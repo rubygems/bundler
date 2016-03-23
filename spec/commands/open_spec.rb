@@ -78,4 +78,9 @@ describe "bundle open" do
     bundle "open rails", :env => { "EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
     expect(out).to include("Installing foo 1.0")
   end
+
+  it "opens the editor with a clean env" do
+    bundle "open", :env => { "EDITOR" => "sh -c 'env'", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
+    expect(out).not_to include("BUNDLE_GEMFILE=")
+  end
 end
