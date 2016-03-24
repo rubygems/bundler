@@ -1,25 +1,22 @@
 # frozen_string_literal: true
+require "bundler/vendored_thor"
 module Bundler
-  class CLI::Plugin
-    attr_reader :name, :options
+  class CLI::Plugin < Thor
 
-    def initialize(options, name)
-      @options = options
-      @name = name
-    end
-
-    def run
-      if @options[:install]
-        unless @options[:git]
-          puts <<-E
-            Only git modules are supported
-            Pass the git path with --git option
-          E
-          return
-        end
-
-        Bundler::Plugin.install(@name, @options[:git])
+    desc "install PLUGIN ", "Install the plugin"
+    method_option "git", :type => :string, :default => false, :banner =>
+      "The git repo to install the plugin from"
+    def install(plugin)
+      unless options[:git]
+        puts <<-W
+          Only git modules are supported as of now
+          Pass the git path with --git option
+        W
+        return
       end
+
+      Bundler::Plugin.install(plugin, options[:git])
     end
+
   end
 end

@@ -63,14 +63,12 @@ module Bundler
       end
 
       def add_source(name, cls)
-        puts "Regiserign source plugin"
         raise "Source already registered" if source? name
 
         @@sources[name] = cls
       end
 
       def source?(name)
-        puts "checking source plugin #name"
         @@sources.key? name
       end
 

@@ -8,7 +8,7 @@ describe "bundle plugin" do
         s.write "plugin.rb", ""
       end
 
-      bundle "plugin foo --install --git file://#{lib_path("foo-1.0")}"
+      bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
 
       expect(out).to include("Installed plugin foo")
     end
@@ -28,7 +28,7 @@ describe "bundle plugin" do
         RUBY
       end
 
-      bundle "plugin foo --install --git file://#{lib_path("foo-1.0")}"
+      bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
 
       bundle "demop"
 
@@ -49,7 +49,7 @@ describe "bundle plugin" do
           RUBY
         end
 
-        bundle "plugin foo --install --git file://#{lib_path("foo-1.0")}"
+        bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
       end
 
       it "runs after a rubygem is installed" do
@@ -90,7 +90,7 @@ describe "bundle plugin" do
           RUBY
         end
 
-        bundle "plugin foo --install --git file://#{lib_path("foo-1.0")}"
+        bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
       end
 
       it "handles source blocks with type options" do

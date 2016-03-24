@@ -436,16 +436,9 @@ module Bundler
       Env.new.write($stdout)
     end
 
-    # TODO: change it to subcommand
-    desc "plugin PLUGIN [OPTIONS]", "Manage the plugins"
-    method_option "install", :type => :boolean, :default => false, :banner =>
-      "install a pluign"
-    method_option "git", :type => :string, :default => nil, :banner =>
-      "Git source of the plugin to install"
-    def plugin(name)
-      require "bundler/cli/plugin"
-      Plugin.new(options, name).run
-    end
+    require "bundler/cli/plugin"
+    desc "plugin SUBCOMMAND ...ARGS", "Manage the plugins"
+    subcommand "plugin", Plugin
 
     # Reformat the arguments passed to bundle that include a --help flag
     # into the corresponding `bundle help #{command}` call
