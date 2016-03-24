@@ -9,7 +9,7 @@ module Bundler
 
       def self.add_hook(event, &block)
         if event == "post-install"
-          Plugin.register_after_install( &block)
+          Plugin.register_post_install( &block)
         end
       end
 
