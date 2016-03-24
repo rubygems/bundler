@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 module Bundler
   module Plugin
-    class << self
-      @@command = {}
-      @@after_install_hooks = []
-      @@sources = {}
 
+    class << self
       def init
+        @command = {}        # stores the list of loaded commands
+        @after_install_hooks = []
+        @sources = {}
+
         # only a crude implementation for demo
+        require "bundler/plugin/base"
         Dir.glob(plugin_root.join("*").join("plugin.rb")).each do |file|
           require file
         end
@@ -31,6 +33,10 @@ module Bundler
         Bundler.user_bundle_path.join("plugins")
       end
 
+      def plugin_config_file
+        Bundler.user_bundle_path.join("plugin")
+      end
+
       def plugin_cache
         Bundler.user_cache.join("plugins")
       end
@@ -38,26 +44,26 @@ module Bundler
       def add_command(command, command_class)
         raise "Command already registered" if is_command? command
 
-        @@command[command] = command_class
+        @command[command] = command_class
       end
 
       def is_command?(command)
         # TODO: check for inbuilt commands
-        @@command.key? command
+        @command.key? command
       end
 
       def exec(command, args = nil)
-        cmd = @@command[command].new
+        cmd = @command[command].new
 
         cmd.execute(args)
       end
 
       def register_after_install(&block)
-        @@after_install_hooks << block
+        @after_install_hooks << block
       end
 
       def post_install(gem)
-        @@after_install_hooks.each do |cb|
+        @after_install_hooks.each do |cb|
           cb.call(gem)
         end
       end
@@ -65,15 +71,15 @@ module Bundler
       def add_source(name, cls)
         raise "Source already registered" if source? name
 
-        @@sources[name] = cls
+        @sources[name] = cls
       end
 
       def source?(name)
-        @@sources.key? name
+        @sources.key? name
       end
 
       def source(source_name, source)
-        obj = @@sources[source_name].new
+        obj = @sources[source_name].new
 
         Proc.new do |name, version|
           # This downloads the gem from source and returns the path
@@ -81,26 +87,5 @@ module Bundler
         end
       end
     end
-
-    class Base
-      def self.command(command)
-        # TODO: pass the class
-        Plugin.add_command command, self
-      end
-
-      def self.add_hook(event, &block)
-        if event == "post-install"
-          Plugin.register_after_install( &block)
-        end
-      end
-
-      def self.source(name)
-        Plugin.add_source name, self
-      end
-
-      def execute(args)
-      end
-    end
-
   end
 end
