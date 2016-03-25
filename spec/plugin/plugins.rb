@@ -21,7 +21,7 @@ describe "bundle plugin" do
           class DemoPlugin < Bundler::Plugin::Base
             command "demop"
 
-            def execute(args)
+            def execute(command, args)
               puts "hello world"
             end
           end
@@ -34,49 +34,31 @@ describe "bundle plugin" do
 
       expect(out).to include("hello world")
     end
-  end
 
-  describe "lifecycle hooks" do
-    describe "post-install hook" do
-      before do
-        build_git "foo" do |s|
-          s.write "plugin.rb", <<-RUBY
-            class DemoPlugin < Bundler::Plugin::Base
-              add_hook("post-install") do |gem|
-                puts "post-install hook is running"
-              end
+    it "executes with arguments" do
+      build_git "foo" do |s|
+        s.write "plugin.rb", <<-RUBY
+          class DemoPlugin < Bundler::Plugin::Base
+            command "demop"
+
+            def execute(command, args)
+              puts "Hello World! You gave me " + args.join(" ") 
             end
-          RUBY
-        end
-
-        bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
+          end
+        RUBY
       end
 
-      it "runs after a rubygem is installed" do
-        build_repo2 do
-          build_gem "yaml_spec"
-        end
+      bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
 
+      bundle "demop chocolate margarita burger"
 
-        install_gemfile <<-G
-          source "file://#{gem_repo2}"
-          gem "yaml_spec"
-        G
-        expect(out).to include "post-install hook is running"
-      end
-
-      it "runs after a git gem is installed" do
-        build_git "bar"
-        install_gemfile <<-G
-          gem "bar", :git => "file://#{lib_path("bar-1.0")}"
-        G
-        expect(out).to include "post-install hook is running"
-      end
+      expect(out).to include("Hello World! You gave me chocolate margarita burger")
     end
+
   end
 
   describe "source plugins" do
-    describe "pre-installed" do
+    context "pre-installed" do
       before do
         build_git "foo" do |s|
           s.write "plugin.rb", <<-RUBY
@@ -106,4 +88,65 @@ describe "bundle plugin" do
       end
     end
   end
+
+  describe "lifecycle hooks" do
+    context "post-install hook" do
+      before do
+        build_repo2 do
+          build_gem "yaml_spec"
+        end
+
+        build_git "foo" do |s|
+          s.write "plugin.rb", <<-RUBY
+            class DemoPlugin < Bundler::Plugin::Base
+              add_hook("post-install") do |gem|
+                puts "post-install hook is running"
+              end
+            end
+          RUBY
+        end
+
+        bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
+      end
+
+      it "runs after a rubygem is installed" do
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "yaml_spec"
+        G
+        expect(out).to include "post-install hook is running"
+      end
+
+      it "runs after a git gem is installed" do
+        build_git "bar"
+        install_gemfile <<-G
+          gem "bar", :git => "file://#{lib_path("bar-1.0")}"
+        G
+        expect(out).to include "post-install hook is running"
+      end
+
+      it "runs with multiple registered hooks" do
+        build_git "bar" do |s|
+          s.write "plugin.rb", <<-RUBY
+            class DemoPlugin2 < Bundler::Plugin::Base
+              add_hook("post-install") do |gem|
+                puts "another post-install hook is running"
+              end
+            end
+          RUBY
+        end
+
+        bundle "plugin install bar --git file://#{lib_path("bar-1.0")}"
+
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "yaml_spec"
+        G
+
+        expect(out).to include "post-install hook is running"
+        expect(out).to include "another post-install hook is running"
+      end
+    end
+  end
+
 end

@@ -34,7 +34,7 @@ module Bundler
         sources = @sources
         post_install_hooks = @post_install_hooks
 
-        @commands = {}           
+        @commands = {}
         @post_install_hooks = []
         @sources = {}
 
@@ -80,13 +80,13 @@ module Bundler
         index.command? command
       end
 
-      def exec(command, args = nil)
+      def exec(command, *args)
         raise "Unknown command" unless index.command? command
 
         load_plugin index.command_plugin(command) unless @commands.key? command
 
         cmd = @commands[command].new
-        cmd.execute(args)
+        cmd.execute(command, args)
       end
 
       def register_post_install(&block)

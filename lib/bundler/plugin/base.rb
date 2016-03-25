@@ -17,7 +17,7 @@ module Bundler
         Plugin.add_source name, self
       end
 
-      def execute(args)
+      def execute(command, args)
       end
     end
 
