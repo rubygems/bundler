@@ -230,6 +230,7 @@ module Bundler
           message = "#{type} hook#{location} failed for #{installer.spec.full_name}"
           raise InstallHookError, message
         end
+        Bundler::Plugin.post_install(installer) if type == :post_install
       end
     end
   end
