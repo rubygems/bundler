@@ -1,17 +1,15 @@
 # frozen_string_literal: true
-require "bundler/plugin/index"
 module Bundler
-  module Plugin
+  class Plugin
+    autoload :Index, "bundler/plugin/index"
+    autoload :Base, "bundler/plugin/base"
+
+    @commands = {}             # The map of loaded commands
+    @post_install_hooks = []   # Array of blocks
+    @sources = {}              # The map of loaded sources
 
     class << self
-
-      def init
-        @commands = {}             # The map of loaded commands
-        @post_install_hooks = []   # Array of blocks
-        @sources = {}              # The map of loaded sources
-      rescue
-      end
-
+      # Installs a plugin and registers it with the index
       def install(name, git_path)
         git_proxy = Source::Git::GitProxy.new(plugin_cache.join(name), git_path, "master")
         git_proxy.checkout
@@ -20,15 +18,21 @@ module Bundler
         git_proxy.copy_to(plugin_path)
 
         unless File.file? plugin_path.join("plugin.rb")
-          Bundler.rm_rf(plugin_root.join(name))
           raise "plugin.rb is not present in the repo"
         end
 
         register_plugin name, plugin_path
 
         Bundler.ui.info "Installed plugin #{name}"
+      rescue StandardError => e
+        Bundler.rm_rf(plugin_root.join(name))
+        Bundler.ui.info "Failed to installed plugin #{name}: #{e.message}"
       end
 
+      # Saves the current state
+      # Runs the plugin.rb
+      # Passes the registerd commands to index
+      # Restores the state
       def register_plugin(name, path)
         commands = @commands
         sources = @sources
@@ -38,7 +42,6 @@ module Bundler
         @post_install_hooks = []
         @sources = {}
 
-        require "bundler/plugin/base"
         require path.join("plugin.rb")
 
         index.add_plugin name, @commands, @sources, @post_install_hooks
@@ -48,8 +51,8 @@ module Bundler
         @sources = sources
       end
 
+      # The ondemand loading of plugins
       def load_plugin(name)
-        require "bundler/plugin/base"
         require plugin_root.join(name).join("plugin.rb")
       end
 
@@ -76,7 +79,7 @@ module Bundler
         @commands[command] = command_class
       end
 
-      def is_command?(command)
+      def command?(command)
         index.command? command
       end
 
@@ -96,7 +99,7 @@ module Bundler
       def post_install(gem)
         if @post_install_hooks.length != index.post_install_hooks.length
           @post_install_hooks = []
-          index.post_install_hooks.each { |p| load_plugin p }
+          index.post_install_hooks.each {|p| load_plugin p }
         end
 
         @post_install_hooks.each do |cb|
@@ -112,6 +115,13 @@ module Bundler
         index.source? name
       end
 
+      # Returns a block to be excuted with the gem name and version
+      # and the plugin will fetch the gem to a local directory
+      # and will return the path
+      #
+      # A workaround for demo. The real one will return a object of
+      # class similar to Source::Git, maybe Source::Plugin with with the rest
+      # of core infra can interact
       def source(source_name, source)
         raise "Unknown source" unless index.source? source_name
 
@@ -119,7 +129,7 @@ module Bundler
 
         obj = @sources[source_name].new
 
-        Proc.new do |name, version|
+        proc do |name, version|
           # This downloads the gem from source and returns the path
           obj.source_get(source, name, version)
         end

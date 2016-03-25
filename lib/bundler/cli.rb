@@ -86,7 +86,7 @@ module Bundler
         Kernel.exec(command_path, *ARGV[1..-1])
       end
 
-      return super unless Bundler::Plugin.is_command? command
+      return super unless Bundler::Plugin.command? command
       Bundler::Plugin.exec(command, *ARGV[1..-1])
     end
 

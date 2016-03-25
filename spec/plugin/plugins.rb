@@ -14,6 +14,27 @@ describe "bundle plugin" do
     end
   end
 
+  describe "malformatted plugin" do
+    it "doesn't install" do
+      build_git "foo" do |s|
+        s.write "plugin.rb", <<-RUBY
+          class DemoPlugin < Bundler::Plugin::Base
+            command "demop"
+
+            raise "I am malformatted"
+            def execute(command, args)
+              puts "hello world"
+            end
+          end
+        RUBY
+      end
+
+      bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
+
+      expect(out).not_to include("Installed plugin foo")
+    end
+  end
+
   describe "command line plugin" do
     it "executes" do
       build_git "foo" do |s|
@@ -42,7 +63,7 @@ describe "bundle plugin" do
             command "demop"
 
             def execute(command, args)
-              puts "Hello World! You gave me " + args.join(" ") 
+              puts "Hello World! You gave me " + args.join(" ")
             end
           end
         RUBY
@@ -54,7 +75,6 @@ describe "bundle plugin" do
 
       expect(out).to include("Hello World! You gave me chocolate margarita burger")
     end
-
   end
 
   describe "source plugins" do
@@ -148,5 +168,4 @@ describe "bundle plugin" do
       end
     end
   end
-
 end

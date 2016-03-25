@@ -2,7 +2,6 @@
 require "bundler/vendored_thor"
 module Bundler
   class CLI::Plugin < Thor
-
     desc "install PLUGIN ", "Install the plugin"
     method_option "git", :type => :string, :default => false, :banner =>
       "The git repo to install the plugin from"
@@ -17,6 +16,5 @@ module Bundler
 
       Bundler::Plugin.install(plugin, options[:git])
     end
-
   end
 end

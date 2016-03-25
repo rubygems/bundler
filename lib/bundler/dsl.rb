@@ -124,7 +124,7 @@ module Bundler
 
     def source(source, *args, &blk)
       options = args.last.is_a?(Hash) ? args.pop.dup : nil
-      if options and options.key? :type and Bundler::Plugin.source? options[:type]
+      if options && options.key?(:type) && Bundler::Plugin.source?(options[:type])
         unless block_given?
           raise InvalidOption, "You need to pass a block to source with type"
         end
@@ -339,9 +339,7 @@ module Bundler
 
       # A workaround for the demo, a real plugin system will have more elegant
       # and elaborate intrgration
-      if @plugin_source
-        opts["path"] = @plugin_source.call(name, version)
-      end
+      opts["path"] = @plugin_source.call(name, version) if @plugin_source
 
       %w(git path).each do |type|
         next unless param = opts[type]
