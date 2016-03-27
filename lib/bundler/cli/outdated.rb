@@ -126,13 +126,13 @@ module Bundler
 
       update_present = active_major > current_major if options[:major]
 
-      if (options[:minor] || options[:patch]) && current_major == active_major
+      if !update_present && (options[:minor] || options[:patch]) && current_major == active_major
         current_minor = current_spec.version.segments[1, 1].first
         active_minor = active_spec.version.segments[1, 1].first
 
-        if options[:minor]
-          update_present = active_minor > current_minor
-        elsif options[:patch] && current_minor == active_minor
+        update_present = active_minor > current_minor if options[:minor]
+
+        if !update_present && options[:patch] && current_minor == active_minor
           current_patch = current_spec.version.segments[2, 1].first
           active_patch = active_spec.version.segments[2, 1].first
 

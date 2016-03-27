@@ -345,4 +345,36 @@ describe "bundle outdated" do
     it_behaves_like "major version is ignored"
     it_behaves_like "minor version is ignored"
   end
+
+  describe "with --minor --patch options" do
+    subject { bundle "outdated --minor --patch" }
+
+    it_behaves_like "minor version updates are detected"
+    it_behaves_like "patch version updates are detected"
+    it_behaves_like "major version is ignored"
+  end
+
+  describe "with --major --minor options" do
+    subject { bundle "outdated --major --minor" }
+
+    it_behaves_like "major version updates are detected"
+    it_behaves_like "minor version updates are detected"
+    it_behaves_like "patch version is ignored"
+  end
+
+  describe "with --major --patch options" do
+    subject { bundle "outdated --major --patch" }
+
+    it_behaves_like "major version updates are detected"
+    it_behaves_like "patch version updates are detected"
+    it_behaves_like "minor version is ignored"
+  end
+
+  describe "with --major --minor --patch options" do
+    subject { bundle "outdated --major --minor --patch" }
+
+    it_behaves_like "major version updates are detected"
+    it_behaves_like "minor version updates are detected"
+    it_behaves_like "patch version updates are detected"
+  end
 end
