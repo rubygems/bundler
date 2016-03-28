@@ -51,7 +51,7 @@ describe Bundler::SSLCerts::CertificateManager do
   describe "#up_to_date?" do
     context "when bundler certs and rubygems certs are the same" do
       before do
-        bundler_certs = Dir[File.join(root.to_s, "lib", "bundler", "ssl_certs", "*.pem")]
+        bundler_certs = Dir[File.join(root.to_s, "lib", "bundler", "ssl_certs", "**", "*.pem")]
         FileUtils.rm(stub_cert)
         FileUtils.cp(bundler_certs, rubygems_certs_dir)
       end
