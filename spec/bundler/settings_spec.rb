@@ -16,6 +16,43 @@ describe Bundler::Settings do
     end
   end
 
+  describe "load_config" do
+    let(:hash) do
+      {
+        "build.thrift" => "--with-cppflags=-D_FORTIFY_SOURCE=0",
+        "build.libv8" => "--with-system-v8",
+        "build.therubyracer" => "--with-v8-dir",
+        "build.pg" => "--with-pg-config=/usr/local/Cellar/postgresql92/9.2.8_1/bin/pg_config",
+        "gem.coc" => "false",
+        "gem.mit" => "false",
+        "gem.test" => "minitest",
+        "thingy" => <<-EOS.tr("\n", " "),
+--asdf --fdsa --ty=oh man i hope this doesnt break bundler because
+that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
+--very-important-option=DontDeleteRoo
+--very-important-option=DontDeleteRoo
+--very-important-option=DontDeleteRoo
+--very-important-option=DontDeleteRoo
+        EOS
+        "xyz" => "zyx",
+      }
+    end
+
+    before do
+      hash.each do |key, value|
+        settings[key] = value
+      end
+    end
+
+    it "can load the config" do
+      loaded = settings.send(:load_config, bundled_app("config"))
+      expected = Hash[hash.map do |k, v|
+        [settings.send(:key_for, k), v.to_s]
+      end]
+      expect(loaded).to eq(expected)
+    end
+  end
+
   describe "#[]" do
     context "when not set" do
       context "when default value present" do
