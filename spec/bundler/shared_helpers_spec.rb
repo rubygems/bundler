@@ -370,7 +370,7 @@ describe Bundler::SharedHelpers do
       end
     end
 
-    context "system throws Errno::ENOTSUP" do
+    context "system throws Errno::ENOTSUP", :ruby => "1.9" do
       let(:file_op_block) { proc {|_path| raise Errno::ENOTSUP } }
 
       it "raises a OperationNotSupportedError" do

@@ -109,7 +109,7 @@ module Bundler
       raise TemporaryResourceError.new(path, action)
     rescue Errno::EPROTO
       raise VirtualProtocolError.new
-    rescue Errno::ENOTSUP
+    rescue *[const_get_safely(:ENOTSUP, Errno)].compact
       raise OperationNotSupportedError.new(path, action)
     end
 
