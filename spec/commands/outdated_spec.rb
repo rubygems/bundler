@@ -241,6 +241,54 @@ describe "bundle outdated" do
     end
   end
 
+  shared_examples_for "version update is detected" do
+    it "reports that a gem has a newer version" do
+      subject
+      expect(out).to include("activesupport (newest")
+    end
+  end
+
+  shared_examples_for "major version updates are detected" do
+    before do
+      update_repo2 do
+        build_gem "activesupport", "3.3.5"
+        build_gem "weakling", "0.8.0"
+      end
+    end
+
+    it_behaves_like "version update is detected"
+  end
+
+  shared_examples_for "minor version updates are detected" do
+    before do
+      update_repo2 do
+        build_gem "activesupport", "2.7.5"
+        build_gem "weakling", "2.0.1"
+      end
+    end
+
+    it_behaves_like "version update is detected"
+  end
+
+  shared_examples_for "patch version updates are detected" do
+    before do
+      update_repo2 do
+        build_gem "activesupport", "2.3.7"
+        build_gem "weakling", "0.3.1"
+      end
+    end
+
+    it_behaves_like "version update is detected"
+  end
+
+  shared_examples_for "no version updates are detected" do
+    it "does not detect any version updates" do
+      subject
+      expect(out).to_not include("activesupport (newest")
+      expect(out).to_not include("weakling (newest")
+    end
+  end
+
   shared_examples_for "major version is ignored" do
     before do
       update_repo2 do
@@ -249,11 +297,7 @@ describe "bundle outdated" do
       end
     end
 
-    it "ignores gems that have updates in the major version" do
-      subject
-      expect(out).to_not include("activesupport (newest")
-      expect(out).to_not include("weakling (newest")
-    end
+    it_behaves_like "no version updates are detected"
   end
 
   shared_examples_for "minor version is ignored" do
@@ -264,11 +308,7 @@ describe "bundle outdated" do
       end
     end
 
-    it "ignores gems that have updates in the minor version" do
-      subject
-      expect(out).to_not include("activesupport (newest")
-      expect(out).to_not include("weakling (newest")
-    end
+    it_behaves_like "no version updates are detected"
   end
 
   shared_examples_for "patch version is ignored" do
@@ -279,27 +319,13 @@ describe "bundle outdated" do
       end
     end
 
-    it "ignores gems that have updates in the patch version" do
-      subject
-      expect(out).to_not include("activesupport (newest")
-      expect(out).to_not include("weakling (newest")
-    end
+    it_behaves_like "no version updates are detected"
   end
 
   describe "with --major option" do
     subject { bundle "outdated --major" }
 
-    it "only reports gems that have a newer major version" do
-      update_repo2 do
-        build_gem "activesupport", "3.3.5"
-        build_gem "weakling", "0.8.0"
-      end
-
-      subject
-      expect(out).to include("activesupport (newest")
-      expect(out).to_not include("weakling (newest")
-    end
-
+    it_behaves_like "major version updates are detected"
     it_behaves_like "minor version is ignored"
     it_behaves_like "patch version is ignored"
   end
@@ -307,17 +333,7 @@ describe "bundle outdated" do
   describe "with --minor option" do
     subject { bundle "outdated --minor" }
 
-    it "only reports gems that have a newer minor version" do
-      update_repo2 do
-        build_gem "activesupport", "2.7.5"
-        build_gem "weakling", "2.0.1"
-      end
-
-      subject
-      expect(out).to include("activesupport (newest")
-      expect(out).to_not include("weakling (newest")
-    end
-
+    it_behaves_like "minor version updates are detected"
     it_behaves_like "major version is ignored"
     it_behaves_like "patch version is ignored"
   end
@@ -325,18 +341,40 @@ describe "bundle outdated" do
   describe "with --patch option" do
     subject { bundle "outdated --patch" }
 
-    it "only reports gems that have a newer patch version" do
-      update_repo2 do
-        build_gem "activesupport", "2.3.7"
-        build_gem "weakling", "0.3.1"
-      end
-
-      subject
-      expect(out).to include("activesupport (newest")
-      expect(out).to_not include("weakling (newest")
-    end
-
+    it_behaves_like "patch version updates are detected"
     it_behaves_like "major version is ignored"
     it_behaves_like "minor version is ignored"
+  end
+
+  describe "with --minor --patch options" do
+    subject { bundle "outdated --minor --patch" }
+
+    it_behaves_like "minor version updates are detected"
+    it_behaves_like "patch version updates are detected"
+    it_behaves_like "major version is ignored"
+  end
+
+  describe "with --major --minor options" do
+    subject { bundle "outdated --major --minor" }
+
+    it_behaves_like "major version updates are detected"
+    it_behaves_like "minor version updates are detected"
+    it_behaves_like "patch version is ignored"
+  end
+
+  describe "with --major --patch options" do
+    subject { bundle "outdated --major --patch" }
+
+    it_behaves_like "major version updates are detected"
+    it_behaves_like "patch version updates are detected"
+    it_behaves_like "minor version is ignored"
+  end
+
+  describe "with --major --minor --patch options" do
+    subject { bundle "outdated --major --minor --patch" }
+
+    it_behaves_like "major version updates are detected"
+    it_behaves_like "minor version updates are detected"
+    it_behaves_like "patch version updates are detected"
   end
 end
