@@ -9,7 +9,7 @@ describe "bundle executable" do
   end
 
   it "returns non-zero exit status when passed unrecognized task" do
-    bundle "unrecognized-tast"
+    bundle "unrecognized-task"
     expect(exitstatus).to_not be_zero if exitstatus
   end
 
