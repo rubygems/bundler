@@ -109,6 +109,8 @@ module Bundler
       raise TemporaryResourceError.new(path, action)
     rescue Errno::EPROTO
       raise VirtualProtocolError.new
+    rescue Errno::ENOTSUP
+      raise OperationNotSupportedError.new(path, action)
     end
 
     def const_get_safely(constant_name, namespace)
