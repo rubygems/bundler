@@ -34,7 +34,7 @@ describe "bundle cache with multiple platforms" do
     cache_gems "rack-1.0.0", "activesupport-2.3.5"
   end
 
-  it "ensures that a succesful bundle install does not delete gems for other platforms" do
+  it "ensures that a successful bundle install does not delete gems for other platforms" do
     bundle "install"
 
     expect(exitstatus).to eq 0 if exitstatus
@@ -43,7 +43,7 @@ describe "bundle cache with multiple platforms" do
     expect(bundled_app("vendor/cache/activesupport-2.3.5.gem")).to exist
   end
 
-  it "ensures that a succesful bundle update does not delete gems for other platforms" do
+  it "ensures that a successful bundle update does not delete gems for other platforms" do
     bundle "update"
 
     expect(exitstatus).to eq 0 if exitstatus
