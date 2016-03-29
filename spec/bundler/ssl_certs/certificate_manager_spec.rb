@@ -3,9 +3,9 @@ require "spec_helper"
 require "bundler/ssl_certs/certificate_manager"
 
 describe Bundler::SSLCerts::CertificateManager do
-  let(:rubygems_path) { root }
-  let(:stub_cert) { File.join(root.to_s, "lib", "rubygems", "ssl_certs", "ssl-cert.pem") }
-  let(:rubygems_certs_dir) { File.join(root.to_s, "lib", "rubygems", "ssl_certs") }
+  let(:rubygems_path)      { root }
+  let(:stub_cert)          { File.join(root.to_s, "lib", "rubygems", "ssl_certs", "rubygems.org", "ssl-cert.pem") }
+  let(:rubygems_certs_dir) { File.join(root.to_s, "lib", "rubygems", "ssl_certs", "rubygems.org") }
 
   subject { described_class.new(rubygems_path) }
 
@@ -37,13 +37,13 @@ describe Bundler::SSLCerts::CertificateManager do
     end
 
     it "should set bundler_certs as the paths of the bundler ssl certs" do
-      expect(subject.bundler_certs).to include(File.join(root, "lib/bundler/ssl_certs/AddTrustExternalCARoot.pem"))
-      expect(subject.bundler_certs).to include(File.join(root, "lib/bundler/ssl_certs/GeoTrustGlobalCA.pem"))
+      expect(subject.bundler_certs).to include(File.join(root, "lib/bundler/ssl_certs/rubygems.global.ssl.fastly.net/DigiCertHighAssuranceEVRootCA.pem"))
+      expect(subject.bundler_certs).to include(File.join(root, "lib/bundler/ssl_certs/index.rubygems.org/GlobalSignRoot.pem"))
     end
 
     context "when rubygems_path is not nil" do
       it "should set rubygems_certs" do
-        expect(subject.rubygems_certs).to include(File.join(root, "lib", "rubygems", "ssl_certs", "ssl-cert.pem"))
+        expect(subject.rubygems_certs).to include(File.join(root, "lib", "rubygems", "ssl_certs", "rubygems.org", "ssl-cert.pem"))
       end
     end
   end
@@ -51,7 +51,7 @@ describe Bundler::SSLCerts::CertificateManager do
   describe "#up_to_date?" do
     context "when bundler certs and rubygems certs are the same" do
       before do
-        bundler_certs = Dir[File.join(root.to_s, "lib", "bundler", "ssl_certs", "*.pem")]
+        bundler_certs = Dir[File.join(root.to_s, "lib", "bundler", "ssl_certs", "**", "*.pem")]
         FileUtils.rm(stub_cert)
         FileUtils.cp(bundler_certs, rubygems_certs_dir)
       end
