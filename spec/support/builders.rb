@@ -300,13 +300,13 @@ module Spec
 
     # A repo that has no pre-installed gems included. (The caller completely
     # determines the contents with the block.)
-    def build_repo4
+    def build_repo4(&blk)
       FileUtils.rm_rf gem_repo4
-      build_repo(gem_repo4) { yield }
+      build_repo(gem_repo4, &blk)
     end
 
-    def update_repo4
-      update_repo(gem_repo4) { yield }
+    def update_repo4(&blk)
+      update_repo(gem_repo4, &blk)
     end
 
     def update_repo2
@@ -354,12 +354,14 @@ module Spec
     end
 
     def update_repo(path)
+      return unless block_given?
       @_build_path = "#{path}/gems"
       yield
-      @_build_path = nil
       with_gem_path_as Path.base_system_gems do
         Dir.chdir(path) { gem_command :generate_index }
       end
+    ensure
+      @_build_path = nil
     end
 
     def build_index(&block)
