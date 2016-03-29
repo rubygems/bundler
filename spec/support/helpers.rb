@@ -2,9 +2,6 @@
 module Spec
   module Helpers
     def reset!
-      @in_p = nil
-      @out_p = nil
-      @err_p = nil
       Dir["#{tmp}/{gems/*,*}"].each do |dir|
         next if %(base remote1 gems rubygems).include?(File.basename(dir))
         if ENV["BUNDLER_SUDO_TESTS"]
@@ -152,15 +149,11 @@ module Spec
 
     def sys_exec(cmd, expect_err = false)
       Open3.popen3(cmd.to_s) do |stdin, stdout, stderr, wait_thr|
-        @in_p = stdin
-        @out_p = stdout
-        @err_p = stderr
+        yield stdin if block_given?
+        stdin.close
 
-        yield @in_p if block_given?
-        @in_p.close
-
-        @out = @out_p.read_available_bytes.strip
-        @err = @err_p.read_available_bytes.strip
+        @out = Thread.new { stdout.read }.value.strip
+        @err = Thread.new { stderr.read }.value.strip
         @exitstatus = wait_thr && wait_thr.value.exitstatus
       end
 
