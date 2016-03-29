@@ -183,7 +183,7 @@ module Bundler
     def resolve_if_need(options)
       if Bundler.default_lockfile.exist? && !options["update"]
         begin
-          tmpdef = @definition.without_unlock
+          tmpdef = @definition.with_unlock({})
           return unless tmpdef.new_platform? || tmpdef.missing_dependencies.any?
         rescue BundlerError
           nil
