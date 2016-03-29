@@ -133,9 +133,10 @@ module Bundler
         gemspec = gemspec_cache_hash.values.first
         root_gem_name = gemspec.name unless gemspec.nil?
       end
+
       specs.each do |spec|
         next if spec.name == "bundler"
-        next if File.exist?("#{root_gem_name}.gemspec") && spec.source.class == Bundler::Source::Path && root_gem_name && spec.name == root_gem_name
+        next if !Dir.glob("*.gemspec").empty? && spec.source.class == Bundler::Source::Path && root_gem_name && spec.name == root_gem_name
         spec.source.send(:fetch_gem, spec) if Bundler.settings[:cache_all_platforms] && spec.source.respond_to?(:fetch_gem, true)
         spec.source.cache(spec, custom_path) if spec.source.respond_to?(:cache)
       end
