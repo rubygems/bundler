@@ -46,14 +46,16 @@ module Bundler
     def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
       @unlocking = unlock == true || !unlock.empty?
 
-      @dependencies    = dependencies
-      @sources         = sources
-      @unlock          = unlock
-      @optional_groups = optional_groups
-      @remote          = false
-      @specs           = nil
-      @ruby_version    = ruby_version
+      @dependencies     = dependencies
+      @sources          = sources
+      @original_sources = sources.dup
+      @unlock           = unlock
+      @optional_groups  = optional_groups
+      @remote           = false
+      @specs            = nil
+      @ruby_version     = ruby_version
 
+      @lockfile               = lockfile
       @lockfile_contents      = String.new
       @locked_bundler_version = nil
       @locked_ruby_version    = nil
@@ -99,6 +101,18 @@ module Bundler
       @local_changes = converge_locals
 
       fixup_dependency_types!
+    end
+
+    # Returns a copy of the definition with the given set of gems requested to
+    # be updated.
+    #
+    # @param unlock [Hash, Boolean, nil] Gems that have been requested
+    #   to be updated or true if all gems should be updated
+    # @return [Bundler::Definition]
+    def with_unlock(unlock = {})
+      unlock ||= {}
+      self.class.new(@lockfile, @dependencies, @original_sources, unlock,
+        @ruby_version, @optional_groups)
     end
 
     def fixup_dependency_types!
@@ -182,12 +196,12 @@ module Bundler
     end
 
     def current_dependencies
-      dependencies.reject {|d| !d.should_include? }
+      dependencies.select(&:should_include?)
     end
 
     def specs_for(groups)
       deps = dependencies.select {|d| (d.groups & groups).any? }
-      deps.delete_if {|d| !d.should_include? }
+      deps.select!(&:should_include?)
       specs.for(expand_dependencies(deps))
     end
 
