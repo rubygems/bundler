@@ -93,12 +93,13 @@ RSpec.configure do |config|
 
   config.before :all do
     build_repo1
+    system_gems []
   end
 
   config.before :each do
     reset!
-    system_gems []
     in_app_root
+    ENV["RSPEC_BUNDLER_PATH_PREFIX"] = prefix
   end
 
   config.after :each do |example|

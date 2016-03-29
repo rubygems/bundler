@@ -125,9 +125,14 @@ begin
       releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.6.1)
       (branches + releases).each do |rg|
         desc "Run specs with Rubygems #{rg}"
-        RSpec::Core::RakeTask.new(rg) do |t|
-          t.rspec_opts = %w(--format documentation --color)
-          t.ruby_opts  = %w(-w)
+        task rg do
+          patterns = Dir["spec/*"] - %w(spec/spec_helper.rb spec/support)
+          patterns.map do |pattern|
+            pattern = pattern.end_with?(".rb") ? pattern : "#{pattern}/{**/,*/,}*_spec.rb"
+            Thread.new do
+              sh "rspec --pattern '#{pattern}'"
+            end
+          end.map(&:join)
         end
 
         # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
