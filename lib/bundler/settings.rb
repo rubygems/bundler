@@ -224,6 +224,7 @@ module Bundler
     CONFIG_REGEX = %r{ # rubocop:disable Style/RegexpLiteral
       ^
       (BUNDLE_.+):\s # the key
+      (?: !\s)? # optional exclamation mark found with ruby 1.9.3
       (['"]?) # optional opening quote
       (.* # contents of the value
         (?: # optionally, up until the next key
