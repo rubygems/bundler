@@ -369,6 +369,15 @@ describe Bundler::SharedHelpers do
           Bundler::VirtualProtocolError)
       end
     end
+
+    context "system throws Errno::ENOTSUP", :ruby => "1.9" do
+      let(:file_op_block) { proc {|_path| raise Errno::ENOTSUP } }
+
+      it "raises a OperationNotSupportedError" do
+        expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
+          Bundler::OperationNotSupportedError)
+      end
+    end
   end
 
   describe "#const_get_safely" do

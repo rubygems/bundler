@@ -107,4 +107,12 @@ module Bundler
 
     status_code(27)
   end
+
+  class OperationNotSupportedError < PermissionError
+    def message
+      "Attempting to #{action} `#{@path}` is unsupported by your OS."
+    end
+
+    status_code(28)
+  end
 end
