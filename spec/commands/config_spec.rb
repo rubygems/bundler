@@ -226,7 +226,7 @@ E
     it "doesn't return quotes around values", :ruby => "1.9" do
       bundle "config foo '1'"
       run "puts Bundler.settings.send(:global_config_file).read"
-      expect(out).to include("'1'")
+      expect(out).to include('"1"')
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("1")
     end
