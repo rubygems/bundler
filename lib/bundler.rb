@@ -52,6 +52,7 @@ module Bundler
   autoload :SourceList,             "bundler/source_list"
   autoload :RubyGemsGemInstaller,   "bundler/rubygems_gem_installer"
   autoload :UI,                     "bundler/ui"
+  autoload :URICredentialsFilter,   "bundler/uri_credentials_filter"
 
   class << self
     attr_writer :bundle_path
