@@ -1102,4 +1102,39 @@ describe "bundle install with git sources" do
       end
     end
   end
+
+  context "git sources that include credentials" do
+    context "that are username and password" do
+      let(:credentials) { "user1:password1" }
+
+      it "does not display the username or password" do
+        install_gemfile <<-G, :expect_err => true
+          git "https://#{credentials}@github.com/company/private-repo" do
+            gem "foo"
+          end
+        G
+
+        bundle :install, :expect_err => true
+        expect(out).to_not include("user1")
+        expect(out).to_not include("password1")
+        expect(out).to include("Fetching https://github.com/company/private-repo")
+      end
+    end
+
+    context "that is an oauth token" do
+      let(:credentials) { "oauth_token" }
+
+      it "does not display the oauth token" do
+        install_gemfile <<-G, :expect_err => true
+          git "https://#{credentials}:x-oauth-basic@github.com/company/private-repo" do
+            gem "foo"
+          end
+        G
+
+        bundle :install, :expect_err => true
+        expect(out).to_not include("oauth_token")
+        expect(out).to include("Fetching https://github.com/company/private-repo")
+      end
+    end
+  end
 end

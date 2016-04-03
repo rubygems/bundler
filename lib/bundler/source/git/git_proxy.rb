@@ -86,12 +86,12 @@ module Bundler
         def checkout
           if path.exist?
             return if has_revision_cached?
-            Bundler.ui.info "Fetching #{uri}"
+            Bundler.ui.info "Fetching #{URICredentialsFilter.anonymized_uri(uri)}"
             in_path do
               git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*")
             end
           else
-            Bundler.ui.info "Fetching #{uri}"
+            Bundler.ui.info "Fetching #{URICredentialsFilter.anonymized_uri(uri)}"
             SharedHelpers.filesystem_access(path.dirname) do |p|
               FileUtils.mkdir_p(p)
             end
@@ -145,10 +145,14 @@ module Bundler
         end
 
         def git(command, check_errors = true, error_msg = nil)
-          raise GitNotAllowedError.new(command) unless allow?
+          command_with_no_credentials = URICredentialsFilter.credentials_filtered_string(command, uri)
+          raise GitNotAllowedError.new(command_with_no_credentials) unless allow?
+
           out = SharedHelpers.with_clean_git_env { `git #{command}` }
-          raise GitCommandError.new(command, path, error_msg) if check_errors && !$?.success?
-          out
+
+          stdout_with_no_credentials = URICredentialsFilter.credentials_filtered_string(out, uri)
+          raise GitCommandError.new(command_with_no_credentials, path, error_msg) if check_errors && !$?.success?
+          stdout_with_no_credentials
         end
 
         def has_revision_cached?
