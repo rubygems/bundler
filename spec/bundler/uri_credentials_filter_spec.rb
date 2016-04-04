@@ -5,49 +5,58 @@ describe Bundler::URICredentialsFilter do
   subject { described_class }
 
   describe "#anonymized_uri" do
-    context "uri is a uri object" do
-      let(:uri) { URI("https://#{credentials}github.com/company/private-repo") }
+    shared_examples_for "sensitive credentials in uri are filtered out" do
+      context "authentication using oauth credentials" do
+        context "specified via 'x-oauth-basic'" do
+          let(:credentials) { "oauth_token:x-oauth-basic@" }
 
-      context "that contains credentials" do
-        let(:credentials) { "oauth_token:x-oauth-basic@" }
+          it "returns the uri without the oauth token" do
+            expect(subject.anonymized_uri(uri)).to eq(URI("https://x-oauth-basic@github.com/company/private-repo"))
+          end
+        end
 
-        it "returns the uri without the credentials" do
-          expect(subject.anonymized_uri(uri)).to eq(URI("https://github.com/company/private-repo"))
+        context "specified via 'x'" do
+          let(:credentials) { "oauth_token:x@" }
+
+          it "returns the uri without the oauth token" do
+            expect(subject.anonymized_uri(uri)).to eq(URI("https://x@github.com/company/private-repo"))
+          end
         end
       end
 
-      context "that does not contains credentials" do
+      context "authentication using login credentials" do
+        let(:credentials) { "username1:hunter3@" }
+
+        it "returns the uri without the password" do
+          expect(subject.anonymized_uri(uri)).to eq(URI("https://username1@github.com/company/private-repo"))
+        end
+      end
+
+      context "authentication without credentials" do
         let(:credentials) { "" }
 
         it "returns the same uri" do
-          # https://github.com/company/private-repo is not a valid URI in ruby 1.8.7
+          # URI does not consider https://github.com/company/private-repo a
+          # valid URI in ruby 1.8.7 due to the https
           if RUBY_VERSION > "1.8.7"
             expect(subject.anonymized_uri(uri)).to eq(URI(uri))
           else
-            expect(subject.anonymized_uri(uri)).to eq(uri)
+            expect(subject.anonymized_uri(uri).to_s).to eq(uri.to_s)
           end
         end
       end
     end
 
+    context "uri is a uri object" do
+      let(:uri) { URI("https://#{credentials}github.com/company/private-repo") }
+
+      it_behaves_like "sensitive credentials in uri are filtered out"
+    end
+
     context "uri is a uri string" do
       let(:uri) { "https://#{credentials}github.com/company/private-repo" }
 
-      context "that contains credentials" do
-        let(:credentials) { "oauth_token:x-oauth-basic@" }
-
-        it "returns the uri without the credentials" do
-          expect(subject.anonymized_uri(uri)).to eq(URI("https://github.com/company/private-repo"))
-        end
-      end
-
-      context "that does not contains credentials" do
-        let(:credentials) { "" }
-
-        it "returns the same uri" do
-          expect(subject.anonymized_uri(uri)).to eq(URI(uri))
-        end
-      end
+      it_behaves_like "sensitive credentials in uri are filtered out"
     end
 
     context "uri is a non-uri format string (ex. path)" do
@@ -75,9 +84,9 @@ describe Bundler::URICredentialsFilter do
     context "with a uri that contains credentials" do
       let(:credentials) { "oauth_token:x-oauth-basic@" }
 
-      it "returns the string without the credentials" do
+      it "returns the string without the sensitive credentials" do
         expect(subject.credentials_filtered_string(str_to_filter, uri)).to eq(
-          "This is a git message containing a uri https://github.com/company/private-repo!")
+          "This is a git message containing a uri https://x-oauth-basic@github.com/company/private-repo!")
       end
     end
 

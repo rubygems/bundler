@@ -7,7 +7,15 @@ module Bundler
       return uri_to_anonymize if uri_to_anonymize.nil?
       uri = uri_to_anonymize.dup
       uri = URI(uri.to_s) unless uri.is_a?(URI)
-      uri.user = uri.password = nil if uri.userinfo
+      if uri.userinfo
+        # oauth authentication
+        if uri.password == "x-oauth-basic" || uri.password == "x"
+          # URI as string does not display with password if no user is set
+          oauth_designation = uri.password
+          uri.user = oauth_designation
+        end
+        uri.password = nil
+      end
       uri
     rescue URI::InvalidURIError # uri is not canonical uri scheme
       uri
