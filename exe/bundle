@@ -17,6 +17,10 @@ end
 
 require "bundler/friendly_errors"
 Bundler.with_friendly_errors do
+  if !"exec".start_with?(ARGV.first || " ") && postit = Gem.bin_path("postit", "postit")
+    Kernel.exec(postit, *ARGV)
+  end
+
   require "bundler/cli"
 
   # Allow any command to use --help flag to show help for that command
