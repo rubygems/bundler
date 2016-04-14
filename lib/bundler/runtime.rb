@@ -127,16 +127,16 @@ module Bundler
 
       Bundler.ui.info "Updating files in #{Bundler.settings.app_cache_path}"
 
-      # Do not try to cache specification for the gem described by the .gemspec
-      root_gem_name = nil
+      # Do not try to cache specification for the gem described any of the gemspecs
+      root_gem_names = nil
       if gemspec_cache_hash = Bundler.instance_variable_get(:@gemspec_cache)
-        gemspec = gemspec_cache_hash.values.first
-        root_gem_name = gemspec.name unless gemspec.nil?
+        gemspecs = gemspec_cache_hash.values
+        root_gem_names = gemspecs.map(&:name)
       end
 
       specs.each do |spec|
         next if spec.name == "bundler"
-        next if !Dir.glob("*.gemspec").empty? && spec.source.class == Bundler::Source::Path && root_gem_name && spec.name == root_gem_name
+        next if !Dir.glob("*.gemspec").empty? && spec.source.class == Bundler::Source::Path && root_gem_names.include?(spec.name)
         spec.source.send(:fetch_gem, spec) if Bundler.settings[:cache_all_platforms] && spec.source.respond_to?(:fetch_gem, true)
         spec.source.cache(spec, custom_path) if spec.source.respond_to?(:cache)
       end
