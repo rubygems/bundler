@@ -10,9 +10,9 @@ describe "Bundler.with_env helpers" do
 
     it "should return the PATH present before bundle was activated" do
       code = "print Bundler.original_env['PATH']"
-      path = `getconf PATH`.strip + ":/foo"
+      path = `getconf PATH`.strip + "#{File::PATH_SEPARATOR}/foo"
       with_path_as(path) do
-        result = bundle("exec ruby -e #{code.inspect}")
+        result = bundle("exec ruby -e #{code.dump}")
         expect(result).to eq(path)
       end
     end
@@ -24,6 +24,27 @@ describe "Bundler.with_env helpers" do
         result = bundle("exec ruby -e #{code.inspect}")
         expect(result).to eq(gem_path)
       end
+    end
+
+    it "works with nested bundle exec invocations" do
+      create_file("exe.rb", <<-'RB')
+        count = ARGV.first.to_i
+        exit if count < 0
+        STDERR.puts "#{count} #{ENV["PATH"].end_with?(":/foo")}"
+        if count == 2
+          ENV["PATH"] = "#{ENV["PATH"]}:/foo"
+        end
+        exec("ruby", __FILE__, (count - 1).to_s)
+      RB
+      path = `getconf PATH`.strip + File::PATH_SEPARATOR + File.dirname(Gem.ruby)
+      with_path_as(path) do
+        bundle!("exec ruby #{bundled_app("exe.rb")} 2", :expect_err => true)
+      end
+      expect(err).to eq <<-EOS.strip
+2 false
+1 true
+0 true
+      EOS
     end
   end
 
