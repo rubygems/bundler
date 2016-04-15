@@ -395,7 +395,7 @@ describe "bundle exec" do
     subject { bundle "exec #{path} arg1 arg2", :expect_err => true }
 
     shared_examples_for "it runs" do
-      it "like a normally executed executable like a normally executed executable" do
+      it "like a normally executed executable" do
         subject
         expect(exitstatus).to eq(exit_code) if exitstatus
         expect(err).to eq(expected_err)
@@ -447,6 +447,13 @@ describe "bundle exec" do
 \e[31mCould not find gem 'rack (= 2)' in any of the gem sources listed in your Gemfile or available on this machine.\e[0m
 \e[33mRun `bundle install` to install missing gems.\e[0m
       EOS
+
+      it_behaves_like "it runs"
+    end
+
+    context "when the executable exits non-zero via at_exit" do
+      let(:executable) { super() + "\n\nat_exit { $! ? raise($!) : exit(1) }" }
+      let(:exit_code) { 1 }
 
       it_behaves_like "it runs"
     end
