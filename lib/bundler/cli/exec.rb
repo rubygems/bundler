@@ -21,7 +21,7 @@ module Bundler
       validate_cmd!
       SharedHelpers.set_bundle_environment
       if bin_path = Bundler.which(cmd)
-        kernel_load(bin_path, *args) if ruby_shebang?(bin_path)
+        return kernel_load(bin_path, *args) if ruby_shebang?(bin_path)
         # First, try to exec directly to something in PATH
         kernel_exec([bin_path, cmd], *args)
       else
@@ -61,7 +61,6 @@ module Bundler
       Bundler.ui = nil
       require "bundler/setup"
       Kernel.load(file)
-      exit
     rescue SystemExit
       raise
     rescue Exception => e # rubocop:disable Lint/RescueException
