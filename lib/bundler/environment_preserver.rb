@@ -11,7 +11,7 @@ module Bundler
 
     # @return [Hash]
     def backup
-      env = restore.clone
+      env = @original.clone
       @keys.each do |key|
         value = env[key]
         env[@prefix + key] = value unless value.nil? || value.empty?
