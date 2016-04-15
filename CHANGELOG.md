@@ -1,3 +1,15 @@
+## 1.12.0.rc.2 (2016-04-15)
+
+Features:
+
+  - `bundle outdated` handles all combinations of `--major`, `--minor`, and `--patch` (#4396, @RochesterinNYC)
+
+Bugfixes:
+
+  - prevent endless recursive copy for `bundle package --all` (#4392, @RochesterinNYC)
+  - allow executables that are `load`ed to exit non-0 via an `at_exit` hook when invoked by `bundle exec` (@segiddins)
+  - nested invocations of `bundle exec` properly preserve the `$PATH` and `$GEM_PATH` environment variables (@segiddins)
+
 ## 1.12.0.rc (2016-03-13)
 
 Performance:
