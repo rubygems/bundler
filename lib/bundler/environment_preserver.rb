@@ -14,7 +14,10 @@ module Bundler
       env = @original.clone
       @keys.each do |key|
         value = env[key]
-        env[@prefix + key] = value unless value.nil? || value.empty?
+        original_value = env[@prefix + key]
+        if !value.nil? && !value.empty? && original_value.nil?
+          env[@prefix + key] = value
+        end
       end
       env
     end

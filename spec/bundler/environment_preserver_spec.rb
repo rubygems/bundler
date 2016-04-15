@@ -32,6 +32,18 @@ describe Bundler::EnvironmentPreserver do
         expect(subject.key?("BUNDLE_ORIG_foo")).to eq(false)
       end
     end
+
+    context "when an original key is set" do
+      let(:env) { { "foo" => "my-foo", "BUNDLE_ORIG_foo" => "orig-foo" } }
+
+      it "should keep the original value in the BUNDLE_ORIG_ variable" do
+        expect(subject["BUNDLE_ORIG_foo"]).to eq("orig-foo")
+      end
+
+      it "should keep the variable" do
+        expect(subject["foo"]).to eq("my-foo")
+      end
+    end
   end
 
   describe "#restore" do
