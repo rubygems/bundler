@@ -293,7 +293,7 @@ module Bundler
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
-      requirement.matches_spec?(spec)
+      requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
     end
 
     def sort_dependencies(dependencies, activated, conflicts)

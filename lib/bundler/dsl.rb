@@ -67,16 +67,16 @@ module Bundler
             "#{file}. Make sure you can build the gem, then try again"
         end
 
+        @gemspecs << spec
+
         gem_platforms = Bundler::Dependency::REVERSE_PLATFORM_MAP[Bundler::GemHelpers.generic_local_platform]
-        gem spec.name, :path => path, :glob => glob, :platforms => gem_platforms
+        gem spec.name, :name => spec.name, :path => path, :glob => glob, :platforms => gem_platforms
 
         group(development_group) do
           spec.development_dependencies.each do |dep|
-            gem dep.name, *(dep.requirement.as_list + [:type => :development])
+            gem dep.name, *(dep.requirement.as_list + [:type => :development, :platforms => gem_platforms])
           end
         end
-
-        @gemspecs << gemspecs.first
       when 0
         raise InvalidOption, "There are no gemspecs at #{expanded_path}"
       else
@@ -149,7 +149,11 @@ module Bundler
     end
 
     def path(path, options = {}, &blk)
-      source_options = normalize_hash(options).merge("path" => Pathname.new(path), "root_path" => gemfile_root)
+      source_options = normalize_hash(options).merge(
+        "path" => Pathname.new(path),
+        "root_path" => gemfile_root,
+        "gemspec" => gemspecs.find {|g| g.name == options["name"] }
+      )
       source = @sources.add_path_source(source_options)
       with_source(source, &blk)
     end
