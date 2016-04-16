@@ -12,7 +12,7 @@ module Bundler
     end
 
     def add_path_source(options = {})
-      if options['gemspec']
+      if options["gemspec"]
         add_source_to_list Source::Gemspec.new(options), path_sources
       else
         add_source_to_list Source::Path.new(options), path_sources
