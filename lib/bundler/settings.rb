@@ -221,12 +221,25 @@ module Bundler
       Pathname.new(@root).join("config") if @root
     end
 
+    CONFIG_REGEX = %r{ # rubocop:disable Style/RegexpLiteral
+      ^
+      (BUNDLE_.+):\s # the key
+      (?: !\s)? # optional exclamation mark found with ruby 1.9.3
+      (['"]?) # optional opening quote
+      (.* # contents of the value
+        (?: # optionally, up until the next key
+          (\n(?!BUNDLE).+)*
+        )
+      )
+      \2 # matching closing quote
+      $
+    }xo
+
     def load_config(config_file)
       SharedHelpers.filesystem_access(config_file, :read) do
         valid_file = config_file && config_file.exist? && !config_file.size.zero?
         return {} if ignore_config? || !valid_file
-        config_regex = /^(BUNDLE_.+): (['"]?)(.*(?:\n(?!BUNDLE).+)?)\2$/
-        config_pairs = config_file.read.scan(config_regex).map do |m|
+        config_pairs = config_file.read.scan(CONFIG_REGEX).map do |m|
           key, _, value = m
           [convert_to_backward_compatible_key(key), value.gsub(/\s+/, " ").tr('"', "'")]
         end
