@@ -38,7 +38,7 @@ describe Bundler::SSLCerts::CertificateManager do
 
     it "should set bundler_certs as the paths of the bundler ssl certs" do
       expect(subject.bundler_certs).to include(File.join(root, "lib/bundler/ssl_certs/rubygems.global.ssl.fastly.net/DigiCertHighAssuranceEVRootCA.pem"))
-      expect(subject.bundler_certs).to include(File.join(root, "lib/bundler/ssl_certs/index.rubygems.org/GlobalSignRoot.pem"))
+      expect(subject.bundler_certs).to include(File.join(root, "lib/bundler/ssl_certs/index.rubygems.org/GlobalSignRootCA.pem"))
     end
 
     context "when rubygems_path is not nil" do
