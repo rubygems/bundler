@@ -201,12 +201,19 @@ module Bundler
         hash.delete(key) if value.nil?
         SharedHelpers.filesystem_access(file) do |p|
           FileUtils.mkdir_p(p.dirname)
-          require "bundler/psyched_yaml"
-          File.open(p, "w") {|f| f.puts YAML.dump(hash) }
+          p.open("w") {|f| f.write(serialize_hash(hash)) }
         end
       end
 
       value
+    end
+
+    def serialize_hash(hash)
+      yaml = String.new("---\n")
+      hash.each do |key, value|
+        yaml << key << ": " << value.to_s.gsub(/\s+/, " ").inspect << "\n"
+      end
+      yaml
     end
 
     def global_config_file
