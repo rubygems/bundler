@@ -247,7 +247,7 @@ module Bundler
       dependencies.map(&:groups).flatten.uniq
     end
 
-    def lock(file, preserve_bundled_with = false)
+    def lock(file, preserve_new_attributes = false)
       contents = to_lock
 
       # Convert to \r\n if the existing lock has them
@@ -264,8 +264,8 @@ module Bundler
         end
       end
 
-      preserve_bundled_with ||= !updating_major && (Bundler.settings[:frozen] || !@unlocking)
-      return if lockfiles_equal?(@lockfile_contents, contents, preserve_bundled_with)
+      preserve_new_attributes ||= !updating_major && (Bundler.settings[:frozen] || !@unlocking)
+      return if lockfiles_equal?(@lockfile_contents, contents, preserve_new_attributes)
 
       if Bundler.settings[:frozen]
         Bundler.ui.error "Cannot write a changed lockfile while frozen."
@@ -678,13 +678,16 @@ module Bundler
       groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
     end
 
-    def lockfiles_equal?(current, proposed, preserve_bundled_with)
-      if preserve_bundled_with
-        pattern = /\n\n#{LockfileParser::BUNDLED}\n\s+#{Gem::Version::VERSION_PATTERN}\n/
-        current.sub(pattern, "\n") == proposed.sub(pattern, "\n")
-      else
-        current == proposed
+    def lockfiles_equal?(current, proposed, preserve_new_attributes)
+      if preserve_new_attributes
+        attributes_to_ignore = LockfileParser.attributes_to_ignore(@locked_bundler_version)
+        attributes_to_ignore.each do |attribute_to_ignore|
+          pattern = /(\A|\n\n)#{attribute_to_ignore}\n(\s+.*\n)+\n?/m
+          current = current.sub(pattern, "\n")
+          proposed = proposed.sub(pattern, "\n")
+        end
       end
+      current == proposed
     end
   end
 end

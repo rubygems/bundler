@@ -52,7 +52,7 @@ module Bundler
 
       setup_manpath
 
-      lock(:preserve_bundled_with => true)
+      lock(:preserve_new_attributes => true)
 
       self
     end

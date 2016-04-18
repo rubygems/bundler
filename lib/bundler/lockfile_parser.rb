@@ -26,6 +26,23 @@ module Bundler
     OPTIONS      = /^  ([a-z]+): (.*)$/i
     SOURCE       = [GIT, GEM, PATH].freeze
 
+    ATTRIBUTES_BY_VERSION_INTRODUCED = {
+      Gem::Version.create("1.0") => [DEPENDENCIES, PLATFORMS, GIT, GEM, PATH].freeze,
+      Gem::Version.create("1.10") => [BUNDLED].freeze,
+      Gem::Version.create("1.12") => [RUBY].freeze,
+    }.freeze
+
+    def self.attributes_to_ignore(base_version = nil)
+      base_version &&= base_version.release
+      base_version ||= Gem::Version.create("1.0")
+      attributes = []
+      ATTRIBUTES_BY_VERSION_INTRODUCED.each do |version, introduced|
+        next if version > base_version
+        attributes += introduced
+      end
+      attributes
+    end
+
     def initialize(lockfile)
       @platforms    = []
       @sources      = []
