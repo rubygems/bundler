@@ -11,6 +11,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--local]
                  [--deployment]
                  [--force]
+                 [--frozen]
                  [--no-cache]
                  [--no-prune]
                  [--path PATH]
@@ -85,6 +86,10 @@ update process below under [CONSERVATIVE UPDATING][].
 * `--force`:
   Force download every gem, even if the required versions are already available
   locally.
+
+* `--frozen`:
+  Do not allow the Gemfile.lock to be updated after this install. Exits
+  non-zero if there are going to be changes to the Gemfile.lock.
 
 * `--system`:
   Installs the gems specified in the bundle to the system's Rubygems location.
