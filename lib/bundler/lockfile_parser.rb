@@ -35,7 +35,7 @@ module Bundler
     ALL_KNOWN_ATTRIBUTES = ATTRIBUTES_BY_VERSION_INTRODUCED.values.flatten.freeze
 
     def self.attributes_in_lockfile(lockfile_contents)
-      lockfile_contents.scan(/^(\W[\W ])$/).uniq
+      lockfile_contents.scan(/^\w[\w ]*$/).uniq
     end
 
     def self.unknown_attributes_in_lockfile(lockfile_contents)
