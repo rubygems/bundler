@@ -983,6 +983,68 @@ describe "Bundler.setup" do
     end
   end
 
+  describe "when RUBY VERSION" do
+    let(:ruby_version) { nil }
+
+    def lock_with(ruby_version = nil)
+      lock = <<-L
+        GEM
+          remote: file:#{gem_repo1}/
+          specs:
+            rack (1.0.0)
+
+        PLATFORMS
+          #{generic_local_platform}
+
+        DEPENDENCIES
+          rack
+      L
+
+      if ruby_version
+        lock += "\n        RUBY VERSION\n           #{ruby_version}\n"
+      end
+
+      lock += <<-L
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      L
+
+      lock
+    end
+
+    before do
+      install_gemfile <<-G
+        ruby ">= 0"
+        source "file:#{gem_repo1}"
+        gem "rack"
+      G
+      lockfile lock_with(ruby_version)
+    end
+
+    context "is not present" do
+      it "does not change the lock" do
+        expect { ruby! "require 'bundler/setup'" }.not_to change { lockfile }
+      end
+    end
+
+    context "is newer" do
+      let(:ruby_version) { "5.5.5" }
+      it "does not change the lock or warn" do
+        expect { ruby! "require 'bundler/setup'" }.not_to change { lockfile }
+        expect(out).to eq("")
+        expect(err).to eq("")
+      end
+    end
+
+    context "is older" do
+      let(:ruby_version) { "1.0.0" }
+      it "does not change the lock" do
+        expect { ruby! "require 'bundler/setup'" }.not_to change { lockfile }
+      end
+    end
+  end
+
   describe "when Psych is not in the Gemfile", :ruby => "~> 2.2" do
     it "does not load Psych" do
       gemfile ""

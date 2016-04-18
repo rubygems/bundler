@@ -682,10 +682,11 @@ module Bundler
       if preserve_new_attributes
         attributes_to_ignore = LockfileParser.attributes_to_ignore(@locked_bundler_version)
         attributes_to_ignore += LockfileParser.unknown_attributes_in_lockfile(current)
-        attributes_to_ignore << LockfileParser::BUNDLED
-        pattern = /(\A|\n\n)#{Regexp.union(attributes_to_ignore)}\n(\s{2,}.*\n)+\n?/
-        current = current.gsub(pattern, "\n")
-        proposed = proposed.gsub(pattern, "\n")
+        attributes_to_ignore += LockfileParser::ENVIRONMENT_VERSION_ATTRIBUTES
+        pattern = /#{Regexp.union(attributes_to_ignore)}\n(\s{2,}.*\n)+/
+        whitespace_cleanup = /\n{2,}/
+        current = current.gsub(pattern, "\n").gsub(whitespace_cleanup, "\n\n").strip
+        proposed = proposed.gsub(pattern, "\n").gsub(whitespace_cleanup, "\n\n").strip
       end
       current == proposed
     end

@@ -34,6 +34,8 @@ module Bundler
 
     ALL_KNOWN_ATTRIBUTES = ATTRIBUTES_BY_VERSION_INTRODUCED.values.flatten.freeze
 
+    ENVIRONMENT_VERSION_ATTRIBUTES = [BUNDLED, RUBY].freeze
+
     def self.attributes_in_lockfile(lockfile_contents)
       lockfile_contents.scan(/^\w[\w ]*$/).uniq
     end
