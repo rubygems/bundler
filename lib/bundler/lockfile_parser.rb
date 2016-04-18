@@ -32,12 +32,22 @@ module Bundler
       Gem::Version.create("1.12") => [RUBY].freeze,
     }.freeze
 
+    ALL_KNOWN_ATTRIBUTES = ATTRIBUTES_BY_VERSION_INTRODUCED.values.flatten.freeze
+
+    def self.attributes_in_lockfile(lockfile_contents)
+      lockfile_contents.scan(/^(\W[\W ])$/).uniq
+    end
+
+    def self.unknown_attributes_in_lockfile(lockfile_contents)
+      attributes_in_lockfile(lockfile_contents) - ALL_KNOWN_ATTRIBUTES
+    end
+
     def self.attributes_to_ignore(base_version = nil)
       base_version &&= base_version.release
       base_version ||= Gem::Version.create("1.0")
       attributes = []
       ATTRIBUTES_BY_VERSION_INTRODUCED.each do |version, introduced|
-        next if version > base_version
+        next if version <= base_version
         attributes += introduced
       end
       attributes

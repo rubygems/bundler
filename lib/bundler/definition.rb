@@ -681,11 +681,11 @@ module Bundler
     def lockfiles_equal?(current, proposed, preserve_new_attributes)
       if preserve_new_attributes
         attributes_to_ignore = LockfileParser.attributes_to_ignore(@locked_bundler_version)
-        attributes_to_ignore.each do |attribute_to_ignore|
-          pattern = /(\A|\n\n)#{attribute_to_ignore}\n(\s+.*\n)+\n?/m
-          current = current.sub(pattern, "\n")
-          proposed = proposed.sub(pattern, "\n")
-        end
+        attributes_to_ignore += LockfileParser.unknown_attributes_in_lockfile(current)
+        attributes_to_ignore << LockfileParser::BUNDLED
+        pattern = /(\A|\n\n)#{Regexp.union(attributes_to_ignore)}\n(\s{2,}.*\n)+\n?/
+        current = current.gsub(pattern, "\n")
+        proposed = proposed.gsub(pattern, "\n")
       end
       current == proposed
     end
