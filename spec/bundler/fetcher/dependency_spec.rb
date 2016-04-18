@@ -79,6 +79,9 @@ describe Bundler::Fetcher::Dependency do
       allow(bundler_retry).to receive(:attempts) {|&block| block.call }
       allow(subject).to receive(:log_specs) {}
       allow(subject).to receive(:remote_uri).and_return(remote_uri)
+      allow(Bundler).to receive_message_chain(:ui, :debug?)
+      allow(Bundler).to receive_message_chain(:ui, :info)
+      allow(Bundler).to receive_message_chain(:ui, :debug)
     end
 
     context "when there are given gem names that are not in the full dependency list" do
@@ -139,19 +142,8 @@ describe Bundler::Fetcher::Dependency do
     end
 
     shared_examples_for "the error is properly handled" do
-      before do
-        allow(Bundler).to receive_message_chain(:ui, :debug?)
-        allow(Bundler).to receive_message_chain(:ui, :info)
-        allow(Bundler).to receive_message_chain(:ui, :debug)
-      end
-
       it "should return nil" do
         expect(subject.specs(gem_names, full_dependency_list, last_spec_list)).to be_nil
-      end
-
-      it "should log the inability to fetch from API at debug level" do
-        expect(Bundler).to receive_message_chain(:ui, :debug).with("could not fetch from the dependency API, trying the full index")
-        subject.specs(gem_names, full_dependency_list, last_spec_list)
       end
 
       context "debug logging is not on" do
@@ -164,22 +156,36 @@ describe Bundler::Fetcher::Dependency do
       end
     end
 
+    shared_examples_for "the error suggests retrying with the full index" do
+      it "should log the inability to fetch from API at debug level" do
+        expect(Bundler).to receive_message_chain(:ui, :debug).with("could not fetch from the dependency API\nit's suggested to retry using the full index via `bundle install --full-index`")
+        subject.specs(gem_names, full_dependency_list, last_spec_list)
+      end
+    end
+
     context "when an HTTPError occurs" do
       before { allow(subject).to receive(:dependency_specs) { raise Bundler::HTTPError.new } }
 
       it_behaves_like "the error is properly handled"
-    end
-
-    context "when a MarshalError occurs" do
-      before { allow(subject).to receive(:dependency_specs) { raise Bundler::MarshalError.new } }
-
-      it_behaves_like "the error is properly handled"
+      it_behaves_like "the error suggests retrying with the full index"
     end
 
     context "when a GemspecError occurs" do
       before { allow(subject).to receive(:dependency_specs) { raise Bundler::GemspecError.new } }
 
       it_behaves_like "the error is properly handled"
+      it_behaves_like "the error suggests retrying with the full index"
+    end
+
+    context "when a MarshalError occurs" do
+      before { allow(subject).to receive(:dependency_specs) { raise Bundler::MarshalError.new } }
+
+      it_behaves_like "the error is properly handled"
+
+      it "should log the inability to fetch from API and mention retrying" do
+        expect(Bundler).to receive_message_chain(:ui, :debug).with("could not fetch from the dependency API, trying the full index")
+        subject.specs(gem_names, full_dependency_list, last_spec_list)
+      end
     end
   end
 
