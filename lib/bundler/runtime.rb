@@ -52,7 +52,7 @@ module Bundler
 
       setup_manpath
 
-      lock(:preserve_new_attributes => true)
+      lock(:preserve_unknown_sections => true)
 
       self
     end

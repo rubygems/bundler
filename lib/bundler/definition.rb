@@ -247,7 +247,7 @@ module Bundler
       dependencies.map(&:groups).flatten.uniq
     end
 
-    def lock(file, preserve_new_attributes = false)
+    def lock(file, preserve_unknown_sections = false)
       contents = to_lock
 
       # Convert to \r\n if the existing lock has them
@@ -264,8 +264,8 @@ module Bundler
         end
       end
 
-      preserve_new_attributes ||= !updating_major && (Bundler.settings[:frozen] || !@unlocking)
-      return if lockfiles_equal?(@lockfile_contents, contents, preserve_new_attributes)
+      preserve_unknown_sections ||= !updating_major && (Bundler.settings[:frozen] || !@unlocking)
+      return if lockfiles_equal?(@lockfile_contents, contents, preserve_unknown_sections)
 
       if Bundler.settings[:frozen]
         Bundler.ui.error "Cannot write a changed lockfile while frozen."
@@ -678,12 +678,12 @@ module Bundler
       groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
     end
 
-    def lockfiles_equal?(current, proposed, preserve_new_attributes)
-      if preserve_new_attributes
-        attributes_to_ignore = LockfileParser.attributes_to_ignore(@locked_bundler_version)
-        attributes_to_ignore += LockfileParser.unknown_attributes_in_lockfile(current)
-        attributes_to_ignore += LockfileParser::ENVIRONMENT_VERSION_ATTRIBUTES
-        pattern = /#{Regexp.union(attributes_to_ignore)}\n(\s{2,}.*\n)+/
+    def lockfiles_equal?(current, proposed, preserve_unknown_sections)
+      if preserve_unknown_sections
+        sections_to_ignore = LockfileParser.sections_to_ignore(@locked_bundler_version)
+        sections_to_ignore += LockfileParser.unknown_sections_in_lockfile(current)
+        sections_to_ignore += LockfileParser::ENVIRONMENT_VERSION_SECTIONS
+        pattern = /#{Regexp.union(sections_to_ignore)}\n(\s{2,}.*\n)+/
         whitespace_cleanup = /\n{2,}/
         current = current.gsub(pattern, "\n").gsub(whitespace_cleanup, "\n\n").strip
         proposed = proposed.gsub(pattern, "\n").gsub(whitespace_cleanup, "\n\n").strip

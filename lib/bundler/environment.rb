@@ -32,7 +32,7 @@ module Bundler
     end
 
     def lock(opts = {})
-      @definition.lock(Bundler.default_lockfile, opts[:preserve_new_attributes])
+      @definition.lock(Bundler.default_lockfile, opts[:preserve_unknown_sections])
     end
 
     def update(*gems)

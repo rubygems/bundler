@@ -29,16 +29,16 @@ describe Bundler::LockfileParser do
        1.12.0.rc.2
   L
 
-  describe ".attributes_in_lockfile" do
+  describe ".sections_in_lockfile" do
     it "returns the attributes" do
-      attributes = described_class.attributes_in_lockfile(lockfile_contents)
+      attributes = described_class.sections_in_lockfile(lockfile_contents)
       expect(attributes).to contain_exactly(
         "BUNDLED WITH", "DEPENDENCIES", "GEM", "GIT", "PLATFORMS", "RUBY VERSION"
       )
     end
   end
 
-  describe ".unknown_attributes_in_lockfile" do
+  describe ".unknown_sections_in_lockfile" do
     let(:lockfile_contents) { strip_whitespace(<<-L) }
       UNKNOWN ATTR
 
@@ -47,13 +47,13 @@ describe Bundler::LockfileParser do
     L
 
     it "returns the unknown attributes" do
-      attributes = described_class.unknown_attributes_in_lockfile(lockfile_contents)
+      attributes = described_class.unknown_sections_in_lockfile(lockfile_contents)
       expect(attributes).to contain_exactly("UNKNOWN ATTR", "UNKNOWN ATTR 2")
     end
   end
 
-  describe ".attributes_to_ignore" do
-    subject { described_class.attributes_to_ignore(base_version) }
+  describe ".sections_to_ignore" do
+    subject { described_class.sections_to_ignore(base_version) }
 
     context "with a nil base version" do
       let(:base_version) { nil }
