@@ -1,3 +1,8 @@
+## 1.12.0.rc.4 (2016-04-20)
+
+Features:
+  - Support for `before_install` and `after_install` hooks added.
+	
 ## 1.12.0.rc.3 (2016-04-19)
 
 Bugfixes:
