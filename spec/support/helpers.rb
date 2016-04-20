@@ -217,6 +217,13 @@ module Spec
       bundle :install, opts
     end
 
+    def lock_gemfile(*args)
+      gemfile(*args)
+      opts = args.last.is_a?(Hash) ? args.last : {}
+      opts[:retry] ||= 0
+      bundle :lock, opts
+    end
+
     def install_gems(*gems)
       gems.each do |g|
         path = "#{gem_repo1}/gems/#{g}.gem"
