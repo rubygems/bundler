@@ -1,3 +1,9 @@
+## 1.12.0.rc.3 (2016-04-19)
+
+Bugfixes:
+
+  - don't allow new attributes to dirty a lockfile when running `bundle exec`, `-rbundler/setup`, or `bundle check` (@segiddins)
+
 ## 1.12.0.rc.2 (2016-04-15)
 
 Features:
