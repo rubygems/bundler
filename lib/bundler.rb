@@ -30,6 +30,7 @@ module Bundler
   autoload :GemHelper,              "bundler/gem_helper"
   autoload :GemHelpers,             "bundler/gem_helpers"
   autoload :Graph,                  "bundler/graph"
+  autoload :Hooks,                  "bundler/hooks"
   autoload :Index,                  "bundler/index"
   autoload :Installer,              "bundler/installer"
   autoload :Injector,               "bundler/injector"
