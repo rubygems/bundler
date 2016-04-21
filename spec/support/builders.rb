@@ -122,6 +122,10 @@ module Spec
 
         build_gem "weakling", "0.0.3"
 
+        build_gem "terranova", "8"
+
+        build_gem "duradura", "7.0"
+
         build_gem "multiple_versioned_deps" do |s|
           s.add_dependency "weakling", ">= 0.0.1", "< 0.1"
         end
