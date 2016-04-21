@@ -14,6 +14,8 @@ describe "bundle outdated" do
       gem "foo", :git => "#{lib_path("foo")}"
       gem "activesupport", "2.3.5"
       gem "weakling", "~> 0.0.1"
+      gem "duradura", '7.0'
+      gem "terranova", '8'
     G
   end
 
@@ -244,7 +246,9 @@ describe "bundle outdated" do
   shared_examples_for "version update is detected" do
     it "reports that a gem has a newer version" do
       subject
+      expect(out).to include("Outdated gems included in the bundle:")
       expect(out).to include("activesupport (newest")
+      expect(out).to_not include("ERROR REPORT TEMPLATE")
     end
   end
 
@@ -284,6 +288,8 @@ describe "bundle outdated" do
   shared_examples_for "no version updates are detected" do
     it "does not detect any version updates" do
       subject
+      expect(out).to include("Bundle up to date!")
+      expect(out).to_not include("ERROR REPORT TEMPLATE")
       expect(out).to_not include("activesupport (newest")
       expect(out).to_not include("weakling (newest")
     end
