@@ -58,7 +58,7 @@ module Bundler
           raise NetworkDownError, "Could not reach host #{uri.host}. Check your network " \
           "connection and try again."
         else
-          raise HTTPError, "Network error while fetching #{uri}"
+          raise HTTPError, "Network error while fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
         end
       end
     end

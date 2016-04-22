@@ -19,6 +19,7 @@ module Bundler
     # This is the error raised if OpenSSL fails the cert verification
     class CertificateFailureError < HTTPError
       def initialize(remote_uri)
+        remote_uri = filter_uri(remote_uri)
         super "Could not verify the SSL certificate for #{remote_uri}.\nThere" \
           " is a chance you are experiencing a man-in-the-middle attack, but" \
           " most likely your system doesn't have the CA certificates needed" \
@@ -39,6 +40,7 @@ module Bundler
     # This error is raised if HTTP authentication is required, but not provided.
     class AuthenticationRequiredError < HTTPError
       def initialize(remote_uri)
+        remote_uri = filter_uri(remote_uri)
         super "Authentication is required for #{remote_uri}.\n" \
           "Please supply credentials for this source. You can do this by running:\n" \
           " bundle config #{remote_uri} username:password"
@@ -47,6 +49,7 @@ module Bundler
     # This error is raised if HTTP authentication is provided, but incorrect.
     class BadAuthenticationError < HTTPError
       def initialize(remote_uri)
+        remote_uri = filter_uri(remote_uri)
         super "Bad username or password for #{remote_uri}.\n" \
           "Please double-check your credentials and correct them."
       end
