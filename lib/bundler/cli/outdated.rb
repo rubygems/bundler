@@ -50,11 +50,11 @@ module Bundler
         if options["strict"]
           active_spec = definition.specs.detect {|spec| spec.name == current_spec.name }
         else
-          active_spec = definition.index[current_spec.name].sort_by(&:version)
-          if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
-            active_spec = active_spec.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
+          active_specs = definition.index[current_spec.name].sort_by(&:version)
+          if !current_spec.version.prerelease? && !options[:pre] && active_specs.size > 1
+            active_spec = active_specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
           end
-          active_spec = active_spec.last
+          active_spec = active_specs.last
 
           if options[:major] || options[:minor] || options[:patch]
             update_present = update_present_via_semver_portions(current_spec, active_spec, options)
