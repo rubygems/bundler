@@ -322,7 +322,7 @@ describe "bundle gem" do
       end
 
       it "requires 'test-gem'" do
-        expect(bundled_app("test_gem/spec/spec_helper.rb").read).to include("require 'test_gem'")
+        expect(bundled_app("test_gem/spec/spec_helper.rb").read).to include(%{require "test_gem"})
       end
 
       it "creates a default test which fails" do
@@ -585,7 +585,7 @@ describe "bundle gem" do
       end
 
       it "requires 'test/gem'" do
-        expect(bundled_app("test-gem/spec/spec_helper.rb").read).to include("require 'test/gem'")
+        expect(bundled_app("test-gem/spec/spec_helper.rb").read).to include(%{require "test/gem"})
       end
 
       it "creates a default test which fails" do
