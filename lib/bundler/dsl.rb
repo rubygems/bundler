@@ -121,6 +121,14 @@ module Bundler
       @dependencies << dep
     end
 
+    def before_install(&blk)
+      Bundler::Hooks.register_hook(:before_install, blk)
+    end
+
+    def after_install(&blk)
+      Bundler::Hooks.register_hook(:after_install, blk)
+    end
+
     def source(source, &blk)
       source = normalize_source(source)
       if block_given?

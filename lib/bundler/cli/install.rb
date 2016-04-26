@@ -99,6 +99,8 @@ module Bundler
       definition = Bundler.definition
       definition.validate_ruby!
 
+      Bundler::Hooks.run(:before_install)
+
       Installer.install(Bundler.root, definition, options)
       Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]
 
@@ -134,6 +136,9 @@ module Bundler
         require "bundler/cli/clean"
         Bundler::CLI::Clean.new(options).run
       end
+
+      Bundler::Hooks.run(:after_install)
+
     rescue GemNotFound, VersionConflict => e
       if options[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your #{Bundler.settings.app_cache_path} directory."
