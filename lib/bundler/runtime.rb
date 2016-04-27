@@ -109,14 +109,6 @@ module Bundler
       end
     end
 
-    def dependencies_for(*groups)
-      if groups.empty?
-        dependencies
-      else
-        dependencies.select {|d| (groups & d.groups).any? }
-      end
-    end
-
     alias_method :gems, :specs
 
     def cache(custom_path = nil)
