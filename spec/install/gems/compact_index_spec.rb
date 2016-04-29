@@ -139,6 +139,20 @@ describe "compact index api" do
     should_be_installed "rack 1.0.0"
   end
 
+  it "falls back when the versions endpoint has a checksum mismatch" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+
+    bundle! :install, :verbose => true, :artifice => "compact_index_checksum_mismatch"
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
+    expect(out).to include <<-'WARN'
+The checksum of /versions does not match the checksum provided by the server! Something is wrong (local checksum is "\"d41d8cd98f00b204e9800998ecf8427e\"", was expecting "\"123\"").
+    WARN
+    should_be_installed "rack 1.0.0"
+  end
+
   it "handles host redirects" do
     gemfile <<-G
       source "#{source_uri}"

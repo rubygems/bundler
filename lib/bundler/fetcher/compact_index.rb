@@ -61,6 +61,9 @@ module Bundler
       def available?
         # Read info file checksums out of /versions, so we can know if gems are up to date
         fetch_uri.scheme != "file" && compact_index_client.update_and_parse_checksums!
+      rescue CompactIndexClient::Updater::MisMatchedChecksumError => e
+        Bundler.ui.warn(e.message)
+        nil
       end
       compact_index_request :available?
 
