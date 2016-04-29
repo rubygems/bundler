@@ -218,21 +218,54 @@ describe "bundle exec" do
     expect(out).to include("bundler: exec needs a command to run")
   end
 
-  describe "shows executable's man page" do
+  describe "with help flags" do
     before(:each) do
       install_gemfile <<-G
         gem "rack"
       G
     end
 
-    it "when --help is present" do
+    it "shows executable's man page when --help is after the executable" do
       bundle "exec echo --help"
       expect(out).to include("Usage: echo [SHORT-OPTION]... [STRING]...")
     end
 
-    it "when -h is present" do
-      bundle "exec echo --help"
+    it "shows executable's man page when --help is between exec and the executable" do
+      bundle "exec --help echo"
       expect(out).to include("Usage: echo [SHORT-OPTION]... [STRING]...")
+    end
+
+    it "uses executable's original behavior for -h" do
+      bundle "exec echo -h"
+      expect(out).to eq("-h")
+    end
+
+    it "shows bundle-exec's man page when --help is before exec" do
+      with_fake_man do
+        bundle "--help exec"
+      end
+      expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
+    end
+
+    it "shows bundle-exec's man page when -h is before exec" do
+      with_fake_man do
+        bundle "-h exec"
+      end
+      expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
+    end
+
+    it "shows bundle-exec's man page when --help is after exec" do
+      with_fake_man do
+        bundle "exec --help"
+      end
+      expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
+    end
+
+    it "shows bundle-exec's man page when -h is after exec" do
+      with_fake_man do
+        bundle "exec -h"
+      end
+      expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
     end
   end
 
