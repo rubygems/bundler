@@ -437,7 +437,7 @@ module Bundler
     # into the corresponding `bundle help #{command}` call
     def self.reformatted_help_args(args)
       bundler_commands = all_commands.keys
-      help_flags = %w(--help -h)
+      help_flags = args.select {|a| %w(--help -h).include? a }
       command = args.select {|a| bundler_commands.include? a }
       other_flags = args.select {|a| a.include? "--" } - help_flags
       executables = args - command - help_flags - other_flags
@@ -447,7 +447,7 @@ module Bundler
       elsif executables.any?
         new_args << command.first
         new_args += executables
-        new_args << "--help"
+        new_args += help_flags
         new_args += other_flags
       else
         new_args += ["help", command.first]
