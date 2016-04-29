@@ -133,6 +133,37 @@ describe "Bundler.setup" do
       expect(load_path[2]).to include "rubylib_dir"
       expect(rack_load_order).to be > 0
     end
+
+    it "orders the load path correctly when there are dependencies" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup
+        puts $LOAD_PATH
+      RUBY
+
+      load_path = out.split("\n") - [
+        bundler_path.to_s,
+        bundler_path.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
+        tmp("rubygems/lib").to_s,
+      ]
+      load_path.map! {|lp| lp.sub(/^#{system_gem_path}/, "") }
+
+      expect(load_path).to start_with(
+        "/gems/rails-2.3.2/lib",
+        "/gems/activeresource-2.3.2/lib",
+        "/gems/activerecord-2.3.2/lib",
+        "/gems/actionpack-2.3.2/lib",
+        "/gems/actionmailer-2.3.2/lib",
+        "/gems/activesupport-2.3.2/lib",
+        "/gems/rake-10.0.2/lib",
+      )
+    end
   end
 
   it "raises if the Gemfile was not yet installed" do
