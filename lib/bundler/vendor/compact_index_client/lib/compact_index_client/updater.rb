@@ -56,7 +56,7 @@ class Bundler::CompactIndexClient
 
     def etag_for(path)
       sum = checksum_for_file(path)
-      sum ? '"' << sum << '"' : nil
+      sum ? %("#{sum}") : nil
     end
 
     def checksum_for_file(path)
