@@ -61,6 +61,9 @@ class Bundler::CompactIndexClient
 
     def checksum_for_file(path)
       return nil unless path.file?
+      # This must use IO.read instead of Digest.file().hexdigest
+      # because we need to preserve \n line endings on windows when calculating
+      # the checksum
       Digest::MD5.hexdigest(IO.read(path))
     end
   end
