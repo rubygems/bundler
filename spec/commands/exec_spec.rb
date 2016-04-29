@@ -218,6 +218,24 @@ describe "bundle exec" do
     expect(out).to include("bundler: exec needs a command to run")
   end
 
+  describe "shows executable's man page" do
+    before(:each) do
+      install_gemfile <<-G
+        gem "rack"
+      G
+    end
+
+    it "when --help is present" do
+      bundle "exec echo --help"
+      expect(out).to include("Usage: echo [SHORT-OPTION]... [STRING]...")
+    end
+
+    it "when -h is present" do
+      bundle "exec echo --help"
+      expect(out).to include("Usage: echo [SHORT-OPTION]... [STRING]...")
+    end
+  end
+
   describe "with gem executables" do
     describe "run from a random directory" do
       before(:each) do
