@@ -49,7 +49,7 @@ class Bundler::CompactIndexClient
 
     def checksum_for_file(path)
       return nil unless path.file?
-      Digest::MD5.file(path).hexdigest
+      Digest::MD5.hexdigest(IO.read(path))
     end
   end
 end
