@@ -1,3 +1,7 @@
+## 1.12.0 (2016-04-28)
+
+This space intentionally left blank.
+
 ## 1.12.0.rc.4 (2016-04-21)
 
 Bugfixes:
