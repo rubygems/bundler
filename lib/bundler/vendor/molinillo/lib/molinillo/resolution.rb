@@ -131,7 +131,7 @@ module Bundler::Molinillo
             specification_provider.send(instance_method, *args, &block)
           rescue NoSuchDependencyError => error
             if state
-              vertex = activated.vertex_named(name_for error.dependency)
+              vertex = activated.vertex_named(name_for(error.dependency))
               error.required_by += vertex.incoming_edges.map { |e| e.origin.name }
               error.required_by << name_for_explicit_dependency_source unless vertex.explicit_requirements.empty?
             end
@@ -345,7 +345,7 @@ module Bundler::Molinillo
         vertex = swapped.vertex_named(name)
         vertex.payload = possibility
         return unless vertex.requirements.
-            all? { |r| requirement_satisfied_by?(r, swapped, possibility) }
+                      all? { |r| requirement_satisfied_by?(r, swapped, possibility) }
         return unless new_spec_satisfied?
         actual_vertex = activated.vertex_named(name)
         actual_vertex.payload = possibility
@@ -363,7 +363,13 @@ module Bundler::Molinillo
           if !dep_names.include?(succ.name) && !succ.root? && succ.predecessors.to_a == [vertex]
             debug(depth) { "Removing orphaned spec #{succ.name} after swapping #{name}" }
             activated.detach_vertex_named(succ.name)
-            requirements.delete_if { |r| name_for(r) == succ.name }
+
+            all_successor_names = succ.recursive_successors.map(&:name)
+
+            requirements.delete_if do |requirement|
+              requirement_name = name_for(requirement)
+              (requirement_name == succ.name) || all_successor_names.include?(requirement_name)
+            end
           end
         end
       end
@@ -420,14 +426,14 @@ module Bundler::Molinillo
         debug(depth) { "Requiring nested dependencies (#{nested_dependencies.join(', ')})" }
         nested_dependencies.each { |d| activated.add_child_vertex(name_for(d), nil, [name_for(activated_spec)], d) }
 
-        push_state_for_requirements(requirements + nested_dependencies, nested_dependencies.size > 0)
+        push_state_for_requirements(requirements + nested_dependencies, !nested_dependencies.empty?)
       end
 
       # Pushes a new {DependencyState} that encapsulates both existing and new
       # requirements
       # @param [Array] new_requirements
       # @return [void]
-      def push_state_for_requirements(new_requirements, requires_sort = true, new_activated = activated.dup)
+      def push_state_for_requirements(new_requirements, requires_sort = true, new_activated = activated)
         new_requirements = sort_dependencies(new_requirements.uniq, new_activated, conflicts) if requires_sort
         new_requirement = new_requirements.shift
         new_name = new_requirement ? name_for(new_requirement) : ''
