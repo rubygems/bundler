@@ -16,7 +16,7 @@ module Bundler::Molinillo
     include TSort
 
     # @visibility private
-    alias_method :tsort_each_node, :each
+    alias tsort_each_node each
 
     # @visibility private
     def tsort_each_child(vertex, &block)
@@ -184,7 +184,7 @@ module Bundler::Molinillo
 
       # @return [Boolean] whether the vertex is considered a root vertex
       attr_accessor :root
-      alias_method :root?, :root
+      alias root? root
 
       # Initializes a vertex with the given name and payload.
       # @param [String] name see {#name}
@@ -262,7 +262,7 @@ module Bundler::Molinillo
           payload == other.payload
       end
 
-      alias_method :eql?, :==
+      alias eql? ==
 
       # @return [Fixnum] a hash for the vertex based upon its {#name}
       def hash
@@ -276,7 +276,7 @@ module Bundler::Molinillo
         equal?(other) || successors.any? { |v| v.path_to?(other) }
       end
 
-      alias_method :descendent?, :path_to?
+      alias descendent? path_to?
 
       # Is there a path from `other` to `self` following edges in the
       # dependency graph?
@@ -285,7 +285,7 @@ module Bundler::Molinillo
         other.path_to?(self)
       end
 
-      alias_method :is_reachable_from?, :ancestor?
+      alias is_reachable_from? ancestor?
     end
   end
 end
