@@ -1,3 +1,11 @@
+## 1.12.1 (2016-04-30)
+
+Bugfixes:
+  - automatically fallback when the new index has a checksum mismatch instead of erroring (@segiddins)
+  - fix computation of new index file local checksums on Windows (#4472, @mwrock)
+  - properly handle certain resolver backtracking cases without erroring (@segiddins, #4484)
+  - ensure the `$LOAD_PATH` contains specs' load paths in the correct order (@segiddins, #4482)
+
 ## 1.12.0 (2016-04-28)
 
 This space intentionally left blank.
