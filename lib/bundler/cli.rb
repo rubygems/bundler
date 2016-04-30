@@ -439,11 +439,11 @@ module Bundler
       bundler_commands = all_commands.keys
       help_flags = %w(--help -h)
       exec_commands = %w(exec e)
-      help_used = args.select {|a| help_flags.include? a}
-      exec_used = args.select {|a| exec_commands.include? a}
+      help_used = args.select {|a| help_flags.include? a }
+      exec_used = args.select {|a| exec_commands.include? a }
       command = args.select {|a| bundler_commands.include? a }
       if exec_used.any? && help_used.any?
-        regex = %r{
+        regex = /
             ( # Matches `exec --help` or `exec --help foo`
               (#{exec_commands.join("|")})
               \s
@@ -456,10 +456,10 @@ module Bundler
               (#{exec_commands.join("|")})
               (.+)*
             )
-          }x
+          /x
         arg_str = args.join(" ")
         if arg_str =~ regex
-          ["help", "exec"]
+          %w(help exec)
         else
           args
         end
