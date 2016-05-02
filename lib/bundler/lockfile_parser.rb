@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "strscan"
 
 # Some versions of the Bundler 1.1 RC series introduced corrupted
@@ -12,17 +13,47 @@ require "strscan"
 
 module Bundler
   class LockfileParser
-    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version
+    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version, :ruby_version
 
-    BUNDLED      = "BUNDLED WITH"
-    DEPENDENCIES = "DEPENDENCIES"
-    PLATFORMS    = "PLATFORMS"
-    GIT          = "GIT"
-    GEM          = "GEM"
-    PATH         = "PATH"
-    SPECS        = "  specs:"
+    BUNDLED      = "BUNDLED WITH".freeze
+    DEPENDENCIES = "DEPENDENCIES".freeze
+    PLATFORMS    = "PLATFORMS".freeze
+    RUBY         = "RUBY VERSION".freeze
+    GIT          = "GIT".freeze
+    GEM          = "GEM".freeze
+    PATH         = "PATH".freeze
+    SPECS        = "  specs:".freeze
     OPTIONS      = /^  ([a-z]+): (.*)$/i
-    SOURCE       = [GIT, GEM, PATH]
+    SOURCE       = [GIT, GEM, PATH].freeze
+
+    SECTIONS_BY_VERSION_INTRODUCED = {
+      Gem::Version.create("1.0") => [DEPENDENCIES, PLATFORMS, GIT, GEM, PATH].freeze,
+      Gem::Version.create("1.10") => [BUNDLED].freeze,
+      Gem::Version.create("1.12") => [RUBY].freeze,
+    }.freeze
+
+    KNOWN_SECTIONS = SECTIONS_BY_VERSION_INTRODUCED.values.flatten.freeze
+
+    ENVIRONMENT_VERSION_SECTIONS = [BUNDLED, RUBY].freeze
+
+    def self.sections_in_lockfile(lockfile_contents)
+      lockfile_contents.scan(/^\w[\w ]*$/).uniq
+    end
+
+    def self.unknown_sections_in_lockfile(lockfile_contents)
+      sections_in_lockfile(lockfile_contents) - KNOWN_SECTIONS
+    end
+
+    def self.sections_to_ignore(base_version = nil)
+      base_version &&= base_version.release
+      base_version ||= Gem::Version.create("1.0")
+      attributes = []
+      SECTIONS_BY_VERSION_INTRODUCED.each do |version, introduced|
+        next if version <= base_version
+        attributes += introduced
+      end
+      attributes
+    end
 
     def initialize(lockfile)
       @platforms    = []
@@ -46,6 +77,8 @@ module Bundler
           @state = :dependency
         elsif line == PLATFORMS
           @state = :platform
+        elsif line == RUBY
+          @state = :ruby
         elsif line == BUNDLED
           @state = :bundled_with
         elsif line =~ /^[^\s]/
@@ -86,7 +119,7 @@ module Bundler
       GIT  => Bundler::Source::Git,
       GEM  => Bundler::Source::Rubygems,
       PATH => Bundler::Source::Path,
-    }
+    }.freeze
 
     def parse_source(line)
       case line
@@ -131,7 +164,7 @@ module Bundler
       end
     end
 
-    NAME_VERSION = '(?! )(.*?)(?: \(([^-]*)(?:-(.*))?\))?'
+    NAME_VERSION = '(?! )(.*?)(?: \(([^-]*)(?:-(.*))?\))?'.freeze
     NAME_VERSION_2 = /^ {2}#{NAME_VERSION}(!)?$/
     NAME_VERSION_4 = /^ {4}#{NAME_VERSION}$/
     NAME_VERSION_6 = /^ {6}#{NAME_VERSION}$/
@@ -184,16 +217,17 @@ module Bundler
     end
 
     def parse_platform(line)
-      if line =~ /^  (.*)$/
-        @platforms << Gem::Platform.new($1)
-      end
+      @platforms << Gem::Platform.new($1) if line =~ /^  (.*)$/
     end
 
     def parse_bundled_with(line)
       line = line.strip
-      if Gem::Version.correct?(line)
-        @bundler_version = Gem::Version.create(line)
-      end
+      return unless Gem::Version.correct?(line)
+      @bundler_version = Gem::Version.create(line)
+    end
+
+    def parse_ruby(line)
+      @ruby_version = line.strip
     end
   end
 end

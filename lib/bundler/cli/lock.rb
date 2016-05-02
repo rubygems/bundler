@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Lock
     attr_reader :options
@@ -16,8 +17,15 @@ module Bundler
       ui = Bundler.ui
       Bundler.ui = UI::Silent.new if print
 
-      unlock = options[:update]
-      definition = Bundler.definition(unlock)
+      gems = options[:update]
+      Bundler::Fetcher.disable_endpoint = options["full-index"]
+
+      if gems && !gems.empty?
+        definition = Bundler.definition(:gems => gems)
+      else
+        definition = Bundler.definition(true)
+      end
+
       definition.resolve_remotely! unless options[:local]
 
       if print

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle update" do
@@ -18,6 +19,7 @@ describe "bundle update" do
       end
 
       bundle "update"
+      expect(out).to include("Bundle updated!")
       should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
@@ -34,14 +36,9 @@ describe "bundle update" do
   end
 
   describe "--quiet argument" do
-    it "shows UI messages without --quiet argument" do
-      bundle "update"
-      expect(out).to include("Fetching source")
-    end
-
-    it "does not show UI messages with --quiet argument" do
+    it "hides UI messages" do
       bundle "update --quiet"
-      expect(out).not_to include("Fetching source")
+      expect(out).not_to include("Bundle updated!")
     end
   end
 
@@ -97,6 +94,26 @@ describe "bundle update" do
       bundle "update --group development"
       should_be_installed "activesupport 3.0"
       should_not_be_installed "rack 1.2"
+    end
+
+    context "when there is a source with the same name as a gem in a group" do
+      before :each do
+        build_git "foo", :path => lib_path("activesupport")
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", :group => :development
+          gem "foo", :git => "#{lib_path("activesupport")}"
+        G
+      end
+
+      it "should not update the gems from that source" do
+        update_repo2 { build_gem "activesupport", "3.0" }
+        update_git "foo", "2.0", :path => lib_path("activesupport")
+
+        bundle "update --group development"
+        should_be_installed "activesupport 3.0"
+        should_not_be_installed "foo 2.0"
+      end
     end
   end
 end
@@ -211,5 +228,114 @@ describe "bundle update" do
 
     bundle "update"
     expect(out).to include("Using 1 already installed gems")
+  end
+end
+
+describe "bundle update --ruby" do
+  before do
+    install_gemfile <<-G, :expect_err => true
+        ::RUBY_VERSION = '2.1.3'
+        ::RUBY_PATCHLEVEL = 100
+        ruby '~> 2.1.0'
+    G
+    bundle "update --ruby", :expect_err => true
+  end
+
+  context "when the Gemfile removes the ruby" do
+    before do
+      install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '2.1.4'
+          ::RUBY_PATCHLEVEL = 222
+      G
+    end
+    it "removes the Ruby from the Gemfile.lock" do
+      bundle "update --ruby", :expect_err => true
+
+      lockfile_should_be <<-L
+       GEM
+         specs:
+
+       PLATFORMS
+         ruby
+
+       DEPENDENCIES
+
+       BUNDLED WITH
+          #{Bundler::VERSION}
+      L
+    end
+  end
+
+  context "when the Gemfile specified an updated Ruby version" do
+    before do
+      install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '2.1.4'
+          ::RUBY_PATCHLEVEL = 222
+          ruby '~> 2.1.0'
+      G
+    end
+    it "updates the Gemfile.lock with the latest version" do
+      bundle "update --ruby", :expect_err => true
+
+      lockfile_should_be <<-L
+       GEM
+         specs:
+
+       PLATFORMS
+         ruby
+
+       DEPENDENCIES
+
+       RUBY VERSION
+          ruby 2.1.4p222
+
+       BUNDLED WITH
+          #{Bundler::VERSION}
+      L
+    end
+  end
+
+  context "when a different Ruby is being used than has been versioned" do
+    before do
+      install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '2.2.2'
+          ::RUBY_PATCHLEVEL = 505
+          ruby '~> 2.1.0'
+      G
+    end
+    it "shows a helpful error message" do
+      bundle "update --ruby", :expect_err => true
+
+      expect(out).to include("Your Ruby version is 2.2.2, but your Gemfile specified ~> 2.1.0")
+    end
+  end
+
+  context "when updating Ruby version and Gemfile `ruby`" do
+    before do
+      install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '1.8.3'
+          ::RUBY_PATCHLEVEL = 55
+          ruby '~> 1.8.0'
+      G
+    end
+    it "updates the Gemfile.lock with the latest version" do
+      bundle "update --ruby", :expect_err => true
+
+      lockfile_should_be <<-L
+       GEM
+         specs:
+
+       PLATFORMS
+         ruby
+
+       DEPENDENCIES
+
+       RUBY VERSION
+          ruby 1.8.3p55
+
+       BUNDLED WITH
+          #{Bundler::VERSION}
+      L
+    end
   end
 end

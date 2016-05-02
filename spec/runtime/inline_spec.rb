@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundler/inline#gemfile" do
@@ -5,7 +6,7 @@ describe "bundler/inline#gemfile" do
     requires = ["bundler/inline"]
     requires.unshift File.expand_path("../../support/artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
     requires = requires.map {|r| "require '#{r}'" }.join("\n")
-    @out = ruby("#{requires}\n\n" << code, options)
+    @out = ruby("#{requires}\n\n" + code, options)
   end
 
   before :each do
@@ -91,6 +92,52 @@ describe "bundler/inline#gemfile" do
 
     expect(out).to include("Installing activesupport")
     expect(err).to lack_errors
+    expect(exitstatus).to be_zero if exitstatus
+  end
+
+  it "lets me use my own ui object" do
+    script <<-RUBY, :artifice => "endpoint"
+      require 'bundler'
+      class MyBundlerUI < Bundler::UI::Silent
+        def confirm(msg, newline = nil)
+          puts "CONFIRMED!"
+        end
+      end
+      gemfile(true, :ui => MyBundlerUI.new) do
+        source "https://rubygems.org"
+        gem "activesupport", :require => true
+      end
+    RUBY
+
+    expect(out).to eq("CONFIRMED!")
+    expect(exitstatus).to be_zero if exitstatus
+  end
+
+  it "raises an exception if passed unknown arguments" do
+    script <<-RUBY, :expect_err => true
+      gemfile(true, :arglebargle => true) do
+        path "#{lib_path}"
+        gem "two"
+      end
+
+      puts "success"
+    RUBY
+    expect(err).to include "Unknown options: arglebargle"
+    expect(out).not_to include "success"
+  end
+
+  it "does not mutate the option argument" do
+    script <<-RUBY
+      require 'bundler'
+      options = { :ui => Bundler::UI::Shell.new }
+      gemfile(false, options) do
+        path "#{lib_path}"
+        gem "two"
+      end
+      puts "OKAY" if options.key?(:ui)
+    RUBY
+
+    expect(out).to match("OKAY")
     expect(exitstatus).to be_zero if exitstatus
   end
 end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class DepProxy
     attr_reader :__platform, :dep

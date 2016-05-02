@@ -1,10 +1,11 @@
+# frozen_string_literal: true
 require "uri"
 
 module Bundler
   class Settings
-    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check ignore_messages gem.mit gem.coc).freeze
-    NUMBER_KEYS = %w(retry timeout redirect).freeze
-    DEFAULT_CONFIG = { :retry => 3, :timeout => 10, :redirect => 5 }
+    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check disable_shared_gems ignore_messages gem.mit gem.coc silence_root_warning no_install).freeze
+    NUMBER_KEYS = %w(retry timeout redirect ssl_verify_mode).freeze
+    DEFAULT_CONFIG = { :retry => 3, :timeout => 10, :redirect => 5 }.freeze
 
     attr_reader :root
 
@@ -35,6 +36,11 @@ module Bundler
       @current_config[key_for(key)] = value
     end
 
+    def []=(key, value)
+      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
+      set_key(key, value, @local_config, local_config_file)
+    end
+
     alias_method :[]=, :set_current
 
     def set_local(key, value)
@@ -63,19 +69,14 @@ module Bundler
     def local_overrides
       repos = {}
       all.each do |k|
-        if k =~ /^local\./
-          repos[$'] = self[k]
-        end
+        repos[$'] = self[k] if k =~ /^local\./
       end
       repos
     end
 
     def mirror_for(uri)
       uri = URI(uri.to_s) unless uri.is_a?(URI)
-
-      # Settings keys are all downcased
-      normalized_key = normalize_uri(uri.to_s.downcase)
-      gem_mirrors[normalized_key] || uri
+      gem_mirrors.for(uri.to_s).uri
     end
 
     def credentials_for(uri)
@@ -83,12 +84,9 @@ module Bundler
     end
 
     def gem_mirrors
-      all.inject({}) do |h, k|
-        if k =~ /^mirror\./
-          uri = normalize_uri($')
-          h[uri] = normalize_uri(self[k])
-        end
-        h
+      all.inject(Mirrors.new) do |mirrors, k|
+        mirrors.parse(k, self[k]) if k =~ /^mirror\./
+        mirrors
       end
     end
 
@@ -264,9 +262,7 @@ module Bundler
   private
 
     def key_for(key)
-      if key.is_a?(String) && /https?:/ =~ key
-        key = normalize_uri(key).to_s
-      end
+      key = Settings.normalize_uri(key).to_s if key.is_a?(String) && /https?:/ =~ key
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end
@@ -320,51 +316,72 @@ module Bundler
       unless hash[key] == value
         hash[key] = value
         hash.delete(key) if value.nil?
-        FileUtils.mkdir_p(file.dirname)
-        require "bundler/psyched_yaml"
-        File.open(file, "w") {|f| f.puts YAML.dump(hash) }
+        SharedHelpers.filesystem_access(file) do |p|
+          FileUtils.mkdir_p(p.dirname)
+          p.open("w") {|f| f.write(serialize_hash(hash)) }
+        end
       end
 
       value
-    rescue Errno::EACCES
-      raise PermissionError.new(file)
+    end
+
+    def serialize_hash(hash)
+      yaml = String.new("---\n")
+      hash.each do |key, value|
+        yaml << key << ": " << value.to_s.gsub(/\s+/, " ").inspect << "\n"
+      end
+      yaml
     end
 
     def global_config_file
-      file = ENV["BUNDLE_CONFIG"] || File.join(Bundler.rubygems.user_home, ".bundle/config")
-      Pathname.new(file)
+      if ENV["BUNDLE_CONFIG"] && !ENV["BUNDLE_CONFIG"].empty?
+        Pathname.new(ENV["BUNDLE_CONFIG"])
+      else
+        Bundler.user_bundle_path.join("config")
+      end
     end
 
     def local_config_file
       Pathname.new(@root).join("config") if @root
     end
 
+    CONFIG_REGEX = %r{ # rubocop:disable Style/RegexpLiteral
+      ^
+      (BUNDLE_.+):\s # the key
+      (?: !\s)? # optional exclamation mark found with ruby 1.9.3
+      (['"]?) # optional opening quote
+      (.* # contents of the value
+        (?: # optionally, up until the next key
+          (\n(?!BUNDLE).+)*
+        )
+      )
+      \2 # matching closing quote
+      $
+    }xo
+
     def load_config(config_file)
-      valid_file = config_file && config_file.exist? && !config_file.size.zero?
-      if !ignore_config? && valid_file
-        config_regex = /^(BUNDLE_.+): (['"]?)(.*(?:\n(?!BUNDLE).+)?)\2$/
-        raise PermissionError.new(config_file, :read) unless config_file.readable?
-        config_pairs = config_file.read.scan(config_regex).map do |m|
+      SharedHelpers.filesystem_access(config_file, :read) do
+        valid_file = config_file && config_file.exist? && !config_file.size.zero?
+        return {} if ignore_config? || !valid_file
+        config_pairs = config_file.read.scan(CONFIG_REGEX).map do |m|
           key, _, value = m
           [convert_to_backward_compatible_key(key), value.gsub(/\s+/, " ").tr('"', "'")]
         end
         Hash[config_pairs]
-      else
-        {}
       end
     end
 
     def convert_to_backward_compatible_key(key)
-      key = "#{key}/" if key =~ /https?:/i && key !~ %r[/\Z]
+      key = "#{key}/" if key =~ /https?:/i && key !~ %r{/\Z}
       key = key.gsub(".", "__") if key.include?(".")
       key
     end
 
     # TODO: duplicates Rubygems#normalize_uri
     # TODO: is this the correct place to validate mirror URIs?
-    def normalize_uri(uri)
+    def self.normalize_uri(uri)
       uri = uri.to_s
-      uri = "#{uri}/" unless uri =~ %r[/\Z]
+      uri = "#{uri}/" unless uri =~ %r{/\Z}
       uri = URI(uri)
       unless uri.absolute?
         raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."

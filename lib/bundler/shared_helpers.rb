@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "pathname"
 require "rubygems"
 
@@ -70,7 +71,7 @@ module Bundler
     end
 
     def with_clean_git_env(&block)
-      keys    = %w[GIT_DIR GIT_WORK_TREE]
+      keys    = %w(GIT_DIR GIT_WORK_TREE)
       old_env = keys.inject({}) do |h, k|
         h.update(k => ENV[k])
       end
@@ -83,22 +84,49 @@ module Bundler
     end
 
     def set_bundle_environment
-      # Set PATH
-      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
-      paths.unshift "#{Bundler.bundle_path}/bin"
-      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
+      set_bundle_variables
+      set_path
+      set_rubyopt
+      set_rubylib
+    end
 
-      # Set RUBYOPT
-      rubyopt = [ENV["RUBYOPT"]].compact
-      if rubyopt.empty? || rubyopt.first !~ %r{-rbundler/setup}
-        rubyopt.unshift %|-rbundler/setup|
-        ENV["RUBYOPT"] = rubyopt.join(" ")
-      end
+    # Rescues permissions errors raised by file system operations
+    # (ie. Errno:EACCESS, Errno::EAGAIN) and raises more friendly errors instead.
+    #
+    # @param path [String] the path that the action will be attempted to
+    # @param action [Symbol, #to_s] the type of operation that will be
+    #   performed. For example: :write, :read, :exec
+    #
+    # @yield path
+    #
+    # @raise [Bundler::PermissionError] if Errno:EACCES is raised in the
+    #   given block
+    # @raise [Bundler::TemporaryResourceError] if Errno:EAGAIN is raised in the
+    #   given block
+    #
+    # @example
+    #   filesystem_access("vendor/cache", :write) do
+    #     FileUtils.mkdir_p("vendor/cache")
+    #   end
+    #
+    # @see {Bundler::PermissionError}
+    def filesystem_access(path, action = :write)
+      yield path
+    rescue Errno::EACCES
+      raise PermissionError.new(path, action)
+    rescue Errno::EAGAIN
+      raise TemporaryResourceError.new(path, action)
+    rescue Errno::EPROTO
+      raise VirtualProtocolError.new
+    rescue *[const_get_safely(:ENOTSUP, Errno)].compact
+      raise OperationNotSupportedError.new(path, action)
+    end
 
-      # Set RUBYLIB
-      rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
-      rubylib.unshift File.expand_path("../..", __FILE__)
-      ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
+    def const_get_safely(constant_name, namespace)
+      const_in_namespace = namespace.constants.include?(constant_name.to_s) ||
+        namespace.constants.include?(constant_name.to_sym)
+      return nil unless const_in_namespace
+      namespace.const_get(constant_name)
     end
 
   private
@@ -110,9 +138,9 @@ module Bundler
     end
 
     def find_file(*names)
-      search_up(*names) {|filename|
+      search_up(*names) do |filename|
         return filename if File.file?(filename)
-      }
+      end
     end
 
     def find_directory(*names)
@@ -135,8 +163,39 @@ module Bundler
           filename = File.join(current, name)
           yield filename
         end
-        current, previous = File.expand_path("..", current), current
+        previous = current
+        current = File.expand_path("..", current)
       end
+    end
+
+    def set_bundle_variables
+      begin
+        ENV["BUNDLE_BIN_PATH"] = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
+      rescue Gem::GemNotFoundException
+        ENV["BUNDLE_BIN_PATH"] = File.expand_path("../../../exe/bundle", __FILE__)
+      end
+
+      # Set BUNDLE_GEMFILE
+      ENV["BUNDLE_GEMFILE"] = find_gemfile.to_s
+    end
+
+    def set_path
+      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
+      paths.unshift "#{Bundler.bundle_path}/bin"
+      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
+    end
+
+    def set_rubyopt
+      rubyopt = [ENV["RUBYOPT"]].compact
+      return if !rubyopt.empty? && rubyopt.first =~ %r{-rbundler/setup}
+      rubyopt.unshift %(-rbundler/setup)
+      ENV["RUBYOPT"] = rubyopt.join(" ")
+    end
+
+    def set_rubylib
+      rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
+      rubylib.unshift File.expand_path("../..", __FILE__)
+      ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
     def clean_load_path

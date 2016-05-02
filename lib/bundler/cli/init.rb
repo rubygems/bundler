@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Init
     attr_reader :options

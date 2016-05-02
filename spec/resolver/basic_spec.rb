@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "Resolving" do
@@ -47,18 +48,18 @@ describe "Resolving" do
   it "raises an exception if a child dependency is not resolved" do
     @index = a_unresovable_child_index
     dep "chef_app_error"
-    expect {
+    expect do
       resolve
-    }.to raise_error(Bundler::VersionConflict)
+    end.to raise_error(Bundler::VersionConflict)
   end
 
   it "should throw error in case of circular dependencies" do
     @index = a_circular_index
     dep "circular_app"
 
-    expect {
+    expect do
       resolve
-    }.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'bar' or gem 'foo'/i)
+    end.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'bar' or gem 'foo'/i)
   end
 
   # Issue #3459
@@ -73,5 +74,34 @@ describe "Resolving" do
     @index = a_complicated_index
     dep "foo", ">= 3.0.0"
     should_resolve_and_include %w(foo-3.0.5)
+  end
+
+  it "takes into account required_ruby_version" do
+    @index = build_index do
+      gem "foo", "1.0.0" do
+        dep "bar", ">= 0"
+      end
+
+      gem "foo", "2.0.0" do |s|
+        dep "bar", ">= 0"
+        s.required_ruby_version = "~> 2.0.0"
+      end
+
+      gem "bar", "1.0.0"
+
+      gem "bar", "2.0.0" do |s|
+        s.required_ruby_version = "~> 2.0.0"
+      end
+    end
+    dep "foo"
+
+    deps = []
+    @deps.each do |d|
+      deps << Bundler::DepProxy.new(d, "ruby")
+    end
+
+    got = Bundler::Resolver.resolve(deps, @index, {}, [], Bundler::RubyVersion.new("1.8.7", nil, nil, nil))
+    got = got.map(&:full_name).sort
+    expect(got).to eq(%w(foo-1.0.0 bar-1.0.0).sort)
   end
 end

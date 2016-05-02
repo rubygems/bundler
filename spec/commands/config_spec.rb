@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe ".bundle/config" do
@@ -54,8 +55,8 @@ describe ".bundle/config" do
     end
 
     it "can also be set explicitly" do
-      bundle "config --global foo global"
-      run "puts Bundler.settings[:foo]"
+      bundle! "config --global foo global"
+      run! "puts Bundler.settings[:foo]"
       expect(out).to eq("global")
     end
 
@@ -229,7 +230,7 @@ E
     it "doesn't return quotes around values", :ruby => "1.9" do
       bundle "config foo '1'"
       run "puts Bundler.settings.send(:global_config_file).read"
-      expect(out).to include("'1'")
+      expect(out).to include('"1"')
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("1")
     end

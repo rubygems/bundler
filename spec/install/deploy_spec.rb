@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "install with --deployment or --frozen" do
@@ -16,6 +17,21 @@ describe "install with --deployment or --frozen" do
   it "fails without a lockfile and says that --frozen requires a lock" do
     bundle "install --frozen"
     expect(err).to include("The --frozen flag requires a gems.locked")
+  end
+
+  it "disallows --deployment --system" do
+    bundle "install --deployment --system"
+    expect(out).to include("You have specified both --deployment")
+    expect(out).to include("Please choose.")
+    expect(exitstatus).to eq(15) if exitstatus
+  end
+
+  it "disallows --deployment --path --system" do
+    bundle "install --deployment --path . --system"
+    expect(out).to include("You have specified both a path to install your gems to")
+    expect(out).to include("You have specified both --deployment")
+    expect(out).to include("Please choose.")
+    expect(exitstatus).to eq(15) if exitstatus
   end
 
   it "works after you try to deploy without a lock" do
@@ -212,7 +228,7 @@ describe "install with --deployment or --frozen" do
 
       bundle "install --deployment"
       expect(err).to include("deployment mode")
-      expect(err).to include("You have deleted from gems.rb:\n* source: #{lib_path("rack-1.0")} (at master)")
+      expect(out).to include("You have deleted from gems.rb:\n* source: #{lib_path("rack-1.0")} (at master@#{revision_for(lib_path("rack-1.0"))[0..6]}")
       expect(err).not_to include("You have added to gems.rb")
       expect(err).not_to include("You have changed in gems.rb")
     end
@@ -235,7 +251,7 @@ describe "install with --deployment or --frozen" do
 
       bundle "install --deployment"
       expect(err).to include("deployment mode")
-      expect(err).to include("You have changed in gems.rb:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
+      expect(out).to include("You have changed in gems.rb:\n* rack from `no specified source` to `#{lib_path("rack")} (at master@#{revision_for(lib_path("rack"))[0..6]})`")
       expect(err).not_to include("You have added to gems.rb")
       expect(err).not_to include("You have deleted from gems.rb")
     end

@@ -1,4 +1,5 @@
 # coding: utf-8
+# frozen_string_literal: true
 lib = File.expand_path("../lib/", __FILE__)
 $:.unshift lib unless $:.include?(lib)
 require "bundler/version"
@@ -19,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "automatiek", "~> 0.1.0"
   s.add_development_dependency "mustache",   "0.99.6"
   s.add_development_dependency "rake",       "~> 10.0"
-  s.add_development_dependency "rdiscount",  "~> 1.6"
+  s.add_development_dependency "rdiscount",  "~> 2.1.8"
   s.add_development_dependency "ronn",       "~> 0.7.3"
   s.add_development_dependency "rspec",      "~> 3.0"
 

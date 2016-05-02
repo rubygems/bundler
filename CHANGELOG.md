@@ -1,3 +1,209 @@
+## 1.12.1 (2016-04-30)
+
+Bugfixes:
+  - automatically fallback when the new index has a checksum mismatch instead of erroring (@segiddins)
+  - fix computation of new index file local checksums on Windows (#4472, @mwrock)
+  - properly handle certain resolver backtracking cases without erroring (@segiddins, #4484)
+  - ensure the `$LOAD_PATH` contains specs' load paths in the correct order (@segiddins, #4482)
+
+## 1.12.0 (2016-04-28)
+
+This space intentionally left blank.
+
+## 1.12.0.rc.4 (2016-04-21)
+
+Bugfixes:
+
+  - don't fail when `bundle outdated` is run with flags and the lockfile contains non-semver versions (#4438, @RochesterinNYC)
+
+## 1.12.0.rc.3 (2016-04-19)
+
+Bugfixes:
+
+  - don't allow new attributes to dirty a lockfile when running `bundle exec`, `-rbundler/setup`, or `bundle check` (@segiddins)
+
+## 1.12.0.rc.2 (2016-04-15)
+
+Features:
+
+  - `bundle outdated` handles all combinations of `--major`, `--minor`, and `--patch` (#4396, @RochesterinNYC)
+
+Bugfixes:
+
+  - prevent endless recursive copy for `bundle package --all` (#4392, @RochesterinNYC)
+  - allow executables that are `load`ed to exit non-0 via an `at_exit` hook when invoked by `bundle exec` (@segiddins)
+  - nested invocations of `bundle exec` properly preserve the `$PATH` and `$GEM_PATH` environment variables (@segiddins)
+
+## 1.12.0.rc (2016-03-13)
+
+Performance:
+
+  - Download gem metadata from globally distributed CDN endpoints (#4358, @segiddins)
+
+Bugfixes:
+
+  - handle Ruby pre-releases built from source (#4324, @RochesterinNYC)
+  - support binstubs from RubyGems 2.6 (#4341, @segiddins)
+  - handle quotes present in in PATH (#4326, @segiddins)
+
+## 1.12.0.pre.2 (2016-02-26)
+
+Performance:
+
+  - speed up `bundle exec` by `load`ing the executable whenever possible, saving roughly .2 seconds per invocation (@segiddins)
+
+Features:
+
+  - add a `--patch` flag for `bundle outdated` (@RochesterinNYC)
+  - add `Bundler.clean_env` and `Bundler.original_env` (#4232, @njam)
+  - add `--frozen` support to `bundle package` (#3356, @RochesterinNYC)
+
+Bugfixes:
+
+  - place bundler loaded gems after `-I` and `RUBYLIB` (@Elffers)
+  - give a better error message when filesystem access raises an `EPROTO` error (#3581, #3932, #4163, @RochesterinNYC)
+  - give a better error message when both `--deployment` and `--system` are used together (@RochesterinNYC)
+  - fix `$PATH` being preserved for use in `Bundler.with_clean_env` (#4251, @segiddins, @njam)
+  - give a better error message when running `bundle outdated` in frozen mode (#4287, @RochesterinNYC)
+  - handle when `http_proxy` is set to `:no_proxy` in the rubygems configuration (#4294, @segiddins)
+  - give a better error message when authentication details aren't properly escaped (#4288, @RochesterinNYC)
+  - fix `bundle outdated --minor` to only report updates that match the current minor version (@RochesterinNYC)
+  - fix extra dependencies being resolved unnecessarily (#4276, @segiddins)
+  - give a better error message when missing specs due to platform mis-matches (#4259, @RochesterinNYC)
+  - skip rebuilding extensions for git gems if they are already built (#4082, @csfrancis, @indirect, @segiddins)
+  - fix `bundle install` not installing when the `no_install` setting is set (#3966, @chulkilee, @segiddins)
+
+## 1.12.0.pre.1 (2016-02-09)
+
+Performance:
+
+  - speed up `bundle install` and `bundle update` by using the new compact gem index (@segiddins, @fotanus, @indirect)
+  - speed up `bundle exec` by avoiding loading the gemfile twice (#2951, #2952, @segiddins)
+
+Features:
+
+  - add support for using version operators to specify ruby versions in the Gemfile (@jtarchie)
+  - redirect `--help` flag for plugins to that plugin's man page (@RochesterinNYC)
+  - support probing a mirror with a fallback timeout (#4128, @pcarranza)
+  - add `--full-index` option to `bundle lock` (@segiddins)
+  - support running with frozen string literals (@deepj, @segiddins)
+  - add `--major` and `--minor` options to `bundle outdated` (#3805, @cirdes)
+  - allow passing a custom `ui` to `bundler/inline` (@lamont-granquist)
+  - add support for ruby 2.4 (#4266, @segiddins)
+  - add `bundle outdated --parseable` for machine-readable output (@RochesterinNYC)
+
+Bugfixes:
+
+  - fix `bundle package --all` recursing endlessly (#4158, @RochesterinNYC)
+  - fail fast on more errors when fetching remote resources (#4154, @RochesterinNYC)
+  - give a better error message when a given git commit can't be found (#4140, @doy)
+  - give a better error message when `bundle clean` doesn't have sufficient permissions (#4170, @RochesterinNYC)
+  - give a better error message when reading a bundler config file fails (@segiddins)
+  - restrict platforms when referencing a `gemspec` in the `Gemfile` to those defined in the gemspec (#4102, #4150, @smellsblue)
+  - fix `bundle gem` with minitest to use the correct rake task (@kotoshenya)
+  - give a better error message when ssl isn't available (#4054, @RochesterinNYC)
+  - print the original `require` error when `Bundler.require` fails (#4182, @RochesterinNYC)
+  - give a better error message when certain resources are temporarily unavailable (#4183, @RochesterinNYC)
+  - fix returning case-sensitive gem mirror URIs on ruby 2.3 (@segiddins)
+  - ignore colorized output from `git` when determining the current branch (#4056, @agis-)
+  - fix storing the shared gems config option as a boolean (@vassilevsky)
+  - add support for running `bundle gem --exe` instead of using the `--bin` option (@christhekeele)
+  - fix `exec`-ing with 0 args in a directory with spaces (#4230, @segiddins)
+  - avoid installing extraneous gems when resolving to an older version of a spec (#4101, #4198, @segiddins)
+  - ensure paths resolved when parsing a gemfile are relative to that file (#3349, @dtognazzini)
+  - give a better error message when encountering an invalid gemspec (#4248, #4275, @RochesterinNYC)
+  - preserve the original `PATH` in `Bundler.with_clean_env` (#4251, @segiddins)
+  - ensure standalone file paths are relative to the project root (#4144, @glennpratt)
+
+## 1.11.2 (2015-12-15)
+
+Bugfixes:
+
+  - _really_ stop calling `required_ruby_version` on nil @specifications (#4147, @indirect)
+
+## 1.11.1 (2015-12-15)
+
+Bugfixes:
+
+  - lazy-load Psych, again (#4149, @indirect)
+  - allow gemspec gems on other platforms (#4150, @indirect)
+  - fix --no-coc and --no-mit flags on `gem` (#4148, @RochesterinNYC)
+  - stop calling `required_ruby_version` on nil @specifications (#4147, @indirect)
+
+## 1.11.0 (2015-12-12)
+
+(this space intentionally left blank)
+
+## 1.11.0.pre.2 (2015-12-06)
+
+Bugfixes:
+
+  - fail gracefully when trying to execute a non-executable file (#4081, @fotanus)
+  - fix a crash when pushing a gem via `rake release` (@segiddins)
+
+## 1.11.0.pre.1 (2015-11-29)
+
+Features:
+
+  - actual Gemfile and lockfile filenames are used in messages (#3672, @segiddins)
+  - the git remote for `rake release` is now customizable (@skateman)
+  - file access permissions errors are now much more friendly (#3703, #3735, #3858, #3988, #4009 @repinel, @Elffers, @segiddins, @agis-)
+  - add support for showing help for plugin commands (@tf)
+  - send `X-Gemfile-Source` header to source mirrors (@agis-)
+  - show what version upstream dependencies were resolved to in conflict messages (@segiddins)
+  - add support for using bundler setting to add private access credentials for git sources (@frsyuki)
+  - take into consideration HTTP proxy settings in `.gemrc` (@PG-kura)
+  - allow specifying a gem host to push to in the `GEM_HOST` environment variable (@pmenglund)
+  - when gempec `required_ruby_version` is available and the Gemfile specifies a ruby version, resolve for the given ruby version (@segiddins)
+  - allow setting a `silence_root_warning` setting to silence the warning when `bundle install` is run as root (@blackxored)
+  - update the `bundle gem` code of conduct template to Contributor Covenant v1.3.0 (@CoralineAda)
+  - add support for specifying gems to update when running `bundle lock` via `--update gem1 gem2` (@JuanitoFatas)
+  - added support for MRI 2.3 (@amatsuda)
+  - show a helpful message when requiring a file in `bundler require` fails (#3960, @agis-)
+  - include git revision hash when printing a git source (#3433, @agis-)
+  - improve hint when a resolution conflict occurs (@seanlinsley)
+  - show a friendly error when a git ref is not found (#3879, @agis-)
+  - improve error message when sources are not absolute URIs (#3925, @agis-)
+  - add `pkg` to rake's clobber list (#3676, @jasonkarns)
+  - retry fetching specs when fetching version metadata fails (@jingweno)
+
+Bugfixes:
+
+  - avoid showing bundler version warning messages twice (@fotanus)
+  - fix running `bundle check` with `--path` when the gems are only installed globally (@akihiro17)
+  - fix `bin/setup` from `bundle gem` assuming `bash` is in `/bin`
+  - fail more gracefully when an HTTP remote is unreachable (#3765, @steverob)
+  - fix a warning running `bundle exec` on jruby 9.0.0.0 (@deivid-rodriguez, @mastfish)
+  - fix the `bundle gem` readme when no tests are generated (@roseweixel)
+  - the dependencies on test gems in `bundle gem` are now locked to major versions (#3811, @indirect)
+  - fix the paths for native extensions generated by `--standalone` (#3813, @AlexanderPavlenko)
+  - fix trying to cache a gem that has no source (@EduardoBautista)
+  - fix `--source` option to `bundle update` causing incorrect gem unlocking (#3759, #3761, @neoeno)
+  - fix handling an empty `BUNDLE_GEMFILE` environment variables (#3678, @agis-)
+  - avoid cleaning up gem extension directory in `bundle clean` (@Sirupsen)
+  - fix the `ssl_verify_mode` setting not being treated as a number (@goughy000)
+  - fix not retrying on zlib errors (#4047, @andremedeiros)
+  - fix a warning being shown for using `URI.encode` (@EduardoBautista)
+  - fix handling of fatal HTTP errors (#3830, @indirect)
+  - ensure all `sudo` access is done in a thread-safe manner (#3910, @agis-)
+  - fix caching gems with a path with the same prefix as the bundled application (@indirect)
+  - fix showing gemspec validation errors on `bundle exec` (#3895, @agis-)
+  - distinguish Gemfile syntax and evaluation errors (#3783, @agis-)
+  - fix nested Gemfile sources not restoring the previous source (#3974, @agis-)
+  - fix the `RUBYLIB` environment variable not being cleaned (#3982, @agis-)
+  - fix handling a dependency missing from `Gemfile.lock` so parallel installation does not deadlock (#4012, @lukaso)
+  - also print gemspecs in `bundle env` output (@agis-)
+  - fix handling when a `path` source does not have a gemspec but a lockfile says there is (#4004, @segiddins)
+  - show a warning when the `RUBYGEMS_GEMDEPS` environment variable is set (#3656, @agis-)
+  - fix handling invalid RubyGems configuration files (#4042, @agis-)
+  - fix `bundle console` falling back to `irb` when the preferred console is unavailable (@felixbuenemann)
+  - restrict platforms when referencing a `gemspec` in the `Gemfile` to those defined in the gemspec (#4102, @smellsblue)
+
+Performance:
+
+  - speed up dependency resolution in pathological cases by 25x (#3803, @segiddins)
+  - drop string allocations when searching for gems (@jrafanie)
+
 ## 1.10.6 (2015-07-22)
 
 Workarounds:
@@ -72,6 +278,7 @@ Bugfixes:
   - allow `viz` to work with prereleases (#3621, #3217, @aprescott)
   - validate gemspecs used in path and git gems (#3639, @segiddins, @indirect)
   - stop printing config warnings when config is unchanged (#3649, @fotanus, @indirect)
+  - Without groups saved via `config` are no longer ignored when the `--without` flag is used
 
 ## 1.10.0.pre.2 (2015-05-07)
 

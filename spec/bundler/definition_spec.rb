@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "bundler/definition"
 
@@ -17,6 +18,16 @@ describe Bundler::Definition do
           and_raise(Errno::EACCES)
         expect { subject.lock("gems.locked") }.
           to raise_error(Bundler::PermissionError, /gems\.locked/)
+      end
+    end
+    context "when a temporary resource access issue occurs" do
+      subject { Bundler::Definition.new(nil, [], Bundler::SourceList.new, []) }
+
+      it "raises a TemporaryResourceError with explanation" do
+        expect(File).to receive(:open).with("Gemfile.lock", "wb").
+          and_raise(Errno::EAGAIN)
+        expect { subject.lock("Gemfile.lock") }.
+          to raise_error(Bundler::TemporaryResourceError, /temporarily unavailable/)
       end
     end
   end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class Fetcher
     class Downloader
@@ -9,40 +10,45 @@ module Bundler
         @redirect_limit = redirect_limit
       end
 
-      def fetch(uri, counter = 0)
+      def fetch(uri, options = {}, counter = 0)
         raise HTTPError, "Too many redirects" if counter >= redirect_limit
 
-        response = request(uri)
+        response = request(uri, options)
         Bundler.ui.debug("HTTP #{response.code} #{response.message}")
 
         case response
+        when Net::HTTPSuccess, Net::HTTPNotModified
+          response
         when Net::HTTPRedirection
           new_uri = URI.parse(response["location"])
           if new_uri.host == uri.host
             new_uri.user = uri.user
             new_uri.password = uri.password
           end
-          fetch(new_uri, counter + 1)
-        when Net::HTTPSuccess
-          response.body
+          fetch(new_uri, options, counter + 1)
         when Net::HTTPRequestEntityTooLarge
           raise FallbackError, response.body
         when Net::HTTPUnauthorized
           raise AuthenticationRequiredError, uri.host
+        when Net::HTTPNotFound
+          raise FallbackError, "Net::HTTPNotFound"
         else
-          raise HTTPError, "#{response.class}: #{response.body}"
+          raise HTTPError, "#{response.class}#{": #{response.body}" unless response.body.empty?}"
         end
       end
 
-      def request(uri)
+      def request(uri, options)
         Bundler.ui.debug "HTTP GET #{uri}"
-        req = Net::HTTP::Get.new uri.request_uri
+        req = Net::HTTP::Get.new uri.request_uri, options
         if uri.user
           user = CGI.unescape(uri.user)
           password = uri.password ? CGI.unescape(uri.password) : nil
           req.basic_auth(user, password)
         end
         connection.request(uri, req)
+      rescue NoMethodError => e
+        raise unless ["undefined method", "use_ssl="].all? {|snippet| e.message.include? snippet }
+        raise LoadError.new("cannot load such file -- openssl")
       rescue OpenSSL::SSL::SSLError
         raise CertificateFailureError.new(uri)
       rescue *HTTP_ERRORS => e

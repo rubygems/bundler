@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "fileutils"
 require "uri"
 require "digest/sha1"
@@ -35,7 +36,7 @@ module Bundler
       end
 
       def to_lock
-        out = "GIT\n"
+        out = String.new("GIT\n")
         out << "  remote: #{@uri}\n"
         out << "  revision: #{revision}\n"
         %w(ref branch tag submodules).each do |opt|
@@ -65,7 +66,14 @@ module Bundler
         else
           ref
         end
-        "#{uri} (at #{at})"
+
+        rev = begin
+                "@#{shortref_for_display(revision)}"
+              rescue GitError
+                nil
+              end
+
+        "#{uri} (at #{at}#{rev})"
       end
 
       def name
@@ -138,11 +146,9 @@ module Bundler
         changed
       end
 
-      # TODO: actually cache git specs
+      # TODO: cache git specs
       def specs(*)
-        if has_app_cache? && !local?
-          set_local!(app_cache_path)
-        end
+        set_local!(app_cache_path) if has_app_cache? && !local?
 
         if requires_checkout? && !@copied
           git_proxy.checkout
@@ -220,6 +226,10 @@ module Bundler
       end
 
     private
+
+      def build_extensions(installer)
+        super if Bundler.rubygems.spec_missing_extensions?(installer.spec)
+      end
 
       def serialize_gemspecs_in(destination)
         expanded_path = destination.expand_path(Bundler.root)

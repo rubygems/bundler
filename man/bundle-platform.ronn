@@ -38,5 +38,10 @@ match the running Ruby VM, it will tell you what part does not.
 ## OPTIONS
 
 * `--ruby`:
+<<<<<<< HEAD
   It will just display the ruby directive information, so you don't have to
   parse it from the gems.rb(5).
+=======
+  It will display the ruby directive information, so you don't have to
+  parse it from the Gemfile(5).
+>>>>>>> master

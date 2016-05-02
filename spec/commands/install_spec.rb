@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle install with gem sources" do
@@ -344,6 +345,72 @@ describe "bundle install with gem sources" do
     end
   end
 
+  describe "Ruby version in Gemfile.lock" do
+    include Bundler::GemHelpers
+
+    context "and using an unsupported Ruby version" do
+      it "prints an error" do
+        install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '1.8.7'
+          ruby '~> 2.1'
+        G
+        expect(out).to include("Your Ruby version is 1.8.7, but your Gemfile specified ~> 2.1")
+      end
+    end
+
+    context "and using a supported Ruby version" do
+      before do
+        install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '2.1.3'
+          ::RUBY_PATCHLEVEL = 100
+          ruby '~> 2.1.0'
+        G
+      end
+
+      it "writes current Ruby version to Gemfile.lock" do
+        lockfile_should_be <<-L
+         GEM
+           specs:
+
+         PLATFORMS
+           ruby
+
+         DEPENDENCIES
+
+         RUBY VERSION
+            ruby 2.1.3p100
+
+         BUNDLED WITH
+            #{Bundler::VERSION}
+        L
+      end
+
+      it "does not update Gemfile.lock with updated ruby versions" do
+        install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '2.2.3'
+          ::RUBY_PATCHLEVEL = 100
+          ruby '~> 2.2.0'
+        G
+
+        lockfile_should_be <<-L
+         GEM
+           specs:
+
+         PLATFORMS
+           ruby
+
+         DEPENDENCIES
+
+         RUBY VERSION
+            ruby 2.1.3p100
+
+         BUNDLED WITH
+            #{Bundler::VERSION}
+        L
+      end
+    end
+  end
+
   describe "when Bundler root contains regex chars" do
     before do
       root_dir = tmp("foo[]bar")
@@ -603,6 +670,40 @@ describe "bundle install with gem sources" do
           expect(download_cache(source, "activesupport-2.3.5.gem")).to exist
         end
       end
+    end
+  end
+
+  describe "when bundle path does not have write access" do
+    before do
+      FileUtils.mkdir_p(bundled_app("vendor"))
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+    end
+
+    it "should display a proper message to explain the problem" do
+      FileUtils.chmod(0500, bundled_app("vendor"))
+
+      bundle :install, :path => "vendor"
+      expect(out).to include(bundled_app("vendor").to_s)
+      expect(out).to include("grant write permissions")
+    end
+  end
+
+  describe "when bundle install is executed with unencoded authentication" do
+    before do
+      gemfile <<-G
+        source 'https://rubygems.org/'
+        gem 'bundler'
+      G
+    end
+
+    it "should display a helpful messag explaining how to fix it" do
+      bundle :install, :env => { "BUNDLE_RUBYGEMS__ORG" => "user:pass{word" }
+      expect(exitstatus).to eq(17) if exitstatus
+      expect(out).to eq("Please CGI escape your usernames and passwords before " \
+                        "setting them for authentication.")
     end
   end
 end

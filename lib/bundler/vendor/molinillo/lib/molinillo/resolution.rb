@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler::Molinillo
   class Resolver
     # A specific resolution from a given {Resolver}
@@ -38,6 +39,7 @@ module Bundler::Molinillo
       # @return [Array] the dependencies that were explicitly required
       attr_reader :original_requested
 
+      # Initializes a new resolution.
       # @param [SpecificationProvider] specification_provider
       #   see {#specification_provider}
       # @param [UI] resolver_ui see {#resolver_ui}
@@ -129,7 +131,7 @@ module Bundler::Molinillo
             specification_provider.send(instance_method, *args, &block)
           rescue NoSuchDependencyError => error
             if state
-              vertex = activated.vertex_named(name_for error.dependency)
+              vertex = activated.vertex_named(name_for(error.dependency))
               error.required_by += vertex.incoming_edges.map { |e| e.origin.name }
               error.required_by << name_for_explicit_dependency_source unless vertex.explicit_requirements.empty?
             end
@@ -340,31 +342,60 @@ module Bundler::Molinillo
       # @return [Boolean] Whether the possibility was swapped into {#activated}
       def attempt_to_swap_possibility
         swapped = activated.dup
-        swapped.vertex_named(name).payload = possibility
-        return unless swapped.vertex_named(name).requirements.
-            all? { |r| requirement_satisfied_by?(r, swapped, possibility) }
-        attempt_to_activate_new_spec
+        vertex = swapped.vertex_named(name)
+        vertex.payload = possibility
+        return unless vertex.requirements.
+                      all? { |r| requirement_satisfied_by?(r, swapped, possibility) }
+        return unless new_spec_satisfied?
+        actual_vertex = activated.vertex_named(name)
+        actual_vertex.payload = possibility
+        fixup_swapped_children(actual_vertex)
+        activate_spec
+      end
+
+      # Ensures there are no orphaned successors to the given {vertex}.
+      # @param [DependencyGraph::Vertex] vertex the vertex to fix up.
+      # @return [void]
+      def fixup_swapped_children(vertex)
+        payload = vertex.payload
+        dep_names = dependencies_for(payload).map(&method(:name_for))
+        vertex.successors.each do |succ|
+          if !dep_names.include?(succ.name) && !succ.root? && succ.predecessors.to_a == [vertex]
+            debug(depth) { "Removing orphaned spec #{succ.name} after swapping #{name}" }
+            activated.detach_vertex_named(succ.name)
+
+            all_successor_names = succ.recursive_successors.map(&:name)
+
+            requirements.delete_if do |requirement|
+              requirement_name = name_for(requirement)
+              (requirement_name == succ.name) || all_successor_names.include?(requirement_name)
+            end
+          end
+        end
       end
 
       # Attempts to activate the current {#possibility} (given that it hasn't
       # already been activated)
       # @return [void]
       def attempt_to_activate_new_spec
-        satisfied = begin
-          locked_requirement = locked_requirement_named(name)
-          requested_spec_satisfied = requirement_satisfied_by?(requirement, activated, possibility)
-          locked_spec_satisfied = !locked_requirement ||
-            requirement_satisfied_by?(locked_requirement, activated, possibility)
-          debug(depth) { 'Unsatisfied by requested spec' } unless requested_spec_satisfied
-          debug(depth) { 'Unsatisfied by locked spec' } unless locked_spec_satisfied
-          requested_spec_satisfied && locked_spec_satisfied
-        end
-        if satisfied
+        if new_spec_satisfied?
           activate_spec
         else
           create_conflict
           unwind_for_conflict
         end
+      end
+
+      # @return [Boolean] whether the current spec is satisfied as a new
+      # possibility.
+      def new_spec_satisfied?
+        locked_requirement = locked_requirement_named(name)
+        requested_spec_satisfied = requirement_satisfied_by?(requirement, activated, possibility)
+        locked_spec_satisfied = !locked_requirement ||
+          requirement_satisfied_by?(locked_requirement, activated, possibility)
+        debug(depth) { 'Unsatisfied by requested spec' } unless requested_spec_satisfied
+        debug(depth) { 'Unsatisfied by locked spec' } unless locked_spec_satisfied
+        requested_spec_satisfied && locked_spec_satisfied
       end
 
       # @param [String] requirement_name the spec name to search for
@@ -392,17 +423,17 @@ module Bundler::Molinillo
       # @return [void]
       def require_nested_dependencies_for(activated_spec)
         nested_dependencies = dependencies_for(activated_spec)
-        debug(depth) { "Requiring nested dependencies (#{nested_dependencies.map(&:to_s).join(', ')})" }
+        debug(depth) { "Requiring nested dependencies (#{nested_dependencies.join(', ')})" }
         nested_dependencies.each { |d| activated.add_child_vertex(name_for(d), nil, [name_for(activated_spec)], d) }
 
-        push_state_for_requirements(requirements + nested_dependencies, nested_dependencies.size > 0)
+        push_state_for_requirements(requirements + nested_dependencies, !nested_dependencies.empty?)
       end
 
       # Pushes a new {DependencyState} that encapsulates both existing and new
       # requirements
       # @param [Array] new_requirements
       # @return [void]
-      def push_state_for_requirements(new_requirements, requires_sort = true, new_activated = activated.dup)
+      def push_state_for_requirements(new_requirements, requires_sort = true, new_activated = activated)
         new_requirements = sort_dependencies(new_requirements.uniq, new_activated, conflicts) if requires_sort
         new_requirement = new_requirements.shift
         new_name = new_requirement ? name_for(new_requirement) : ''

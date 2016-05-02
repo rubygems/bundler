@@ -2,6 +2,7 @@ inherit_from:
   - .rubocop_todo.yml
 
 AllCops:
+  TargetRubyVersion: 1.9
   Exclude:
     - tmp/**/*
     - lib/bundler/vendor/**/*
@@ -15,17 +16,36 @@ Lint/AssignmentInCondition:
 
 Lint/EndAlignment:
   AlignWith: variable
+  AutoCorrect: true
+
+Lint/UnusedMethodArgument:
+  Enabled: false
 
 # Style
 
 Style/AccessModifierIndentation:
   EnforcedStyle: outdent
 
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
 Style/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: always
+
+Style/MultilineBlockChain:
+  Enabled: false
+
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
+
+Style/PerlBackrefs:
+  Enabled: false
+
+Style/SingleLineBlockParams:
+  Enabled: false
 
 Style/SpaceInsideBlockBraces:
   SpaceBeforeBlockParameters: false
@@ -45,8 +65,15 @@ Style/StringLiteralsInInterpolation:
 
 # Having these make it easier to *not* forget to add one when adding a new
 # value and you can simply copy the previous line.
-Style/TrailingComma:
+Style/TrailingCommaInLiteral:
   EnforcedStyleForMultiline: comma
+
+Style/TrailingUnderscoreVariable:
+  Enabled: false
+
+# `String.new` is preferred style with enabled frozen string literal
+Style/EmptyLiteral:
+  Enabled: false
 
 # 1.8.7 support
 
@@ -65,31 +92,29 @@ Style/EachWithObject:
 Style/SpecialGlobalVars:
   Enabled: false
 
-Style/TrailingComma:
+Style/TrailingCommaInArguments:
+  Enabled: false
+
+Performance/FlatMap:
   Enabled: false
 
 # Metrics
 
-# Arbitrary max lengths for classes simply do not work and enabling this will
-# lead to a never ending stream of annoyance and changes.
+# We've chosen to use Rubocop only for style, and not for complexity or quality checks.
 Metrics/ClassLength:
   Enabled: false
 
-# Arbitrary max lengths for methods simply do not work and enabling this will
-# lead to a never ending stream of annoyance and changes.
+Metrics/ModuleLength:
+  Enabled: false
+
 Metrics/MethodLength:
   Enabled: false
 
-# No enforced convention here.
 Metrics/BlockNesting:
   Enabled: false
 
-# It will be obvious which code is complex, Rubocop should only lint simple
-# rules for us.
 Metrics/AbcSize:
   Enabled: false
 
-# It will be obvious which code is complex, Rubocop should only lint simple
-# rules for us.
 Metrics/CyclomaticComplexity:
   Enabled: false

@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # Exit cleanly from an early interrupt
 Signal.trap("INT") { exit 1 }
@@ -7,5 +8,11 @@ require "bundler/friendly_errors"
 Bundler.with_friendly_errors do
   require "bundler"
   require "bundler/cli"
-  Bundler::CLI.start(ARGV, :debug => true)
+
+  # Allow any command to use --help flag to show help for that command
+  help_flags = %w(--help -h)
+  help_flag_used = ARGV.any? {|a| help_flags.include? a }
+  args = help_flag_used ? Bundler::CLI.reformatted_help_args(ARGV) : ARGV
+
+  Bundler::CLI.start(args, :debug => true)
 end

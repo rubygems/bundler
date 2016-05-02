@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "set"
 
 module Bundler
@@ -12,6 +13,9 @@ module Bundler
 
     attr_reader :specs, :all_specs, :sources
     protected :specs, :all_specs
+
+    RUBY = "ruby".freeze
+    NULL = "\0".freeze
 
     def initialize
       @sources = []
@@ -68,7 +72,7 @@ module Bundler
         end
       end
 
-      results.sort_by {|s| [s.version, s.platform.to_s == "ruby" ? "\0" : s.platform.to_s] }
+      results.sort_by {|s| [s.version, s.platform.to_s == RUBY ? NULL : s.platform.to_s] }
     end
 
     def local_search(query, base = nil)
@@ -76,6 +80,7 @@ module Bundler
       when Gem::Specification, RemoteSpecification, LazySpecification, EndpointSpecification then search_by_spec(query)
       when String then specs_by_name(query)
       when Gem::Dependency then search_by_dependency(query, base)
+      when DepProxy then search_by_dependency(query.dep, base)
       else
         raise "You can't search for a #{query.inspect}."
       end
@@ -130,17 +135,14 @@ module Bundler
     def ==(other)
       all? do |spec|
         other_spec = other[spec].first
-        (spec.dependencies & other_spec.dependencies).empty? && spec.source == other_spec.source
+        other_spec && (spec.dependencies & other_spec.dependencies).empty? && spec.source == other_spec.source
       end
     end
 
     def add_source(index)
-      if index.is_a?(Index)
-        @sources << index
-        @sources.uniq! # need to use uniq! here instead of checking for the item before adding
-      else
-        raise ArgumentError, "Source must be an index, not #{index.class}"
-      end
+      raise ArgumentError, "Source must be an index, not #{index.class}" unless index.is_a?(Index)
+      @sources << index
+      @sources.uniq! # need to use uniq! here instead of checking for the item before adding
     end
 
   private

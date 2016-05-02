@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "uri"
 require "rubygems/user_interaction"
 require "rubygems/spec_fetcher"
@@ -60,7 +61,7 @@ module Bundler
       end
 
       def to_lock
-        out = "GEM\n"
+        out = String.new("GEM\n")
         remotes.reverse_each do |remote|
           out << "  remote: #{suppress_configured_credentials remote}\n"
         end
@@ -68,7 +69,7 @@ module Bundler
       end
 
       def to_s
-        remote_names = self.remotes.map(&:to_s).join(", ")
+        remote_names = remotes.map(&:to_s).join(", ")
         "rubygems repository #{remote_names}"
       end
       alias_method :name, :to_s
@@ -120,7 +121,7 @@ module Bundler
 
         unless Bundler.settings[:no_install]
           message = "Installing #{version_message(spec)}"
-          message << " with native extensions" if spec.extensions.any?
+          message += " with native extensions" if spec.extensions.any?
           Bundler.ui.confirm message
 
           path = cached_gem(spec)
@@ -134,7 +135,7 @@ module Bundler
 
           installed_spec = nil
           Bundler.rubygems.preserve_paths do
-            installed_spec = Bundler::GemInstaller.new(
+            installed_spec = Bundler::RubyGemsGemInstaller.new(
               path,
               :install_dir         => install_path.to_s,
               :bin_dir             => bin_path.to_s,
@@ -155,12 +156,16 @@ module Bundler
                 ext_src.gsub!(src[0..-6], "")
                 dst = File.dirname(File.join(dst, ext_src))
               end
-              Bundler.mkdir_p dst
+              SharedHelpers.filesystem_access(dst) do |p|
+                Bundler.mkdir_p(p)
+              end
               Bundler.sudo "cp -R #{src} #{dst}" if Dir[src].any?
             end
 
             spec.executables.each do |exe|
-              Bundler.mkdir_p Bundler.system_bindir
+              SharedHelpers.filesystem_access(Bundler.system_bindir) do |p|
+                Bundler.mkdir_p(p)
+              end
               Bundler.sudo "cp -R #{install_path}/bin/#{exe} #{Bundler.system_bindir}/"
             end
           end
@@ -262,9 +267,10 @@ module Bundler
 
       def normalize_uri(uri)
         uri = uri.to_s
-        uri = "#{uri}/" unless uri =~ %r'/$'
+        uri = "#{uri}/" unless uri =~ %r{/$}
         uri = URI(uri)
-        raise ArgumentError, "The source must be an absolute URI" unless uri.absolute?
+        raise ArgumentError, "The source must be an absolute URI. For example:\n" \
+          "source 'https://rubygems.org'" if !uri.absolute? || (uri.is_a?(URI::HTTP) && uri.host.nil?)
         uri
       end
 
@@ -324,7 +330,7 @@ module Bundler
       end
 
       def api_fetchers
-        fetchers.select(&:use_api)
+        fetchers.select {|f| f.use_api && f.fetchers.first.api_fetcher? }
       end
 
       def remote_specs
@@ -334,12 +340,12 @@ module Bundler
           # gather lists from non-api sites
           index_fetchers.each do |f|
             Bundler.ui.info "Fetching source index from #{f.uri}"
-            idx.use f.specs(nil, self)
+            idx.use f.specs_with_retry(nil, self)
           end
 
           # because ensuring we have all the gems we need involves downloading
           # the gemspecs of those gems, if the non-api sites contain more than
-          # about 100 gems, we just treat all sites as non-api for speed.
+          # about 100 gems, we treat all sites as non-api for speed.
           allow_api = idx.size < API_REQUEST_LIMIT && dependency_names.size < API_REQUEST_LIMIT
           Bundler.ui.debug "Need to query more than #{API_REQUEST_LIMIT} gems." \
             " Downloading full index instead..." unless allow_api
@@ -347,7 +353,7 @@ module Bundler
           if allow_api
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching gem metadata from #{f.uri}", Bundler.ui.debug?
-              idx.use f.specs(dependency_names, self)
+              idx.use f.specs_with_retry(dependency_names, self)
               Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
             end
 
@@ -360,7 +366,7 @@ module Bundler
               idxcount = idx.size
               api_fetchers.each do |f|
                 Bundler.ui.info "Fetching version metadata from #{f.uri}", Bundler.ui.debug?
-                idx.use f.specs(idx.dependency_names, self), true
+                idx.use f.specs_with_retry(idx.dependency_names, self), true
                 Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
               end
               break if idxcount == idx.size
@@ -375,7 +381,7 @@ module Bundler
               # if there are any cross-site gems we missed, get them now
               api_fetchers.each do |f|
                 Bundler.ui.info "Fetching dependency metadata from #{f.uri}", Bundler.ui.debug?
-                idx.use f.specs(unmet, self)
+                idx.use f.specs_with_retry(unmet, self)
                 Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
               end if unmet.any?
             else
@@ -386,7 +392,7 @@ module Bundler
           unless allow_api
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching source index from #{f.uri}"
-              idx.use f.specs(nil, self)
+              idx.use f.specs_with_retry(nil, self)
             end
           end
         end
@@ -399,12 +405,15 @@ module Bundler
 
         download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
         gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
-        FileUtils.mkdir_p("#{download_path}/cache")
-
-        download_gem(spec, uri, download_path)
+        SharedHelpers.filesystem_access("#{download_path}/cache") do |p|
+          FileUtils.mkdir_p(p)
+        end
+        Bundler.rubygems.download_gem(spec, uri, download_path)
 
         if Bundler.requires_sudo?
-          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
+          SharedHelpers.filesystem_access("#{Bundler.rubygems.gem_dir}/cache") do |p|
+            Bundler.mkdir_p(p)
+          end
           Bundler.sudo "mv #{download_path}/cache/#{spec.full_name}.gem #{gem_path}"
         end
 

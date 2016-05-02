@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle init" do
@@ -11,9 +12,9 @@ describe "bundle init" do
       gem "rails"
     G
 
-    expect {
+    expect do
       bundle :init
-    }.not_to change { File.read(bundled_app("gems.rb")) }
+    end.not_to change { File.read(bundled_app("gems.rb")) }
   end
 
   it "should generate from an existing gemspec" do

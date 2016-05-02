@@ -1,6 +1,6 @@
 # Bundler Code of Conduct
 
-The Bundler project strongly values contributors from anywhere, regardless of gender, sexual orientation, disability, physical appearance, body size, race, or religion. As a result, the Bundler team has agreed to and enforces this code of conduct in order to provide a harassment-free experience for everyone who participates in the development of Bundler.
+The Bundler project strongly values contributors from anywhere, regardless of level of experience, gender, gender identity and expression, sexual orientation, disability, physical appearance, body size, race, ethnicity, age, religion, or nationality. As a result, the Bundler team has agreed to and enforces this code of conduct in order to provide a harassment-free experience for everyone who participates in the development of Bundler.
 
 ### Summary
 
@@ -8,13 +8,13 @@ Harassment in code and discussion or violation of physical boundaries is complet
 
 ### In detail
 
-Harassment includes offensive verbal comments related to gender, sexual orientation, disability, physical appearance, body size, race, religion, sexual images, deliberate intimidation, stalking, sustained disruption, and unwelcome sexual attention.
+Harassment includes offensive verbal comments related to level of experience, gender, gender identity and expression, sexual orientation, disability, physical appearance, body size, race, ethnicity, age, religion, nationality, the use of sexualized language or imagery, deliberate intimidation, stalking, sustained disruption, and unwelcome sexual attention.
 
 Individuals asked to stop any harassing behavior are expected to comply immediately.
 
 Maintainers, including the core team, are also subject to the anti-harassment policy.
 
-If anyone engages in harassing behavior, including maintainers, we may take appropriate action, up to and including warning the offender, deletion of comments, removal from the project’s codebase and communication systems, and escalation to Github support.
+If anyone engages in abusive, harassing, or otherwise unacceptable behavior, including maintainers, we may take appropriate action, up to and including warning the offender, deletion of comments, removal from the project’s codebase and communication systems, and escalation to Github support.
 
 If you are being harassed, notice that someone else is being harassed, or have any other concerns, please contact a member of [the core team](http://bundler.io/contributors.html) or [email the core team](mailto:team@bundler.io) immediately.
 

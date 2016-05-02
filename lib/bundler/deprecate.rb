@@ -1,5 +1,5 @@
+# frozen_string_literal: true
 module Bundler
-
   if defined? ::Deprecate
     Deprecate = ::Deprecate
   elsif defined? Gem::Deprecate
@@ -13,5 +13,4 @@ module Bundler
       yield
     end
   end
-
 end

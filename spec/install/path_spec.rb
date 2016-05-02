@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle install" do
@@ -37,6 +38,12 @@ describe "bundle install" do
       bundle "config path vendor/bundle"
       bundle "install"
       expect(out).to include("gems are installed into ./vendor")
+    end
+
+    it "disallows --path vendor/bundle --system" do
+      bundle "install --path vendor/bundle --system"
+      expect(out).to include("Please choose.")
+      expect(exitstatus).to eq(15) if exitstatus
     end
 
     it "remembers to disable system gems after config path vendor/bundle" do

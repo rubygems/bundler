@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "rubygems/dependency"
 require "bundler/shared_helpers"
 require "bundler/rubygems_ext"
@@ -54,6 +55,15 @@ module Bundler
       :x64_mingw_23 => Gem::Platform::X64_MINGW
     }.freeze
 
+    REVERSE_PLATFORM_MAP = {}.tap do |reverse_platform_map|
+      PLATFORM_MAP.each do |key, value|
+        reverse_platform_map[value] ||= []
+        reverse_platform_map[value] << key
+      end
+
+      reverse_platform_map.each {|_, platforms| platforms.freeze }
+    end.freeze
+
     def initialize(name, version, options = {}, &blk)
       type = options["type"] || :runtime
       super(name, version, type)
@@ -65,9 +75,7 @@ module Bundler
       @env            = options["env"]
       @should_include = options.fetch("should_include", true)
 
-      if options.key?("require")
-        @autorequire = Array(options["require"] || [])
-      end
+      @autorequire = Array(options["require"] || []) if options.key?("require")
     end
 
     def gem_platforms(valid_platforms)
@@ -99,9 +107,9 @@ module Bundler
 
     def current_platform?
       return true if @platforms.empty?
-      @platforms.any? { |p|
+      @platforms.any? do |p|
         Bundler.current_ruby.send("#{p}?")
-      }
+      end
     end
 
     def to_lock

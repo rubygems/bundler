@@ -24,7 +24,11 @@ configuration file using the following names:
 
 ## OPTIONS
 
+<<<<<<< HEAD
 * `--exe`:
+=======
+* `--exe` or `-b` or `--bin`:
+>>>>>>> master
   Specify that Bundler should create a binary executable (as `exe/GEM_NAME`)
   in the generated rubygem project. This binary will also be added to the
   `GEM_NAME.gemspec` manifest. This behavior is disabled by default.

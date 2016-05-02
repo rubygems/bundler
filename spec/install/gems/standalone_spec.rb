@@ -1,18 +1,13 @@
+# frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install --standalone" do
-  describe "with simple gems" do
-    before do
-      install_gemfile <<-G, :standalone => true
-        source "file://#{gem_repo1}"
-        gem "rails"
-      G
-    end
-
+shared_examples "bundle install --standalone" do
+  shared_examples "common functionality" do
     it "still makes the gems available to normal bundler" do
       # See CLI::Install#run.
       with_config(:path => "bundle") do
-        should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+        args = expected_gems.map {|k, v| "#{k} #{v}" }
+        should_be_installed(*args)
       end
     end
 
@@ -21,31 +16,58 @@ describe "bundle install --standalone" do
     end
 
     it "makes the gems available without bundler" do
-      ruby <<-RUBY, :no_lib => true
+      testrb = String.new <<-RUBY
         $:.unshift File.expand_path("bundle")
         require "bundler/setup"
 
-        require "actionpack"
-        puts ACTIONPACK
       RUBY
+      expected_gems.each do |k, _|
+        testrb << "\nrequire \"#{k}\""
+        testrb << "\nputs #{k.upcase}"
+      end
+      Dir.chdir(bundled_app) do
+        ruby testrb, :no_lib => true
+      end
 
-      expect(out).to eq("2.3.2")
+      expect(out).to eq(expected_gems.values.join("\n"))
     end
 
     it "works on a different system" do
       FileUtils.mv(bundled_app, "#{bundled_app}2")
-      Dir.chdir("#{bundled_app}2")
 
-      ruby <<-RUBY, :no_lib => true
+      testrb = String.new <<-RUBY
         $:.unshift File.expand_path("bundle")
         require "bundler/setup"
 
-        require "actionpack"
-        puts ACTIONPACK
       RUBY
+      expected_gems.each do |k, _|
+        testrb << "\nrequire \"#{k}\""
+        testrb << "\nputs #{k.upcase}"
+      end
+      Dir.chdir("#{bundled_app}2") do
+        ruby testrb, :no_lib => true
+      end
 
-      expect(out).to eq("2.3.2")
+      expect(out).to eq(expected_gems.values.join("\n"))
     end
+  end
+
+  describe "with simple gems" do
+    before do
+      install_gemfile <<-G, :standalone => true
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+    end
+
+    let(:expected_gems) do
+      {
+        "actionpack" => "2.3.2",
+        "rails" => "2.3.2",
+      }
+    end
+
+    include_examples "common functionality"
   end
 
   describe "with gems with native extension" do
@@ -63,6 +85,36 @@ describe "bundle install --standalone" do
     end
   end
 
+  describe "with gem that has an invalid gemspec" do
+    before do
+      build_git "bar", :gemspec => false do |s|
+        s.write "lib/bar/version.rb", %(BAR_VERSION = '1.0')
+        s.write "bar.gemspec", <<-G
+          lib = File.expand_path('../lib/', __FILE__)
+          $:.unshift lib unless $:.include?(lib)
+          require 'bar/version'
+
+          Gem::Specification.new do |s|
+            s.name        = 'bar'
+            s.version     = BAR_VERSION
+            s.summary     = 'Bar'
+            s.files       = Dir["lib/**/*.rb"]
+            s.author      = 'Anonymous'
+            s.require_path = [1,2]
+          end
+        G
+      end
+      install_gemfile <<-G, :standalone => true
+        gem "bar", :git => "#{lib_path("bar-1.0")}"
+      G
+    end
+
+    it "outputs a helpful error message" do
+      expect(out).to include("You have one or more invalid gemspecs that need to be fixed.")
+      expect(out).to include("bar 1.0 has an invalid gemspec")
+    end
+  end
+
   describe "with a combination of gems and git repos" do
     before do
       build_git "devise", "1.0"
@@ -75,29 +127,21 @@ describe "bundle install --standalone" do
     end
 
     it "still makes the gems available to normal bundler" do
+      let(:expected_gems) do
+        {
+          "actionpack" => "2.3.2",
+          "devise" => "1.0",
+          "rails" => "2.3.2",
+        }
+      end
+
       # See CLI::Install#run.
       with_config(:path => "bundle") do
         should_be_installed "actionpack 2.3.2", "rails 2.3.2", "devise 1.0"
       end
     end
 
-    it "generates a bundle/bundler/setup.rb" do
-      expect(bundled_app("bundle/bundler/setup.rb")).to exist
-    end
-
-    it "makes the gems available without bundler" do
-      ruby <<-RUBY, :no_lib => true
-        $:.unshift File.expand_path("bundle")
-        require "bundler/setup"
-
-        require "devise"
-        require "actionpack"
-        puts DEVISE
-        puts ACTIONPACK
-      RUBY
-
-      expect(out).to eq("1.0\n2.3.2")
-    end
+    include_examples "common functionality"
   end
 
   describe "with groups" do
@@ -115,33 +159,28 @@ describe "bundle install --standalone" do
       G
     end
 
-    it "makes the gems available without bundler" do
-      ruby <<-RUBY, :no_lib => true
-        $:.unshift File.expand_path("bundle")
-        require "bundler/setup"
-
-        require "actionpack"
-        require "spec"
-        require "rack/test"
-        puts ACTIONPACK
-        puts SPEC
-        puts RACK_TEST
-      RUBY
-
-      expect(out).to eq("2.3.2\n1.2.7\n1.0")
+    let(:expected_gems) do
+      {
+        "actionpack" => "2.3.2",
+        "rails" => "2.3.2",
+      }
     end
+
+    include_examples "common functionality"
 
     it "allows creating a standalone file with limited groups" do
       bundle "install --standalone default"
 
-      load_error_ruby <<-RUBY, "spec", :no_lib => true
-        $:.unshift File.expand_path("bundle")
-        require "bundler/setup"
+      Dir.chdir(bundled_app) do
+        load_error_ruby <<-RUBY, "spec", :no_lib => true
+          $:.unshift File.expand_path("bundle")
+          require "bundler/setup"
 
-        require "actionpack"
-        puts ACTIONPACK
-        require "spec"
-      RUBY
+          require "actionpack"
+          puts ACTIONPACK
+          require "spec"
+        RUBY
+      end
 
       expect(out).to eq("2.3.2")
       expect(err).to eq("ZOMG LOAD ERROR")
@@ -151,14 +190,16 @@ describe "bundle install --standalone" do
       bundle "config without test"
       bundle "install --standalone"
 
-      load_error_ruby <<-RUBY, "spec", :no_lib => true
-        $:.unshift File.expand_path("bundle")
-        require "bundler/setup"
+      Dir.chdir(bundled_app) do
+        load_error_ruby <<-RUBY, "spec", :no_lib => true
+          $:.unshift File.expand_path("bundle")
+          require "bundler/setup"
 
-        require "actionpack"
-        puts ACTIONPACK
-        require "spec"
-      RUBY
+          require "actionpack"
+          puts ACTIONPACK
+          require "spec"
+        RUBY
+      end
 
       expect(out).to eq("2.3.2")
       expect(err).to eq("ZOMG LOAD ERROR")
@@ -169,13 +210,15 @@ describe "bundle install --standalone" do
       bundle "config --local path path/to/bundle"
       bundle "install --standalone"
 
-      ruby <<-RUBY, :no_lib => true, :expect_err => false
-        $:.unshift File.expand_path("path/to/bundle")
-        require "bundler/setup"
+      Dir.chdir(bundled_app) do
+        ruby <<-RUBY, :no_lib => true, :expect_err => false
+          $:.unshift File.expand_path("path/to/bundle")
+          require "bundler/setup"
 
-        require "actionpack"
-        puts ACTIONPACK
-      RUBY
+          require "actionpack"
+          puts ACTIONPACK
+        RUBY
+      end
 
       expect(out).to eq("2.3.2")
     end
@@ -185,14 +228,16 @@ describe "bundle install --standalone" do
       bundle "install"
       bundle "install --standalone"
 
-      load_error_ruby <<-RUBY, "spec", :no_lib => true
-        $:.unshift File.expand_path("bundle")
-        require "bundler/setup"
+      Dir.chdir(bundled_app) do
+        load_error_ruby <<-RUBY, "spec", :no_lib => true
+          $:.unshift File.expand_path("bundle")
+          require "bundler/setup"
 
-        require "actionpack"
-        puts ACTIONPACK
-        require "spec"
-      RUBY
+          require "actionpack"
+          puts ACTIONPACK
+          require "spec"
+        RUBY
+      end
 
       expect(out).to eq("2.3.2")
       expect(err).to eq("ZOMG LOAD ERROR")
@@ -208,59 +253,67 @@ describe "bundle install --standalone" do
           source "#{source_uri}"
           gem "rails"
         G
-      end
-
-      it "should run without errors" do
         bundle "install --standalone", :artifice => "endpoint"
-
-        expect(exitstatus).to eq(0) if exitstatus
       end
 
-      it "still makes the gems available to normal bundler" do
-        bundle "install --standalone", :artifice => "endpoint"
-
-        # See CLI::Install#run.
-        with_config(:path => "bundle") do
-          should_be_installed "actionpack 2.3.2", "rails 2.3.2"
-        end
+      let(:expected_gems) do
+        {
+          "actionpack" => "2.3.2",
+          "rails" => "2.3.2",
+        }
       end
 
-      it "generates a bundle/bundler/setup.rb" do
-        bundle "install --standalone", :artifice => "endpoint"
-
-        expect(bundled_app("bundle/bundler/setup.rb")).to exist
-      end
-
-      it "makes the gems available without bundler" do
-        bundle "install --standalone", :artifice => "endpoint"
-
-        ruby <<-RUBY, :no_lib => true
-          $:.unshift File.expand_path("bundle")
-          require "bundler/setup"
-
-          require "actionpack"
-          puts ACTIONPACK
-        RUBY
-
-        expect(out).to eq("2.3.2")
-      end
-
-      it "works on a different system" do
-        bundle "install --standalone", :artifice => "endpoint"
-
-        FileUtils.mv(bundled_app, "#{bundled_app}2")
-        Dir.chdir("#{bundled_app}2")
-
-        ruby <<-RUBY, :no_lib => true
-          $:.unshift File.expand_path("bundle")
-          require "bundler/setup"
-
-          require "actionpack"
-          puts ACTIONPACK
-        RUBY
-
-        expect(out).to eq("2.3.2")
-      end
+      include_examples "common functionality"
     end
   end
+
+  describe "with --binstubs" do
+    before do
+      install_gemfile <<-G, :standalone => true, :binstubs => true
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+    end
+
+    let(:expected_gems) do
+      {
+        "actionpack" => "2.3.2",
+        "rails" => "2.3.2",
+      }
+    end
+
+    include_examples "common functionality"
+
+    it "creates stubs that use the standalone load path" do
+      Dir.chdir(bundled_app) do
+        expect(`bin/rails -v`.chomp).to eql "2.3.2"
+      end
+    end
+
+    it "creates stubs that can be executed from anywhere" do
+      require "tmpdir"
+      Dir.chdir(Dir.tmpdir) do
+        expect(`#{bundled_app("bin/rails")} -v`.chomp).to eql "2.3.2"
+      end
+    end
+
+    it "creates stubs with the correct load path" do
+      extension_line = File.read(bundled_app("bin/rails")).each_line.find {|line| line.include? "$:.unshift" }.strip
+      expect(extension_line).to eq "$:.unshift File.expand_path '../../bundle', __FILE__"
+    end
+  end
+end
+
+describe "bundle install --standalone" do
+  include_examples("bundle install --standalone")
+end
+
+describe "bundle install --standalone run in a subdirectory" do
+  before do
+    subdir = bundled_app("bob")
+    FileUtils.mkdir_p(subdir)
+    Dir.chdir(subdir)
+  end
+
+  include_examples("bundle install --standalone")
 end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle check" do
@@ -288,14 +289,14 @@ describe "bundle check" do
             rack (1.0.0)
 
         PLATFORMS
-          #{generic(Gem::Platform.local)}
+          #{generic_local_platform}
 
         DEPENDENCIES
           rack
       L
 
       if bundler_version
-        lock << "\n        BUNDLED WITH\n           #{bundler_version}\n"
+        lock += "\n        BUNDLED WITH\n           #{bundler_version}\n"
       end
 
       lock

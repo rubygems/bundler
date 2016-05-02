@@ -3,7 +3,7 @@ bundle-update(1) -- Update your gems to the latest available versions
 
 ## SYNOPSIS
 
-`bundle update` <*gems> [--group=NAME] [--source=NAME] [--local]
+`bundle update` <*gems> [--group=NAME] [--source=NAME] [--local] [--ruby]
 
 ## DESCRIPTION
 
@@ -30,6 +30,9 @@ gem.
 
 * `--local`:
   Do not attempt to fetch gems remotely and use the gem cache instead.
+
+* `--ruby`:
+  Update the locked version of Ruby to the current version of Ruby.
 
 ## UPDATING ALL GEMS
 
@@ -79,9 +82,15 @@ all of the dependencies, all the way down, and install what you need:
     Bundle complete! 2 gems.rb dependencies, 26 gems total.
     Use `bundle show [gemname]` to see where a bundled gem is installed.
 
+<<<<<<< HEAD
 As you can see, even though you have just two gems in gems.rb(5), your application
 actually needs 26 different gems in order to run. Bundler remembers the exact versions
 it installed in `gems.locked`. The next time you run [bundle install(1)][bundle-install], bundler skips
+=======
+As you can see, even though you have two gems in the Gemfile(5), your application
+needs 26 different gems in order to run. Bundler remembers the exact versions
+it installed in `Gemfile.lock`. The next time you run [bundle install(1)][bundle-install], bundler skips
+>>>>>>> master
 the dependency resolution and installs the same gems as it installed last time.
 
 After checking in `gems.locked` into version control and cloning it on another

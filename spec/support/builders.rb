@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/shared_helpers"
 
 module Spec
@@ -102,8 +103,14 @@ module Spec
           s.write "lib/platform_specific.rb", "PLATFORM_SPECIFIC = '1.0.0 x86-darwin-100'"
         end
 
-        build_gem "only_java" do |s|
+        build_gem "only_java", "1.0" do |s|
           s.platform = "java"
+          s.write "lib/only_java.rb", "ONLY_JAVA = '1.0.0 JAVA'"
+        end
+
+        build_gem "only_java", "1.1" do |s|
+          s.platform = "java"
+          s.write "lib/only_java.rb", "ONLY_JAVA = '1.1.0 JAVA'"
         end
 
         build_gem "nokogiri", "1.4.2"
@@ -114,6 +121,10 @@ module Spec
         end
 
         build_gem "weakling", "0.0.3"
+
+        build_gem "terranova", "8"
+
+        build_gem "duradura", "7.0"
 
         build_gem "multiple_versioned_deps" do |s|
           s.add_dependency "weakling", ">= 0.0.1", "< 0.1"
@@ -158,9 +169,7 @@ module Spec
           RUBY
         end
 
-        build_gem "very_simple_binary" do |s|
-          s.add_c_extension
-        end
+        build_gem "very_simple_binary", &:add_c_extension
 
         build_gem "bundler", "0.9" do |s|
           s.executables = "bundle"
@@ -244,6 +253,39 @@ module Spec
         end
 
         build_gem "foo"
+
+        # A minimal fake pry console
+        build_gem "pry" do |s|
+          s.write "lib/pry.rb", <<-RUBY
+            class Pry
+              class << self
+                def toplevel_binding
+                  unless defined?(@toplevel_binding) && @toplevel_binding
+                    TOPLEVEL_BINDING.eval %{
+                      def self.__pry__; binding; end
+                      Pry.instance_variable_set(:@toplevel_binding, __pry__)
+                      class << self; undef __pry__; end
+                    }
+                  end
+                  @toplevel_binding.eval('private')
+                  @toplevel_binding
+                end
+
+                def __pry__
+                  while line = gets
+                    begin
+                      puts eval(line, toplevel_binding).inspect.sub(/^"(.*)"$/, '=> \\1')
+                    rescue Exception => e
+                      puts "\#{e.class}: \#{e.message}"
+                      puts e.backtrace.first
+                    end
+                  end
+                end
+                alias start __pry__
+              end
+            end
+          RUBY
+        end
       end
     end
 
@@ -262,13 +304,13 @@ module Spec
 
     # A repo that has no pre-installed gems included. (The caller completely
     # determines the contents with the block.)
-    def build_repo4
+    def build_repo4(&blk)
       FileUtils.rm_rf gem_repo4
-      build_repo(gem_repo4) { yield }
+      build_repo(gem_repo4, &blk)
     end
 
-    def update_repo4
-      update_repo(gem_repo4) { yield }
+    def update_repo4(&blk)
+      update_repo(gem_repo4, &blk)
     end
 
     def update_repo2
@@ -298,22 +340,32 @@ module Spec
     def build_repo(path, &blk)
       return if File.directory?(path)
       rake_path = Dir["#{Path.base_system_gems}/**/rake*.gem"].first
+
+      if rake_path.nil?
+        Spec::Path.base_system_gems.rmtree
+        Spec::Rubygems.setup
+        rake_path = Dir["#{Path.base_system_gems}/**/rake*.gem"].first
+      end
+
       if rake_path
         FileUtils.mkdir_p("#{path}/gems")
         FileUtils.cp rake_path, "#{path}/gems/"
       else
-        abort "You need to `rm -rf #{tmp}`"
+        abort "Your test gems are missing! Run `rm -rf #{tmp}` and try again."
       end
+
       update_repo(path, &blk)
     end
 
     def update_repo(path)
+      return unless block_given?
       @_build_path = "#{path}/gems"
       yield
-      @_build_path = nil
       with_gem_path_as Path.base_system_gems do
         Dir.chdir(path) { gem_command :generate_index }
       end
+    ensure
+      @_build_path = nil
     end
 
     def build_index(&block)
@@ -369,9 +421,7 @@ module Spec
 
       Array(versions).each do |version|
         spec = builder.new(self, name, version)
-        if !spec.authors or spec.authors.empty?
-          spec.authors = ["no one"]
-        end
+        spec.authors = ["no one"] if !spec.authors || spec.authors.empty?
         yield spec if block_given?
         spec._build(options)
       end
@@ -429,6 +479,10 @@ module Spec
 
       def runtime(name, requirements)
         @spec.add_runtime_dependency(name, requirements)
+      end
+
+      def required_ruby_version=(*reqs)
+        @spec.required_ruby_version = *reqs
       end
 
       alias_method :dep, :runtime
@@ -495,6 +549,7 @@ module Spec
         if options[:rubygems_version]
           @spec.rubygems_version = options[:rubygems_version]
           def @spec.mark_version; end
+
           def @spec.validate; end
         end
 
@@ -507,9 +562,7 @@ module Spec
           @files["#{name}.gemspec"] = @spec.to_ruby
         end
 
-        unless options[:no_default]
-          @files = _default_files.merge(@files)
-        end
+        @files = _default_files.merge(@files) unless options[:no_default]
 
         @spec.authors = ["no one"]
 
@@ -584,7 +637,7 @@ module Spec
 
           current_ref = `git rev-parse HEAD`.strip
           _default_files.keys.each do |path|
-            _default_files[path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
+            _default_files[path] += "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
           super(options.merge(:path => libpath, :gemspec => false))
           `git add *`
@@ -622,13 +675,11 @@ module Spec
           destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)
 
-          if !@spec.authors or @spec.authors.empty?
-            @spec.authors = ["that guy"]
-          end
+          @spec.authors = ["that guy"] if !@spec.authors || @spec.authors.empty?
 
           Bundler.rubygems.build(@spec, opts[:skip_validation])
           if opts[:to_system]
-            `gem install --ignore-dependencies #{@spec.full_name}.gem`
+            `gem install --ignore-dependencies --no-ri --no-rdoc #{@spec.full_name}.gem`
           else
             FileUtils.mv("#{@spec.full_name}.gem", opts[:path] || _default_path)
           end
@@ -692,6 +743,5 @@ module Spec
       l69BkyvzjgDPkmOHVGiSZDLi3YDvypbUpo6LOy4v5rVg5U2F/A0v
       -----END RSA PRIVATE KEY-----
     PKEY
-
   end
 end

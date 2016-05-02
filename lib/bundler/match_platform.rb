@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/gem_helpers"
 
 module Bundler
@@ -5,9 +6,9 @@ module Bundler
     include GemHelpers
 
     def match_platform(p)
-      Gem::Platform::RUBY == platform or
-      platform.nil? or p == platform or
-      generic(Gem::Platform.new(platform)) === p
+      Gem::Platform::RUBY == platform ||
+        platform.nil? || p == platform ||
+        generic(Gem::Platform.new(platform)) === p
     end
   end
 end

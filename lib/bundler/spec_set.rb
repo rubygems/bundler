@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "tsort"
 require "forwardable"
 
@@ -6,7 +7,7 @@ module Bundler
     extend Forwardable
     include TSort, Enumerable
 
-    def_delegators :@specs, :<<, :length, :add, :remove
+    def_delegators :@specs, :<<, :length, :add, :remove, :size
     def_delegators :sorted, :each
 
     def initialize(specs)

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "git base name" do
@@ -101,7 +102,7 @@ describe "bundle cache with git" do
       gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
     G
 
-    bundle %|config local.foo #{lib_path("foo-1.0")}|
+    bundle %(config local.foo #{lib_path("foo-1.0")})
     bundle "install"
     bundle "cache --all"
 
@@ -124,18 +125,18 @@ describe "bundle cache with git" do
     end
 
     Dir.chdir(lib_path("has_submodule-1.0")) do
-      `git submodule add #{lib_path("submodule-1.0")} submodule-1.0`
+      sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0", :expect_err => true
       `git commit -m "submodulator"`
     end
 
-    install_gemfile <<-G
+    install_gemfile <<-G, :expect_err => true
       git "#{lib_path("has_submodule-1.0")}", :submodules => true do
         gem "has_submodule"
       end
     G
 
     ref = git.ref_for("master", 11)
-    bundle "cache --all"
+    bundle "cache --all", :expect_err => true
 
     expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
     expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist

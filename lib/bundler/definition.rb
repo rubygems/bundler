@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/lockfile_parser"
 require "digest/sha1"
 require "set"
@@ -19,9 +20,7 @@ module Bundler
       unlock ||= {}
       gemfile = Pathname.new(gemfile).expand_path
 
-      unless gemfile.file?
-        raise GemfileNotFound, "#{gemfile} not found"
-      end
+      raise GemfileNotFound, "#{gemfile} not found" unless gemfile.file?
 
       Dsl.evaluate(gemfile, lockfile, unlock)
     end
@@ -55,14 +54,16 @@ module Bundler
       @specs           = nil
       @ruby_version    = ruby_version
 
-      @lockfile_contents      = ""
+      @lockfile_contents      = String.new
       @locked_bundler_version = nil
+      @locked_ruby_version    = nil
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
         locked = LockfileParser.new(@lockfile_contents)
         @platforms = locked.platforms
         @locked_bundler_version = locked.bundler_version
+        @locked_ruby_version = locked.ruby_version
 
         if unlock != true
           @locked_deps    = locked.dependencies
@@ -166,6 +167,12 @@ module Bundler
       missing
     end
 
+    def missing_dependencies
+      missing = []
+      resolve.materialize(current_dependencies, missing)
+      missing
+    end
+
     def requested_specs
       @requested_specs ||= begin
         groups = requested_groups
@@ -196,7 +203,7 @@ module Bundler
           last_resolve
         else
           # Run a resolve against the locally available gems
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version)
         end
       end
     end
@@ -240,7 +247,7 @@ module Bundler
       dependencies.map(&:groups).flatten.uniq
     end
 
-    def lock(file, preserve_bundled_with = false)
+    def lock(file, preserve_unknown_sections = false)
       contents = to_lock
 
       # Convert to \r\n if the existing lock has them
@@ -257,22 +264,22 @@ module Bundler
         end
       end
 
-      preserve_bundled_with ||= !updating_major && (Bundler.settings[:frozen] || !@unlocking)
-      return if lockfiles_equal?(@lockfile_contents, contents, preserve_bundled_with)
+      preserve_unknown_sections ||= !updating_major && (Bundler.settings[:frozen] || !@unlocking)
+      return if lockfiles_equal?(@lockfile_contents, contents, preserve_unknown_sections)
 
       if Bundler.settings[:frozen]
         Bundler.ui.error "Cannot write a changed lockfile while frozen."
         return
       end
 
-      File.open(file, "wb") {|f| f.puts(contents) }
-    rescue Errno::EACCES
-      raise PermissionError.new(file)
+      SharedHelpers.filesystem_access(file) do |p|
+        File.open(p, "wb") {|f| f.puts(contents) }
+      end
     end
 
     # Returns the version of Bundler that is creating or has created
     # gems.locked. Used in #to_lock.
-    def lock_version
+    def locked_bundler_version
       if @locked_bundler_version && @locked_bundler_version < Gem::Version.new(Bundler::VERSION)
         new_version = Bundler::VERSION
       end
@@ -280,8 +287,17 @@ module Bundler
       new_version || @locked_bundler_version || Bundler::VERSION
     end
 
+    def locked_ruby_version
+      return unless ruby_version
+      if @unlock[:ruby] || !@locked_ruby_version
+        Bundler::RubyVersion.system
+      else
+        @locked_ruby_version
+      end
+    end
+
     def to_lock
-      out = ""
+      out = String.new
 
       sources.lock_sources.each do |source|
         # Add the source header
@@ -316,20 +332,26 @@ module Bundler
         handled << dep.name
       end
 
+      if locked_ruby_version
+        out << "\nRUBY VERSION\n"
+        out << "   #{locked_ruby_version}\n"
+      end
+
       # Record the version of Bundler that was used to create the lockfile
       out << "\nBUNDLED WITH\n"
-      out << "   #{lock_version}\n"
+      out << "   #{locked_bundler_version}\n"
 
       out
     end
 
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
-      msg = "You are trying to install in deployment mode after changing\n" \
-            "your #{SharedHelpers.gemfile_name}. Run `bundle install` elsewhere and add the\n" \
-            "updated gems.locked to version control."
+      msg = String.new
+      msg << "You are trying to install in deployment mode after changing\n" \
+             "your #{SharedHelpers.gemfile_name}. Run `bundle install` elsewhere and add the\n" \
+             "updated #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} to version control."
 
       unless explicit_flag
-        msg += "\n\nIf this is a development machine, remove the #{SharedHelpers.gemfile_name} " \
+        msg << "\n\nIf this is a development machine, remove the #{SharedHelpers.gemfile_name} " \
                "freeze \nby running `bundle install --no-deployment`."
       end
 
@@ -354,9 +376,7 @@ module Bundler
       new_deps = @dependencies - @locked_deps
       deleted_deps = @locked_deps - @dependencies
 
-      if new_deps.any?
-        added.concat new_deps.map {|d| "* #{pretty_dep(d)}" }
-      end
+      added.concat new_deps.map {|d| "* #{pretty_dep(d)}" } if new_deps.any?
 
       if deleted_deps.any?
         deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" }
@@ -367,11 +387,10 @@ module Bundler
       @locked_deps.each  {|d| both_sources[d.name][1] = d.source }
 
       both_sources.each do |name, (dep, lock_source)|
-        if (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
-          gemfile_source_name = (dep && dep.source) || "no specified source"
-          lockfile_source_name = lock_source || "no specified source"
-          changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
-        end
+        next unless (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
+        gemfile_source_name = (dep && dep.source) || "no specified source"
+        lockfile_source_name = lock_source || "no specified source"
+        changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
       end
 
       msg << "\n\nYou have added to #{SharedHelpers.gemfile_name}:\n" << added.join("\n") if added.any?
@@ -385,7 +404,7 @@ module Bundler
     def validate_ruby!
       return unless ruby_version
 
-      if diff = ruby_version.diff(Bundler.ruby_version)
+      if diff = ruby_version.diff(Bundler::RubyVersion.system)
         problem, expected, actual = diff
 
         msg = case problem
@@ -512,9 +531,7 @@ module Bundler
 
     def converge_dependencies
       (@dependencies + @locked_deps).each do |dep|
-        if dep.source
-          dep.source = sources.get(dep.source)
-        end
+        dep.source = sources.get(dep.source) if dep.source
       end
       Set.new(@dependencies) != Set.new(@locked_deps)
     end
@@ -556,9 +573,14 @@ module Bundler
 
         # Don't add a spec to the list if its source is expired. For example,
         # if you change a Git gem to Rubygems.
+        next if s.source.nil? || @unlock[:sources].include?(s.source.name)
+
+        # XXX This is a backwards-compatibility fix to preserve the ability to
+        # unlock a single gem by passing its name via `--source`. See issue #3759
         next if s.source.nil? || @unlock[:sources].include?(s.name)
+
         # If the spec is from a path source and it doesn't exist anymore
-        # then we just unlock it.
+        # then we unlock it.
 
         # Path sources have special logic
         if s.source.instance_of?(Source::Path)
@@ -613,7 +635,7 @@ module Bundler
         dep = Dependency.new(dep, ">= 0") unless dep.respond_to?(:name)
         next unless remote || dep.current_platform?
         dep.gem_platforms(@platforms).each do |p|
-          deps << DepProxy.new(dep, p) if remote || p == generic(Gem::Platform.local)
+          deps << DepProxy.new(dep, p) if remote || p == generic_local_platform
         end
       end
       deps
@@ -655,16 +677,20 @@ module Bundler
     end
 
     def requested_groups
-      self.groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
+      groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
     end
 
-    def lockfiles_equal?(current, proposed, preserve_bundled_with)
-      if preserve_bundled_with
-        pattern = /\n\n#{LockfileParser::BUNDLED}\n\s+#{Gem::Version::VERSION_PATTERN}\n/
-        current.sub(pattern, "\n") == proposed.sub(pattern, "\n")
-      else
-        current == proposed
+    def lockfiles_equal?(current, proposed, preserve_unknown_sections)
+      if preserve_unknown_sections
+        sections_to_ignore = LockfileParser.sections_to_ignore(@locked_bundler_version)
+        sections_to_ignore += LockfileParser.unknown_sections_in_lockfile(current)
+        sections_to_ignore += LockfileParser::ENVIRONMENT_VERSION_SECTIONS
+        pattern = /#{Regexp.union(sections_to_ignore)}\n(\s{2,}.*\n)+/
+        whitespace_cleanup = /\n{2,}/
+        current = current.gsub(pattern, "\n").gsub(whitespace_cleanup, "\n\n").strip
+        proposed = proposed.gsub(pattern, "\n").gsub(whitespace_cleanup, "\n\n").strip
       end
+      current == proposed
     end
   end
 end

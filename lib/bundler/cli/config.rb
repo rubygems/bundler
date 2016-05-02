@@ -1,97 +1,100 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Config
-    attr_reader :options, :thor
+    attr_reader :name, :options, :scope, :thor
     attr_accessor :args
 
     def initialize(options, args, thor)
       @options = options
       @args = args
       @thor = thor
+      @name = peek = args.shift
+      @scope = "global"
+      return unless peek && peek.start_with?("--")
+      @name = args.shift
+      @scope = peek[2..-1]
     end
 
     def run
-      peek = args.shift
-
-      if peek && peek =~ /^\-\-/
-        name = args.shift
-        scope = $'
-      else
-        name = peek
-        scope = options["local"] ? "local" : "global"
-      end
-
       unless name
-        Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
-
-        Bundler.settings.all.each do |setting|
-          Bundler.ui.confirm "#{setting}"
-          thor.with_padding do
-            Bundler.settings.pretty_values_for(setting).each do |line|
-              Bundler.ui.info line
-            end
-          end
-          Bundler.ui.confirm ""
-        end
+        confirm_all
         return
       end
 
-      case scope
-      when "delete"
-        delete_config(name)
-      when "local", "global"
-        # NOTE: `"current"` is not a valid scope, because current settings are
-        # not remembered between commands.
-        if args.empty?
-          Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
-          thor.with_padding do
-            Bundler.settings.pretty_values_for(name).each {|line| Bundler.ui.info line }
-          end
-          return
-        end
-
-        new_value = args.join(" ").gsub("--global", "").gsub("--local", "").strip
-        new_value.gsub!(/\s+/, ":") if name == "with" || name == "without"
-        locations = Bundler.settings.locations(name)
-
-        if scope == "global"
-          if locations[:local]
-            Bundler.ui.info "Your application has set #{name} to #{locations[:local].inspect}. " \
-              "This will override the global value you are currently setting"
-          end
-
-          if locations[:env]
-            Bundler.ui.info "You have a bundler environment variable for #{name} set to " \
-              "#{locations[:env].inspect}. This will take precedence over the global value you are setting"
-          end
-
-          if locations[:global] && locations[:global] != new_value
-            Bundler.ui.info "You are replacing the current global value of #{name}, which is currently " \
-              "#{locations[:global].inspect}"
-          end
-        end
-
-        if scope == "local" && locations[:local] != new_value
-          Bundler.ui.info "You are replacing the current local value of #{name}, which is currently " \
-            "#{locations[:local].inspect}"
-        end
-
-        resolve_system_path_conflicts(name, new_value, scope)
-        resolve_group_conflicts(name, new_value, scope)
-        delete_config(name, nil) if new_value == "" and (name == "with" or name == "without")
-
-        # NOTE: Bundler.settings stores multiple with and without keys, given an array like
-        # [:foo, :bar, :baz, :qux], as "foo:bar:baz:qux" (see #set_array)
-
-        if name.match(/\Alocal\./)
-          pathname = Pathname.new(args.join(" "))
-          new_value = pathname.expand_path.to_s if pathname.directory?
-        end
-
-        Bundler.settings.send("set_#{scope}", name, new_value)
-      else
+      unless valid_scope?(scope)
         Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
         exit 1
       end
+
+      if scope == "delete"
+        Bundler.settings.set_local(name, nil)
+        Bundler.settings.set_global(name, nil)
+        return
+      end
+
+      if args.empty?
+        confirm(name)
+        return
+      end
+
+      Bundler.ui.info(message) if message
+      Bundler.settings.send("set_#{scope}", name, new_value)
+    end
+
+  private
+
+    def confirm_all
+      Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
+      Bundler.settings.all.each do |setting|
+        Bundler.ui.confirm "#{setting}"
+        show_pretty_values_for(setting)
+        Bundler.ui.confirm ""
+      end
+    end
+
+    def confirm(name)
+      Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
+      show_pretty_values_for(name)
+    end
+
+    def new_value
+      pathname = Pathname.new(args.join(" "))
+      if name.start_with?("local.") && pathname.directory?
+        pathname.expand_path.to_s
+      else
+        args.join(" ")
+      end
+    end
+
+    def message
+      locations = Bundler.settings.locations(name)
+      if scope == "global"
+        if locations[:local]
+          "Your application has set #{name} to #{locations[:local].inspect}. " \
+            "This will override the global value you are currently setting"
+        elsif locations[:env]
+          "You have a bundler environment variable for #{name} set to " \
+            "#{locations[:env].inspect}. This will take precedence over the global value you are setting"
+        elsif locations[:global] && locations[:global] != args.join(" ")
+          "You are replacing the current global value of #{name}, which is currently " \
+            "#{locations[:global].inspect}"
+        end
+      elsif scope == "local" && locations[:local] != args.join(" ")
+        "You are replacing the current local value of #{name}, which is currently " \
+          "#{locations[:local].inspect}"
+      end
+    end
+
+    def show_pretty_values_for(setting)
+      thor.with_padding do
+        Bundler.settings.pretty_values_for(setting).each do |line|
+          Bundler.ui.info line
+        end
+      end
+    end
+
+    def valid_scope?(scope)
+      %w(delete local global).include?(scope)
     end
 
     # Clears `path` if `path.system` is being set, and vice versa.

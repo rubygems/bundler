@@ -14,47 +14,42 @@ notifications:
   email:
     # andre
     - secure: "bCcvqJT7YrBawtkXXwHhT+jOFth7r2Qv/30PkkbhQxk6Jb3xambjCOJ3U6vJ\ngYmiL50exi5lUp3oc3SEbHN5t2CrZqOZDQ6o7P8EAmB5c0oH2RrYaFOkI5Gt\nul/jGH/96A9sj0aMwG7JfdMSfhqj1DUKAm2PnnbXPL853VfmT24="
-    # terence
-    - secure: "MQ8eA5Jb8YzEpAo58DRGfVJklAPcEbAulpBZnTxp0am6ldneDtJHbQk21w6R\nj5GsDHlzr/lMp/GHIimtUZ7rLohfND8fj/W7fs1Dkd4eN02/ERt98x3pHlqv\nvZgSnZ39uVYv+OcphraE24QaRaGWLhWZAMYQTVe/Yz50NyG8g1U="
   slack:
     on_success: change
     on_failure: always
     rooms:
       - secure: JxBi7DDJGkIF/7f/FSN/HUHpvV4EKfQccZHTPd1b2pNJn3GXo6u+tNVbAw2WjxYzPyPQI3ZcYBCU9SEXp/i7VmG8uMzh8Kyildw+miSKYKVb90uYqcsXWzbxwyNBgJLvyDkzST45H5lgnyAicee3WkFes/WDZikIajbH7ztdb04=
 
+addons:
+  code_climate:
+    repo_token:
+      secure: "TrzIv116JLGUxm6PAUskCYrv8KTDguncKROVwbnjVPKTGDAgoDderd8JUdDEXrKoZ9qGLD2TPYKExt9/QDl71E+qHdWnVqWv4HKCUk2P9z/VLKzHuggOUBkCXiJUhjywUieCJhI3N92bfq2EjSBbu2/OFHqWOjLQ+QCooTEBjv8="
+
 rvm:
+  - 2.3
   - 2.2
-  - 2.1
-  - 2.0.0
-  - rbx-2
 
 # Rubygems versions MUST be available as rake tasks
-# see Rakefile:66 for the list of possible RGV values
+# see Rakefile:125 for the list of possible RGV values
 env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.4.8
+  - RGV=v2.6.4
 
 matrix:
   include:
-    # Ruby 2.2, Rubygems 2.4.5 and up (RG 2.4 is included by the matrix above)
-    # Ruby 2.1, Rubygems 2.2.2 and up
-    - rvm: 2.1
-      env: RGV=v2.2.3
-    # Ruby 2.0.0, Rubygems 2.0.0 and up
-    - rvm: 2.0.0
-      env: RGV=v2.2.3
-    - rvm: 2.0.0
-      env: RGV=v2.1.11
-    - rvm: 2.0.0
-      env: RGV=v2.0.14
+    # Ruby 2.3, Rubygems 2.5.1 and up
+    - rvm: 2.2
+      env: RGV=v2.5.2
+    # Ruby 2.2, Rubygems 2.4.5 and up
+    - rvm: 2.2
+      env: RGV=v2.4.8
 
     # ALLOWED FAILURES
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
       env: RGV=master
+
   allow_failures:
     - rvm: ruby-head
-    - rvm: jruby
-    - rvm: rbx-2

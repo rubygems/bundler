@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "the lockfile format" do
@@ -17,7 +18,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -40,7 +41,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         omg!
@@ -63,7 +64,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -81,7 +82,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -103,7 +104,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -121,7 +122,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -140,7 +141,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack (> 0)
@@ -158,7 +159,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -186,7 +187,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -204,7 +205,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -269,7 +270,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -296,7 +297,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -322,7 +323,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack-obama
@@ -348,7 +349,37 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
+
+      DEPENDENCIES
+        rack-obama (>= 1.0)
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    G
+  end
+
+  it "generates a lockfile wihout credentials for a configured source" do
+    bundle "config http://localgemserver.test/ user:pass"
+
+    install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
+      source "http://localgemserver.test/"
+      source "http://user:pass@othergemserver.test/"
+
+      gem "rack-obama", ">= 1.0"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: http://localgemserver.test/
+        remote: http://user:pass@othergemserver.test/
+        specs:
+          rack (1.0.0)
+          rack-obama (1.0)
+            rack
+
+      PLATFORMS
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -403,7 +434,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -472,7 +503,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -502,7 +533,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -532,7 +563,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -559,7 +590,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -599,7 +630,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         bar!
@@ -634,7 +665,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         actionpack
@@ -675,7 +706,7 @@ describe "the lockfile format" do
           rake (10.0.2)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rails
@@ -701,7 +732,7 @@ describe "the lockfile format" do
           net-ssh (1.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         double_deps
@@ -727,7 +758,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -753,7 +784,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -781,7 +812,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo
@@ -809,7 +840,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo
@@ -837,7 +868,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo
@@ -864,7 +895,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -897,7 +928,7 @@ describe "the lockfile format" do
       gem "rack"
     G
 
-    platforms = ["java", generic(Gem::Platform.local).to_s].sort
+    platforms = ["java", generic_local_platform.to_s].sort
 
     lockfile_should_be <<-G
       GEM
@@ -1094,6 +1125,33 @@ describe "the lockfile format" do
     G
   end
 
+  it "captures the Ruby version in the lockfile", :focus do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      ruby '#{RUBY_VERSION}'
+      gem "rack", "> 0.9", "< 1.0"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (0.9.1)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack (> 0.9, < 1.0)
+
+      RUBY VERSION
+         ruby #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    G
+  end
+
   # Some versions of the Bundler 1.1 RC series introduced corrupted
   # lockfiles. There were two major problems:
   #
@@ -1216,13 +1274,13 @@ describe "the lockfile format" do
 
     context "when nothing changes" do
       it "preserves gems.locked \\n line endings" do
-        expect {
+        expect do
           ruby <<-RUBY
                    require 'rubygems'
                    require 'bundler'
                    Bundler.setup
                  RUBY
-        }.not_to change { File.mtime(bundled_app("gems.locked")) }
+        end.not_to change { File.mtime(bundled_app("gems.locked")) }
       end
 
       it "preserves gems.locked \\n\\r line endings" do
@@ -1230,13 +1288,13 @@ describe "the lockfile format" do
         File.open(bundled_app("gems.locked"), "wb") {|f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
-        expect {
+        expect do
           ruby <<-RUBY
                    require 'rubygems'
                    require 'bundler'
                    Bundler.setup
                  RUBY
-        }.not_to change { File.mtime(bundled_app("gems.locked")) }
+        end.not_to change { File.mtime(bundled_app("gems.locked")) }
       end
     end
   end

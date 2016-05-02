@@ -1,16 +1,18 @@
+# frozen_string_literal: true
 require "bundler/rubygems_integration"
 require "bundler/source/git/git_proxy"
 
 module Bundler
   class Env
     def write(io)
-      io.write report(:print_gemfile => true)
+      io.write report(:print_gemfile => true, :print_gemspecs => true)
     end
 
     def report(options = {})
       print_gemfile = options.delete(:print_gemfile)
+      print_gemspecs = options.delete(:print_gemspecs)
 
-      out = "Environment\n\n"
+      out = String.new("Environment\n\n")
       out << "    Bundler   #{Bundler::VERSION}\n"
       out << "    Rubygems  #{Gem::VERSION}\n"
       out << "    Ruby      #{ruby_version}"
@@ -39,6 +41,14 @@ module Bundler
         out << "    " << read_file(Bundler.default_lockfile).gsub(/\n/, "\n    ") << "\n"
       end
 
+      if print_gemspecs
+        dsl = Dsl.new.tap {|d| d.eval_gemfile(Bundler.default_gemfile) }
+        dsl.gemspecs.each do |gs|
+          out << "\n#{Pathname.new(gs).basename}"
+          out << "\n\n    " << read_file(gs).gsub(/\n/, "\n    ") << "\n"
+        end
+      end
+
       out
     end
 
@@ -53,7 +63,7 @@ module Bundler
     end
 
     def ruby_version
-      str = "#{RUBY_VERSION}"
+      str = String.new("#{RUBY_VERSION}")
       if RUBY_VERSION < "1.9"
         str << " (#{RUBY_RELEASE_DATE}"
         str << " patchlevel #{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL

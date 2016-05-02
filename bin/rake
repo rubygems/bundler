@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
+load File.expand_path("../with_rubygems", __FILE__) if ENV["RGV"]
 
 require "rubygems"
 
@@ -10,5 +13,7 @@ bundler_spec.dependencies.each do |dep|
     $stderr.puts "#{e.message} (#{e.class})"
   end
 end
+
+Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
 
 load Gem.bin_path("rake", "rake")

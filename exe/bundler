@@ -1,11 +1,3 @@
 #!/usr/bin/env ruby
-
-# Exit cleanly from an early interrupt
-Signal.trap("INT") { exit 1 }
-
-require "bundler/friendly_errors"
-Bundler.with_friendly_errors do
-  require "bundler"
-  require "bundler/cli"
-  Bundler::CLI.start(ARGV, :debug => true)
-end
+# frozen_string_literal: true
+load File.expand_path("../bundle", __FILE__)

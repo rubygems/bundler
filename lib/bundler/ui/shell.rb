@@ -1,9 +1,10 @@
+# frozen_string_literal: true
 require "bundler/vendored_thor"
 
 module Bundler
   module UI
     class Shell
-      LEVELS = %w(silent error warn confirm info debug)
+      LEVELS = %w(silent error warn confirm info debug).freeze
 
       attr_writer :shell, :deprecation_messages
 
@@ -15,6 +16,10 @@ module Bundler
         @level = ENV["DEBUG"] ? "debug" : "info"
         @warning_history = []
         @deprecation_messages = Set.new
+      end
+
+      def add_color(string, color)
+        @shell.set_color(string, color)
       end
 
       def info(msg, newline = nil)
@@ -76,14 +81,15 @@ module Bundler
         name ? LEVELS.index(name) <= LEVELS.index(@level) : @level
       end
 
-      def trace(e, newline = nil)
-        return unless debug?
+      def trace(e, newline = nil, force = false)
+        return unless debug? || force
         msg = "#{e.class}: #{e.message}\n#{e.backtrace.join("\n  ")}"
         tell_stdout(msg, nil, newline)
       end
 
       def silence
-        old_level, @level = @level, "silent"
+        old_level = @level
+        @level = "silent"
         yield
       ensure
         @level = old_level
