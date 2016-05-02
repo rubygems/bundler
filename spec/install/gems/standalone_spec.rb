@@ -70,6 +70,24 @@ shared_examples "bundle install --standalone" do
     include_examples "common functionality"
   end
 
+  describe "with simple gems" do
+    before do
+      install_gemfile <<-G, :standalone => true
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+    end
+
+    let(:expected_gems) do
+      {
+        "actionpack" => "2.3.2",
+        "rails" => "2.3.2",
+      }
+    end
+
+    include_examples "common functionality"
+  end
+
   describe "with gems with native extension" do
     before do
       install_gemfile <<-G, :standalone => true

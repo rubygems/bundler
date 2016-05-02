@@ -162,6 +162,11 @@ module Bundler
         else
           Bundler.settings.local_without = difference
         end
+      elsif scope == "local" && locations[:local] != args.join(" ")
+        "You are replacing the current local value of #{name}, which is currently " \
+          "#{locations[:local].inspect}"
+      end
+    end
 
         :conflict
       elsif (name == "without") && with_conflict?(groups, scope)

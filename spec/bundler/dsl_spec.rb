@@ -90,6 +90,14 @@ describe Bundler::Dsl do
       expect { subject.eval_gemfile("Gemfile") }.
         to raise_error(Bundler::GemfileError, /There was an error evaluating `Gemfile`: ruby_version must match the :engine_version for MRI/)
     end
+
+    it "distinguishes syntax errors from evaluation errors" do
+      expect(Bundler).to receive(:read_file).with("Gemfile").and_return(
+        "ruby '2.1.5', :engine => 'ruby', :engine_version => '1.2.4'"
+      )
+      expect { subject.eval_gemfile("Gemfile") }.
+        to raise_error(Bundler::GemfileError, /There was an error evaluating `Gemfile`: ruby_version must match the :engine_version for MRI/)
+    end
   end
 
   describe "#gem" do
@@ -228,6 +236,23 @@ describe Bundler::Dsl do
       gemfile "s = 'foo'.freeze; s.strip!"
       expect { Bundler::Dsl.evaluate(bundled_app("gems.rb"), nil, true) }.
         to raise_error(Bundler::GemfileError, /There was an error parsing `gems.rb`: can't modify frozen String. Bundler cannot continue./i)
+    end
+  end
+
+  describe "#with_source" do
+    context "if there was a rubygem source already defined" do
+      it "restores it after it's done" do
+        other_source = double("other-source")
+        allow(Bundler::Source::Rubygems).to receive(:new).and_return(other_source)
+        allow(Bundler).to receive(:default_gemfile).and_return(Pathname.new("./Gemfile"))
+
+        subject.source("https://other-source.org") do
+          subject.gem("dobry-pies", :path => "foo")
+          subject.gem("foo")
+        end
+
+        expect(subject.dependencies.last.source).to eq(other_source)
+      end
     end
   end
 

@@ -22,6 +22,10 @@ module Bundler
         @shell.set_color(string, color)
       end
 
+      def add_color(string, color)
+        @shell.set_color(string, color)
+      end
+
       def info(msg, newline = nil)
         tell_stdout(msg, nil, newline) if level("info")
       end

@@ -706,4 +706,38 @@ describe "bundle install with gem sources" do
                         "setting them for authentication.")
     end
   end
+
+  describe "when bundle path does not have write access" do
+    before do
+      FileUtils.mkdir_p(bundled_app("vendor"))
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+    end
+
+    it "should display a proper message to explain the problem" do
+      FileUtils.chmod(0500, bundled_app("vendor"))
+
+      bundle :install, :path => "vendor"
+      expect(out).to include(bundled_app("vendor").to_s)
+      expect(out).to include("grant write permissions")
+    end
+  end
+
+  describe "when bundle install is executed with unencoded authentication" do
+    before do
+      gemfile <<-G
+        source 'https://rubygems.org/'
+        gem 'bundler'
+      G
+    end
+
+    it "should display a helpful messag explaining how to fix it" do
+      bundle :install, :env => { "BUNDLE_RUBYGEMS__ORG" => "user:pass{word" }
+      expect(exitstatus).to eq(17) if exitstatus
+      expect(out).to eq("Please CGI escape your usernames and passwords before " \
+                        "setting them for authentication.")
+    end
+  end
 end

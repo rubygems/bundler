@@ -249,7 +249,7 @@ describe "bundle update" do
             rails (2.3.2)
 
         PLATFORMS
-          #{generic(Gem::Platform.local)}
+          #{generic_local_platform}
 
         DEPENDENCIES
           rails!

@@ -116,6 +116,96 @@ describe "bundle update" do
       end
     end
   end
+
+  describe "with --source option" do
+    it "should not update gems not included in the source that happen to have the same name" do
+      pending("Allowed to fail to preserve backwards-compatibility")
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport"
+      G
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "update --source activesupport"
+      should_not_be_installed "activesupport 3.0"
+    end
+
+    it "should update gems not included in the source that happen to have the same name" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport"
+      G
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "update --source activesupport"
+      should_be_installed "activesupport 3.0"
+    end
+  end
+
+  context "when there is a child dependency that is also in the gemfile" do
+    before do
+      build_repo2 do
+        build_gem "fred", "1.0"
+        build_gem "harry", "1.0" do |s|
+          s.add_dependency "fred"
+        end
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "harry"
+        gem "fred"
+      G
+    end
+
+    it "should not update the child dependencies of a gem that has the same name as the source" do
+      update_repo2 do
+        build_gem "fred", "2.0"
+        build_gem "harry", "2.0" do |s|
+          s.add_dependency "fred"
+        end
+      end
+
+      bundle "update --source harry"
+      should_be_installed "harry 2.0"
+      should_be_installed "fred 1.0"
+    end
+  end
+
+  context "when there is a child dependency that appears elsewhere in the dependency graph" do
+    before do
+      build_repo2 do
+        build_gem "fred", "1.0" do |s|
+          s.add_dependency "george"
+        end
+        build_gem "george", "1.0"
+        build_gem "harry", "1.0" do |s|
+          s.add_dependency "george"
+        end
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "harry"
+        gem "fred"
+      G
+    end
+
+    it "should not update the child dependencies of a gem that has the same name as the source" do
+      update_repo2 do
+        build_gem "george", "2.0"
+        build_gem "harry", "2.0" do |s|
+          s.add_dependency "george"
+        end
+      end
+
+      bundle "update --source harry"
+      should_be_installed "harry 2.0"
+      should_be_installed "fred 1.0"
+      should_be_installed "george 1.0"
+    end
+  end
 end
 
 describe "bundle update in more complicated situations" do
@@ -228,6 +318,115 @@ describe "bundle update" do
 
     bundle "update"
     expect(out).to include("Using 1 already installed gems")
+  end
+end
+
+describe "bundle update --ruby" do
+  before do
+    install_gemfile <<-G, :expect_err => true
+        ::RUBY_VERSION = '2.1.3'
+        ::RUBY_PATCHLEVEL = 100
+        ruby '~> 2.1.0'
+    G
+    bundle "update --ruby", :expect_err => true
+  end
+
+  context "when the Gemfile removes the ruby" do
+    before do
+      install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '2.1.4'
+          ::RUBY_PATCHLEVEL = 222
+      G
+    end
+    it "removes the Ruby from the Gemfile.lock" do
+      bundle "update --ruby", :expect_err => true
+
+      lockfile_should_be <<-L
+       GEM
+         specs:
+
+       PLATFORMS
+         ruby
+
+       DEPENDENCIES
+
+       BUNDLED WITH
+          #{Bundler::VERSION}
+      L
+    end
+  end
+
+  context "when the Gemfile specified an updated Ruby version" do
+    before do
+      install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '2.1.4'
+          ::RUBY_PATCHLEVEL = 222
+          ruby '~> 2.1.0'
+      G
+    end
+    it "updates the Gemfile.lock with the latest version" do
+      bundle "update --ruby", :expect_err => true
+
+      lockfile_should_be <<-L
+       GEM
+         specs:
+
+       PLATFORMS
+         ruby
+
+       DEPENDENCIES
+
+       RUBY VERSION
+          ruby 2.1.4p222
+
+       BUNDLED WITH
+          #{Bundler::VERSION}
+      L
+    end
+  end
+
+  context "when a different Ruby is being used than has been versioned" do
+    before do
+      install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '2.2.2'
+          ::RUBY_PATCHLEVEL = 505
+          ruby '~> 2.1.0'
+      G
+    end
+    it "shows a helpful error message" do
+      bundle "update --ruby", :expect_err => true
+
+      expect(out).to include("Your Ruby version is 2.2.2, but your Gemfile specified ~> 2.1.0")
+    end
+  end
+
+  context "when updating Ruby version and Gemfile `ruby`" do
+    before do
+      install_gemfile <<-G, :expect_err => true
+          ::RUBY_VERSION = '1.8.3'
+          ::RUBY_PATCHLEVEL = 55
+          ruby '~> 1.8.0'
+      G
+    end
+    it "updates the Gemfile.lock with the latest version" do
+      bundle "update --ruby", :expect_err => true
+
+      lockfile_should_be <<-L
+       GEM
+         specs:
+
+       PLATFORMS
+         ruby
+
+       DEPENDENCIES
+
+       RUBY VERSION
+          ruby 1.8.3p55
+
+       BUNDLED WITH
+          #{Bundler::VERSION}
+      L
+    end
   end
 end
 
