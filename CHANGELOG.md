@@ -1,3 +1,9 @@
+## 1.12.2 (2016-05-04)
+
+Bugfixes:
+  - fix modifying a frozen string when the resolver conflicts on dependencies with requirements (#4520, @grzuy)
+  - fix `bundle exec foo --help` not showing the invoked command's help (#4480, @b-ggs)
+
 ## 1.12.1 (2016-04-30)
 
 Bugfixes:
