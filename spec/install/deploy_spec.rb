@@ -172,13 +172,13 @@ describe "install with --deployment or --frozen" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
-        gem "rack-obama"
+        gem "rack-obama", "1.1"
       G
 
       bundle "install --frozen"
       expect(out).to include("deployment mode")
       expect(out).to include("You have added to the Gemfile")
-      expect(out).to include("* rack-obama")
+      expect(out).to include("* rack-obama (= 1.1)")
       expect(out).not_to include("You have deleted from the Gemfile")
       expect(out).not_to include("You have changed in the Gemfile")
     end
