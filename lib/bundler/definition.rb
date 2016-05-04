@@ -434,7 +434,7 @@ module Bundler
     end
 
     def pretty_dep(dep, source = false)
-      msg = "#{dep.name}"
+      msg = String.new(dep.name)
       msg << " (#{dep.requirement})" unless dep.requirement == Gem::Requirement.default
       msg << " from the `#{dep.source}` source" if source && dep.source
       msg
