@@ -12,8 +12,8 @@ module Bundler
       Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
       Bundler.settings[:cache_all_platforms] = options["all-platforms"] if options.key?("all-platforms")
       Bundler.settings[:cache_path] = options["cache-path"] if options.key?("cache-path")
+      Bundler.settings[:cache_all] = options[:all]
 
-      setup_cache_all
       install
 
       # TODO: move cache contents here now that all bundles are locked
@@ -31,16 +31,6 @@ module Bundler
         options["update"] = true
       end
       Bundler::CLI::Install.new(options).run
-    end
-
-    def setup_cache_all
-      Bundler.settings[:cache_all] = options[:all] if options.key?("all")
-
-      if Bundler.definition.has_local_dependencies? && !Bundler.settings[:cache_all]
-        Bundler.ui.warn "Your Gemfile contains path and git dependencies. If you want "    \
-          "to package them as well, please pass the --all flag. This will be the default " \
-          "on Bundler 2.0."
-      end
     end
   end
 end
