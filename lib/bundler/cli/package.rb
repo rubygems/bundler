@@ -12,7 +12,7 @@ module Bundler
       Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
       Bundler.settings[:cache_all_platforms] = options["all-platforms"] if options.key?("all-platforms")
       Bundler.settings[:cache_path] = options["cache-path"] if options.key?("cache-path")
-      Bundler.settings[:cache_all] = options[:all]
+      Bundler.settings[:cache_all] = true
 
       install
 
