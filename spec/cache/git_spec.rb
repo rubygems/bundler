@@ -142,18 +142,6 @@ end
       should_be_installed "has_submodule 1.0"
     end
 
-    it "displays warning message when detecting git repo in Gemfile" do
-      build_git "foo"
-
-      install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}'
-      G
-
-      bundle "#{cmd}"
-
-      expect(out).to include("Your Gemfile contains path and git dependencies.")
-    end
-
     it "does not display warning message if cache_all is set in bundle config" do
       build_git "foo"
 
