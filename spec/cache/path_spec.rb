@@ -10,7 +10,7 @@ require "spec_helper"
         gem "foo", :path => '#{bundled_app("lib/foo")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
       expect(bundled_app("vendor/cache/foo-1.0")).not_to exist
       should_be_installed "foo 1.0"
     end
@@ -22,7 +22,7 @@ require "spec_helper"
         gem "foo", :path => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
       expect(bundled_app("vendor/cache/foo-1.0")).to exist
       expect(bundled_app("vendor/cache/foo-1.0/.bundlecache")).to be_file
 
@@ -40,7 +40,7 @@ require "spec_helper"
         gem "#{libname}", :path => '#{libpath}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
       expect(bundled_app("vendor/cache/#{libname}")).to exist
       expect(bundled_app("vendor/cache/#{libname}/.bundlecache")).to be_file
 
@@ -55,13 +55,13 @@ require "spec_helper"
         gem "foo", :path => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
 
       build_lib "foo" do |s|
         s.write "lib/foo.rb", "puts :CACHE"
       end
 
-      bundle "#{cmd} --all"
+      bundle cmd
 
       expect(bundled_app("vendor/cache/foo-1.0")).to exist
       FileUtils.rm_rf lib_path("foo-1.0")
@@ -77,13 +77,13 @@ require "spec_helper"
         gem "foo", :path => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
 
       install_gemfile <<-G
         gem "bar", :path => '#{lib_path("bar-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
       expect(bundled_app("vendor/cache/bar-1.0")).not_to exist
     end
 
@@ -94,7 +94,7 @@ require "spec_helper"
         gem "foo", :path => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
       build_lib "bar"
 
       install_gemfile <<-G
