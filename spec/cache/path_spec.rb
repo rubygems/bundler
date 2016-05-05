@@ -87,18 +87,6 @@ require "spec_helper"
       expect(bundled_app("vendor/cache/bar-1.0")).not_to exist
     end
 
-    it "raises a warning without --all" do
-      build_lib "foo"
-
-      install_gemfile <<-G
-        gem "foo", :path => '#{lib_path("foo-1.0")}'
-      G
-
-      bundle cmd
-      expect(out).to match(/please pass the \-\-all flag/)
-      expect(bundled_app("vendor/cache/foo-1.0")).not_to exist
-    end
-
     it "stores the given flag" do
       build_lib "foo"
 
