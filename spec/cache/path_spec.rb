@@ -113,7 +113,7 @@ require "spec_helper"
         gem "foo", :path => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
       build_lib "baz"
 
       gemfile <<-G
@@ -121,8 +121,8 @@ require "spec_helper"
         gem "baz", :path => '#{lib_path("baz-1.0")}'
       G
 
-      bundle "#{cmd} --no-all"
-      expect(bundled_app("vendor/cache/baz-1.0")).not_to exist
+      bundle cmd
+      expect(bundled_app("vendor/cache/baz-1.0")).to exist
     end
   end
 end
