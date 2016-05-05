@@ -23,7 +23,7 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
@@ -41,7 +41,7 @@ end
       G
 
       bundle "install --path vendor/bundle"
-      bundle "#{cmd} --all"
+      bundle cmd
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
@@ -57,8 +57,8 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
-      bundle "#{cmd} --all"
+      bundle cmd
+      bundle cmd
 
       expect(err).to eq("")
       FileUtils.rm_rf lib_path("foo-1.0")
@@ -73,7 +73,7 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle cmd
 
       update_git "foo" do |s|
         s.write "lib/foo.rb", "puts :CACHE"
@@ -83,7 +83,7 @@ end
       expect(ref).not_to eq(old_ref)
 
       bundle "update"
-      bundle "#{cmd} --all"
+      bundle cmd
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
@@ -103,7 +103,7 @@ end
 
       bundle %(config local.foo #{lib_path("foo-1.0")})
       bundle "install"
-      bundle "#{cmd} --all"
+      bundle cmd
 
       expect(bundled_app("vendor/cache/foo-invalid-#{ref}")).to exist
 
@@ -135,7 +135,7 @@ end
       G
 
       ref = git.ref_for("master", 11)
-      bundle "#{cmd} --all", :expect_err => true
+      bundle cmd, :expect_err => true
 
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist
@@ -149,8 +149,8 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
-      bundle "#{cmd}"
+      bundle cmd
+      bundle cmd
 
       expect(out).not_to include("Your Gemfile contains path and git dependencies.")
     end
@@ -166,7 +166,7 @@ end
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
-      bundle "#{cmd} --all"
+      bundle cmd
 
       ref = git.ref_for("master", 11)
       gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
