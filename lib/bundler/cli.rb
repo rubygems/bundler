@@ -171,10 +171,10 @@ module Bundler
     def install
       require "bundler/cli/install"
       no_install = Bundler.settings[:no_install]
-      Bundler.settings[:no_install] = false
+      Bundler.settings[:no_install] = false if no_install == true
       Install.new(options.dup).run
     ensure
-      Bundler.settings[:no_install] = no_install
+      Bundler.settings[:no_install] = no_install unless no_install.nil?
     end
 
     desc "update [OPTIONS]", "update the current environment"

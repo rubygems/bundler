@@ -31,6 +31,16 @@ describe "bundle install with gem sources" do
       expect(bundled_app("Gemfile.lock")).to exist
     end
 
+    it "does not create ./.bundle by default" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle :install # can't use install_gemfile since it sets retry
+      expect(bundled_app(".bundle")).not_to exist
+    end
+
     it "creates lock files based on the Gemfile name" do
       gemfile bundled_app("OmgFile"), <<-G
         source "file://#{gem_repo1}"
