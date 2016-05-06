@@ -1,3 +1,9 @@
+## 1.12.3 (2016-05-06)
+
+Bugfixes:
+  - fix uncoditionally writing `.bundle/config` when running `bundle install` (@segiddins)
+  - fall back to the dependency API and the full index when the home directory is not writable (@segiddins)
+
 ## 1.12.2 (2016-05-04)
 
 Bugfixes:
