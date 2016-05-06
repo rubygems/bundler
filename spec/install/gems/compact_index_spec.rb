@@ -153,6 +153,19 @@ The checksum of /versions does not match the checksum provided by the server! So
     should_be_installed "rack 1.0.0"
   end
 
+  it "falls back when the user's home directory does not exist or is not writable" do
+    ENV["HOME"] = nil
+
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+
+    bundle! :install, :artifice => "compact_index"
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
+    should_be_installed "rack 1.0.0"
+  end
+
   it "handles host redirects" do
     gemfile <<-G
       source "#{source_uri}"
