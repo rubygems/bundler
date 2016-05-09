@@ -120,6 +120,16 @@ module Spec
           s.add_dependency "weakling", ">= 0.0.3"
         end
 
+        build_gem "laduradura", "5.15.2"
+        build_gem "laduradura", "5.15.2" do |s|
+          s.platform = "java"
+          s.write "lib/laduradura.rb", "LADURADURA = '5.15.2 JAVA'"
+        end
+        build_gem "laduradura", "5.15.3" do |s|
+          s.platform = "java"
+          s.write "lib/laduradura.rb", "LADURADURA = '5.15.2 JAVA'"
+        end
+
         build_gem "weakling", "0.0.3"
 
         build_gem "terranova", "8"

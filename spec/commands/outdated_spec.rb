@@ -243,6 +243,20 @@ describe "bundle outdated" do
     end
   end
 
+  context "update available for a gem on a different platform" do
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "laduradura", '= 5.15.2'
+      G
+    end
+
+    it "reports that no updates are available" do
+      bundle "outdated"
+      expect(out).to include("Bundle up to date!")
+    end
+  end
+
   shared_examples_for "version update is detected" do
     it "reports that a gem has a newer version" do
       subject
