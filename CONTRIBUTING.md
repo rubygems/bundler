@@ -5,8 +5,7 @@ Bundler welcomes contributions from *everyone*. While contributing, please follo
 If you'd like to help make Bundler better, you totally rock! Here are some ways you can contribute:
 
   - by using prerelease versions (run `gem install bundler --pre`)
-  - by [reporting bugs you encounter](https://github.com/bundler/bundler/issues/new)
-  - by [suggesting new features](https://github.com/bundler/bundler-features/issues/new)
+  - by [reporting bugs you encounter or suggesting new features](https://github.com/bundler/bundler/issues/new)
   - by adding to or editing [the Bundler documentation website](http://bundler.io) and [Bundler man pages](http://bundler.io/man/bundle.1.html)
   - by [checking issues for completeness](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md#bug-triage)
   - by closing issues that are not complete
