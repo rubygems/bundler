@@ -18,6 +18,23 @@ describe "The library itself" do
     "#{filename} uses inconsistent single quotes on lines #{failing_lines.join(", ")}"
   end
 
+  def check_for_debugging_mechanisms(filename)
+    debugging_mechanisms_regex = /
+      (binding\.pry)|
+      (debugger)|
+      (sleep\s*\(?\d+)|
+      (fit\s*\(?("|\w))
+    /x
+
+    failing_lines = []
+    File.readlines(filename).each_with_index do |line, number|
+      failing_lines << number + 1 if line =~ debugging_mechanisms_regex
+    end
+
+    return if failing_lines.empty?
+    "#{filename} has debugging mechanisms (like binding.pry, sleep, debugger, rspec focusing, etc.) on lines #{failing_lines.join(", ")}"
+  end
+
   def check_for_tab_characters(filename)
     failing_lines = []
     File.readlines(filename).each_with_index do |line, number|
@@ -92,6 +109,20 @@ describe "The library itself" do
       `git ls-files -z`.split("\x0").each do |filename|
         next unless filename =~ included
         error_messages << check_for_spec_defs_with_single_quotes(filename)
+      end
+    end
+    expect(error_messages.compact).to be_well_formed
+  end
+
+  it "does not include any leftover debugging or development mechanisms" do
+    included = /spec/
+    exempt = /quality\_spec\.rb/
+    error_messages = []
+    Dir.chdir(File.expand_path("../", __FILE__)) do
+      `git ls-files -z`.split("\x0").each do |filename|
+        next unless filename =~ included
+        next if filename =~ exempt
+        error_messages << check_for_debugging_mechanisms(filename)
       end
     end
     expect(error_messages.compact).to be_well_formed
