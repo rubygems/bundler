@@ -1,5 +1,7 @@
 # frozen_string_literal: true
+require "fileutils"
 require "stringio"
+require "tmpdir"
 require "zlib"
 
 class Bundler::CompactIndexClient
@@ -24,33 +26,41 @@ class Bundler::CompactIndexClient
     def update(local_path, remote_path, retrying = nil)
       headers = {}
 
-      if local_path.file?
-        headers["If-None-Match"] = etag_for(local_path)
-        headers["Range"] = "bytes=#{local_path.size}-"
-      else
-        # Fastly ignores Range when Accept-Encoding: gzip is set
-        headers["Accept-Encoding"] = "gzip"
-      end
+      Dir.mktmpdir(local_path.basename.to_s, local_path.dirname) do |local_temp_dir|
+        local_temp_path = Pathname.new(local_temp_dir).join(local_path.basename)
 
-      response = @fetcher.call(remote_path, headers)
-      return if response.is_a?(Net::HTTPNotModified)
+        # download new file if retrying
+        if retrying.nil? && local_path.file?
+          FileUtils.cp local_path, local_temp_path
+          headers["If-None-Match"] = etag_for(local_temp_path)
+          headers["Range"] = "bytes=#{local_temp_path.size}-"
+        else
+          # Fastly ignores Range when Accept-Encoding: gzip is set
+          headers["Accept-Encoding"] = "gzip"
+        end
 
-      content = response.body
-      if response["Content-Encoding"] == "gzip"
-        content = Zlib::GzipReader.new(StringIO.new(content)).read
-      end
+        response = @fetcher.call(remote_path, headers)
+        return if response.is_a?(Net::HTTPNotModified)
 
-      mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
-      local_path.open(mode) {|f| f << content }
+        content = response.body
+        if response["Content-Encoding"] == "gzip"
+          content = Zlib::GzipReader.new(StringIO.new(content)).read
+        end
 
-      response_etag = response["ETag"]
-      return if etag_for(local_path) == response_etag
+        mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
+        local_temp_path.open(mode) {|f| f << content }
 
-      if retrying.nil?
-        local_path.delete
-        update(local_path, remote_path, :retrying)
-      else
-        raise MisMatchedChecksumError.new(remote_path, response_etag, etag_for(local_path))
+        response_etag = response["ETag"]
+        if etag_for(local_temp_path) == response_etag
+          FileUtils.mv(local_temp_path, local_path)
+          return
+        end
+
+        if retrying.nil?
+          update(local_path, remote_path, :retrying)
+        else
+          raise MisMatchedChecksumError.new(remote_path, response_etag, etag_for(local_temp_path))
+        end
       end
     end
 
