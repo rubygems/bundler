@@ -193,13 +193,19 @@ module Bundler
     def clean_load_path
       # handle 1.9 where system gems are always on the load path
       if defined?(::Gem)
-        me = File.expand_path("../../", __FILE__)
+        # JRuby sometime produces uri:classloader:/gems/bundler-1.12.3/lib
+        # paths and sometimes uri:classloader://gems/bundler-1.12.3/lib
+        # due to some file-path normalization not able to keep uri prefixes
+        # intact. i.e. when 'me' is 'uri:classloader://gems/bundler-1.12.3/lib'
+        # and 'uri:classloader:/gems/bundler-1.12.3/lib' is on the load path
+        # then bundle itself gets removed from the load path
+        me = File.expand_path("../../", __FILE__).sub('://', ':/')
         me = /^#{Regexp.escape(me)}/
 
         loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
 
         $LOAD_PATH.reject! do |p|
-          next if File.expand_path(p) =~ me
+          next if File.expand_path(p).sub('://', ':/') =~ me
           loaded_gem_paths.delete(p)
         end
         $LOAD_PATH.uniq!
