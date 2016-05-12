@@ -41,7 +41,10 @@ class Bundler::CompactIndexClient
       end
 
       mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
-      local_path.open(mode) {|f| f << content }
+
+      Bundler::SharedHelpers.filesystem_access(local_path) do
+        local_path.open(mode) {|f| f << content }
+      end
 
       response_etag = response["ETag"]
       return if etag_for(local_path) == response_etag
