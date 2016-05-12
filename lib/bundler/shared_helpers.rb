@@ -84,9 +84,9 @@ module Bundler
     # Rescues permissions errors raised by file system operations
     # (ie. Errno:EACCESS, Errno::EAGAIN) and raises more friendly errors instead.
     #
-    # @param path [String] the path that the action will be attempted to
-    # @param action [Symbol, #to_s] the type of operation that will be
-    #   performed. For example: :write, :read, :exec
+    # @param path [#to_s] the path that the action will be attempted to
+    # @param action [#to_s] the type of operation that will be
+    #   performed. For example: "read", "write", "exec"
     #
     # @yield path
     #
@@ -96,12 +96,12 @@ module Bundler
     #   given block
     #
     # @example
-    #   filesystem_access("vendor/cache", :write) do
-    #     FileUtils.mkdir_p("vendor/cache")
+    #   filesystem_access("vendor/cache", "write") do |path|
+    #     FileUtils.mkdir_p(path)
     #   end
     #
     # @see {Bundler::PermissionError}
-    def filesystem_access(path, action = :write)
+    def filesystem_access(path, action = "write")
       yield path
     rescue Errno::EACCES
       raise PermissionError.new(path, action)
