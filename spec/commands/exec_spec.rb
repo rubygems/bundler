@@ -544,5 +544,30 @@ describe "bundle exec" do
 
       it_behaves_like "it runs"
     end
+
+    context "accepts the INT signal" do
+      let(:executable) { strip_whitespace <<-RUBY }
+        #{shebang}
+        begin
+          Thread.new do
+            puts 'Started' # For process sync
+            STDOUT.flush
+            sleep 1
+            raise "No Interrupt received" # So that this thread exits
+          end.join
+        rescue Interrupt
+        end
+        puts "foo"
+      RUBY
+
+      it do
+        bundle("exec #{path}") do |_i, o, thr|
+          o.gets # Consumes 'Started' and ensures that thread has started
+          Process.kill("INT", thr.pid)
+        end
+
+        expect(out).to eq("foo")
+      end
+    end
   end
 end
