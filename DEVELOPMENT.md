@@ -60,6 +60,12 @@ Before you submit a pull request, please remember to do the following:
         $ bin/rspec spec/bundler
         $ bin/rspec spec/commands/update_spec.rb
 
+- Please ensure that the commit messages included in the pull request __do not__ have the following:
+  - `@tag` Github user or team references (ex. `@indirect` or `@bundler/core`)
+  - `#id` references to issues or pull requests (ex. `#43` or `bundler/bundler-site#12`)
+
+  If you want to use these mechanisms, please instead include them in the pull request description. This prevents multiple notifications or references being created on commit rebases or pull request/branch force pushes.
+
 # Bug triage
 
 Triage is the work of processing tickets that have been opened into actionable issues, feature requests, or bug reports. That includes verifying bugs, categorizing the ticket, and ensuring there's enough information to reproduce the bug for anyone who wants to try to fix it.
