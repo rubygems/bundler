@@ -40,7 +40,7 @@ class CompactIndexAPI < Endpoint
 
       if ranges
         status 206
-        body ranges.map! {|range| response_body.byteslice(range) }.join
+        body ranges.map! {|range| slice_body(response_body, range) }.join
       else
         status 200
         body response_body
@@ -53,6 +53,14 @@ class CompactIndexAPI < Endpoint
 
     def parse_etags(value)
       value ? value.split(/, ?/).select {|s| s.sub!(/"(.*)"/, '\1') } : []
+    end
+
+    def slice_body(body, range)
+      if body.respond_to?(:byteslice)
+        body.byteslice(range)
+      else # pre-1.9.3
+        body.unpack("@#{range.first}a#{range.end + 1}").first
+      end
     end
 
     def gems(gem_repo = gem_repo1)

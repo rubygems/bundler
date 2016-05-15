@@ -656,4 +656,22 @@ The checksum of /versions does not match the checksum provided by the server! So
       bundle! :install, :artifice => "compact_index_forbidden"
     end
   end
+
+  it "performs partial update while local cache is updated by another process" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'rack'
+    G
+
+    # Create an empty file to trigger a partial download
+    versions = File.join(Bundler.rubygems.user_home, ".bundle", "cache", "compact_index",
+      "localgemserver.test.80.dd34752a738ee965a2a4298dc16db6c5", "versions")
+    FileUtils.mkdir_p(File.dirname(versions))
+    FileUtils.touch(versions)
+
+    bundle! :install, :artifice => "compact_index_concurrent_download"
+
+    expect(File.read(versions)).to start_with("created_at")
+    should_be_installed "rack 1.0.0"
+  end
 end
