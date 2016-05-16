@@ -25,7 +25,7 @@ module Bundler
         @ref        = options["ref"] || options["branch"] || options["tag"] || "master"
         @submodules = options["submodules"]
         @name       = options["name"]
-        @version    = options["version"]
+        @version    = options["version"].to_s.strip.gsub("-", ".pre.")
 
         @copied     = false
         @local      = false
