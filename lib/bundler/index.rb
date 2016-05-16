@@ -89,7 +89,7 @@ module Bundler
     alias_method :[], :search
 
     def <<(spec)
-      @specs[spec.name]["#{spec.version}-#{spec.platform}"] = spec
+      @specs[spec.name][spec.full_name] = spec
 
       spec
     end
@@ -175,7 +175,7 @@ module Bundler
     end
 
     def search_by_spec(spec)
-      spec = @specs[spec.name]["#{spec.version}-#{spec.platform}"]
+      spec = @specs[spec.name][spec.full_name]
       spec ? [spec] : []
     end
 
