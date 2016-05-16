@@ -258,17 +258,14 @@ module Bundler
           locked_requirement = vertex.payload.requirement
         end
         if results.any?
-          version = results.first.version
-          nested  = [[]]
+          nested  = {}
           results.each do |spec|
-            if spec.version != version
-              nested << []
-              version = spec.version
-            end
-            nested.last << spec
+            (nested[spec.version] ||= []) << spec
           end
-          groups = nested.map {|a| SpecGroup.new(a) }
-          !locked_requirement ? groups : groups.select {|sg| locked_requirement.satisfied_by? sg.version }
+          nested.reduce([]) do |groups, (version, specs)|
+            next groups if locked_requirement && !locked_requirement.satisfied_by?(version)
+            groups << SpecGroup.new(specs)
+          end
         else
           []
         end
