@@ -75,11 +75,7 @@ module Bundler
     end
 
     def method_missing(method, *args, &blk)
-      if Gem::Specification.new.respond_to?(method)
-        _remote_specification.send(method, *args, &blk)
-      else
-        super
-      end
+      _remote_specification.send(method, *args, &blk)
     end
   end
 end
