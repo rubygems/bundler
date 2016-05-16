@@ -60,14 +60,12 @@ module Bundler
     # about, returning all of the results.
     def search(query, base = nil)
       results = local_search(query, base)
-      seen = Set.new(results.map {|spec| [spec.name, spec.version, spec.platform] })
+      seen = results.map(&:full_name).to_set
 
       @sources.each do |source|
         source.search(query, base).each do |spec|
-          lookup = [spec.name, spec.version, spec.platform]
-          unless seen.include?(lookup)
+          if seen.add?(spec.full_name)
             results << spec
-            seen << lookup
           end
         end
       end
