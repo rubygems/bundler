@@ -1,3 +1,11 @@
+## 1.12.4 (2016-05-16)
+
+Bugfixes:
+  - ensure concurrent use of the new index can't corrupt the cache (#4519, @domcleal)
+  - allow missing rubygems credentials when pushing a gem with a custom host (#4437, @Cohen-Carlisle)
+  - fix installing built-in specs with `--standalone` (#4557, @segiddins)
+  - fix `bundle show` when a gem has a prerelease version that includes a `-` (#4385, @segiddins)
+
 ## 1.12.3 (2016-05-06)
 
 Bugfixes:
