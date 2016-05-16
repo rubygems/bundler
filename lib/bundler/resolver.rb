@@ -258,7 +258,7 @@ module Bundler
           locked_requirement = vertex.payload.requirement
         end
         if results.any?
-          nested  = {}
+          nested = {}
           results.each do |spec|
             (nested[spec.version] ||= []) << spec
           end

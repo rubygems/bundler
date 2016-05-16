@@ -64,9 +64,7 @@ module Bundler
 
       @sources.each do |source|
         source.search(query, base).each do |spec|
-          if seen.add?(spec.full_name)
-            results << spec
-          end
+          results << spec if seen.add?(spec.full_name)
         end
       end
 
