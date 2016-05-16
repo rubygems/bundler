@@ -252,7 +252,7 @@ module Bundler
       platform = dependency.__platform
       dependency = dependency.dep unless dependency.is_a? Gem::Dependency
       search = @search_for[dependency] ||= begin
-        index = @source_requirements[dependency.name] || @index
+        index = index_for(dependency)
         results = index.search(dependency, @base[dependency.name])
         if vertex = @base_dg.vertex_named(dependency.name)
           locked_requirement = vertex.payload.requirement
@@ -274,6 +274,10 @@ module Bundler
         end
       end
       search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform(platform) }
+    end
+
+    def index_for(dependency)
+      @source_requirements[dependency.name] || @index
     end
 
     def name_for(dependency)
@@ -314,14 +318,12 @@ module Bundler
         if (base = @base[dependency.name]) && !base.empty?
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
-          base_dep = Dependency.new dependency.name, ">= 0.a"
-          all = search_for(DepProxy.new base_dep, dependency.__platform).size.to_f
-          if all.zero?
-            0
-          elsif (search = search_for(dependency).size.to_f) == all && all == 1
+          all = index_for(dependency).search(dependency.name).size
+          if all <= 1
             0
           else
-            search / all
+            search = search_for(dependency).size
+            all - search
           end
         end
       end
