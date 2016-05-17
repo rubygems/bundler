@@ -107,11 +107,7 @@ module Bundler
       end
 
       def activate_platform!(platform)
-        unless @activated.include?(platform)
-          if for?(platform, nil)
-            @activated << platform
-          end
-        end
+        @activated << platform if !@activated.include?(platform) && for?(platform, nil)
       end
 
       def name
