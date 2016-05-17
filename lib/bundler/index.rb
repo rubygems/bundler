@@ -105,7 +105,7 @@ module Bundler
 
     def dependency_names
       names = []
-      each {|s| names.push(*s.dependencies.map(&:name)) }
+      each {|s| names.concat(s.dependencies.map(&:name)) }
       names.uniq
     end
 
