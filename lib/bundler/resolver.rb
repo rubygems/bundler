@@ -317,10 +317,10 @@ module Bundler
         else
           all = index_for(dependency).search(dependency.name).size
           if all <= 1
-            0
+            all
           else
             search = search_for(dependency).size
-            all - search
+            search - all
           end
         end
       end
