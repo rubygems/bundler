@@ -68,7 +68,10 @@ module Bundler
         end
       end
 
-      results.sort_by {|s| [s.version, s.platform.to_s == RUBY ? NULL : s.platform.to_s] }
+      results.sort_by do |s|
+        platform_string = s.platform.to_s
+        [s.version, platform_string == RUBY ? NULL : platform_string]
+      end
     end
 
     def local_search(query, base = nil)
@@ -112,8 +115,8 @@ module Bundler
     def use(other, override_dupes = false)
       return unless other
       other.each do |s|
-        if (dupes = search_by_spec(s)) && dupes.any?
-          @all_specs[s.name] = [s] + dupes
+        if (dupes = search_by_spec(s)) && !dupes.empty?
+          @all_specs[s.name] = dupes + [s]
           next unless override_dupes
           self << s
         end
