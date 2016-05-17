@@ -106,14 +106,12 @@ module Bundler
         specs.values
       end
 
-      def activate_platform(platform)
+      def activate_platform!(platform)
         unless @activated.include?(platform)
           if for?(platform, nil)
             @activated << platform
-            return __dependencies[platform] || []
           end
         end
-        []
       end
 
       def name
@@ -270,7 +268,7 @@ module Bundler
           []
         end
       end
-      search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform(platform) }
+      search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }
     end
 
     def index_for(dependency)
