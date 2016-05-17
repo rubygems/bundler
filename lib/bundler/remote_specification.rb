@@ -66,6 +66,10 @@ module Bundler
       [@name, @version, @platform == Gem::Platform::RUBY ? -1 : 1]
     end
 
+    def to_s
+      "#<#{self.class} name=#{name} version=#{version} platform=#{platform}>"
+    end
+
   private
 
     def _remote_specification
