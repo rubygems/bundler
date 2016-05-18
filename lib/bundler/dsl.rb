@@ -34,7 +34,7 @@ module Bundler
     end
 
     def eval_gemfile(gemfile, contents = nil)
-      @gemfile = Pathname.new(gemfile)
+      @gemfile = Pathname.new(gemfile).expand_path
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
     rescue Exception => e
