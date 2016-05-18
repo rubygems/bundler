@@ -34,7 +34,9 @@ module Bundler
     end
 
     def eval_gemfile(gemfile, contents = nil)
-      @gemfile = Pathname.new(gemfile).expand_path
+      expanded_gemfile_path = Pathname.new(gemfile).expand_path
+      @gemfile = expanded_gemfile_path
+      original_gemfile = @gemfile
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
     rescue Exception => e
@@ -43,6 +45,8 @@ module Bundler
         "`#{File.basename gemfile.to_s}`: #{e.message}"
 
       raise DSLError.new(message, gemfile, e.backtrace, contents)
+    ensure
+      @gemfile = original_gemfile
     end
 
     def gemspec(opts = nil)
