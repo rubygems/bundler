@@ -31,6 +31,8 @@ module Bundler
       end
 
       def register_plugin name, path
+        require path.join("plugin.rb") # this shall latter be used to find the actions the plugin performs
+
         index.register_plugin name, path
       end
 

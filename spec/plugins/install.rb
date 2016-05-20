@@ -43,5 +43,42 @@ describe "bundler plugin install" do
     expect(out).to include("Plugin dependencies are not supported")
 
     expect(out).not_to include("Installed plugin")
+
+    expect(plugin_gems("kung-foo-1.0")).not_to be_directory
+  end
+
+  context "malformatted plugin" do
+
+    it "fails when plugin.rb is missing" do
+      build_repo2 do
+        build_gem "charlie"
+      end
+
+      bundle "plugin install charlie --source file://#{gem_repo2}"
+
+      expect(out).to include("plugin.rb was not found")
+
+      expect(out).not_to include("Installed plugin")
+
+      expect(plugin_gems("charlie-1.0")).not_to be_directory
+    end
+
+
+    it "fails when plugin.rb throws exception on load" do
+      build_repo2 do
+        build_gem "chaplin" do |s|
+          s.write "plugin.rb", <<-RUBY
+            raise "I got you man"
+          RUBY
+        end
+      end
+
+      bundle "plugin install chaplin --source file://#{gem_repo2}"
+
+      expect(out).not_to include("Installed plugin")
+
+      expect(plugin_gems("chaplin-1.0")).not_to be_directory
+    end
+
   end
 end
