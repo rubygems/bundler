@@ -38,6 +38,7 @@ module Bundler
   autoload :MatchPlatform,          "bundler/match_platform"
   autoload :Mirror,                 "bundler/mirror"
   autoload :Mirrors,                "bundler/mirror"
+  autoload :Plugin,                 "bundler/plugin"
   autoload :RemoteSpecification,    "bundler/remote_specification"
   autoload :Resolver,               "bundler/resolver"
   autoload :Retry,                  "bundler/retry"

@@ -21,7 +21,8 @@ module Bundler
         @dependency_names = []
         @allow_remote = false
         @allow_cached = false
-        @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache]
+        @caches = [*Bundler.rubygems.gem_cache]
+        @caches << Bundler.app_cache unless options[:ignore_app_cache] # To use this class for installing plugins
 
         Array(options["remotes"] || []).reverse_each {|r| add_remote(r) }
       end
@@ -80,7 +81,7 @@ module Bundler
           # sources, and large_idx.use small_idx is way faster than
           # small_idx.use large_idx.
           idx = @allow_remote ? remote_specs.dup : Index.new
-          idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
+          idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote && !@options[:ignore_app_cache]
           idx.use(installed_specs, :override_dupes)
           idx
         end

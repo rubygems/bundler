@@ -433,6 +433,10 @@ module Bundler
       Env.new.write($stdout)
     end
 
+    require "bundler/cli/plugin"
+    desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
+    subcommand "plugin", Plugin
+
     # Reformat the arguments passed to bundle that include a --help flag
     # into the corresponding `bundle help #{command}` call
     def self.reformatted_help_args(args)
