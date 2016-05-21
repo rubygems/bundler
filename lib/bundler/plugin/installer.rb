@@ -1,10 +1,24 @@
 #frozen_string_literal: true
 
 module Bundler
+  # Handles the installation of plugin in appropriate directories.
+  #
+  # This class is supposed to be wrapper over the existing gem installation infra
+  # but currently it itself handles everything as the Source's subclasses (e.g. Source::RubyGems)
+  # are heavily dependent on the Gemfile.
+  #
+  # @todo: Remove the dependencies of Source's subclasses and try to use the Bundler sources directly. This will reduce the redundancies.
   class Plugin::Installer
 
     # Installs the plugin and returns the path where the plugin was installed
-    def self.install(name, source, version = nil)
+    #
+    # @param [String] name of the plugin gem to search in the source
+    # @param [String] source the rubygems URL to resolve the gem
+    # @param [Array, String] version (optional) of the gem to install
+    #
+    # @return [String] the path where the plugin was installed
+    def self.install(name, source, version = [">= 0"])
+
       rg_source = Source::Rubygems.new "remotes" => source, :ignore_app_cache => true
       rg_source.remote!
       rg_source.dependency_names << name
@@ -22,7 +36,13 @@ module Bundler
     end
 
 
-    # Installs the plugin from the provided spec and returns the path where the plugin was installed
+    # Installs the plugin from the provided spec and returns the path where the
+    # plugin was installed.
+    #
+    # @param spec to fetch and install
+    # @raise [ArgumentError] if the spec object has no remote set
+    #
+    # @return [String] the path where the plugin was installed
     def self.install_from_spec(spec)
       raise ArgumentError, "Spec #{spec.name} doesn't have remote set" unless spec.remote
 
