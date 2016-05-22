@@ -21,6 +21,7 @@ module Bundler
         return
       end
 
+      # TODO: raise InvalidScopeError.new(scope) unless valid_scope?(scope)
       unless valid_scope?(scope)
         Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
         exit 1
@@ -37,7 +38,13 @@ module Bundler
         return
       end
 
+      message = message_for(name)
       Bundler.ui.info(message) if message
+
+      new_value = expand_local_path(name, args)
+      resolve_system_path_conflicts(name, new_value, scope)
+      resolve_group_conflicts(name, new_value, scope)
+      delete_config(name, nil) if new_value == "" and (name == "with" or name == "without")
       Bundler.settings.send("set_#{scope}", name, new_value)
     end
 
@@ -57,7 +64,7 @@ module Bundler
       show_pretty_values_for(name)
     end
 
-    def new_value
+    def expand_local_path(name, args)
       pathname = Pathname.new(args.join(" "))
       if name.start_with?("local.") && pathname.directory?
         pathname.expand_path.to_s
@@ -66,7 +73,7 @@ module Bundler
       end
     end
 
-    def message
+    def message_for(name)
       locations = Bundler.settings.locations(name)
       if scope == "global"
         if locations[:local]
@@ -147,6 +154,8 @@ module Bundler
     #         the options conflict.
     #
     def resolve_group_conflicts(name, new_value, scope = "global")
+      # NOTE: Bundler.settings stores multiple with and without keys, given an array like
+      # [:foo, :bar, :baz, :qux], as "foo:bar:baz:qux"
       groups = new_value.split(":").map(&:to_sym)
 
       if (name == "with") && without_conflict?(groups, scope)
@@ -162,11 +171,6 @@ module Bundler
         else
           Bundler.settings.local_without = difference
         end
-      elsif scope == "local" && locations[:local] != args.join(" ")
-        "You are replacing the current local value of #{name}, which is currently " \
-          "#{locations[:local].inspect}"
-      end
-    end
 
         :conflict
       elsif (name == "without") && with_conflict?(groups, scope)
