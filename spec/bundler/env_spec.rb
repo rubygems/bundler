@@ -36,13 +36,13 @@ describe Bundler::Env do
 
       let(:output) { env.report(:print_gemfile => true) }
 
-      it "prints the Gemfile" do
-        expect(output).to include("Gemfile")
+      it "prints gems.rb" do
+        expect(output).to include("gems.rb")
         expect(output).to include("'rack', '1.0.0'")
       end
 
       it "prints the lockfile" do
-        expect(output).to include("Gemfile.lock")
+        expect(output).to include("gems.locked")
         expect(output).to include("rack (1.0.0)")
       end
     end
