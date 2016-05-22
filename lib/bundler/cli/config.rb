@@ -44,7 +44,7 @@ module Bundler
       new_value = expand_local_path(name, args)
       resolve_system_path_conflicts(name, new_value, scope)
       resolve_group_conflicts(name, new_value, scope)
-      delete_config(name, nil) if new_value == "" and (name == "with" or name == "without")
+      delete_config(name, nil) if new_value == "" && (name == "with" || name == "without")
       Bundler.settings.send("set_#{scope}", name, new_value)
     end
 
@@ -116,10 +116,10 @@ module Bundler
     #         the scope of the option being set by the user (either `"local"` or
     #         `"global"`).
     def resolve_system_path_conflicts(name, new_value, scope = "global")
-      if name == "path.system" and Bundler.settings[:path] and new_value == "true"
+      if name == "path.system" && Bundler.settings[:path] && new_value == "true"
         Bundler.ui.warn "`path` is already configured, so it will be unset."
         delete_config("path")
-      elsif name == "path" and Bundler.settings["path.system"]
+      elsif name == "path" && Bundler.settings["path.system"]
         Bundler.ui.warn "`path.system` is already configured, so it will be unset."
         delete_config("path.system")
       end
@@ -237,7 +237,7 @@ module Bundler
     #
     def groups_conflict?(name, groups, scope_prev, scope_new)
       conflicts = conflicting_groups(name, groups, scope_prev, scope_new)
-      conflicts && conflicts.size > 0 && scope_new.to_sym == scope_prev
+      conflicts && !conflicts.empty? && scope_new.to_sym == scope_prev
     end
 
     # Finds the conflicting (overlapping) groups in the list given by the user
@@ -280,7 +280,7 @@ module Bundler
     #         `global` scope.
     #
     def without_conflict?(groups, scope)
-      groups_conflict?(:without, groups, :local, scope) or groups_conflict?(:without, groups, :global, scope)
+      groups_conflict?(:without, groups, :local, scope) || groups_conflict?(:without, groups, :global, scope)
     end
 
     # Determines whether the user's (`without`) groups conflict with the
@@ -297,7 +297,7 @@ module Bundler
     #         `global` scope.
     #
     def with_conflict?(groups, scope)
-      groups_conflict?(:with, groups, :local, scope) or groups_conflict?(:with, groups, :global, scope)
+      groups_conflict?(:with, groups, :local, scope) || groups_conflict?(:with, groups, :global, scope)
     end
   end
 end

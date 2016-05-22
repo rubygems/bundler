@@ -215,11 +215,8 @@ module Bundler
 
         def in_path(&blk)
           checkout unless path.exist?
-          if path.exist?
-            SharedHelpers.chdir(path, &blk)
-          else
-            raise GitNotCheckedOutError.new(uri)
-          end
+          raise GitNotCheckedOutError.new(uri) unless path.exist?
+          SharedHelpers.chdir(path, &blk)
         end
 
         def allowed_in_path

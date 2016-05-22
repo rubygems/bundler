@@ -2,10 +2,7 @@
 require "spec_helper"
 
 describe "bundle help" do
-  # Rubygems 1.4+ no longer load gem plugins so this test is no longer needed
-  rubygems_under_14 = Gem::Requirement.new("< 1.4").satisfied_by?(Gem::Version.new(Gem::VERSION))
-
-  it "uses mann when available" do
+  it "uses man pages when available" do
     with_fake_man do
       bundle "help gemfile"
     end

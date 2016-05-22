@@ -22,10 +22,6 @@ module Bundler
         @shell.set_color(string, color)
       end
 
-      def add_color(string, color)
-        @shell.set_color(string, color)
-      end
-
       def info(msg, newline = nil)
         tell_stdout(msg, nil, newline) if level("info")
       end
@@ -41,10 +37,9 @@ module Bundler
       end
 
       def deprecate(msg, newline = nil)
-        unless @deprecation_messages.include?(msg)
-          @deprecation_messages.add(msg)
-          tell_stderr("DEPRECATION: " + msg, :yellow, newline)
-        end
+        return if @deprecation_messages.include?(msg)
+        @deprecation_messages.add(msg)
+        tell_stderr("DEPRECATION: " + msg, :yellow, newline)
       end
 
       def error(msg, newline = nil)

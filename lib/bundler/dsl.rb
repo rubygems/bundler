@@ -415,10 +415,9 @@ module Bundler
     end
 
     def infer_ruby_version(gemfile)
-      unless @ruby_version
-        ruby_version = gemfile.parent + ".ruby-version"
-        ruby(ruby_version.read.strip) if ruby_version.file?
-      end
+      return if @ruby_version
+      ruby_version_path = gemfile.parent + ".ruby-version"
+      ruby(ruby_version.read.strip) if ruby_version_path.file?
     end
 
     class DSLError < GemfileError

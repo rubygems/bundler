@@ -206,7 +206,6 @@ module Bundler
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
       set_path = ""
-      install_path = ""
 
       # We don't use @current_config here, because we no longer accept the path
       # flag.
@@ -222,7 +221,7 @@ module Bundler
         set_path = File.join(@root, Bundler.ruby_scope)
       end
 
-      install_path = if Pathname.new(set_path).absolute?
+      if Pathname.new(set_path).absolute?
         # The user specified an absolute path.
         # The set path is the root bundler (gems.rb) path, the systems gem
         # path, or any other absolute path.
