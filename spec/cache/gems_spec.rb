@@ -70,7 +70,7 @@ describe "bundle cache" do
 
       bundle "cache"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
   end
 
@@ -153,11 +153,11 @@ describe "bundle cache" do
     end
 
     it "should not explode if the lockfile is not present" do
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(bundled_app("gems.locked"))
 
       bundle :cache
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
   end
 
@@ -173,13 +173,6 @@ describe "bundle cache" do
       expect(cached_gem("rack-1.0.0")).to exist
       expect(cached_gem("actionpack-2.3.2")).to exist
       expect(cached_gem("activesupport-2.3.2")).to exist
-    end
-
-    it "re-caches during install" do
-      cached_gem("rack-1.0.0").rmtree
-      bundle :install
-      expect(out).to include("Updating files in vendor/cache")
-      expect(cached_gem("rack-1.0.0")).to exist
     end
 
     it "adds and removes when gems are updated" do
@@ -203,6 +196,7 @@ describe "bundle cache" do
         source "file://#{gem_repo2}"
         gem "rack"
       G
+      bundle :cache
       expect(cached_gem("rack-1.0.0")).to exist
       expect(cached_gem("actionpack-2.3.2")).not_to exist
       expect(cached_gem("activesupport-2.3.2")).not_to exist
@@ -216,6 +210,7 @@ describe "bundle cache" do
         gem "rack", :git => "#{lib_path("rack-1.0")}"
         gem "actionpack"
       G
+      bundle :cache
       expect(cached_gem("rack-1.0.0")).not_to exist
       expect(cached_gem("actionpack-2.3.2")).to exist
       expect(cached_gem("activesupport-2.3.2")).to exist
@@ -233,10 +228,7 @@ describe "bundle cache" do
       end
 
       simulate_new_machine
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "platform_specific"
-      G
+      bundle :cache
 
       expect(cached_gem("platform_specific-1.0-#{Gem::Platform.local}")).to exist
       expect(cached_gem("platform_specific-1.0-java")).to exist
@@ -249,7 +241,7 @@ describe "bundle cache" do
         :rubygems_version => "1.3.2"
       simulate_new_machine
 
-      bundle :install
+      bundle :cache
       expect(cached_gem("rack-1.0.0")).to exist
     end
 
