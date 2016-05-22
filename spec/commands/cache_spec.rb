@@ -25,7 +25,7 @@ describe "bundle cache" do
           gem 'bundler'
         D
 
-        bundle "package --all"
+        bundle "cache --all"
 
         expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
         expect(bundled_app("vendor/cache/bundler-0.9.gem")).to_not exist
@@ -55,7 +55,7 @@ describe "bundle cache" do
             gemspec
           D
 
-          bundle! "package --all"
+          bundle! "cache --all"
 
           expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
           expect(bundled_app("vendor/cache/nokogiri-1.4.2.gem")).to exist
@@ -86,7 +86,7 @@ describe "bundle cache" do
             gemspec
           D
 
-          bundle! "package --all"
+          bundle! "cache --all"
 
           expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
           expect(bundled_app("vendor/cache/nokogiri-1.4.2.gem")).to exist
@@ -130,7 +130,7 @@ describe "bundle cache" do
           gemspec :name => 'mygem_client'
         D
 
-        bundle! "package --all"
+        bundle! "cache --all"
 
         expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
         expect(bundled_app("vendor/cache/nokogiri-1.4.2.gem")).to exist
@@ -176,7 +176,7 @@ describe "bundle cache" do
         gem 'rack'
       D
 
-      bundle "package --no-install"
+      bundle "cache --no-install"
       bundle "install"
 
       should_be_installed "rack 1.0.0"
