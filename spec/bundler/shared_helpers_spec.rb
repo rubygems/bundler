@@ -27,7 +27,7 @@ describe Bundler::SharedHelpers do
 
       it "raises a GemfileNotFound error" do
         expect { subject.default_gemfile }.to raise_error(
-          Bundler::GemfileNotFound, "Could not locate Gemfile")
+          Bundler::GemfileNotFound, "Could not locate gems.rb")
       end
     end
   end
