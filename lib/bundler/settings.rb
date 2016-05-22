@@ -286,7 +286,7 @@ module Bundler
     end
 
     def get_array(key)
-      self[key] ? self[key].split(":").map(&:to_sym) : []
+      self[key] ? self[key].split(" ").map(&:to_sym) : []
     end
 
     def set_array(key, array, scope)
@@ -295,7 +295,7 @@ module Bundler
       end
 
       if array
-        value = (array.empty? ? nil : array.join(":"))
+        value = (array.empty? ? nil : array.join(" "))
         case scope
         when :current then self[key] = value      if array
         when :local   then set_local(key, value)  if array

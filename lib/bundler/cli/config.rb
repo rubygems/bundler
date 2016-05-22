@@ -1,42 +1,25 @@
 # frozen_string_literal: true
 module Bundler
   class CLI::Config
-    attr_reader :name, :options, :scope, :thor
+    attr_reader :name, :options, :scope, :thor, :delete
     attr_accessor :args
 
     def initialize(options, args, thor)
-      @options = options
+      if options["global"] && options["local"]
+        raise InvalidOption, "Global and local settings cannot be changed at the same time. Please choose one or the other."
+      end
+
+      @delete = options["delete"]
+      @scope = options["local"] ? "local" : "global"
       @args = args
-      @thor = thor
-      @name = peek = args.shift
-      @scope = "global"
-      return unless peek && peek.start_with?("--")
       @name = args.shift
-      @scope = peek[2..-1]
+      @thor = thor
     end
 
     def run
-      unless name
-        confirm_all
-        return
-      end
-
-      # TODO: raise InvalidScopeError.new(scope) unless valid_scope?(scope)
-      unless valid_scope?(scope)
-        Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
-        exit 1
-      end
-
-      if scope == "delete"
-        Bundler.settings.set_local(name, nil)
-        Bundler.settings.set_global(name, nil)
-        return
-      end
-
-      if args.empty?
-        confirm(name)
-        return
-      end
+      return delete_config(name) if delete
+      return confirm_all unless name
+      return confirm(name) if args.empty?
 
       message = message_for(name)
       Bundler.ui.info(message) if message
@@ -44,8 +27,12 @@ module Bundler
       new_value = expand_local_path(name, args)
       resolve_system_path_conflicts(name, new_value, scope)
       resolve_group_conflicts(name, new_value, scope)
-      delete_config(name, nil) if new_value == "" && (name == "with" || name == "without")
-      Bundler.settings.send("set_#{scope}", name, new_value)
+
+      if new_value == "" && (name == "with" || name == "without")
+        delete_config(name, nil)
+      else
+        Bundler.settings.send("set_#{scope}", name, new_value)
+      end
     end
 
   private
@@ -154,9 +141,7 @@ module Bundler
     #         the options conflict.
     #
     def resolve_group_conflicts(name, new_value, scope = "global")
-      # NOTE: Bundler.settings stores multiple with and without keys, given an array like
-      # [:foo, :bar, :baz, :qux], as "foo:bar:baz:qux"
-      groups = new_value.split(":").map(&:to_sym)
+      groups = new_value.split(" ").map(&:to_sym)
 
       if (name == "with") && without_conflict?(groups, scope)
         without_scope = groups_conflict?(:without, groups, :local, scope) ? "locally" : "globally"
@@ -262,7 +247,7 @@ module Bundler
     #
     def conflicting_groups(name, groups, scope_prev, scope_new)
       settings = Bundler.settings.send(name.to_sym, scope_prev)
-      settings = (settings.map {|opt| opt.to_s.split(":").map(&:to_sym) }).flatten # TODO: refactor
+      settings = (settings.map {|opt| opt.to_s.split(" ").map(&:to_sym) }).flatten # TODO: refactor
       groups & settings
     end
 

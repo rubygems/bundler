@@ -294,9 +294,11 @@ module Bundler
       where they were specified.
     D
     method_option "local", :type => :boolean, :default => false, :banner =>
-     "Add the configuration locally"
+      "Add the configuration locally"
     method_option "global", :type => :boolean, :default => false, :banner =>
-     "Add the configuration globally"
+      "Add the configuration globally"
+    method_option "delete", :type => :boolean, :default => false, :banner =>
+      "Delete the configuration locally and globally"
 
     def config(*args)
       require "bundler/cli/config"

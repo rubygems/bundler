@@ -10,15 +10,16 @@ describe ".bundle/config" do
   end
 
   describe "BUNDLE_APP_CONFIG" do
+    before { ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s }
+    after { ENV["BUNDLE_APP_CONFIG"] = nil }
+
     it "can be moved with an environment variable" do
-      ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
-      # NOTE: here and below, we need to use `--local` because we want to
-      # write to the app's config file, not the user's
       bundle "config --local foo bar"
       bundle :install
 
       expect(bundled_app(".bundle")).not_to exist
       expect(tmp("foo/bar/config")).to exist
+      expect(tmp("foo/bar/config").read).to include('BUNDLE_FOO: "bar"')
       should_be_installed "rack 1.0.0"
     end
 
