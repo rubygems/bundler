@@ -196,29 +196,24 @@ describe "bundle cache" do
   end
 
   context "with --frozen" do
-    before do
-      gemfile <<-G
+    it "tries to cache with frozen" do
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
-      bundle "install"
-    end
 
-    subject { bundle "package --frozen" }
-
-    it "tries to install with frozen" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
         gem "rack-obama"
       G
-      subject
+
+      bundle "cache --frozen"
+
       expect(exitstatus).to eq(16) if exitstatus
-      expect(out).to include("deployment mode")
-      expect(out).to include("You have added to the Gemfile")
-      expect(out).to include("* rack-obama")
-      bundle "env"
-      expect(out).to include("frozen")
+      expect(err).to include("deployment mode")
+      expect(err).to include("You have added to gems.rb")
+      expect(err).to include("* rack-obama")
     end
   end
 end
