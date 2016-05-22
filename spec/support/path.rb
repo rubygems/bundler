@@ -51,7 +51,7 @@ module Spec
     def download_cache_source_dir(source)
       uri  = URI(source.to_s)
       port = uri.port unless uri.port == 80
-      path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r|\A/?\Z|
+      path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r{\A/?\Z}
       [uri.hostname, port, path].compact.join(".")
     end
 

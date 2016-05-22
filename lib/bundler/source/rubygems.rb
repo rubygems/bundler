@@ -496,7 +496,7 @@ module Bundler
         uri = remotes.first
         return unless uri
         port = uri.port unless uri.port == 80
-        path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r|\A/?\Z|
+        path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r{\A/?\Z}
         source_dir = [uri.hostname, port, path].compact.join(".")
         Bundler.settings.download_cache_path.join(source_dir).tap(&:mkpath).join(*paths)
       end

@@ -57,7 +57,7 @@ module Bundler
         Bundler::CLI::Clean.new(options).run
       end
 
-      Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" if Installer.using_gems.size > 0
+      Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" unless Installer.using_gems.empty?
       Bundler.ui.confirm "Bundle updated!"
       without_groups_messages
     end

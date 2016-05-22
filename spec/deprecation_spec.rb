@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 if Bundler::VERSION == "1.99.0.dev"

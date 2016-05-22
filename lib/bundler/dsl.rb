@@ -417,9 +417,7 @@ module Bundler
     def infer_ruby_version(gemfile)
       unless @ruby_version
         ruby_version = gemfile.parent + ".ruby-version"
-        if ruby_version.file?
-          ruby(ruby_version.read.strip)
-        end
+        ruby(ruby_version.read.strip) if ruby_version.file?
       end
     end
 

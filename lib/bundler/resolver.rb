@@ -288,11 +288,15 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      Bundler.default_gemfile.basename.to_s rescue "gems.rb"
+      Bundler.default_gemfile.basename.to_s
+    rescue
+      "gems.rb"
     end
 
     def name_for_locking_dependency_source
-      Bundler.default_lockfile.basename.to_s rescue "gems.locked"
+      Bundler.default_lockfile.basename.to_s
+    rescue
+      "gems.locked"
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
@@ -348,11 +352,11 @@ module Bundler
           specs = @source_requirements[name][name]
           versions_with_platforms = specs.map {|s| [s.version, s.platform] }
           message = String.new("Could not find gem '#{requirement}' in #{requirement.source}.\n")
-          if versions_with_platforms.any?
-            message << "Source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
-          else
-            message << "Source does not contain any versions of '#{requirement}'"
-          end
+          message << if versions_with_platforms.any?
+                       "Source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
+                     else
+                       "Source does not contain any versions of '#{requirement}'"
+                     end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
             "listed in your Gemfile or available on this machine."

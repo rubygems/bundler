@@ -902,7 +902,7 @@ describe "bundle install with git sources" do
       end
 
       bundle :install, :expect_err => true,
-        :requires => [lib_path("install_hooks.rb")]
+                       :requires => [lib_path("install_hooks.rb")]
       expect(err).to eq_err("Ran pre-install hook: foo-1.0")
     end
 
@@ -922,8 +922,8 @@ describe "bundle install with git sources" do
       end
 
       bundle :install, :expect_err => true,
-        :requires => [lib_path("install_hooks.rb")]
-       expect(err).to eq_err("Ran post-install hook: foo-1.0")
+                       :requires => [lib_path("install_hooks.rb")]
+      expect(err).to eq_err("Ran post-install hook: foo-1.0")
     end
 
     it "complains if the install hook fails" do
@@ -942,7 +942,7 @@ describe "bundle install with git sources" do
       end
 
       bundle :install, :expect_err => true,
-        :requires => [lib_path("install_hooks.rb")]
+                       :requires => [lib_path("install_hooks.rb")]
       expect(err).to include("failed for foo-1.0")
     end
   end

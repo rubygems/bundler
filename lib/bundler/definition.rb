@@ -408,18 +408,18 @@ module Bundler
         problem, expected, actual = diff
 
         msg = case problem
-        when :engine
-          "Your Ruby engine is #{actual}, but your #{SharedHelpers.gemfile_name} specified #{expected}"
-        when :version
-          "Your Ruby version is #{actual}, but your #{SharedHelpers.gemfile_name} specified #{expected}"
-        when :engine_version
-          "Your #{Bundler.ruby_version.engine} version is #{actual}, but your #{SharedHelpers.gemfile_name} specified #{ruby_version.engine} #{expected}"
-        when :patchlevel
-          if !expected.is_a?(String)
-            "The Ruby patchlevel in your #{SharedHelpers.gemfile_name} must be a string"
-          else
-            "Your Ruby patchlevel is #{actual}, but your #{SharedHelpers.gemfile_name} specified #{expected}"
-          end
+              when :engine
+                "Your Ruby engine is #{actual}, but your #{SharedHelpers.gemfile_name} specified #{expected}"
+              when :version
+                "Your Ruby version is #{actual}, but your #{SharedHelpers.gemfile_name} specified #{expected}"
+              when :engine_version
+                "Your #{Bundler.ruby_version.engine} version is #{actual}, but your #{SharedHelpers.gemfile_name} specified #{ruby_version.engine} #{expected}"
+              when :patchlevel
+                if !expected.is_a?(String)
+                  "The Ruby patchlevel in your #{SharedHelpers.gemfile_name} must be a string"
+                else
+                  "Your Ruby patchlevel is #{actual}, but your #{SharedHelpers.gemfile_name} specified #{expected}"
+                end
         end
 
         raise RubyVersionMismatch, msg

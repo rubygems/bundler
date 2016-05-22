@@ -12,11 +12,10 @@ module Bundler
       warn_if_root
 
       [:with, :without].each do |option|
-        if options[option]
-          Bundler.ui.error "You have specified a `#{option}` group with the " \
-            "`#{option}` flag. Please use `bundle config #{option} #{options[option]}` instead."
-          exit 1
-        end
+        next unless options[option]
+        Bundler.ui.error "You have specified a `#{option}` group with the " \
+          "`#{option}` flag. Please use `bundle config #{option} #{options[option]}` instead."
+        exit 1
       end
 
       if options[:cache]
@@ -73,7 +72,7 @@ module Bundler
         options[:system] = true
       end
 
-      Bundler.settings[:path]     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
+      Bundler.settings[:path] = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
 
       Bundler.settings[:path] ||= "bundle" if options["standalone"]
       Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
@@ -92,7 +91,7 @@ module Bundler
       Installer.install(Bundler.root, definition, options)
       Bundler.load.cache if Bundler.app_cache.exist? && Bundler.settings[:cache] && !Bundler.settings[:frozen]
 
-      Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" if Installer.using_gems.size > 0
+      Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" unless Installer.using_gems.empty?
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
       confirm_without_groups
 

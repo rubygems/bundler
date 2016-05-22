@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "bundler/vendored_thor"
 
@@ -11,18 +12,18 @@ describe Bundler::UI::Shell do
   %w(info confirm warn debug).each do |method_name|
     describe "##{method_name}" do
       it "outputs to STDOUT" do
-        expect {
+        expect do
           shell.send(method_name, "Boom")
-        }.to output(/Boom/).to_stdout
+        end.to output(/Boom/).to_stdout
       end
     end
   end
 
   describe "#error" do
     it "outputs to STDERR" do
-      expect {
+      expect do
         shell.error("Boom")
-      }.to output(/Boom/).to_stderr
+      end.to output(/Boom/).to_stderr
     end
   end
 end

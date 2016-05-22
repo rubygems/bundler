@@ -451,7 +451,7 @@ describe "bundle install with gem sources" do
     it "prints an error and exits" do
       ["--cache",
        "--path vendor/bundle",
-       "--system"
+       "--system",
       ].each do |flag|
         gemfile <<-G
           gem 'rack'

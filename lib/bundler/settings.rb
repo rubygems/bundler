@@ -222,16 +222,16 @@ module Bundler
         set_path = File.join(@root, Bundler.ruby_scope)
       end
 
-      if Pathname.new(set_path).absolute?
+      install_path = if Pathname.new(set_path).absolute?
         # The user specified an absolute path.
         # The set path is the root bundler (gems.rb) path, the systems gem
         # path, or any other absolute path.
-        install_path = set_path
+        set_path
       else
         # The user specified a relative path.
         # The install path is this path expanded from the root bundler
         # (gems.rb) directory.
-        install_path = File.join(Bundler.root, set_path)
+        File.join(Bundler.root, set_path)
       end
     end
 
