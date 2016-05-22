@@ -36,11 +36,6 @@ module Bundler
       @current_config[key_for(key)] = value
     end
 
-    def []=(key, value)
-      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
-      set_key(key, value, @local_config, local_config_file)
-    end
-
     alias_method :[]=, :set_current
 
     def set_local(key, value)
