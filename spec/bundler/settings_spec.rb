@@ -40,7 +40,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
 
     before do
       hash.each do |key, value|
-        settings[key] = value
+        settings.set_local(key, value)
       end
     end
 
