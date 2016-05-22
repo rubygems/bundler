@@ -184,9 +184,9 @@ module Bundler
       when nil
         get_array(group_type)
       when :global
-        @global_config[key] ? @global_config[key].split(" ").map(&:to_sym) : []
+        @global_config[key] ? @global_config[key].split(":").map(&:to_sym) : []
       when :local
-        @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
+        @local_config[key] ? @local_config[key].split(":").map(&:to_sym) : []
       else
         raise Bundler::InvalidOption, "Invalid scope #{scope} given. Please use :local or :global."
       end
@@ -286,7 +286,7 @@ module Bundler
     end
 
     def get_array(key)
-      self[key] ? self[key].split(" ").map(&:to_sym) : []
+      self[key] ? self[key].split(":").map(&:to_sym) : []
     end
 
     def set_array(key, array, scope)
@@ -295,7 +295,7 @@ module Bundler
       end
 
       if array
-        value = (array.empty? ? nil : array.join(" "))
+        value = (array.empty? ? nil : array.join(":"))
         case scope
         when :current then self[key] = value      if array
         when :local   then set_local(key, value)  if array

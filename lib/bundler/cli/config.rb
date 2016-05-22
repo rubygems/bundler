@@ -24,7 +24,9 @@ module Bundler
       message = message_for(name)
       Bundler.ui.info(message) if message
 
-      new_value = expand_local_path(name, args)
+      new_value = %w[with without].include?(name) ? args.join(":") : args.join(" ")
+      new_value = expand_local_path(name, new_value) if name.start_with?("local.")
+
       resolve_system_path_conflicts(name, new_value, scope)
       resolve_group_conflicts(name, new_value, scope)
 
@@ -51,13 +53,9 @@ module Bundler
       show_pretty_values_for(name)
     end
 
-    def expand_local_path(name, args)
-      pathname = Pathname.new(args.join(" "))
-      if name.start_with?("local.") && pathname.directory?
-        pathname.expand_path.to_s
-      else
-        args.join(" ")
-      end
+    def expand_local_path(name, value)
+      pathname = Pathname.new(value)
+      pathname.directory? ? pathname.expand_path.to_s : value
     end
 
     def message_for(name)
@@ -141,7 +139,7 @@ module Bundler
     #         the options conflict.
     #
     def resolve_group_conflicts(name, new_value, scope = "global")
-      groups = new_value.split(" ").map(&:to_sym)
+      groups = new_value.split(":").map(&:to_sym)
 
       if (name == "with") && without_conflict?(groups, scope)
         without_scope = groups_conflict?(:without, groups, :local, scope) ? "locally" : "globally"
