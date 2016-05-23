@@ -46,7 +46,7 @@ describe "bundle install" do
 
           Current Bundler version:
             bundler (#{Bundler::VERSION})
-        E
+      E
       expect(out).to include(nice_error)
     end
 
@@ -139,5 +139,6 @@ describe "bundle install" do
       bundle "check"
       expect(out).to include("The Gemfile's dependencies are satisfied")
     end
+
   end
 end
