@@ -354,7 +354,7 @@ describe "bundle install with gem sources" do
           ::RUBY_VERSION = '1.8.7'
           ruby '~> 2.1'
         G
-        expect(out).to include("Your Ruby version is 1.8.7, but your Gemfile specified ~> 2.1")
+        expect(err).to include("Your Ruby version is 1.8.7, but your gems.rb specified ~> 2.1")
       end
     end
 
