@@ -408,7 +408,7 @@ module Bundler
         SharedHelpers.filesystem_access("#{download_path}/cache") do |p|
           FileUtils.mkdir_p(p)
         end
-        Bundler.rubygems.download_gem(spec, uri, download_path)
+        download_gem_with_cache(spec, uri, download_path)
 
         if Bundler.requires_sudo?
           SharedHelpers.filesystem_access("#{Bundler.rubygems.gem_dir}/cache") do |p|
@@ -448,7 +448,7 @@ module Bundler
       # @param  [String] download_path
       #         the local directory the .gem will end up in.
       #
-      def download_gem(spec, uri, download_path)
+      def download_gem_with_cache(spec, uri, download_path)
         cache_path = download_cache_path("#{spec.full_name}.gem")
         local_path = File.join(download_path, "cache/#{spec.full_name}.gem")
         if cache_path.exist?
