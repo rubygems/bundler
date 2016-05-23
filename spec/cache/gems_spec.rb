@@ -164,7 +164,7 @@ describe "bundle cache" do
   describe "when previously cached" do
     before :each do
       build_repo2
-      install_gemfile <<-G
+      gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack"
         gem "actionpack"
@@ -177,22 +177,24 @@ describe "bundle cache" do
 
     it "adds and removes when gems are updated" do
       update_repo2
-      bundle "update"
+      bundle :update
+      bundle :cache
       expect(cached_gem("rack-1.2")).to exist
       expect(cached_gem("rack-1.0.0")).not_to exist
     end
 
     it "adds new gems and dependencies" do
-      install_gemfile <<-G
+      gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rails"
       G
+      bundle :cache
       expect(cached_gem("rails-2.3.2")).to exist
       expect(cached_gem("activerecord-2.3.2")).to exist
     end
 
     it "removes .gems for removed gems and dependencies" do
-      install_gemfile <<-G
+      gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack"
       G
@@ -205,7 +207,7 @@ describe "bundle cache" do
     it "removes .gems when gem changes to git source" do
       build_git "rack"
 
-      install_gemfile <<-G
+      gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack", :git => "#{lib_path("rack-1.0")}"
         gem "actionpack"
@@ -218,11 +220,10 @@ describe "bundle cache" do
 
     it "doesn't remove gems that are for another platform" do
       simulate_platform "java" do
-        install_gemfile <<-G
+        gemfile <<-G
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
-
         bundle :cache
         expect(cached_gem("platform_specific-1.0-java")).to exist
       end
@@ -274,10 +275,10 @@ describe "bundle cache" do
       build_gem "foo-bundler", "1.0",
         :path => bundled_app("vendor/cache")
 
-      install_gemfile <<-G
+      gemfile <<-G
         gem "foo-bundler"
       G
-
+      bundle :cache
       should_be_installed "foo-bundler 1.0"
     end
   end
