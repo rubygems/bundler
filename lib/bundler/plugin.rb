@@ -15,11 +15,7 @@ module Bundler
       # @option options [String] :version (optional) the version of the plugin to install
       def install(name, options)
         require "bundler/plugin/installer.rb"
-
-        source = options[:source] || raise(ArgumentError, "You need to provide the source")
-        version = options[:version] || [">= 0"]
-
-        plugin_path = Pathname.new Installer.install(name, source, version)
+        plugin_path = Pathname.new Installer.install(name, options)
 
         validate_plugin! plugin_path
 
@@ -33,7 +29,7 @@ module Bundler
 
       # Checks if the gem is good to be a plugin
       #
-      # At present it just checks whether it contains plugin.rb file
+      # At present it only checks whether it contains plugin.rb file
       #
       # @param [Pathname] plugin_path the path plugin is installed at
       #
@@ -52,7 +48,7 @@ module Bundler
       def register_plugin name, path
         require path.join("plugin.rb") # this shall latter be used to find the actions the plugin performs
 
-        index.register_plugin name, path
+        index.register_plugin name, path.to_s
       end
 
       # The index object used to store the details about the plugin

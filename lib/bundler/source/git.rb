@@ -86,12 +86,17 @@ module Bundler
       def install_path
         @install_path ||= begin
           git_scope = "#{base_name}-#{shortref_for_path(revision)}"
-          path = Bundler.install_path.join(git_scope)
 
-          if !path.exist? && Bundler.requires_sudo?
-            Bundler.user_bundle_path.join(Bundler.ruby_scope).join(git_scope)
+          if @options[:plugin]
+            path = Plugin.root.join("bundler", "gems", git_scope)
           else
-            path
+            path = Bundler.install_path.join(git_scope)
+
+            if !path.exist? && Bundler.requires_sudo?
+              Bundler.user_bundle_path.join(Bundler.ruby_scope).join(git_scope)
+            else
+              path
+            end
           end
         end
       end
@@ -169,7 +174,7 @@ module Bundler
           serialize_gemspecs_in(install_path)
           @copied = true
         end
-        generate_bin(spec)
+        generate_bin(spec) unless @options[:plugin]
 
         requires_checkout? ? spec.post_install_message : nil
       end
@@ -200,10 +205,14 @@ module Bundler
         @cache_path ||= begin
           git_scope = "#{base_name}-#{uri_hash}"
 
-          if Bundler.requires_sudo?
-            Bundler.user_bundle_path.join("cache/git", git_scope)
+          if @options[:plugin]
+            Plugin.cache.join("bundler", "git", git_scope)
           else
-            Bundler.cache.join("git", git_scope)
+            if Bundler.requires_sudo?
+              Bundler.user_bundle_path.join("cache/git", git_scope)
+            else
+              Bundler.cache.join("git", git_scope)
+            end
           end
         end
       end
@@ -227,8 +236,8 @@ module Bundler
       end
 
       def serialize_gemspecs_in(destination)
-        expanded_path = destination.expand_path(Bundler.root)
-        Dir["#{expanded_path}/#{@glob}"].each do |spec_path|
+        destination = destination.expand_path(Bundler.root) if destination.relative?
+        Dir["#{destination}/#{@glob}"].each do |spec_path|
           # Evaluate gemspecs and cache the result. Gemspecs
           # in git might require git or other dependencies.
           # The gemspecs we cache should already be evaluated.

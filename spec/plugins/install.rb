@@ -39,7 +39,7 @@ describe "bundler plugin install" do
     end
 
     bundle "plugin install kung-foo --source file://#{gem_repo2}"
-    
+
     expect(out).to include("Plugin dependencies are not supported")
 
     expect(out).not_to include("Installed plugin")
@@ -80,5 +80,17 @@ describe "bundler plugin install" do
       expect(plugin_gems("chaplin-1.0")).not_to be_directory
     end
 
+  end
+
+  context "git plugins" do
+    it "installs form a git source" do
+      build_git "foo" do |s|
+        s.write "plugin.rb"
+      end
+
+      bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
+
+      expect(out).to include("Installed plugin foo")
+    end
   end
 end

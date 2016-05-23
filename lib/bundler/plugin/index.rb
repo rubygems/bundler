@@ -4,7 +4,7 @@ require "yaml"
 module Bundler
   # Manages which plugins are installed and their sources. This also is supposed to map
   # which plugin does what (currently the features are not implemented so this class is
-  # now just a stub class).
+  # now a stub class).
   class Plugin::Index
 
     def initialize
@@ -19,15 +19,15 @@ module Bundler
         valid_file = index_f && index_f.exist? && !index_f.size.zero?
         return unless valid_file
         index = YAML.load_file(index_f)
-        @plugin_sources = index[:plugin_sources]
+        @plugin_sources = index["plugin_sources"]
       end
     end
 
     # Should be called when any of the instance variables change. Stores the instance
-    # variables in YAML format. (The instance variables are supposed to be just String key value pairs)
+    # variables in YAML format. (The instance variables are supposed to be only String key value pairs)
     def save_index
       index = {
-        :plugin_sources => @plugin_sources
+        "plugin_sources" => @plugin_sources
       }
 
       SharedHelpers.filesystem_access(index_file) do |index_f|
