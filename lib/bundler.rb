@@ -316,14 +316,22 @@ module Bundler
 
     def sudo(str)
       SUDO_MUTEX.synchronize do
+        if self.settings["path.system"]
+          key = "path.system"
+          location = "to the system RubyGems"
+        else
+          key = "path"
+          location = "into #{self.settings.path}"
+        end
+
         prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
-        Your user account isn't allowed to install to the system Rubygems.
+        Your user account isn't allowed to install #{location}.
         You can cancel this installation and run:
 
-            bundle install --path vendor/bundle
+            bundle config --delete #{key}
 
-        to install the gems into ./vendor/bundle/, or you can enter your password
-        and install the bundled gems to Rubygems using sudo.
+        to install the gems into ./.bundle/, or you can enter your password
+        and install the gems in this bundle using sudo.
 
         Password:
         PROMPT
