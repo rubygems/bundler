@@ -67,7 +67,7 @@ module Spec
     # @return [Pathname] The global cache path.
     #
     def download_cache(source, *path)
-      home(".bundler/cache", download_cache_source_dir(source), *path)
+      home(".bundle/cache", download_cache_source_dir(source), *path)
     end
 
     def base_system_gems
