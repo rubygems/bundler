@@ -23,6 +23,7 @@ describe Bundler::Fetcher::Index do
         let(:error_message) { "certificate verify failed" }
 
         it "should raise a Bundler::Fetcher::CertificateFailureError" do
+          expect(Bundler::SharedHelpers).to receive(:gemfile_name).and_return("gems.rb")
           expect { subject.specs(gem_names) }.to raise_error(Bundler::Fetcher::CertificateFailureError,
             %r{Could not verify the SSL certificate for http://sample_uri.com})
         end
@@ -88,7 +89,9 @@ describe Bundler::Fetcher::Index do
     end
 
     context "when a OpenSSL::SSL::SSLError occurs" do
-      before { allow(rubygems).to receive(:fetch_all_remote_specs) { raise OpenSSL::SSL::SSLError.new(error_message) } }
+      before do
+        allow(rubygems).to receive(:fetch_all_remote_specs) { raise OpenSSL::SSL::SSLError.new(error_message) }
+      end
 
       it_behaves_like "the error is properly handled"
     end

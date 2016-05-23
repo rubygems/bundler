@@ -176,7 +176,10 @@ describe Bundler::Fetcher::Downloader do
     end
 
     context "when the request response causes a OpenSSL::SSL::SSLError" do
-      before { allow(connection).to receive(:request).with(uri, net_http_get) { raise OpenSSL::SSL::SSLError.new } }
+      before do
+        allow(connection).to receive(:request).with(uri, net_http_get) { raise OpenSSL::SSL::SSLError.new }
+        expect(Bundler::SharedHelpers).to receive(:gemfile_name).and_return("gems.rb")
+      end
 
       it "should raise a LoadError about openssl" do
         expect { subject.request(uri, options) }.to raise_error(Bundler::Fetcher::CertificateFailureError,
