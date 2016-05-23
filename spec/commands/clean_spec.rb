@@ -487,9 +487,12 @@ describe "bundle clean" do
 
   describe "when missing permissions" do
     after do
-      FileUtils.chmod(0755, default_bundle_path("cache"))
+      FileUtils.chmod(0755, system_gem_path("cache"))
     end
+
     it "returns a helpful error message" do
+      bundle "config path.system true"
+
       gemfile <<-G
         source "file://#{gem_repo1}"
 
@@ -505,13 +508,12 @@ describe "bundle clean" do
       G
       bundle :install
 
-      system_cache_path = default_bundle_path("cache")
-      FileUtils.chmod(0500, system_cache_path)
+      FileUtils.chmod(0500, system_gem_path("cache"))
 
-      bundle :clean, :force => true
+      bundle "clean --force", :expect_err => true
 
-      expect(out).to include(system_gem_path.to_s)
-      expect(out).to include("grant write permissions")
+      expect(err).to include(system_gem_path("cache").to_s)
+      expect(err).to include("grant write permissions")
 
       sys_exec "gem list"
       expect(out).to include("foo (1.0)")
