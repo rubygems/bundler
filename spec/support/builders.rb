@@ -253,39 +253,6 @@ module Spec
         end
 
         build_gem "foo"
-
-        # A minimal fake pry console
-        build_gem "pry" do |s|
-          s.write "lib/pry.rb", <<-RUBY
-            class Pry
-              class << self
-                def toplevel_binding
-                  unless defined?(@toplevel_binding) && @toplevel_binding
-                    TOPLEVEL_BINDING.eval %{
-                      def self.__pry__; binding; end
-                      Pry.instance_variable_set(:@toplevel_binding, __pry__)
-                      class << self; undef __pry__; end
-                    }
-                  end
-                  @toplevel_binding.eval('private')
-                  @toplevel_binding
-                end
-
-                def __pry__
-                  while line = gets
-                    begin
-                      puts eval(line, toplevel_binding).inspect.sub(/^"(.*)"$/, '=> \\1')
-                    rescue Exception => e
-                      puts "\#{e.class}: \#{e.message}"
-                      puts e.backtrace.first
-                    end
-                  end
-                end
-                alias start __pry__
-              end
-            end
-          RUBY
-        end
       end
     end
 
