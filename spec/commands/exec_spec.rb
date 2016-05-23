@@ -427,9 +427,9 @@ describe "bundle exec" do
     context "the executable raises" do
       let(:executable) { super() << "\nraise 'ERROR'" }
       let(:exit_code) { 1 }
-      let(:expected) { super() << "\nbundler: failed to load command: #{path} (#{path})" }
       let(:expected_err) do
-        "RuntimeError: ERROR\n  #{path}:7" +
+        "bundler: failed to load command: #{path} (#{path})\n" +
+          "RuntimeError: ERROR\n  #{path}:7" +
           (Bundler.current_ruby.ruby_18? ? "" : ":in `<top (required)>'")
       end
       it_behaves_like "it runs"
@@ -449,7 +449,8 @@ describe "bundle exec" do
       end
 
       let(:exit_code) { Bundler::GemNotFound.new.status_code }
-      let(:expected) { <<-EOS.strip }
+      let(:expected) { "" }
+      let(:expected_err) { <<-EOS.strip }
 \e[31mCould not find gem 'rack (= 2)' in any of the gem sources listed in your Gemfile or available on this machine.\e[0m
 \e[33mRun `bundle install` to install missing gems.\e[0m
       EOS
