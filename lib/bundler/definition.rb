@@ -137,8 +137,17 @@ module Bundler
     # @return [Bundler::SpecSet]
     def specs
       @specs ||= begin
-        specs = resolve.materialize(Bundler.settings[:cache_all_platforms] ? dependencies : requested_dependencies)
-
+        begin
+          specs = resolve.materialize(Bundler.settings[:cache_all_platforms] ? dependencies : requested_dependencies)
+        rescue GemNotFound => e # Handle yanked gem
+          gem_name, gem_version = extract_gem_info(e)
+          locked_gem = @locked_specs[gem_name].last
+          raise if locked_gem.nil? || locked_gem.version.to_s != gem_version
+          raise GemNotFound, "Your bundle is locked to #{locked_gem}, but that version could not " \
+                             "be found in any of the sources listed in your Gemfile. If you haven't changed sources, " \
+                             "that means the author of #{locked_gem} has removed it. You'll need to update your bundle " \
+                             "to a different version of foo that hasn't been removed in order to install."
+        end
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
           bundler = local.search(Gem::Dependency.new("bundler", VERSION)).last
@@ -689,6 +698,12 @@ module Bundler
         proposed = proposed.gsub(pattern, "\n").gsub(whitespace_cleanup, "\n\n").strip
       end
       current == proposed
+    end
+
+    def extract_gem_info(error)
+      # This method will extract the error message like "Could not find foo-1.2.3 in any of the sources"
+      # to an array. The first element will be the gem name (e.g. foo), the second will be the version number.
+      error.message.scan(/Could not find (\w+)-(\d+(?:\.\d+)+)/).flatten
     end
   end
 end
