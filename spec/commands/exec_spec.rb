@@ -219,109 +219,89 @@ describe "bundle exec" do
   end
 
   describe "with help flags" do
-    describe "when exec is used" do
-      before(:each) do
-        install_gemfile <<-G
-          gem "rack"
-        G
-      end
-
-      it "shows executable's man page when --help is after the executable" do
-        bundle "exec cat --help"
-        expect(out).to include("Usage: cat [OPTION]... [FILE]...")
-      end
-
-      it "uses executable's original behavior for -h" do
-        bundle "exec cat -h"
-        expect(err).to include("cat: invalid option -- 'h'")
-      end
-
-      it "shows bundle-exec's man page when --help is between exec and the executable" do
-        with_fake_man do
-          bundle "exec --help cat"
-        end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
-      end
-
-      it "shows bundle-exec's man page when --help is before exec" do
-        with_fake_man do
-          bundle "--help exec"
-        end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
-      end
-
-      it "shows bundle-exec's man page when -h is before exec" do
-        with_fake_man do
-          bundle "-h exec"
-        end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
-      end
-
-      it "shows bundle-exec's man page when --help is after exec" do
-        with_fake_man do
-          bundle "exec --help"
-        end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
-      end
-
-      it "shows bundle-exec's man page when -h is after exec" do
-        with_fake_man do
-          bundle "exec -h"
-        end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
-      end
+    each_prefix = proc do |string, &blk|
+      1.upto(string.length) {|l| blk.call(string[0, l]) }
     end
+    each_prefix.call("exec") do |exec|
+      describe "when #{exec} is used" do
+        before(:each) do
+          install_gemfile <<-G
+            gem "rack"
+          G
 
-    describe "when e is used" do
-      before(:each) do
-        install_gemfile <<-G
-          gem "rack"
-        G
-      end
-
-      it "shows executable's man page when --help is after the executable" do
-        bundle "e cat --help"
-        expect(out).to include("Usage: cat [OPTION]... [FILE]...")
-      end
-
-      it "uses executable's original behavior for -h" do
-        bundle "e cat -h"
-        expect(err).to include("cat: invalid option -- 'h'")
-      end
-
-      it "shows bundle-exec's man page when --help is between exec and the executable" do
-        with_fake_man do
-          bundle "e --help cat"
+          create_file("print_args", <<-'RUBY')
+            #!/usr/bin/env ruby
+            puts "args: #{ARGV.inspect}"
+          RUBY
+          bundled_app("print_args").chmod(0755)
         end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
-      end
 
-      it "shows bundle-exec's man page when --help is before exec" do
-        with_fake_man do
-          bundle "--help e"
+        it "shows executable's man page when --help is after the executable" do
+          bundle "#{exec} print_args --help"
+          expect(out).to eq('args: ["--help"]')
         end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
-      end
 
-      it "shows bundle-exec's man page when -h is before exec" do
-        with_fake_man do
-          bundle "-h e"
-        end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
-      end
+        it "shows executable's man page when --help is after the executable and an argument" do
+          bundle "#{exec} print_args foo --help"
+          expect(out).to eq('args: ["foo", "--help"]')
 
-      it "shows bundle-exec's man page when --help is after exec" do
-        with_fake_man do
-          bundle "e --help"
-        end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
-      end
+          bundle "#{exec} print_args foo bar --help"
+          expect(out).to eq('args: ["foo", "bar", "--help"]')
 
-      it "shows bundle-exec's man page when -h is after exec" do
-        with_fake_man do
-          bundle "e -h"
+          bundle "#{exec} print_args foo --help bar"
+          expect(out).to eq('args: ["foo", "--help", "bar"]')
         end
-        expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
+
+        it "shows executable's man page when the executable has a -" do
+          FileUtils.mv(bundled_app("print_args"), bundled_app("docker-template"))
+          bundle "#{exec} docker-template build discourse --help"
+          expect(out).to eq('args: ["build", "discourse", "--help"]')
+        end
+
+        it "shows executable's man page when --help is after another flag" do
+          bundle "#{exec} print_args --bar --help"
+          expect(out).to eq('args: ["--bar", "--help"]')
+        end
+
+        it "uses executable's original behavior for -h" do
+          bundle "#{exec} print_args -h"
+          expect(out).to eq('args: ["-h"]')
+        end
+
+        it "shows bundle-exec's man page when --help is between exec and the executable" do
+          with_fake_man do
+            bundle "#{exec} --help cat"
+          end
+          expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
+        end
+
+        it "shows bundle-exec's man page when --help is before exec" do
+          with_fake_man do
+            bundle "--help #{exec}"
+          end
+          expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
+        end
+
+        it "shows bundle-exec's man page when -h is before exec" do
+          with_fake_man do
+            bundle "-h #{exec}"
+          end
+          expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
+        end
+
+        it "shows bundle-exec's man page when --help is after exec" do
+          with_fake_man do
+            bundle "#{exec} --help"
+          end
+          expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
+        end
+
+        it "shows bundle-exec's man page when -h is after exec" do
+          with_fake_man do
+            bundle "#{exec} -h"
+          end
+          expect(out).to include(%(["#{root}/lib/bundler/man/bundle-exec"]))
+        end
       end
     end
   end

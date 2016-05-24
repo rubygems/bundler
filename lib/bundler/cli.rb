@@ -438,35 +438,20 @@ module Bundler
     def self.reformatted_help_args(args)
       bundler_commands = all_commands.keys
       help_flags = %w(--help -h)
-      exec_commands = %w(exec e)
-      help_used = args.select {|a| help_flags.include? a }
-      exec_used = args.select {|a| exec_commands.include? a }
-      command = args.select {|a| bundler_commands.include? a }
-      if exec_used.any? && help_used.any?
-        regex = /
-            ( # Matches `exec --help` or `exec --help foo`
-              (#{exec_commands.join("|")})
-              \s
-              (#{help_flags.join("|")})
-              (.+)*
-            )|
-            ( # Matches `--help exec` or `--help exec foo`
-              (#{help_flags.join("|")})
-              \s
-              (#{exec_commands.join("|")})
-              (.+)*
-            )
-          /x
-        arg_str = args.join(" ")
-        if arg_str =~ regex
+      exec_commands = %w(e ex exe exec)
+      help_used = args.index {|a| help_flags.include? a }
+      exec_used = args.index {|a| exec_commands.include? a }
+      command = args.find {|a| bundler_commands.include? a }
+      if exec_used && help_used
+        if exec_used + help_used == 1
           %w(help exec)
         else
           args
         end
-      elsif command.empty?
+      elsif command.nil?
         abort("Could not find command \"#{args.join(" ")}\".")
       else
-        ["help", command.first]
+        ["help", command || args].flatten.compact
       end
     end
 
