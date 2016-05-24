@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "handle yanked" do
+context "when installing a bundle that includes yanked gems" do
   before(:each) do
     build_repo4 do
       build_gem "foo", "9.0.0"
     end
   end
 
-  it "throws and error when there is gem yanked" do
+  it "throws an error when the original gem version is yanked" do
     lockfile <<-L
        GEM
          remote: file://#{gem_repo4}
@@ -31,7 +31,7 @@ describe "handle yanked" do
     expect(out).to include("Your bundle is locked to foo (10.0.0)")
   end
 
-  it "throws the original error when manually enter a version number that doesn't exist" do
+  it "throws the original error when only the Gemfile specifies a gem version that doesn't exist" do
     install_gemfile <<-G
         source "file://#{gem_repo4}"
         gem "foo", "10.0.0"

@@ -146,7 +146,7 @@ module Bundler
           raise GemNotFound, "Your bundle is locked to #{locked_gem}, but that version could not " \
                              "be found in any of the sources listed in your Gemfile. If you haven't changed sources, " \
                              "that means the author of #{locked_gem} has removed it. You'll need to update your bundle " \
-                             "to a different version of foo that hasn't been removed in order to install."
+                             "to a different version of #{locked_gem} that hasn't been removed in order to install."
         end
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
