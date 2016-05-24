@@ -10,7 +10,7 @@ describe Bundler::Fetcher::CompactIndex do
   # Testing private method. Do not commit.
   describe '#specs_for_names' do
     it "has only one thread open at the end of the run" do
-      compact_index.specs_for_names(['lskdjf'])
+      compact_index.specs_for_names(["lskdjf"])
 
       thread_count = Thread.list.select {|thread| thread.status == "run" }.count
       expect(thread_count).to eq 1
@@ -19,7 +19,7 @@ describe Bundler::Fetcher::CompactIndex do
     it "calls worker#stop during the run" do
       expect_any_instance_of(Bundler::Worker).to receive(:stop).at_least(:once)
 
-      compact_index.specs_for_names(['lskdjf'])
+      compact_index.specs_for_names(["lskdjf"])
     end
   end
 end
