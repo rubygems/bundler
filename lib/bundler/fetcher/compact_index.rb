@@ -89,7 +89,10 @@ module Bundler
               worker_name = "Compact Index (#{display_uri.host})"
               worker = Bundler::Worker.new(25, worker_name, func)
               inputs.each {|input| worker.enq(input) }
-              inputs.map { worker.deq }
+              res = inputs.map { worker.deq }
+              worker.stop
+
+              res
             end
           end
         end
