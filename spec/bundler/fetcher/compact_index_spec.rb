@@ -4,7 +4,7 @@ require "spec_helper"
 describe Bundler::Fetcher::CompactIndex do
   let(:downloader)  { double(:downloader) }
   let(:remote)      { double(:remote, :cache_slug => "lsjdf") }
-  let(:display_uri) { URI("http://sample_uri.com") }
+  let(:display_uri) { URI("http://sampleuri.com") }
   let(:compact_index) { described_class.new(downloader, remote, display_uri) }
 
   # Testing private method. Do not commit.
