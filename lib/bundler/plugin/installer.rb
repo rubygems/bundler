@@ -9,7 +9,7 @@ module Bundler
   #
   # @todo: Remove the dependencies of Source's subclasses and try to use the Bundler sources directly. This will reduce the redundancies.
   class Plugin::Installer
-    def self.install(name, options)
+    def install(name, options)
       if options[:git]
         install_git(name, options)
       elsif options[:source]
@@ -22,7 +22,9 @@ module Bundler
       end
     end
 
-    def self.install_git(name, options)
+  private
+
+    def install_git(name, options)
       uri = options.delete(:git)
 
       options[:name] = name
@@ -45,7 +47,7 @@ module Bundler
     # @param [Array, String] version (optional) of the gem to install
     #
     # @return [String] the path where the plugin was installed
-    def self.install_rubygems(name, source, version = [">= 0"])
+    def install_rubygems(name, source, version = [">= 0"])
       rg_source = Source::Rubygems.new "remotes" => source, :ignore_app_cache => true
       rg_source.remote!
       rg_source.dependency_names << name
@@ -69,7 +71,7 @@ module Bundler
     # @raise [ArgumentError] if the spec object has no remote set
     #
     # @return [String] the path where the plugin was installed
-    def self.install_from_spec(spec)
+    def install_from_spec(spec)
       raise ArgumentError, "Spec #{spec.name} doesn't have remote set" unless spec.remote
 
       uri = spec.remote.uri

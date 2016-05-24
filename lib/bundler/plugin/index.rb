@@ -12,6 +12,24 @@ module Bundler
       load_index
     end
 
+    # This function is to be called when a new plugin is installed. This function shall add
+    # the functions of the plugin to existing maps and also the name to source location.
+    #
+    # @param [String] name of the plugin to be registered
+    # @param [String] path where the plugin is installed
+    def register_plugin(name, path)
+      @plugin_sources[name] = path
+
+      save_index
+    end
+
+    # Path where the index file is stored
+    def index_file
+      Plugin.root.join("index")
+    end
+
+  private
+
     # Reads the index file from the directory and initializes the instance variables.
     def load_index
       SharedHelpers.filesystem_access(index_file, :read) do |index_f|
@@ -33,22 +51,6 @@ module Bundler
         FileUtils.mkdir_p(index_f.dirname)
         File.open(index_f, "w") {|f| f.puts YAML.dump(index) }
       end
-    end
-
-    # This function is to be called when a new plugin is installed. This function shall add
-    # the functions of the plugin to existing maps and also the name to source location.
-    #
-    # @param [String] name of the plugin to be registered
-    # @param [String] path where the plugin is installed
-    def register_plugin(name, path)
-      @plugin_sources[name] = path
-
-      save_index
-    end
-
-    # Path where the index file is stored
-    def index_file
-      Plugin.root.join("index")
     end
   end
 end

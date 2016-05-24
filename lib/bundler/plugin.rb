@@ -14,7 +14,7 @@ module Bundler
       # @option options [String] :version (optional) the version of the plugin to install
       def install(name, options)
         require "bundler/plugin/installer.rb"
-        plugin_path = Pathname.new Installer.install(name, options)
+        plugin_path = Pathname.new Installer.new.install(name, options)
 
         validate_plugin! plugin_path
 
@@ -25,6 +25,23 @@ module Bundler
         Bundler.rm_rf(plugin_path) if plugin_path
         Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
       end
+
+      # The index object used to store the details about the plugin
+      def index
+        @index ||= Index.new
+      end
+
+      # The directory root to all plugin related data
+      def root
+        @root ||= Bundler.user_bundle_path.join("plugin")
+      end
+
+      # The cache directory for plugin stuffs
+      def cache
+        @cache ||= root.join("cache")
+      end
+
+    private
 
       # Checks if the gem is good to be a plugin
       #
@@ -47,21 +64,6 @@ module Bundler
         require path.join("plugin.rb") # this shall latter be used to find the actions the plugin performs
 
         index.register_plugin name, path.to_s
-      end
-
-      # The index object used to store the details about the plugin
-      def index
-        @index ||= Index.new
-      end
-
-      # The directory root to all plugin related data
-      def root
-        @root ||= Bundler.user_bundle_path.join("plugin")
-      end
-
-      # The cache directory for plugin stuffs
-      def cache
-        @cache ||= root.join("cache")
       end
     end
   end
