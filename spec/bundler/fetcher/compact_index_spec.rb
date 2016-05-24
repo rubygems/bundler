@@ -8,7 +8,7 @@ describe Bundler::Fetcher::CompactIndex do
   let(:compact_index) { described_class.new(downloader, remote, display_uri) }
 
   # Testing private method. Do not commit.
-  describe '#specs_for_names' do
+  describe "#specs_for_names" do
     it "has only one thread open at the end of the run" do
       compact_index.specs_for_names(["lskdjf"])
 
