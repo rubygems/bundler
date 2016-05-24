@@ -207,12 +207,10 @@ module Bundler
 
           if @options[:plugin]
             Plugin.cache.join("bundler", "git", git_scope)
+          elsif Bundler.requires_sudo?
+            Bundler.user_bundle_path.join("cache/git", git_scope)
           else
-            if Bundler.requires_sudo?
-              Bundler.user_bundle_path.join("cache/git", git_scope)
-            else
-              Bundler.cache.join("git", git_scope)
-            end
+            Bundler.cache.join("git", git_scope)
           end
         end
       end

@@ -1,12 +1,10 @@
-#frozen_string_literal: true
-require 'spec_helper'
+# frozen_string_literal: true
+require "spec_helper"
 
 describe "bundler plugin install" do
   before do
     build_repo2 do
-      build_gem "foo" do |s|
-        s.write "plugin.rb"
-      end
+      build_plugin "foo"
     end
   end
 
@@ -32,8 +30,7 @@ describe "bundler plugin install" do
 
   it "shows error for plugins with dependencies" do
     build_repo2 do
-      build_gem "kung-foo" do |s|
-        s.write "plugin.rb"
+      build_plugin "kung-foo" do |s|
         s.add_dependency "rake"
       end
     end
@@ -48,7 +45,6 @@ describe "bundler plugin install" do
   end
 
   context "malformatted plugin" do
-
     it "fails when plugin.rb is missing" do
       build_repo2 do
         build_gem "charlie"
@@ -63,10 +59,9 @@ describe "bundler plugin install" do
       expect(plugin_gems("charlie-1.0")).not_to be_directory
     end
 
-
     it "fails when plugin.rb throws exception on load" do
       build_repo2 do
-        build_gem "chaplin" do |s|
+        build_plugin "chaplin" do |s|
           s.write "plugin.rb", <<-RUBY
             raise "I got you man"
           RUBY
@@ -79,7 +74,6 @@ describe "bundler plugin install" do
 
       expect(plugin_gems("chaplin-1.0")).not_to be_directory
     end
-
   end
 
   context "git plugins" do

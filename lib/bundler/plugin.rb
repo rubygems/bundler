@@ -1,11 +1,10 @@
-#frozen_string_literal: true
+# frozen_string_literal: true
 
 module Bundler
   class Plugin
     autoload :Index, "bundler/plugin/index"
 
     class << self
-
       # Installs a new plugin by the given name
       #
       #
@@ -34,10 +33,9 @@ module Bundler
       # @param [Pathname] plugin_path the path plugin is installed at
       #
       # @raise [Error] if plugin.rb file is not found
-      def validate_plugin! plugin_path
-        unless File.file? plugin_path.join("plugin.rb")
-          raise "plugin.rb was not found in the plugin gem!"
-        end
+      def validate_plugin!(plugin_path)
+        plugin_file = plugin_path.join("plugin.rb")
+        raise "plugin.rb was not found in the plugin!" unless plugin_file.file?
       end
 
       # Runs the plugin.rb file, records the plugin actions it registers for and
@@ -45,7 +43,7 @@ module Bundler
       #
       # @param [String] name the name of the plugin
       # @param [Pathname] path the path where the plugin is installed at
-      def register_plugin name, path
+      def register_plugin(name, path)
         require path.join("plugin.rb") # this shall latter be used to find the actions the plugin performs
 
         index.register_plugin name, path.to_s

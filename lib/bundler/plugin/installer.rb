@@ -1,4 +1,4 @@
-#frozen_string_literal: true
+# frozen_string_literal: true
 
 module Bundler
   # Handles the installation of plugin in appropriate directories.
@@ -9,12 +9,8 @@ module Bundler
   #
   # @todo: Remove the dependencies of Source's subclasses and try to use the Bundler sources directly. This will reduce the redundancies.
   class Plugin::Installer
-
     def self.install(name, options)
       if options[:git]
-        #uri = options[:git]
-        #revision = options[:ref] || options[:branch] || "master"
-
         install_git(name, options)
       elsif options[:source]
         source = options[:source]
@@ -66,7 +62,6 @@ module Bundler
       install_from_spec specs.first
     end
 
-
     # Installs the plugin from the provided spec and returns the path where the
     # plugin was installed.
     #
@@ -94,22 +89,6 @@ module Bundler
 
         ).install.full_gem_path
       end
-    end
-
-    def self.base_name uri
-      File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)?(//\w*/)?(\w*/)*}, ""), ".git")
-    end
-
-    def self.uri_hash uri
-      if uri =~ %r{^\w+://(\w+@)?}
-        # Downcase the domain component of the URI
-        # and strip off a trailing slash, if one is present
-        input = URI.parse(uri).normalize.to_s.sub(%r{/$}, "")
-      else
-        # If there is no URI scheme, assume it is an ssh/git URI
-        input = uri
-      end
-      Digest::SHA1.hexdigest(input)
     end
   end
 end
