@@ -38,6 +38,14 @@ describe "Bundler.require" do
       s.write "lib/eight.rb", "puts 'eight'"
     end
 
+    build_lib "nine", "1.0.0" do |s|
+      s.write "lib/nine.rb", "puts 'nine'"
+    end
+
+    build_lib "ten", "1.0.0" do |s|
+      s.write "lib/ten.rb", "puts 'ten'"
+    end
+
     gemfile <<-G
       path "#{lib_path}"
       gem "one", :group => :bar, :require => %w[baz qux]
@@ -48,6 +56,10 @@ describe "Bundler.require" do
       gem "six", :group => "string"
       gem "seven", :group => :not
       gem "eight", :require => true, :group => :require_true
+      env "BUNDLER_TEST" => "nine" do
+        gem "nine", :require => true
+      end
+      gem "ten", :install_if => lambda { ENV["BUNDLER_TEST"] == "ten" }
     G
   end
 
@@ -84,6 +96,18 @@ describe "Bundler.require" do
   it "allows requiring gems with non standard names explicitly" do
     run "Bundler.require ; require 'mofive'"
     expect(out).to eq("two\nfive")
+  end
+
+  it "allows requiring gems which are scoped by env" do
+    ENV["BUNDLER_TEST"] = "nine"
+    run "Bundler.require"
+    expect(out).to eq("two\nnine")
+  end
+
+  it "allows requiring gems which are scoped by install_if" do
+    ENV["BUNDLER_TEST"] = "ten"
+    run "Bundler.require"
+    expect(out).to eq("two\nten")
   end
 
   it "raises an exception if a require is specified but the file does not exist" do
