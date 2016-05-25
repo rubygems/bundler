@@ -2,18 +2,19 @@
 
 module Bundler
   class Plugin
-    autoload :Index, "bundler/plugin/index"
+    autoload :Dsl,        "bundler/plugin/dsl"
+    autoload :Index,      "bundler/plugin/index"
+    autoload :Installer,  "bundler/plugin/installer"
+    autoload :SourceList, "bundler/plugin/source_list"
 
     class << self
       # Installs a new plugin by the given name
-      #
       #
       # @param [String] name the name of plugin to be installed
       # @param [Hash] options various parameters as described in description
       # @option options [String] :source rubygems source to fetch the plugin gem from
       # @option options [String] :version (optional) the version of the plugin to install
       def install(name, options)
-        require "bundler/plugin/installer.rb"
         plugin_path = Pathname.new Installer.new.install(name, options)
 
         validate_plugin! plugin_path
@@ -24,6 +25,20 @@ module Bundler
       rescue StandardError => e
         Bundler.rm_rf(plugin_path) if plugin_path
         Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
+      end
+
+      def eval_gemfile(gemfile)
+        definition = Dsl.evaluate(gemfile, nil, {})
+        return unless definition.dependencies.any?
+
+        plugins = Installer.new.install_definition(definition)
+
+        plugins.each do |name, path|
+          path = Pathname.new path
+          validate_plugin! path
+          register_plugin name, path
+          Bundler.ui.info "Installed plugin #{name}"
+        end
       end
 
       # The index object used to store the details about the plugin

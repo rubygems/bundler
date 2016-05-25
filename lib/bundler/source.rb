@@ -11,6 +11,10 @@ module Bundler
       @options = {}
     end
 
+    def for_plugin?
+      @options[:plugin]
+    end
+
     def unmet_deps
       specs.unmet_dependency_names
     end

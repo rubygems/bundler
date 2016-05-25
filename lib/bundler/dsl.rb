@@ -19,7 +19,7 @@ module Bundler
 
     def initialize
       @source               = nil
-      @sources              = SourceList.new
+      @sources            ||= SourceList.new
       @git_sources          = {}
       @dependencies         = []
       @groups               = []
@@ -218,6 +218,10 @@ module Bundler
       yield
     ensure
       @env = old
+    end
+
+    def plugin(*args)
+      # Pass on
     end
 
     def method_missing(name, *args)

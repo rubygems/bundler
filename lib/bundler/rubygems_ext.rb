@@ -24,7 +24,8 @@ module Gem
 
     def full_gem_path
       if source.respond_to?(:path)
-        Pathname.new(loaded_from).dirname.expand_path(Bundler.root).to_s.untaint
+        root = source.for_plugin? ? Bundler::Plugin.root : Bundler.root
+        Pathname.new(loaded_from).dirname.expand_path(root).to_s.untaint
       else
         rg_full_gem_path
       end

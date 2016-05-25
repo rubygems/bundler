@@ -22,6 +22,17 @@ module Bundler
       end
     end
 
+    def install_definition(definition)
+      plugins = definition.dependencies.map(&:name)
+
+      definition.resolve_remotely!
+      specs = definition.specs
+
+      paths = install_from_spec specs
+
+      paths.select {|name, _| plugins.include? name}
+    end
+
   private
 
     def install_git(name, options)
@@ -74,7 +85,7 @@ module Bundler
       paths = {}
 
       specs.each do |spec|
-        raise ArgumentError, "Spec #{spec.name} doesn't have remote set" unless spec.remote
+        next if spec.name == "bundler"
 
         spec.source.install spec
 

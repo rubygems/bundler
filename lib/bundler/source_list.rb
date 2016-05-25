@@ -5,10 +5,10 @@ module Bundler
       :git_sources
 
     def initialize
-      @path_sources       = []
-      @git_sources        = []
-      @rubygems_aggregate = Source::Rubygems.new
-      @rubygems_sources   = []
+      @path_sources         = []
+      @git_sources          = []
+      @rubygems_aggregate ||= Source::Rubygems.new
+      @rubygems_sources     = []
     end
 
     def add_path_source(options = {})
