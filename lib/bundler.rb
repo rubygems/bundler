@@ -316,12 +316,12 @@ module Bundler
 
     def sudo(str)
       SUDO_MUTEX.synchronize do
-        if self.settings["path.system"]
+        if settings["path.system"]
           key = "path.system"
           location = "to the system RubyGems"
         else
           key = "path"
-          location = "into #{self.settings.path}"
+          location = "into #{settings.path}"
         end
 
         prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "

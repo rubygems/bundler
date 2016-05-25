@@ -428,7 +428,7 @@ describe "bundle exec" do
       let(:executable) { super() << "\nraise 'ERROR'" }
       let(:exit_code) { 1 }
       let(:expected_err) do
-        "bundler: failed to load command: #{path} (#{path})\n" +
+        "bundler: failed to load command: #{path} (#{path})\n" \
           "RuntimeError: ERROR\n  #{path}:7" +
           (Bundler.current_ruby.ruby_18? ? "" : ":in `<top (required)>'")
       end
