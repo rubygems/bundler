@@ -1,3 +1,10 @@
+## 1.12.5 (2016-05-25)
+
+Bugfixes:
+  - only take over `--help` on `bundle exec` when the first two arguments are `exec` and `--help` (#4596, @segiddins)
+  - don't require `require: true` dependencies that are excluded via `env` or `install_if` (@BrianHawley)
+  - reduce the number of threads used simultaneously by bundler (#4367, @will-in-wi)
+
 ## 1.12.4 (2016-05-16)
 
 Bugfixes:
