@@ -68,9 +68,9 @@ module Bundler
       groups = [:default] if groups.empty?
 
       @definition.dependencies.each do |dep|
-        # Skip the dependency if it is not in any of the requested
-        # groups
-        next unless (dep.groups & groups).any? && dep.current_platform?
+        # Skip the dependency if it is not in any of the requested groups, or
+        # not for the current platform, or doesn't match the gem constraints.
+        next unless (dep.groups & groups).any? && dep.should_include?
 
         required_file = nil
 
