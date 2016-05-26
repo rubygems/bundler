@@ -83,7 +83,7 @@ describe "bundle lock" do
   end
 
   it "does not fetch remote specs when using the --local option" do
-    bundle "lock --update --local"
+    bundle "lock --update --local", :expect_err => true
 
     expect(err).to include("sources listed in your gems.rb or available on this machine")
   end

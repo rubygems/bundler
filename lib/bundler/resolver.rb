@@ -359,7 +359,7 @@ module Bundler
                      end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
-            "listed in your Gemfile or available on this machine."
+            "listed in your #{SharedHelpers.gemfile_name} or available on this machine."
         end
         raise GemNotFound, message
       end
