@@ -358,10 +358,20 @@ module Bundler
       changed = []
 
       gemfile_sources = sources.lock_sources
-      if @locked_sources != gemfile_sources
-        new_sources = gemfile_sources - @locked_sources
-        deleted_sources = @locked_sources - gemfile_sources
 
+      new_sources = gemfile_sources - @locked_sources
+      deleted_sources = @locked_sources - gemfile_sources
+
+      new_deps = @dependencies - @locked_deps
+      deleted_deps = @locked_deps - @dependencies
+
+      # Check if it is possible that the source is only changed thing
+      if (new_deps.empty? && deleted_deps.empty?) && (new_sources.any? && deleted_sources.any?)
+        new_sources.reject! {|source| source.instance_of?(Bundler::Source::Path) && source.path.exist? }
+        deleted_sources.reject! {|source| source.instance_of?(Bundler::Source::Path) && source.path.exist? }
+      end
+
+      if @locked_sources != gemfile_sources
         if new_sources.any?
           added.concat new_sources.map {|source| "* source: #{source}" }
         end
@@ -371,14 +381,8 @@ module Bundler
         end
       end
 
-      new_deps = @dependencies - @locked_deps
-      deleted_deps = @locked_deps - @dependencies
-
       added.concat new_deps.map {|d| "* #{pretty_dep(d)}" } if new_deps.any?
-
-      if deleted_deps.any?
-        deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" }
-      end
+      deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" } if deleted_deps.any?
 
       both_sources = Hash.new {|h, k| h[k] = [] }
       @dependencies.each {|d| both_sources[d.name][0] = d }
