@@ -700,7 +700,7 @@ describe "bundle install with gem sources" do
     it "should display a helpful message explaining how to fix it" do
       bundle :install, :env => { "BUNDLE_RUBYGEMS__ORG" => "user:pass{word" }
       expect(exitstatus).to eq(17) if exitstatus
-      expect(out).to eq("Please CGI escape your usernames and passwords before " \
+      expect(err).to eq("Please CGI escape your usernames and passwords before " \
                         "setting them for authentication.")
     end
   end
@@ -717,9 +717,10 @@ describe "bundle install with gem sources" do
     it "should display a proper message to explain the problem" do
       FileUtils.chmod(0500, bundled_app("vendor"))
 
-      bundle :install, :path => "vendor"
-      expect(out).to include(bundled_app("vendor").to_s)
-      expect(out).to include("grant write permissions")
+      bundle "config path vendor"
+      bundle :install
+      expect(err).to include(bundled_app("vendor").to_s)
+      expect(err).to include("grant write permissions")
     end
   end
 
@@ -734,7 +735,7 @@ describe "bundle install with gem sources" do
     it "should display a helpful messag explaining how to fix it" do
       bundle :install, :env => { "BUNDLE_RUBYGEMS__ORG" => "user:pass{word" }
       expect(exitstatus).to eq(17) if exitstatus
-      expect(out).to eq("Please CGI escape your usernames and passwords before " \
+      expect(err).to eq("Please CGI escape your usernames and passwords before " \
                         "setting them for authentication.")
     end
   end
