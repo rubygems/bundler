@@ -223,7 +223,8 @@ describe "bundle outdated" do
 
   context "after bundle install --deployment" do
     before do
-      install_gemfile <<-G, :deployment => true
+      bundle "config frozen true"
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
 
         gem "rack"
@@ -236,10 +237,10 @@ describe "bundle outdated" do
 
       bundle "outdated"
       expect(exitstatus).to_not be_zero if exitstatus
-      expect(out).to include("You are trying to check outdated gems in deployment mode.")
-      expect(out).to include("Run `bundle outdated` elsewhere.")
-      expect(out).to include("If this is a development machine, remove the ")
-      expect(out).to include("Gemfile freeze\nby running `bundle install --no-deployment`.")
+      expect(err).to include("You are trying to check outdated gems in deployment mode.")
+      expect(err).to include("Run `bundle outdated` elsewhere.")
+      expect(err).to include("If this is a development machine, remove the ")
+      expect(err).to include("freeze\nby running `bundle install --no-deployment`.")
     end
   end
 

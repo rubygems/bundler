@@ -265,8 +265,8 @@ describe "bundle update when a gem depends on a newer version of bundler" do
   it "should explain that bundler conflicted" do
     bundle "update"
     expect(err).not_to match(/in snapshot/i)
-    expect(out).to include("current bundler version")
-    expect(out).to include("rails (3.0.1) has dependency bundler (= #{Bundler::VERSION.succ})")
+    expect(out).to include("this Bundler version")
+    expect(out).to include("rails (3.0.1) depends on bundler (= #{Bundler::VERSION.succ})")
   end
 end
 
@@ -396,7 +396,7 @@ describe "bundle update --ruby" do
     it "shows a helpful error message" do
       bundle "update --ruby", :expect_err => true
 
-      expect(out).to include("Your Ruby version is 2.2.2, but your Gemfile specified ~> 2.1.0")
+      expect(err).to include("Your Ruby version is 2.2.2, but your gems.rb specified ~> 2.1.0")
     end
   end
 
@@ -505,7 +505,7 @@ describe "bundle update --ruby" do
     it "shows a helpful error message" do
       bundle "update --ruby", :expect_err => true
 
-      expect(out).to include("Your Ruby version is 2.2.2, but your Gemfile specified ~> 2.1.0")
+      expect(err).to include("Your Ruby version is 2.2.2, but your gems.rb specified ~> 2.1.0")
     end
   end
 

@@ -31,7 +31,7 @@ describe "bundle install" do
         gem "requires_nonexistant_bunder"
       G
 
-      expect(out).to include("requires_nonexistant_bunder (1.0) has dependency bundler (= 0.1.1), which is unsatisfied by the current bundler version #{Bundler::VERSION}")
+      expect(out).to include("requires_nonexistant_bunder (1.0) depends on bundler (= 0.1.1), but this Bundler version is #{Bundler::VERSION}")
 
       should_be_installed "bundler #{Bundler::VERSION}"
     end

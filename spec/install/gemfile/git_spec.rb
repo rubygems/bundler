@@ -92,13 +92,13 @@ describe "bundle install with git sources" do
         s.platform = "java"
       end
 
-      install_gemfile <<-G
+      install_gemfile <<-G, :expect_err => true
         platforms :jruby do
           gem "only_java", "1.2", :git => "#{lib_path("only_java-1.0-java")}"
         end
       G
 
-      expect(out).to include("Source contains 'only_java' at: 1.0 java")
+      expect(err).to include("Source contains 'only_java' at: 1.0 java")
     end
 
     it "complains with multiple versions and platforms if pinned specs don't exist in the git repo" do
@@ -113,13 +113,13 @@ describe "bundle install with git sources" do
         s.write "only_java1-0.gemspec", File.read("#{lib_path("only_java-1.0-java")}/only_java.gemspec")
       end
 
-      install_gemfile <<-G
+      install_gemfile <<-G, :expect_err => true
         platforms :jruby do
           gem "only_java", "1.2", :git => "#{lib_path("only_java-1.1-java")}"
         end
       G
 
-      expect(out).to include("Source contains 'only_java' at: 1.0 java, 1.1 java")
+      expect(err).to include("Source contains 'only_java' at: 1.0 java, 1.1 java")
     end
 
     it "still works after moving the application directory" do
@@ -865,7 +865,7 @@ describe "bundle install with git sources" do
         gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "deadbeef"
       G
       bundle "install", :expect_err => true
-      expect(out).to include("Revision deadbeef does not exist in the repository")
+      expect(err).to include("Revision deadbeef does not exist in the repository")
     end
   end
 
@@ -1164,6 +1164,7 @@ describe "bundle install with git sources" do
         G
 
         bundle :install, :expect_err => true
+        expect(err).to_not include("password1")
         expect(out).to_not include("password1")
         expect(out).to include("Fetching https://user1@github.com/company/private-repo")
       end
