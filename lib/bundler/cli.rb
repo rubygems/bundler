@@ -230,7 +230,7 @@ module Bundler
     method_option "path", :type => :string, :lazy_default => "bin", :banner =>
       "Binstub destination directory (default bin)"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
-      "Make gem/s work without the Bundler runtime"
+      "Make binstubs that can work without the Bundler runtime"
     def binstubs(*gems)
       require "bundler/cli/binstubs"
       Binstubs.new(options, gems).run
