@@ -258,6 +258,7 @@ module Bundler
       SharedHelpers.default_bundle_dir
     end
 
+    # TODO move this to Settings#system_bindir
     def system_bindir
       # Gem.bindir doesn't always return the location that Rubygems will install
       # system binaries. If you put '-n foo' in your .gemrc, Rubygems will
