@@ -230,7 +230,7 @@ module Bundler
     end
 
     def allow_sudo?
-      !@local_config.key?(key_for(:path))
+      self["path.system"]
     end
 
     def ignore_config?
