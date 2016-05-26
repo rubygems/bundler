@@ -22,7 +22,8 @@ module Bundler
         @allow_remote = false
         @allow_cached = false
         @caches = [*Bundler.rubygems.gem_cache]
-        @caches << Bundler.app_cache unless options[:ignore_app_cache] # To use this class for installing plugins
+        @caches << Bundler.app_cache unless options[:plugin] # To use this class for installing plugins
+        @caches << Bundler::Plugin.cache if options[:plugin]
 
         Array(options["remotes"] || []).reverse_each {|r| add_remote(r) }
       end
@@ -81,7 +82,7 @@ module Bundler
           # sources, and large_idx.use small_idx is way faster than
           # small_idx.use large_idx.
           idx = @allow_remote ? remote_specs.dup : Index.new
-          idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote && !@options[:ignore_app_cache]
+          idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
           idx.use(installed_specs, :override_dupes)
           idx
         end
@@ -124,7 +125,10 @@ module Bundler
           Bundler.ui.confirm message
 
           path = cached_gem(spec)
-          if Bundler.requires_sudo?
+          if @options[:plugin]
+            install_path = Bundler::Plugin.root
+            bin_path     = install_path.join("bin")
+          elsif Bundler.requires_sudo?
             install_path = Bundler.tmp(spec.full_name)
             bin_path     = install_path.join("bin")
           else
@@ -143,9 +147,10 @@ module Bundler
               :env_shebang         => true
             ).install
           end
+          spec.full_gem_path = installed_spec.full_gem_path
 
           # SUDO HAX
-          if Bundler.requires_sudo?
+          if !@options[:plugin] && Bundler.requires_sudo?
             Bundler.rubygems.repository_subdirectories.each do |name|
               src = File.join(install_path, name, "*")
               dst = File.join(Bundler.rubygems.gem_dir, name)
@@ -174,7 +179,7 @@ module Bundler
 
         spec.post_install_message
       ensure
-        Bundler.rm_rf(install_path) if Bundler.requires_sudo?
+        Bundler.rm_rf(install_path) if !@options[:plugin] && Bundler.requires_sudo?
       end
 
       def cache(spec, custom_path = nil)
@@ -316,7 +321,7 @@ module Bundler
         @cached_specs ||= begin
           idx = installed_specs.dup
 
-          path = Bundler.app_cache
+          path = @options[:plugin] ? Bundler::Plugin.cache : Bundler.app_cache
           Dir["#{path}/*.gem"].each do |gemfile|
             next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
             s ||= Bundler.rubygems.spec_from_gem(gemfile)
@@ -402,15 +407,20 @@ module Bundler
         uri = spec.remote.uri
         spec.fetch_platform
 
-        download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
-        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
+        if @options[:plugin]
+          download_path = Bundler::Plugin.root
+          gem_path = "#{download_path}/cache/#{spec.full_name}.gem"
+        else
+          download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
+          gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
+        end
 
         SharedHelpers.filesystem_access("#{download_path}/cache") do |p|
           FileUtils.mkdir_p(p)
         end
         Bundler.rubygems.download_gem(spec, uri, download_path)
 
-        if Bundler.requires_sudo?
+        if !@options[:plugin] && Bundler.requires_sudo?
           SharedHelpers.filesystem_access("#{Bundler.rubygems.gem_dir}/cache") do |p|
             Bundler.mkdir_p(p)
           end
@@ -419,7 +429,7 @@ module Bundler
 
         gem_path
       ensure
-        Bundler.rm_rf(download_path) if Bundler.requires_sudo?
+        Bundler.rm_rf(download_path) if !@options[:plugin] && Bundler.requires_sudo?
       end
 
       def builtin_gem?(spec)

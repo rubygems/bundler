@@ -48,7 +48,7 @@ module Bundler
     #
     # @return [String] the path where the plugin was installed
     def install_rubygems(name, source, version = [">= 0"])
-      rg_source = Source::Rubygems.new "remotes" => source, :ignore_app_cache => true
+      rg_source = Source::Rubygems.new "remotes" => source, :plugin => true
       rg_source.remote!
       rg_source.dependency_names << name
 
@@ -58,10 +58,9 @@ module Bundler
       idx = rg_source.specs
 
       specs = Resolver.resolve(deps_proxies, idx).materialize([dep])
+      paths = install_from_spec specs
 
-      raise InstallError, "Plugin dependencies are not supported currently" unless specs.size == 1
-
-      install_from_spec specs.first
+      paths[name]
     end
 
     # Installs the plugin from the provided spec and returns the path where the
@@ -71,26 +70,18 @@ module Bundler
     # @raise [ArgumentError] if the spec object has no remote set
     #
     # @return [String] the path where the plugin was installed
-    def install_from_spec(spec)
-      raise ArgumentError, "Spec #{spec.name} doesn't have remote set" unless spec.remote
+    def install_from_spec(specs)
+      paths = {}
 
-      uri = spec.remote.uri
-      spec.fetch_platform
+      specs.each do |spec|
+        raise ArgumentError, "Spec #{spec.name} doesn't have remote set" unless spec.remote
 
-      download_path = Plugin.cache
+        spec.source.install spec
 
-      path = Bundler.rubygems.download_gem(spec, uri, download_path)
-
-      Bundler.rubygems.preserve_paths do
-        Bundler::RubyGemsGemInstaller.new(
-          path,
-          :install_dir         => Plugin.root.to_s,
-          :ignore_dependencies => true,
-          :wrappers            => true,
-          :env_shebang         => true
-
-        ).install.full_gem_path
+        paths[spec.name] = spec.full_gem_path
       end
+
+      paths
     end
   end
 end
