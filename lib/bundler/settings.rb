@@ -253,6 +253,15 @@ module Bundler
       end
     end
 
+    def system_bindir
+      # Gem.bindir doesn't always return the location that Rubygems will install
+      # system binaries. If you put '-n foo' in your .gemrc, Rubygems will
+      # install binstubs there instead. Unfortunately, Rubygems doesn't expose
+      # that directory at all, so rather than parse .gemrc ourselves, we allow
+      # the directory to be set as well, via `bundle config bindir foo`.
+      self[:system_bindir] || Bundler.rubygems.gem_bindir
+    end
+
   private
 
     def key_for(key)

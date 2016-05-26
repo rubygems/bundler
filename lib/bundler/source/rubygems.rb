@@ -130,7 +130,7 @@ module Bundler
             bin_path     = install_path.join("bin")
           else
             install_path = Bundler.settings.path
-            bin_path = Bundler.system_bindir
+            bin_path = Bundler.settings.system_bindir
           end
 
           installed_spec = nil
@@ -163,10 +163,10 @@ module Bundler
             end
 
             spec.executables.each do |exe|
-              SharedHelpers.filesystem_access(Bundler.system_bindir) do |p|
+              SharedHelpers.filesystem_access(Bundler.settings.system_bindir) do |p|
                 Bundler.mkdir_p(p)
               end
-              Bundler.sudo "cp -R #{install_path}/bin/#{exe} #{Bundler.system_bindir}/"
+              Bundler.sudo "cp -R #{install_path}/bin/#{exe} #{Bundler.settings.system_bindir}/"
             end
           end
           installed_spec.loaded_from = loaded_from(spec)
