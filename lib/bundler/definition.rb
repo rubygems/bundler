@@ -366,9 +366,9 @@ module Bundler
       deleted_deps = @locked_deps - @dependencies
 
       # Check if it is possible that the source is only changed thing
-      if (new_deps.empty? && deleted_deps.empty?) && (new_sources.any? && deleted_sources.any?)
-        new_sources.reject! {|source| source.instance_of?(Bundler::Source::Path) && source.path.exist? }
-        deleted_sources.reject! {|source| source.instance_of?(Bundler::Source::Path) && source.path.exist? }
+      if (new_deps.empty? && deleted_deps.empty?) && (!new_sources.empty? && !deleted_sources.empty?)
+        new_sources.reject! {|source| source.is_a_path? && source.path.exist? }
+        deleted_sources.reject! {|source| source.is_a_path? && source.path.exist? }
       end
 
       if @locked_sources != gemfile_sources
@@ -382,7 +382,9 @@ module Bundler
       end
 
       added.concat new_deps.map {|d| "* #{pretty_dep(d)}" } if new_deps.any?
-      deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" } if deleted_deps.any?
+      if deleted_deps.any?
+        deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" }
+      end
 
       both_sources = Hash.new {|h, k| h[k] = [] }
       @dependencies.each {|d| both_sources[d.name][0] = d }
@@ -533,7 +535,15 @@ module Bundler
 
     def converge_dependencies
       (@dependencies + @locked_deps).each do |dep|
-        dep.source = sources.get(dep.source) if dep.source
+        locked_source = @locked_deps.select {|d| d.name == dep.name }.last
+        # This is to make sure that if bundler is installing in deployment mode and
+        # after locked_source and sources don't match, we still use locked_source.
+        if Bundler.settings[:frozen] && !locked_source.nil? &&
+            locked_source.respond_to?(:source) && locked_source.source.instance_of?(Source::Path) && locked_source.source.path.exist?
+          dep.source = locked_source.source
+        elsif dep.source
+          dep.source = sources.get(dep.source)
+        end
       end
       Set.new(@dependencies) != Set.new(@locked_deps)
     end
