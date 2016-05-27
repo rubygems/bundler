@@ -92,12 +92,12 @@ module Bundler
           return unless allow_remote?
           if path.exist?
             return if has_revision_cached?
-            Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+            Bundler.ui.info "Fetching #{filtered_uri}"
             in_path do
               git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*")
             end
           else
-            Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+            Bundler.ui.info "Fetching #{filtered_uri}"
             SharedHelpers.filesystem_access(path.dirname) do |p|
               FileUtils.mkdir_p(p)
             end
@@ -145,20 +145,18 @@ module Bundler
         end
 
         def git_retry(command)
-          Bundler::Retry.new("git #{command}", GitNotAllowedError).attempts do
+          Bundler::Retry.new("git #{filtered_command}", GitNotAllowedError).attempts do
             git(command)
           end
         end
 
         def git(command, check_errors = true, error_msg = nil)
-          command_with_no_credentials = URICredentialsFilter.credential_filtered_string(command, uri)
-          raise GitNotAllowedError.new(command_with_no_credentials) unless allow?
+          raise GitNotAllowedError.new(filtered_command) unless allow?
 
           out = SharedHelpers.with_clean_git_env { `git #{command}` }
+          raise GitCommandError.new(filtered_command, path, error_msg) if check_errors && !$?.success?
 
-          stdout_with_no_credentials = URICredentialsFilter.credential_filtered_string(out, uri)
-          raise GitCommandError.new(command_with_no_credentials, path, error_msg) if check_errors && !$?.success?
-          stdout_with_no_credentials
+          URICredentialsFilter.credential_filtered_string(out, uri)
         end
 
         def has_revision_cached?
@@ -177,6 +175,11 @@ module Bundler
           allowed_in_path do
             git("rev-parse --verify #{ref}", true).strip
           end
+        end
+
+        # Filtered credentials out of the URI for printing
+        def filtered_uri
+          @filtered_uri ||= URICredentialsFilter.credential_filtered_uri(uri)
         end
 
         # Escape the URI for git commands
