@@ -6,8 +6,6 @@ module Bundler
   # This class is supposed to be wrapper over the existing gem installation infra
   # but currently it itself handles everything as the Source's subclasses (e.g. Source::RubyGems)
   # are heavily dependent on the Gemfile.
-  #
-  # @todo: Remove the dependencies of Source's subclasses and try to use the Bundler sources directly. This will reduce the redundancies.
   class Plugin::Installer
     def install(name, options)
       if options[:git]
@@ -22,6 +20,11 @@ module Bundler
       end
     end
 
+    # Installs the plugin from Definition object created by limited parsing of
+    # Gemfile searching for plugins to be installed
+    #
+    # @param [Definition] definiton object
+    # @return [Hash] map of plugin names to thier paths
     def install_definition(definition)
       plugins = definition.dependencies.map(&:name)
 
@@ -30,7 +33,7 @@ module Bundler
 
       paths = install_from_spec specs
 
-      paths.select {|name, _| plugins.include? name}
+      paths.select {|name, _| plugins.include? name }
     end
 
   private
@@ -74,13 +77,12 @@ module Bundler
       paths[name]
     end
 
-    # Installs the plugin from the provided spec and returns the path where the
-    # plugin was installed.
+    # Installs the plugins and deps from the provided specs and returns map of
+    # gems to their paths
     #
-    # @param spec to fetch and install
-    # @raise [ArgumentError] if the spec object has no remote set
+    # @param specs to install
     #
-    # @return [String] the path where the plugin was installed
+    # @return [Hash] map of names to path where the plugin was installed
     def install_from_spec(specs)
       paths = {}
 

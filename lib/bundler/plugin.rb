@@ -27,6 +27,10 @@ module Bundler
         Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
       end
 
+      # Evaluates the Gemfile with a limited DSL and installs the plugins
+      # specified by plugin method
+      #
+      # @param [Pathname] gemfile path
       def eval_gemfile(gemfile)
         definition = Dsl.evaluate(gemfile, nil, {})
         return unless definition.dependencies.any?

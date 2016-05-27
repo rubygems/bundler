@@ -71,4 +71,53 @@ describe "bundler plugin install" do
       expect(out).to include("Installed plugin foo")
     end
   end
+
+  context "Gemfile eval" do
+    it "installs plugins listed in gemfile" do
+      gemfile <<-G
+        source 'file://#{gem_repo2}'
+        plugin 'foo'
+        gem 'rack', "1.0.0"
+      G
+
+      bundle "install"
+
+      expect(out).to include("Installed plugin foo")
+
+      expect(out).to include("Bundle complete!")
+
+      should_be_installed("rack 1.0.0")
+    end
+
+    it "accepts plugin version" do
+      update_repo2 do
+        build_plugin "foo", "1.1.0"
+      end
+
+      install_gemfile <<-G
+        source 'file://#{gem_repo2}'
+        plugin 'foo', "1.0"
+      G
+
+      bundle "install"
+
+      expect(out).to include("Installing foo 1.0")
+
+      expect(out).to include("Installed plugin foo")
+
+      expect(out).to include("Bundle complete!")
+    end
+
+    it "accepts git sources" do
+      build_git "ga-plugin" do |s|
+        s.write "plugin.rb"
+      end
+
+      install_gemfile <<-G
+        plugin 'ga-plugin', :git => "#{lib_path("ga-plugin-1.0")}"
+      G
+
+      expect(out).to include("Installed plugin ga-plugin")
+    end
+  end
 end
