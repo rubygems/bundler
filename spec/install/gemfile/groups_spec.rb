@@ -372,23 +372,23 @@ describe "bundle install with groups" do
     end
   end
 
-  describe "when locked and installed with `without --local`" do
+  describe "when installed with `without`" do
     before(:each) do
       build_repo2
       system_gems "rack-0.9.1" do
-        bundle "config --local without rack"
+        bundle "config --local without middleware"
         install_gemfile <<-G
           source "file://#{gem_repo2}"
           gem "rack"
 
-          group :rack do
+          group :middleware do
             gem "rack_middleware"
           end
         G
       end
     end
 
-    it "uses the correct versions even if `without` was used on the original" do
+    it "uses the correct versions on another machine" do
       should_be_installed "rack 0.9.1"
       should_not_be_installed "rack_middleware 1.0"
       simulate_new_machine
