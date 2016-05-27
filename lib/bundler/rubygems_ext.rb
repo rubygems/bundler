@@ -22,6 +22,8 @@ module Gem
     alias_method :rg_full_gem_path, :full_gem_path
     alias_method :rg_loaded_from,   :loaded_from
 
+    attr_writer :full_gem_path unless instance_methods.include?(:full_gem_path=)
+
     def full_gem_path
       if source.respond_to?(:path)
         root = source.for_plugin? ? Bundler::Plugin.root : Bundler.root
