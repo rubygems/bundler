@@ -24,7 +24,15 @@ module Bundler
       message = message_for(name)
       Bundler.ui.info(message) if message
 
-      new_value = %w(with without).include?(name) ? args.join(":") : args.join(" ")
+      if %w(with without).include?(name)
+        if args.size == 1
+          new_value = args.first.split(" ").join(":")
+        else
+          new_value = args.join(":")
+        end
+      else
+        new_value = args.join(" ")
+      end
       new_value = expand_local_path(name, new_value) if name.start_with?("local.")
 
       resolve_system_path_conflicts(name, new_value, scope)
