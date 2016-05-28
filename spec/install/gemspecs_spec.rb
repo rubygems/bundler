@@ -46,4 +46,76 @@ describe "bundle install" do
     bundle :install, :artifice => "endpoint_marshal_fail" # force gemspec load
     should_be_installed "activesupport 2.3.2"
   end
+
+  context "when ruby version is specified in gemspec and gemfile" do
+    it "installs when patch level is not specified and the version matches" do
+      build_lib("foo", :path => tmp.join("foo")) do |s|
+        s.write "Gemfile", <<-G
+        source "file://#{gem_repo1}"
+        ruby '#{RUBY_VERSION}', :engine_version => '#{RUBY_VERSION}', :engine => 'ruby'
+        gemspec
+        G
+        s.required_ruby_version = RUBY_VERSION
+      end
+
+      Dir.chdir(tmp.join("foo")) do
+        bundle "install"
+        should_be_installed "foo 1.0"
+      end
+    end
+
+    it "installs when patch level is specified and the version still matches the current version" do
+      build_lib("foo", :path => tmp.join("foo")) do |s|
+        s.write "Gemfile", <<-G
+        source "file://#{gem_repo1}"
+        ruby '#{RUBY_VERSION}', :engine_version => '#{RUBY_VERSION}', :engine => 'ruby', :patchlevel => '#{RUBY_PATCHLEVEL}'
+        gemspec
+        G
+        s.required_ruby_version = "#{RUBY_VERSION}.#{RUBY_PATCHLEVEL}"
+      end
+
+      Dir.chdir(tmp.join("foo")) do
+        bundle "install"
+        should_be_installed "foo 1.0"
+      end
+    end
+
+    it "fails and complains about patchlevel on patchlevel mismatch" do
+      patchlevel = RUBY_PATCHLEVEL.to_i + 1
+      build_lib("foo", :path => tmp.join("foo")) do |s|
+        s.write "Gemfile", <<-G
+        source "file://#{gem_repo1}"
+        ruby '#{RUBY_VERSION}', :engine_version => '#{RUBY_VERSION}', :engine => 'ruby', :patchlevel => '#{patchlevel}'
+        gemspec
+        G
+        s.required_ruby_version = "#{RUBY_VERSION}.#{patchlevel}"
+      end
+
+      Dir.chdir(tmp.join("foo")) do
+        bundle "install"
+        expect(out).to include("Ruby patchlevel")
+        expect(out).to include("but your Gemfile specified")
+        expect(exitstatus).to eq(18) if exitstatus
+      end
+    end
+
+    it "fails and complains about version on version mismatch" do
+      version = Gem::Requirement.create(RUBY_VERSION).requirements.first.last.bump.version
+      build_lib("foo", :path => tmp.join("foo")) do |s|
+        s.write "Gemfile", <<-G
+        source "file://#{gem_repo1}"
+        ruby '#{version}', :engine_version => '#{version}', :engine => 'ruby'
+        gemspec
+        G
+        s.required_ruby_version = version
+      end
+
+      Dir.chdir(tmp.join("foo")) do
+        bundle "install"
+        expect(out).to include("Ruby version")
+        expect(out).to include("but your Gemfile specified")
+        expect(exitstatus).to eq(18) if exitstatus
+      end
+    end
+  end
 end
