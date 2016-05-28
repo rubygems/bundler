@@ -24,25 +24,13 @@ module Bundler
       message = message_for(name)
       Bundler.ui.info(message) if message
 
-      if %w(with without).include?(name)
-        if args.size == 1
-          new_value = args.first.split(" ").join(":")
-        else
-          new_value = args.join(":")
-        end
-      else
-        new_value = args.join(" ")
-      end
-      new_value = expand_local_path(name, new_value) if name.start_with?("local.")
+      new_value = value_for(name, args)
+      group_delete = new_value.empty? && %w(with without).include?(name)
+      return delete_config(name, nil) if group_delete
 
       resolve_system_path_conflicts(name, new_value, scope)
       resolve_group_conflicts(name, new_value, scope)
-
-      if new_value == "" && (name == "with" || name == "without")
-        delete_config(name, nil)
-      else
-        Bundler.settings.send("set_#{scope}", name, new_value)
-      end
+      Bundler.settings.send("set_#{scope}", name, new_value)
     end
 
   private
@@ -82,6 +70,17 @@ module Bundler
       elsif scope == "local" && locations[:local] != args.join(" ")
         "You are replacing the current local value of #{name}, which is currently " \
           "#{locations[:local].inspect}"
+      end
+    end
+
+    def value_for(name, args)
+      case name
+      when /^local\./
+        expand_local_path(name, args.join(" "))
+      when "with", "without"
+        args.size == 1 ? args.first.split(" ").join(":") : args.join(":")
+      else
+        args.join(" ")
       end
     end
 
