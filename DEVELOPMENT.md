@@ -8,12 +8,11 @@ You can start learning about Bundler by reading [the documentation](http://bundl
 
 If you’re interested in contributing to Bundler, that’s awesome! We’d love your help.
 
-If you have any questions after reading this page, please feel free to contact either [@indirect](http://github.com/indirect) or [@hone](http://github.com/hone). They are both happy to provide help working through your first bugfix or thinking through the problem you’re trying to resolve.
+If you have any questions after reading this page, please feel free to contact either [@indirect](https://github.com/indirect), [@segiddins](https://github.com/segiddins), or [@RochesterinNYC](https://github.com/RochesterinNYC). They are all happy to provide help working through your first bug fix or thinking through the problem you’re trying to resolve.
 
 ## How you can help
 
-We track [small
-bugs and features](https://github.com/bundler/bundler/issues?labels=small) so that anyone who wants to help can start with something that's not too overwhelming. We also keep a [list of things anyone can help with, any time](https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md#contributing). If nothing on those lists looks good, talk to us, and we'll figure out what you can help with. We can absolutely use your help, no matter what level of programming skill you have at the moment.
+We track [small bugs and features](https://github.com/bundler/bundler/issues?labels=small) so that anyone who wants to help can start with something that's not too overwhelming. We also keep a [list of things anyone can help with, any time](https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md#contributing). If nothing on those lists looks good, talk to us, and we'll figure out what you can help with. We can absolutely use your help, no matter what level of programming skill you have at the moment.
 
 # Development setup
 
