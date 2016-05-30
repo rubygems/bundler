@@ -31,6 +31,5 @@ module Bundler
       end
       Bundler::CLI::Install.new(options).run
     end
-
   end
 end
