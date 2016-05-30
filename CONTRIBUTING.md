@@ -29,7 +29,7 @@ If you're having a problem, please see [ISSUES](https://github.com/bundler/bundl
 
 # Requesting Features
 
-Head on over to the [Bundler features](https://github.com/bundler/bundler-features) project, or any of the lists or channels listed below. Feature-wise, we consider Bundler stable, so the core team does not tend to work on feature suggestions. Pull requests are welcome though!
+Feel free to discuss your ideas or feature requests on any of the lists or channels listed below or [create an issue](https://github.com/bundler/bundler/issues/new) with the `feature-request` label. Feature-wise, we consider Bundler stable, so the core team does not tend to work on feature suggestions. Pull requests are welcome though!
 
 # Discussing Bundler
 
