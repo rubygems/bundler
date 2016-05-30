@@ -27,7 +27,9 @@ module Bundler
 
       def source(source, *args, &blk)
         options = args.last.is_a?(Hash) ? args.pop.dup : nil
-        super unless options && options.key?(:type)
+        return super unless options && options.key?(:type)
+
+        plugin("bundler-source-#{options[:type]}")
       end
     end
   end
