@@ -384,40 +384,6 @@ The checksum of /versions does not match the checksum provided by the server! So
     should_be_installed "rails 2.3.2"
   end
 
-  it "installs the binstubs" do
-    gemfile <<-G
-      source "#{source_uri}"
-      gem "rack"
-    G
-
-    bundle "install --binstubs", :artifice => "compact_index"
-
-    gembin "rackup"
-    expect(out).to eq("1.0.0")
-  end
-
-  it "installs the bins when using --path and uses autoclean" do
-    gemfile <<-G
-      source "#{source_uri}"
-      gem "rack"
-    G
-
-    bundle "install --path vendor/bundle", :artifice => "compact_index"
-
-    expect(vendored_gems("bin/rackup")).to exist
-  end
-
-  it "installs the bins when using --path and uses bundle clean" do
-    gemfile <<-G
-      source "#{source_uri}"
-      gem "rack"
-    G
-
-    bundle "install --path vendor/bundle --no-clean", :artifice => "compact_index"
-
-    expect(vendored_gems("bin/rackup")).to exist
-  end
-
   it "prints post_install_messages" do
     gemfile <<-G
       source "#{source_uri}"
