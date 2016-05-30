@@ -89,7 +89,6 @@ module Bundler
       def install(spec, opts = {})
         force = opts[:force]
         ensure_builtin_gems_cached = opts[:ensure_builtin_gems_cached]
-        cache_globally(spec, cached_path(spec)) if spec && cached_path(spec)
 
         if ensure_builtin_gems_cached && builtin_gem?(spec)
           if !cached_path(spec)
@@ -457,24 +456,6 @@ module Bundler
           Bundler.rubygems.download_gem(spec, uri, download_path)
           FileUtils.cp(local_path, cache_path)
         end
-      end
-
-      # Checks if a spec's .gem file exists in the global cache. If it does
-      # not, we create the relevant global cache subdirectory if it does not
-      # exist and copy the gem from the local cache to the global cache.
-      #
-      # @param  [Specification] spec
-      #         the spec we want to copy to the global cache.
-      #
-      # @param  [String] local_cache_dir
-      #         the local directory from which we want to copy the .gem.
-      #
-      def cache_globally(spec, local_cache_dir)
-        cache_path = download_cache_path("#{spec.full_name}.gem")
-        return unless cache_path && !cache_path.exist?
-        cache_dir = File.dirname(cache_path)
-        FileUtils.mkdir_p(cache_dir)
-        FileUtils.cp(local_cache_dir, cache_dir)
       end
 
       # Returns the global cache path of the calling Rubygems::Source object.
