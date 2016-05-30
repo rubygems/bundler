@@ -16,6 +16,7 @@ module Bundler
       def initialize
         @plugin_paths = {}
         @commands = {}
+        @sources = {}
 
         load_index
       end
@@ -33,6 +34,11 @@ module Bundler
         raise CommandConflict.new(name, common) unless common.empty?
         commands.each {|c| @commands[c] = name }
 
+        com = sources & @sources.keys
+        raise "Source(s) #{com.join(", ")} are already registered" if com.any?
+        sources.each {|k| @sources[k] = name }
+
+        @plugin_paths[name] = path
         save_index
       end
 
@@ -69,12 +75,21 @@ module Bundler
         end
       end
 
+      def source?(source)
+        @sources.key? source
+      end
+
+      def source_plugin(name)
+        @sources[name]
+      end
+
       # Should be called when any of the instance variables change. Stores the instance
       # variables in YAML format. (The instance variables are supposed to be only String key value pairs)
       def save_index
         index = {
           "plugin_paths" => @plugin_paths,
           "commands" => @commands,
+          "sources" => @sources,
         }
 
         require "bundler/yaml_serializer"

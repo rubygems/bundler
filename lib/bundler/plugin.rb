@@ -16,6 +16,7 @@ module Bundler
   module_function
 
     @commands = {}
+    @sources = {}
 
     # Installs a new plugin by the given name
     #
@@ -93,6 +94,7 @@ module Bundler
       Index.new.installed?(plugin)
     end
 
+<<<<<<< 13f64fa210edbf92f3281e4055e88a37437d0486
     # Post installation processing and registering with index
     #
     # @param [Hash] plugins mapped to their installtion path
@@ -102,9 +104,37 @@ module Bundler
         validate_plugin! path
         register_plugin name, path
         Bundler.ui.info "Installed plugin #{name}"
+=======
+      def add_source(source, cls)
+        @sources[source] = cls
+      end
+
+      def source?(name)
+        index.source? name
+      end
+
+      def source(name)
+        load_plugin index.source_plugin name unless @sources.key? name
+
+        @sources[name]
+      end
+
+    private
+
+      # Checks if the gem is good to be a plugin
+      #
+      # At present it only checks whether it contains plugin.rb file
+      #
+      # @param [Pathname] plugin_path the path plugin is installed at
+      # @raise [Error] if plugin.rb file is not found
+      def validate_plugin!(plugin_path)
+        plugin_file = plugin_path.join(PLUGIN_FILE_NAME)
+        raise "#{PLUGIN_FILE_NAME} was not found in the plugin!" unless plugin_file.file?
+>>>>>>> A base for source plugin
       end
     end
 
+<<<<<<< 13f64fa210edbf92f3281e4055e88a37437d0486
     # Checks if the gem is good to be a plugin
     #
     # At present it only checks whether it contains plugins.rb file
@@ -123,13 +153,33 @@ module Bundler
     # @param [Pathname] path the path where the plugin is installed at
     def register_plugin(name, path)
       commands = @commands
+=======
+      # Runs the plugin.rb file in an isolated namespace, records the plugin
+      # actions it registers for and then passes the data to index to be stored.
+      #
+      # @param [String] name the name of the plugin
+      # @param [Pathname] path the path where the plugin is installed at
+      def register_plugin(name, path)
+        commands = @commands
+        sources = @sources
+
+        @commands = {}
+        @sources = {}
+>>>>>>> A base for source plugin
 
       @commands = {}
 
+<<<<<<< 13f64fa210edbf92f3281e4055e88a37437d0486
       begin
         load path.join(PLUGIN_FILE_NAME), true
       rescue StandardError => e
         raise MalformattedPlugin, "#{e.class}: #{e.message}"
+=======
+        index.register_plugin name, path.to_s, @commands.keys, @sources.keys
+      ensure
+        @commands = commands
+        @sources = sources
+>>>>>>> A base for source plugin
       end
 
       index.register_plugin name, path.to_s, @commands.keys

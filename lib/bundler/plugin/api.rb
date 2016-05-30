@@ -32,6 +32,11 @@ module Bundler
         Plugin.add_command command, cls
       end
 
+      def self.source(source)
+        self.include Bundler::Plugin::Api::Source
+        Plugin.add_source source, self
+      end
+
       # The cache dir to be used by the plugins for persistance storage
       #
       # @return [Pathname] path of the cache dir

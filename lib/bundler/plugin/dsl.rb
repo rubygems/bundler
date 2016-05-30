@@ -24,6 +24,11 @@ module Bundler
       def method_missing(name, *args)
         raise PluginGemfileError, "Undefined local variable or method `#{name}' for Gemfile" unless Bundler::Dsl.method_defined? name
       end
+
+      def source(source, *args, &blk)
+        options = args.last.is_a?(Hash) ? args.pop.dup : nil
+        super unless options && options.key?(:type)
+      end
     end
   end
 end
