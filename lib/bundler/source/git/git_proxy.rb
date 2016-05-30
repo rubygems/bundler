@@ -145,16 +145,16 @@ module Bundler
         end
 
         def git_retry(command)
-          Bundler::Retry.new("git #{filtered_command}", GitNotAllowedError).attempts do
+          Bundler::Retry.new("git #{filter_command(command)}", GitNotAllowedError).attempts do
             git(command)
           end
         end
 
         def git(command, check_errors = true, error_msg = nil)
-          raise GitNotAllowedError.new(filtered_command) unless allow?
+          raise GitNotAllowedError.new(filter_command(command)) unless allow?
 
           out = SharedHelpers.with_clean_git_env { `git #{command}` }
-          raise GitCommandError.new(filtered_command, path, error_msg) if check_errors && !$?.success?
+          raise GitCommandError.new(filter_command(command), path, error_msg) if check_errors && !$?.success?
 
           URICredentialsFilter.credential_filtered_string(out, uri)
         end
@@ -177,9 +177,14 @@ module Bundler
           end
         end
 
-        # Filtered credentials out of the URI for printing
+        # URI without credentials for printing
         def filtered_uri
           @filtered_uri ||= URICredentialsFilter.credential_filtered_uri(uri)
+        end
+
+        # Command without credentials for printing
+        def filter_command(command)
+          URICredentialsFilter.credential_filtered_string(command, uri)
         end
 
         # Escape the URI for git commands
