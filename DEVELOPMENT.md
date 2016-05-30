@@ -98,15 +98,14 @@ If you can reproduce an issue, you're well on your way to fixing it. :) Fixing i
 Finally, the ticket may be a duplicate of another older ticket. If you notice a ticket is a duplicate, simply comment on the ticket noting the original ticket’s number. For example, you could say “This is a duplicate of issue #42, and can be closed”.
 
 
-# Adding new features
+# Adding New Features
 
 If you would like to add a new feature to Bundler, please follow these steps:
 
-  1. [Create an issue](https://github.com/bundler/bundler-features/issues/new) in the bundler-features repo to discuss your feature.
+  1. [Create an issue](https://github.com/bundler/bundler/issues/new) with the [`feature-request` label](https://github.com/bundler/bundler/labels/feature-request) to discuss your feature.
   2. Base your commits on the master branch, since we follow [SemVer](http://semver.org) and don't add new features to old releases.
   3. Commit the code and at least one test covering your changes to a feature branch in your fork.
-  4. Put a line in the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the "Features" heading.
-  5. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your feature branch.
+  4. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your feature branch.
 
 If you don't hear back immediately, don’t get discouraged! We all have day jobs, but we respond to most tickets within a day or two.
 
