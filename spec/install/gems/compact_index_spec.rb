@@ -22,8 +22,8 @@ describe "compact index api" do
       gem " sinatra"
     G
 
-    bundle :install, :artifice => "compact_index"
-    expect(out).to include("' sinatra' is not a valid gem name because it contains whitespace.")
+    bundle :install, :artifice => "compact_index", :expect_err => true
+    expect(err).to include("' sinatra' is not a valid gem name because it contains whitespace.")
   end
 
   it "should handle nested dependencies" do
@@ -193,8 +193,8 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack"
     G
 
-    bundle :install, :artifice => "compact_index_redirects"
-    expect(out).to match(/Too many redirects/)
+    bundle :install, :artifice => "compact_index_redirects", :expect_err => true
+    expect(err).to match(/Too many redirects/)
   end
 
   context "when --full-index is specified" do
