@@ -448,7 +448,7 @@ module Bundler
       #         the local directory the .gem will end up in.
       #
       def download_gem_with_cache(spec, uri, download_path)
-        cache_path = download_cache_path("#{spec.full_name}.gem")
+        cache_path = download_cache_path(uri, "#{spec.full_name}.gem")
         local_path = File.join(download_path, "cache/#{spec.full_name}.gem")
         if cache_path.exist?
           FileUtils.cp(cache_path, local_path)
@@ -460,25 +460,24 @@ module Bundler
 
       # Returns the global cache path of the calling Rubygems::Source object.
       #
-      # Note that the Source determines the path's subdirectory. We use this
+      # Note that the URI determines the path's subdirectory. We use this
       # subdirectory in the global cache path so that gems with the same name
       # -- and possibly different versions -- from different sources are saved
       # to their respective subdirectories and do not override one another.
       #
-      # @param  [Array<String>] paths
-      #         the subdirectories and / or file to be concatenated onto the
-      #         global cache path.
+      # @param  [URI] uri
+      #         the URI that the gem will be downloaded from if it is not cached
+      #
+      # @param  [String] filename
+      #         the name of the .gem file that we want to cache
       #
       # @return [Pathname] The global cache path.
       #
-      def download_cache_path(*paths)
-        raise InstallError, "Caching is only possible for sources with one URL" if remotes.size > 1
-        uri = remotes.first
-        return unless uri
+      def download_cache_path(uri, filename)
         port = uri.port unless uri.port == 80
-        path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r{\A/?\Z}
+        path = Digest::MD5.hexdigest(uri.path)[0..6] unless uri.path =~ %r{\A/?\Z}
         source_dir = [uri.hostname, port, path].compact.join(".")
-        Bundler.settings.download_cache_path.join(source_dir).tap(&:mkpath).join(*paths)
+        Bundler.settings.download_cache_path.join(source_dir).tap(&:mkpath).join(filename)
       end
     end
   end
