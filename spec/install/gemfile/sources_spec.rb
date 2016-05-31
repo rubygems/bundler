@@ -191,6 +191,8 @@ describe "bundle install with gems on multiple sources" do
               end
             G
           end
+
+          pending "this should have a test or be removed"
         end
 
         context "and only the dependency is pinned" do
@@ -210,6 +212,8 @@ describe "bundle install with gems on multiple sources" do
               gem "rack", :source => "file://#{gem_repo1}"
             G
           end
+
+          pending "this should have a test or be removed"
         end
       end
     end
