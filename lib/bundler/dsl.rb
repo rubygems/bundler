@@ -383,19 +383,9 @@ module Bundler
     def check_primary_source_safety(source)
       return unless source.rubygems_primary_remotes.any?
 
-      # TODO: 2.0 upgrade from setting to default
-      if Bundler.settings[:disable_multisource]
-        raise GemspecError, "Warning: this #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
-          "Each source after the first must include a block to indicate which gems " \
-          "should come from that source."
-      else
-        Bundler.ui.deprecate "Your #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
-          "Using `source` more than once without a block is a security risk, and " \
-          "may result in installing unexpected gems. To resolve this warning, use " \
-          "a block to indicate which gems should come from the secondary source. " \
-          "It will be an error to have multiple primary sources in Bundler 2.0. " \
-          "To enable that error now, run `bundle config disable_multisource true`."
-      end
+      raise GemspecError, "This #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
+        "Each source after the first must include a block to indicate which gems " \
+        "should come from that source."
     end
 
     def warn_github_source_change(repo_name)
