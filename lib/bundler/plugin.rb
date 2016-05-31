@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Bundler
-  class Plugin
+  module Plugin
     autoload :Api,        "bundler/plugin/api"
     autoload :Dsl,        "bundler/plugin/dsl"
     autoload :Index,      "bundler/plugin/index"

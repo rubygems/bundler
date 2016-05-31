@@ -9,7 +9,7 @@ module Bundler
     method_option "source", :type => :string, :default => nil, :banner =>
       "URL of the RubyGems source to fetch the plugin from"
     method_option "version", :type => :string, :default => nil, :banner =>
-      "The version of the plugin to fetch from"
+      "The version of the plugin to fetch"
     method_option "git", :type => :string, :default => nil, :banner =>
       "URL of the git repo to fetch from"
     method_option "branch", :type => :string, :default => nil, :banner =>

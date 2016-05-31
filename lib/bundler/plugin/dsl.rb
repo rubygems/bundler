@@ -7,13 +7,12 @@ module Bundler
 
     # So that we don't have to override all there methods to dummy ones
     # explicitly.
-    # They will be handled by missing_methods
+    # They will be handled by method_missing
     [:gemspec, :gem, :path, :install_if, :platforms, :env].each {|m| undef_method m }
 
     def initialize
-      @sources = Plugin::SourceList.new
-
       super
+      @sources = Plugin::SourceList.new
     end
 
     def plugin(name, *args)

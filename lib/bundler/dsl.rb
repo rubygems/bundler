@@ -19,7 +19,7 @@ module Bundler
 
     def initialize
       @source               = nil
-      @sources            ||= SourceList.new
+      @sources              = SourceList.new
       @git_sources          = {}
       @dependencies         = []
       @groups               = []
