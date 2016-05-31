@@ -270,7 +270,7 @@ module Bundler
         path = path.parent until path.exist?
 
         # bins are written to a different location on OS X
-        bin_dir = Pathname.new(Bundler.system_bindir)
+        bin_dir = Pathname.new(Bundler.settings.system_bindir)
         bin_dir = bin_dir.parent until bin_dir.exist?
 
         # if any directory is not writable, we need sudo
