@@ -38,10 +38,7 @@ module Bundler
       Pathname.new @plugin_paths[name]
     end
 
-    def command?(command)
-      @commands.key? command
-    end
-
+    # Fetch the name of plugin handling the command
     def command_plugin(command)
       @commands[command]
     end

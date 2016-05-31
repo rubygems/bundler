@@ -65,14 +65,18 @@ module Bundler
         @cache ||= root.join("cache")
       end
 
+      # To be called via the Api to register to handle a command
       def add_command(command, cls)
         @commands[command] = cls
       end
 
+      # Checks if any plugins handles the command
       def command?(command)
-        index.command? command
+        !index.command_plugin(command).nil?
       end
 
+      # To be called from Cli class to pass the command and argument to
+      # approriate plugin class
       def exec_command(command, args)
         raise "Command #{command} not found" unless command? command
 
@@ -95,8 +99,8 @@ module Bundler
         raise "#{PLUGIN_FILE_NAME} was not found in the plugin!" unless plugin_file.file?
       end
 
-      # Runs the plugin.rb file, records the plugin actions it registers for and
-      # then passes the data to index to be stored
+      # Runs the plugin.rb file in an isolated namespace, records the plugin
+      # actions it registers for and then passes the data to index to be stored.
       #
       # @param [String] name the name of the plugin
       # @param [Pathname] path the path where the plugin is installed at
@@ -105,7 +109,7 @@ module Bundler
 
         @commands = {}
 
-        require path.join(PLUGIN_FILE_NAME) # this shall latter be used to find the actions the plugin performs
+        load path.join(PLUGIN_FILE_NAME), true
 
         index.register_plugin name, path.to_s, @commands.keys
       ensure
@@ -113,6 +117,9 @@ module Bundler
       end
 
       def load_plugin(name)
+        # Need to ensure before this that plugin root where the rest of gems
+        # are installed to be on load path to support plugin deps. Currently not
+        # done to avoid conflicts
         path = index.plugin_path(name)
 
         load path.join(PLUGIN_FILE_NAME)

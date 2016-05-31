@@ -8,7 +8,7 @@ describe "command plugins" do
         s.write "plugin.rb", <<-RUBY
           module Mah
             class Plugin < Bundler::Plugin::Api
-              command "mahcommand"
+              command "mahcommand" # declares the command
 
               def exec(command, args)
                 puts "MahHello"
@@ -21,7 +21,6 @@ describe "command plugins" do
 
     bundle "plugin install command-mah --source file://#{gem_repo2}"
     expect(out).to include("Installed plugin command-mah")
-    puts out
 
     bundle "mahcommand"
     expect(out).to eq("MahHello")
@@ -32,8 +31,9 @@ describe "command plugins" do
       build_plugin "the-echoer"do |s|
         s.write "plugin.rb", <<-RUBY
           module Resonance
-            class Echoer < Bundler::Plugin::Api
-              command "echo"
+            class Echoer
+              # Another method to declare the command
+              Bundler::Plugin::Api.command "echo", self
 
               def exec(command, args)
                 puts "You gave me \#{args.join(", ")}"
@@ -45,6 +45,7 @@ describe "command plugins" do
     end
 
     bundle "plugin install the-echoer --source file://#{gem_repo2}"
+    expect(out).to include("Installed plugin the-echoer")
 
     bundle "echo tacos tofu lasange", "no-color" => false
     expect(out).to eq("You gave me tacos, tofu, lasange")
