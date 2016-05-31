@@ -140,4 +140,19 @@ describe "bundler/inline#gemfile" do
     expect(out).to match("OKAY")
     expect(exitstatus).to be_zero if exitstatus
   end
+
+  it "installs quietly if necessary when the install option is not set" do
+    script <<-RUBY
+      gemfile do
+        source "file://#{gem_repo1}"
+        gem "rack"
+      end
+
+      puts RACK
+    RUBY
+
+    expect(out).to eq("1.0.0")
+    expect(err).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
 end

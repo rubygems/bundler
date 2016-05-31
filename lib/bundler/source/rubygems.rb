@@ -27,6 +27,7 @@ module Bundler
       end
 
       def remote!
+        @specs = nil
         @allow_remote = true
       end
 
