@@ -7,7 +7,8 @@ module Bundler
   # now a stub class).
   class Plugin::Index
     def initialize
-      @plugin_sources = {}
+      @plugin_paths = {}
+      @commands = {}
 
       load_index
     end
@@ -17,8 +18,13 @@ module Bundler
     #
     # @param [String] name of the plugin to be registered
     # @param [String] path where the plugin is installed
-    def register_plugin(name, path)
-      @plugin_sources[name] = path
+    # @param [Array<String>] commands that are handled by the plugin
+    def register_plugin(name, path, commands)
+      @plugin_paths[name] = path
+
+      common = commands & @commands.keys
+      raise "Command(s) #{common.join(", ")} are already registered" if common.any?
+      commands.each{|c| @commands[c] = name }
 
       save_index
     end
@@ -26,6 +32,18 @@ module Bundler
     # Path where the index file is stored
     def index_file
       Plugin.root.join("index")
+    end
+
+    def plugin_path(name)
+      Pathname.new @plugin_paths[name]
+    end
+
+    def command?(command)
+      @commands.key? command
+    end
+
+    def command_plugin(command)
+      @commands[command]
     end
 
   private
@@ -36,7 +54,8 @@ module Bundler
         valid_file = index_f && index_f.exist? && !index_f.size.zero?
         break unless valid_file
         index = YAML.load_file(index_f)
-        @plugin_sources = index["plugin_sources"]
+        @plugin_paths = index["plugin_paths"]
+        @commands = index["commands"]
       end
     end
 
@@ -44,7 +63,8 @@ module Bundler
     # variables in YAML format. (The instance variables are supposed to be only String key value pairs)
     def save_index
       index = {
-        "plugin_sources" => @plugin_sources,
+        "plugin_paths" => @plugin_paths,
+        "commands" => @commands,
       }
 
       SharedHelpers.filesystem_access(index_file) do |index_f|

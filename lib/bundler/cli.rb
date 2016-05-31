@@ -82,6 +82,10 @@ module Bundler
     end
 
     def self.handle_no_command_error(command, has_namespace = $thor_runner)
+      if Bundler::Plugin.command? command
+        return Bundler::Plugin.exec_command(command, ARGV[1..-1])
+      end
+
       return super unless command_path = Bundler.which("bundler-#{command}")
 
       Kernel.exec(command_path, *ARGV[1..-1])

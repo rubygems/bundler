@@ -2,10 +2,15 @@
 
 module Bundler
   class Plugin
+    autoload :Api,        "bundler/plugin/api"
     autoload :Dsl,        "bundler/plugin/dsl"
     autoload :Index,      "bundler/plugin/index"
     autoload :Installer,  "bundler/plugin/installer"
     autoload :SourceList, "bundler/plugin/source_list"
+
+    PLUGIN_FILE_NAME = "plugin.rb".freeze
+
+    @commands = {}
 
     class << self
       # Installs a new plugin by the given name
@@ -60,6 +65,22 @@ module Bundler
         @cache ||= root.join("cache")
       end
 
+      def add_command(command, cls)
+        @commands[command] = cls
+      end
+
+      def command?(command)
+        index.command? command
+      end
+
+      def exec_command(command, args)
+        raise "Command #{command} not found" unless command? command
+
+        load_plugin index.command_plugin(command) unless @commands.key? command
+
+        @commands[command].new.exec(command, args)
+      end
+
     private
 
       # Checks if the gem is good to be a plugin
@@ -70,8 +91,8 @@ module Bundler
       #
       # @raise [Error] if plugin.rb file is not found
       def validate_plugin!(plugin_path)
-        plugin_file = plugin_path.join("plugin.rb")
-        raise "plugin.rb was not found in the plugin!" unless plugin_file.file?
+        plugin_file = plugin_path.join(PLUGIN_FILE_NAME)
+        raise "#{PLUGIN_FILE_NAME} was not found in the plugin!" unless plugin_file.file?
       end
 
       # Runs the plugin.rb file, records the plugin actions it registers for and
@@ -80,9 +101,21 @@ module Bundler
       # @param [String] name the name of the plugin
       # @param [Pathname] path the path where the plugin is installed at
       def register_plugin(name, path)
-        require path.join("plugin.rb") # this shall latter be used to find the actions the plugin performs
+        commands = @commands
 
-        index.register_plugin name, path.to_s
+        @commands = {}
+
+        require path.join(PLUGIN_FILE_NAME) # this shall latter be used to find the actions the plugin performs
+
+        index.register_plugin name, path.to_s, @commands.keys
+      ensure
+        @commands = commands
+      end
+
+      def load_plugin(name)
+        path = index.plugin_path(name)
+
+        load path.join(PLUGIN_FILE_NAME)
       end
     end
   end
