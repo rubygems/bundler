@@ -211,9 +211,9 @@ describe "install with --deployment or --frozen" do
         gem "rack"
       G
 
-      bundle "install --deployment"
+      bundle "install --deployment", :expect_err => true
       expect(err).to include("deployment mode")
-      expect(out).to include("You have deleted from gems.rb:\n* source: #{lib_path("rack-1.0")} (at master@#{revision_for(lib_path("rack-1.0"))[0..6]}")
+      expect(err).to include("You have deleted from gems.rb:\n* source: #{lib_path("rack-1.0")} (at master@#{revision_for(lib_path("rack-1.0"))[0..6]}")
       expect(err).not_to include("You have added to gems.rb")
       expect(err).not_to include("You have changed in gems.rb")
     end
@@ -234,9 +234,9 @@ describe "install with --deployment or --frozen" do
         gem "foo", :git => "#{lib_path("rack")}"
       G
 
-      bundle "install --deployment"
+      bundle "install --deployment", :expect_err => true
       expect(err).to include("deployment mode")
-      expect(out).to include("You have changed in gems.rb:\n* rack from `no specified source` to `#{lib_path("rack")} (at master@#{revision_for(lib_path("rack"))[0..6]})`")
+      expect(err).to include("You have changed in gems.rb:\n* rack from `no specified source` to `#{lib_path("rack")} (at master@#{revision_for(lib_path("rack"))[0..6]})`")
       expect(err).not_to include("You have added to gems.rb")
       expect(err).not_to include("You have deleted from gems.rb")
     end
