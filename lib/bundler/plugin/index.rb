@@ -51,8 +51,8 @@ module Bundler
         valid_file = index_f && index_f.exist? && !index_f.size.zero?
         break unless valid_file
         index = YAML.load_file(index_f)
-        @plugin_paths = index["plugin_paths"]
-        @commands = index["commands"]
+        @plugin_paths = index["plugin_paths"] || {}
+        @commands = index["commands"] || {}
       end
     end
 

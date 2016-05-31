@@ -82,7 +82,7 @@ module Bundler
     end
 
     def self.handle_no_command_error(command, has_namespace = $thor_runner)
-      if Bundler::Plugin.command? command
+      if ENV["BUNDLE_PLUGIN"] && Bundler::Plugin.command?(command)
         return Bundler::Plugin.exec_command(command, ARGV[1..-1])
       end
 
@@ -437,9 +437,11 @@ module Bundler
       Env.new.write($stdout)
     end
 
-    require "bundler/cli/plugin"
-    desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
-    subcommand "plugin", Plugin
+    if ENV["BUNDLE_PLUGIN"]
+      require "bundler/cli/plugin"
+      desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
+      subcommand "plugin", Plugin
+    end
 
     # Reformat the arguments passed to bundle that include a --help flag
     # into the corresponding `bundle help #{command}` call
