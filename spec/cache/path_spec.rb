@@ -9,7 +9,7 @@ describe "bundle cache with path" do
       gem "foo", :path => '#{bundled_app("lib/foo")}'
     G
 
-    bundle "cache --all"
+    bundle "cache"
     expect(bundled_app("vendor/cache/foo-1.0")).not_to exist
     should_be_installed "foo 1.0"
   end
@@ -24,7 +24,7 @@ describe "bundle cache with path" do
       gem "#{libname}", :path => '#{libpath}'
     G
 
-    bundle "cache --all"
+    bundle "cache"
     expect(bundled_app("vendor/cache/#{libname}")).to exist
     expect(bundled_app("vendor/cache/#{libname}/.bundlecache")).to be_file
 
@@ -39,13 +39,13 @@ describe "bundle cache with path" do
       gem "foo", :path => '#{lib_path("foo-1.0")}'
     G
 
-    bundle "cache --all"
+    bundle "cache"
 
     build_lib "foo" do |s|
       s.write "lib/foo.rb", "puts :CACHE"
     end
 
-    bundle "cache --all"
+    bundle "cache"
 
     expect(bundled_app("vendor/cache/foo-1.0")).to exist
     FileUtils.rm_rf lib_path("foo-1.0")
@@ -61,63 +61,13 @@ describe "bundle cache with path" do
       gem "foo", :path => '#{lib_path("foo-1.0")}'
     G
 
-    bundle "cache --all"
+    bundle "cache"
 
     install_gemfile <<-G
       gem "bar", :path => '#{lib_path("bar-1.0")}'
     G
 
-    bundle "cache --all"
-    expect(bundled_app("vendor/cache/bar-1.0")).not_to exist
-  end
-
-  it "raises a warning without --all" do
-    build_lib "foo"
-
-    install_gemfile <<-G
-      gem "foo", :path => '#{lib_path("foo-1.0")}'
-    G
-
-    bundle "cache"
-    expect(out).to match(/please pass the \-\-all flag/)
-    expect(bundled_app("vendor/cache/foo-1.0")).not_to exist
-  end
-
-  it "does not store the given flag" do
-    build_lib "foo"
-
-    install_gemfile <<-G
-      gem "foo", :path => '#{lib_path("foo-1.0")}'
-    G
-
-    bundle "cache --all"
-    build_lib "bar"
-
-    install_gemfile <<-G
-      gem "foo", :path => '#{lib_path("foo-1.0")}'
-      gem "bar", :path => '#{lib_path("bar-1.0")}'
-    G
-
     bundle "cache"
     expect(bundled_app("vendor/cache/bar-1.0")).not_to exist
-  end
-
-  it "can rewind chosen configuration" do
-    build_lib "foo"
-
-    install_gemfile <<-G
-      gem "foo", :path => '#{lib_path("foo-1.0")}'
-    G
-
-    bundle "cache --all"
-    build_lib "baz"
-
-    gemfile <<-G
-      gem "foo", :path => '#{lib_path("foo-1.0")}'
-      gem "baz", :path => '#{lib_path("baz-1.0")}'
-    G
-
-    bundle "cache --no-all"
-    expect(bundled_app("vendor/cache/baz-1.0")).not_to exist
   end
 end

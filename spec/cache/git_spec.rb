@@ -22,7 +22,7 @@ describe "bundle cache with git" do
       gem "foo", :git => '#{lib_path("foo-1.0")}'
     G
 
-    bundle "cache --all"
+    bundle "cache"
     expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
     expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
     expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
@@ -41,7 +41,7 @@ describe "bundle cache with git" do
 
     bundle "config path vendor/bundle"
     bundle "install"
-    bundle "cache --all"
+    bundle "cache"
 
     expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
     expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
@@ -58,8 +58,8 @@ describe "bundle cache with git" do
       gem "foo", :git => '#{lib_path("foo-1.0")}'
     G
 
-    bundle "cache --all"
-    bundle "cache --all"
+    bundle "cache"
+    bundle "cache"
 
     expect(err).to lack_errors
     FileUtils.rm_rf lib_path("foo-1.0")
@@ -74,7 +74,7 @@ describe "bundle cache with git" do
       gem "foo", :git => '#{lib_path("foo-1.0")}'
     G
 
-    bundle "cache --all"
+    bundle "cache"
 
     update_git "foo" do |s|
       s.write "lib/foo.rb", "puts :CACHE"
@@ -84,7 +84,7 @@ describe "bundle cache with git" do
     expect(ref).not_to eq(old_ref)
 
     bundle "update"
-    bundle "cache --all"
+    bundle "cache"
 
     expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
     expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
@@ -104,7 +104,7 @@ describe "bundle cache with git" do
 
     bundle %(config local.foo #{lib_path("foo-1.0")})
     bundle "install"
-    bundle "cache --all"
+    bundle "cache"
 
     expect(bundled_app("vendor/cache/foo-invalid-#{ref}")).to exist
 
@@ -136,37 +136,11 @@ describe "bundle cache with git" do
     G
 
     ref = git.ref_for("master", 11)
-    bundle "cache --all", :expect_err => true
+    bundle "cache", :expect_err => true
 
     expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
     expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist
     should_be_installed "has_submodule 1.0"
-  end
-
-  it "displays warning message when detecting git repo in Gemfile" do
-    build_git "foo"
-
-    install_gemfile <<-G
-      gem "foo", :git => '#{lib_path("foo-1.0")}'
-    G
-
-    bundle "cache"
-
-    expect(out).to include("Your gems.rb contains path and git dependencies.")
-  end
-
-  it "does not display warning message if cache_all is set in bundle config" do
-    bundle "config cache_all true"
-    build_git "foo"
-
-    install_gemfile <<-G
-      gem "foo", :git => '#{lib_path("foo-1.0")}'
-    G
-
-    bundle "cache --all"
-    bundle "cache"
-
-    expect(out).not_to include("Your gems.rb contains path and git dependencies.")
   end
 
   it "caches pre-evaluated gemspecs" do
@@ -180,7 +154,7 @@ describe "bundle cache with git" do
     install_gemfile <<-G
       gem "foo", :git => '#{lib_path("foo-1.0")}'
     G
-    bundle "cache --all"
+    bundle "cache"
 
     ref = git.ref_for("master", 11)
     gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read

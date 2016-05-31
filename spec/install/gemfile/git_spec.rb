@@ -1118,7 +1118,7 @@ describe "bundle install with git sources" do
           gem 'foo'
         end
       G
-      bundle "cache --all"
+      bundle "cache"
       simulate_new_machine
 
       bundle "install", :env => { "PATH" => "" }

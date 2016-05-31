@@ -244,7 +244,6 @@ module Bundler
     end
 
     desc "cache [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
-    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "all-platforms", :type => :boolean, :banner =>
       "Include gems for all platforms present in the lockfile, not only the current one"
     method_option "cache-path", :type => :string, :banner =>

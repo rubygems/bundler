@@ -11,12 +11,6 @@ Copy all of the `.gem` files needed to run the application into the
 `vendor/cache` directory. In the future, when running [bundle install(1)][bundle-install],
 use the gems in the cache in preference to the ones on `rubygems.org`.
 
-## GIT AND PATH GEMS
-
-Since Bundler 1.2, the `bundle cache` command can also cache `:git` and
-`:path` dependencies besides .gem files. This needs to be explicitly enabled
-via the `--all` option. Once used, the `--all` option will be remembered.
-
 ## SUPPORT FOR MULTIPLE PLATFORMS
 
 When using gems that have different packages for different platforms, Bundler
