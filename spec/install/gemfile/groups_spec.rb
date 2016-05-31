@@ -400,8 +400,10 @@ describe "bundle install with groups" do
     end
 
     it "does not hit the remote a second time" do
+      pending "this test never passed, but that is a bug we should fix"
       FileUtils.rm_rf gem_repo2
       bundle "install"
+      expect(out).to_not include("Could not fetch specs")
       expect(err).to lack_errors
     end
   end
