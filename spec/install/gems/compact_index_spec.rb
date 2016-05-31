@@ -448,19 +448,6 @@ The checksum of /versions does not match the checksum provided by the server! So
       expect(out).not_to include("#{user}:#{password}")
     end
 
-    it "strips http basic auth creds when warning about ambiguous sources" do
-      gemfile <<-G
-        source "#{basic_auth_source_uri}"
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
-
-      bundle! :install, :artifice => "compact_index_basic_authentication"
-      expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
-      expect(out).not_to include("#{user}:#{password}")
-      should_be_installed "rack 1.0.0"
-    end
-
     it "does not pass the user / password to different hosts on redirect" do
       gemfile <<-G
         source "#{basic_auth_source_uri}"
