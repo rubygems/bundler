@@ -144,19 +144,12 @@ shared_examples "bundle install --standalone" do
       G
     end
 
-    it "still makes the gems available to normal bundler" do
-      let(:expected_gems) do
-        {
-          "actionpack" => "2.3.2",
-          "devise" => "1.0",
-          "rails" => "2.3.2",
-        }
-      end
-
-      # See CLI::Install#run.
-      with_config(:path => "bundle") do
-        should_be_installed "actionpack 2.3.2", "rails 2.3.2", "devise 1.0"
-      end
+    let(:expected_gems) do
+      {
+        "actionpack" => "2.3.2",
+        "devise" => "1.0",
+        "rails" => "2.3.2",
+      }
     end
 
     include_examples "common functionality"
@@ -285,9 +278,9 @@ shared_examples "bundle install --standalone" do
     end
   end
 
-  describe "with --binstubs" do
+  describe "with binstubs" do
     before do
-      install_gemfile <<-G, :standalone => true, :binstubs => true
+      install_gemfile <<-G, :standalone => true
         source "file://#{gem_repo1}"
         gem "rails"
       G
@@ -303,12 +296,14 @@ shared_examples "bundle install --standalone" do
     include_examples "common functionality"
 
     it "creates stubs that use the standalone load path" do
+      pending "standalone should probably always create binstubs now that --binstubs is gone"
       Dir.chdir(bundled_app) do
         expect(`bin/rails -v`.chomp).to eql "2.3.2"
       end
     end
 
     it "creates stubs that can be executed from anywhere" do
+      pending "standalone should probably always create binstubs now that --binstubs is gone"
       require "tmpdir"
       Dir.chdir(Dir.tmpdir) do
         expect(`#{bundled_app("bin/rails")} -v`.chomp).to eql "2.3.2"
@@ -316,6 +311,7 @@ shared_examples "bundle install --standalone" do
     end
 
     it "creates stubs with the correct load path" do
+      pending "standalone should probably always create binstubs now that --binstubs is gone"
       extension_line = File.read(bundled_app("bin/rails")).each_line.find {|line| line.include? "$:.unshift" }.strip
       expect(extension_line).to eq "$:.unshift File.expand_path '../../bundle', __FILE__"
     end
