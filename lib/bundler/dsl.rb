@@ -127,8 +127,8 @@ module Bundler
 
     def source(source, *args, &blk)
       options = args.last.is_a?(Hash) ? args.pop.dup : nil
-      if options && options.key?(:type) && !@plugin_dsl
-        unless Bundler::Plugin.source?(options[:type])
+      if options && options.key?(:type)
+        unless Plugin.source?(options[:type])
           raise "No sources available for #{options[:type]}"
         end
 
@@ -136,14 +136,13 @@ module Bundler
           raise InvalidOption, "You need to pass a block to #source with :type option"
         end
 
-        Bundler::Plugin.source(options[:type]).new.say_hi
-        throw "Source plugins are not implemented yet :P "
-      end
-
-      source = normalize_source(source)
-      if block_given?
+        source_opts = normalize_hash(options).merge("uri" => source)
+        with_source(@sources.add_plugin_source(options["type"], source_opts), &blk)
+      elsif block_given?
+        source = normalize_source(source)
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
+        source = normalize_source(source)
         check_primary_source_safety(@sources)
         @sources.add_rubygems_remote(source)
       end

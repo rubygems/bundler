@@ -2,7 +2,8 @@
 module Bundler
   class SourceList
     attr_reader :path_sources,
-      :git_sources
+      :git_sources,
+      :plugin_sources
 
     def initialize
       @path_sources       = []
@@ -25,6 +26,10 @@ module Bundler
 
     def add_rubygems_source(options = {})
       add_source_to_list Source::Rubygems.new(options), @rubygems_sources
+    end
+
+    def add_plugin_source(source, options = {})
+      add_source_to_list Plugin.source(source).new(options), @plugin_sources
     end
 
     def add_rubygems_remote(uri)
@@ -92,9 +97,10 @@ module Bundler
 
     def source_list_for(source)
       case source
-      when Source::Git      then git_sources
-      when Source::Path     then path_sources
-      when Source::Rubygems then rubygems_sources
+      when Source::Git          then git_sources
+      when Source::Path         then path_sources
+      when Source::Rubygems     then rubygems_sources
+      when Plugin::Base::Source then plugin_sources
       else raise ArgumentError, "Invalid source: #{source.inspect}"
       end
     end

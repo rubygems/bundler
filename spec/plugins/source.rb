@@ -22,6 +22,20 @@ describe "bundler source plugin" do
     G
 
     expect(out).to include("Installed plugin bundler-source-gitp")
+
+    expect(out).to include("Bundle complete!")
+  end
+
+  it "handles the source option", :focused do
+    build_git "ma-gitp-gem"
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      source "#{lib_path("ga-plugin-1.0")}", :type => :gitp do
+        gem "ma-gitp-gem"
+      end
+    G
+
+    expect(out).to include("Bundle complete!")
   end
 end
 
