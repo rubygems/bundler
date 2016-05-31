@@ -110,15 +110,16 @@ module Bundler
       end
 
       Installer.ambiguous_gems.to_a.each do |name, installed_from_uri, *also_found_in_uris|
-        Bundler.ui.error "Warning: the gem '#{name}' was found in multiple sources."
+        Bundler.ui.error "Error: the gem '#{name}' was found in multiple sources."
         Bundler.ui.error "Installed from: #{installed_from_uri}"
         Bundler.ui.error "Also found in:"
         also_found_in_uris.each {|uri| Bundler.ui.error "  * #{uri}" }
-        Bundler.ui.error "You should add a source requirement to restrict this gem to your preferred source."
+        Bundler.ui.error "You must add a source requirement to restrict this gem to your preferred source."
         Bundler.ui.error "For example:"
         Bundler.ui.error "    gem '#{name}', :source => '#{installed_from_uri}'"
         Bundler.ui.error "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
       end
+      raise GemfileError, "Some of your gems could be installed from more than one source, and Bundler can't tell which source you want to use. Gems have to be installed from just one source, so you'll need to set a source for that gem." if Installer.ambiguous_gems.any?
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
         require "bundler/cli/clean"
