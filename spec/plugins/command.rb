@@ -4,7 +4,7 @@ require "spec_helper"
 describe "command plugins" do
   it "executes without arguments" do
     build_repo2 do
-      build_plugin "command-mah"do |s|
+      build_plugin "command-mah" do |s|
         s.write "plugin.rb", <<-RUBY
           module Mah
             class Plugin < Bundler::Plugin::Api
@@ -28,7 +28,7 @@ describe "command plugins" do
 
   it "accepts the arguments" do
     build_repo2 do
-      build_plugin "the-echoer"do |s|
+      build_plugin "the-echoer" do |s|
         s.write "plugin.rb", <<-RUBY
           module Resonance
             class Echoer

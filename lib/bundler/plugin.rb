@@ -92,7 +92,6 @@ module Bundler
       # At present it only checks whether it contains plugin.rb file
       #
       # @param [Pathname] plugin_path the path plugin is installed at
-      #
       # @raise [Error] if plugin.rb file is not found
       def validate_plugin!(plugin_path)
         plugin_file = plugin_path.join(PLUGIN_FILE_NAME)
@@ -116,6 +115,9 @@ module Bundler
         @commands = commands
       end
 
+      # Executes the plugin.rb file
+      #
+      # @param [String] name of the plugin
       def load_plugin(name)
         # Need to ensure before this that plugin root where the rest of gems
         # are installed to be on load path to support plugin deps. Currently not

@@ -24,7 +24,7 @@ module Bundler
 
       common = commands & @commands.keys
       raise "Command(s) #{common.join(", ")} are already registered" if common.any?
-      commands.each{|c| @commands[c] = name }
+      commands.each {|c| @commands[c] = name }
 
       save_index
     end

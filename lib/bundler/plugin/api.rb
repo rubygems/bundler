@@ -8,6 +8,13 @@ module Bundler
   # interactions to methods of this class only. This will save them from breaking
   # when some internal change.
   #
+  # Currently we are delegating the methods defined in Bundler class to
+  # itself. So, this class acts as a buffer.
+  #
+  # If there is some change in the Bundler class that is incompatible to its
+  # previous behavior or if otherwise desired, we can reimplement(or implement)
+  # the method to preserve compatibility.
+  #
   # To use this, either the class can inherit this class or use it directly.
   # For example of both types of use, refer the file `spec/plugins/command.rb`
   #
@@ -39,11 +46,9 @@ module Bundler
       Bundler.tmp(File.join(["plugin", name]))
     end
 
-    # The bundler settings
-    #
-    # @return [Bundler::Setting] setting object of bundler
-    def settings
-      Bundler.settings
+    def method_missing(name, *args, &blk)
+      super unless Bundler.respond_to?(name)
+      Bundler.send(name, *args, &blk)
     end
   end
 end
