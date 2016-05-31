@@ -184,7 +184,7 @@ module Bundler
 
         # String without credentials, for printing
         def filter_string(string)
-          URICredentialsFilter.credential_filtered_string(command, uri)
+          URICredentialsFilter.credential_filtered_string(string, uri)
         end
 
         # Escape the URI for git commands
