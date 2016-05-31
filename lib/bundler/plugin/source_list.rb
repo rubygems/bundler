@@ -5,8 +5,8 @@ module Bundler
   # approptiate options to be used with Source classes for plugin installation
   class Plugin::SourceList < Bundler::SourceList
     def initialize
-      @rubygems_aggregate = Source::Rubygems.new :plugin => true
       super
+      @rubygems_aggregate = Source::Rubygems.new :plugin => true
     end
 
     def add_git_source(options = {})
