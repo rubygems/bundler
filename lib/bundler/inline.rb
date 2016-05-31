@@ -48,8 +48,17 @@ def gemfile(install = false, options = {}, &gemfile)
   def definition.lock(*); end
   definition.validate_ruby!
 
-  if install
-    Bundler.ui = ui
+  missing_specs = proc do
+    begin
+      !definition.missing_specs.empty?
+    rescue Bundler::GemNotFound
+      definition.instance_variable_set(:@index, nil)
+      true
+    end
+  end
+
+  Bundler.ui = ui if install
+  if install || missing_specs.call
     Bundler::Installer.install(Bundler.root, definition, :system => true)
     Bundler::Installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post-install message from #{name}:\n#{message}"
@@ -58,7 +67,7 @@ def gemfile(install = false, options = {}, &gemfile)
 
   runtime = Bundler::Runtime.new(nil, definition)
   runtime.setup.require
-
+ensure
   bundler_module = class << Bundler; self; end
-  bundler_module.send(:define_method, :root, old_root)
+  bundler_module.send(:define_method, :root, old_root) if old_root
 end
