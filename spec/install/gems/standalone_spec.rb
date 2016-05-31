@@ -129,7 +129,7 @@ shared_examples "bundle install --standalone" do
 
     it "outputs a helpful error message" do
       expect(out).to include("You have one or more invalid gemspecs that need to be fixed.")
-      expect(out).to include("bar 1.0 has an invalid gemspec")
+      expect(err).to include("bar 1.0 has an invalid gemspec")
     end
   end
 
