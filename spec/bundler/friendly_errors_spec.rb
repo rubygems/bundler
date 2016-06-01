@@ -23,10 +23,10 @@ describe Bundler, "friendly errors" do
 
       bundle :install, :env => { "DEBUG" => true }
 
-      expect(out).to include("Your RubyGems configuration")
-      expect(out).to include("invalid YAML syntax")
-      expect(out).to include("Psych::SyntaxError")
-      expect(out).not_to include("ERROR REPORT TEMPLATE")
+      expect(err).to include("Your RubyGems configuration")
+      expect(err).to include("invalid YAML syntax")
+      expect(err).to include("Psych::SyntaxError")
+      expect(err).not_to include("ERROR REPORT TEMPLATE")
       expect(exitstatus).to eq(25) if exitstatus
     end
 
