@@ -87,16 +87,12 @@ module Bundler
         @install_path ||= begin
           git_scope = "#{base_name}-#{shortref_for_path(revision)}"
 
-          if for_plugin?
-            path = Plugin.root.join("bundler", "gems", git_scope)
-          else
-            path = Bundler.install_path.join(git_scope)
+          path = Bundler.install_path.join(git_scope)
 
-            if !path.exist? && Bundler.requires_sudo?
-              Bundler.user_bundle_path.join(Bundler.ruby_scope).join(git_scope)
-            else
-              path
-            end
+          if !path.exist? && Bundler.requires_sudo?
+            Bundler.user_bundle_path.join(Bundler.ruby_scope).join(git_scope)
+          else
+            path
           end
         end
       end
@@ -174,7 +170,7 @@ module Bundler
           serialize_gemspecs_in(install_path)
           @copied = true
         end
-        generate_bin(spec) unless for_plugin?
+        generate_bin(spec)
 
         requires_checkout? ? spec.post_install_message : nil
       end
@@ -205,9 +201,7 @@ module Bundler
         @cache_path ||= begin
           git_scope = "#{base_name}-#{uri_hash}"
 
-          if for_plugin?
-            Plugin.cache.join("bundler", "git", git_scope)
-          elsif Bundler.requires_sudo?
+          if Bundler.requires_sudo?
             Bundler.user_bundle_path.join("cache/git", git_scope)
           else
             Bundler.cache.join("git", git_scope)

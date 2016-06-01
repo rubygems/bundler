@@ -7,14 +7,6 @@ module Bundler
 
     attr_accessor :dependency_names
 
-    def initialize
-      @options = {}
-    end
-
-    def for_plugin?
-      @options[:plugin]
-    end
-
     def unmet_deps
       specs.unmet_dependency_names
     end
@@ -22,7 +14,7 @@ module Bundler
     def version_message(spec)
       message = "#{spec.name} #{spec.version}"
 
-      if !for_plugin? && Bundler.locked_gems
+      if Bundler.locked_gems
         locked_spec = Bundler.locked_gems.specs.find {|s| s.name == spec.name }
         locked_spec_version = locked_spec.version if locked_spec
         if locked_spec_version && spec.version != locked_spec_version

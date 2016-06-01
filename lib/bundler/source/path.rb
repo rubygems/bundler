@@ -107,6 +107,10 @@ module Bundler
         name
       end
 
+      def root
+        Bundler.root
+      end
+
     private
 
       def expanded_path

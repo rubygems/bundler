@@ -7,6 +7,9 @@ module Bundler
   # but currently it itself handles everything as the Source's subclasses (e.g. Source::RubyGems)
   # are heavily dependent on the Gemfile.
   class Plugin::Installer
+    autoload :Rubygems, "bundler/plugin/installer/rubygems"
+    autoload :Git,      "bundler/plugin/installer/git"
+
     def install(name, options)
       if options[:git]
         install_git(name, options)
@@ -43,9 +46,8 @@ module Bundler
 
       options[:name] = name
       options[:uri] = uri
-      options[:plugin] = true
 
-      git_source = Source::Git.new options
+      git_source = Git.new options
       git_source.remote!
 
       git_source.install(git_source.specs.first)
@@ -62,7 +64,7 @@ module Bundler
     #
     # @return [String] the path where the plugin was installed
     def install_rubygems(name, source, version = [">= 0"])
-      rg_source = Source::Rubygems.new "remotes" => source, :plugin => true
+      rg_source = Rubygems.new "remotes" => source
       rg_source.remote!
       rg_source.dependency_names << name
 

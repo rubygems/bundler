@@ -6,15 +6,15 @@ module Bundler
   class Plugin::SourceList < Bundler::SourceList
     def initialize
       super
-      @rubygems_aggregate = Source::Rubygems.new :plugin => true
+      @rubygems_aggregate = Plugin::Installer::Rubygems.new
     end
 
     def add_git_source(options = {})
-      add_source_to_list Source::Git.new(options.merge(:plugin => true)), git_sources
+      add_source_to_list Plugin::Installer::Git.new(options), git_sources
     end
 
     def add_rubygems_source(options = {})
-      add_source_to_list Source::Rubygems.new(options.merge(:plugin => true)), @rubygems_sources
+      add_source_to_list Plugin::Installer::Rubygems.new(options), @rubygems_sources
     end
   end
 end
