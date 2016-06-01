@@ -138,7 +138,10 @@ module Bundler
   private
 
     def find_gemfile
-      find_file(ENV["BUNDLE_GEMFILE"], "gems.rb", "Gemfile")
+      env_path = ENV["BUNDLE_GEMFILE"]
+      return env_path if env_path && File.file?(env_path)
+
+      find_file(env_path, "gems.rb", "Gemfile")
     end
 
     def find_file(*names)
@@ -164,8 +167,7 @@ module Bundler
         end
 
         names.compact.each do |name|
-          filename = File.expand_path(File.join(current, name))
-          yield filename
+          yield File.expand_path(File.join(current, name))
         end
         previous = current
         current = File.expand_path("..", current)
