@@ -212,8 +212,8 @@ This also means that you cannot include different versions of the same
 gem in different groups, because doing so would result in different
 sets of dependencies used in development and production. Because of
 the vagaries of the dependency resolution process, this usually
-affects more than just the gems you list in your gems.rb(5), and can
-(surprisingly) radically change the gems you are using.
+affects more than the gems you explicitly list in your gems.rb(5),
+and can (surprisingly) radically change the gems you are using.
 
 ## LOCAL GIT REPOS
 

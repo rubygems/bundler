@@ -249,7 +249,7 @@ module Bundler
     method_option "cache-path", :type => :string, :banner =>
       "Specify a different cache path than the default (vendor/cache)."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of gems.rb"
-    method_option "no-install", :type => :boolean, :banner => "Don't actually install the gems, just cache."
+    method_option "no-install", :type => :boolean, :banner => "Don't install the gems, only cache them."
     method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     method_option "frozen", :type => :boolean, :banner =>

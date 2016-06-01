@@ -120,7 +120,7 @@ module Bundler
         Bundler.ui.error "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
       end
       raise GemfileError, "Some of your gems could be installed from more than one source, and Bundler " \
-        "can't tell which source you want to use. Gems have to be installed from just one source, so " \
+        "can't tell which source you want to use. Gems have to be installed from only one source, so " \
         "you'll need to set a source for that gem." if Installer.ambiguous_gems.any?
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
