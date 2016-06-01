@@ -32,7 +32,11 @@ module Bundler
       return pwd.join("gems.rb") if ENV["BUNDLE_INLINE"]
 
       gemfile = find_gemfile
-      raise GemfileNotFound, "Could not locate gems.rb" unless gemfile
+      if gemfile.nil?
+        gemfile_name = Bundler::ORIGINAL_ENV.fetch('BUNDLE_GEMFILE', 'gems.rb')
+        raise GemfileNotFound, "Could not locate #{gemfile_name}"
+      end
+
       deprecate_gemfile(gemfile)
       Pathname.new(gemfile)
     end
