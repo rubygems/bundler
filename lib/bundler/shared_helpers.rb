@@ -29,9 +29,11 @@ module Bundler
     end
 
     def default_gemfile
+      return pwd.join("gems.rb") if ENV["BUNDLE_INLINE"]
+
       gemfile = find_gemfile
-      deprecate_gemfile(gemfile)
       raise GemfileNotFound, "Could not locate gems.rb" unless gemfile
+      deprecate_gemfile(gemfile)
       Pathname.new(gemfile)
     end
 
