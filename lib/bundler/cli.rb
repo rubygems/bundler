@@ -491,6 +491,17 @@ module Bundler
       Doctor.new(options).run
     end
 
+    desc "pristine [GEMNAME ...] [OPTIONS]", "Restores installed gems to pristine condition from your "
+    method_option "skip", :type => :array, :default => [], :banner => "Used on --all, skip if name == gem_name"
+    method_option "extensions", :type => :boolean, :default => false, :banner =>
+        "If –extensions is given (but not –all or gem names) only gems with extensions will be restored."
+    method_option "no-extensions", :type => :boolean, :default => false, :banner =>
+        "If –no-extensions is provided pristine will not attempt to restore a gem with an extension."
+    def pristine(*gem_list)
+      require "bundler/cli/pristine"
+      Pristine.new(options, gem_list).run
+    end
+
     if Bundler.settings[:plugins]
       require "bundler/cli/plugin"
       desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"

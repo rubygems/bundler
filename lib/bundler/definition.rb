@@ -486,6 +486,17 @@ module Bundler
       raise InvalidOption, "Unable to remove the platform `#{platform}` since the only platforms are #{@platforms.join ", "}"
     end
 
+    def any_path_sources?
+      !sources.path_sources.empty?
+    end
+
+    def any_git_sources?
+      !sources.git_sources.empty?
+    end
+
+    def calculate_full_gem_list
+    end
+
     attr_reader :sources
     private :sources
 
