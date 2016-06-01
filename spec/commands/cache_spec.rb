@@ -2,7 +2,7 @@
 require "spec_helper"
 
 describe "bundle cache" do
-  context "with --gemfile" do
+  context "with BUNDLE_GEMFILE" do
     it "finds the gemfile" do
       gemfile bundled_app("NotGemfile"), <<-G
         source "file://#{gem_repo1}"
