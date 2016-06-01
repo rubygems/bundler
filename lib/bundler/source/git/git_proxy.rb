@@ -153,8 +153,10 @@ module Bundler
         def git(command, check_errors = true, error_msg = nil)
           raise GitNotAllowedError.new(filter_string(command)) unless allow?
 
-          out = SharedHelpers.with_clean_git_env { `git #{command}` }
-          raise GitCommandError.new(filter_string(command), path, error_msg) if check_errors && !$?.success?
+          out = SharedHelpers.with_clean_git_env { `git #{command} 2>&1` }
+          if check_errors && !$?.success?
+            raise GitCommandError.new(filter_string(command), path, error_msg || filter_string(out))
+          end
 
           filter_string(out)
         end

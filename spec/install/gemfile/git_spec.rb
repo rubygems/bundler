@@ -1165,6 +1165,8 @@ describe "bundle install with git sources" do
 
         bundle :install, :expect_err => true
         expect(err).to_not include("password1")
+        expect(err).to include("Git error")
+        expect(err).to include("Authentication failed")
         expect(out).to_not include("password1")
         expect(out).to include("Fetching https://user1@github.com/company/private-repo")
       end
