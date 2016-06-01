@@ -134,9 +134,7 @@ module Bundler
   private
 
     def find_gemfile
-      given = ENV["BUNDLE_GEMFILE"]
-      return given if given && !given.empty?
-      find_file("gems.rb", "Gemfile")
+      find_file(ENV["BUNDLE_GEMFILE"], "gems.rb", "Gemfile")
     end
 
     def find_file(*names)
@@ -161,7 +159,7 @@ module Bundler
           return nil if File.file?(File.join(current, "bundler.gemspec"))
         end
 
-        names.each do |name|
+        names.compact.each do |name|
           filename = File.join(current, name)
           yield filename
         end
