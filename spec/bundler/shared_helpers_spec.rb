@@ -111,10 +111,11 @@ describe Bundler::SharedHelpers do
     end
 
     context "ENV['BUNDLE_GEMFILE'] set" do
-      before { ENV["BUNDLE_GEMFILE"] = "/path/Gemfile" }
-
       it "returns ENV['BUNDLE_GEMFILE']" do
-        expect(subject.in_bundle?).to eq("/path/Gemfile")
+        ENV["BUNDLE_GEMFILE"] = "./Gemfile"
+        expected_gemfile = Pathname.new(ENV["BUNDLE_GEMFILE"]).expand_path
+        expected_gemfile.write("")
+        expect(subject.in_bundle?).to eq(expected_gemfile)
       end
     end
 
