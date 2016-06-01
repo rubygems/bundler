@@ -9,9 +9,8 @@ describe "bundle cache" do
         gem 'rack'
       G
 
-      bundle "cache --gemfile=NotGemfile"
-
       ENV["BUNDLE_GEMFILE"] = "NotGemfile"
+      bundle "cache"
       should_be_installed "rack 1.0.0"
     end
   end
