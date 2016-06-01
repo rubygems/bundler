@@ -364,9 +364,8 @@ describe "the lockfile format" do
 
     install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
       source "http://localgemserver.test/"
-      source "http://user:pass@othergemserver.test/"
-
       gem "rack-obama", ">= 1.0"
+      source "http://user:pass@othergemserver.test/" do; end
     G
 
     lockfile_should_be <<-G
