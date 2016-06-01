@@ -160,7 +160,7 @@ module Bundler
         end
 
         names.compact.each do |name|
-          filename = File.join(current, name)
+          filename = File.expand_path(File.join(current, name))
           yield filename
         end
         previous = current

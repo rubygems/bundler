@@ -12,19 +12,16 @@ describe Bundler::SharedHelpers do
   subject { Bundler::SharedHelpers }
 
   describe "#default_gemfile" do
-    before { ENV["BUNDLE_GEMFILE"] = "/path/Gemfile" }
-
     context "Gemfile is present" do
-      let(:expected_gemfile_path) { Pathname.new("/path/Gemfile") }
-
       it "returns the Gemfile path" do
-        expect(subject.default_gemfile).to eq(expected_gemfile_path)
+        ENV["BUNDLE_GEMFILE"] = "./Gemfile"
+        expected_gemfile = Pathname.new(ENV["BUNDLE_GEMFILE"]).expand_path
+        expected_gemfile.write("")
+        expect(subject.default_gemfile).to eq(expected_gemfile)
       end
     end
 
     context "Gemfile is not present" do
-      before { ENV["BUNDLE_GEMFILE"] = nil }
-
       it "raises a GemfileNotFound error" do
         expect { subject.default_gemfile }.to raise_error(
           Bundler::GemfileNotFound, "Could not locate gems.rb")
