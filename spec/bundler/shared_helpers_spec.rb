@@ -14,10 +14,9 @@ describe Bundler::SharedHelpers do
   describe "#default_gemfile" do
     context "Gemfile is present" do
       it "returns the Gemfile path" do
-        ENV["BUNDLE_GEMFILE"] = "./Gemfile"
-        expected_gemfile = Pathname.new(ENV["BUNDLE_GEMFILE"]).expand_path
-        expected_gemfile.write("")
-        expect(subject.default_gemfile).to eq(expected_gemfile)
+        expected = Pathname.pwd.join("gems.rb")
+        expected.write("")
+        expect(subject.default_gemfile).to eq(expected)
       end
     end
 
@@ -112,10 +111,9 @@ describe Bundler::SharedHelpers do
 
     context "ENV['BUNDLE_GEMFILE'] set" do
       it "returns ENV['BUNDLE_GEMFILE']" do
-        ENV["BUNDLE_GEMFILE"] = "./Gemfile"
-        expected_gemfile = Pathname.new(ENV["BUNDLE_GEMFILE"]).expand_path
-        expected_gemfile.write("")
-        expect(subject.in_bundle?).to eq(expected_gemfile)
+        ENV["BUNDLE_GEMFILE"] = "Gemfile"
+        File.write(ENV["BUNDLE_GEMFILE"], "")
+        expect(subject.in_bundle?).to eq(ENV["BUNDLE_GEMFILE"])
       end
     end
 
