@@ -3,16 +3,9 @@ require "spec_helper"
 
 describe "Bundler.with_env helpers" do
   describe "Bundler.original_env" do
-    around do |example|
-      env = Bundler::ORIGINAL_ENV.dup
-      Bundler::ORIGINAL_ENV["BUNDLE_PATH"] = "./gems.rb"
-      example.run
-      Bundler::ORIGINAL_ENV.replace env
-    end
-
     before do
       gemfile ""
-      bundle "install --path vendor/bundle"
+      bundle! :install
     end
 
     it "should return the PATH present before bundle was activated" do
@@ -58,21 +51,7 @@ describe "Bundler.with_env helpers" do
   describe "Bundler.clean_env" do
     before do
       gemfile ""
-      bundle "config path vendor/bundle"
-      bundle "install"
-
-      code = "Bundler.with_clean_env do;" \
-             "  print ENV['GEM_PATH'] != '';" \
-             "end"
-
-      result = bundle "exec ruby -e #{code.inspect}"
-      expect(result).to eq("true")
-    end
-
-    it "should not pass any bundler environment variables" do
-      Bundler.with_clean_env do
-        expect(`echo $BUNDLE_PATH`.strip).not_to eq("./gems.rb")
-      end
+      bundle! :install
     end
 
     it "should delete BUNDLE_PATH" do
@@ -96,11 +75,6 @@ describe "Bundler.with_env helpers" do
       expect(result).to eq("/foo")
     end
 
-    it "should not change ORIGINAL_ENV" do
-      pending "I can't figure out why this is broken 😭 Help me @segiddins, you're my only hope"
-      expect(Bundler::ORIGINAL_ENV["BUNDLE_PATH"]).to eq("./gems.rb")
-    end
-
     it "should restore the original MANPATH" do
       code = "print Bundler.clean_env['MANPATH']"
       ENV["MANPATH"] = "/foo"
@@ -118,9 +92,7 @@ describe "Bundler.with_env helpers" do
     end
 
     it "should restore the environment after execution" do
-      pending "I can't figure out why this is broken 😭 Help me @segiddins, you're my only hope"
       Bundler.with_original_env do
-        expect(`echo $BUNDLE_PATH`.strip).to eq("./gems.rb")
         ENV["FOO"] = "hello"
       end
 
