@@ -10,7 +10,7 @@ describe "bundle install" do
         gem "foo", :git => "#{lib_path("foo")}"
       G
 
-      bundle :install
+      bundle :install, :verbose => true
       expect(out).to include("Using foo 1.0 from #{lib_path("foo")} (at master@#{revision_for(lib_path("foo"))[0..6]})")
       should_be_installed "foo 1.0"
     end
@@ -35,10 +35,11 @@ describe "bundle install" do
           foo!
       L
 
-      bundle "install --path=vendor/bundle --without development"
+      bundle! "config without development"
+      bundle! :install
 
       expect(out).to include("Bundle complete!")
-      expect(vendored_gems("bundler/gems/foo-1.0-#{revision_for(lib_path("foo-1.0"))[0..11]}")).to be_directory
+      expect(default_bundle_path("bundler/gems/foo-1.0-#{revision_for(lib_path("foo-1.0"))[0..11]}")).to be_directory
     end
   end
 end
