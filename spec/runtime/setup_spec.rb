@@ -152,7 +152,7 @@ describe "Bundler.setup" do
         bundler_path.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
         tmp("rubygems/lib").to_s,
       ]
-      load_path.map! {|lp| lp.sub(/^#{system_gem_path}/, "") }
+      load_path.map! {|lp| lp.sub(/^#{default_bundle_path}/, "") }
 
       expect(load_path).to start_with(
         "/gems/rails-2.3.2/lib",
