@@ -33,7 +33,7 @@ module Bundler
 
       gemfile = find_gemfile
       if gemfile.nil?
-        gemfile_name = Bundler::ORIGINAL_ENV.fetch('BUNDLE_GEMFILE', 'gems.rb')
+        gemfile_name = ENV.fetch('BUNDLE_GEMFILE', 'gems.rb')
         raise GemfileNotFound, "Could not locate #{gemfile_name}"
       end
 
