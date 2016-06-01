@@ -310,12 +310,12 @@ describe "bundle install with gem sources" do
     it "gracefully handles error when rubygems server is unavailable" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        source "http://localhost:9384"
-
-        gem 'foo'
+        source "http://localhost:9384" do
+          gem 'foo'
+        end
       G
 
-      bundle :install
+      bundle :install, :expect_err => true
       expect(err).to include("Could not fetch specs from http://localhost:9384/")
       expect(err).not_to include("file://")
     end
