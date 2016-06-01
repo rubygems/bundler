@@ -136,9 +136,8 @@ describe "The library itself" do
   it "does not contain any warnings" do
     Dir.chdir(root.join("lib")) do
       exclusions = %w(
-        bundler/capistrano.rb
         bundler/gem_tasks.rb
-        bundler/vlad.rb
+        bundler/templates/gems.rb
       )
       lib_files = `git ls-files -z`.split("\x0").grep(/\.rb$/) - exclusions
       lib_files.reject! {|f| f.start_with?("bundler/vendor") }
