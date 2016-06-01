@@ -506,14 +506,14 @@ The checksum of /versions does not match the checksum provided by the server! So
 
       it "shows instructions if auth is not provided for the source" do
         bundle :install, :artifice => "compact_index_strict_basic_authentication"
-        expect(out).to include("bundle config #{source_hostname} username:password")
+        expect(err).to include("bundle config #{source_hostname} username:password")
       end
 
       it "fails if authentication has already been provided, but failed" do
         bundle "config #{source_hostname} #{user}:wrong"
 
         bundle :install, :artifice => "compact_index_strict_basic_authentication"
-        expect(out).to include("Bad username or password")
+        expect(err).to include("Bad username or password")
       end
     end
 
