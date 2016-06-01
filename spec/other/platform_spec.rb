@@ -121,11 +121,9 @@ G
     it "infers from .ruby-version" do
       gemfile <<-G
         source "file://#{gem_repo1}"
-
         gem "foo"
       G
-
-      bundled_app(".ruby-version").open("w") {|f| f.write "2.2.3\n" }
+      bundled_app(".ruby-version").write("2.2.3\n")
 
       bundle "platform --ruby"
 
