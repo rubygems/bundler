@@ -362,7 +362,7 @@ module Bundler
     def replace_bin_path(specs)
       gem_class = (class << Gem; self; end)
 
-      redefine_method(gem_class, :find_spec_for_exe) do |name, *args|
+      redefine_method(gem_class, :find_spec_for_exe, true) do |name, *args|
         exec_name = args.first
 
         spec = if exec_name
@@ -461,8 +461,8 @@ module Bundler
       end
     end
 
-    def redefine_method(klass, method, &block)
-      if klass.instance_methods(false).include?(method)
+    def redefine_method(klass, method, force_removal = false, &block)
+      if force_removal || klass.instance_methods.include?(method)
         klass.send(:remove_method, method)
       end
       klass.send(:define_method, method, &block)
