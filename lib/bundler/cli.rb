@@ -425,6 +425,8 @@ module Bundler
       "the path the lockfile should be written to"
     method_option "full-index", :type => :boolean, :default => false, :banner =>
       "Fall back to using the single-file index of all gems"
+    method_option "add-platform", :type => :array, :default => [], :banner =>
+      "add a new platform to the lockfile"
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run

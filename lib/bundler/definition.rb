@@ -87,8 +87,7 @@ module Bundler
       @unlock[:sources] ||= []
 
       current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
-      @new_platform = !@platforms.include?(current_platform)
-      @platforms |= [current_platform]
+      add_platform(current_platform)
 
       @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
@@ -431,6 +430,11 @@ module Bundler
 
         raise RubyVersionMismatch, msg
       end
+    end
+
+    def add_platform(platform)
+      @new_platform ||= !@platforms.include?(platform)
+      @platforms |= [platform]
     end
 
     attr_reader :sources
