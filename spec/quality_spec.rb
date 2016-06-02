@@ -131,12 +131,10 @@ describe "The library itself" do
   end
 
   it "does not include any leftover debugging or development mechanisms" do
-    included = /spec/
-    exempt = /quality\_spec\.rb/
+    exempt = %r{quality_spec.rb|support/helpers}
     error_messages = []
     Dir.chdir(File.expand_path("../", __FILE__)) do
       `git ls-files -z`.split("\x0").each do |filename|
-        next unless filename =~ included
         next if filename =~ exempt
         error_messages << check_for_debugging_mechanisms(filename)
       end
