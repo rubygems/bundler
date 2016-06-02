@@ -21,15 +21,14 @@ module Bundler
       @sources = []
       @cache = {}
       @specs = Hash.new {|h, k| h[k] = {} }
-      @all_specs = Hash.new {|h, k| h[k] = [] }
+      @all_specs = Hash.new {|h, k| h[k] = EMPTY_SEARCH }
     end
 
     def initialize_copy(o)
-      super
-      @sources = @sources.dup
+      @sources = o.sources.dup
       @cache = {}
       @specs = Hash.new {|h, k| h[k] = {} }
-      @all_specs = Hash.new {|h, k| h[k] = [] }
+      @all_specs = Hash.new {|h, k| h[k] = EMPTY_SEARCH }
 
       o.specs.each do |name, hash|
         @specs[name] = hash.dup
@@ -49,7 +48,7 @@ module Bundler
     end
 
     def search_all(name)
-      all_matches = @all_specs[name] + local_search(name)
+      all_matches = local_search(name) + @all_specs[name]
       @sources.each do |source|
         all_matches.concat(source.search_all(name))
       end
@@ -89,14 +88,15 @@ module Bundler
 
     def <<(spec)
       @specs[spec.name][spec.full_name] = spec
-
       spec
     end
 
     def each(&blk)
+      return enum_for(:each) unless blk
       specs.values.each do |spec_sets|
         spec_sets.values.each(&blk)
       end
+      sources.each {|s| s.each(&blk) }
     end
 
     # returns a list of the dependencies
@@ -116,9 +116,9 @@ module Bundler
       return unless other
       other.each do |s|
         if (dupes = search_by_spec(s)) && !dupes.empty?
-          @all_specs[s.name] = dupes + [s]
+          # safe to << since it's a new array when it has contents
+          @all_specs[s.name] = dupes << s
           next unless override_dupes
-          self << s
         end
         self << s
       end
@@ -153,7 +153,8 @@ module Bundler
     def search_by_dependency(dependency, base = nil)
       @cache[base || false] ||= {}
       @cache[base || false][dependency] ||= begin
-        specs = specs_by_name(dependency.name) + (base || [])
+        specs = specs_by_name(dependency.name)
+        specs += base if base
         found = specs.select do |spec|
           if base # allow all platforms when searching from a lockfile
             dependency.matches_spec?(spec)
@@ -173,25 +174,11 @@ module Bundler
       end
     end
 
+    EMPTY_SEARCH = [].freeze
+
     def search_by_spec(spec)
       spec = @specs[spec.name][spec.full_name]
-      spec ? [spec] : []
-    end
-
-    if RUBY_VERSION < "1.9"
-      def same_version?(a, b)
-        regex = /^(.*?)(?:\.0)*$/
-        a.to_s[regex, 1] == b.to_s[regex, 1]
-      end
-    else
-      def same_version?(a, b)
-        a == b
-      end
-    end
-
-    def spec_satisfies_dependency?(spec, dep)
-      return false unless dep.name == spec.name
-      dep.requirement.satisfied_by?(spec.version)
+      spec ? [spec] : EMPTY_SEARCH
     end
   end
 end
