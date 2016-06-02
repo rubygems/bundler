@@ -35,6 +35,22 @@ describe "The library itself" do
     "#{filename} has debugging mechanisms (like binding.pry, sleep, debugger, rspec focusing, etc.) on lines #{failing_lines.join(", ")}"
   end
 
+  def check_for_git_merge_conflicts(filename)
+    merge_conflicts_regex = /
+      <<<<<<<|
+      =======|
+      >>>>>>>
+    /x
+
+    failing_lines = []
+    File.readlines(filename).each_with_index do |line, number|
+      failing_lines << number + 1 if line =~ merge_conflicts_regex
+    end
+
+    return if failing_lines.empty?
+    "#{filename} has unresolved git merge conflicts on lines #{failing_lines.join(", ")}"
+  end
+
   def check_for_tab_characters(filename)
     failing_lines = []
     File.readlines(filename).each_with_index do |line, number|
@@ -115,14 +131,24 @@ describe "The library itself" do
   end
 
   it "does not include any leftover debugging or development mechanisms" do
-    included = /spec/
-    exempt = /quality\_spec\.rb/
+    exempt = %r{quality_spec.rb|support/helpers}
     error_messages = []
     Dir.chdir(File.expand_path("../", __FILE__)) do
       `git ls-files -z`.split("\x0").each do |filename|
-        next unless filename =~ included
         next if filename =~ exempt
         error_messages << check_for_debugging_mechanisms(filename)
+      end
+    end
+    expect(error_messages.compact).to be_well_formed
+  end
+
+  it "does not include any unresolved merge conflicts" do
+    error_messages = []
+    exempt = %r{lock/lockfile_spec|quality_spec}
+    Dir.chdir(File.expand_path("../", __FILE__)) do
+      `git ls-files -z`.split("\x0").each do |filename|
+        next if filename =~ exempt
+        error_messages << check_for_git_merge_conflicts(filename)
       end
     end
     expect(error_messages.compact).to be_well_formed
