@@ -255,7 +255,7 @@ module Bundler
           nested = []
           results.each do |spec|
             version, specs = nested.last
-            if  version == spec.version
+            if version == spec.version
               specs << spec
             else
               nested << [spec.version, [spec]]
