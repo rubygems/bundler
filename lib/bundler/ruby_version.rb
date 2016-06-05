@@ -38,6 +38,24 @@ module Bundler
       output
     end
 
+    # @private
+    PATTERN = %r{
+      ruby\s
+      ([\d.]+) # ruby version
+      (?:p(\d+))? # optional patchlevel
+      (?: \((\S+) (.+)\))? # optional engine info
+    }xo
+
+    # Returns a RubyVersion from the given string.
+    # @param [String] the version string to match.
+    # @return [RubyVersion,Nil] The version if the string is a valid RubyVersion
+    #         description, and nil otherwise.
+    def self.from_string(string)
+      if string =~ PATTERN
+        new($1, $2, $3, $4)
+      end
+    end
+
     def single_version_string
       to_s(gem_version)
     end
