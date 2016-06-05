@@ -42,7 +42,7 @@ describe "bundle lock" do
           with_license (1.0)
 
       PLATFORMS
-        ruby
+        #{local}
 
       DEPENDENCIES
         foo
@@ -102,5 +102,12 @@ describe "bundle lock" do
     bundle "lock --update rails rake"
 
     expect(read_lockfile).to eq(@lockfile)
+  end
+
+  it "supports adding new platforms" do
+    bundle! "lock --add-platform java x86-mingw32"
+
+    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    expect(lockfile.platforms).to eq([java, local, mingw])
   end
 end

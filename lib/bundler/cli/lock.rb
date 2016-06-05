@@ -26,6 +26,11 @@ module Bundler
         definition = Bundler.definition(true)
       end
 
+      options["add-platform"].each do |platform|
+        platform = Gem::Platform.new(platform)
+        definition.add_platform(platform)
+      end
+
       definition.resolve_remotely! unless options[:local]
 
       if print
