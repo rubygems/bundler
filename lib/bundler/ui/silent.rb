@@ -1,6 +1,10 @@
+# frozen_string_literal: true
 module Bundler
   module UI
     class Silent
+      def add_color(string, color)
+      end
+
       def info(message, newline = nil)
       end
 

@@ -1,7 +1,7 @@
+# frozen_string_literal: true
 module Bundler
   module GemHelpers
-
-    GENERIC_CACHE = {}
+    GENERIC_CACHE = {} # rubocop:disable MutableConstant
     GENERICS = [
       [Gem::Platform.new("java"), Gem::Platform.new("java")],
       [Gem::Platform.new("mswin32"), Gem::Platform.new("mswin32")],
@@ -10,7 +10,7 @@ module Bundler
       [Gem::Platform.new("x64-mingw32"), Gem::Platform.new("x64-mingw32")],
       [Gem::Platform.new("x86_64-mingw32"), Gem::Platform.new("x64-mingw32")],
       [Gem::Platform.new("mingw32"), Gem::Platform.new("x86-mingw32")]
-    ]
+    ].freeze
 
     def generic(p)
       return p if p == Gem::Platform::RUBY
@@ -22,5 +22,11 @@ module Bundler
         found || Gem::Platform::RUBY
       end
     end
+    module_function :generic
+
+    def generic_local_platform
+      generic(Gem::Platform.local)
+    end
+    module_function :generic_local_platform
   end
 end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "require 'bundler/gem_tasks'" do
@@ -25,11 +26,18 @@ describe "require 'bundler/gem_tasks'" do
     expect(err).to eq("")
     expected_tasks = [
       "rake build",
+      "rake clean",
+      "rake clobber",
       "rake install",
       "rake release[remote]",
     ]
     tasks = out.lines.to_a.map {|s| s.split("#").first.strip }
     expect(tasks & expected_tasks).to eq(expected_tasks)
     expect(exitstatus).to eq(0) if exitstatus
+  end
+
+  it "adds 'pkg' to rake/clean's CLOBBER" do
+    require "bundler/gem_tasks"
+    expect(CLOBBER).to include("pkg")
   end
 end

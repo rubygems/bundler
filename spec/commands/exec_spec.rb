@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle exec" do
@@ -102,8 +103,9 @@ describe "bundle exec" do
       f.puts "echo foobar"
     end
     File.chmod(0744, "--verbose")
-    ENV["PATH"] = "."
-    bundle "exec -- --verbose"
+    with_path_as(".") do
+      bundle "exec -- --verbose"
+    end
     expect(out).to eq("foobar")
   end
 
@@ -131,13 +133,13 @@ describe "bundle exec" do
       G
     end
 
-    bundle "exec rackup"
+    bundle! "exec rackup", :expect_err => true
 
     expect(out).to eq("0.9.1")
     expect(err).to match("deprecated")
 
     Dir.chdir bundled_app2 do
-      bundle "exec rackup"
+      bundle! "exec rackup"
       expect(out).to eq("1.0.0")
     end
   end
@@ -323,5 +325,144 @@ describe "bundle exec" do
     bundle "config auto_install 1"
     bundle "exec rackup"
     expect(out).to include("Installing foo 1.0")
+  end
+
+  describe "with gems bundled via :path with invalid gemspecs" do
+    it "outputs the gemspec validation errors", :rubygems => ">= 1.7.2" do
+      build_lib "foo"
+
+      gemspec = lib_path("foo-1.0").join("foo.gemspec").to_s
+      File.open(gemspec, "w") do |f|
+        f.write <<-G
+          Gem::Specification.new do |s|
+            s.name    = 'foo'
+            s.version = '1.0'
+            s.summary = 'TODO: Add summary'
+            s.authors = 'Me'
+          end
+        G
+      end
+
+      install_gemfile <<-G, :expect_err => true
+        gem "foo", :path => "#{lib_path("foo-1.0")}"
+      G
+
+      bundle "exec irb", :expect_err => true
+
+      expect(err).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
+      expect(err).to match('"TODO" is not a summary')
+    end
+  end
+
+  describe "with gems bundled for deployment" do
+    it "works when calling bundler from another script" do
+      gemfile <<-G
+      module Monkey
+        def bin_path(a,b,c)
+          raise Gem::GemNotFoundException.new('Fail')
+        end
+      end
+      Bundler.rubygems.extend(Monkey)
+      G
+      bundle "install --deployment"
+      bundle "exec ruby -e '`../../exe/bundler -v`; puts $?.success?'"
+      expect(out).to match("true")
+    end
+  end
+
+  context "`load`ing a ruby file instead of `exec`ing" do
+    let(:path) { bundled_app("ruby_executable") }
+    let(:shebang) { "#!/usr/bin/env ruby" }
+    let(:executable) { <<-RUBY.gsub(/^ */, "").strip }
+      #{shebang}
+
+      require "rack"
+      puts "EXEC: \#{caller.grep(/load/).empty? ? 'exec' : 'load'}"
+      puts "ARGS: \#{$0} \#{ARGV.join(' ')}"
+      puts "RACK: \#{RACK}"
+    RUBY
+
+    before do
+      path.open("w") {|f| f << executable }
+      path.chmod(0755)
+
+      install_gemfile <<-G
+        gem "rack"
+      G
+    end
+
+    let(:exec) { "EXEC: load" }
+    let(:args) { "ARGS: #{path} arg1 arg2" }
+    let(:rack) { "RACK: 1.0.0" }
+    let(:exit_code) { 0 }
+    let(:expected) { [exec, args, rack].join("\n") }
+    let(:expected_err) { "" }
+
+    subject { bundle "exec #{path} arg1 arg2", :expect_err => true }
+
+    shared_examples_for "it runs" do
+      it "like a normally executed executable" do
+        subject
+        expect(exitstatus).to eq(exit_code) if exitstatus
+        expect(err).to eq(expected_err)
+        expect(out).to eq(expected)
+      end
+    end
+
+    it_behaves_like "it runs"
+
+    context "the executable exits explicitly" do
+      let(:executable) { super() << "\nexit #{exit_code}\nputs 'POST_EXIT'\n" }
+
+      context "with exit 0" do
+        it_behaves_like "it runs"
+      end
+
+      context "with exit 99" do
+        let(:exit_code) { 99 }
+        it_behaves_like "it runs"
+      end
+    end
+
+    context "the executable raises" do
+      let(:executable) { super() << "\nraise 'ERROR'" }
+      let(:exit_code) { 1 }
+      let(:expected_err) do
+        "bundler: failed to load command: #{path} (#{path})\n" \
+          "RuntimeError: ERROR\n  #{path}:7" +
+          (Bundler.current_ruby.ruby_18? ? "" : ":in `<top (required)>'")
+      end
+      it_behaves_like "it runs"
+    end
+
+    context "when the file uses the current ruby shebang" do
+      let(:shebang) { "#!#{Gem.ruby}" }
+      it_behaves_like "it runs"
+    end
+
+    context "when Bundler.setup fails" do
+      before do
+        gemfile <<-G
+          gem 'rack', '2'
+        G
+        ENV["BUNDLER_FORCE_TTY"] = "true"
+      end
+
+      let(:exit_code) { Bundler::GemNotFound.new.status_code }
+      let(:expected) { "" }
+      let(:expected_err) { <<-EOS.strip }
+\e[31mCould not find gem 'rack (= 2)' in any of the gem sources listed in your gems.rb or available on this machine.\e[0m
+\e[33mRun `bundle install` to install missing gems.\e[0m
+      EOS
+
+      it_behaves_like "it runs"
+    end
+
+    context "when the executable exits non-zero via at_exit" do
+      let(:executable) { super() + "\n\nat_exit { $! ? raise($!) : exit(1) }" }
+      let(:exit_code) { 1 }
+
+      it_behaves_like "it runs"
+    end
   end
 end

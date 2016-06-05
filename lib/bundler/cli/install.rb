@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Install
     attr_reader :options
@@ -11,11 +12,10 @@ module Bundler
       warn_if_root
 
       [:with, :without].each do |option|
-        if options[option]
-          Bundler.ui.error "You have specified a `#{option}` group with the " \
-            "`#{option}` flag. Please use `bundle config #{option} #{options[option]}` instead."
-          exit 1
-        end
+        next unless options[option]
+        Bundler.ui.error "You have specified a `#{option}` group with the " \
+          "`#{option}` flag. Please use `bundle config #{option} #{options[option]}` instead."
+        exit 1
       end
 
       if options[:cache]
@@ -23,21 +23,24 @@ module Bundler
          "install --cache`."
         exit 1
       end
+
       if options[:system]
         Bundler.ui.error "Please use `bundle config path.system true` " \
           "instead of `bundle install --system`"
       end
-
-      ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
-
-      # Just disable color in deployment mode
-      Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
 
       if options[:path]
         Bundler.ui.error "You have specified an installation path with the "\
          "path flag. Please use `bundle config path #{options[:path]}` instead."
         exit 1
       end
+
+      ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
+
+      # Disable color in deployment mode
+      Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
+
+      check_for_options_conflicts
 
       if options["trust-policy"]
         unless Bundler.rubygems.security_policies.keys.include?(options["trust-policy"])
@@ -58,9 +61,7 @@ module Bundler
                                  "before deploying."
         end
 
-        if Bundler.app_cache.exist?
-          options[:local] = true
-        end
+        options[:local] = true if Bundler.app_cache.exist?
 
         Bundler.settings[:frozen] = "1"
       end
@@ -71,7 +72,7 @@ module Bundler
         options[:system] = true
       end
 
-      Bundler.settings[:path]     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
+      Bundler.settings[:path] = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
 
       Bundler.settings[:path] ||= "bundle" if options["standalone"]
       Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
@@ -90,7 +91,7 @@ module Bundler
       Installer.install(Bundler.root, definition, options)
       Bundler.load.cache if Bundler.app_cache.exist? && Bundler.settings[:cache] && !Bundler.settings[:frozen]
 
-      Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" if Installer.using_gems.size > 0
+      Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" unless Installer.using_gems.empty?
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
       confirm_without_groups
 
@@ -109,15 +110,18 @@ module Bundler
       end
 
       Installer.ambiguous_gems.to_a.each do |name, installed_from_uri, *also_found_in_uris|
-        Bundler.ui.error "Warning: the gem '#{name}' was found in multiple sources."
+        Bundler.ui.error "Error: the gem '#{name}' was found in multiple sources."
         Bundler.ui.error "Installed from: #{installed_from_uri}"
         Bundler.ui.error "Also found in:"
         also_found_in_uris.each {|uri| Bundler.ui.error "  * #{uri}" }
-        Bundler.ui.error "You should add a source requirement to restrict this gem to your preferred source."
+        Bundler.ui.error "You must add a source requirement to restrict this gem to your preferred source."
         Bundler.ui.error "For example:"
         Bundler.ui.error "    gem '#{name}', :source => '#{installed_from_uri}'"
         Bundler.ui.error "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
       end
+      raise GemfileError, "Some of your gems could be installed from more than one source, and Bundler " \
+        "can't tell which source you want to use. Gems have to be installed from only one source, so " \
+        "you'll need to set a source for that gem." if Installer.ambiguous_gems.any?
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
         require "bundler/cli/clean"
@@ -136,22 +140,24 @@ module Bundler
         WARN
       end
       raise e
+    rescue Gem::InvalidSpecificationException => e
+      Bundler.ui.warn "You have one or more invalid gemspecs that need to be fixed."
+      raise e
     end
 
   private
 
     def warn_if_root
-      return if Bundler::WINDOWS || !Process.uid.zero?
+      return if Bundler.settings[:silence_root_warning] || Bundler::WINDOWS || !Process.uid.zero?
       Bundler.ui.warn "Don't run Bundler as root. Bundler can ask for sudo " \
         "if it is needed, and installing your bundle as root will break this " \
         "application for all non-root users on this machine.", :wrap => true
     end
 
     def confirm_without_groups
-      if Bundler.settings.without.any?
-        require "bundler/cli/common"
-        Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
-      end
+      return unless Bundler.settings.without.any?
+      require "bundler/cli/common"
+      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
     end
 
     def dependencies_count_for(definition)
@@ -167,6 +173,15 @@ module Bundler
     def print_post_install_message(name, msg)
       Bundler.ui.confirm "Post-install message from #{name}:"
       Bundler.ui.info msg
+    end
+
+    def check_for_options_conflicts
+      if (options[:path] || options[:deployment]) && options[:system]
+        error_message = String.new
+        error_message << "You have specified both a path to install your gems to as well as --system. Please choose.\n" if options[:path]
+        error_message << "You have specified both --deployment as well as --system. Please choose.\n" if options[:deployment]
+        raise InvalidOption.new(error_message)
+      end
     end
   end
 end

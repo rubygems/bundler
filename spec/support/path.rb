@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "pathname"
 
 module Spec
@@ -50,7 +51,7 @@ module Spec
     def download_cache_source_dir(source)
       uri  = URI(source.to_s)
       port = uri.port unless uri.port == 80
-      path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r|\A/?\Z|
+      path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r{\A/?\Z}
       [uri.hostname, port, path].compact.join(".")
     end
 
@@ -66,7 +67,7 @@ module Spec
     # @return [Pathname] The global cache path.
     #
     def download_cache(source, *path)
-      home(".bundler/cache", download_cache_source_dir(source), *path)
+      home(".bundle/cache", download_cache_source_dir(source), *path)
     end
 
     def base_system_gems

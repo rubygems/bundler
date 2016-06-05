@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "thread"
 
 module Bundler
@@ -11,15 +12,24 @@ module Bundler
       end
     end
 
+    # @return [String] the name of the worker
+    attr_reader :name
+
     # Creates a worker pool of specified size
     #
     # @param size [Integer] Size of pool
+    # @param name [String] name the name of the worker
     # @param func [Proc] job to run in inside the worker pool
-    def initialize(size, func)
+    def initialize(size, name, func)
+      @name = name
       @request_queue = Queue.new
       @response_queue = Queue.new
       @func = func
-      @threads = size.times.map {|i| Thread.start { process_queue(i) } }
+      @threads = Array.new(size) do |i|
+        Thread.start { process_queue(i) }.tap do |thread|
+          thread.name = "#{name} Worker ##{i}" if thread.respond_to?(:name=)
+        end
+      end
       trap("INT") { abort_threads }
     end
 

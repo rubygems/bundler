@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Update
     attr_reader :options, :gems
@@ -12,7 +13,7 @@ module Bundler
       sources = Array(options[:source])
       groups  = Array(options[:group]).map(&:to_sym)
 
-      if gems.empty? && sources.empty? && groups.empty?
+      if gems.empty? && sources.empty? && groups.empty? && !options[:ruby]
         # We're doing a full update
         Bundler.definition(true)
       else
@@ -20,7 +21,7 @@ module Bundler
           raise GemfileLockNotFound, "This Bundle hasn't been installed yet. " \
             "Run `bundle install` to update and install the bundled gems."
         end
-        # cycle through the requested gems, just to make sure they exist
+        # cycle through the requested gems, to make sure they exist
         names = Bundler.locked_gems.specs.map(&:name)
         gems.each do |g|
           next if names.include?(g)
@@ -30,10 +31,10 @@ module Bundler
 
         if groups.any?
           specs = Bundler.definition.specs_for groups
-          sources.concat(specs.map(&:name))
+          gems.concat(specs.map(&:name))
         end
 
-        Bundler.definition(:gems => gems, :sources => sources)
+        Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby])
       end
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]
@@ -56,7 +57,7 @@ module Bundler
         Bundler::CLI::Clean.new(options).run
       end
 
-      Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" if Installer.using_gems.size > 0
+      Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" unless Installer.using_gems.empty?
       Bundler.ui.confirm "Bundle updated!"
       without_groups_messages
     end
@@ -64,10 +65,9 @@ module Bundler
   private
 
     def without_groups_messages
-      if Bundler.settings.without.any?
-        require "bundler/cli/common"
-        Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
-      end
+      return unless Bundler.settings.without.any?
+      require "bundler/cli/common"
+      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
     end
   end
 end

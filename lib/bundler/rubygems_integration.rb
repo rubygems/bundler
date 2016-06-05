@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "monitor"
 require "rubygems"
 require "rubygems/config_file"
@@ -34,6 +35,10 @@ module Bundler
       Gem::Command.build_args = args
     end
 
+    def load_path_insert_index
+      Gem.load_path_insert_index
+    end
+
     def loaded_specs(name)
       Gem.loaded_specs[name]
     end
@@ -49,8 +54,21 @@ module Bundler
 
     def validate(spec)
       Bundler.ui.silence { spec.validate(false) }
+    rescue Gem::InvalidSpecificationException => e
+      error_message = "The gemspec at #{spec.loaded_from} is not valid. Please fix this gemspec.\n" \
+        "The validation error was '#{e.message}'\n"
+      raise Gem::InvalidSpecificationException.new(error_message)
     rescue Errno::ENOENT
       nil
+    end
+
+    def set_installed_by_version(spec, installed_by_version = Gem::VERSION)
+      return unless spec.respond_to?(:installed_by_version=)
+      spec.installed_by_version = Gem::Version.create(installed_by_version)
+    end
+
+    def spec_missing_extensions?(spec)
+      !spec.respond_to?(:missing_extensions?) || spec.missing_extensions?
     end
 
     def path(obj)
@@ -62,11 +80,15 @@ module Bundler
     end
 
     def configuration
+      require "bundler/psyched_yaml"
       Gem.configuration
-    rescue Gem::SystemExitException => e
+    rescue Gem::SystemExitException, LoadError => e
       Bundler.ui.error "#{e.class}: #{e.message}"
       Bundler.ui.trace e
-      raise Gem::SystemExitException
+      raise
+    rescue YamlLibrarySyntaxError => e
+      raise YamlSyntaxError.new(e, "Your RubyGems configuration, which is " \
+        "usually located in ~/.gemrc, contains invalid YAML syntax.")
     end
 
     def ruby_engine
@@ -131,7 +153,7 @@ module Bundler
     end
 
     def repository_subdirectories
-      %w[cache doc gems specifications]
+      %w(cache doc gems specifications)
     end
 
     def clear_paths
@@ -177,21 +199,29 @@ module Bundler
     def fetch_prerelease_specs
       fetch_specs(false, true)
     rescue Gem::RemoteFetcher::FetchError
-      [] # if we can't download them, there aren't any
+      {} # if we can't download them, there aren't any
     end
 
-    def fetch_all_remote_specs
+    # TODO: This is for older versions of Rubygems... should we support the
+    # X-Gemfile-Source header on these old versions?
+    # Maybe the newer implementation will work on older Rubygems?
+    # It seems difficult to keep this implementation and still send the header.
+    def fetch_all_remote_specs(remote)
+      old_sources = Bundler.rubygems.sources
+      Bundler.rubygems.sources = [remote.uri.to_s]
       # Fetch all specs, minus prerelease specs
       spec_list = fetch_specs(true, false)
       # Then fetch the prerelease specs
-      fetch_prerelease_specs.each {|k, v| spec_list[k] += v }
+      fetch_prerelease_specs.each {|k, v| spec_list[k].push(*v) }
 
-      spec_list
+      spec_list.values.first
+    ensure
+      Bundler.rubygems.sources = old_sources
     end
 
     def with_build_args(args)
       ext_lock.synchronize do
-        old_args = self.build_args
+        old_args = build_args
         begin
           self.build_args = args
           yield
@@ -239,7 +269,7 @@ module Bundler
     end
 
     def security_policy_keys
-      %w{High Medium Low AlmostNo No}.map {|level| "#{level}Security" }
+      %w(High Medium Low AlmostNo No).map {|level| "#{level}Security" }
     end
 
     def security_policies
@@ -270,7 +300,7 @@ module Bundler
 
       ::Kernel.send(:define_method, :gem) do |dep, *reqs|
         if executables.include? File.basename(caller.first.split(":").first)
-          return
+          break
         end
         reqs.pop if reqs.last.is_a?(Hash)
 
@@ -331,27 +361,31 @@ module Bundler
     # +specs+
     def replace_bin_path(specs)
       gem_class = (class << Gem; self; end)
-      redefine_method(gem_class, :bin_path) do |name, *args|
+
+      redefine_method(gem_class, :find_spec_for_exe) do |name, *args|
         exec_name = args.first
 
-        if exec_name == "bundle"
-          return ENV["BUNDLE_BIN_PATH"]
-        end
-
-        spec = nil
-
-        if exec_name
-          spec = specs.find {|s| s.executables.include?(exec_name) }
-          spec or raise Gem::Exception, "can't find executable #{exec_name}"
-          unless spec.name == name
-            warn "Bundler is using a binstub that was created for a different gem.\n" \
-              "This is deprecated, in future versions you may need to `bundle binstub #{name}` " \
-              "to work around a system/bundle conflict."
-          end
+        spec = if exec_name
+          specs.find {|s| s.executables.include?(exec_name) }
         else
-          spec = specs.find {|s| s.name == name }
-          exec_name = spec.default_executable or raise Gem::Exception, "no default executable for #{spec.full_name}"
+          specs.find {|s| s.name == name }
         end
+        raise(Gem::Exception, "can't find executable #{exec_name}") unless spec
+        raise Gem::Exception, "no default executable for #{spec.full_name}" unless exec_name ||= spec.default_executable
+        unless spec.name == name
+          warn "Bundler is using a binstub that was created for a different gem.\n" \
+            "This is deprecated, in future versions you may need to `bundle binstub #{name}` " \
+            "to work around a system/bundle conflict."
+        end
+        spec
+      end
+
+      redefine_method(gem_class, :bin_path) do |name, *args|
+        exec_name = args.first
+        return ENV["BUNDLE_BIN_PATH"] if exec_name == "bundle"
+
+        spec = find_spec_for_exe(name, *args)
+        exec_name ||= spec.default_executable
 
         gem_bin = File.join(spec.full_gem_path, spec.bindir, exec_name)
         gem_from_path_bin = File.join(File.dirname(spec.loaded_from), spec.bindir, exec_name)
@@ -488,9 +522,7 @@ module Bundler
         # Missing summary is downgraded to a warning in later versions,
         # so we set it to an empty string to prevent an exception here.
         spec.summary ||= ""
-        Bundler.ui.silence { spec.validate(false) }
-      rescue Errno::ENOENT
-        nil
+        RubygemsIntegration.instance_method(:validate).bind(self).call(spec)
       end
     end
 
@@ -499,9 +531,9 @@ module Bundler
       def stub_rubygems(specs)
         Gem::Specification.all = specs
 
-        Gem.post_reset {
+        Gem.post_reset do
           Gem::Specification.all = specs
-        }
+        end
 
         stub_source_index(specs)
       end
@@ -556,38 +588,38 @@ module Bundler
         Gem::Specification.find_all_by_name name
       end
 
-      def fetch_specs(source, name)
+      def fetch_specs(source, remote, name)
         path = source + "#{name}.#{Gem.marshal_version}.gz"
-        string = Gem::RemoteFetcher.fetcher.fetch_path(path)
+        fetcher = gem_remote_fetcher
+        fetcher.headers = { "X-Gemfile-Source" => remote.original_uri.to_s } if remote.original_uri
+        string = fetcher.fetch_path(path)
         Bundler.load_marshal(string)
       rescue Gem::RemoteFetcher::FetchError => e
         # it's okay for prerelease to fail
         raise e unless name == "prerelease_specs"
       end
 
-      def fetch_all_remote_specs
-        # Since SpecFetcher now returns NameTuples, we just fetch directly
-        # and unmarshal the array ourselves.
-        hash = {}
+      def fetch_all_remote_specs(remote)
+        source = remote.uri.is_a?(URI) ? remote.uri : URI.parse(source.to_s)
 
-        Gem.sources.each do |source|
-          source = URI.parse(source.to_s) unless source.is_a?(URI)
-          hash[source] = fetch_specs(source, "specs")
+        specs = fetch_specs(source, remote, "specs")
+        pres = fetch_specs(source, remote, "prerelease_specs") || []
 
-          pres = fetch_specs(source, "prerelease_specs")
-          hash[source].push(*pres) if pres && !pres.empty?
-        end
-
-        hash
+        specs.push(*pres)
       end
 
       def download_gem(spec, uri, path)
-        require "resolv"
         uri = Bundler.settings.mirror_for(uri)
+        fetcher = gem_remote_fetcher
+        fetcher.headers = { "X-Gemfile-Source" => spec.remote.original_uri.to_s } if spec.remote.original_uri
+        fetcher.download(spec, uri, path)
+      end
+
+      def gem_remote_fetcher
+        require "resolv"
         proxy = configuration[:http_proxy]
         dns = Resolv::DNS.new
-        fetcher = Gem::RemoteFetcher.new(proxy, dns)
-        fetcher.download(spec, uri, path)
+        Bundler::GemRemoteFetcher.new(proxy, dns)
       end
 
       def gem_from_path(path, policy = nil)
@@ -629,9 +661,7 @@ module Bundler
             const_set(:CHDIR_MONITOR, EXT_LOCK)
           end
 
-          if const_defined?(:CHDIR_MUTEX)
-            remove_const(:CHDIR_MUTEX)
-          end
+          remove_const(:CHDIR_MUTEX) if const_defined?(:CHDIR_MUTEX)
           const_set(:CHDIR_MUTEX, const_get(:CHDIR_MONITOR))
         end
       end

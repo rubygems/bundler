@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "when using sudo", :sudo => true do
@@ -150,10 +151,36 @@ describe "when using sudo", :sudo => true do
   end
 
   describe "and root runs install" do
+    let(:warning) { "Don't run Bundler as root." }
+
+    before do
+      gemfile %(source "file://#{gem_repo1}")
+    end
+
     it "warns against that" do
-      gemfile %|source "file://#{gem_repo1}"|
       bundle :install, :sudo => true
-      expect(out).to include("Don't run Bundler as root.")
+      expect(out).to include(warning)
+    end
+
+    context "when ENV['BUNDLE_SILENCE_ROOT_WARNING'] is set" do
+      it "skips the warning" do
+        bundle :install, :sudo => :preserve_env, :env => { "BUNDLE_SILENCE_ROOT_WARNING" => true }
+        expect(out).to_not include(warning)
+      end
+    end
+
+    context "when silence_root_warning is passed as an option" do
+      it "skips the warning" do
+        bundle :install, :sudo => true, :silence_root_warning => true
+        expect(out).to_not include(warning)
+      end
+    end
+
+    context "when silence_root_warning = false" do
+      it "warns against that" do
+        bundle :install, :sudo => true, :silence_root_warning => false
+        expect(out).to include(warning)
+      end
     end
   end
 end

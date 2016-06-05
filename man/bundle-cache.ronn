@@ -11,18 +11,13 @@ Copy all of the `.gem` files needed to run the application into the
 `vendor/cache` directory. In the future, when running [bundle install(1)][bundle-install],
 use the gems in the cache in preference to the ones on `rubygems.org`.
 
-## GIT AND PATH GEMS
-
-Since Bundler 1.2, the `bundle cache` command can also cache `:git` and
-`:path` dependencies besides .gem files. This needs to be explicitly enabled
-via the `--all` option. Once used, the `--all` option will be remembered.
-
 ## SUPPORT FOR MULTIPLE PLATFORMS
 
 When using gems that have different packages for different platforms, Bundler
-1.8 and newer support caching of gems for other platforms in `vendor/cache`.
-This needs to be enabled via the `--all-platforms` option. This setting will be
-remembered in your local bundler configuration.
+1.8 and newer support caching of gems for other platforms where the Gemfile
+has been resolved (i.e. present in the lockfile) in `vendor/cache`.  This needs
+to be enabled via the `--all-platforms` option. This setting will be remembered
+in your local bundler configuration.
 
 ## REMOTE FETCHING
 
@@ -43,12 +38,12 @@ to JRuby and run `bundle install`, bundler is forced to check to
 see whether a `"java"` platformed `nokogiri` exists.
 
 Even though the `nokogiri` gem for the Ruby platform is
-_technically_ acceptable on JRuby, it actually has a C extension
+_technically_ acceptable on JRuby, it has a C extension
 that does not run on JRuby. As a result, bundler will, by default,
 still connect to `rubygems.org` to check whether it has a version
 of one of your gems more specific to your platform.
 
-This problem is also not just limited to the `"java"` platform.
+This problem is also not limited to the `"java"` platform.
 A similar (common) problem can happen when developing on Windows
 and deploying to Linux, or even when developing on OSX and
 deploying to Linux.
@@ -56,7 +51,7 @@ deploying to Linux.
 If you know for sure that the gems cached in `vendor/cache`
 are appropriate for the platform you are on, you can run
 `bundle install --local` to skip checking for more appropriate
-gems, and just use the ones in `vendor/cache`.
+gems, and use the ones in `vendor/cache`.
 
 One way to be sure that you have the right platformed versions
 of all your gems is to run `bundle cache` on an identical

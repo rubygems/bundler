@@ -19,20 +19,46 @@ bugs](https://github.com/bundler/bundler/issues?labels=small&state=open) and [sm
 
 Bundler doesn't use a Gemfile to list development dependencies, because when we tried it we couldn't tell if we were awake or it was just another level of dreams. To work on Bundler, you'll probably want to do a couple of things.
 
-  1. Install Bundler's development dependencies
+  1. Install `groff-base` and `graphviz` packages using your package manager, e.g for ubuntu
 
-        $ rake spec:deps
+        $ sudo apt-get install graphviz groff-base -y
 
-  2. Run the test suite, to make sure things are working
+     and for OS X (with brew installed)
 
-        $ rake spec
+        $ brew install graphviz homebrew/dupes/groff
 
-  3. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
+  2. Install Bundler's development dependencies
+
+        $ bin/rake spec:deps
+
+  3. Run the test suite, to make sure things are working
+
+        $ bin/rake spec
+
+  4. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
 
         $ alias dbundle='ruby -I /path/to/bundler/lib /path/to/bundler/exe/bundle'
 
      With that set up, you can test changes you've made to Bundler by running `dbundle`, without interfering with the regular `bundle` command.
 
+# Submitting Pull Requests
+
+Before you submit a pull request, please remember to do the following:
+
+- Make sure the code formatting and styling adheres to the guidelines. We use Rubocop for this. Lack of formatting adherence will result in automatic Travis build failures.
+
+        $ bin/rubocop -a
+
+- Please run the test suite:
+
+        $ bin/rspec
+
+- If you are unable to run the entire test suite, please run the unit test suite and at least the integration specs related to the command or domain of Bundler that your code changes relate to.
+
+- Ex. For a pull request that changes something with `bundle update`, you might run:
+
+        $ bin/rspec spec/bundler
+        $ bin/rspec spec/commands/update_spec.rb
 
 # Bug triage
 
@@ -96,7 +122,7 @@ Code needs explanation, and sometimes those who know the code well have trouble 
 
 Bundler has two main sources of documentation: the built-in help (including usage information and man pages) and the [Bundler documentation site](http://bundler.io).
 
-If you’d like to submit a patch to the man pages, follow the steps for adding a feature above. All of the man pages are located in the `man` directory. Just use the “Documentation” heading when you describe what you did in the changelog.
+If you’d like to submit a patch to the man pages, follow the steps for submitting a pull request above. All of the man pages are located in the `man` directory. Just use the “Documentation” heading when you describe what you did in the changelog.
 
 If you have a suggestion or proposed change for [bundler.io](http://bundler.io), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
@@ -105,14 +131,12 @@ If you have a suggestion or proposed change for [bundler.io](http://bundler.io),
 
 Community is an important part of all we do. If you’d like to be part of the Bundler community, you can jump right in and start helping make Bundler better for everyone who uses it.
 
-It would be tremendously helpful to have more people answering questions about Bundler (and often simply about Rubygems or Ruby itself) in our [issue tracker](https://github.com/bundler/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
+It would be tremendously helpful to have more people answering questions about Bundler (and often simply about [Rubygems](https://github.com/rubygems/rubygems) or Ruby itself) in our [issue tracker](https://github.com/bundler/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
 
 Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [bundler.io](http://bundler.io), we would absolutely love it if you opened an issue or pull request on the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
 Finally, sharing your experiences and discoveries by writing them up is a valuable way to help others who have similar problems or experiences in the future. You can write a blog post, create an example and commit it to Github, take screenshots, or make videos.
 
-Examples of how Bundler is used help everyone, and we’ve discovered that people already use it in ways that we never imagined when we were writing it. If you’re still not sure what to write about, there are also several projects doing interesting things based on Bundler. They could probably use publicity too.
+Publishing examples of how Bundler is used helps everyone, and we’ve discovered that people already use it in ways that we never imagined when we were writing it. If you’re still not sure what to write about, there are also several projects doing interesting things based on Bundler. They could probably use publicity too.
 
-If you let someone on the core team know you wrote about Bundler, we will add your post to the list of Bundler resources on the Github project wiki.
-
-Finally, participate carefully in the  all contributors to the Bundler project must agree to the contributor [code of conduct](http://bundler.io/conduct.html). By participating in this project you agree to abide by its terms.
+Finally, all contributors to the Bundler project must agree to the contributor [code of conduct](http://bundler.io/conduct.html). By participating in this project you agree to abide by its terms.

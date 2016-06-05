@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle install with groups" do
@@ -371,23 +372,23 @@ describe "bundle install with groups" do
     end
   end
 
-  describe "when locked and installed with `without --local`" do
+  describe "when installed with `without`" do
     before(:each) do
       build_repo2
       system_gems "rack-0.9.1" do
-        bundle "config --local without rack"
+        bundle "config --local without middleware"
         install_gemfile <<-G
           source "file://#{gem_repo2}"
           gem "rack"
 
-          group :rack do
+          group :middleware do
             gem "rack_middleware"
           end
         G
       end
     end
 
-    it "uses the correct versions even if `without` was used on the original" do
+    it "uses the correct versions on another machine" do
       should_be_installed "rack 0.9.1"
       should_not_be_installed "rack_middleware 1.0"
       simulate_new_machine
@@ -399,8 +400,10 @@ describe "bundle install with groups" do
     end
 
     it "does not hit the remote a second time" do
+      pending "this test never passed, but that is a bug we should fix"
       FileUtils.rm_rf gem_repo2
       bundle "install"
+      expect(out).to_not include("Could not fetch specs")
       expect(err).to lack_errors
     end
   end

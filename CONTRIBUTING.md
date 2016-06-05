@@ -12,12 +12,17 @@ If you'd like to help make Bundler better, you totally rock! Here are some ways 
   - by closing issues that are not complete
   - by adding a failing test for reproducible [reported bugs](https://github.com/bundler/bundler/issues)
   - by reviewing [pull requests](https://github.com/bundler/bundler/pulls) and suggesting improvements
-  - by improving existing code, including [suggestions from PullReview](https://www.pullreview.com/github/bundler/bundler/reviews/master)
+  - by improving existing code, including suggestions from [PullReview](https://www.pullreview.com/github/bundler/bundler/reviews/master) or [CodeClimate](https://codeclimate.com/github/bundler/bundler)
   - by [writing code](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md) (no patch is too small! fix typos or bad whitespace)
+  - by backfilling [unit tests](https://github.com/bundler/bundler/tree/master/spec/bundler) for modules that lack [coverage](https://codeclimate.com/github/bundler/bundler/coverage)
 
-If you need help getting started, check out the [DEVELOPMENT](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md) file for steps that will get you up and running.
+If you need help getting started, check out the [DEVELOPMENT.md](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md) file for steps that will get you up and running.
 
 Thanks for helping us make Bundler better.
+
+# Roadmap
+
+If you're interested in reading some of the potential ideas or plans for Bundler, see the official Bundler [Trello Board](https://trello.com/b/DioUaKgx/bundler).
 
 # Troubleshooting
 
@@ -25,7 +30,7 @@ If you're having a problem, please see [ISSUES](https://github.com/bundler/bundl
 
 # Requesting Features
 
-Head on over to the [Bundler features](https://github.com/bundler/bundler-features) project, or any of the lists or channels listed below. Feature-wise we consider Bundler stable, so the core team does not tend to work on feature suggestions. Pull requests welcome though!
+Head on over to the [Bundler features](https://github.com/bundler/bundler-features) project, or any of the lists or channels listed below. Feature-wise, we consider Bundler stable, so the core team does not tend to work on feature suggestions. Pull requests are welcome though!
 
 # Discussing Bundler
 

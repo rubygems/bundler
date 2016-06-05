@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Spec
   module Platforms
     include Bundler::GemHelpers
@@ -35,11 +36,11 @@ module Spec
     end
 
     def local
-      generic(Gem::Platform.local)
+      generic_local_platform
     end
 
     def not_local
-      all_platforms.find {|p| p != generic(Gem::Platform.local) }
+      all_platforms.find {|p| p != generic_local_platform }
     end
 
     def local_tag

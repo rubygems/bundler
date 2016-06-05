@@ -1,6 +1,8 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Check
     attr_reader :options
+
     def initialize(options)
       @options = options
     end
@@ -9,6 +11,7 @@ module Bundler
       if options[:path]
         Bundler.settings[:path] = File.expand_path(options[:path])
       end
+
       begin
         definition = Bundler.definition
         definition.validate_ruby!
@@ -28,7 +31,7 @@ module Bundler
         Bundler.ui.error "This bundle has been frozen, but there is no #{SharedHelpers.lockfile_name} present"
         exit 1
       else
-        Bundler.load.lock(:preserve_bundled_with => true) unless options[:"dry-run"]
+        Bundler.load.lock(:preserve_unknown_sections => true) unless options[:"dry-run"]
         Bundler.ui.info "#{SharedHelpers.gemfile_name}'s dependencies are satisfied"
       end
     end

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
 module Bundler
   class Source
     class Git < Path
       class GitNotInstalledError < GitError
         def initialize
-          msg =  "You need to install git to be able to use gems from git repositories. "
+          msg = String.new
+          msg << "You need to install git to be able to use gems from git repositories. "
           msg << "For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git"
           super msg
         end
@@ -11,7 +13,8 @@ module Bundler
 
       class GitNotAllowedError < GitError
         def initialize(command)
-          msg =  "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, "
+          msg = String.new
+          msg << "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, "
           msg << "this error message could probably be more useful. Please submit a ticket at http://github.com/bundler/bundler/issues "
           msg << "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
           super msg
@@ -19,8 +22,10 @@ module Bundler
       end
 
       class GitCommandError < GitError
-        def initialize(command, path = nil)
-          msg =  "Git error: command `git #{command}` in directory #{SharedHelpers.pwd} has failed."
+        def initialize(command, path = nil, extra_info = nil)
+          msg = String.new
+          msg << "Git error: command `git #{command}` in directory #{SharedHelpers.pwd} has failed."
+          msg << "\n#{extra_info}" if extra_info
           msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path && path.exist?
           super msg
         end
@@ -28,8 +33,13 @@ module Bundler
 
       class GitNotCheckedOutError < GitError
         def initialize(uri)
-          msg = "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
-          super msg
+          super("The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application")
+        end
+      end
+
+      class MissingGitRevisionError < GitError
+        def initialize(ref, repo)
+          super("Revision #{ref} does not exist in the repository #{repo}. Maybe you misspelled it?")
         end
       end
 
@@ -50,12 +60,20 @@ module Bundler
         end
 
         def revision
-          @revision ||= allowed_in_path { git("rev-parse #{ref}").strip }
+          return @revision if @revision
+
+          begin
+            @revision ||= find_local_revision
+          rescue GitCommandError
+            raise MissingGitRevisionError.new(ref, uri)
+          end
+
+          @revision
         end
 
         def branch
           @branch ||= allowed_in_path do
-            git("branch") =~ /^\* (.*)$/ && $1.strip
+            git("rev-parse --abbrev-ref HEAD").strip
           end
         end
 
@@ -74,14 +92,16 @@ module Bundler
           return unless allow_remote?
           if path.exist?
             return if has_revision_cached?
-            Bundler.ui.info "Fetching #{uri}"
+            Bundler.ui.info "Fetching #{filtered_uri}"
             in_path do
-              git_retry %|fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*"|
+              git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*")
             end
           else
-            Bundler.ui.info "Fetching #{uri}"
-            FileUtils.mkdir_p(path.dirname)
-            git_retry %|clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet|
+            Bundler.ui.info "Fetching #{filtered_uri}"
+            SharedHelpers.filesystem_access(path.dirname) do |p|
+              FileUtils.mkdir_p(p)
+            end
+            git_retry %(clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet)
           end
         end
 
@@ -89,9 +109,13 @@ module Bundler
           # method 1
           unless File.exist?(destination.join(".git"))
             begin
-              FileUtils.mkdir_p(destination.dirname)
-              FileUtils.rm_rf(destination)
-              git_retry %|clone --no-checkout --quiet "#{path}" "#{destination}"|
+              SharedHelpers.filesystem_access(destination.dirname) do |p|
+                FileUtils.mkdir_p(p)
+              end
+              SharedHelpers.filesystem_access(destination) do |p|
+                FileUtils.rm_rf(p)
+              end
+              git_retry %(clone --no-checkout --quiet "#{path}" "#{destination}")
               File.chmod(((File.stat(destination).mode | 0777) & ~File.umask), destination)
             rescue Errno::EEXIST => e
               file_path = e.message[%r{.*?(/.*)}, 1]
@@ -102,12 +126,10 @@ module Bundler
           end
           # method 2
           SharedHelpers.chdir(destination) do
-            git_retry %|fetch --force --quiet --tags "#{path}"|
+            git_retry %(fetch --force --quiet --tags "#{path}")
             git "reset --hard #{@revision}"
 
-            if submodules
-              git_retry "submodule update --init --recursive"
-            end
+            git_retry "submodule update --init --recursive" if submodules
           end
         end
 
@@ -123,16 +145,20 @@ module Bundler
         end
 
         def git_retry(command)
-          Bundler::Retry.new("git #{command}", GitNotAllowedError).attempts do
+          Bundler::Retry.new("git #{filter_string(command)}", GitNotAllowedError).attempts do
             git(command)
           end
         end
 
-        def git(command, check_errors = true)
-          raise GitNotAllowedError.new(command) unless allow?
-          out = SharedHelpers.with_clean_git_env { `git #{command}` }
-          raise GitCommandError.new(command, path) if check_errors && !$?.success?
-          out
+        def git(command, check_errors = true, error_msg = nil)
+          raise GitNotAllowedError.new(filter_string(command)) unless allow?
+
+          out = SharedHelpers.with_clean_git_env { `git #{command} 2>&1` }
+          if check_errors && !$?.success?
+            raise GitCommandError.new(filter_string(command), path, error_msg || filter_string(out))
+          end
+
+          filter_string(out)
         end
 
         def has_revision_cached?
@@ -141,6 +167,26 @@ module Bundler
           true
         rescue GitError
           false
+        end
+
+        def remove_cache
+          FileUtils.rm_rf(path)
+        end
+
+        def find_local_revision
+          allowed_in_path do
+            git("rev-parse --verify #{ref}", true).strip
+          end
+        end
+
+        # URI without credentials, for printing
+        def filtered_uri
+          @filtered_uri ||= URICredentialsFilter.credential_filtered_uri(uri)
+        end
+
+        # String without credentials, for printing
+        def filter_string(string)
+          URICredentialsFilter.credential_filtered_string(string, uri)
         end
 
         # Escape the URI for git commands
@@ -179,11 +225,8 @@ module Bundler
 
         def in_path(&blk)
           checkout unless path.exist?
-          if path.exist?
-            SharedHelpers.chdir(path, &blk)
-          else
-            raise GitNotCheckedOutError.new(uri)
-          end
+          raise GitNotCheckedOutError.new(uri) unless path.exist?
+          SharedHelpers.chdir(path, &blk)
         end
 
         def allowed_in_path

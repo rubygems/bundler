@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe Bundler::SourceList do
@@ -64,12 +65,12 @@ describe Bundler::SourceList do
       end
 
       context "with the git: protocol" do
-        let(:msg) {
+        let(:msg) do
           "The git source `git://existing-git.org/path.git` " \
           "uses the `git` protocol, which transmits data without encryption. " \
           "Disable this warning with `bundle config git.allow_insecure true`, " \
           "or switch to the `https` protocol to keep your data secure."
-        }
+        end
 
         it "warns about git protocols" do
           expect(Bundler.ui).to receive(:warn).with(msg)

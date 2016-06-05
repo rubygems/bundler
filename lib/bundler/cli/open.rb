@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/cli/common"
 require "shellwords"
 
@@ -15,7 +16,9 @@ module Bundler
       path = Bundler::CLI::Common.select_spec(name, :regex_match).full_gem_path
       Dir.chdir(path) do
         command = Shellwords.split(editor) + [path]
-        system(*command) || Bundler.ui.info("Could not run '#{command.join(" ")}'")
+        Bundler.with_clean_env do
+          system(*command)
+        end || Bundler.ui.info("Could not run '#{command.join(" ")}'")
       end
     end
   end

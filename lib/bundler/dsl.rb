@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/dependency"
 require "bundler/ruby_dsl"
 
@@ -13,6 +14,7 @@ module Bundler
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
 
+    attr_reader :gemspecs
     attr_accessor :dependencies
 
     def initialize
@@ -26,15 +28,21 @@ module Bundler
       @platforms            = []
       @env                  = nil
       @ruby_version         = nil
+      @gemspecs             = []
+      @gemfile              = nil
       add_git_sources
     end
 
     def eval_gemfile(gemfile, contents = nil)
+      @gemfile = Pathname.new(gemfile)
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
       infer_ruby_version(gemfile)
     rescue Exception => e
-      message = "There was an error parsing `#{File.basename gemfile.to_s}`: #{e.message}"
+      message = "There was an error " \
+        "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \
+        "`#{File.basename gemfile.to_s}`: #{e.message}"
+
       raise DSLError.new(message, gemfile, e.backtrace, contents)
     end
 
@@ -43,7 +51,7 @@ module Bundler
       glob              = opts && opts[:glob]
       name              = opts && opts[:name] || "{,*}"
       development_group = opts && opts[:development_group] || :development
-      expanded_path     = File.expand_path(path, Bundler.default_gemfile.dirname)
+      expanded_path     = gemfile_root.join(path)
 
       gemspecs = Dir[File.join(expanded_path, "#{name}.gemspec")]
 
@@ -53,21 +61,24 @@ module Bundler
 
         unless spec
           raise InvalidOption, "There was an error loading the gemspec at " \
-            "#{file}. Make sure you can build the gem, then try again."
+            "#{file}. Make sure you can build the gem, then try again"
         end
 
-        gem spec.name, :path => path, :glob => glob
+        gem_platforms = Bundler::Dependency::REVERSE_PLATFORM_MAP[Bundler::GemHelpers.generic_local_platform]
+        gem spec.name, :path => path, :glob => glob, :platforms => gem_platforms
 
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *(dep.requirement.as_list + [:type => :development])
           end
         end
+
+        @gemspecs << gemspecs.first
       when 0
-        raise InvalidOption, "There are no gemspecs at #{expanded_path}."
+        raise InvalidOption, "There are no gemspecs at #{expanded_path}"
       else
         raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. " \
-          "Please use the :name option to specify which one should be used."
+          "Please use the :name option to specify which one should be used"
       end
     end
 
@@ -84,9 +95,8 @@ module Bundler
         if current.requirement != dep.requirement
           if current.type == :development
             @dependencies.delete current
-          elsif dep.type == :development
-            return
           else
+            return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
                             "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})"
           end
@@ -94,15 +104,14 @@ module Bundler
         else
           Bundler.ui.warn "Your #{SharedHelpers.gemfile_name} lists the gem #{current.name} (#{current.requirement}) more than once.\n" \
                           "You should probably keep only one of them.\n" \
-                          "While it's not a problem now, it could cause errors if you change the version of just one of them later."
+                          "While it's not a problem now, it could cause errors if you change the version of one of them later."
         end
 
         if current.source != dep.source
           if current.type == :development
             @dependencies.delete current
-          elsif dep.type == :development
-            return
           else
+            return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
                             "You specified that #{dep.name} (#{dep.requirement}) should come from " \
                             "#{current.source || "an unspecified source"} and #{dep.source}\n"
@@ -137,7 +146,9 @@ module Bundler
     end
 
     def path(path, options = {}, &blk)
-      with_source(@sources.add_path_source(normalize_hash(options).merge("path" => Pathname.new(path))), &blk)
+      source_options = normalize_hash(options).merge("path" => Pathname.new(path), "root_path" => gemfile_root)
+      source = @sources.add_path_source(source_options)
+      with_source(source, &blk)
     end
 
     def git(uri, options = {}, &blk)
@@ -199,7 +210,8 @@ module Bundler
     alias_method :platform, :platforms
 
     def env(name)
-      @env, old = name, @env
+      old = @env
+      @env = name
       yield
     ensure
       @env = old
@@ -213,6 +225,19 @@ module Bundler
 
     def add_git_sources
       git_source(:github) do |repo_name|
+        # It would be better to use https instead of the git protocol, but this
+        # can break deployment of existing locked bundles when switching between
+        # different versions of Bundler. The change will be made in 2.0, which
+        # does not guarantee compatibility with the 1.x series.
+        #
+        # See https://github.com/bundler/bundler/pull/2569 for discussion
+        #
+        # This can be overridden by adding this code to your Gemfiles:
+        #
+        #   git_source(:github) do |repo_name|
+        #     repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+        #     "https://github.com/#{repo_name}.git"
+        #   end
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
         "https://github.com/#{repo_name}.git"
       end
@@ -233,13 +258,14 @@ module Bundler
     end
 
     def with_source(source)
+      old_source = @source
       if block_given?
         @source = source
         yield
       end
       source
     ensure
-      @source = nil
+      @source = old_source
     end
 
     def normalize_hash(opts)
@@ -255,10 +281,10 @@ module Bundler
 
     def normalize_options(name, version, opts)
       if name.is_a?(Symbol)
-        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name}"' instead.}
+        raise GemfileError, %(You need to specify gem names as Strings. Use 'gem "#{name}"' instead)
       end
       if name =~ /\s/
-        raise GemfileError, %{'#{name}' is not a valid gem name because it contains whitespace.}
+        raise GemfileError, %('#{name}' is not a valid gem name because it contains whitespace)
       end
 
       normalize_hash(opts)
@@ -297,16 +323,15 @@ module Bundler
         opts["git"] = @git_sources[git_name].call(opts[git_name])
       end
 
-      %w[git path].each do |type|
-        if param = opts[type]
-          if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
-            options = opts.merge("name" => name, "version" => $1)
-          else
-            options = opts.dup
-          end
-          source = send(type, param, options) {}
-          opts["source"] = source
+      %w(git path).each do |type|
+        next unless param = opts[type]
+        if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
+          options = opts.merge("name" => name, "version" => $1)
+        else
+          options = opts.dup
         end
+        source = send(type, param, options) {}
+        opts["source"] = source
       end
 
       opts["source"] ||= @source
@@ -328,7 +353,8 @@ module Bundler
     def validate_keys(command, opts, valid_keys)
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
-        message = "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
+        message = String.new
+        message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
         message << if invalid_keys.size > 1
                      "as options for #{command}, but they are invalid."
                    else
@@ -357,19 +383,9 @@ module Bundler
     def check_primary_source_safety(source)
       return unless source.rubygems_primary_remotes.any?
 
-      # TODO: 2.0 upgrade from setting to default
-      if Bundler.settings[:disable_multisource]
-        raise GemspecError, "Warning: this #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
-          "Each source after the first must include a block to indicate which gems " \
-          "should come from that source."
-      else
-        Bundler.ui.deprecate "Your #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
-          "Using `source` more than once without a block is a security risk, and " \
-          "may result in installing unexpected gems. To resolve this warning, use " \
-          "a block to indicate which gems should come from the secondary source. " \
-          "It will be an error to have multiple primary sources in Bundler 2.0. " \
-          "To enable that error now, run `bundle config disable_multisource true`."
-      end
+      raise GemspecError, "This #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
+        "Each source after the first must include a block to indicate which gems " \
+        "should come from that source."
     end
 
     def warn_github_source_change(repo_name)
@@ -389,12 +405,9 @@ module Bundler
     end
 
     def infer_ruby_version(gemfile)
-      unless @ruby_version
-        ruby_version = gemfile.parent + ".ruby-version"
-        if ruby_version.file?
-          ruby(ruby_version.read.strip)
-        end
-      end
+      return if @ruby_version
+      ruby_version_path = gemfile.parent + ".ruby-version"
+      ruby(ruby_version_path.read.strip) if ruby_version_path.file?
     end
 
     class DSLError < GemfileError
@@ -458,7 +471,7 @@ module Bundler
         @to_s ||= begin
           trace_line, description = parse_line_number_from_description
 
-          m = "\n[!] "
+          m = String.new("\n[!] ")
           m << description
           m << ". Bundler cannot continue.\n"
 
@@ -478,9 +491,9 @@ module Bundler
           m << "\n"
           m << "#{indent}from #{trace_line.gsub(/:in.*$/, "")}\n"
           m << "#{indent}-------------------------------------------\n"
-          m << "#{indent}#{    lines[line_numer - 1] }" unless first_line
-          m << "#{indicator}#{ lines[line_numer] }"
-          m << "#{indent}#{    lines[line_numer + 1] }" unless last_line
+          m << "#{indent}#{lines[line_numer - 1]}" unless first_line
+          m << "#{indicator}#{lines[line_numer]}"
+          m << "#{indent}#{lines[line_numer + 1]}" unless last_line
           m << "\n" unless m.end_with?("\n")
           m << "#{indent}-------------------------------------------\n"
         end
@@ -497,6 +510,10 @@ module Bundler
         [trace_line, description]
       end
     end
-  end
 
+    def gemfile_root
+      @gemfile ||= Bundler.default_gemfile
+      @gemfile.dirname
+    end
+  end
 end

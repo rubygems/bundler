@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle update" do
@@ -26,7 +27,7 @@ describe "bundle update" do
         build_lib "activesupport", "3.0", :path => lib_path("rails/activesupport")
 
         bundle "update --source activesupport --verbose"
-        expect(out).to include("Using activesupport 3.0 (was 2.3.5) from source at #{lib_path("rails/activesupport")}")
+        expect(out).to include("Using activesupport 3.0 (was 2.3.5) from source at `#{lib_path("rails/activesupport")}`")
       end
     end
   end

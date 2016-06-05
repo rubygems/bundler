@@ -1,8 +1,14 @@
+# frozen_string_literal: true
 module Bundler
   class RubyVersion
-    attr_reader :version, :patchlevel, :engine, :engine_version
+    attr_reader :versions,
+      :patchlevel,
+      :engine,
+      :engine_versions,
+      :gem_version,
+      :engine_gem_version
 
-    def initialize(version, patchlevel, engine, engine_version)
+    def initialize(versions, patchlevel, engine, engine_version)
       # The parameters to this method must satisfy the
       # following constraints, which are verified in
       # the DSL:
@@ -15,47 +21,32 @@ module Bundler
       #   must not be specified, or the engine version
       #   specified must match the version.
 
-      @version        = version
-      @engine         = engine || "ruby"
-      # keep track of the engine specified by the user
-      @input_engine   = engine
-      @engine_version = engine_version || version
-      @patchlevel     = patchlevel
+      @versions           = Array(versions)
+      @gem_version        = Gem::Requirement.create(@versions.first).requirements.first.last
+      @input_engine       = engine
+      @engine             = engine || "ruby"
+      @engine_versions    = (engine_version && Array(engine_version)) || @versions
+      @engine_gem_version = Gem::Requirement.create(@engine_versions.first).requirements.first.last
+      @patchlevel         = patchlevel
     end
 
-    def to_s
-      output = "ruby #{version}"
+    def to_s(versions = self.versions)
+      output = String.new("ruby #{versions_string(versions)}")
       output << "p#{patchlevel}" if patchlevel
-      output << " (#{engine} #{engine_version})" unless engine == "ruby"
+      output << " (#{engine} #{versions_string(engine_versions)})" unless engine == "ruby"
 
       output
     end
 
-    def ==(other)
-      version == other.version &&
-        engine == other.engine &&
-        engine_version == other.engine_version &&
-        patchlevel == other.patchlevel
+    def single_version_string
+      to_s(gem_version)
     end
 
-    # Returns a tuple of these things:
-    #   [diff, this, other]
-    #   The priority of attributes are
-    #   1. engine
-    #   2. ruby_version
-    #   3. engine_version
-    def diff(other)
-      if engine != other.engine && @input_engine
-        [:engine, engine, other.engine]
-      elsif version != other.version
-        [:version, version, other.version]
-      elsif engine_version != other.engine_version && @input_engine
-        [:engine_version, engine_version, other.engine_version]
-      elsif patchlevel != other.patchlevel && @patchlevel
-        [:patchlevel, patchlevel, other.patchlevel]
-      else
-        nil
-      end
+    def ==(other)
+      versions == other.versions &&
+        engine == other.engine &&
+        engine_versions == other.engine_versions &&
+        patchlevel == other.patchlevel
     end
 
     def host
@@ -65,52 +56,59 @@ module Bundler
         RbConfig::CONFIG["host_os"]
       ].join("-")
     end
-  end
 
-  # A subclass of RubyVersion that implements version,
-  # engine and engine_version based upon the current
-  # information in the system. It can be used anywhere
-  # a RubyVersion object is expected, and can be
-  # compared with a RubyVersion object.
-  class SystemRubyVersion < RubyVersion
-    def initialize(*)
-      # override the default initialize, because
-      # we will implement version, engine and
-      # engine_version dynamically
+    # Returns a tuple of these things:
+    #   [diff, this, other]
+    #   The priority of attributes are
+    #   1. engine
+    #   2. ruby_version
+    #   3. engine_version
+    def diff(other)
+      raise ArgumentError, "Can only diff with a RubyVersion" unless other.is_a?(RubyVersion)
+      if engine != other.engine && @input_engine
+        [:engine, engine, other.engine]
+      elsif versions.empty? || !matches?(versions, other.gem_version)
+        [:version, versions_string(versions), versions_string(other.versions)]
+      elsif @input_engine && !matches?(engine_versions, other.engine_gem_version)
+        [:engine_version, versions_string(engine_versions), versions_string(other.engine_versions)]
+      elsif patchlevel && (!patchlevel.is_a?(String) || !other.patchlevel.is_a?(String) || !matches?(patchlevel, other.patchlevel))
+        [:patchlevel, patchlevel, other.patchlevel]
+      end
     end
 
-    def version
-      RUBY_VERSION.dup
+    def versions_string(versions)
+      Array(versions).join(", ")
     end
 
-    def gem_version
-      @gem_version ||= Gem::Version.new(version)
-    end
-
-    def engine
-      if defined?(RUBY_ENGINE)
+    def self.system
+      ruby_engine = if defined?(RUBY_ENGINE) && !RUBY_ENGINE.nil?
         RUBY_ENGINE.dup
       else
         # not defined in ruby 1.8.7
         "ruby"
       end
-    end
-
-    def engine_version
-      case engine
-      when "ruby"
-        RUBY_VERSION.dup
-      when "rbx"
-        Rubinius::VERSION.dup
-      when "jruby"
-        JRUBY_VERSION.dup
-      else
-        raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
+      ruby_engine_version = case ruby_engine
+                            when "ruby"
+                              RUBY_VERSION.dup
+                            when "rbx"
+                              Rubinius::VERSION.dup
+                            when "jruby"
+                              JRUBY_VERSION.dup
+                            else
+                              raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
       end
+      @ruby_version ||= RubyVersion.new(RUBY_VERSION.dup, RUBY_PATCHLEVEL.to_s, ruby_engine, ruby_engine_version)
     end
 
-    def patchlevel
-      RUBY_PATCHLEVEL.to_s
+  private
+
+    def matches?(requirements, version)
+      # Handles RUBY_PATCHLEVEL of -1 for instances like ruby-head
+      return requirements == version if requirements.to_s == "-1" || version.to_s == "-1"
+
+      Array(requirements).all? do |requirement|
+        Gem::Requirement.create(requirement).satisfied_by?(Gem::Version.create(version))
+      end
     end
   end
 end

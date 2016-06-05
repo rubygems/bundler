@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle flex_install" do
@@ -229,9 +230,9 @@ describe "bundle flex_install" do
     end
 
     it "does something" do
-      expect {
+      expect do
         bundle "install"
-      }.not_to change { File.read(bundled_app("gems.locked")) }
+      end.not_to change { File.read(bundled_app("gems.locked")) }
 
       expect(err).to include("rack = 0.9.1")
       expect(err).to include("locked at 1.0.0")

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe ".bundle/config" do
@@ -9,38 +10,38 @@ describe ".bundle/config" do
   end
 
   describe "BUNDLE_APP_CONFIG" do
+    before { ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s }
+    after { ENV["BUNDLE_APP_CONFIG"] = nil }
+
     it "can be moved with an environment variable" do
-      ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
-      # NOTE: here and below, we need to use `--local` because we want to
-      # write to the app's config file, not the user's
       bundle "config --local foo bar"
-      bundle :install
 
       expect(bundled_app(".bundle")).not_to exist
       expect(tmp("foo/bar/config")).to exist
+      expect(tmp("foo/bar/config").read).to include('BUNDLE_FOO: "bar"')
+    end
+
+    it "honors path in a moved config" do
+      bundle "config --local path bar"
+      bundle :install
+      expect(bundled_app(".bundle")).not_to exist
+      expect(tmp("foo/bar/config")).to exist
+      expect(tmp("foo/bar/config").read).to include('BUNDLE_PATH: "bar"')
+      expect(bundled_app("bar")).to be_directory
       should_be_installed "rack 1.0.0"
     end
 
-    it "can provide a relative path with the environment variable" do
+    it "accepts relative paths" do
       FileUtils.mkdir_p bundled_app("omg")
       Dir.chdir bundled_app("omg")
-
       ENV["BUNDLE_APP_CONFIG"] = "../foo"
+
       bundle "config --local foo bar"
       bundle :install
 
       expect(bundled_app(".bundle")).not_to exist
       expect(bundled_app("../foo/config")).to exist
       should_be_installed "rack 1.0.0"
-    end
-
-    it "removes environment.rb from BUNDLE_APP_CONFIG's path" do
-      FileUtils.mkdir_p(tmp("foo/bar"))
-      ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
-      bundle "install"
-      FileUtils.touch tmp("foo/bar/environment.rb")
-      should_be_installed "rack 1.0.0"
-      expect(tmp("foo/bar/environment.rb")).not_to exist
     end
   end
 
@@ -54,13 +55,13 @@ describe ".bundle/config" do
     end
 
     it "can also be set explicitly" do
-      bundle "config --global foo global"
-      run "puts Bundler.settings[:foo]"
+      bundle! "config --global foo global"
+      run! "puts Bundler.settings[:foo]"
       expect(out).to eq("global")
     end
 
     it "has lower precedence than local" do
-      bundle "config --local  foo local"
+      bundle "config --local foo local"
 
       bundle "config --global foo global"
       expect(out).to match(/Your application has set foo to "local"/)
@@ -229,7 +230,7 @@ E
     it "doesn't return quotes around values", :ruby => "1.9" do
       bundle "config foo '1'"
       run "puts Bundler.settings.send(:global_config_file).read"
-      expect(out).to include("'1'")
+      expect(out).to include('"1"')
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("1")
     end

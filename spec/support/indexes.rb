@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Spec
   module Indexes
     def dep(name, reqs = nil)
@@ -206,7 +207,7 @@ module Spec
     # Issue #3459
     def a_complicated_index
       build_index do
-        gem "foo", %w{3.0.0 3.0.5} do
+        gem "foo", %w(3.0.0 3.0.5) do
           dep "qux", ["~> 3.1"]
           dep "baz", ["< 9.0", ">= 5.0"]
           dep "bar", ["~> 1.0"]
@@ -245,7 +246,7 @@ module Spec
           dep "garply", [">= 0.3.1"]
         end
 
-        gem "grault", %w{2.6.3 3.1.1}
+        gem "grault", %w(2.6.3 3.1.1)
 
         gem "garply", "0.5.1" do
           dep "waldo", ["~> 0.1.3"]
@@ -344,6 +345,5 @@ module Spec
         end
       end
     end
-
   end
 end

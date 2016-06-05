@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle clean" do
@@ -484,6 +485,42 @@ describe "bundle clean" do
     expect(out).to include("rack (1.0.0)")
   end
 
+  describe "when missing permissions" do
+    after do
+      FileUtils.chmod(0755, system_gem_path("cache"))
+    end
+
+    it "returns a helpful error message" do
+      bundle "config path.system true"
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "foo"
+        gem "rack"
+      G
+      bundle :install
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "rack"
+      G
+      bundle :install
+
+      FileUtils.chmod(0500, system_gem_path("cache"))
+
+      bundle "clean --force", :expect_err => true
+
+      expect(err).to include(system_gem_path("cache").to_s)
+      expect(err).to include("grant write permissions")
+
+      sys_exec "gem list"
+      expect(out).to include("foo (1.0)")
+      expect(out).to include("rack (1.0.0)")
+    end
+  end
+
   it "cleans git gems with a 7 length git revision" do
     build_git "foo"
     revision = revision_for(lib_path("foo-1.0"))
@@ -646,5 +683,28 @@ describe "bundle clean" do
     expect(out).to include("Installing weakling 0.0.3")
     should_have_gems "thin-1.0", "rack-1.0.0", "weakling-0.0.3"
     should_not_have_gems "foo-1.0"
+  end
+
+  it "doesn't remove extensions artifacts from bundled git gems after clean", :rubygems => "2.2" do
+    build_git "very_simple_git_binary", &:add_c_extension
+
+    revision = revision_for(lib_path("very_simple_git_binary-1.0"))
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "very_simple_git_binary", :git => "#{lib_path("very_simple_git_binary-1.0")}", :ref => "#{revision}"
+    G
+
+    bundle! "config path vendor/bundle"
+    bundle! "install"
+    expect(vendored_gems("bundler/gems/extensions")).to exist
+    expect(vendored_gems("bundler/gems/very_simple_git_binary-1.0-#{revision[0..11]}")).to exist
+
+    bundle! :clean
+    expect(out).to eq("")
+
+    expect(vendored_gems("bundler/gems/extensions")).to exist
+    expect(vendored_gems("bundler/gems/very_simple_git_binary-1.0-#{revision[0..11]}")).to exist
   end
 end

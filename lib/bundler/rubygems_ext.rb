@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "pathname"
 
 if defined?(Gem::QuickLoader)
@@ -52,7 +53,7 @@ module Gem
     if method_defined?(:extension_dir)
       alias_method :rg_extension_dir, :extension_dir
       def extension_dir
-        @extension_dir ||= if source.respond_to?(:extension_dir_name)
+        @bundler_extension_dir ||= if source.respond_to?(:extension_dir_name)
           File.expand_path(File.join(extensions_dir, source.extension_dir_name))
         else
           rg_extension_dir
@@ -78,7 +79,7 @@ module Gem
     end
 
     def to_gemfile(path = nil)
-      gemfile = "source 'https://rubygems.org'\n"
+      gemfile = String.new("source 'https://rubygems.org'\n")
       gemfile << dependencies_to_gemfile(nondevelopment_dependencies)
       unless development_dependencies.empty?
         gemfile << "\n"
@@ -94,14 +95,14 @@ module Gem
   private
 
     def dependencies_to_gemfile(dependencies, group = nil)
-      gemfile = ""
+      gemfile = String.new
       if dependencies.any?
         gemfile << "group :#{group} do\n" if group
         dependencies.each do |dependency|
           gemfile << "  " if group
-          gemfile << %|gem "#{dependency.name}"|
+          gemfile << %(gem "#{dependency.name}")
           req = dependency.requirements_list.first
-          gemfile << %|, "#{req}"| if req
+          gemfile << %(, "#{req}") if req
           gemfile << "\n"
         end
         gemfile << "end\n" if group
@@ -126,7 +127,7 @@ module Gem
     end
 
     def to_lock
-      out = "  #{name}"
+      out = String.new("  #{name}")
       unless requirement == Gem::Requirement.default
         reqs = requirement.requirements.map {|o, v| "#{o} #{v}" }.sort.reverse
         out << " (#{reqs.join(", ")})"

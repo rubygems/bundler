@@ -16,10 +16,10 @@ started, and gems.rb(5) for more information on the `gems.rb` format.
 ## OPTIONS
 
 * `--no-color`:
-  Prints all output without color
+  Print all output without color
 
 * `--verbose`:
-  Prints out additional logging information
+  Print out additional logging information
 
 ## BUNDLE COMMANDS
 
@@ -44,7 +44,7 @@ We divide `bundle` subcommands into primary commands and utilities.
   Specify and read configuration options for bundler
 
 * `bundle help(1)`:
-  Displays detailed help for each subcommand
+  Display detailed help for each subcommand
 
 ## UTILITIES
 
@@ -77,10 +77,10 @@ We divide `bundle` subcommands into primary commands and utilities.
   Create a simple gem, suitable for development with bundler
 
 * [bundle platform(1)][bundle-platform]:
-  Displays platform compatibility information
+  Display platform compatibility information
 
 * `bundle clean(1)`:
-  Cleans up unused gems in your bundler directory
+  Clean up unused gems in your bundler directory
 
 ## PLUGINS
 

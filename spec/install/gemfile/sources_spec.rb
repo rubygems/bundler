@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle install with gems on multiple sources" do
@@ -190,6 +191,8 @@ describe "bundle install with gems on multiple sources" do
               end
             G
           end
+
+          pending "this should have a test or be removed"
         end
 
         context "and only the dependency is pinned" do
@@ -209,6 +212,8 @@ describe "bundle install with gems on multiple sources" do
               gem "rack", :source => "file://#{gem_repo1}"
             G
           end
+
+          pending "this should have a test or be removed"
         end
       end
     end
@@ -276,7 +281,7 @@ describe "bundle install with gems on multiple sources" do
       it "does not unlock the non-path gem after install" do
         bundle :install
 
-        bundle %{exec ruby -e 'puts "OK"'}
+        bundle %(exec ruby -e 'puts "OK"')
 
         expect(out).to include("OK")
         expect(exitstatus).to eq(0) if exitstatus

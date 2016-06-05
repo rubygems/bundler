@@ -12,5 +12,5 @@
 # output from ronn
 /lib/bundler/man/
 
-# output from ci_reporter
-/spec/reports/
+# rspec failure tracking
+.rspec_status

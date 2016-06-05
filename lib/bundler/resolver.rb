@@ -1,19 +1,28 @@
+# frozen_string_literal: true
 module Bundler
   class Resolver
     require "bundler/vendored_molinillo"
 
     class Molinillo::VersionConflict
+      def printable_dep(dep)
+        if dep.is_a?(Bundler::Dependency)
+          DepProxy.new(dep, dep.platforms.join(", ")).to_s.strip
+        else
+          dep.to_s
+        end
+      end
+
       def message
-        conflicts.sort.reduce("") do |o, (name, conflict)|
+        conflicts.sort.reduce(String.new) do |o, (name, conflict)|
           o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
-            o << %(    #{DepProxy.new(conflict.locked_requirement, Gem::Platform::RUBY)}\n)
+            o << %(    #{printable_dep(conflict.locked_requirement)}\n)
             o << %(\n)
           end
           o << %(  In gems.rb:\n)
           o << conflict.requirement_trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
-            t = ""
+            t = String.new
             depth = 2
             tree.each do |req|
               t << "  " * depth << req.to_s
@@ -86,27 +95,27 @@ module Bundler
         specs = {}
 
         @activated.each do |p|
-          if s = @specs[p]
-            platform = generic(Gem::Platform.new(s.platform))
-            next if specs[platform]
+          next unless s = @specs[p]
+          platform = generic(Gem::Platform.new(s.platform))
+          next if specs[platform]
 
-            lazy_spec = LazySpecification.new(name, version, platform, source)
-            lazy_spec.dependencies.replace s.dependencies
-            s.dependencies.each do |dep|
-              next unless dep.name == "bundler"
-              unless dep.requirement.satisfied_by?(Gem::Version.create(VERSION))
-                Bundler.ui.warn "#{lazy_spec} has dependency #{dep}, which is unsatisfied by the current bundler version #{VERSION}"
-              end
+          lazy_spec = LazySpecification.new(name, version, platform, source)
+          lazy_spec.dependencies.replace s.dependencies
+          specs[platform] = lazy_spec
+
+          s.dependencies.each do |dep|
+            if dep.name == "bundler" && !dep.requirement.satisfied_by?(Gem::Version.create(VERSION))
+              Bundler.ui.warn "#{lazy_spec} depends on #{dep}, but this Bundler version is #{VERSION}"
             end
-            specs[platform] = lazy_spec
           end
         end
+
         specs.values
       end
 
       def activate_platform(platform)
         unless @activated.include?(platform)
-          if for?(platform)
+          if for?(platform, nil)
             @activated << platform
             return __dependencies[platform] || []
           end
@@ -126,8 +135,14 @@ module Bundler
         @source ||= first.source
       end
 
-      def for?(platform)
-        @specs[platform]
+      def for?(platform, required_ruby_version)
+        if spec = @specs[platform]
+          if required_ruby_version && spec.respond_to?(:required_ruby_version) && spec_required_ruby_version = spec.required_ruby_version
+            spec_required_ruby_version.satisfied_by?(required_ruby_version.gem_version)
+          else
+            true
+          end
+        end
       end
 
       def to_s
@@ -148,12 +163,11 @@ module Bundler
         @dependencies ||= begin
           dependencies = {}
           ALL.each do |p|
-            if spec = @specs[p]
-              dependencies[p] = []
-              spec.dependencies.each do |dep|
-                next if dep.type == :development || dep.name == "bundler"
-                dependencies[p] << DepProxy.new(dep, p)
-              end
+            next unless spec = @specs[p]
+            dependencies[p] = []
+            spec.dependencies.each do |dep|
+              next if dep.type == :development || dep.name == "bundler"
+              dependencies[p] << DepProxy.new(dep, p)
             end
           end
           dependencies
@@ -171,14 +185,14 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [])
+    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil)
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base)
+      resolver = new(index, source_requirements, base, ruby_version)
       result = resolver.start(requirements)
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base)
+    def initialize(index, source_requirements, base, ruby_version)
       @index = index
       @source_requirements = source_requirements
       @base = base
@@ -186,6 +200,7 @@ module Bundler
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
       @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
+      @ruby_version = ruby_version
     end
 
     def start(requirements)
@@ -198,7 +213,7 @@ module Bundler
       names = e.dependencies.sort_by(&:name).map {|d| "gem '#{d.name}'" }
       raise CyclicDependencyError, "Your gems.rb requires gems that depend" \
         " on each other, creating an infinite loop. Please remove" \
-        " #{names.count > 1 ? "either " : "" }#{names.join(" or ")}" \
+        " #{names.count > 1 ? "either " : ""}#{names.join(" or ")}" \
         " and try again."
     end
 
@@ -209,15 +224,15 @@ module Bundler
     # @param [Integer] depth the current depth of the resolution process.
     # @return [void]
     def debug(depth = 0)
-      if debug?
-        debug_info = yield
-        debug_info = debug_info.inspect unless debug_info.is_a?(String)
-        STDERR.puts debug_info.split("\n").map {|s| "  " * depth + s }
-      end
+      return unless debug?
+      debug_info = yield
+      debug_info = debug_info.inspect unless debug_info.is_a?(String)
+      STDERR.puts debug_info.split("\n").map {|s| "  " * depth + s }
     end
 
     def debug?
-      ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"]
+      return @debug_mode if defined?(@debug_mode)
+      @debug_mode = ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"]
     end
 
     def before_resolution
@@ -265,7 +280,7 @@ module Bundler
           []
         end
       end
-      search.select {|sg| sg.for?(platform) }.each {|sg| sg.activate_platform(platform) }
+      search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform(platform) }
     end
 
     def name_for(dependency)
@@ -273,11 +288,15 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      Bundler.default_gemfile.basename.to_s rescue "gems.rb"
+      Bundler.default_gemfile.basename.to_s
+    rescue
+      "gems.rb"
     end
 
     def name_for_locking_dependency_source
-      Bundler.default_lockfile.basename.to_s rescue "gems.locked"
+      Bundler.default_lockfile.basename.to_s
+    rescue
+      "gems.locked"
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
@@ -299,7 +318,7 @@ module Bundler
     def amount_constrained(dependency)
       @amount_constrained ||= {}
       @amount_constrained[dependency.name] ||= begin
-        if base = @base[dependency.name] and !base.empty?
+        if (base = @base[dependency.name]) && !base.empty?
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
           base_dep = Dependency.new dependency.name, ">= 0.a"
@@ -318,29 +337,42 @@ module Bundler
     def verify_gemfile_dependencies_are_found!(requirements)
       requirements.each do |requirement|
         next if requirement.name == "bundler"
-        if search_for(requirement).empty?
-          if base = @base[requirement.name] and !base.empty?
-            version = base.first.version
-            message = "You have requested:\n" \
-              "  #{requirement.name} #{requirement.requirement}\n\n" \
-              "The bundle currently has #{requirement.name} locked at #{version}.\n" \
-              "Try running `bundle update #{requirement.name}`"
-          elsif requirement.source
-            name = requirement.name
-            versions = @source_requirements[name][name].map(&:version)
-            message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
-            if versions.any?
-              message << "Source contains '#{name}' at: #{versions.join(", ")}"
-            else
-              message << "Source does not contain any versions of '#{requirement}'"
-            end
-          else
-            message = "Could not find gem '#{requirement}' in any of the gem sources " \
-              "listed in your gems.rb or available on this machine."
-          end
-          raise GemNotFound, message
+        next unless search_for(requirement).empty?
+
+        if (base = @base[requirement.name]) && !base.empty?
+          version = base.first.version
+          message = "You have requested:\n" \
+            "  #{requirement.name} #{requirement.requirement}\n\n" \
+            "The bundle currently has #{requirement.name} locked at #{version}.\n" \
+            "Try running `bundle update #{requirement.name}`\n\n" \
+            "If you are updating multiple gems in your Gemfile at once,\n" \
+            "try passing them all to `bundle update`"
+        elsif requirement.source
+          name = requirement.name
+          specs = @source_requirements[name][name]
+          versions_with_platforms = specs.map {|s| [s.version, s.platform] }
+          message = String.new("Could not find gem '#{requirement}' in #{requirement.source}.\n")
+          message << if versions_with_platforms.any?
+                       "Source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
+                     else
+                       "Source does not contain any versions of '#{requirement}'"
+                     end
+        else
+          message = "Could not find gem '#{requirement}' in any of the gem sources " \
+            "listed in your #{SharedHelpers.gemfile_name} or available on this machine."
         end
+        raise GemNotFound, message
       end
+    end
+
+    def formatted_versions_with_platforms(versions_with_platforms)
+      version_platform_strs = versions_with_platforms.map do |vwp|
+        version = vwp.first
+        platform = vwp.last
+        version_platform_str = String.new(version.to_s)
+        version_platform_str << " #{platform}" unless platform.nil?
+      end
+      version_platform_strs.join(", ")
     end
   end
 end

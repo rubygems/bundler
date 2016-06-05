@@ -1,6 +1,10 @@
+# frozen_string_literal: true
 require "erb"
 require "rubygems/dependency_installer"
 require "bundler/worker"
+require "bundler/installer/parallel_installer"
+require "bundler/installer/standalone"
+require "bundler/installer/gem_installer"
 
 module Bundler
   class Installer < Environment
@@ -68,52 +72,7 @@ module Bundler
       install(options)
 
       lock unless Bundler.settings[:frozen]
-      generate_standalone(options[:standalone]) if options[:standalone]
-    end
-
-    def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
-      # Fetch the build settings, if there are any
-      settings = Bundler.settings["build.#{spec.name}"]
-      install_options = { :force => force, :ensure_builtin_gems_cached => standalone }
-
-      post_install_message = nil
-      if settings
-        # Build arguments are global, so this is mutexed
-        Bundler.rubygems.with_build_args [settings] do
-          post_install_message = spec.source.install(spec, install_options)
-        end
-      else
-        post_install_message = spec.source.install(spec, install_options)
-      end
-
-      Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
-
-      if Bundler.settings[:bin] && standalone
-        generate_standalone_bundler_executable_stubs(spec)
-      elsif Bundler.settings[:bin]
-        generate_bundler_executable_stubs(spec, :force => true)
-      end
-
-      post_install_message
-    rescue Errno::ENOSPC
-      raise Bundler::InstallError, "Your disk is out of space. Free some " \
-        "space to be able to install your bundle."
-    rescue Exception => e
-      # if install hook failed or gem signature is bad, just die
-      raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
-
-      # other failure, likely a native extension build failure
-      Bundler.ui.info ""
-      Bundler.ui.warn "#{e.class}: #{e.message}"
-      msg = "An error occurred while installing #{spec.name} (#{spec.version}),"
-      msg << " and Bundler cannot continue."
-
-      unless spec.source.options["git"]
-        msg << "\nMake sure that `gem install"
-        msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
-      end
-      Bundler.ui.debug e.backtrace.join("\n")
-      raise Bundler::InstallError, msg
+      Standalone.new(options[:standalone], @definition).generate if options[:standalone]
     end
 
     def generate_bundler_executable_stubs(spec, options = {})
@@ -169,43 +128,15 @@ module Bundler
       end
     end
 
-  private
-
-    # the order that the resolver provides is significant, since
-    # dependencies might actually affect the installation of a gem.
-    # that said, it's a rare situation (other than rake), and parallel
-    # installation is just SO MUCH FASTER. so we let people opt in.
-    def install(options)
-      force = options["force"]
-      jobs = [Bundler.settings[:jobs].to_i - 1, 1].max
-      if jobs > 1 && can_install_in_parallel?
-        require "bundler/installer/parallel_installer"
-        install_in_parallel jobs, options[:standalone], force
-      else
-        install_sequentially options[:standalone], force
-      end
-    end
-
-    def can_install_in_parallel?
-      if Bundler.rubygems.provides?(">= 2.1.0")
-        true
-      else
-        Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
-          "gems must be installed one at a time. Upgrade to Rubygems 2.1.0 " \
-          "or higher to enable parallel gem installation."
-        false
-      end
-    end
-
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = Bundler.bin_path
+      standalone_path = standalone_path = Bundler.root.join(Bundler.settings[:path]).relative_path_from(bin_path)
       template = File.read(File.expand_path("../templates/Executable.standalone", __FILE__))
       ruby_command = ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
         next if executable == "bundle"
-        standalone_path = standalone_path = Pathname(Bundler.settings[:path]).expand_path.relative_path_from(bin_path)
         executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
         File.open "#{bin_path}/#{executable}", "w", 0755 do |f|
           f.puts ERB.new(template, nil, "-").result(binding)
@@ -213,48 +144,27 @@ module Bundler
       end
     end
 
-    def generate_standalone(groups)
-      standalone_path = Bundler.settings[:path]
-      bundler_path = File.join(standalone_path, "bundler")
-      FileUtils.mkdir_p(bundler_path)
+  private
 
-      paths = []
-
-      if groups.empty?
-        specs = @definition.requested_specs
-      else
-        specs = @definition.specs_for groups.map(&:to_sym)
-      end
-
-      specs.each do |spec|
-        next if spec.name == "bundler"
-        next if spec.require_paths.nil? # builtin gems
-
-        spec.require_paths.each do |path|
-          full_path = Pathname.new(path).absolute? ? path : File.join(spec.full_gem_path, path)
-          gem_path = Pathname.new(full_path).relative_path_from(Bundler.root.join(bundler_path))
-          paths << gem_path.to_s.sub("#{Bundler.ruby_version.engine}/#{RbConfig::CONFIG["ruby_version"]}", '#{ruby_engine}/#{ruby_version}')
-        end
-      end
-
-      File.open File.join(bundler_path, "setup.rb"), "w" do |file|
-        file.puts "require 'rbconfig'"
-        file.puts "# ruby 1.8.7 doesn't define RUBY_ENGINE"
-        file.puts "ruby_engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby'"
-        file.puts "ruby_version = RbConfig::CONFIG[\"ruby_version\"]"
-        file.puts "path = File.expand_path('..', __FILE__)"
-        paths.each do |path|
-          file.puts %{$:.unshift "\#{path}/#{path}"}
-        end
-      end
+    # the order that the resolver provides is significant, since
+    # dependencies might affect the installation of a gem.
+    # that said, it's a rare situation (other than rake), and parallel
+    # installation is SO MUCH FASTER. so we let people opt in.
+    def install(options)
+      force = options["force"]
+      jobs = 1
+      jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?
+      install_in_parallel jobs, options[:standalone], force
     end
 
-    def install_sequentially(standalone, force = false)
-      specs.each do |spec|
-        message = install_gem_from_spec spec, standalone, 0, force
-        if message
-          Installer.post_install_messages[spec.name] = message
-        end
+    def can_install_in_parallel?
+      if Bundler.rubygems.provides?(">= 2.1.0")
+        true
+      else
+        Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
+          "gems will be installed one at a time. Upgrade to Rubygems 2.1.0 " \
+          "or higher to enable parallel gem installation."
+        false
       end
     end
 
@@ -263,7 +173,9 @@ module Bundler
     end
 
     def create_bundle_path
-      Bundler.mkdir_p(Bundler.bundle_path.to_s) unless Bundler.bundle_path.exist?
+      SharedHelpers.filesystem_access(Bundler.bundle_path.to_s) do |p|
+        Bundler.mkdir_p(p)
+      end unless Bundler.bundle_path.exist?
     rescue Errno::EEXIST
       raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " \
         "because of an invalid symlink. Remove the symlink so the directory can be created."
@@ -274,15 +186,14 @@ module Bundler
         local = Bundler.ui.silence do
           begin
             tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
+            true unless tmpdef.new_platform? || tmpdef.missing_dependencies.any?
           rescue BundlerError
           end
         end
       end
 
-      unless local
-        options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
-      end
+      return if local
+      options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
     end
   end
 end

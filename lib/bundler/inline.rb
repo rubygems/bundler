@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Allows for declaring a gems.rb inline in a ruby script, optionally installing
 # any gems that aren't already installed on the user's system.
 #
@@ -27,13 +28,18 @@
 #
 #          puts Pod::VERSION # => "0.34.4"
 #
-def gemfile(install = false, &gemfile)
+def gemfile(install = false, options = {}, &gemfile)
   require "bundler"
+
+  opts = options.dup
+  ui = opts.delete(:ui) { Bundler::UI::Shell.new }
+  raise ArgumentError, "Unknown options: #{opts.keys.join(", ")}" unless opts.empty?
+
   old_root = Bundler.method(:root)
   def Bundler.root
     Bundler::SharedHelpers.pwd.expand_path
   end
-  ENV["BUNDLE_GEMFILE"] ||= "gems.rb"
+  ENV["BUNDLE_INLINE"] = "inline"
 
   builder = Bundler::Dsl.new
   builder.instance_eval(&gemfile)
@@ -43,7 +49,7 @@ def gemfile(install = false, &gemfile)
   definition.validate_ruby!
 
   if install
-    Bundler.ui = Bundler::UI::Shell.new
+    Bundler.ui = ui
     Bundler::Installer.install(Bundler.root, definition, :system => true)
     Bundler::Installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post-install message from #{name}:\n#{message}"

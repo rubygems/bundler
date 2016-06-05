@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   module CLI::Common
     def self.without_groups_message
@@ -51,6 +52,5 @@ module Bundler
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
     end
-
   end
 end

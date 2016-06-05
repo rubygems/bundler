@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "bundler/settings"
 
@@ -12,6 +13,43 @@ describe Bundler::Settings do
         expect { subject.set_local("foo", "bar") }.
           to raise_error(Bundler::GemfileNotFound, "Could not locate gems.rb")
       end
+    end
+  end
+
+  describe "load_config" do
+    let(:hash) do
+      {
+        "build.thrift" => "--with-cppflags=-D_FORTIFY_SOURCE=0",
+        "build.libv8" => "--with-system-v8",
+        "build.therubyracer" => "--with-v8-dir",
+        "build.pg" => "--with-pg-config=/usr/local/Cellar/postgresql92/9.2.8_1/bin/pg_config",
+        "gem.coc" => "false",
+        "gem.mit" => "false",
+        "gem.test" => "minitest",
+        "thingy" => <<-EOS.tr("\n", " "),
+--asdf --fdsa --ty=oh man i hope this doesnt break bundler because
+that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
+--very-important-option=DontDeleteRoo
+--very-important-option=DontDeleteRoo
+--very-important-option=DontDeleteRoo
+--very-important-option=DontDeleteRoo
+        EOS
+        "xyz" => "zyx",
+      }
+    end
+
+    before do
+      hash.each do |key, value|
+        settings.set_local(key, value)
+      end
+    end
+
+    it "can load the config" do
+      loaded = settings.send(:load_config, bundled_app("config"))
+      expected = Hash[hash.map do |k, v|
+        [settings.send(:key_for, k), v.to_s]
+      end]
+      expect(loaded).to eq(expected)
     end
   end
 
@@ -33,11 +71,19 @@ describe Bundler::Settings do
         settings[:frozen] = "true"
         expect(settings[:frozen]).to be true
       end
+
       context "when specific gem is configured" do
         it "returns a boolean" do
           settings["ignore_messages.foobar"] = "true"
           expect(settings["ignore_messages.foobar"]).to be true
         end
+      end
+    end
+
+    context "when is number" do
+      it "returns a number" do
+        settings[:ssl_verify_mode] = "1"
+        expect(settings[:ssl_verify_mode]).to be 1
       end
     end
 
@@ -182,7 +228,8 @@ describe Bundler::Settings do
 
     it "reads older keys without trailing slashes" do
       settings["mirror.https://rubygems.org"] = "http://rubygems-mirror.org"
-      expect(settings.gem_mirrors).to eq(URI("https://rubygems.org/") => URI("http://rubygems-mirror.org/"))
+      expect(settings.mirror_for("https://rubygems.org/")).to eq(
+        URI("http://rubygems-mirror.org/"))
     end
   end
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle install from an existing gemspec" do
@@ -163,6 +164,88 @@ describe "bundle install from an existing gemspec" do
       G
 
       should_be_installed "rack 1.0"
+    end
+  end
+
+  context "with a lockfile and some missing dependencies" do
+    let(:source_uri) { "http://localgemserver.test" }
+
+    context "previously bundled for Ruby" do
+      let(:platform) { "ruby" }
+      let(:explicit_platform) { false }
+
+      before do
+        build_lib("foo", :path => tmp.join("foo")) do |s|
+          s.add_dependency "rack", "=1.0.0"
+          s.platform = platform if explicit_platform
+        end
+
+        gemfile <<-G
+          source "#{source_uri}"
+          gemspec :path => "../foo"
+        G
+
+        lockfile <<-L
+          PATH
+            remote: ../foo
+            specs:
+              foo (1.0)
+                rack (= 1.0.0)
+
+          GEM
+            remote: #{source_uri}
+            specs:
+              rack (1.0.0)
+
+          PLATFORMS
+            #{generic_local_platform}
+
+          DEPENDENCIES
+            foo!
+
+          BUNDLED WITH
+             #{Bundler::VERSION}
+        L
+      end
+
+      context "using JRuby with explicit platform" do
+        let(:platform) { "java" }
+        let(:explicit_platform) { true }
+
+        it "should install" do
+          simulate_ruby_engine "jruby" do
+            simulate_platform "java" do
+              results = bundle "install", :artifice => "endpoint"
+              expect(results).to include("Installing rack 1.0.0")
+              should_be_installed "rack 1.0.0"
+            end
+          end
+        end
+      end
+
+      context "using JRuby" do
+        let(:platform) { "java" }
+
+        it "should install" do
+          simulate_ruby_engine "jruby" do
+            simulate_platform "java" do
+              results = bundle "install", :artifice => "endpoint"
+              expect(results).to include("Installing rack 1.0.0")
+              should_be_installed "rack 1.0.0"
+            end
+          end
+        end
+      end
+
+      context "using Windows" do
+        it "should install" do
+          simulate_windows do
+            results = bundle "install", :artifice => "endpoint"
+            expect(results).to include("Installing rack 1.0.0")
+            should_be_installed "rack 1.0.0"
+          end
+        end
+      end
     end
   end
 end

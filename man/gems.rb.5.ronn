@@ -35,9 +35,15 @@ this warning, by using the [`:source` option](#SOURCE-source-) or a
 
 ### CREDENTIALS (#credentials)
 
+<<<<<<< HEAD:man/gems.rb.5.ronn
 Some gem sources require a username and password. Use `bundle config` to set
 the username and password for any sources that need it. The command must be run
 once on each computer that will install the gems.rb, but this keeps the
+=======
+Some gem sources require a username and password. Use [bundle config(1)][bundle-config] to set
+the username and password for any of the sources that need it. The command must
+be run once on each computer that will install the Gemfile, but this keeps the
+>>>>>>> master:man/gemfile.5.ronn
 credentials from being stored in plain text in version control.
 
     bundle config gems.example.com user:password
@@ -137,10 +143,10 @@ The Bundler runtime allows its two main methods, `Bundler.setup` and
     Bundler.setup(:default, :test)   # set up the _default_ and _test_ groups, but no others
 
     # require requires all of the gems in the specified groups
-    Bundler.require                  # defaults to just the _default_ group
+    Bundler.require                  # defaults to the _default_ group
     Bundler.require(:default)        # identical
     Bundler.require(:default, :test) # requires the _default_ and _test_ groups
-    Bundler.require(:test)           # requires just the _test_ group
+    Bundler.require(:test)           # requires the _test_ group
 
 The Bundler CLI allows you to specify a list of groups whose gems `bundle install` should
 not install with the `--without` option. To specify multiple groups to ignore, specify a
@@ -155,7 +161,7 @@ without any `--without option`, bundler will recall it.
 
 Also, calling `Bundler.setup` with no parameters, or calling `require "bundler/setup"`
 will setup all groups except for the ones you excluded via `--without` (since they
-are obviously not available).
+are not available).
 
 Note that on `bundle install`, bundler downloads and evaluates all gems, in order to
 create a single canonical list of all of the required gems and their dependencies.
@@ -353,7 +359,7 @@ currently expands to an insecure `git://` URL. This allows a
 man-in-the-middle attacker to compromise your system.
 
 If the git repository you want to use is hosted on GitHub and is public, you can use the
-:github shorthand to specify just the github username and repository name (without the
+:github shorthand to specify the github username and repository name (without the
 trailing ".git"), separated by a slash. If both the username and repository name are the
 same, you can omit one.
 
@@ -369,7 +375,7 @@ Since the `github` method is a specialization of `git_source`, it accepts a `:br
 ### GIST (:gist)
 
 If the git repository you want to use is hosted as a Github Gist and is public, you can use
-the :gist shorthand to specify just the gist identifier (without the trailing ".git").
+the :gist shorthand to specify the gist identifier (without the trailing ".git").
 
     gem "the_hatch", :gist => "4815162342"
 
@@ -382,7 +388,7 @@ Since the `gist` method is a specialization of `git_source`, it accepts a `:bran
 ### BITBUCKET (:bitbucket)
 
 If the git repository you want to use is hosted on Bitbucket and is public, you can use the
-:bitbucket shorthand to specify just the bitbucket username and repository name (without the
+:bitbucket shorthand to specify the bitbucket username and repository name (without the
 trailing ".git"), separated by a slash. If both the username and repository name are the
 same, you can omit one.
 

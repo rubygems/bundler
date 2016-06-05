@@ -1,97 +1,99 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Config
-    attr_reader :options, :thor
+    attr_reader :name, :options, :scope, :thor, :delete
     attr_accessor :args
 
     def initialize(options, args, thor)
-      @options = options
+      if options["global"] && options["local"]
+        raise InvalidOption, "Global and local settings cannot be changed at the same time. Please choose one or the other."
+      end
+
+      @delete = options["delete"]
+      @scope = options["local"] ? "local" : "global"
       @args = args
+      @name = args.shift
       @thor = thor
     end
 
     def run
-      peek = args.shift
+      return delete_config(name) if delete
+      return confirm_all unless name
+      return confirm(name) if args.empty?
 
-      if peek && peek =~ /^\-\-/
-        name = args.shift
-        scope = $'
+      message = message_for(name)
+      Bundler.ui.info(message) if message
+
+      new_value = value_for(name, args)
+      group_delete = new_value.empty? && %w(with without).include?(name)
+      return delete_config(name, nil) if group_delete
+
+      resolve_system_path_conflicts(name, new_value, scope)
+      resolve_group_conflicts(name, new_value, scope)
+      Bundler.settings.send("set_#{scope}", name, new_value)
+    end
+
+  private
+
+    def confirm_all
+      Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
+      Bundler.settings.all.each do |setting|
+        Bundler.ui.confirm "#{setting}"
+        show_pretty_values_for(setting)
+        Bundler.ui.confirm ""
+      end
+    end
+
+    def confirm(name)
+      Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
+      show_pretty_values_for(name)
+    end
+
+    def expand_local_path(name, value)
+      pathname = Pathname.new(value)
+      pathname.directory? ? pathname.expand_path.to_s : value
+    end
+
+    def message_for(name)
+      locations = Bundler.settings.locations(name)
+      if scope == "global"
+        if locations[:local]
+          "Your application has set #{name} to #{locations[:local].inspect}. " \
+            "This will override the global value you are currently setting"
+        elsif locations[:env]
+          "You have a bundler environment variable for #{name} set to " \
+            "#{locations[:env].inspect}. This will take precedence over the global value you are setting"
+        elsif locations[:global] && locations[:global] != args.join(" ")
+          "You are replacing the current global value of #{name}, which is currently " \
+            "#{locations[:global].inspect}"
+        end
+      elsif scope == "local" && locations[:local] != args.join(" ")
+        "You are replacing the current local value of #{name}, which is currently " \
+          "#{locations[:local].inspect}"
+      end
+    end
+
+    def value_for(name, args)
+      case name
+      when /^local\./
+        expand_local_path(name, args.join(" "))
+      when "with", "without"
+        args.size == 1 ? args.first.split(" ").join(":") : args.join(":")
       else
-        name = peek
-        scope = options["local"] ? "local" : "global"
+        args.join(" ")
       end
+    end
 
-      unless name
-        Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
-
-        Bundler.settings.all.each do |setting|
-          Bundler.ui.confirm "#{setting}"
-          thor.with_padding do
-            Bundler.settings.pretty_values_for(setting).each do |line|
-              Bundler.ui.info line
-            end
-          end
-          Bundler.ui.confirm ""
+    def show_pretty_values_for(setting)
+      thor.with_padding do
+        Bundler.settings.pretty_values_for(setting).each do |line|
+          Bundler.ui.info line
         end
-        return
       end
+    end
 
-      case scope
-      when "delete"
-        delete_config(name)
-      when "local", "global"
-        # NOTE: `"current"` is not a valid scope, because current settings are
-        # not remembered between commands.
-        if args.empty?
-          Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
-          thor.with_padding do
-            Bundler.settings.pretty_values_for(name).each {|line| Bundler.ui.info line }
-          end
-          return
-        end
-
-        new_value = args.join(" ").gsub("--global", "").gsub("--local", "").strip
-        new_value.gsub!(/\s+/, ":") if name == "with" || name == "without"
-        locations = Bundler.settings.locations(name)
-
-        if scope == "global"
-          if locations[:local]
-            Bundler.ui.info "Your application has set #{name} to #{locations[:local].inspect}. " \
-              "This will override the global value you are currently setting"
-          end
-
-          if locations[:env]
-            Bundler.ui.info "You have a bundler environment variable for #{name} set to " \
-              "#{locations[:env].inspect}. This will take precedence over the global value you are setting"
-          end
-
-          if locations[:global] && locations[:global] != new_value
-            Bundler.ui.info "You are replacing the current global value of #{name}, which is currently " \
-              "#{locations[:global].inspect}"
-          end
-        end
-
-        if scope == "local" && locations[:local] != new_value
-          Bundler.ui.info "You are replacing the current local value of #{name}, which is currently " \
-            "#{locations[:local].inspect}"
-        end
-
-        resolve_system_path_conflicts(name, new_value, scope)
-        resolve_group_conflicts(name, new_value, scope)
-        delete_config(name, nil) if new_value == "" and (name == "with" or name == "without")
-
-        # NOTE: Bundler.settings stores multiple with and without keys, given an array like
-        # [:foo, :bar, :baz, :qux], as "foo:bar:baz:qux" (see #set_array)
-
-        if name.match(/\Alocal\./)
-          pathname = Pathname.new(args.join(" "))
-          new_value = pathname.expand_path.to_s if pathname.directory?
-        end
-
-        Bundler.settings.send("set_#{scope}", name, new_value)
-      else
-        Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
-        exit 1
-      end
+    def valid_scope?(scope)
+      %w(delete local global).include?(scope)
     end
 
     # Clears `path` if `path.system` is being set, and vice versa.
@@ -106,10 +108,10 @@ module Bundler
     #         the scope of the option being set by the user (either `"local"` or
     #         `"global"`).
     def resolve_system_path_conflicts(name, new_value, scope = "global")
-      if name == "path.system" and Bundler.settings[:path] and new_value == "true"
+      if name == "path.system" && Bundler.settings[:path] && new_value == "true"
         Bundler.ui.warn "`path` is already configured, so it will be unset."
         delete_config("path")
-      elsif name == "path" and Bundler.settings["path.system"]
+      elsif name == "path" && Bundler.settings["path.system"]
         Bundler.ui.warn "`path.system` is already configured, so it will be unset."
         delete_config("path.system")
       end
@@ -225,7 +227,7 @@ module Bundler
     #
     def groups_conflict?(name, groups, scope_prev, scope_new)
       conflicts = conflicting_groups(name, groups, scope_prev, scope_new)
-      conflicts && conflicts.size > 0 && scope_new.to_sym == scope_prev
+      conflicts && !conflicts.empty? && scope_new.to_sym == scope_prev
     end
 
     # Finds the conflicting (overlapping) groups in the list given by the user
@@ -250,7 +252,7 @@ module Bundler
     #
     def conflicting_groups(name, groups, scope_prev, scope_new)
       settings = Bundler.settings.send(name.to_sym, scope_prev)
-      settings = (settings.map {|opt| opt.to_s.split(":").map(&:to_sym) }).flatten # TODO: refactor
+      settings = (settings.map {|opt| opt.to_s.split(" ").map(&:to_sym) }).flatten # TODO: refactor
       groups & settings
     end
 
@@ -268,7 +270,7 @@ module Bundler
     #         `global` scope.
     #
     def without_conflict?(groups, scope)
-      groups_conflict?(:without, groups, :local, scope) or groups_conflict?(:without, groups, :global, scope)
+      groups_conflict?(:without, groups, :local, scope) || groups_conflict?(:without, groups, :global, scope)
     end
 
     # Determines whether the user's (`without`) groups conflict with the
@@ -285,7 +287,7 @@ module Bundler
     #         `global` scope.
     #
     def with_conflict?(groups, scope)
-      groups_conflict?(:with, groups, :local, scope) or groups_conflict?(:with, groups, :global, scope)
+      groups_conflict?(:with, groups, :local, scope) || groups_conflict?(:with, groups, :global, scope)
     end
   end
 end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle lock" do
@@ -82,7 +83,7 @@ describe "bundle lock" do
   end
 
   it "does not fetch remote specs when using the --local option" do
-    bundle "lock --update --local"
+    bundle "lock --update --local", :expect_err => true
 
     expect(err).to include("sources listed in your gems.rb or available on this machine")
   end
@@ -93,5 +94,13 @@ describe "bundle lock" do
     expect(out).to match(/Writing lockfile to.+lock/)
     expect(read_lockfile "lock").to eq(@lockfile)
     expect { read_lockfile }.to raise_error(Errno::ENOENT)
+  end
+
+  it "update specific gems using --update" do
+    lockfile @lockfile.gsub("2.3.2", "2.3.1").gsub("10.0.2", "10.0.1")
+
+    bundle "lock --update rails rake"
+
+    expect(read_lockfile).to eq(@lockfile)
   end
 end

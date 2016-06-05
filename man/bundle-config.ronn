@@ -147,6 +147,12 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `ignore_messages` (`BUNDLE_IGNORE_MESSAGES`): When set, no post install
   messages will be printed. To silence a single gem, use dot notation like
   `ignore_messages.httparty true`.
+* `retry` (`BUNDLE_RETRY`):
+   The number of times to retry failed network requests. Defaults to `3`.
+* `redirect` (`BUNDLE_REDIRECT`):
+   The number of redirects allowed for network requests. Defaults to `5`.
+* `timeout` (`BUNDLE_TIMEOUT`):
+   The seconds allowed before timing out for network requests. Defaults to `10`.
 
 In general, you should set these settings per-application by passing the
 applicable flag to the `bundle config --local` command.
@@ -206,8 +212,8 @@ This also means that you cannot include different versions of the same
 gem in different groups, because doing so would result in different
 sets of dependencies used in development and production. Because of
 the vagaries of the dependency resolution process, this usually
-affects more than just the gems you list in your gems.rb(5), and can
-(surprisingly) radically change the gems you are using.
+affects more than the gems you explicitly list in your gems.rb(5),
+and can (surprisingly) radically change the gems you are using.
 
 ## LOCAL GIT REPOS
 

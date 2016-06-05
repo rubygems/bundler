@@ -1,45 +1,32 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "gemcutter's dependency API", :realworld => true do
-  def wait_for_server(port, seconds = 15)
-    tries = 0
-    TCPSocket.new("127.0.0.1", port)
-  rescue => e
-    raise(e) if tries > (seconds * 2)
-    tries += 1
-    sleep 0.5
-    retry
-  end
-
   context "when Gemcutter API takes too long to respond" do
     before do
-      # need to hack, so we can require rack
-      old_gem_home = ENV["GEM_HOME"]
-      ENV["GEM_HOME"] = Spec::Path.base_system_gems.to_s
-      require "rack"
-      ENV["GEM_HOME"] = old_gem_home
+      require_rack
 
-      port = 21_453
-      port += 1 while TCPSocket.new("127.0.0.1", port) rescue false
+      port = find_unused_port
       @server_uri = "http://127.0.0.1:#{port}"
 
       require File.expand_path("../../support/artifice/endpoint_timeout", __FILE__)
       require "thread"
-      @t = Thread.new {
+      @t = Thread.new do
         server = Rack::Server.start(:app       => EndpointTimeout,
                                     :Host      => "0.0.0.0",
                                     :Port      => port,
                                     :server    => "webrick",
                                     :AccessLog => [])
         server.start
-      }
+      end
       @t.run
 
-      wait_for_server(port)
+      wait_for_server("127.0.0.1", port)
     end
 
     after do
       @t.kill
+      @t.join
     end
 
     it "times out and falls back on the modern index" do

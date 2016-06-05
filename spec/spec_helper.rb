@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 $:.unshift File.expand_path("..", __FILE__)
 $:.unshift File.expand_path("../../lib", __FILE__)
 
@@ -44,6 +45,8 @@ ENV["BUNDLE_SPEC_RUN"] = "true"
 # Don't wrap output in tests
 ENV["THOR_COLUMNS"] = "10000"
 
+Spec::CodeClimate.setup
+
 RSpec.configure do |config|
   config.include Spec::Builders
   config.include Spec::Helpers
@@ -54,6 +57,9 @@ RSpec.configure do |config|
   config.include Spec::Platforms
   config.include Spec::Sudo
   config.include Spec::Permissions
+
+  # Enable flags like --only-failures and --next-failure
+  config.example_status_persistence_file_path = ".rspec_status"
 
   if ENV["BUNDLER_SUDO_TESTS"] && Spec::Sudo.present?
     config.filter_run :sudo => true
@@ -74,9 +80,8 @@ RSpec.configure do |config|
   config.filter_run :focused => true unless ENV["CI"]
   config.run_all_when_everything_filtered = true
 
-  original_wd       = Dir.pwd
-  original_path     = ENV["PATH"]
-  original_gem_home = ENV["GEM_HOME"]
+  original_wd  = Dir.pwd
+  original_env = ENV.to_hash
 
   def pending_jruby_shebang_fix
     pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
@@ -100,16 +105,6 @@ RSpec.configure do |config|
     puts @out if defined?(@out) && example.exception
 
     Dir.chdir(original_wd)
-    # Reset ENV
-    ENV["PATH"]                  = original_path
-    ENV["GEM_HOME"]              = original_gem_home
-    ENV["GEM_PATH"]              = original_gem_home
-    ENV["BUNDLE_PATH"]           = nil
-    ENV["BUNDLE_GEMFILE"]        = nil
-    ENV["BUNDLE_FROZEN"]         = nil
-    ENV["BUNDLE_APP_CONFIG"]     = nil
-    ENV["BUNDLER_TEST"]          = nil
-    ENV["BUNDLER_SPEC_PLATFORM"] = nil
-    ENV["BUNDLER_SPEC_VERSION"]  = nil
+    ENV.replace(original_env)
   end
 end

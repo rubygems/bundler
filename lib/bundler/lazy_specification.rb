@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "uri"
 require "rubygems/spec_fetcher"
 require "bundler/match_platform"
@@ -19,7 +20,7 @@ module Bundler
     end
 
     def full_name
-      if platform == Gem::Platform::RUBY or platform.nil?
+      if platform == Gem::Platform::RUBY || platform.nil?
         "#{@name}-#{@version}"
       else
         "#{@name}-#{@version}-#{platform}"
@@ -35,10 +36,12 @@ module Bundler
     end
 
     def to_lock
-      if platform == Gem::Platform::RUBY or platform.nil?
-        out = "    #{name} (#{version})\n"
+      out = String.new
+
+      if platform == Gem::Platform::RUBY || platform.nil?
+        out << "    #{name} (#{version})\n"
       else
-        out = "    #{name} (#{version}-#{platform})\n"
+        out << "    #{name} (#{version}-#{platform})\n"
       end
 
       dependencies.sort_by(&:to_s).uniq.each do |dep|
@@ -54,7 +57,7 @@ module Bundler
     end
 
     def respond_to?(*args)
-      super || @specification.respond_to?(*args)
+      super || @specification ? @specification.respond_to?(*args) : nil
     end
 
     def to_s

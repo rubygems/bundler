@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/vendored_thor" unless defined?(Thor)
 require "bundler"
 
@@ -72,12 +73,12 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh("gem build -V '#{spec_path}'") {
+      sh("gem build -V '#{spec_path}'") do
         file_name = File.basename(built_gem_path)
-        FileUtils.mkdir_p(File.join(base, "pkg"))
+        SharedHelpers.filesystem_access(File.join(base, "pkg")) {|p| FileUtils.mkdir_p(p) }
         FileUtils.mv(built_gem_path, "pkg")
         Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}."
-      }
+      end
       File.join(base, "pkg", file_name)
     end
 
@@ -91,12 +92,17 @@ module Bundler
   protected
 
     def rubygem_push(path)
-      if Pathname.new("~/.gem/credentials").expand_path.exist?
-        sh("gem push '#{path}'")
-        Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org."
-      else
+      unless  Pathname.new("~/.gem/credentials").expand_path.file?
         raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
       end
+      allowed_push_host = nil
+      gem_command = "gem push '#{path}'"
+      if @gemspec.respond_to?(:metadata)
+        allowed_push_host = @gemspec.metadata["allowed_push_host"]
+        gem_command += " --host #{allowed_push_host}" if allowed_push_host
+      end
+      sh(gem_command)
+      Bundler.ui.confirm "Pushed #{name} #{version} to #{allowed_push_host ? allowed_push_host : "rubygems.org."}"
     end
 
     def built_gem_path
@@ -116,14 +122,13 @@ module Bundler
     end
 
     def already_tagged?
-      if sh("git tag").split(/\n/).include?(version_tag)
-        Bundler.ui.confirm "Tag #{version_tag} has already been created."
-        true
-      end
+      return false unless sh("git tag").split(/\n/).include?(version_tag)
+      Bundler.ui.confirm "Tag #{version_tag} has already been created."
+      true
     end
 
     def guard_clean
-      clean? && committed? or raise("There are files that need to be committed first.")
+      clean? && committed? || raise("There are files that need to be committed first.")
     end
 
     def clean?
@@ -158,28 +163,26 @@ module Bundler
 
     def sh(cmd, &block)
       out, code = sh_with_code(cmd, &block)
-      if code == 0
-        out
-      else
-        raise(out.empty? ? "Running `#{cmd}' failed. Run this command directly for more detailed output." : out)
+      unless code.zero?
+        raise(out.empty? ? "Running `#{cmd}` failed. Run this command directly for more detailed output." : out)
       end
+      out
     end
 
     def sh_with_code(cmd, &block)
-      cmd << " 2>&1"
-      outbuf = ""
+      cmd += " 2>&1"
+      outbuf = String.new
       Bundler.ui.debug(cmd)
-      SharedHelpers.chdir(base) {
+      SharedHelpers.chdir(base) do
         outbuf = `#{cmd}`
-        if $? == 0
-          block.call(outbuf) if block
-        end
-      }
-      [outbuf, $?]
+        status = $?.exitstatus
+        block.call(outbuf) if status.zero? && block
+        [outbuf, status]
+      end
     end
 
     def gem_push?
-      ! %w{n no nil false off 0}.include?(ENV["gem_push"].to_s.downcase)
+      ! %w(n no nil false off 0).include?(ENV["gem_push"].to_s.downcase)
     end
   end
 end

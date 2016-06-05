@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/current_ruby"
 
 module Bundler
@@ -17,23 +18,31 @@ module Bundler
     end
 
     def run
-      ui = Bundler.ui
-      raise ArgumentError if cmd.nil?
-
-      # First, try to exec directly to something in PATH
+      validate_cmd!
       SharedHelpers.set_bundle_environment
-      bin_path = Bundler.which(@cmd)
-      if bin_path
-        Bundler.ui = nil
-        Kernel.exec(bin_path, *args)
+      if bin_path = Bundler.which(cmd)
+        return kernel_load(bin_path, *args) if ruby_shebang?(bin_path)
+        # First, try to exec directly to something in PATH
+        kernel_exec([bin_path, cmd], *args)
+      else
+        # exec using the given command
+        kernel_exec(cmd, *args)
       end
+    end
 
-      # If that didn't work, set up the whole bundle
-      Bundler.definition.validate_ruby!
-      Bundler.load.setup_environment
+  private
+
+    def validate_cmd!
+      return unless cmd.nil?
+      Bundler.ui.error "bundler: exec needs a command to run"
+      exit 128
+    end
+
+    def kernel_exec(*args)
+      ui = Bundler.ui
       Bundler.ui = nil
-      Kernel.exec(@cmd, *args)
-    rescue Errno::EACCES
+      Kernel.exec(*args)
+    rescue Errno::EACCES, Errno::ENOEXEC
       Bundler.ui = ui
       Bundler.ui.error "bundler: not executable: #{cmd}"
       exit 126
@@ -42,10 +51,32 @@ module Bundler
       Bundler.ui.error "bundler: command not found: #{cmd}"
       Bundler.ui.warn "Install missing gem executables with `bundle install`"
       exit 127
-    rescue ArgumentError
+    end
+
+    def kernel_load(file, *args)
+      args.pop if args.last.is_a?(Hash)
+      ARGV.replace(args)
+      $0 = file
+      ui = Bundler.ui
+      Bundler.ui = nil
+      require "bundler/setup"
+      Kernel.load(file)
+    rescue SystemExit
+      raise
+    rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = ui
-      Bundler.ui.error "bundler: exec needs a command to run"
-      exit 128
+      Bundler.ui.error "bundler: failed to load command: #{cmd} (#{file})"
+      backtrace = e.backtrace.take_while {|bt| !bt.start_with?(__FILE__) }
+      abort "#{e.class}: #{e.message}\n  #{backtrace.join("\n  ")}"
+    end
+
+    def ruby_shebang?(file)
+      possibilities = [
+        "#!/usr/bin/env ruby\n",
+        "#!#{Gem.ruby}\n",
+      ]
+      first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }
+      possibilities.any? {|shebang| first_line.start_with?(shebang) }
     end
   end
 end

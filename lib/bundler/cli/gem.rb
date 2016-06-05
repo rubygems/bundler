@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "pathname"
 
 module Bundler
@@ -5,7 +6,7 @@ module Bundler
     TEST_FRAMEWORK_VERSIONS = {
       "rspec" => "3.0",
       "minitest" => "5.0"
-    }
+    }.freeze
 
     attr_reader :options, :gem_name, :thor, :name, :target
 
@@ -27,7 +28,6 @@ module Bundler
       namespaced_path = name.tr("-", "/")
       constant_name = name.gsub(/-[_-]*(?![_-]|$)/) { "::" }.gsub(/([_-]+|(::)|^)(.|$)/) { $2.to_s + $3.upcase }
       constant_array = constant_name.split("::")
-      test_task = options[:test] == "minitest" ? "test" : "spec"
 
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
@@ -42,7 +42,6 @@ module Bundler
         :author           => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
         :email            => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
         :test             => options[:test],
-        :test_task        => test_task,
         :ext              => options[:ext],
         :exe              => options[:exe],
         :bundler_version  => bundler_dependency_version
@@ -61,10 +60,10 @@ module Bundler
         "bin/setup.tt" => "bin/setup"
       }
 
-      executables = %w[
+      executables = %w(
         bin/console
         bin/setup
-      ]
+      )
 
       if test_framework = ask_and_set_test_framework
         config[:test] = test_framework
@@ -87,10 +86,12 @@ module Bundler
         end
       end
 
+      config[:test_task] = config[:test] == "minitest" ? "test" : "spec"
+
       if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
         "This means that any other developer or company will be legally allowed to use your code " \
         "for free as long as they admit you created it. You can read more about the MIT license " \
-        "at choosealicense.com/licenses/mit.")
+        "at http://choosealicense.com/licenses/mit.")
         config[:mit] = true
         Bundler.ui.info "MIT License enabled in config"
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
@@ -100,8 +101,10 @@ module Bundler
         "Codes of conduct can increase contributions to your project by contributors who " \
         "prefer collaborative, safe spaces. You can read more about the code of conduct at " \
         "contributor-covenant.org. Having a code of conduct means agreeing to the responsibility " \
-        "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
-        "how to enforce codes of conduct, see bit.ly/coc-enforcement.")
+        "of enforcing it, so be sure that you are prepared to do that. Be sure that your email " \
+        "address is specified as a contact in the generated code of conduct so that people know " \
+        "who to contact in case of a violation. For suggestions about " \
+        "how to enforce codes of conduct, see http://bit.ly/coc-enforcement.")
         config[:coc] = true
         Bundler.ui.info "Code of conduct enabled in config"
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
@@ -133,10 +136,8 @@ module Bundler
         `git add .`
       end
 
-      if options[:edit]
-        # Open gemspec in editor
-        thor.run("#{options["edit"]} \"#{target.join("#{name}.gemspec")}\"")
-      end
+      # Open gemspec in editor
+      open_editor(options["edit"], target.join("#{name}.gemspec")) if options[:edit]
     end
 
   private
@@ -146,7 +147,8 @@ module Bundler
     end
 
     def ask_and_set(key, header, message)
-      choice = options[key] || Bundler.settings["gem.#{key}"]
+      choice = options[key]
+      choice = Bundler.settings["gem.#{key}"] if choice.nil?
 
       if choice.nil?
         Bundler.ui.confirm header
@@ -203,6 +205,10 @@ module Bundler
         Bundler.ui.error "Invalid gem name #{name} constant #{constant_array.join("::")} is already in use. Please choose another gem name."
         exit 1
       end
+    end
+
+    def open_editor(editor, file)
+      thor.run(%(#{editor} "#{file}"))
     end
   end
 end

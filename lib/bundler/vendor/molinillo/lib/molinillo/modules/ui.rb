@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler::Molinillo
   # Conveys information about the resolution process to a user.
   module UI
@@ -57,7 +58,8 @@ module Bundler::Molinillo
     #
     # @return [Boolean]
     def debug?
-      @debug_mode ||= ENV['MOLINILLO_DEBUG']
+      return @debug_mode if defined?(@debug_mode)
+      @debug_mode = ENV['MOLINILLO_DEBUG']
     end
   end
 end

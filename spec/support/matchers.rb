@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Spec
   module Matchers
     RSpec::Matchers.define :lack_errors do
@@ -43,8 +44,9 @@ module Spec
       names.each do |name|
         name, version, platform = name.split(/\s+/)
         version_const = name == "bundler" ? "Bundler::VERSION" : Spec::Builders.constantize(name)
-        run "require '#{name}.rb'; puts #{version_const}", *groups
-        actual_version, actual_platform = out.split(/\s+/)
+        run! "require '#{name}.rb'; puts #{version_const}", *groups
+        expect(out).not_to be_empty, "#{name} is not installed"
+        actual_version, actual_platform = out.split(/\s+/, 2)
         expect(Gem::Version.new(actual_version)).to eq(Gem::Version.new(version))
         expect(actual_platform).to eq(platform)
       end
@@ -56,7 +58,7 @@ module Spec
       opts = names.last.is_a?(Hash) ? names.pop : {}
       groups = Array(opts[:groups]) || []
       names.each do |name|
-        name, version = name.split(/\s+/)
+        name, version = name.split(/\s+/, 2)
         run <<-R, *(groups + [opts])
           begin
             require '#{name}'
@@ -80,7 +82,7 @@ module Spec
     def lockfile_should_be(expected)
       should_be_locked
       spaces = expected[/\A\s+/, 0] || ""
-      expected.gsub!(/^#{spaces}/, "")
+      expected = expected.gsub(/^#{spaces}/, "")
       expect(bundled_app("gems.locked").read).to eq(expected)
     end
   end

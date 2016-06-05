@@ -1,9 +1,14 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "bundler/source/rubygems/remote"
 
 describe Bundler::Source::Rubygems::Remote do
   def remote(uri)
     Bundler::Source::Rubygems::Remote.new(uri)
+  end
+
+  before do
+    allow(Digest::MD5).to receive(:hexdigest).with(duck_type(:to_s)) {|string| "MD5HEX(#{string})" }
   end
 
   let(:uri_no_auth) { URI("https://gems.example.com") }
@@ -32,6 +37,17 @@ describe Bundler::Source::Rubygems::Remote do
         expect(remote(uri_no_auth).anonymized_uri).to eq(uri_no_auth)
       end
     end
+
+    describe "#cache_slug" do
+      it "returns the correct slug" do
+        expect(remote(uri_no_auth).cache_slug).to eq("gems.example.com.443.MD5HEX(gems.example.com.443./)")
+      end
+
+      it "only applies the given user" do
+        Bundler.settings[uri_no_auth.to_s] = credentials
+        expect(remote(uri_no_auth).cache_slug).to eq("gems.example.com.username.443.MD5HEX(gems.example.com.username.443./)")
+      end
+    end
   end
 
   context "when the original URI has a username and password" do
@@ -56,6 +72,17 @@ describe Bundler::Source::Rubygems::Remote do
         expect(remote(uri_with_auth).anonymized_uri).to eq(uri_no_auth)
       end
     end
+
+    describe "#cache_slug" do
+      it "returns the correct slug" do
+        expect(remote(uri_with_auth).cache_slug).to eq("gems.example.com.username.443.MD5HEX(gems.example.com.username.443./)")
+      end
+
+      it "does not apply given credentials" do
+        Bundler.settings[uri_with_auth.to_s] = credentials
+        expect(remote(uri_with_auth).cache_slug).to eq("gems.example.com.username.443.MD5HEX(gems.example.com.username.443./)")
+      end
+    end
   end
 
   context "when the original URI has only a username" do
@@ -64,6 +91,12 @@ describe Bundler::Source::Rubygems::Remote do
     describe "#anonymized_uri" do
       it "returns the URI without username and password" do
         expect(remote(uri).anonymized_uri).to eq(URI("https://gem.fury.io/me/"))
+      end
+    end
+
+    describe "#cache_slug" do
+      it "returns the correct slug" do
+        expect(remote(uri).cache_slug).to eq("gem.fury.io.SeCrEt-ToKeN.443.MD5HEX(gem.fury.io.SeCrEt-ToKeN.443./me/)")
       end
     end
   end
@@ -81,6 +114,14 @@ describe Bundler::Source::Rubygems::Remote do
 
     specify "#anonymized_uri returns the mirror URI without credentials" do
       expect(remote(uri).anonymized_uri).to eq(mirror_uri_no_auth)
+    end
+
+    specify "#original_uri returns the original source" do
+      expect(remote(uri).original_uri).to eq(uri)
+    end
+
+    specify "#cache_slug returns the correct slug" do
+      expect(remote(uri).cache_slug).to eq("rubygems.org.443.MD5HEX(rubygems.org.443./)")
     end
   end
 
@@ -100,6 +141,22 @@ describe Bundler::Source::Rubygems::Remote do
 
     specify "#anonymized_uri returns the mirror URI without credentials" do
       expect(remote(uri).anonymized_uri).to eq(mirror_uri_no_auth)
+    end
+
+    specify "#original_uri returns the original source" do
+      expect(remote(uri).original_uri).to eq(uri)
+    end
+
+    specify "#cache_slug returns the original source" do
+      expect(remote(uri).cache_slug).to eq("rubygems.org.443.MD5HEX(rubygems.org.443./)")
+    end
+  end
+
+  context "when there is no mirror set" do
+    describe "#original_uri" do
+      it "is not set" do
+        expect(remote(uri_no_auth).original_uri).to be_nil
+      end
     end
   end
 end

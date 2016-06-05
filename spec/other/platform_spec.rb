@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundle platform" do
@@ -120,11 +121,9 @@ G
     it "infers from .ruby-version" do
       gemfile <<-G
         source "file://#{gem_repo1}"
-
         gem "foo"
       G
-
-      bundled_app(".ruby-version").open("w") {|f| f.write "2.2.3\n" }
+      bundled_app(".ruby-version").write("2.2.3\n")
 
       bundle "platform --ruby"
 
@@ -204,7 +203,51 @@ G
       G
 
       bundle "platform --ruby"
+
       expect(out).to eq("No ruby version specified")
+    end
+
+    it "handles when there is a locked requirement" do
+      gemfile <<-G
+        ruby "< 1.8.7"
+      G
+
+      lockfile <<-L
+        GEM
+          specs:
+
+        PLATFORMS
+          ruby
+
+        DEPENDENCIES
+
+        RUBY VERSION
+           ruby 1.0.0p127
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      L
+
+      bundle! "platform --ruby"
+      expect(out).to eq("ruby 1.0.0p127")
+    end
+
+    it "handles when there is a requirement in the gemfile" do
+      gemfile <<-G
+        ruby ">= 1.8.7"
+      G
+
+      bundle! "platform --ruby"
+      expect(out).to eq("ruby 1.8.7")
+    end
+
+    it "handles when there are multiple requirements in the gemfile" do
+      gemfile <<-G
+        ruby ">= 1.8.7", "< 2.0.0"
+      G
+
+      bundle! "platform --ruby"
+      expect(out).to eq("ruby 1.8.7")
     end
   end
 

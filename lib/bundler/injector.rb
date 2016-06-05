@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class Injector
     def self.inject(new_deps)
@@ -47,7 +48,7 @@ module Bundler
 
     def new_gem_lines
       @new_deps.map do |d|
-        %|gem '#{d.name}', '#{d.requirement}'|
+        %(gem '#{d.name}', '#{d.requirement}')
       end.join("\n")
     end
 

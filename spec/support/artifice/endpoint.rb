@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require File.expand_path("../../path.rb", __FILE__)
 require File.expand_path("../../../../lib/bundler/deprecate", __FILE__)
 include Spec::Path
@@ -12,6 +13,9 @@ require "artifice"
 require "sinatra/base"
 
 class Endpoint < Sinatra::Base
+  set :raise_errors, true
+  set :show_exceptions, false
+
   helpers do
     def dependencies_for(gem_names, gem_repo = gem_repo1)
       return [] if gem_names.nil? || gem_names.empty?
@@ -21,16 +25,15 @@ class Endpoint < Sinatra::Base
       Bundler::Deprecate.skip_during do
         Marshal.load(File.open(gem_repo.join("specs.4.8")).read).map do |name, version, platform|
           spec = load_spec(name, version, platform, gem_repo)
-          if gem_names.include?(spec.name)
-            {
-              :name         => spec.name,
-              :number       => spec.version.version,
-              :platform     => spec.platform.to_s,
-              :dependencies => spec.dependencies.select {|dep| dep.type == :runtime }.map do |dep|
-                [dep.name, dep.requirement.requirements.map {|a| a.join(" ") }.join(", ")]
-              end
-            }
-          end
+          next unless gem_names.include?(spec.name)
+          {
+            :name         => spec.name,
+            :number       => spec.version.version,
+            :platform     => spec.platform.to_s,
+            :dependencies => spec.dependencies.select {|dep| dep.type == :runtime }.map do |dep|
+              [dep.name, dep.requirement.requirements.map {|a| a.join(" ") }.join(", ")]
+            end
+          }
         end.compact
       end
     end

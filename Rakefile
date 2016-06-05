@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+# frozen_string_literal: true
 $:.unshift File.expand_path("../lib", __FILE__)
 require "shellwords"
 require "benchmark"
@@ -33,7 +34,7 @@ namespace :spec do
     deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
-    deps["rubocop"] ||= "= 0.33.0" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
+    deps["rubocop"] ||= "= 0.39.0" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
@@ -42,8 +43,8 @@ namespace :spec do
     end
 
     deps.sort_by {|name, _| name }.each do |name, version|
-      sh %{#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || } +
-         %{#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc}
+      sh %(#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || ) +
+        %(#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc)
     end
 
     # Download and install gems used inside tests
@@ -62,16 +63,15 @@ namespace :spec do
       sh "sudo apt-get install groff-base -y"
       # Install graphviz so that the viz specs can run
       sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
-      if RUBY_VERSION < "1.9"
-        # Downgrade Rubygems on 1.8 so Ronn can be required
-        # https://github.com/rubygems/rubygems/issues/784
-        sh "gem update --system 2.1.11"
-      else
-        # Downgrade Rubygems so RSpec 3 can be installed
-        # https://github.com/rubygems/rubygems/issues/813
-        sh "gem update --system 2.2.0"
-      end
-      # Install the other gem deps, etc.
+
+      # Install the gems with a consistent version of RubyGems
+      sh "gem update --system 2.6.3"
+
+      $LOAD_PATH.unshift("./spec")
+      require "support/rubygems_ext"
+      Spec::Rubygems::DEPS["codeclimate-test-reporter"] = nil if RUBY_VERSION >= "2.2.0"
+
+      # Install the other gem deps, etc
       Rake::Task["spec:deps"].invoke
     end
   end
@@ -88,7 +88,7 @@ begin
 
   if RUBY_VERSION >= "1.9.3"
     # can't go in the gemspec because of the ruby version requirement
-    gem "rubocop", "= 0.33.0"
+    gem "rubocop", "= 0.39.0"
     require "rubocop/rake_task"
     RuboCop::RakeTask.new
   end
@@ -99,14 +99,14 @@ begin
     end
 
     desc "Run the real-world spec suite (requires internet)"
-    task :realworld => %w[set_realworld spec]
+    task :realworld => %w(set_realworld spec)
 
     task :set_realworld do
       ENV["BUNDLER_REALWORLD_TESTS"] = "1"
     end
 
     desc "Run the spec suite with the sudo tests"
-    task :sudo => %w[set_sudo spec clean_sudo]
+    task :sudo => %w(set_sudo spec clean_sudo)
 
     task :set_sudo do
       ENV["BUNDLER_SUDO_TESTS"] = "1"
@@ -122,7 +122,7 @@ begin
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
       branches = %w(master)
-      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.3 v2.4.8)
+      releases = %w(v2.4.8 v2.5.2 v2.6.4)
       (branches + releases).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
@@ -275,6 +275,13 @@ end
 
 begin
   require "automatiek"
+
+  Automatiek::RakeTask.new("compact_index_client") do |lib|
+    lib.download = { :github => "https://github.com/bundler/compact_index_client" }
+    lib.namespace = "CompactIndexClient"
+    lib.prefix = "Bundler"
+    lib.vendor_lib = "lib/bundler/vendor/compact_index_client"
+  end
 
   Automatiek::RakeTask.new("molinillo") do |lib|
     lib.download = { :github => "https://github.com/CocoaPods/Molinillo" }

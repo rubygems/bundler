@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "bundler/installer/parallel_installer"
 
@@ -55,6 +56,21 @@ describe ParallelInstaller::SpecInstallation do
         spec = ParallelInstaller::SpecInstallation.new(dep)
         allow(spec).to receive(:all_dependencies).and_return(dependencies)
         expect(spec.dependencies_installed?(all_specs)).to be_falsey
+      end
+    end
+
+    context "when dependencies that are not on the overall installation list are the only ones not installed" do
+      it "raises an error" do
+        dependencies = []
+        dependencies << instance_double("SpecInstallation", :spec => "alpha", :name => "alpha", :installed? => true, :all_dependencies => [], :type => :production)
+        all_specs = dependencies + [instance_double("SpecInstallation", :spec => "gamma", :name => "gamma", :installed? => false, :all_dependencies => [], :type => :production)]
+        # Add dependency which is not in all_specs
+        dependencies << instance_double("SpecInstallation", :spec => "beta", :name => "beta", :installed? => false, :all_dependencies => [], :type => :production)
+        dependencies << instance_double("SpecInstallation", :spec => "delta", :name => "delta", :installed? => false, :all_dependencies => [], :type => :production)
+        spec = ParallelInstaller::SpecInstallation.new(dep)
+        allow(spec).to receive(:all_dependencies).and_return(dependencies)
+        expect { spec.dependencies_installed?(all_specs) }.
+          to raise_error(Bundler::LockfileError, /Your Gemfile.lock is corrupt\. The following.*'beta' 'delta'/)
       end
     end
   end

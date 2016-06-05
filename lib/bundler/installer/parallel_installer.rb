@@ -1,4 +1,6 @@
+# frozen_string_literal: true
 require "bundler/worker"
+require "bundler/installer/gem_installer"
 
 class ParallelInstaller
   class SpecInstallation
@@ -35,13 +37,21 @@ class ParallelInstaller
     # sure needed dependencies have been installed.
     def dependencies_installed?(all_specs)
       installed_specs = all_specs.select(&:installed?).map(&:name)
-      dependencies.all? {|d| installed_specs.include? d.name }
+      dependencies(all_specs.map(&:name)).all? {|d| installed_specs.include? d.name }
     end
 
-    # Represents only the non-development dependencies and the ones that
-    # are itself.
-    def dependencies
-      @dependencies ||= all_dependencies.reject {|dep| ignorable_dependency? dep }
+    # Represents only the non-development dependencies, the ones that are
+    # itself and are in the total list.
+    def dependencies(all_spec_names)
+      @dependencies ||= begin
+        deps = all_dependencies.reject {|dep| ignorable_dependency? dep }
+        missing = deps.reject {|dep| all_spec_names.include? dep.name }
+        unless missing.empty?
+          raise Bundler::LockfileError, "Your Gemfile.lock is corrupt. The following #{missing.size > 1 ? "gems are" : "gem is"} missing " \
+                              "from the DEPENDENCIES section: '#{missing.map(&:name).join('\' \'')}'"
+        end
+        deps
+      end
     end
 
     # Represents all dependencies
@@ -75,8 +85,10 @@ class ParallelInstaller
   end
 
   def worker_pool
-    @worker_pool ||= Bundler::Worker.new @size, lambda { |spec_install, worker_num|
-      message = @installer.install_gem_from_spec spec_install.spec, @standalone, worker_num, @force
+    @worker_pool ||= Bundler::Worker.new @size, "Parallel Installer", lambda { |spec_install, worker_num|
+      message = Bundler::GemInstaller.new(
+        spec_install.spec, @installer, @standalone, worker_num, @force
+      ).install_from_spec
       spec_install.post_install_message = message unless message.nil?
       spec_install
     }

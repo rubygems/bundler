@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "Bundler.require" do
@@ -96,6 +97,36 @@ describe "Bundler.require" do
     R
 
     expect(err).to eq_err("ZOMG LOAD ERROR")
+  end
+
+  it "displays a helpful message if the required gem throws an error" do
+    build_lib "faulty", "1.0.0" do |s|
+      s.write "lib/faulty.rb", "raise RuntimeError.new(\"Gem Internal Error Message\")"
+    end
+
+    gemfile <<-G
+      path "#{lib_path}"
+      gem "faulty"
+    G
+
+    run "Bundler.require", :expect_err => true
+    expect(err).to match("error while trying to load the gem 'faulty'")
+    expect(err).to match("Gem Internal Error Message")
+  end
+
+  it "displays a helpful message if the required gem throws an error" do
+    build_lib "faulty", "1.0.0" do |s|
+      s.write "lib/faulty.rb", "raise RuntimeError.new(\"Gem Internal Error Message\")"
+    end
+
+    gemfile <<-G
+      path "#{lib_path}"
+      gem "faulty"
+    G
+
+    run "Bundler.require", :expect_err => true
+    expect(err).to match("error while trying to load the gem 'faulty'")
+    expect(err).to match("Gem Internal Error Message")
   end
 
   it "doesn't swallow the error when the library has an unrelated error" do
