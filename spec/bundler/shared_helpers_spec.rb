@@ -222,7 +222,7 @@ describe Bundler::SharedHelpers do
     shared_examples_for "ENV['RUBYOPT'] gets set correctly" do
       it "ensures -rbundler/setup is at the beginning of ENV['RUBYOPT']" do
         subject.set_bundle_environment
-        expect(ENV["RUBYOPT"].split(" ").first).to include("-rbundler/setup")
+        expect(ENV["RUBYOPT"].split(" ")).to start_with("-rbundler/setup")
       end
     end
 
