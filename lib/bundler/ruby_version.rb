@@ -64,7 +64,7 @@ module Bundler
     #   2. ruby_version
     #   3. engine_version
     def diff(other)
-      raise ArgumentError, "Can only diff with a RubyVersion" unless other.is_a?(RubyVersion)
+      raise ArgumentError, "Can only diff with a RubyVersion, not a #{other.class}" unless other.is_a?(RubyVersion)
       if engine != other.engine && @input_engine
         [:engine, engine, other.engine]
       elsif versions.empty? || !matches?(versions, other.gem_version)
