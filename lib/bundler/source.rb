@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 module Bundler
   class Source
-    autoload :Rubygems, "bundler/source/rubygems"
-    autoload :Path,     "bundler/source/path"
+    autoload :Gemspec,  "bundler/source/gemspec"
     autoload :Git,      "bundler/source/git"
+    autoload :Path,     "bundler/source/path"
+    autoload :Rubygems, "bundler/source/rubygems"
 
     attr_accessor :dependency_names
 

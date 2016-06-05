@@ -44,8 +44,8 @@ module Bundler
       if print_gemspecs
         dsl = Dsl.new.tap {|d| d.eval_gemfile(Bundler.default_gemfile) }
         dsl.gemspecs.each do |gs|
-          out << "\n#{Pathname.new(gs).basename}"
-          out << "\n\n    " << read_file(gs).gsub(/\n/, "\n    ") << "\n"
+          out << "\n#{File.basename(gs.loaded_from)}"
+          out << "\n\n    " << read_file(gs.loaded_from).gsub(/\n/, "\n    ") << "\n"
         end
       end
 

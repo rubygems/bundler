@@ -143,6 +143,25 @@ describe "bundle install from an existing gemspec" do
     expect(@err).not_to match(/ahh/)
   end
 
+  it "allows conflicts" do
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.version = "1.0.0"
+      s.add_dependency "bar", "= 1.0.0"
+    end
+    build_gem "deps", :to_system => true do |s|
+      s.add_dependency "foo", "= 0.0.1"
+    end
+    build_gem "foo", "0.0.1", :to_system => true
+
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "deps"
+      gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
+    G
+
+    should_be_installed "foo 1.0.0"
+  end
+
   context "when child gemspecs conflict with a released gemspec" do
     before do
       # build the "parent" gem that depends on another gem in the same repo

@@ -156,6 +156,7 @@ module Bundler
       @cache[base || false][dependency] ||= begin
         specs = specs_by_name(dependency.name) + (base || [])
         found = specs.select do |spec|
+          next true if spec.source.is_a?(Source::Gemspec)
           if base # allow all platforms when searching from a lockfile
             dependency.matches_spec?(spec)
           else
