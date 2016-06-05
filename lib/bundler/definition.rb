@@ -85,6 +85,7 @@ module Bundler
 
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
+      @unlock[:ruby] ||= @ruby_version && @locked_ruby_version && @ruby_version.diff(RubyVersion.from_string(@locked_ruby_version))
       @unlocking ||= @unlock[:ruby] || (!@locked_ruby_version ^ !@ruby_version)
 
       current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
