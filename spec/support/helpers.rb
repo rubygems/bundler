@@ -347,6 +347,15 @@ module Spec
       ENV["BUNDLER_SPEC_PLATFORM"] = old if block_given?
     end
 
+    def simulate_ruby_version(version)
+      return if version == RUBY_VERSION
+      old = ENV["BUNDLER_SPEC_RUBY_VERSION"]
+      ENV["BUNDLER_SPEC_RUBY_VERSION"] = version
+      yield if block_given?
+    ensure
+      ENV["BUNDLER_SPEC_RUBY_VERSION"] = old if block_given?
+    end
+
     def simulate_ruby_engine(engine, version = "1.6.0")
       return if engine == local_ruby_engine
 
