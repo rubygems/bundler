@@ -480,6 +480,10 @@ options, which control where bundler looks for the `.gemspec`, the glob it uses 
 for the gemspec (defaults to: "{,*,*/*}.gemspec"), what named `.gemspec` it uses
 (if more than one is present), and which group development dependencies are included in.
 
+When a `gemspec` dependency encounters version conflicts during resolution, the
+local version under development will always be selected -- even if there are
+remote versions that better match other requirements for the `gemspec` gem.
+
 ## SOURCE PRIORITY
 
 When attempting to locate a gem to satisfy a gem requirement,
