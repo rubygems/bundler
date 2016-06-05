@@ -2,7 +2,7 @@
 
 module Bundler
   module Plugin::Api::Source
-    attr_reader :uri
+    attr_reader :uri, :options
 
     def initialize(opts)
       @options = opts
@@ -27,7 +27,10 @@ module Bundler
       index
     end
 
-    def fetch_gemfile
+    def install
+    end
+
+    def fetch_gemfiles
       raise "Source plugins need to define fetch_gemfile method"
     end
   end

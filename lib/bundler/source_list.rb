@@ -8,6 +8,7 @@ module Bundler
     def initialize
       @path_sources       = []
       @git_sources        = []
+      @plugin_sources     = []
       @rubygems_aggregate = Source::Rubygems.new
       @rubygems_sources   = []
     end
@@ -100,7 +101,7 @@ module Bundler
       when Source::Git          then git_sources
       when Source::Path         then path_sources
       when Source::Rubygems     then rubygems_sources
-      when Plugin::Base::Source then plugin_sources
+      when Plugin::Api::Source then plugin_sources
       else raise ArgumentError, "Invalid source: #{source.inspect}"
       end
     end
