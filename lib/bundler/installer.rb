@@ -68,6 +68,7 @@ module Bundler
       end
 
       resolve_if_need(options)
+      ensure_specs_are_compatible!
       install(options)
 
       lock unless Bundler.settings[:frozen]
@@ -154,6 +155,24 @@ module Bundler
       jobs = 1
       jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?
       install_in_parallel jobs, options[:standalone], force
+    end
+
+    def ensure_specs_are_compatible!
+      system_ruby = Bundler::RubyVersion.system
+      rubygems_version = Gem::Version.create(Gem::VERSION)
+      specs.each do |spec|
+        if required_ruby_version = spec.required_ruby_version
+          unless required_ruby_version.satisfied_by?(system_ruby.gem_version)
+            raise InstallError, "#{spec.full_name} requires ruby version #{required_ruby_version}, " \
+              "which is incompatible with the current version, #{system_ruby}"
+          end
+        end
+        next unless required_rubygems_version = spec.required_rubygems_version
+        unless required_rubygems_version.satisfied_by?(rubygems_version)
+          raise InstallError, "#{spec.full_name} requires rubygems version #{required_rubygems_version}, " \
+            "which is incompatible with the current version, #{rubygems_version}"
+        end
+      end
     end
 
     def can_install_in_parallel?
