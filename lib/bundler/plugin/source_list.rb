@@ -3,18 +3,20 @@
 module Bundler
   # SourceList object to be used while parsing the Gemfile, setting the
   # approptiate options to be used with Source classes for plugin installation
-  class Plugin::SourceList < Bundler::SourceList
-    def initialize
-      super
-      @rubygems_aggregate = Plugin::Installer::Rubygems.new
-    end
+  module Plugin
+    class SourceList < Bundler::SourceList
+      def initialize
+        super
+        @rubygems_aggregate = Plugin::Installer::Rubygems.new
+      end
 
-    def add_git_source(options = {})
-      add_source_to_list Plugin::Installer::Git.new(options), git_sources
-    end
+      def add_git_source(options = {})
+        add_source_to_list Plugin::Installer::Git.new(options), git_sources
+      end
 
-    def add_rubygems_source(options = {})
-      add_source_to_list Plugin::Installer::Rubygems.new(options), @rubygems_sources
+      def add_rubygems_source(options = {})
+        add_source_to_list Plugin::Installer::Rubygems.new(options), @rubygems_sources
+      end
     end
   end
 end
