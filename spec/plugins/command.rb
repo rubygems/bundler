@@ -2,7 +2,7 @@
 require "spec_helper"
 
 describe "command plugins" do
-  it "executes without arguments" do
+  before do
     build_repo2 do
       build_plugin "command-mah" do |s|
         s.write "plugins.rb", <<-RUBY
@@ -20,6 +20,9 @@ describe "command plugins" do
     end
 
     bundle "plugin install command-mah --source file://#{gem_repo2}"
+  end
+
+  it "executes without arguments" do
     expect(out).to include("Installed plugin command-mah")
 
     bundle "mahcommand"
@@ -49,5 +52,30 @@ describe "command plugins" do
 
     bundle "echo tacos tofu lasange", "no-color" => false
     expect(out).to eq("You gave me tacos, tofu, lasange")
+  end
+
+  it "raises error on redeclaration of command" do
+    build_repo2 do
+      build_plugin "copycat" do |s|
+        s.write "plugins.rb", <<-RUBY
+          module CopyCat
+            class Cheater < Bundler::Plugin::API
+              command "mahcommand", self
+
+              def exec(command, args)
+              end
+            end
+          end
+        RUBY
+      end
+    end
+
+    bundle "plugin install copycat --source file://#{gem_repo2}"
+
+    expect(out).not_to include("Installed plugin copycat")
+
+    expect(out).to include("Failed to install plugin copycat")
+
+    expect(out).to include("Command(s) `mahcommand` declared by copycat are already registered.")
   end
 end

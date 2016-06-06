@@ -6,6 +6,13 @@ module Bundler
   # now a stub class).
   module Plugin
     class Index
+      class CommandConflict < PluginError
+        def initialize(plugin, commands)
+          msg = "Command(s) `#{commands.join("`, `")}` declared by #{plugin} are already registered."
+          super msg
+        end
+      end
+
       def initialize
         @plugin_paths = {}
         @commands = {}
@@ -23,7 +30,7 @@ module Bundler
         @plugin_paths[name] = path
 
         common = commands & @commands.keys
-        raise "Command(s) #{common.join(", ")} are already registered" if common.any?
+        raise CommandConflict.new(name, common) if common.any?
         commands.each {|c| @commands[c] = name }
 
         save_index
