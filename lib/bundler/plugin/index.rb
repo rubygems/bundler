@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "yaml"
 
 module Bundler
   # Manages which plugins are installed and their sources. This also is supposed to map
@@ -50,7 +49,8 @@ module Bundler
       SharedHelpers.filesystem_access(index_file, :read) do |index_f|
         valid_file = index_f && index_f.exist? && !index_f.size.zero?
         break unless valid_file
-        index = YAML.load_file(index_f)
+        data = index_f.read
+        index = load_yaml(data)
         @plugin_paths = index["plugin_paths"] || {}
         @commands = index["commands"] || {}
       end
@@ -66,8 +66,42 @@ module Bundler
 
       SharedHelpers.filesystem_access(index_file) do |index_f|
         FileUtils.mkdir_p(index_f.dirname)
-        File.open(index_f, "w") {|f| f.puts YAML.dump(index) }
+        File.open(index_f, "w") {|f| f.puts dump_hash(index) }
       end
+    end
+
+    def dump_yaml(hash)
+      yaml = "---\n"
+      yaml << dump_hash(hash)
+    end
+
+    def dump_hash(hash)
+      yaml = String.new("")
+      hash.each do |k, v|
+        yaml << k << ": "
+        if v.is_a?(Hash)
+          yaml << "\n" << dump_hash(v).gsub(/^/, "  ") << "\n"
+        else
+          yaml << v.to_s.gsub(/\s+/, " ").inspect << "\n"
+        end
+      end
+      yaml
+    end
+
+    def load_yaml(str)
+      res = {}
+      stack = [res]
+      str.scan(/^( *)(.*):\s?(["']?)([^"'\n]*)\3\n/).each do |(indent, key, _, val)|
+        depth = indent.scan(/  /).length
+        if val.empty?
+          new_hash = {}
+          stack[depth][key] = new_hash
+          stack[depth + 1] = new_hash
+        else
+          stack[depth][key] = val
+        end
+      end
+      res
     end
   end
 end
