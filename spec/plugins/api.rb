@@ -3,10 +3,10 @@ require "spec_helper"
 
 require "bundler/plugin"
 
-describe Bundler::Plugin::Api do
+describe Bundler::Plugin::API do
   context "plugin declarations" do
     before do
-      stub_const "UserPluginClass", Class.new(Bundler::Plugin::Api)
+      stub_const "UserPluginClass", Class.new(Bundler::Plugin::API)
     end
 
     it "declares a command plugin with same class as handler" do
@@ -30,7 +30,7 @@ describe Bundler::Plugin::Api do
 
   context "bundler interfaces provided" do
     before do
-      stub_const "UserPluginClass", Class.new(Bundler::Plugin::Api)
+      stub_const "UserPluginClass", Class.new(Bundler::Plugin::API)
     end
 
     subject(:api) { UserPluginClass.new }

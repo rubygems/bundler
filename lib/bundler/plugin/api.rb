@@ -21,7 +21,7 @@ module Bundler
   # To use it without inheriting, you will have to create an object of this
   # to use the functions (except for declaration functions like command, source,
   # and hooks).
-  class Plugin::Api
+  class Plugin::API
     # The plugins should declare that they handle a command through this helper.
     #
     # @param [String] command being handled by them

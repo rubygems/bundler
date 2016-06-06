@@ -2,13 +2,13 @@
 
 module Bundler
   module Plugin
-    autoload :Api,        "bundler/plugin/api"
-    autoload :Dsl,        "bundler/plugin/dsl"
+    autoload :API,        "bundler/plugin/api"
+    autoload :DSL,        "bundler/plugin/dsl"
     autoload :Index,      "bundler/plugin/index"
     autoload :Installer,  "bundler/plugin/installer"
     autoload :SourceList, "bundler/plugin/source_list"
 
-    PLUGIN_FILE_NAME = "plugin.rb".freeze
+    PLUGIN_FILE_NAME = "plugins.rb".freeze
 
     @commands = {}
 
@@ -37,7 +37,7 @@ module Bundler
       #
       # @param [Pathname] gemfile path
       def eval_gemfile(gemfile)
-        definition = Dsl.evaluate(gemfile, nil, {})
+        definition = DSL.evaluate(gemfile, nil, {})
         return unless definition.dependencies.any?
 
         plugins = Installer.new.install_definition(definition)
@@ -65,7 +65,7 @@ module Bundler
         @cache ||= root.join("cache")
       end
 
-      # To be called via the Api to register to handle a command
+      # To be called via the API to register to handle a command
       def add_command(command, cls)
         @commands[command] = cls
       end
@@ -89,16 +89,16 @@ module Bundler
 
       # Checks if the gem is good to be a plugin
       #
-      # At present it only checks whether it contains plugin.rb file
+      # At present it only checks whether it contains plugins.rb file
       #
       # @param [Pathname] plugin_path the path plugin is installed at
-      # @raise [Error] if plugin.rb file is not found
+      # @raise [Error] if plugins.rb file is not found
       def validate_plugin!(plugin_path)
         plugin_file = plugin_path.join(PLUGIN_FILE_NAME)
         raise "#{PLUGIN_FILE_NAME} was not found in the plugin!" unless plugin_file.file?
       end
 
-      # Runs the plugin.rb file in an isolated namespace, records the plugin
+      # Runs the plugins.rb file in an isolated namespace, records the plugin
       # actions it registers for and then passes the data to index to be stored.
       #
       # @param [String] name the name of the plugin
@@ -115,7 +115,7 @@ module Bundler
         @commands = commands
       end
 
-      # Executes the plugin.rb file
+      # Executes the plugins.rb file
       #
       # @param [String] name of the plugin
       def load_plugin(name)

@@ -707,7 +707,7 @@ module Spec
 
     class PluginBuilder < GemBuilder
       def _default_files
-        @_default_files ||= super.merge("plugin.rb" => "")
+        @_default_files ||= super.merge("plugins.rb" => "")
       end
     end
 

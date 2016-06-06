@@ -34,7 +34,7 @@ module Bundler
       definition.resolve_remotely!
       specs = definition.specs
 
-      paths = install_from_spec specs
+      paths = install_from_specs specs
 
       paths.select {|name, _| plugins.include? name }
     end
@@ -74,7 +74,7 @@ module Bundler
       idx = rg_source.specs
 
       specs = Resolver.resolve(deps_proxies, idx).materialize([dep])
-      paths = install_from_spec specs
+      paths = install_from_specs specs
 
       paths[name]
     end
@@ -85,12 +85,10 @@ module Bundler
     # @param specs to install
     #
     # @return [Hash] map of names to path where the plugin was installed
-    def install_from_spec(specs)
+    def install_from_specs(specs)
       paths = {}
 
       specs.each do |spec|
-        next if spec.name == "bundler"
-
         spec.source.install spec
 
         paths[spec.name] = spec.full_gem_path

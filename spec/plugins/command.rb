@@ -5,9 +5,9 @@ describe "command plugins" do
   it "executes without arguments" do
     build_repo2 do
       build_plugin "command-mah" do |s|
-        s.write "plugin.rb", <<-RUBY
+        s.write "plugins.rb", <<-RUBY
           module Mah
-            class Plugin < Bundler::Plugin::Api
+            class Plugin < Bundler::Plugin::API
               command "mahcommand" # declares the command
 
               def exec(command, args)
@@ -29,11 +29,11 @@ describe "command plugins" do
   it "accepts the arguments" do
     build_repo2 do
       build_plugin "the-echoer" do |s|
-        s.write "plugin.rb", <<-RUBY
+        s.write "plugins.rb", <<-RUBY
           module Resonance
             class Echoer
               # Another method to declare the command
-              Bundler::Plugin::Api.command "echo", self
+              Bundler::Plugin::API.command "echo", self
 
               def exec(command, args)
                 puts "You gave me \#{args.join(", ")}"

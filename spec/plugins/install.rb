@@ -29,24 +29,24 @@ describe "bundler plugin install" do
   end
 
   context "malformatted plugin" do
-    it "fails when plugin.rb is missing" do
+    it "fails when plugins.rb is missing" do
       build_repo2 do
         build_gem "charlie"
       end
 
       bundle "plugin install charlie --source file://#{gem_repo2}"
 
-      expect(out).to include("plugin.rb was not found")
+      expect(out).to include("plugins.rb was not found")
 
       expect(out).not_to include("Installed plugin")
 
       expect(plugin_gems("charlie-1.0")).not_to be_directory
     end
 
-    it "fails when plugin.rb throws exception on load" do
+    it "fails when plugins.rb throws exception on load" do
       build_repo2 do
         build_plugin "chaplin" do |s|
-          s.write "plugin.rb", <<-RUBY
+          s.write "plugins.rb", <<-RUBY
             raise "I got you man"
           RUBY
         end
@@ -63,7 +63,7 @@ describe "bundler plugin install" do
   context "git plugins" do
     it "installs form a git source" do
       build_git "foo" do |s|
-        s.write "plugin.rb"
+        s.write "plugins.rb"
       end
 
       bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
@@ -110,7 +110,7 @@ describe "bundler plugin install" do
 
     it "accepts git sources" do
       build_git "ga-plugin" do |s|
-        s.write "plugin.rb"
+        s.write "plugins.rb"
       end
 
       install_gemfile <<-G

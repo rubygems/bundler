@@ -185,19 +185,27 @@ module Bundler
     end
 
     def normalize_settings
-      Bundler.settings[:path]     = nil if options[:system]
-      Bundler.settings[:path]     = "vendor/bundle" if options[:deployment]
-      Bundler.settings[:path]     = options["path"] if options["path"]
-      Bundler.settings[:path] ||= "bundle" if options["standalone"]
-      Bundler.settings[:bin]      = options["binstubs"] if options["binstubs"]
-      Bundler.settings[:bin]      = nil if options["binstubs"] && options["binstubs"].empty?
-      Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
-      Bundler.settings[:jobs]     = options["jobs"] if options["jobs"]
-      Bundler.settings[:no_prune] = true if options["no-prune"]
-      Bundler.settings[:no_install] = true if options["no-install"]
-      Bundler.settings[:clean]    = options["clean"] if options["clean"]
-      Bundler.settings.without    = options[:without]
-      Bundler.settings.with       = options[:with]
+      Bundler.settings[:path]                = nil if options[:system]
+      Bundler.settings[:path]                = "vendor/bundle" if options[:deployment]
+      Bundler.settings[:path]                = options["path"] if options["path"]
+      Bundler.settings[:path]              ||= "bundle" if options["standalone"]
+
+      Bundler.settings[:bin]                 = options["binstubs"] if options["binstubs"]
+      Bundler.settings[:bin]                 = nil if options["binstubs"] && options["binstubs"].empty?
+
+      Bundler.settings[:shebang]             = options["shebang"] if options["shebang"]
+
+      Bundler.settings[:jobs]                = options["jobs"] if options["jobs"]
+
+      Bundler.settings[:no_prune]            = true if options["no-prune"]
+
+      Bundler.settings[:no_install]          = true if options["no-install"]
+
+      Bundler.settings[:clean]               = options["clean"] if options["clean"]
+
+      Bundler.settings.without               = options[:without]
+      Bundler.settings.with                  = options[:with]
+
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? true : nil
     end
 

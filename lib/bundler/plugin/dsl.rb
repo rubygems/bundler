@@ -2,7 +2,7 @@
 
 module Bundler
   # Dsl to parse the Gemfile looking for plugins to install
-  class Plugin::Dsl < Bundler::Dsl
+  class Plugin::DSL < Bundler::Dsl
     alias_method :_gem, :gem # To use for plugin installation as gem
 
     # So that we don't have to override all there methods to dummy ones
@@ -20,7 +20,7 @@ module Bundler
     end
 
     def method_missing(name, *args)
-      # Dummy evaluation
+      super unless Bundler::Dsl.instance_methods.include? name
     end
   end
 end
