@@ -103,25 +103,46 @@ describe "bundle install with gem sources" do
       end
     end
 
-    describe "when some gems require a different version of ruby" do
-      it "does not try to install those gems" do
-        update_repo gem_repo1 do
-          build_gem "require_ruby" do |s|
-            s.required_ruby_version = "> 9000"
+    describe "when a required ruby version" do
+      context "allows only an older version" do
+        it "installs the older version" do
+          update_repo gem_repo1 do
+            build_gem "rack", "9001.0.0" do |s|
+              s.required_ruby_version = "> 9000"
+            end
           end
+
+          install_gemfile <<-G, :artifice => "compact_index"
+            ruby "#{RUBY_VERSION}"
+            source "file://#{gem_repo1}"
+            gem 'rack'
+          G
+
+          expect(out).to_not include("rack-9001.0.0 requires ruby version > 9000")
+          should_be_installed("rack 1.0")
         end
+      end
 
-        install_gemfile <<-G, :artifice => "compact_index"
-          source "file://#{gem_repo1}"
-          gem 'require_ruby'
-        G
+      context "allows no gems" do
+        it "does not try to install those gems" do
+          update_repo gem_repo1 do
+            build_gem "require_ruby" do |s|
+              s.required_ruby_version = "> 9000"
+            end
+          end
 
-        expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
-        expect(out).to include("require_ruby-1.0 requires ruby version > 9000, which is incompatible with the current version, #{Bundler::RubyVersion.system}")
+          install_gemfile <<-G, :artifice => "compact_index"
+            source "file://#{gem_repo1}"
+            gem 'require_ruby'
+          G
+
+          expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
+          expect(out).to include("require_ruby-1.0 requires ruby version > 9000, which is incompatible with the current version, #{Bundler::RubyVersion.system}")
+        end
       end
     end
 
-    describe "when some gems require a different version of rubygems" do
+    describe "when a required rubygems version disallows a gem" do
       it "does not try to install those gems" do
         update_repo gem_repo1 do
           build_gem "require_rubygems" do |s|
