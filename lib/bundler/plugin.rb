@@ -40,7 +40,7 @@ module Bundler
     # specified by plugin method
     #
     # @param [Pathname] gemfile path
-    def eval_gemfile(gemfile)
+    def gemfile_install(gemfile)
       definition = DSL.evaluate(gemfile, nil, {})
       return unless definition.dependencies.any?
 

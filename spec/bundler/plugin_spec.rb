@@ -63,7 +63,7 @@ describe Bundler::Plugin do
       allow(definition).to receive(:dependencies) { [] }
       allow(installer).to receive(:install_definition).never
 
-      subject.eval_gemfile(gemfile)
+      subject.gemfile_install(gemfile)
     end
 
     it "should validate and register the plugins" do
@@ -77,7 +77,7 @@ describe Bundler::Plugin do
       expect(subject).to receive(:validate_plugin!).twice
       expect(subject).to receive(:register_plugin).twice
 
-      subject.eval_gemfile(gemfile)
+      subject.gemfile_install(gemfile)
     end
   end
 

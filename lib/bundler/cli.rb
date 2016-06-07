@@ -82,7 +82,7 @@ module Bundler
     end
 
     def self.handle_no_command_error(command, has_namespace = $thor_runner)
-      if ENV["BUNDLE_PLUGIN"] && Bundler::Plugin.command?(command)
+      if Bundler.settings[:plugin] && Bundler::Plugin.command?(command)
         return Bundler::Plugin.exec_command(command, ARGV[1..-1])
       end
 
@@ -437,7 +437,7 @@ module Bundler
       Env.new.write($stdout)
     end
 
-    if ENV["BUNDLE_PLUGIN"]
+    if Bundler.settings[:plugin]
       require "bundler/cli/plugin"
       desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
       subcommand "plugin", Plugin

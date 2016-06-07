@@ -35,5 +35,11 @@ describe Bundler::Plugin::Index do
     it "returns the plugins name on query" do
       expect(index.command_plugin("newco")).to eq("cplugin")
     end
+
+    it "raises error on conflict" do
+      expect do
+        index.register_plugin("aplugin", lib_path("aplugin").to_s, ["newco"])
+      end.to raise_error(Index::CommandConflict)
+    end
   end
 end

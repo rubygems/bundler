@@ -56,7 +56,7 @@ module Bundler
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
-      Plugin.eval_gemfile(Bundler.default_gemfile) if ENV["BUNDLE_PLUGIN"]
+      Plugin.gemfile_install(Bundler.default_gemfile) if Bundler.settings[:plugin]
 
       definition = Bundler.definition
       definition.validate_ruby!

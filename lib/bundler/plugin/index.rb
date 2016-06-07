@@ -30,7 +30,7 @@ module Bundler
         @plugin_paths[name] = path
 
         common = commands & @commands.keys
-        raise CommandConflict.new(name, common) if common.any?
+        raise CommandConflict.new(name, common) unless common.empty?
         commands.each {|c| @commands[c] = name }
 
         save_index
