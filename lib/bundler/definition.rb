@@ -52,7 +52,7 @@ module Bundler
       @optional_groups = optional_groups
       @remote          = false
       @specs           = nil
-      @ruby_version    = ruby_version
+      @ruby_version    = ruby_version || Bundler::RubyVersion.system
 
       @lockfile_contents      = String.new
       @locked_bundler_version = nil

@@ -102,9 +102,9 @@ describe "bundle install with install-time dependencies" do
     end
   end
 
-  describe "when a required ruby version" do
-    context "allows only an older version" do
-      it "installs the older version" do
+  describe "when an explicit ruby version" do
+    context "allows only an older gem version" do
+      it "installs the older gem version" do
         update_repo gem_repo1 do
           build_gem "rack", "9001.0.0" do |s|
             s.required_ruby_version = "> 9000"
@@ -122,7 +122,7 @@ describe "bundle install with install-time dependencies" do
       end
     end
 
-    context "allows no versions" do
+    context "allows no gem versions" do
       it "raises an error during resolution" do
         update_repo gem_repo1 do
           build_gem "require_ruby" do |s|
@@ -132,6 +132,54 @@ describe "bundle install with install-time dependencies" do
 
         install_gemfile <<-G, :artifice => "compact_index"
           ruby "#{RUBY_VERSION}"
+          source "file://#{gem_repo1}"
+          gem 'require_ruby'
+        G
+
+        expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
+        nice_error = <<-E.strip.gsub(/^ {8}/, "")
+          Fetching source index from file:#{gem_repo1}/
+          Resolving dependencies...
+          Bundler could not find compatible versions for gem "require_ruby":
+            In Gemfile:
+              ruby (= #{RUBY_VERSION})
+
+              require_ruby was resolved to 1.0, which depends on
+                ruby (> 9000)
+        E
+        expect(out).to eq(nice_error)
+      end
+    end
+  end
+
+  describe "when the current ruby version" do
+    context "allows only an older gem version" do
+      it "installs the older gem version" do
+        update_repo gem_repo1 do
+          build_gem "rack", "9001.0.0" do |s|
+            s.required_ruby_version = "> 9000"
+          end
+        end
+
+        install_gemfile <<-G, :artifice => "compact_index"
+          source "file://#{gem_repo1}"
+          gem 'rack'
+        G
+
+        expect(out).to_not include("rack-9001.0.0 requires ruby version > 9000")
+        should_be_installed("rack 1.0")
+      end
+    end
+
+    context "allows no gem versions" do
+      it "raises an error during resolution" do
+        update_repo gem_repo1 do
+          build_gem "require_ruby" do |s|
+            s.required_ruby_version = "> 9000"
+          end
+        end
+
+        install_gemfile <<-G, :artifice => "compact_index"
           source "file://#{gem_repo1}"
           gem 'require_ruby'
         G
