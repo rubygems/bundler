@@ -441,7 +441,7 @@ module Bundler
       Env.new.write($stdout)
     end
 
-    if Bundler.settings[:plugin]
+    if ENV["BUNDLE_PLUGIN"]
       require "bundler/cli/plugin"
       desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
       subcommand "plugin", Plugin
