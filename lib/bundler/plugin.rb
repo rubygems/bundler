@@ -8,6 +8,9 @@ module Bundler
     autoload :Installer,  "bundler/plugin/installer"
     autoload :SourceList, "bundler/plugin/source_list"
 
+    MalformattedPlugin = Class.new(PluginError)
+    UndefinedCommandError = Class.new(PluginError)
+
     PLUGIN_FILE_NAME = "plugins.rb".freeze
 
     @commands = {}
@@ -78,7 +81,7 @@ module Bundler
       # To be called from Cli class to pass the command and argument to
       # approriate plugin class
       def exec_command(command, args)
-        raise "Command #{command} not found" unless command? command
+        raise UndefinedCommandError, "Command #{command} not found" unless command? command
 
         load_plugin index.command_plugin(command) unless @commands.key? command
 
@@ -95,7 +98,7 @@ module Bundler
       # @raise [Error] if plugins.rb file is not found
       def validate_plugin!(plugin_path)
         plugin_file = plugin_path.join(PLUGIN_FILE_NAME)
-        raise "#{PLUGIN_FILE_NAME} was not found in the plugin!" unless plugin_file.file?
+        raise MalformattedPlugin, "#{PLUGIN_FILE_NAME} was not found in the plugin!" unless plugin_file.file?
       end
 
       # Runs the plugins.rb file in an isolated namespace, records the plugin
