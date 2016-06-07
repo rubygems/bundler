@@ -233,6 +233,8 @@ module Bundler
       "Overwrite existing binstubs if they exist"
     method_option "path", :type => :string, :lazy_default => "bin", :banner =>
       "Binstub destination directory (default bin)"
+    method_option "standalone", :type => :array, :lazy_default => [], :banner =>
+      "Make binstubs that can work without the Bundler runtime"
     def binstubs(*gems)
       require "bundler/cli/binstubs"
       Binstubs.new(options, gems).run
@@ -427,6 +429,8 @@ module Bundler
       "the path the lockfile should be written to"
     method_option "full-index", :type => :boolean, :default => false, :banner =>
       "Fall back to using the single-file index of all gems"
+    method_option "add-platform", :type => :array, :default => [], :banner =>
+      "add a new platform to the lockfile"
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run

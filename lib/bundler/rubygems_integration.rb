@@ -212,7 +212,7 @@ module Bundler
       # Fetch all specs, minus prerelease specs
       spec_list = fetch_specs(true, false)
       # Then fetch the prerelease specs
-      fetch_prerelease_specs.each {|k, v| spec_list[k].push(*v) }
+      fetch_prerelease_specs.each {|k, v| spec_list[k].concat(v) }
 
       spec_list.values.first
     ensure
@@ -605,7 +605,7 @@ module Bundler
         specs = fetch_specs(source, remote, "specs")
         pres = fetch_specs(source, remote, "prerelease_specs") || []
 
-        specs.push(*pres)
+        specs.concat(pres)
       end
 
       def download_gem(spec, uri, path)

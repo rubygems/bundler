@@ -41,7 +41,7 @@ module Bundler
           deps = compact_index_client.dependencies(remaining_gems)
           next_gems = deps.map {|d| d[3].map(&:first).flatten(1) }.flatten(1).uniq
           deps.each {|dep| gem_info << dep }
-          complete_gems.push(*deps.map(&:first)).uniq!
+          complete_gems.concat(deps.map(&:first)).uniq!
           remaining_gems = next_gems - complete_gems
         end
 
@@ -89,7 +89,7 @@ module Bundler
               worker_name = "Compact Index (#{display_uri.host})"
               worker = Bundler::Worker.new(25, worker_name, func)
               inputs.each {|input| worker.enq(input) }
-              inputs.map { worker.deq }
+              inputs.map { worker.deq }.tap { worker.stop }
             end
           end
         end

@@ -87,8 +87,7 @@ module Bundler
       @unlock[:sources] ||= []
 
       current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
-      @new_platform = !@platforms.include?(current_platform)
-      @platforms |= [current_platform]
+      add_platform(current_platform)
 
       @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
@@ -137,8 +136,17 @@ module Bundler
     # @return [Bundler::SpecSet]
     def specs
       @specs ||= begin
-        specs = resolve.materialize(Bundler.settings[:cache_all_platforms] ? dependencies : requested_dependencies)
-
+        begin
+          specs = resolve.materialize(Bundler.settings[:cache_all_platforms] ? dependencies : requested_dependencies)
+        rescue GemNotFound => e # Handle yanked gem
+          gem_name, gem_version = extract_gem_info(e)
+          locked_gem = @locked_specs[gem_name].last
+          raise if locked_gem.nil? || locked_gem.version.to_s != gem_version
+          raise GemNotFound, "Your bundle is locked to #{locked_gem}, but that version could not " \
+                             "be found in any of the sources listed in your Gemfile. If you haven't changed sources, " \
+                             "that means the author of #{locked_gem} has removed it. You'll need to update your bundle " \
+                             "to a different version of #{locked_gem} that hasn't been removed in order to install."
+        end
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
           bundler = local.search(Gem::Dependency.new("bundler", VERSION)).last
@@ -216,7 +224,7 @@ module Bundler
           source.dependency_names = dependency_names.dup
           idx.add_source source.specs
           dependency_names -= pinned_spec_names(source.specs)
-          dependency_names.push(*source.unmet_deps).uniq!
+          dependency_names.concat(source.unmet_deps).uniq!
         end
       end
     end
@@ -358,10 +366,20 @@ module Bundler
       changed = []
 
       gemfile_sources = sources.lock_sources
-      if @locked_sources != gemfile_sources
-        new_sources = gemfile_sources - @locked_sources
-        deleted_sources = @locked_sources - gemfile_sources
 
+      new_sources = gemfile_sources - @locked_sources
+      deleted_sources = @locked_sources - gemfile_sources
+
+      new_deps = @dependencies - @locked_deps
+      deleted_deps = @locked_deps - @dependencies
+
+      # Check if it is possible that the source is only changed thing
+      if (new_deps.empty? && deleted_deps.empty?) && (!new_sources.empty? && !deleted_sources.empty?)
+        new_sources.reject! {|source| source.is_a_path? && source.path.exist? }
+        deleted_sources.reject! {|source| source.is_a_path? && source.path.exist? }
+      end
+
+      if @locked_sources != gemfile_sources
         if new_sources.any?
           added.concat new_sources.map {|source| "* source: #{source}" }
         end
@@ -371,11 +389,7 @@ module Bundler
         end
       end
 
-      new_deps = @dependencies - @locked_deps
-      deleted_deps = @locked_deps - @dependencies
-
       added.concat new_deps.map {|d| "* #{pretty_dep(d)}" } if new_deps.any?
-
       if deleted_deps.any?
         deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" }
       end
@@ -422,6 +436,11 @@ module Bundler
 
         raise RubyVersionMismatch, msg
       end
+    end
+
+    def add_platform(platform)
+      @new_platform ||= !@platforms.include?(platform)
+      @platforms |= [platform]
     end
 
     attr_reader :sources
@@ -529,7 +548,15 @@ module Bundler
 
     def converge_dependencies
       (@dependencies + @locked_deps).each do |dep|
-        dep.source = sources.get(dep.source) if dep.source
+        locked_source = @locked_deps.select {|d| d.name == dep.name }.last
+        # This is to make sure that if bundler is installing in deployment mode and
+        # after locked_source and sources don't match, we still use locked_source.
+        if Bundler.settings[:frozen] && !locked_source.nil? &&
+            locked_source.respond_to?(:source) && locked_source.source.instance_of?(Source::Path) && locked_source.source.path.exist?
+          dep.source = locked_source.source
+        elsif dep.source
+          dep.source = sources.get(dep.source)
+        end
       end
       Set.new(@dependencies) != Set.new(@locked_deps)
     end
@@ -689,6 +716,12 @@ module Bundler
         proposed = proposed.gsub(pattern, "\n").gsub(whitespace_cleanup, "\n\n").strip
       end
       current == proposed
+    end
+
+    def extract_gem_info(error)
+      # This method will extract the error message like "Could not find foo-1.2.3 in any of the sources"
+      # to an array. The first element will be the gem name (e.g. foo), the second will be the version number.
+      error.message.scan(/Could not find (\w+)-(\d+(?:\.\d+)+)/).flatten
     end
   end
 end

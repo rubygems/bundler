@@ -60,8 +60,8 @@ module Bundler
       end
 
       def eql?(other)
-        other.instance_of?(Path) &&
-          expanded_path == expand(other.path) &&
+        return unless other.class == Path || other.class == Gemspec
+        expanded_path == expand(other.path) &&
           version == other.version
       end
 
@@ -109,6 +109,10 @@ module Bundler
 
       def root
         Bundler.root
+      end
+
+      def is_a_path?
+        instance_of?(Path)
       end
 
     private

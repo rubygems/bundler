@@ -66,6 +66,10 @@ module Bundler
       [@name, @version, @platform == Gem::Platform::RUBY ? -1 : 1]
     end
 
+    def to_s
+      "#<#{self.class} name=#{name} version=#{version} platform=#{platform}>"
+    end
+
   private
 
     def _remote_specification
@@ -75,11 +79,7 @@ module Bundler
     end
 
     def method_missing(method, *args, &blk)
-      if Gem::Specification.new.respond_to?(method)
-        _remote_specification.send(method, *args, &blk)
-      else
-        super
-      end
+      _remote_specification.send(method, *args, &blk)
     end
   end
 end
