@@ -74,7 +74,7 @@ describe "command plugins" do
 
     expect(out).not_to include("Installed plugin copycat")
 
-    expect(out).to include("Failed to install plugin copycat")
+    expect(out).to include("Failed to install plugin")
 
     expect(out).to include("Command(s) `mahcommand` declared by copycat are already registered.")
   end

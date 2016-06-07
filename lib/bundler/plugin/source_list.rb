@@ -6,8 +6,10 @@ module Bundler
   module Plugin
     class SourceList < Bundler::SourceList
       def initialize
-        super
+        @path_sources       = []
+        @git_sources        = []
         @rubygems_aggregate = Plugin::Installer::Rubygems.new
+        @rubygems_sources   = []
       end
 
       def add_git_source(options = {})

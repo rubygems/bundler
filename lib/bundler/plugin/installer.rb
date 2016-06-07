@@ -11,14 +11,14 @@ module Bundler
       autoload :Rubygems, "bundler/plugin/installer/rubygems"
       autoload :Git,      "bundler/plugin/installer/git"
 
-      def install(name, options)
+      def install(names, options)
+        version = options[:version] || [">= 0"]
+
         if options[:git]
-          install_git(name, options)
+          install_git(names, version, options)
         elsif options[:source]
           source = options[:source]
-          version = options[:version] || [">= 0"]
-
-          install_rubygems(name, source, version)
+          install_rubygems(names, version, source)
         else
           raise(ArgumentError, "You need to provide the source")
         end
@@ -42,42 +42,39 @@ module Bundler
 
     private
 
-      def install_git(name, options)
+      def install_git(names, version, options)
         uri = options.delete(:git)
-
-        options["name"] = name
         options["uri"] = uri
 
-        git_source = Git.new options
-        git_source.remote!
+        source_list = SourceList.new
+        source_list.add_git_source(options)
 
-        git_source.install(git_source.specs.first)
+        # To support bot sources
+        if options[:source]
+          source_list.add_rubygems_source("remotes" => options[:source])
+        end
 
-        git_source.path
+        deps = names.map {|name| Dependency.new name, version }
+
+        definition = Definition.new(nil, deps, source_list, {})
+        install_definition(definition)
       end
 
       # Installs the plugin from rubygems source and returns the path where the
       # plugin was installed
       #
       # @param [String] name of the plugin gem to search in the source
+      # @param [Array] version of the gem to install
       # @param [String] source the rubygems URL to resolve the gem
-      # @param [Array, String] version (optional) of the gem to install
       #
       # @return [String] the path where the plugin was installed
-      def install_rubygems(name, source, version = [">= 0"])
-        rg_source = Rubygems.new "remotes" => source
-        rg_source.remote!
-        rg_source.dependency_names << name
+      def install_rubygems(names, version, source)
+        deps = names.map {|name| Dependency.new name, version }
+        source_list = SourceList.new
+        source_list.add_rubygems_source("remotes" => source)
 
-        dep = Dependency.new name, version
-
-        deps_proxies = [DepProxy.new(dep, GemHelpers.generic_local_platform)]
-        idx = rg_source.specs
-
-        specs = Resolver.resolve(deps_proxies, idx).materialize([dep])
-        paths = install_from_specs specs
-
-        paths[name]
+        definition = Definition.new(nil, deps, source_list, {})
+        install_definition(definition)
       end
 
       # Installs the plugins and deps from the provided specs and returns map of

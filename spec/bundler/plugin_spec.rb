@@ -25,29 +25,30 @@ describe Bundler::Plugin do
     let(:opts) { { "version" => "~> 1.0", "source" => "foo" } }
 
     before do
-      allow(installer).
-        to receive(:install).with("new-plugin", opts) { lib_path("new-plugin") }
+      allow(installer).to receive(:install).with(["new-plugin"], opts) do
+        { "new_plugin" => lib_path("new-plugin") }
+      end
     end
 
     it "passes the name and options to installer" do
-      allow(installer).to receive(:install).with("new-plugin", opts) do
-        lib_path("new-plugin")
+      allow(installer).to receive(:install).with(["new-plugin"], opts) do
+        { "new-plugin" => lib_path("new-plugin").to_s }
       end.once
 
-      subject.install "new-plugin", opts
+      subject.install ["new-plugin"], opts
     end
 
     it "validates the installed plugin" do
       allow(subject).
         to receive(:validate_plugin!).with(lib_path("new-plugin")).once
 
-      subject.install "new-plugin", opts
+      subject.install ["new-plugin"], opts
     end
 
     it "registers the plugin with index" do
       allow(index).to receive(:register_plugin).
         with("new-plugin", lib_path("new-plugin").to_s, []).once
-      subject.install "new-plugin", opts
+      subject.install ["new-plugin"], opts
     end
   end
 

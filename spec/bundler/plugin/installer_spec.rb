@@ -12,18 +12,19 @@ describe Bundler::Plugin::Installer do
 
     describe "with mocked installers" do
       it "returns the installation path after installing git plugins" do
-        allow(installer).to receive(:install_git).and_return("/git/install/path")
+        allow(installer).to receive(:install_git).
+          and_return("new-plugin" => "/git/install/path")
 
-        expect(installer.install("new-plugin", :git => "https://some.ran/dom")).
-          to eq("/git/install/path")
+        expect(installer.install(["new-plugin"], :git => "https://some.ran/dom")).
+          to eq("new-plugin" => "/git/install/path")
       end
 
       it "returns the installation path after installing rubygems plugins" do
         allow(installer).to receive(:install_rubygems).
-          and_return("/rubygems/install/path")
+          and_return("new-plugin" => "/rubygems/install/path")
 
-        expect(installer.install("new-plugin", :source => "https://some.ran/dom")).
-          to eq("/rubygems/install/path")
+        expect(installer.install(["new-plugin"], :source => "https://some.ran/dom")).
+          to eq("new-plugin" => "/rubygems/install/path")
       end
     end
 
@@ -34,12 +35,10 @@ describe Bundler::Plugin::Installer do
         end
 
         rev = revision_for(lib_path("ga-plugin"))
-        expected_path = Bundler::Plugin.root.
-          join("bundler", "gems", "ga-plugin-#{rev[0..11]}")
+        expected = { "ga-plugin" => Bundler::Plugin.root.join("bundler", "gems", "ga-plugin-#{rev[0..11]}").to_s }
 
         opts = { :git => "file://#{lib_path("ga-plugin")}" }
-        expect(installer.install("ga-plugin", opts)).
-          to eq(expected_path)
+        expect(installer.install(["ga-plugin"], opts)).to eq(expected)
       end
 
       it "returns the installation path after installing rubygems plugins" do
@@ -48,8 +47,8 @@ describe Bundler::Plugin::Installer do
         end
 
         opts = { :source => "file://#{gem_repo2}" }
-        expect(installer.install("re-plugin", opts)).
-          to eq(plugin_gems("re-plugin-1.0").to_s)
+        expect(installer.install(["re-plugin"], opts)).
+          to eq("re-plugin" => plugin_gems("re-plugin-1.0").to_s)
       end
     end
   end

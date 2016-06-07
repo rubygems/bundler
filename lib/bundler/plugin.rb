@@ -19,20 +19,16 @@ module Bundler
 
     # Installs a new plugin by the given name
     #
-    # @param [String] name the name of plugin to be installed
+    # @param [Array<String>] names the name of plugin to be installed
     # @param [Hash] options various parameters as described in description
     # @option options [String] :source rubygems source to fetch the plugin gem from
     # @option options [String] :version (optional) the version of the plugin to install
-    def install(name, options)
-      plugin_path = Pathname.new Installer.new.install(name, options)
+    def install(names, options)
+      paths = Installer.new.install(names, options)
 
-      validate_plugin! plugin_path
-
-      register_plugin name, plugin_path
-
-      Bundler.ui.info "Installed plugin #{name}"
+      save_plugins paths
     rescue PluginError => e
-      Bundler.rm_rf(plugin_path) if plugin_path
+      paths.values.map {|path| Bundler.rm_rf(path)} if paths
       Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     end
 
@@ -46,12 +42,7 @@ module Bundler
 
       plugins = Installer.new.install_definition(definition)
 
-      plugins.each do |name, path|
-        path = Pathname.new path
-        validate_plugin! path
-        register_plugin name, path
-        Bundler.ui.info "Installed plugin #{name}"
-      end
+      save_plugins plugins
     end
 
     # The index object used to store the details about the plugin
@@ -87,6 +78,18 @@ module Bundler
       load_plugin index.command_plugin(command) unless @commands.key? command
 
       @commands[command].new.exec(command, args)
+    end
+
+    # Post installation processing and registering with index
+    #
+    # @param [Hash] plugins mapped to their installtion path
+    def save_plugins(plugins)
+      plugins.each do |name, path|
+        path = Pathname.new path
+        validate_plugin! path
+        register_plugin name, path
+        Bundler.ui.info "Installed plugin #{name}"
+      end
     end
 
     # Checks if the gem is good to be a plugin
@@ -134,7 +137,7 @@ module Bundler
     end
 
     class << self
-      private :load_plugin, :register_plugin, :validate_plugin!
+      private :load_plugin, :register_plugin, :save_plugins, :validate_plugin!
     end
   end
 end
