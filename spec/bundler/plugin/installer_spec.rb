@@ -29,6 +29,13 @@ describe Bundler::Plugin::Installer do
     end
 
     describe "with actual installers" do
+      before do
+        build_repo2 do
+          build_plugin "re-plugin"
+          build_plugin "ma-plugin"
+        end
+      end
+
       it "returns the installation path after installing git plugins" do
         build_git "ga-plugin", :path => lib_path("ga-plugin") do |s|
           s.write "plugins.rb"
@@ -42,13 +49,17 @@ describe Bundler::Plugin::Installer do
       end
 
       it "returns the installation path after installing rubygems plugins" do
-        build_repo2 do
-          build_plugin "re-plugin"
-        end
-
         opts = { :source => "file://#{gem_repo2}" }
         expect(installer.install(["re-plugin"], opts)).
           to eq("re-plugin" => plugin_gems("re-plugin-1.0").to_s)
+      end
+
+      it "accepts multiple plugins" do
+        opts = { :source => "file://#{gem_repo2}" }
+
+        expect(installer.install(["re-plugin", "ma-plugin"], opts)).
+          to eq("re-plugin" => plugin_gems("re-plugin-1.0").to_s,
+                "ma-plugin" => plugin_gems("ma-plugin-1.0").to_s)
       end
     end
   end

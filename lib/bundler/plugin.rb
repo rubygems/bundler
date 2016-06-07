@@ -13,9 +13,9 @@ module Bundler
 
     PLUGIN_FILE_NAME = "plugins.rb".freeze
 
-    @commands = {}
+  module_function
 
-    module_function
+    @commands = {}
 
     # Installs a new plugin by the given name
     #
@@ -28,7 +28,7 @@ module Bundler
 
       save_plugins paths
     rescue PluginError => e
-      paths.values.map {|path| Bundler.rm_rf(path)} if paths
+      paths.values.map {|path| Bundler.rm_rf(path) } if paths
       Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     end
 

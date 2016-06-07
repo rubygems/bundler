@@ -5,6 +5,7 @@ describe "bundler plugin install" do
   before do
     build_repo2 do
       build_plugin "foo"
+      build_plugin "kung-foo"
     end
   end
 
@@ -26,6 +27,25 @@ describe "bundler plugin install" do
     bundle "plugin install foo --source file://#{gem_repo2}"
 
     expect(out).to include("Installed plugin foo")
+  end
+
+  it "installs multiple plugins" do
+    bundle "plugin install foo kung-foo --source file://#{gem_repo2}"
+
+    expect(out).to include("Installed plugin foo")
+    expect(out).to include("Installed plugin kung-foo")
+  end
+
+  it "uses the same version for multiple plugins" do
+    update_repo2 do
+      build_plugin "foo", "1.1"
+      build_plugin "kung-foo", "1.1"
+    end
+
+    bundle "plugin install foo kung-foo --version '1.0' --source file://#{gem_repo2}"
+
+    expect(out).to include("Installing foo 1.0")
+    expect(out).to include("Installing kung-foo 1.0")
   end
 
   context "malformatted plugin" do

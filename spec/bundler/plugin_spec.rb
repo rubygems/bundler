@@ -50,6 +50,22 @@ describe Bundler::Plugin do
         with("new-plugin", lib_path("new-plugin").to_s, []).once
       subject.install ["new-plugin"], opts
     end
+
+    context "multiple plugins" do
+      it do
+        allow(installer).to receive(:install).
+          with(["new-plugin", "another-plugin"], opts) do
+          {
+            "new_plugin" => lib_path("new-plugin"),
+            "another-plugin" => lib_path("another-plugin"),
+          }
+        end.once
+
+        allow(subject).to receive(:validate_plugin!).twice
+        allow(index).to receive(:register_plugin).twice
+        subject.install ["new-plugin", "another-plugin"], opts
+      end
+    end
   end
 
   describe "evaluate gemfile for plugins" do
