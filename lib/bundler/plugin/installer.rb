@@ -45,8 +45,8 @@ module Bundler
       def install_git(name, options)
         uri = options.delete(:git)
 
-        options[:name] = name
-        options[:uri] = uri
+        options["name"] = name
+        options["uri"] = uri
 
         git_source = Git.new options
         git_source.remote!

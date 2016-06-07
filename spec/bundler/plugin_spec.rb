@@ -22,11 +22,11 @@ describe Bundler::Plugin do
   end
 
   describe "install command" do
-    let(:opts) {{"version" => "~> 1.0", "source" => "foo"}}
+    let(:opts) { { "version" => "~> 1.0", "source" => "foo" } }
 
     before do
       allow(installer).
-        to receive(:install).with("new-plugin", opts) {lib_path("new-plugin")}
+        to receive(:install).with("new-plugin", opts) { lib_path("new-plugin") }
     end
 
     it "passes the name and options to installer" do
@@ -72,7 +72,7 @@ describe Bundler::Plugin do
         "new-plugin" => lib_path("new-plugin"),
         "another-plugin" => lib_path("another-plugin"),
       }
-      allow(installer).to receive(:install_definition) {plugin_paths}
+      allow(installer).to receive(:install_definition) { plugin_paths }
 
       expect(subject).to receive(:validate_plugin!).twice
       expect(subject).to receive(:register_plugin).twice
