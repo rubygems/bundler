@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-require "bundler/plugin"
-
 describe Bundler::Plugin::API do
   context "plugin declarations" do
     before do
@@ -10,21 +8,17 @@ describe Bundler::Plugin::API do
     end
 
     it "declares a command plugin with same class as handler" do
-      success = false
-      allow(Bundler::Plugin).to receive(:add_command).with("meh", UserPluginClass) { success = true }
+      allow(Bundler::Plugin).
+        to receive(:add_command).with("meh", UserPluginClass).once
 
       UserPluginClass.command "meh"
-
-      expect(success).to be true
     end
 
     it "accepts another class as argument that handles the command" do
-      success = false
       stub_const "NewClass", Class.new
-      allow(Bundler::Plugin).to receive(:add_command).with("meh", NewClass) { success = true }
+      allow(Bundler::Plugin).to receive(:add_command).with("meh", NewClass).once
 
       UserPluginClass.command "meh", NewClass
-      expect(success).to be true
     end
   end
 

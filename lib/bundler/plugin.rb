@@ -30,7 +30,7 @@ module Bundler
         register_plugin name, plugin_path
 
         Bundler.ui.info "Installed plugin #{name}"
-      rescue StandardError => e
+      rescue PluginError => e
         Bundler.rm_rf(plugin_path) if plugin_path
         Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
       end
@@ -111,7 +111,11 @@ module Bundler
 
         @commands = {}
 
-        load path.join(PLUGIN_FILE_NAME), true
+        begin
+          load path.join(PLUGIN_FILE_NAME), true
+        rescue StandardError => e
+          raise MalformattedPlugin, "#{e.class}: #{e.message}"
+        end
 
         index.register_plugin name, path.to_s, @commands.keys
       ensure
