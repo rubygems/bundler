@@ -106,14 +106,8 @@ module Bundler
         specs.values
       end
 
-      def activate_platform(platform)
-        unless @activated.include?(platform)
-          if for?(platform, nil)
-            @activated << platform
-            return __dependencies[platform] || []
-          end
-        end
-        []
+      def activate_platform!(platform)
+        @activated << platform if !@activated.include?(platform) && for?(platform, nil)
       end
 
       def name
@@ -252,28 +246,34 @@ module Bundler
       platform = dependency.__platform
       dependency = dependency.dep unless dependency.is_a? Gem::Dependency
       search = @search_for[dependency] ||= begin
-        index = @source_requirements[dependency.name] || @index
+        index = index_for(dependency)
         results = index.search(dependency, @base[dependency.name])
         if vertex = @base_dg.vertex_named(dependency.name)
           locked_requirement = vertex.payload.requirement
         end
         if results.any?
-          version = results.first.version
-          nested  = [[]]
+          nested = []
           results.each do |spec|
-            if spec.version != version
-              nested << []
-              version = spec.version
+            version, specs = nested.last
+            if version == spec.version
+              specs << spec
+            else
+              nested << [spec.version, [spec]]
             end
-            nested.last << spec
           end
-          groups = nested.map {|a| SpecGroup.new(a) }
-          !locked_requirement ? groups : groups.select {|sg| locked_requirement.satisfied_by? sg.version }
+          nested.reduce([]) do |groups, (version, specs)|
+            next groups if locked_requirement && !locked_requirement.satisfied_by?(version)
+            groups << SpecGroup.new(specs)
+          end
         else
           []
         end
       end
-      search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform(platform) }
+      search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }
+    end
+
+    def index_for(dependency)
+      @source_requirements[dependency.name] || @index
     end
 
     def name_for(dependency)
@@ -314,14 +314,12 @@ module Bundler
         if (base = @base[dependency.name]) && !base.empty?
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
-          base_dep = Dependency.new dependency.name, ">= 0.a"
-          all = search_for(DepProxy.new base_dep, dependency.__platform).size.to_f
-          if all.zero?
-            0
-          elsif (search = search_for(dependency).size.to_f) == all && all == 1
-            0
+          all = index_for(dependency).search(dependency.name).size
+          if all <= 1
+            all
           else
-            search / all
+            search = search_for(dependency).size
+            search - all
           end
         end
       end

@@ -54,7 +54,7 @@ module Bundler
         gem_list = []
         gem_names.each_slice(Source::Rubygems::API_REQUEST_SIZE) do |names|
           marshalled_deps = downloader.fetch(dependency_api_uri(names)).body
-          gem_list.push(*Bundler.load_marshal(marshalled_deps))
+          gem_list.concat(Bundler.load_marshal(marshalled_deps))
         end
         gem_list
       end
@@ -64,7 +64,7 @@ module Bundler
         spec_list = []
 
         gem_list.each do |s|
-          deps_list.push(*s[:dependencies].map(&:first))
+          deps_list.concat(s[:dependencies].map(&:first))
           deps = s[:dependencies].map {|n, d| [n, d.split(", ")] }
           spec_list.push([s[:name], s[:number], s[:platform], deps])
         end

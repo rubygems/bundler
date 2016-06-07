@@ -63,7 +63,7 @@ module Bundler
     FAIL_ERRORS = begin
       fail_errors = [AuthenticationRequiredError, BadAuthenticationError, FallbackError]
       fail_errors << Gem::Requirement::BadRequirementError if defined?(Gem::Requirement::BadRequirementError)
-      fail_errors.push(*NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
+      fail_errors.concat(NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
     end.freeze
 
     class << self

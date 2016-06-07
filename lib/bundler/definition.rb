@@ -224,7 +224,7 @@ module Bundler
           source.dependency_names = dependency_names.dup
           idx.add_source source.specs
           dependency_names -= pinned_spec_names(source.specs)
-          dependency_names.push(*source.unmet_deps).uniq!
+          dependency_names.concat(source.unmet_deps).uniq!
         end
       end
     end

@@ -170,13 +170,5 @@ describe Bundler::RemoteSpecification do
         subject.missing_method_call
       end
     end
-
-    context "and is not present in Gem::Specification" do
-      before { allow_any_instance_of(Gem::Specification).to receive(:respond_to?).and_return(false) }
-
-      it "should throw method missing error" do
-        expect { subject.missing_method_call }.to raise_error(NoMethodError)
-      end
-    end
   end
 end

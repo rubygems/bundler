@@ -21,15 +21,14 @@ module Bundler
       @sources = []
       @cache = {}
       @specs = Hash.new {|h, k| h[k] = {} }
-      @all_specs = Hash.new {|h, k| h[k] = [] }
+      @all_specs = Hash.new {|h, k| h[k] = EMPTY_SEARCH }
     end
 
     def initialize_copy(o)
-      super
-      @sources = @sources.dup
+      @sources = o.sources.dup
       @cache = {}
       @specs = Hash.new {|h, k| h[k] = {} }
-      @all_specs = Hash.new {|h, k| h[k] = [] }
+      @all_specs = Hash.new {|h, k| h[k] = EMPTY_SEARCH }
 
       o.specs.each do |name, hash|
         @specs[name] = hash.dup
@@ -49,7 +48,7 @@ module Bundler
     end
 
     def search_all(name)
-      all_matches = @all_specs[name] + local_search(name)
+      all_matches = local_search(name) + @all_specs[name]
       @sources.each do |source|
         all_matches.concat(source.search_all(name))
       end
@@ -60,19 +59,18 @@ module Bundler
     # about, returning all of the results.
     def search(query, base = nil)
       results = local_search(query, base)
-      seen = Set.new(results.map {|spec| [spec.name, spec.version, spec.platform] })
+      seen = results.map(&:full_name).to_set
 
       @sources.each do |source|
         source.search(query, base).each do |spec|
-          lookup = [spec.name, spec.version, spec.platform]
-          unless seen.include?(lookup)
-            results << spec
-            seen << lookup
-          end
+          results << spec if seen.add?(spec.full_name)
         end
       end
 
-      results.sort_by {|s| [s.version, s.platform.to_s == RUBY ? NULL : s.platform.to_s] }
+      results.sort_by do |s|
+        platform_string = s.platform.to_s
+        [s.version, platform_string == RUBY ? NULL : platform_string]
+      end
     end
 
     def local_search(query, base = nil)
@@ -90,14 +88,15 @@ module Bundler
 
     def <<(spec)
       @specs[spec.name][spec.full_name] = spec
-
       spec
     end
 
     def each(&blk)
+      return enum_for(:each) unless blk
       specs.values.each do |spec_sets|
         spec_sets.values.each(&blk)
       end
+      sources.each {|s| s.each(&blk) }
     end
 
     # returns a list of the dependencies
@@ -109,17 +108,17 @@ module Bundler
 
     def dependency_names
       names = []
-      each {|s| names.push(*s.dependencies.map(&:name)) }
+      each {|s| names.concat(s.dependencies.map(&:name)) }
       names.uniq
     end
 
     def use(other, override_dupes = false)
       return unless other
       other.each do |s|
-        if (dupes = search_by_spec(s)) && dupes.any?
-          @all_specs[s.name] = [s] + dupes
+        if (dupes = search_by_spec(s)) && !dupes.empty?
+          # safe to << since it's a new array when it has contents
+          @all_specs[s.name] = dupes << s
           next unless override_dupes
-          self << s
         end
         self << s
       end
@@ -154,7 +153,8 @@ module Bundler
     def search_by_dependency(dependency, base = nil)
       @cache[base || false] ||= {}
       @cache[base || false][dependency] ||= begin
-        specs = specs_by_name(dependency.name) + (base || [])
+        specs = specs_by_name(dependency.name)
+        specs += base if base
         found = specs.select do |spec|
           next true if spec.source.is_a?(Source::Gemspec)
           if base # allow all platforms when searching from a lockfile
@@ -175,25 +175,11 @@ module Bundler
       end
     end
 
+    EMPTY_SEARCH = [].freeze
+
     def search_by_spec(spec)
       spec = @specs[spec.name][spec.full_name]
-      spec ? [spec] : []
-    end
-
-    if RUBY_VERSION < "1.9"
-      def same_version?(a, b)
-        regex = /^(.*?)(?:\.0)*$/
-        a.to_s[regex, 1] == b.to_s[regex, 1]
-      end
-    else
-      def same_version?(a, b)
-        a == b
-      end
-    end
-
-    def spec_satisfies_dependency?(spec, dep)
-      return false unless dep.name == spec.name
-      dep.requirement.satisfied_by?(spec.version)
+      spec ? [spec] : EMPTY_SEARCH
     end
   end
 end

@@ -115,8 +115,8 @@ module Bundler
       end
     end
 
-    def build_dependency(name, *requirements)
-      Gem::Dependency.new(name, *requirements)
+    def build_dependency(name, requirements)
+      Gem::Dependency.new(name, requirements)
     rescue ArgumentError => e
       raise unless e.message.include?(ILLFORMED_MESSAGE)
       puts # we shouldn't print the error message on the "fetching info" status line
