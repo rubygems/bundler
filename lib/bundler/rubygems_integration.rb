@@ -169,6 +169,12 @@ module Bundler
       yield
     end
 
+    def has_required_ruby_version?
+      return @has_required_ruby_version if @calculated_has_required_ruby_version
+      @calculated_has_required_ruby_version = true
+      @has_required_ruby_version = Gem::Specification.new.respond_to?(:required_ruby_version)
+    end
+
     def loaded_gem_paths
       # RubyGems 2.2+ can put binary extension into dedicated folders,
       # therefore use RubyGems facilities to obtain their load paths.
