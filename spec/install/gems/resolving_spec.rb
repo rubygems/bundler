@@ -105,20 +105,37 @@ describe "bundle install with gem sources" do
 
     describe "when some gems require a different version of ruby" do
       it "does not try to install those gems" do
-        pending "waiting for a rubygems index that includes ruby version"
-
         update_repo gem_repo1 do
           build_gem "require_ruby" do |s|
             s.required_ruby_version = "> 9000"
           end
         end
 
-        install_gemfile <<-G
+        install_gemfile <<-G, :artifice => "compact_index"
           source "file://#{gem_repo1}"
           gem 'require_ruby'
         G
 
         expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
+        expect(out).to include("require_ruby-1.0 requires ruby version > 9000, which is incompatible with the current version, #{Bundler::RubyVersion.system}")
+      end
+    end
+
+    describe "when some gems require a different version of rubygems" do
+      it "does not try to install those gems" do
+        update_repo gem_repo1 do
+          build_gem "require_rubygems" do |s|
+            s.required_rubygems_version = "> 9000"
+          end
+        end
+
+        install_gemfile <<-G, :artifice => "compact_index"
+          source "file://#{gem_repo1}"
+          gem 'require_rubygems'
+        G
+
+        expect(out).to_not include("Gem::InstallError: require_rubygems requires RubyGems version > 9000")
+        expect(out).to include("require_rubygems-1.0 requires rubygems version > 9000, which is incompatible with the current version, #{Gem::VERSION}")
       end
     end
   end
