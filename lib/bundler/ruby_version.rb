@@ -102,10 +102,9 @@ module Bundler
 
     def to_gem_version_with_patchlevel
       @gem_version_with_patch ||= begin
-        patch_number = @patchlevel ? Gem::Requirement.create(@patchlevel).requirements.first.last : 0
-        Gem::Requirement.create("#{@gem_version}.#{patch_number}").requirements.first.last
-      rescue BadRequirementError
-        Gem::Requirement.create("#{@gem_version}.0").requirements.first.last
+        Gem::Version.create("#{@gem_version}.#{@patchlevel}")
+      rescue ArgumentError
+        @gem_version
       end
     end
 

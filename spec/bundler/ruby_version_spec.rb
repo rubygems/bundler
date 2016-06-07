@@ -454,22 +454,22 @@ describe "Bundler::RubyVersion and its subclasses" do
     end
 
     describe "#to_gem_version_with_patchlevel" do
-      shared_examples_for "the patchlevel is 0" do
-        it "uses 0 as patchlevel" do
-          expect(subject.to_gem_version_with_patchlevel.to_s).to eq("#{version}.0")
+      shared_examples_for "the patchlevel is omitted" do
+        it "does not include a patch level" do
+          expect(subject.to_gem_version_with_patchlevel.to_s).to eq(version)
         end
       end
 
       context "with nil patch number" do
         let(:patchlevel) { nil }
 
-        it_behaves_like "the patchlevel is 0"
+        it_behaves_like "the patchlevel is omitted"
       end
 
       context "with negative patch number" do
         let(:patchlevel) { -1 }
 
-        it_behaves_like "the patchlevel is 0"
+        it_behaves_like "the patchlevel is omitted"
       end
 
       context "with a valid patch number" do
