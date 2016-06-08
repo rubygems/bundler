@@ -43,7 +43,7 @@ module Bundler
       ruby\s
       ([\d.]+) # ruby version
       (?:p(\d+))? # optional patchlevel
-      (?: \((\S+) (.+)\))? # optional engine info
+      (?:\s\((\S+)\s(.+)\))? # optional engine info
     /xo
 
     # Returns a RubyVersion from the given string.

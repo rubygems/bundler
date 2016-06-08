@@ -391,7 +391,7 @@ describe "bundle install with gem sources" do
         L
       end
 
-      it "does not update Gemfile.lock with updated ruby versions" do
+      it "updates Gemfile.lock with updated incompatible ruby version" do
         install_gemfile <<-G, :expect_err => true
           ::RUBY_VERSION = '2.2.3'
           ::RUBY_PATCHLEVEL = 100
@@ -408,7 +408,7 @@ describe "bundle install with gem sources" do
          DEPENDENCIES
 
          RUBY VERSION
-            ruby 2.1.3p100
+            ruby 2.2.3p100
 
          BUNDLED WITH
             #{Bundler::VERSION}
