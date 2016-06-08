@@ -74,12 +74,12 @@ module Bundler
 
         SharedHelpers.filesystem_access(index_file) do |index_f|
           FileUtils.mkdir_p(index_f.dirname)
-          File.open(index_f, "w") {|f| f.puts dump_hash(index) }
+          File.open(index_f, "w") {|f| f.puts dump_yaml(index) }
         end
       end
 
       def dump_yaml(hash)
-        yaml = "---\n"
+        yaml = String.new("---\n")
         yaml << dump_hash(hash)
       end
 

@@ -37,7 +37,7 @@ module Bundler
 
         paths = install_from_specs specs
 
-        paths.select {|name, _| plugins.include? name }
+        Hash[paths.select {|name, _| plugins.include? name }]
       end
 
     private
