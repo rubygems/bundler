@@ -69,6 +69,16 @@ describe "bundler version trampolining" do
       expect(out).to eq("Bundler version 1.12.3")
       expect(system_gem_path.join("gems", "bundler-1.12.3")).to exist
     end
+
+    it "fails gracefully when installing the bundler fails" do
+      ENV["BUNDLER_VERSION"] = "9999"
+      bundle "--version", :expect_err => true
+      expect(err).to eq(<<-E.strip)
+Installing the inferred bundler version (= 9999) failed.
+If you'd like to update to the current bundler version (1.12.5) in this project, run `bundle update --bundler`.
+The error was: Unable to resolve dependency: user requested 'bundler (= 9999)'
+      E
+    end
   end
 
   context "bundle update --bundler" do

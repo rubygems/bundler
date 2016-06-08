@@ -18,8 +18,16 @@ installed_version =
 installed_version &&= Gem::Version.new(installed_version)
 
 if !version.satisfied_by?(installed_version)
-  installer = BundlerVendoredPostIt::Installer.new(version)
-  installer.install!
+  begin
+    installer = BundlerVendoredPostIt::Installer.new(version)
+    installer.install!
+  rescue => e
+    abort <<-EOS.strip
+Installing the inferred bundler version (#{version}) failed.
+If you'd like to update to the current bundler version (#{installed_version}) in this project, run `bundle update --bundler`.
+The error was: #{e}
+    EOS
+  end
 
   Gem.loaded_specs.delete("bundler") unless defined?(Bundler)
   gem "bundler", version
