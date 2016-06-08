@@ -85,7 +85,13 @@ module Bundler
 
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
-      @unlock[:ruby] ||= @ruby_version && @locked_ruby_version && @ruby_version.diff(RubyVersion.from_string(@locked_ruby_version))
+      @unlock[:ruby] ||= if @ruby_version && @locked_ruby_version
+        unless locked_ruby_version_object = RubyVersion.from_string(@locked_ruby_version)
+          raise LockfileError, "Failed to create a `RubyVersion` object from " \
+            "`#{@locked_ruby_version}` found in #{lockfile} -- try running `bundle update --ruby`."
+        end
+        @ruby_version.diff(locked_ruby_version_object)
+      end
       @unlocking ||= @unlock[:ruby] || (!@locked_ruby_version ^ !@ruby_version)
 
       current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
