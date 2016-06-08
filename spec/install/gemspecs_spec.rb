@@ -61,6 +61,7 @@ describe "bundle install" do
     end
 
     it "installs when patch level is specified and the version still matches the current version" do
+      pending "this feature does not support dev ruby versions" if RUBY_PATCHLEVEL < 0
       build_lib("foo", :path => bundled_app) do |s|
         s.required_ruby_version = "#{RUBY_VERSION}.#{RUBY_PATCHLEVEL}"
       end
@@ -73,6 +74,7 @@ describe "bundle install" do
     end
 
     it "fails and complains about patchlevel on patchlevel mismatch" do
+      pending "this feature does not support dev ruby versions" if RUBY_PATCHLEVEL < 0
       patchlevel = RUBY_PATCHLEVEL.to_i + 1
       build_lib("foo", :path => bundled_app) do |s|
         s.required_ruby_version = "#{RUBY_VERSION}.#{patchlevel}"
