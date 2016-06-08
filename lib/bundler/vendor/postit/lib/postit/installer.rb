@@ -6,7 +6,7 @@ module BundlerVendoredPostIt
 
     def installed?
       !Gem::Specification.find_by_name('bundler', @bundler_version).nil?
-    rescue Gem::MissingSpecVersionError
+    rescue LoadError
       false
     end
 
