@@ -58,7 +58,8 @@ module Bundler
           valid_file = index_f && index_f.exist? && !index_f.size.zero?
           break unless valid_file
           data = index_f.read
-          index = load_yaml(data)
+          require "bundler/yaml_serializer"
+          index = YAMLSerializer.load(data)
           @plugin_paths = index["plugin_paths"] || {}
           @commands = index["commands"] || {}
         end
@@ -72,44 +73,11 @@ module Bundler
           "commands" => @commands,
         }
 
+        require "bundler/yaml_serializer"
         SharedHelpers.filesystem_access(index_file) do |index_f|
           FileUtils.mkdir_p(index_f.dirname)
-          File.open(index_f, "w") {|f| f.puts dump_yaml(index) }
+          File.open(index_f, "w") {|f| f.puts YAMLSerializer.dump(index) }
         end
-      end
-
-      def dump_yaml(hash)
-        yaml = String.new("---\n")
-        yaml << dump_hash(hash)
-      end
-
-      def dump_hash(hash)
-        yaml = String.new("")
-        hash.each do |k, v|
-          yaml << k << ": "
-          if v.is_a?(Hash)
-            yaml << "\n" << dump_hash(v).gsub(/^/, "  ") << "\n"
-          else
-            yaml << v.to_s.gsub(/\s+/, " ").inspect << "\n"
-          end
-        end
-        yaml
-      end
-
-      def load_yaml(str)
-        res = {}
-        stack = [res]
-        str.scan(/^( *)(.*):\s?(["']?)([^"'\n]*)\3\n/).each do |(indent, key, _, val)|
-          depth = indent.scan(/  /).length
-          if val.empty?
-            new_hash = {}
-            stack[depth][key] = new_hash
-            stack[depth + 1] = new_hash
-          else
-            stack[depth][key] = val
-          end
-        end
-        res
       end
     end
   end
