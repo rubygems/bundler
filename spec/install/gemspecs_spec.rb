@@ -46,4 +46,65 @@ describe "bundle install" do
     bundle :install, :artifice => "endpoint_marshal_fail" # force gemspec load
     should_be_installed "activesupport 2.3.2"
   end
+
+  context "when ruby version is specified in gemspec and gemfile" do
+    it "installs when patch level is not specified and the version matches" do
+      build_lib("foo", :path => bundled_app) do |s|
+        s.required_ruby_version = RUBY_VERSION
+      end
+
+      install_gemfile <<-G
+        ruby '#{RUBY_VERSION}', :engine_version => '#{RUBY_VERSION}', :engine => 'ruby'
+        gemspec
+      G
+      should_be_installed "foo 1.0"
+    end
+
+    it "installs when patch level is specified and the version still matches the current version" do
+      pending "this feature does not support dev ruby versions" if RUBY_PATCHLEVEL < 0
+      build_lib("foo", :path => bundled_app) do |s|
+        s.required_ruby_version = "#{RUBY_VERSION}.#{RUBY_PATCHLEVEL}"
+      end
+
+      install_gemfile <<-G
+        ruby '#{RUBY_VERSION}', :engine_version => '#{RUBY_VERSION}', :engine => 'ruby', :patchlevel => '#{RUBY_PATCHLEVEL}'
+        gemspec
+      G
+      should_be_installed "foo 1.0"
+    end
+
+    it "fails and complains about patchlevel on patchlevel mismatch" do
+      pending "this feature does not support dev ruby versions" if RUBY_PATCHLEVEL < 0
+      patchlevel = RUBY_PATCHLEVEL.to_i + 1
+      build_lib("foo", :path => bundled_app) do |s|
+        s.required_ruby_version = "#{RUBY_VERSION}.#{patchlevel}"
+      end
+
+      install_gemfile <<-G
+        ruby '#{RUBY_VERSION}', :engine_version => '#{RUBY_VERSION}', :engine => 'ruby', :patchlevel => '#{patchlevel}'
+        gemspec
+      G
+
+      expect(out).to include("Ruby patchlevel")
+      expect(out).to include("but your Gemfile specified")
+      expect(exitstatus).to eq(18) if exitstatus
+    end
+
+    it "fails and complains about version on version mismatch" do
+      version = Gem::Requirement.create(RUBY_VERSION).requirements.first.last.bump.version
+
+      build_lib("foo", :path => bundled_app) do |s|
+        s.required_ruby_version = version
+      end
+
+      install_gemfile <<-G
+        ruby '#{version}', :engine_version => '#{version}', :engine => 'ruby'
+        gemspec
+      G
+
+      expect(out).to include("Ruby version")
+      expect(out).to include("but your Gemfile specified")
+      expect(exitstatus).to eq(18) if exitstatus
+    end
+  end
 end

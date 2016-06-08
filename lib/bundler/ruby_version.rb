@@ -100,6 +100,14 @@ module Bundler
       @ruby_version ||= RubyVersion.new(RUBY_VERSION.dup, RUBY_PATCHLEVEL.to_s, ruby_engine, ruby_engine_version)
     end
 
+    def to_gem_version_with_patchlevel
+      @gem_version_with_patch ||= begin
+        Gem::Version.create("#{@gem_version}.#{@patchlevel}")
+      rescue ArgumentError
+        @gem_version
+      end
+    end
+
   private
 
     def matches?(requirements, version)
