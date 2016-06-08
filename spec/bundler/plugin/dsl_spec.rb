@@ -2,6 +2,8 @@
 require "spec_helper"
 
 describe Bundler::Plugin::DSL do
+  DSL = Bundler::Plugin::DSL
+
   subject(:dsl) { Bundler::Plugin::DSL.new }
 
   before do
@@ -14,7 +16,7 @@ describe Bundler::Plugin::DSL do
     end
 
     it "raises error for other methods" do
-      expect { dsl.no_method }.to raise_error(Bundler::GemfileError)
+      expect { dsl.no_method }.to raise_error(DSL::PluginGemfileError)
     end
   end
 end

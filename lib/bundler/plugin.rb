@@ -8,8 +8,8 @@ module Bundler
     autoload :Installer,  "bundler/plugin/installer"
     autoload :SourceList, "bundler/plugin/source_list"
 
-    MalformattedPlugin = Class.new(PluginError)
-    UndefinedCommandError = Class.new(PluginError)
+    class MalformattedPlugin < PluginError; end
+    class UndefinedCommandError < PluginError; end
 
     PLUGIN_FILE_NAME = "plugins.rb".freeze
 

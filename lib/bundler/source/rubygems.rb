@@ -149,7 +149,7 @@ module Bundler
           if requires_sudo?
             Bundler.rubygems.repository_subdirectories.each do |name|
               src = File.join(install_path, name, "*")
-              dst = File.join(Bundler.rubygems.gem_dir, name)
+              dst = File.join(rubygems_dir, name)
               if name == "extensions" && Dir.glob(src).any?
                 src = File.join(src, "*/*")
                 ext_src = Dir.glob(src).first
@@ -249,7 +249,7 @@ module Bundler
       end
 
       def loaded_from(spec)
-        "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
+        "#{rubygems_dir}/specifications/#{spec.full_name}.gemspec"
       end
 
       def cached_gem(spec)
