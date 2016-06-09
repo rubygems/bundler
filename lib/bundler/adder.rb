@@ -9,7 +9,7 @@ module Bundler
       @version = version || last_version_number
     end
 
-    def add
+    def run
       Bundler.default_gemfile.open("a") do |f|
         f.puts
         f.puts output_line

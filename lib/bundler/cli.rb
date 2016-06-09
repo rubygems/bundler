@@ -446,7 +446,7 @@ module Bundler
 
     desc "add GEM [VERSION]", "Add the named gem to the bottom of Gemfile"
     def add(name, version = nil)
-      Adder.new(name, version).add
+      Adder.new(name, version).run
     end
 
     if Bundler.settings[:plugins]
