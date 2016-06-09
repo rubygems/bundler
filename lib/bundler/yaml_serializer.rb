@@ -23,10 +23,24 @@ module Bundler
       yaml
     end
 
+    SCAN_REGEX = /
+      ^
+      ([ ]*) # indentations
+      (.*) # key
+      (?::(?=\s)) # :  (without the lookahead the #key includes this when : is present in value)
+      [ ]?
+      (?: !\s)? # optional exclamation mark found with ruby 1.9.3
+      (['"]?) # optional opening quote
+      (.*) # value
+      \3 # matching closing quote
+      $
+    /xo
+
     def load(str)
       res = {}
       stack = [res]
-      str.scan(/^( *)(.*):\s?(["']?)([^"'\n]*)\3\n/).each do |(indent, key, _, val)|
+      str.scan(SCAN_REGEX).each do |(indent, key, _, val)|
+        key = convert_to_backward_compatible_key(key)
         depth = indent.scan(/  /).length
         if val.empty?
           new_hash = {}
@@ -39,8 +53,15 @@ module Bundler
       res
     end
 
+    # for settings' keys
+    def convert_to_backward_compatible_key(key)
+      key = "#{key}/" if key =~ /https?:/i && key !~ %r{/\Z}
+      key = key.gsub(".", "__") if key.include?(".")
+      key
+    end
+
     class << self
-      private :dump_hash
+      private :dump_hash, :convert_to_backward_compatible_key
     end
   end
 end
