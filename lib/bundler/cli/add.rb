@@ -1,10 +1,13 @@
 # frozen_string_literal: true
+require "bundler/cli/common"
 require "net/http"
 require "yaml"
 
 module Bundler
   class CLI::Add
-    def initialize(name, version)
+    attr_reader :options, :name, :version
+    def initialize(options, name, version)
+      @options = options
       @name = name
       @version = version || last_version_number
     end
@@ -20,17 +23,20 @@ module Bundler
   private
 
     def last_version_number
-      uri = URI.parse("https://rubygems.org/api/v1/gems/#{@name}.yaml")
-      response = Net::HTTP.get(uri)
-      YAML.load(response)["version"]
+      definition = Bundler.definition(true)
+      definition.resolve_remotely!
+      specs = definition.index[name].sort_by(&:version)
+      spec = specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
+      spec = specs.last
+      spec.version.to_s
     end
 
     def output_line
-      %(|gem "#{@name}", "#{approximate_recommendation}"|)
+      %(|gem "#{name}", "#{approximate_recommendation}"|)
     end
 
     def approximate_recommendation
-      Gem::Version.new(@version).approximate_recommendation
+      Gem::Version.new(version).approximate_recommendation
     end
   end
 end
