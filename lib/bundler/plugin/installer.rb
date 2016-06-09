@@ -16,11 +16,9 @@ module Bundler
 
         if options[:git]
           install_git(names, version, options)
-        elsif options[:source]
-          source = options[:source]
-          install_rubygems(names, version, source)
         else
-          raise(ArgumentError, "You need to provide the source")
+          sources = options[:source] || Gem.sources.sources.map(&:uri)
+          install_rubygems(names, version, sources)
         end
       end
 
@@ -49,7 +47,7 @@ module Bundler
         source_list = SourceList.new
         source_list.add_git_source(options)
 
-        # To support bot sources
+        # To support both sources
         if options[:source]
           source_list.add_rubygems_source("remotes" => options[:source])
         end
@@ -65,13 +63,14 @@ module Bundler
       #
       # @param [String] name of the plugin gem to search in the source
       # @param [Array] version of the gem to install
-      # @param [String] source the rubygems URL to resolve the gem
+      # @param [String, Array<String>] source(s) to resolve the gem
       #
       # @return [String] the path where the plugin was installed
-      def install_rubygems(names, version, source)
+      def install_rubygems(names, version, sources)
         deps = names.map {|name| Dependency.new name, version }
+
         source_list = SourceList.new
-        source_list.add_rubygems_source("remotes" => source)
+        source_list.add_rubygems_source("remotes" => sources)
 
         definition = Definition.new(nil, deps, source_list, {})
         install_definition(definition)

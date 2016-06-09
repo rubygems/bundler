@@ -9,14 +9,6 @@ describe "bundler plugin install" do
     end
   end
 
-  it "fails when source in not provided" do
-    bundle "plugin install foo"
-
-    expect(out).to include("You need to provide the source")
-
-    expect(out).not_to include("Installed plugin")
-  end
-
   it "shows propper message when gem in not found in the source" do
     bundle "plugin install no-foo --source file://#{gem_repo1}"
 

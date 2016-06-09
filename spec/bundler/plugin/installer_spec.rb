@@ -5,9 +5,13 @@ describe Bundler::Plugin::Installer do
   subject(:installer) { Bundler::Plugin::Installer.new }
 
   describe "cli install" do
-    it "raises error when non of the source is provided" do
-      expect { installer.install("new-plugin", {}) }.
-        to raise_error(ArgumentError)
+    it "uses Gem.sources when non of the source is provided" do
+      sources = Gem.sources.sources.map(&:uri)
+
+      allow(installer).to receive(:install_rubygems).
+        with("new-plugin", [">= 0"], sources).once
+
+      installer.install("new-plugin", {})
     end
 
     describe "with mocked installers" do
