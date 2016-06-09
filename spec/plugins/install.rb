@@ -19,6 +19,7 @@ describe "bundler plugin install" do
     bundle "plugin install foo --source file://#{gem_repo2}"
 
     expect(out).to include("Installed plugin foo")
+    plugin_should_be_installed("foo")
   end
 
   it "installs multiple plugins" do
@@ -26,6 +27,8 @@ describe "bundler plugin install" do
 
     expect(out).to include("Installed plugin foo")
     expect(out).to include("Installed plugin kung-foo")
+
+    plugin_should_be_installed("foo", "kung-foo")
   end
 
   it "uses the same version for multiple plugins" do
@@ -38,6 +41,7 @@ describe "bundler plugin install" do
 
     expect(out).to include("Installing foo 1.0")
     expect(out).to include("Installing kung-foo 1.0")
+    plugin_should_be_installed("foo", "kung-foo")
   end
 
   context "malformatted plugin" do
@@ -81,6 +85,7 @@ describe "bundler plugin install" do
       bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
 
       expect(out).to include("Installed plugin foo")
+      plugin_should_be_installed("foo")
     end
   end
 
@@ -99,6 +104,7 @@ describe "bundler plugin install" do
       expect(out).to include("Bundle complete!")
 
       should_be_installed("rack 1.0.0")
+      plugin_should_be_installed("foo")
     end
 
     it "accepts plugin version" do
@@ -115,7 +121,7 @@ describe "bundler plugin install" do
 
       expect(out).to include("Installing foo 1.0")
 
-      expect(out).to include("Installed plugin foo")
+      plugin_should_be_installed("foo")
 
       expect(out).to include("Bundle complete!")
     end
@@ -130,6 +136,23 @@ describe "bundler plugin install" do
       G
 
       expect(out).to include("Installed plugin ga-plugin")
+      plugin_should_be_installed("ga-plugin")
+    end
+  end
+
+  context "inline gemfiles" do
+    it "installs the listed plugins" do
+      code = <<-RUBY
+        require "bundler/inline"
+
+        gemfile do
+          source 'file://#{gem_repo2}'
+          plugin 'foo'
+        end
+      RUBY
+
+      ruby code
+      plugin_should_be_installed("foo")
     end
   end
 end

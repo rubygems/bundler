@@ -50,6 +50,10 @@ module Bundler
         @commands[command]
       end
 
+      def installed?(name)
+        @plugin_paths[name]
+      end
+
     private
 
       # Reads the index file from the directory and initializes the instance variables.

@@ -36,8 +36,14 @@ module Bundler
     # specified by plugin method
     #
     # @param [Pathname] gemfile path
-    def gemfile_install(gemfile)
-      definition = DSL.evaluate(gemfile, nil, {})
+    def gemfile_install(gemfile = nil, &inline)
+      if block_given?
+        builder = DSL.new
+        builder.instance_eval(&inline)
+        definition = builder.to_definition(nil, true)
+      else
+        definition = DSL.evaluate(gemfile, nil, {})
+      end
       return unless definition.dependencies.any?
 
       plugins = Installer.new.install_definition(definition)
@@ -78,6 +84,13 @@ module Bundler
       load_plugin index.command_plugin(command) unless @commands.key? command
 
       @commands[command].new.exec(command, args)
+    end
+
+    # currently only intended for specs
+    #
+    # @return [String, nil] installed path
+    def installed?(plugin)
+      Index.new.installed?(plugin)
     end
 
     # Post installation processing and registering with index

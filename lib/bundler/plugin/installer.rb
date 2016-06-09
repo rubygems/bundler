@@ -30,6 +30,7 @@ module Bundler
       def install_definition(definition)
         plugins = definition.dependencies.map(&:name)
 
+        def definition.lock(*); end
         definition.resolve_remotely!
         specs = definition.specs
 
@@ -54,7 +55,7 @@ module Bundler
 
         deps = names.map {|name| Dependency.new name, version }
 
-        definition = Definition.new(nil, deps, source_list, {})
+        definition = Definition.new(nil, deps, source_list, true)
         install_definition(definition)
       end
 
@@ -72,7 +73,7 @@ module Bundler
         source_list = SourceList.new
         source_list.add_rubygems_source("remotes" => sources)
 
-        definition = Definition.new(nil, deps, source_list, {})
+        definition = Definition.new(nil, deps, source_list, true)
         install_definition(definition)
       end
 
