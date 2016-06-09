@@ -7,13 +7,11 @@ describe Bundler::YAMLSerializer do
 
   describe "#dump" do
     it "works for simple hash" do
-      hash = { "Q" => "Where does Thursday come before Wednesday?",
-               "Ans" => "In the dictionary. :P" }
+      hash = { "Q" => "Where does Thursday come before Wednesday? In the dictionary. :P" }
 
       expected = strip_whitespace <<-YAML
           ---
-          Q: "Where does Thursday come before Wednesday?"
-          Ans: "In the dictionary. :P"
+          Q: "Where does Thursday come before Wednesday? In the dictionary. :P"
       YAML
 
       expect(serializer.dump(hash)).to eq(expected)
@@ -21,19 +19,15 @@ describe Bundler::YAMLSerializer do
 
     it "handles nested hash" do
       hash = {
-        "a_joke" => {
-          "my-stand" => "I can totally keep secrets",
-          "my-explanation" => "It's the people I tell them to that can't",
+        "nice-one" => {
+          "read_ahead" => "All generalizations are false, including this one",
         },
-        "read_ahead" => "All generalizations are false, including this one",
       }
 
       expected = strip_whitespace <<-YAML
           ---
-          a_joke:
-            my-stand: "I can totally keep secrets"
-            my-explanation: "It's the people I tell them to that can't"
-          read_ahead: "All generalizations are false, including this one"
+          nice-one:
+            read_ahead: "All generalizations are false, including this one"
       YAML
 
       expect(serializer.dump(hash)).to eq(expected)
@@ -83,6 +77,36 @@ describe Bundler::YAMLSerializer do
       YAML
 
       expect(serializer.load(yaml)).to eq("BUNDLE_MIRROR__HTTPS://RUBYGEMS__ORG/" => "http://rubygems-mirror.org")
+    end
+  end
+
+  describe "against yaml lib" do
+    let(:hash) do
+      {
+        "a_joke" => {
+          "my-stand" => "I can totally keep secrets",
+          "but" => "The people I tell them to can't :P",
+        },
+        "sales" => {
+          "item" => "A Parachute",
+          "description" => "Only used once, never opened.",
+        },
+        "one-more" => "I'd tell you a chemistry joke but I know I wouldn't get a reaction.",
+      }
+    end
+
+    context "#load" do
+      it "retrieves the original hash" do
+        require "yaml"
+        expect(serializer.load(YAML.dump(hash))).to eq(hash)
+      end
+    end
+
+    context "#dump" do
+      it "retrieves the original hash" do
+        require "yaml"
+        expect(YAML.load(serializer.dump(hash))).to eq(hash)
+      end
     end
   end
 end

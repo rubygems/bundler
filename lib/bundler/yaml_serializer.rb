@@ -40,7 +40,6 @@ module Bundler
       res = {}
       stack = [res]
       str.scan(SCAN_REGEX).each do |(indent, key, _, val)|
-        key = convert_to_backward_compatible_key(key)
         depth = indent.scan(/  /).length
         if val.empty?
           new_hash = {}
@@ -53,15 +52,8 @@ module Bundler
       res
     end
 
-    # for settings' keys
-    def convert_to_backward_compatible_key(key)
-      key = "#{key}/" if key =~ /https?:/i && key !~ %r{/\Z}
-      key = key.gsub(".", "__") if key.include?(".")
-      key
-    end
-
     class << self
-      private :dump_hash, :convert_to_backward_compatible_key
+      private :dump_hash
     end
   end
 end

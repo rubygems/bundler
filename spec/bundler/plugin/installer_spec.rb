@@ -6,7 +6,8 @@ describe Bundler::Plugin::Installer do
 
   describe "cli install" do
     it "uses Gem.sources when non of the source is provided" do
-      sources = Gem.sources.sources.map(&:uri)
+      sources = double(:sources)
+      allow(Bundler).to receive_message_chain("rubygems.sources") { sources }
 
       allow(installer).to receive(:install_rubygems).
         with("new-plugin", [">= 0"], sources).once

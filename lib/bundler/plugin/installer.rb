@@ -17,7 +17,7 @@ module Bundler
         if options[:git]
           install_git(names, version, options)
         else
-          sources = options[:source] || Gem.sources.sources.map(&:uri)
+          sources = options[:source] || Bundler.rubygems.sources
           install_rubygems(names, version, sources)
         end
       end
