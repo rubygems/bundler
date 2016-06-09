@@ -40,11 +40,11 @@ module Bundler
       end
 
       # A tmp dir to be used by plugins
+      # Accepts names that get concatenated as suffix
       #
-      # @param [String] name unique for the plugin or the purpose
       # @return [Pathname] object for the new directory created
-      def tmp(name)
-        Bundler.tmp(File.join(["plugin", name]))
+      def tmp(*names)
+        Bundler.tmp(["plugin", *names].join("-"))
       end
 
       def method_missing(name, *args, &blk)

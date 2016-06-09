@@ -33,5 +33,15 @@ describe Bundler::Plugin::API do
     it "provides the bundler settings" do
       expect(api.settings).to eq(Bundler.settings)
     end
+
+    context "#tmp" do
+      it "provides a tmp dir" do
+        expect(api.tmp("mytmp")).to be_directory
+      end
+
+      it "accepts multiple names for suffix" do
+        expect(api.tmp("myplugin", "download")).to be_directory
+      end
+    end
   end
 end
