@@ -61,6 +61,15 @@ describe "bundler version trampolining" do
   context "installing missing bundler versions", :realworld => true do
     before do
       ENV["BUNDLER_VERSION"] = "1.12.3"
+      if Bundler::RubygemsIntegration.provides?("< 2.6.4")
+        # necessary since we intall with 2.6.4 but the specs can run against
+        # older versions that match againt the "gem" invocation
+        %w(bundle bundler).each do |exe|
+          system_gem_path.join("bin", exe).open("a") do |f|
+            f << %(\ngem "bundler", ">= 0.a"\n)
+          end
+        end
+      end
     end
 
     it "guesses & installs the correct bundler version" do
