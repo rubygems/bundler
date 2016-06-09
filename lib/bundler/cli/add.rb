@@ -3,7 +3,7 @@ require "net/http"
 require "yaml"
 
 module Bundler
-  class Adder
+  class CLI::Add
     def initialize(name, version)
       @name = name
       @version = version || last_version_number
