@@ -5,13 +5,24 @@ module BundlerVendoredPostIt
     end
 
     def installed?
-      !Gem::Specification.find_by_name('bundler', @bundler_version).nil?
+      if Gem::Specification.respond_to?(:find_by_name)
+        !Gem::Specification.find_by_name('bundler', @bundler_version).nil?
+      else
+        dep = Gem::Dependency.new('bundler', @bundler_version)
+        Gem.source_index.gems.values.any? do |s|
+          dep.match?(s.name, s.version)
+        end
+      end
     rescue LoadError
       false
     end
 
     def install!
-      Gem.install('bundler', @bundler_version) unless installed?
+      return if installed?
+      require "rubygems/dependency_installer"
+      installer = Gem::DependencyInstaller.new
+      installer.install('bundler', @bundler_version)
+      installer.installed_gems
     end
   end
 end

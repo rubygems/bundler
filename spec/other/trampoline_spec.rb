@@ -82,10 +82,10 @@ describe "bundler version trampolining" do
     it "fails gracefully when installing the bundler fails" do
       ENV["BUNDLER_VERSION"] = "9999"
       bundle "--version", :expect_err => true
-      expect(err).to eq(<<-E.strip)
+      expect(err).to start_with(<<-E.strip)
 Installing the inferred bundler version (= 9999) failed.
 If you'd like to update to the current bundler version (1.12.5) in this project, run `bundle update --bundler`.
-The error was: Unable to resolve dependency: user requested 'bundler (= 9999)'
+The error was:
       E
     end
   end
