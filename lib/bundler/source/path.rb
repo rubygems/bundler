@@ -107,6 +107,10 @@ module Bundler
         name
       end
 
+      def root
+        Bundler.root
+      end
+
       def is_a_path?
         instance_of?(Path)
       end

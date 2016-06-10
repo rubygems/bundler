@@ -17,28 +17,9 @@ module Bundler
         end
       end
 
-      if options[:without] && options[:with]
-        conflicting_groups = options[:without] & options[:with]
-        unless conflicting_groups.empty?
-          Bundler.ui.error "You can't list a group in both, --with and --without." \
-          "The offending groups are: #{conflicting_groups.join(", ")}."
-          exit 1
-        end
-      end
+      check_for_group_conflicts
 
-      Bundler.settings.with    = [] if options[:with] && options[:with].empty?
-      Bundler.settings.without = [] if options[:without] && options[:without].empty?
-
-      with = options.fetch("with", [])
-      with |= Bundler.settings.with.map(&:to_s)
-      with -= options[:without] if options[:without]
-
-      without = options.fetch("without", [])
-      without |= Bundler.settings.without.map(&:to_s)
-      without -= options[:with] if options[:with]
-
-      options[:with]    = with
-      options[:without] = without
+      normalize_groups
 
       ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
 
@@ -47,16 +28,7 @@ module Bundler
 
       check_for_options_conflicts
 
-      if options["trust-policy"]
-        unless Bundler.rubygems.security_policies.keys.include?(options["trust-policy"])
-          Bundler.ui.error "Rubygems doesn't know about trust policy '#{options["trust-policy"]}'. " \
-            "The known policies are: #{Bundler.rubygems.security_policies.keys.join(", ")}."
-          exit 1
-        end
-        Bundler.settings["trust-policy"] = options["trust-policy"]
-      else
-        Bundler.settings["trust-policy"] = nil if Bundler.settings["trust-policy"]
-      end
+      check_trust_policy
 
       if options[:deployment] || options[:frozen]
         unless Bundler.default_lockfile.exist?
@@ -77,24 +49,14 @@ module Bundler
         options[:system] = true
       end
 
-      Bundler.settings[:path]     = nil if options[:system]
-      Bundler.settings[:path]     = "vendor/bundle" if options[:deployment]
-      Bundler.settings[:path]     = options["path"] if options["path"]
-      Bundler.settings[:path] ||= "bundle" if options["standalone"]
-      Bundler.settings[:bin]      = options["binstubs"] if options["binstubs"]
-      Bundler.settings[:bin]      = nil if options["binstubs"] && options["binstubs"].empty?
-      Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
-      Bundler.settings[:jobs]     = options["jobs"] if options["jobs"]
-      Bundler.settings[:no_prune] = true if options["no-prune"]
-      Bundler.settings[:no_install] = true if options["no-install"]
-      Bundler.settings[:clean]    = options["clean"] if options["clean"]
-      Bundler.settings.without    = options[:without]
-      Bundler.settings.with       = options[:with]
+      normalize_settings
+
       Bundler::Fetcher.disable_endpoint = options["full-index"]
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? true : nil
 
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
+
+      Plugin.gemfile_install(Bundler.default_gemfile) if Bundler.settings[:plugins]
 
       definition = Bundler.definition
       definition.validate_ruby!
@@ -119,16 +81,7 @@ module Bundler
         end
       end
 
-      Installer.ambiguous_gems.to_a.each do |name, installed_from_uri, *also_found_in_uris|
-        Bundler.ui.error "Warning: the gem '#{name}' was found in multiple sources."
-        Bundler.ui.error "Installed from: #{installed_from_uri}"
-        Bundler.ui.error "Also found in:"
-        also_found_in_uris.each {|uri| Bundler.ui.error "  * #{uri}" }
-        Bundler.ui.error "You should add a source requirement to restrict this gem to your preferred source."
-        Bundler.ui.error "For example:"
-        Bundler.ui.error "    gem '#{name}', :source => '#{installed_from_uri}'"
-        Bundler.ui.error "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
-      end
+      warn_ambiguous_gems
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
         require "bundler/cli/clean"
@@ -182,12 +135,90 @@ module Bundler
       Bundler.ui.info msg
     end
 
+    def check_for_group_conflicts
+      if options[:without] && options[:with]
+        conflicting_groups = options[:without] & options[:with]
+        unless conflicting_groups.empty?
+          Bundler.ui.error "You can't list a group in both, --with and --without." \
+          "The offending groups are: #{conflicting_groups.join(", ")}."
+          exit 1
+        end
+      end
+    end
+
     def check_for_options_conflicts
       if (options[:path] || options[:deployment]) && options[:system]
         error_message = String.new
         error_message << "You have specified both a path to install your gems to as well as --system. Please choose.\n" if options[:path]
         error_message << "You have specified both --deployment as well as --system. Please choose.\n" if options[:deployment]
         raise InvalidOption.new(error_message)
+      end
+    end
+
+    def check_trust_policy
+      if options["trust-policy"]
+        unless Bundler.rubygems.security_policies.keys.include?(options["trust-policy"])
+          Bundler.ui.error "Rubygems doesn't know about trust policy '#{options["trust-policy"]}'. " \
+            "The known policies are: #{Bundler.rubygems.security_policies.keys.join(", ")}."
+          exit 1
+        end
+        Bundler.settings["trust-policy"] = options["trust-policy"]
+      else
+        Bundler.settings["trust-policy"] = nil if Bundler.settings["trust-policy"]
+      end
+    end
+
+    def normalize_groups
+      Bundler.settings.with    = [] if options[:with] && options[:with].empty?
+      Bundler.settings.without = [] if options[:without] && options[:without].empty?
+
+      with = options.fetch("with", [])
+      with |= Bundler.settings.with.map(&:to_s)
+      with -= options[:without] if options[:without]
+
+      without = options.fetch("without", [])
+      without |= Bundler.settings.without.map(&:to_s)
+      without -= options[:with] if options[:with]
+
+      options[:with]    = with
+      options[:without] = without
+    end
+
+    def normalize_settings
+      Bundler.settings[:path]                = nil if options[:system]
+      Bundler.settings[:path]                = "vendor/bundle" if options[:deployment]
+      Bundler.settings[:path]                = options["path"] if options["path"]
+      Bundler.settings[:path]              ||= "bundle" if options["standalone"]
+
+      Bundler.settings[:bin]                 = options["binstubs"] if options["binstubs"]
+      Bundler.settings[:bin]                 = nil if options["binstubs"] && options["binstubs"].empty?
+
+      Bundler.settings[:shebang]             = options["shebang"] if options["shebang"]
+
+      Bundler.settings[:jobs]                = options["jobs"] if options["jobs"]
+
+      Bundler.settings[:no_prune]            = true if options["no-prune"]
+
+      Bundler.settings[:no_install]          = true if options["no-install"]
+
+      Bundler.settings[:clean]               = options["clean"] if options["clean"]
+
+      Bundler.settings.without               = options[:without]
+      Bundler.settings.with                  = options[:with]
+
+      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? true : nil
+    end
+
+    def warn_ambiguous_gems
+      Installer.ambiguous_gems.to_a.each do |name, installed_from_uri, *also_found_in_uris|
+        Bundler.ui.error "Warning: the gem '#{name}' was found in multiple sources."
+        Bundler.ui.error "Installed from: #{installed_from_uri}"
+        Bundler.ui.error "Also found in:"
+        also_found_in_uris.each {|uri| Bundler.ui.error "  * #{uri}" }
+        Bundler.ui.error "You should add a source requirement to restrict this gem to your preferred source."
+        Bundler.ui.error "For example:"
+        Bundler.ui.error "    gem '#{name}', :source => '#{installed_from_uri}'"
+        Bundler.ui.error "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
       end
     end
   end

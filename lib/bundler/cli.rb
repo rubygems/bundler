@@ -16,6 +16,7 @@ module Bundler
 
     def initialize(*args)
       super
+      Bundler.reset!
 
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
       ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile) if custom_gemfile && !custom_gemfile.empty?
@@ -82,6 +83,10 @@ module Bundler
     end
 
     def self.handle_no_command_error(command, has_namespace = $thor_runner)
+      if Bundler.settings[:plugins] && Bundler::Plugin.command?(command)
+        return Bundler::Plugin.exec_command(command, ARGV[1..-1])
+      end
+
       return super unless command_path = Bundler.which("bundler-#{command}")
 
       Kernel.exec(command_path, *ARGV[1..-1])
@@ -435,6 +440,12 @@ module Bundler
     desc "env", "Print information about the environment Bundler is running under"
     def env
       Env.new.write($stdout)
+    end
+
+    if Bundler.settings[:plugins]
+      require "bundler/cli/plugin"
+      desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
+      subcommand "plugin", Plugin
     end
 
     # Reformat the arguments passed to bundle that include a --help flag

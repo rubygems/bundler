@@ -38,6 +38,7 @@ module Bundler
   autoload :MatchPlatform,          "bundler/match_platform"
   autoload :Mirror,                 "bundler/mirror"
   autoload :Mirrors,                "bundler/mirror"
+  autoload :Plugin,                 "bundler/plugin"
   autoload :RemoteSpecification,    "bundler/remote_specification"
   autoload :Resolver,               "bundler/resolver"
   autoload :Retry,                  "bundler/retry"
@@ -195,8 +196,7 @@ module Bundler
     end
 
     def settings
-      return @settings if defined?(@settings)
-      @settings = Settings.new(app_config_path)
+      @settings ||= Settings.new(app_config_path)
     rescue GemfileNotFound
       @settings = Settings.new(Pathname.new(".bundle").expand_path)
     end
@@ -379,6 +379,8 @@ module Bundler
     end
 
     def reset!
+      @root = nil
+      @settings = nil
       @definition = nil
     end
 

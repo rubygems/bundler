@@ -86,6 +86,7 @@ module Bundler
       def install_path
         @install_path ||= begin
           git_scope = "#{base_name}-#{shortref_for_path(revision)}"
+
           path = Bundler.install_path.join(git_scope)
 
           if !path.exist? && Bundler.requires_sudo?
@@ -227,8 +228,8 @@ module Bundler
       end
 
       def serialize_gemspecs_in(destination)
-        expanded_path = destination.expand_path(Bundler.root)
-        Dir["#{expanded_path}/#{@glob}"].each do |spec_path|
+        destination = destination.expand_path(Bundler.root) if destination.relative?
+        Dir["#{destination}/#{@glob}"].each do |spec_path|
           # Evaluate gemspecs and cache the result. Gemspecs
           # in git might require git or other dependencies.
           # The gemspecs we cache should already be evaluated.

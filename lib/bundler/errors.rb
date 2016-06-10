@@ -36,6 +36,7 @@ module Bundler
   class LockfileError < BundlerError; status_code(20); end
   class CyclicDependencyError < BundlerError; status_code(21); end
   class GemfileLockNotFound < BundlerError; status_code(22); end
+  class PluginError < BundlerError; status_code(23); end
   class GemfileEvalError < GemfileError; end
   class MarshalError < StandardError; end
 

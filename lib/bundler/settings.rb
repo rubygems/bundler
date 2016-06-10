@@ -3,7 +3,7 @@ require "uri"
 
 module Bundler
   class Settings
-    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check disable_shared_gems ignore_messages gem.mit gem.coc silence_root_warning no_install).freeze
+    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check disable_shared_gems ignore_messages gem.mit gem.coc silence_root_warning no_install plugins).freeze
     NUMBER_KEYS = %w(retry timeout redirect ssl_verify_mode).freeze
     DEFAULT_CONFIG = { :retry => 3, :timeout => 10, :redirect => 5 }.freeze
 
@@ -201,19 +201,12 @@ module Bundler
         hash.delete(key) if value.nil?
         SharedHelpers.filesystem_access(file) do |p|
           FileUtils.mkdir_p(p.dirname)
-          p.open("w") {|f| f.write(serialize_hash(hash)) }
+          require "bundler/yaml_serializer"
+          p.open("w") {|f| f.write(YAMLSerializer.dump(hash)) }
         end
       end
 
       value
-    end
-
-    def serialize_hash(hash)
-      yaml = String.new("---\n")
-      hash.each do |key, value|
-        yaml << key << ": " << value.to_s.gsub(/\s+/, " ").inspect << "\n"
-      end
-      yaml
     end
 
     def global_config_file
@@ -246,18 +239,9 @@ module Bundler
       SharedHelpers.filesystem_access(config_file, :read) do
         valid_file = config_file && config_file.exist? && !config_file.size.zero?
         return {} if ignore_config? || !valid_file
-        config_pairs = config_file.read.scan(CONFIG_REGEX).map do |m|
-          key, _, value = m
-          [convert_to_backward_compatible_key(key), value.gsub(/\s+/, " ").tr('"', "'")]
-        end
-        Hash[config_pairs]
+        require "bundler/yaml_serializer"
+        YAMLSerializer.load config_file.read
       end
-    end
-
-    def convert_to_backward_compatible_key(key)
-      key = "#{key}/" if key =~ /https?:/i && key !~ %r{/\Z}
-      key = key.gsub(".", "__") if key.include?(".")
-      key
     end
 
     # TODO: duplicates Rubygems#normalize_uri

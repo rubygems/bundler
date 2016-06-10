@@ -419,6 +419,10 @@ module Spec
       GitReader.new lib_path(spec.full_name)
     end
 
+    def build_plugin(name, *args, &blk)
+      build_with(PluginBuilder, name, args, &blk)
+    end
+
   private
 
     def build_with(builder, name, args, &blk)
@@ -698,6 +702,12 @@ module Spec
 
       def _default_path
         @context.gem_repo1("gems")
+      end
+    end
+
+    class PluginBuilder < GemBuilder
+      def _default_files
+        @_default_files ||= super.merge("plugins.rb" => "")
       end
     end
 

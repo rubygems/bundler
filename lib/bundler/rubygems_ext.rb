@@ -22,9 +22,11 @@ module Gem
     alias_method :rg_full_gem_path, :full_gem_path
     alias_method :rg_loaded_from,   :loaded_from
 
+    attr_writer :full_gem_path unless instance_methods.include?(:full_gem_path=)
+
     def full_gem_path
       if source.respond_to?(:path)
-        Pathname.new(loaded_from).dirname.expand_path(Bundler.root).to_s.untaint
+        Pathname.new(loaded_from).dirname.expand_path(source.root).to_s.untaint
       else
         rg_full_gem_path
       end

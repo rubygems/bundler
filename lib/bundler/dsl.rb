@@ -224,6 +224,10 @@ module Bundler
       @env = old
     end
 
+    def plugin(*args)
+      # Pass on
+    end
+
     def method_missing(name, *args)
       raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile"
     end
