@@ -196,8 +196,7 @@ module Bundler
     end
 
     def settings
-      return @settings if defined?(@settings)
-      @settings = Settings.new(app_config_path)
+      @settings ||= Settings.new(app_config_path)
     rescue GemfileNotFound
       @settings = Settings.new(Pathname.new(".bundle").expand_path)
     end
@@ -380,6 +379,8 @@ module Bundler
     end
 
     def reset!
+      @root = nil
+      @settings = nil
       @definition = nil
     end
 
