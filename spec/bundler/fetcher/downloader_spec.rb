@@ -225,6 +225,15 @@ describe Bundler::Fetcher::Downloader do
             "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint")
         end
       end
+
+      context "when error message is about no route to host" do
+        let(:message) { "Failed to open TCP connection to www.uri-to-fetch.com:443 " }
+
+        it "should raise a Bundler::Fetcher::HTTPError" do
+          expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
+            "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint")
+        end
+      end
     end
   end
 end
