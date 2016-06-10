@@ -155,4 +155,22 @@ describe "bundler/inline#gemfile" do
     expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
+
+  it "installs quietly from git if necessary when the install option is not set" do
+    build_git "foo", "1.0.0"
+    baz_ref = build_git("baz", "2.0.0").ref_for("HEAD")
+    script <<-RUBY
+      gemfile do
+        gem "foo", :git => #{lib_path("foo-1.0.0").to_s.dump}
+        gem "baz", :git => #{lib_path("baz-2.0.0").to_s.dump}, :ref => #{baz_ref.dump}
+      end
+
+      puts FOO
+      puts BAZ
+    RUBY
+
+    expect(out).to eq("1.0.0\n2.0.0")
+    expect(err).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
 end
