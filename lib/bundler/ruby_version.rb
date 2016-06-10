@@ -103,9 +103,11 @@ module Bundler
         # not defined in ruby 1.8.7
         "ruby"
       end
+      # :sob: mocking RUBY_VERSION breaks stuff on 1.8.7
+      ruby_version = ENV.fetch("BUNDLER_SPEC_RUBY_VERSION") { RUBY_VERSION }.dup
       ruby_engine_version = case ruby_engine
                             when "ruby"
-                              RUBY_VERSION.dup
+                              ruby_version
                             when "rbx"
                               Rubinius::VERSION.dup
                             when "jruby"
@@ -113,7 +115,7 @@ module Bundler
                             else
                               raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
       end
-      @ruby_version ||= RubyVersion.new(RUBY_VERSION.dup, RUBY_PATCHLEVEL.to_s, ruby_engine, ruby_engine_version)
+      @ruby_version ||= RubyVersion.new(ruby_version, RUBY_PATCHLEVEL.to_s, ruby_engine, ruby_engine_version)
     end
 
   private

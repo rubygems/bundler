@@ -21,11 +21,6 @@ if ENV["BUNDLER_SPEC_WINDOWS"] == "true"
 end
 
 class Object
-  if ENV["BUNDLER_SPEC_RUBY_VERSION"]
-    remove_const :RUBY_VERSION if defined?(RUBY_VERSION)
-    RUBY_VERSION = ENV["BUNDLER_SPEC_RUBY_VERSION"]
-  end
-
   if ENV["BUNDLER_SPEC_RUBY_ENGINE"]
     if defined?(RUBY_ENGINE) && RUBY_ENGINE != "jruby" && ENV["BUNDLER_SPEC_RUBY_ENGINE"] == "jruby"
       begin
