@@ -56,6 +56,40 @@ describe "Bundler::RubyVersion and its subclasses" do
         end
       end
     end
+
+    describe ".from_string" do
+      shared_examples_for "returning" do
+        it "returns the original RubyVersion" do
+          expect(described_class.from_string(subject.to_s)).to eq(subject)
+        end
+      end
+
+      include_examples "returning"
+
+      context "no patchlevel" do
+        let(:patchlevel) { nil }
+
+        include_examples "returning"
+      end
+
+      context "engine is ruby" do
+        let(:engine) { "ruby" }
+        let(:engine_version) { version }
+
+        include_examples "returning"
+      end
+
+      context "with multiple requirements" do
+        let(:engine_version) { ["> 9", "< 11"] }
+        let(:version) { ["> 8", "< 10"] }
+        let(:patchlevel) { nil }
+
+        it "returns nil" do
+          expect(described_class.from_string(subject.to_s)).to be_nil
+        end
+      end
+    end
+
     describe "#to_s" do
       it "should return info string with the ruby version, patchlevel, engine, and engine version" do
         expect(subject.to_s).to eq("ruby 2.0.0p645 (jruby 2.0.1)")
