@@ -51,7 +51,7 @@ def gemfile(install = false, options = {}, &gemfile)
   missing_specs = proc do
     begin
       !definition.missing_specs.empty?
-    rescue Bundler::GemNotFound
+    rescue Bundler::GemNotFound, Bundler::GitError
       definition.instance_variable_set(:@index, nil)
       true
     end
