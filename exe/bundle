@@ -4,6 +4,13 @@
 # Exit cleanly from an early interrupt
 Signal.trap("INT") { exit 1 }
 
+unless ENV["BUNDLE_DISABLE_POSTIT"]
+  update = "update".start_with?(ARGV.first || " ") && ARGV.find {|a| a.start_with?("--bundler") }
+  update &&= update =~ /--bundler(?:=(.+))?/ && $1 || "> 0.a"
+  ENV["BUNDLER_VERSION"] = update if update
+  require "bundler/postit_trampoline"
+end
+
 require "bundler"
 # Check if an older version of bundler is installed
 $LOAD_PATH.each do |path|

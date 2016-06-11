@@ -204,6 +204,8 @@ module Bundler
       "Force downloading every gem."
     method_option "ruby", :type => :boolean, :banner =>
       "Update ruby specified in Gemfile.lock"
+    method_option "bundler", :type => :string, :lazy_default => "> 0.a", :banner =>
+      "Update the locked version of bundler"
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run

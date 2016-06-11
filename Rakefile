@@ -296,10 +296,21 @@ begin
     lib.prefix = "Bundler"
     lib.vendor_lib = "lib/bundler/vendor/thor"
   end
+
+  Automatiek::RakeTask.new("postit") do |lib|
+    lib.download = { :github => "https://github.com/bundler/postit" }
+    lib.namespace = "PostIt"
+    lib.vendor_lib = "lib/bundler/vendor/postit"
+
+    def lib.namespace_files
+      process_files(namespace, "BundlerVendoredPostIt")
+    end
+  end
 rescue LoadError
   namespace :vendor do
     task(:molinillo) { abort "Install the automatiek gem to be able to vendor gems." }
     task(:thor) { abort "Install the automatiek gem to be able to vendor gems." }
+    task(:postit) { abort "Install the automatiek gem to be able to vendor gems." }
   end
 end
 

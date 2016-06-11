@@ -13,7 +13,7 @@ module Bundler
       sources = Array(options[:source])
       groups  = Array(options[:group]).map(&:to_sym)
 
-      if gems.empty? && sources.empty? && groups.empty? && !options[:ruby]
+      if gems.empty? && sources.empty? && groups.empty? && !options[:ruby] && !options[:bundler]
         # We're doing a full update
         Bundler.definition(true)
       else

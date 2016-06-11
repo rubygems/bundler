@@ -169,6 +169,7 @@ module Bundler
 
       # Set BUNDLE_GEMFILE
       ENV["BUNDLE_GEMFILE"] = find_gemfile.to_s
+      ENV["BUNDLER_VERSION"] = Bundler::VERSION
     end
 
     def set_path

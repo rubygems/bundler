@@ -11,7 +11,8 @@ module Spec
         # Rake version has to be consistent for tests to pass
         "rake" => "10.0.2",
         # 3.0.0 breaks 1.9.2 specs
-        "builder" => "2.1.2"
+        "builder" => "2.1.2",
+        "bundler" => "1.12.0",
       }
       # ruby-graphviz is used by the viz tests
       deps["ruby-graphviz"] = nil if RUBY_VERSION >= "1.9.3"
