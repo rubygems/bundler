@@ -1270,4 +1270,44 @@ describe "the lockfile format" do
     expect(err).to match(/your gems.locked contains merge conflicts/i)
     expect(err).to match(/git checkout HEAD -- gems.locked/i)
   end
+
+  it "stores each rubygems source in its own source section" do
+    build_repo gem_repo3 do
+      build_gem "cocoapods", "0.37.0"
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo3}"
+      source "file://#{gem_repo1}" do
+        gem "thin" # comes first to test name sorting
+        gem "rack"
+      end
+      gem "cocoapods" # should come from repo3!
+    G
+
+    lockfile_should_be <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+          thin (1.0)
+            rack
+
+      GEM
+        remote: file:#{gem_repo3}/
+        specs:
+          cocoapods (0.37.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        cocoapods
+        rack!
+        thin!
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    L
+  end
 end

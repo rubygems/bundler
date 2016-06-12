@@ -286,7 +286,7 @@ describe Bundler::SourceList do
   end
 
   describe "#lock_sources" do
-    it "combines the rubygems sources into a single instance, removing duplicate remotes from the end" do
+    it "returns each rubygems source" do
       source_list.add_git_source("uri" => "git://third-git.org/path.git")
       source_list.add_rubygems_source("remotes" => ["https://duplicate-rubygems.org"])
       source_list.add_path_source("path" => "/third/path/to/gem")
@@ -303,15 +303,14 @@ describe Bundler::SourceList do
         Bundler::Source::Git.new("uri" => "git://first-git.org/path.git"),
         Bundler::Source::Git.new("uri" => "git://second-git.org/path.git"),
         Bundler::Source::Git.new("uri" => "git://third-git.org/path.git"),
+        Bundler::Source::Rubygems.new,
+        Bundler::Source::Rubygems.new("remotes" => ["https://duplicate-rubygems.org"]),
+        Bundler::Source::Rubygems.new("remotes" => ["https://first-rubygems.org"]),
+        Bundler::Source::Rubygems.new("remotes" => ["https://second-rubygems.org"]),
+        Bundler::Source::Rubygems.new("remotes" => ["https://third-rubygems.org"]),
         Bundler::Source::Path.new("path" => "/first/path/to/gem"),
         Bundler::Source::Path.new("path" => "/second/path/to/gem"),
         Bundler::Source::Path.new("path" => "/third/path/to/gem"),
-        Bundler::Source::Rubygems.new("remotes" => [
-          "https://duplicate-rubygems.org",
-          "https://first-rubygems.org",
-          "https://second-rubygems.org",
-          "https://third-rubygems.org",
-        ]),
       ]
     end
   end
