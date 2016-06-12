@@ -425,3 +425,51 @@ describe "bundle update --ruby" do
     end
   end
 end
+
+describe "bundle update conservative" do
+  context "patch preferred" do
+    it "single gem without dependencies" do
+      build_repo4 do
+        build_gem "foo", %w(1.0.0 1.0.1 1.1.0 2.0.0)
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo', '1.0.0'
+      G
+
+      gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo'
+      G
+
+      # bundle "update --patch_preferred" # preferred is a bit lengthy
+      # bundle "update --patch"
+      require_relative '../../lib/bundler/cli'
+      require_relative '../../lib/bundler/cli/update'
+      #Bundler::CLI::Update.new({patch: true}, [])
+      # Bundler.with_clean_env do
+      #   ENV['BUNDLE_GEMFILE'] = bundled_app.to_s
+      #   Bundler::CLI::Update.new({}, [])
+      # end
+      bundle 'update'
+
+      # switch i guess is recognized as a gem name, so no update at all occurs
+      should_be_installed "foo 1.0.1"
+    end
+  end
+
+  context "minor preferred" do
+
+  end
+
+  context "strict" do
+    it "patch preferred"
+
+    it "minor preferred"
+  end
+
+  context "dry run" do
+
+  end
+end

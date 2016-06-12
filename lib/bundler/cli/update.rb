@@ -3,7 +3,7 @@ module Bundler
   class CLI::Update
     attr_reader :options, :gems
     def initialize(options, gems)
-      @options = options
+      @options = options.tap {|o|p o}
       @gems = gems
     end
 
