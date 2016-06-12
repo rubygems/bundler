@@ -12,7 +12,7 @@ module Bundler
       setup_cache_all
       Bundler.settings[:cache_all_platforms] = options["all-platforms"] if options.key?("all-platforms")
       Bundler.load.cache
-      Bundler.settings[:no_prune] = true if options["no-prune"]
+      Bundler.settings[:no_prune] = true unless options["prune"]
       Bundler.load.lock
     rescue GemNotFound => e
       Bundler.ui.error(e.message)
