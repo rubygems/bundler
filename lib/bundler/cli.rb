@@ -444,10 +444,10 @@ module Bundler
       Env.new.write($stdout)
     end
 
-    desc "add GEM [VERSION]", "Add the named gem to the bottom of Gemfile"
-    def add(name, version = nil)
+    desc "add GEM [VERSION]", "Add the specified gem to the bottom of Gemfile"
+    def add(name, version = nil, *gems)
       require "bundler/cli/add"
-      Add.new(options, name, version).run
+      Add.new(options, name, version, gems).run
     end
 
     if Bundler.settings[:plugins]
