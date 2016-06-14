@@ -443,18 +443,8 @@ describe "bundle update conservative" do
         gem 'foo'
       G
 
-      # bundle "update --patch_preferred" # preferred is a bit lengthy
-      # bundle "update --patch"
-      require_relative '../../lib/bundler/cli'
-      require_relative '../../lib/bundler/cli/update'
-      #Bundler::CLI::Update.new({patch: true}, [])
-      # Bundler.with_clean_env do
-      #   ENV['BUNDLE_GEMFILE'] = bundled_app.to_s
-      #   Bundler::CLI::Update.new({}, [])
-      # end
-      bundle 'update'
+      bundle "update --patch"
 
-      # switch i guess is recognized as a gem name, so no update at all occurs
       should_be_installed "foo 1.0.1"
     end
   end

@@ -172,14 +172,14 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil)
+    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil, update_opts = UpdateOptions.new)
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base, ruby_version)
+      resolver = new(index, source_requirements, base, ruby_version, update_opts)
       result = resolver.start(requirements)
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base, ruby_version)
+    def initialize(index, source_requirements, base, ruby_version, update_opts = UpdateOptions.new)
       @index = index
       @source_requirements = source_requirements
       @base = base
@@ -188,6 +188,7 @@ module Bundler
       @base_dg = Molinillo::DependencyGraph.new
       @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
       @ruby_version = ruby_version
+      @update_opts = update_opts
     end
 
     def start(requirements)
@@ -363,6 +364,22 @@ module Bundler
         version_platform_str << " #{platform}" unless platform.nil?
       end
       version_platform_strs.join(", ")
+    end
+
+    class UpdateOptions
+      attr_accessor :level, :strict, :minimal
+
+      def initialize
+        @level_default = :major
+        @level = @level_default
+        @strict = false
+        @minimal = false
+      end
+
+      def level=(value)
+        v = value.to_sym rescue nil
+        @level = [:major, :minor, :patch].include?(v) ? v : @level_default
+      end
     end
   end
 end

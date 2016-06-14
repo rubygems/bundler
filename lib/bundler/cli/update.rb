@@ -3,7 +3,7 @@ module Bundler
   class CLI::Update
     attr_reader :options, :gems
     def initialize(options, gems)
-      @options = options.tap {|o|p o}
+      @options = options
       @gems = gems
     end
 
@@ -38,6 +38,8 @@ module Bundler
 
         Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby])
       end
+
+      Bundler.definition.update_opts.level = [:major, :minor, :patch].detect { |v| options.keys.include?(v) }
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 

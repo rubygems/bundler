@@ -7,7 +7,7 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps
+    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps, :update_opts
 
     # Given a gemfile and lockfile creates a Bundler definition
     #
@@ -57,6 +57,7 @@ module Bundler
       @lockfile_contents      = String.new
       @locked_bundler_version = nil
       @locked_ruby_version    = nil
+      @update_opts            = Resolver::UpdateOptions.new
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
@@ -221,7 +222,7 @@ module Bundler
         else
           # Run a resolve against the locally available gems
           Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version, update_opts)
         end
       end
     end
