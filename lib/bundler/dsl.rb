@@ -126,17 +126,19 @@ module Bundler
     end
 
     def source(source, *args, &blk)
-      options = args.last.is_a?(Hash) ? args.pop.dup : nil
-      if options && options.key?(:type)
-        unless Plugin.source?(options[:type])
-          raise "No sources available for #{options[:type]}"
+      options = args.last.is_a?(Hash) ? args.pop.dup : {}
+      options = normalize_hash(options)
+      if options && options.key?("type")
+        options["type"] = options["type"].to_s
+        unless Plugin.source?(options["type"])
+          raise "No sources available for #{options["type"]}"
         end
 
         unless block_given?
           raise InvalidOption, "You need to pass a block to #source with :type option"
         end
 
-        source_opts = normalize_hash(options).merge("uri" => source)
+        source_opts = options.merge("uri" => source)
         with_source(@sources.add_plugin_source(options["type"], source_opts), &blk)
       elsif block_given?
         source = normalize_source(source)

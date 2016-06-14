@@ -101,7 +101,7 @@ module Bundler
       when Source::Git          then git_sources
       when Source::Path         then path_sources
       when Source::Rubygems     then rubygems_sources
-      when Plugin::Api::Source then plugin_sources
+      when Plugin::API::Source  then plugin_sources
       else raise ArgumentError, "Invalid source: #{source.inspect}"
       end
     end

@@ -5,10 +5,9 @@ describe "bundler source plugin" do
   before do
     build_repo2 do
       build_plugin "bundler-source-gitp" do |s|
-        s.write "plugin.rb", <<-RUBY
-          class SPlugin < Bundler::Plugin::Api
-            Api = Bundler::Plugin::Api
-            source :gitp
+        s.write "plugins.rb", <<-RUBY
+          class SPlugin < Bundler::Plugin::API
+            source "gitp"
 
             def initialize(opts)
               super

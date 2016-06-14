@@ -14,7 +14,7 @@ describe Bundler::Plugin::Index do
 
   describe "#register plugin" do
     before do
-      index.register_plugin("new-plugin", lib_path("new-plugin").to_s, [])
+      index.register_plugin("new-plugin", lib_path("new-plugin").to_s, [], [])
     end
 
     it "is available for retrieval" do
@@ -29,7 +29,7 @@ describe Bundler::Plugin::Index do
 
   describe "commands" do
     before do
-      index.register_plugin("cplugin", lib_path("cplugin").to_s, ["newco"])
+      index.register_plugin("cplugin", lib_path("cplugin").to_s, ["newco"], [])
     end
 
     it "returns the plugins name on query" do
@@ -38,7 +38,7 @@ describe Bundler::Plugin::Index do
 
     it "raises error on conflict" do
       expect do
-        index.register_plugin("aplugin", lib_path("aplugin").to_s, ["newco"])
+        index.register_plugin("aplugin", lib_path("aplugin").to_s, ["newco"], [])
       end.to raise_error(Index::CommandConflict)
     end
   end

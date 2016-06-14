@@ -23,6 +23,7 @@ module Bundler
   # and hooks).
   module Plugin
     class API
+      autoload :Source, "bundler/plugin/api/source"
       # The plugins should declare that they handle a command through this helper.
       #
       # @param [String] command being handled by them
@@ -32,9 +33,9 @@ module Bundler
         Plugin.add_command command, cls
       end
 
-      def self.source(source)
-        self.include Bundler::Plugin::Api::Source
-        Plugin.add_source source, self
+      def self.source(source, cls = self)
+        self.include Bundler::Plugin::API::Source
+        Plugin.add_source source, cls
       end
 
       # The cache dir to be used by the plugins for persistance storage

@@ -27,9 +27,7 @@ module Bundler
       # @param [String] name of the plugin to be registered
       # @param [String] path where the plugin is installed
       # @param [Array<String>] commands that are handled by the plugin
-      def register_plugin(name, path, commands)
-        @plugin_paths[name] = path
-
+      def register_plugin(name, path, commands, sources)
         common = commands & @commands.keys
         raise CommandConflict.new(name, common) unless common.empty?
         commands.each {|c| @commands[c] = name }
@@ -60,6 +58,14 @@ module Bundler
         @plugin_paths[name]
       end
 
+      def source?(source)
+        @sources.key? source
+      end
+
+      def source_plugin(name)
+        @sources[name]
+      end
+
     private
 
       # Reads the index file from the directory and initializes the instance variables.
@@ -73,14 +79,6 @@ module Bundler
           @plugin_paths = index["plugin_paths"] || {}
           @commands = index["commands"] || {}
         end
-      end
-
-      def source?(source)
-        @sources.key? source
-      end
-
-      def source_plugin(name)
-        @sources[name]
       end
 
       # Should be called when any of the instance variables change. Stores the instance
