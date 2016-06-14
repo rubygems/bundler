@@ -78,6 +78,7 @@ module Bundler
           index = YAMLSerializer.load(data)
           @plugin_paths = index["plugin_paths"] || {}
           @commands = index["commands"] || {}
+          @sources = index["sources"] || {}
         end
       end
 

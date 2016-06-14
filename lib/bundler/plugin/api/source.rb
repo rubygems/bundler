@@ -5,10 +5,13 @@ module Bundler
     class API
       module Source
         attr_reader :uri, :options
+        attr_accessor :dependency_names
 
         def initialize(opts)
           @options = opts
+          @dependency_names = []
           @uri = opts["uri"]
+          @type = opts["type"]
         end
 
         def specs
@@ -29,11 +32,36 @@ module Bundler
           index
         end
 
+        def unmet_deps
+          specs.unmet_dependency_names
+        end
+
+        def can_lock?(spec)
+          spec.source == self
+        end
+
+        def to_lock
+          out = String.new("PLUGIN\n")
+          out << "  remote: #{@uri}\n"
+          out << "  type: #{@type}\n"
+          options_to_lock.each do |opt, value|
+            out << "  #{opt}: #{value}\n"
+          end
+          out << "  specs:\n"
+        end
+
         def install
         end
 
         def fetch_gemfiles
           raise "Source plugins need to define fetch_gemfile method"
+        end
+
+        def options_to_lock
+          {}
+        end
+
+        def remote!
         end
       end
     end

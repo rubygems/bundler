@@ -10,6 +10,7 @@ module Bundler
 
     class MalformattedPlugin < PluginError; end
     class UndefinedCommandError < PluginError; end
+    class UnknownSourceError < PluginError; end
 
     PLUGIN_FILE_NAME = "plugins.rb".freeze
 
@@ -115,9 +116,17 @@ module Bundler
     end
 
     def source(name)
+      raise UnknownSourceError, "Source #{name} not found" unless source? name
+
       load_plugin index.source_plugin name unless @sources.key? name
 
       @sources[name]
+    end
+
+    def source_from_lock(locked_opts)
+      src = source(locked_opts["type"])
+
+      src.new(locked_opts.merge("uri" => locked_opts["remote"]))
     end
 
     # Checks if the gem is good to be a plugin

@@ -47,7 +47,7 @@ module Bundler
     end
 
     def all_sources
-      path_sources + git_sources + rubygems_sources
+      path_sources + git_sources + plugin_sources + rubygems_sources
     end
 
     def get(source)
@@ -55,14 +55,14 @@ module Bundler
     end
 
     def lock_sources
-      lock_sources = (path_sources + git_sources).sort_by(&:to_s)
+      lock_sources = (path_sources + git_sources + plugin_sources).sort_by(&:to_s)
       lock_sources << combine_rubygems_sources
     end
 
     def replace_sources!(replacement_sources)
       return true if replacement_sources.empty?
 
-      [path_sources, git_sources].each do |source_list|
+      [path_sources, git_sources, plugin_sources].each do |source_list|
         source_list.map! do |source|
           replacement_sources.find {|s| s == source } || source
         end

@@ -16,24 +16,50 @@ describe "bundler source plugin" do
             end
 
             def fetch_gemfiles
-              @glob = "{,*,*/*}.gemspec"
-              @bare_loc = tmp('splugin')
-              `git clone \#{@options["uri"]} \#{@bare_loc}`
+              @gemfiles ||= begin
+                glob = "{,*,*/*}.gemspec"
 
-              Dir["\#{@bare_loc}/\#{@glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }
+                if !cached?
+                  cache_repo
+                end
+
+                Dir["\#{cache_path}/\#{glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }
+              end
             end
 
             def install(spec, opts)
               mkdir_p(install_path.dirname)
               rm_rf(install_path)
-              `git clone --no-checkout --quiet "\#{@bare_loc}" "\#{install_path}"`
+              `git clone --no-checkout --quiet "\#{cache_path}" "\#{install_path}"`
               Dir.chdir install_path do
                 `git reset --hard \#{revision}`
               end
+
+              nil
+            end
+
+            def cache_path
+              @cache_path ||= cache.join("gitp", base_name)
+            end
+
+            def cache_repo
+              `git clone \#{@options["uri"]} \#{cache_path}`
+            end
+
+            def cached?
+              File.directory?(cache_path)
+            end
+
+            def options_to_lock
+              {"revision" => revision}
+            end
+
+            def cached_revision
+              options["revision"]
             end
 
             def revision
-              Dir.chdir @bare_loc do
+              Dir.chdir cache_path do
                 `git rev-parse --verify \#{@ref}`.strip
               end
             end
@@ -83,14 +109,17 @@ describe "bundler source plugin" do
 
   it "handles the source option", :focused do
     build_git "ma-gitp-gem"
+    build_git "ma-gitp-gem2"
     install_gemfile <<-G
       source "file://#{gem_repo2}"
       source "#{lib_path("ma-gitp-gem-1.0")}", :type => :gitp do
         gem "ma-gitp-gem"
       end
       #gem 'ma-gitp-gem', :git => "#{lib_path("ma-gitp-gem-1.0")}"
+      gem 'ma-gitp-gem2', :git => "#{lib_path("ma-gitp-gem2-1.0")}"
     G
 
+    puts out
     expect(out).to include("Bundle complete!")
     should_be_installed("ma-gitp-gem 1.0")
   end
