@@ -54,7 +54,7 @@ module Bundler
         end
 
         def fetch_gemfiles
-          raise "Source plugins need to define fetch_gemfile method"
+          []
         end
 
         def options_to_lock

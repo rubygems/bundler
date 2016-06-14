@@ -25,7 +25,7 @@ module Gem
     attr_writer :full_gem_path unless instance_methods.include?(:full_gem_path=)
 
     def full_gem_path
-      if source.respond_to?(:path)
+      if source.respond_to?(:path) || source.is_a?(Bundler::Plugin::API::Source)
         Pathname.new(loaded_from).dirname.expand_path(source.root).to_s.untaint
       else
         rg_full_gem_path

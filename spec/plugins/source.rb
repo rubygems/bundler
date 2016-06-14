@@ -18,12 +18,15 @@ describe "bundler source plugin" do
             def fetch_gemfiles
               @gemfiles ||= begin
                 glob = "{,*,*/*}.gemspec"
-
                 if !cached?
                   cache_repo
                 end
-
-                Dir["\#{cache_path}/\#{glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }
+                if installed?
+                  path = install_path
+                else
+                  path = cache_path
+                end
+                Dir["\#{path}/\#{glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }
               end
             end
 
@@ -43,7 +46,7 @@ describe "bundler source plugin" do
             end
 
             def cache_repo
-              `git clone \#{@options["uri"]} \#{cache_path}`
+              `git clone --quiet \#{@options["uri"]} \#{cache_path}`
             end
 
             def cached?
@@ -59,8 +62,10 @@ describe "bundler source plugin" do
             end
 
             def revision
-              Dir.chdir cache_path do
-                `git rev-parse --verify \#{@ref}`.strip
+              @revision ||= cached_revision || begin
+                Dir.chdir cache_path do
+                  `git rev-parse --verify \#{@ref}`.strip
+                end
               end
             end
 
@@ -89,6 +94,10 @@ describe "bundler source plugin" do
                 end
               end
             end
+
+            def installed?
+              File.directory?(install_path)
+            end
           end
         RUBY
       end
@@ -96,30 +105,36 @@ describe "bundler source plugin" do
   end
 
   it "installs source automatically from #source :type option" do
+    update_repo2 do
+      build_plugin "bundler-source-psource" do |s|
+        s.write "plugins.rb", <<-RUBY
+            class Cheater < Bundler::Plugin::API
+              source "psource", self
+            end
+        RUBY
+      end
+    end
+
     install_gemfile <<-G
       source "file://#{gem_repo2}"
-      source "file://#{lib_path("gitp")}", :type => :gitp do
+      source "file://#{lib_path("gitp")}", :type => :psource do
       end
     G
 
-    expect(out).to include("Installed plugin bundler-source-gitp")
+    expect(out).to include("Installed plugin bundler-source-psource")
 
     expect(out).to include("Bundle complete!")
   end
 
-  it "handles the source option", :focused do
+  it "handles the source option" do
     build_git "ma-gitp-gem"
-    build_git "ma-gitp-gem2"
     install_gemfile <<-G
       source "file://#{gem_repo2}"
       source "#{lib_path("ma-gitp-gem-1.0")}", :type => :gitp do
         gem "ma-gitp-gem"
       end
-      #gem 'ma-gitp-gem', :git => "#{lib_path("ma-gitp-gem-1.0")}"
-      gem 'ma-gitp-gem2', :git => "#{lib_path("ma-gitp-gem2-1.0")}"
     G
 
-    puts out
     expect(out).to include("Bundle complete!")
     should_be_installed("ma-gitp-gem 1.0")
   end

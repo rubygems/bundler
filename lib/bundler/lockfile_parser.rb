@@ -22,7 +22,7 @@ module Bundler
     GIT          = "GIT".freeze
     GEM          = "GEM".freeze
     PATH         = "PATH".freeze
-    PLUGIN       = "PATH".freeze
+    PLUGIN       = "PLUGIN".freeze
     SPECS        = "  specs:".freeze
     OPTIONS      = /^  ([a-z]+): (.*)$/i
     SOURCE       = [GIT, GEM, PATH, PLUGIN].freeze
