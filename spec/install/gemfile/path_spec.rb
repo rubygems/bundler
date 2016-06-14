@@ -363,6 +363,40 @@ describe "bundle install with explicit source paths" do
     expect(exitstatus).to eq(0) if exitstatus
   end
 
+  context "existing lockfile" do
+    it "rubygems gems don't re-resolve without changes" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack-obama', '1.0'
+        gem 'net-ssh', '1.0'
+      G
+
+      bundle :check, :env => { "DEBUG" => 1 }
+      expect(out).to match(/using resolution from the lockfile/)
+      should_be_installed "rack-obama 1.0", "net-ssh 1.0"
+    end
+
+    it "source path gems w/deps don't re-resolve without changes" do
+      build_lib "rack-obama", "1.0", :path => lib_path("omg") do |s|
+        s.add_dependency "yard"
+      end
+
+      build_lib "net-ssh", "1.0", :path => lib_path("omg") do |s|
+        s.add_dependency "yard"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack-obama', :path => "#{lib_path("omg")}"
+        gem 'net-ssh', :path => "#{lib_path("omg")}"
+      G
+
+      bundle :check, :env => { "DEBUG" => 1 }
+      expect(out).to match(/using resolution from the lockfile/)
+      should_be_installed "rack-obama 1.0", "net-ssh 1.0"
+    end
+  end
+
   it "installs executable stubs" do
     build_lib "foo" do |s|
       s.executables = ["foo"]
@@ -381,7 +415,7 @@ describe "bundle install with explicit source paths" do
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
         s.add_dependency "bar"
       end
-      build_lib "bar", "1.0", :path => lib_path("foo/bar")
+      build_lib "bar", "1.0", :path => lib_path("foo")
 
       install_gemfile <<-G
         gem "foo", :path => "#{lib_path("foo")}"
@@ -399,7 +433,7 @@ describe "bundle install with explicit source paths" do
     end
 
     it "unlocks all gems when a child dependency gem is updated" do
-      build_lib "bar", "2.0", :path => lib_path("foo/bar")
+      build_lib "bar", "2.0", :path => lib_path("foo")
 
       bundle "install"
 
@@ -418,6 +452,7 @@ describe "bundle install with explicit source paths" do
     end
 
     it "gets dependencies that are updated in the path" do
+      build_lib "rack", "1.0.0", :path => lib_path("foo")
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
         s.add_dependency "rack"
       end
