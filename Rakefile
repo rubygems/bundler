@@ -4,7 +4,12 @@ $:.unshift File.expand_path("../lib", __FILE__)
 require "shellwords"
 require "benchmark"
 
-RUBYGEMS_REPO = File.expand_path("tmp/rubygems")
+RUBYGEMS_REPO = if `cd .. && git remote --verbose` =~ /rubygems/i
+  File.expand_path("..")
+else
+  File.expand_path("tmp/rubygems")
+end
+
 BUNDLER_SPEC = Gem::Specification.load("bundler.gemspec")
 
 def safe_task(&block)
@@ -142,18 +147,22 @@ begin
           end
           hash = nil
 
-          Dir.chdir(RUBYGEMS_REPO) do
-            system("git remote update")
-            if rg == "master"
-              system("git checkout origin/master")
-            else
-              system("git checkout #{rg}") || raise("Unknown Rubygems ref #{rg}")
+          if RUBYGEMS_REPO.start_with?(Dir.pwd)
+            Dir.chdir(RUBYGEMS_REPO) do
+              system("git remote update")
+              if rg == "master"
+                system("git checkout origin/master")
+              else
+                system("git checkout #{rg}") || raise("Unknown Rubygems ref #{rg}")
+              end
+              hash = `git rev-parse HEAD`.chomp
             end
-            hash = `git rev-parse HEAD`.chomp
+          elsif rg != "master"
+            raise "need to be running against master with bundler as a submodule"
           end
 
           puts "Checked out rubygems '#{rg}' at #{hash}"
-          ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
+          ENV["RUBYOPT"] = "-I#{File.join(RUBYGEMS_REPO, "lib")} #{rubyopt}"
           puts "RUBYOPT=#{ENV["RUBYOPT"]}"
         end
 

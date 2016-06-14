@@ -151,6 +151,7 @@ describe "Bundler.setup" do
         bundler_path.to_s,
         bundler_path.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
         tmp("rubygems/lib").to_s,
+        root.join("../lib").expand_path.to_s,
       ]
       load_path.map! {|lp| lp.sub(/^#{system_gem_path}/, "") }
 
