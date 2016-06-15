@@ -446,8 +446,10 @@ module Bundler
 
     desc "add GEM [VERSION]", "Add the specified gem to the bottom of Gemfile"
     def add(name, version = nil, *gems)
-      require "bundler/cli/add"
-      Add.new(options, name, version, gems).run
+      # require "bundler/cli/add"
+      # Add.new(options, name, version, gems).run
+      require "bundler/cli/inject"
+      Inject.new(options, name, version, gems).run
     end
 
     if Bundler.settings[:plugins]
