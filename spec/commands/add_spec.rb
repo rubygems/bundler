@@ -1,30 +1,44 @@
 # frozen_string_literal: true
-require "pry-byebug"
 require "spec_helper"
 
 describe "bundle add" do
   before :each do
+    build_repo2
+
     gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "file://#{gem_repo2}"
     G
   end
 
   context "when version number is set" do
     it "adds gem with provided version" do
-      bundle "add 'rack-obama' '1.0'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'rack-obama', '= 1.0'/)
+      bundle "add activesupport 2.3.5"
+      expect(bundled_app("Gemfile").read).to match(/gem 'activesupport', '= 2.3.5'/)
     end
 
     it "adds gem with provided version and version operator" do
-      bundle "add 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'rack-obama', '> 0'/)
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+      end
+
+      bundle "add activesupport '> 2.3.5'"
+      expect(bundled_app("Gemfile").read).to match(/gem 'activesupport', '> 2.3.5'/)
     end
   end
 
   context "when version number is not set" do
     it "adds gem with last stable version" do
-      bundle "add 'rack-obama'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'rack-obama', '= 1.0'/)
+      bundle "add activesupport"
+      expect(bundled_app("Gemfile").read).to match(/gem 'activesupport', '= 2.3.5'/)
+    end
+
+    it "adds the gem with the last prerelease version" do
+      update_repo2 do
+        build_gem "activesupport", "3.0.0.beta"
+      end
+
+      bundle "add activesupport --pre"
+      expect(bundled_app("Gemfile").read).to match(/gem 'activesupport', '= 3.0.0.beta'/)
     end
   end
 end
