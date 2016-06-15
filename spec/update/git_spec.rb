@@ -192,21 +192,50 @@ describe "bundle update" do
       expect(out).to include(lib_path("foo-1.0").to_s)
     end
 
-    it "should not explode on invalid revision on update of gem by name" do
-      build_git "rack", "0.8"
+    context "local overrides" do
+      before do
+        build_git "rack", "0.8"
 
-      build_git "rack", "0.8", :path => lib_path("local-rack") do |s|
-        s.write "lib/rack.rb", "puts :LOCAL"
+        build_git "rack", "0.8", :path => lib_path("local-rack") do |s|
+          s.write "lib/rack.rb", "puts :LOCAL"
+        end
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
+        G
+
+        bundle %(config local.rack #{lib_path("local-rack")})
       end
 
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
-      G
+      context "invalid revision" do
+        it "should not explode on update of gem by name" do
+          bundle "update rack"
+          expect(out).to include("Bundle updated!")
+        end
+      end
 
-      bundle %(config local.rack #{lib_path("local-rack")})
-      bundle "update rack"
-      expect(out).to include("Bundle updated!")
+      context "invalid revision and branch in gemfile.lock" do
+        it "should not explode on update of gem by name" do
+          lockfile <<-G
+            GIT
+              remote: #{lib_path("rack-0.8")}
+              revision: #{"a" * 40}
+              branch: invalid
+              specs:
+                rack (0.8)
+
+            PLATFORMS
+              #{generic_local_platform}
+
+            DEPENDENCIES
+              rack!
+          G
+
+          bundle "update rack"
+          expect(out).to include("Bundle updated!")
+        end
+      end
     end
 
     it "shows the previous version of the gem" do
