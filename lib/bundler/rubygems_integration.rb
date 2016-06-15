@@ -462,8 +462,14 @@ module Bundler
     end
 
     def redefine_method(klass, method, &block)
-      if klass.instance_methods(false).include?(method)
-        klass.send(:remove_method, method)
+      begin
+        if klass.instance_method(method) && method != :initialize
+          # doing this to ensure we also get private methods
+          klass.send(:remove_method, method)
+        end
+      rescue NameError
+        # method isn't defined
+        nil
       end
       klass.send(:define_method, method, &block)
     end
