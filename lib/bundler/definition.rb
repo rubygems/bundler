@@ -57,7 +57,6 @@ module Bundler
       @lockfile_contents      = String.new
       @locked_bundler_version = nil
       @locked_ruby_version    = nil
-      @update_opts            = Resolver::UpdateOptions.new
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
@@ -83,6 +82,8 @@ module Bundler
         @locked_specs   = SpecSet.new([])
         @locked_sources = []
       end
+
+      @update_opts = Resolver::UpdateOptions.new(@locked_specs)
 
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
