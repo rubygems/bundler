@@ -37,7 +37,9 @@ module Bundler
       definition = Bundler.definition(true)
       definition.resolve_remotely!
       specs = definition.index[name].sort_by(&:version)
-      specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
+      unless options[:pre]
+        specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
+      end
       spec = specs.last
       spec.version.to_s
     end

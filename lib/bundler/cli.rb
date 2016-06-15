@@ -445,6 +445,7 @@ module Bundler
     end
 
     desc "add GEM [VERSION]", "Add the specified gem to the bottom of Gemfile"
+    method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
     def add(name, version = nil, *gems)
       # require "bundler/cli/add"
       # Add.new(options, name, version, gems).run
