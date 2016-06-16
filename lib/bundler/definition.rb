@@ -482,7 +482,7 @@ module Bundler
         end
       end
 
-      !locked || unlocking || dependencies_for_source_changed?(locked) || source.specs != locked.specs
+      !locked || unlocking || dependencies_for_source_changed?(source) || specs_for_source_changed?(source)
     end
 
     def dependencies_for_source_changed?(source)
@@ -490,6 +490,13 @@ module Bundler
       locked_deps_for_source = @locked_deps.select {|s| s.source == source }
 
       Set.new(deps_for_source) != Set.new(locked_deps_for_source)
+    end
+
+    def specs_for_source_changed?(source)
+      locked_index = Index.new
+      locked_index.use(@locked_specs.select {|s| source.can_lock?(s) })
+
+      source.specs != locked_index
     end
 
     # Get all locals and override their matching sources.

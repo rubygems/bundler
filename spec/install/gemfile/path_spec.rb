@@ -415,7 +415,7 @@ describe "bundle install with explicit source paths" do
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
         s.add_dependency "bar"
       end
-      build_lib "bar", "1.0", :path => lib_path("foo")
+      build_lib "bar", "1.0", :path => lib_path("foo/bar")
 
       install_gemfile <<-G
         gem "foo", :path => "#{lib_path("foo")}"
@@ -433,7 +433,7 @@ describe "bundle install with explicit source paths" do
     end
 
     it "unlocks all gems when a child dependency gem is updated" do
-      build_lib "bar", "2.0", :path => lib_path("foo")
+      build_lib "bar", "2.0", :path => lib_path("foo/bar")
 
       bundle "install"
 
@@ -452,7 +452,6 @@ describe "bundle install with explicit source paths" do
     end
 
     it "gets dependencies that are updated in the path" do
-      build_lib "rack", "1.0.0", :path => lib_path("foo")
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
         s.add_dependency "rack"
       end
