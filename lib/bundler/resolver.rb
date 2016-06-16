@@ -407,10 +407,10 @@ module Bundler
 
             (@strict ?
               filter_dep_specs(dep_specs, locked_spec) :
-              sort_dep_specs(dep_specs, locked_spec)).tap do |res|
+              sort_dep_specs(dep_specs, locked_spec)).tap do |specs|
               if ENV['DEBUG_PATCH_RESOLVER'] # MODO: proper debug flag check and proper debug output
                 STDERR.puts super_result
-                STDERR.puts "after search_for: #{debug_format_result(dep, res).inspect}"
+                STDERR.puts "after search_for: #{debug_format_result(dep, specs).inspect}"
               end
             end
           end
@@ -460,7 +460,7 @@ module Bundler
           case
           when a_ver.segments[0] != b_ver.segments[0]
             b_ver <=> a_ver
-          when !@level == :minor && (a_ver.segments[1] != b_ver.segments[1])
+          when !(@level == :minor) && (a_ver.segments[1] != b_ver.segments[1])
             b_ver <=> a_ver
           when @minimal && !unlocking_gem?(gem_name)
             b_ver <=> a_ver

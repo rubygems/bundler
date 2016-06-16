@@ -13,7 +13,7 @@ module Spec
 
     alias_method :platforms, :platform
 
-    def resolve
+    def resolve(args=[])
       @platforms ||= ["ruby"]
       deps = []
       @deps.each do |d|
@@ -21,7 +21,7 @@ module Spec
           deps << Bundler::DepProxy.new(d, p)
         end
       end
-      Bundler::Resolver.resolve(deps, @index)
+      Bundler::Resolver.resolve(deps, @index, *args)
     end
 
     def should_resolve_as(specs)
@@ -30,8 +30,8 @@ module Spec
       expect(got).to eq(specs.sort)
     end
 
-    def should_resolve_and_include(specs)
-      got = resolve
+    def should_resolve_and_include(specs, args=[])
+      got = resolve(args)
       got = got.map(&:full_name).sort
       specs.each do |s|
         expect(got).to include(s)
@@ -47,6 +47,15 @@ module Spec
 
     def gem(*args, &blk)
       build_spec(*args, &blk).first
+    end
+
+    def locked(name, versions)
+      Bundler::SpecSet.new(build_spec(name, Array(versions)))
+    end
+
+    def should_consv_resolve_and_include(level, locked, specs)
+      searcher = Bundler::Resolver::UpdateOptions.new(locked).tap { |s| s.level = level }
+      should_resolve_and_include specs, [{}, [], nil, searcher]
     end
 
     def an_awesome_index

@@ -100,8 +100,19 @@ describe "Resolving" do
       deps << Bundler::DepProxy.new(d, "ruby")
     end
 
-    got = Bundler::Resolver.resolve(deps, @index, {}, [], Bundler::RubyVersion.new("1.8.7", nil, nil, nil))
-    got = got.map(&:full_name).sort
-    expect(got).to eq(%w(foo-1.0.0 bar-1.0.0).sort)
+    should_resolve_and_include %w(foo-1.0.0 bar-1.0.0), [{}, [], Bundler::RubyVersion.new("1.8.7", nil, nil, nil)]
+  end
+
+  context 'conservative' do
+    context 'patch' do
+      it 'resolves single gem with no dependencies' do
+        @index = build_index do
+          gem "foo", %w(1.0.0 1.0.1 1.0.2 1.1.0 2.0.0)
+        end
+        dep 'foo'
+
+        should_consv_resolve_and_include :patch, locked('foo', '1.0.0'), %w(foo-1.0.2)
+      end
+    end
   end
 end
