@@ -13,6 +13,13 @@ module Bundler
         end
       end
 
+      class SourceConflict < PluginError
+        def initialize(plugin, sources)
+          msg = "Source(s) `#{sources.join("`, `")}` declared by #{plugin} are already registered."
+          super msg
+        end
+      end
+
       def initialize
         @plugin_paths = {}
         @commands = {}
@@ -32,8 +39,8 @@ module Bundler
         raise CommandConflict.new(name, common) unless common.empty?
         commands.each {|c| @commands[c] = name }
 
-        com = sources & @sources.keys
-        raise "Source(s) #{com.join(", ")} are already registered" if com.any?
+        common = sources & @sources.keys
+        raise SourceConflict.new(name, common) unless common.empty?
         sources.each {|k| @sources[k] = name }
 
         @plugin_paths[name] = path
