@@ -450,7 +450,7 @@ module Bundler
       # require "bundler/cli/add"
       # Add.new(options, name, version, gems).run
       require "bundler/cli/inject"
-      Inject.new(options, name, version, gems).run
+      Inject.new(options, name, version, gems, "add").run
     end
 
     if Bundler.settings[:plugins]

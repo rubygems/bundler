@@ -2,12 +2,13 @@
 require "bundler/cli/common"
 module Bundler
   class CLI::Inject
-    attr_reader :options, :name, :version, :gems
-    def initialize(options, name, version, gems)
+    attr_reader :options, :name, :version, :gems, :command
+    def initialize(options, name, version, gems, command = "inject")
       @options = options
       @name = name
       @version = version || last_version_number
       @gems = gems
+      @command = command
     end
 
     def run
@@ -21,7 +22,8 @@ module Bundler
         deps << Bundler::Dependency.new(gem_name, gem_version)
       end
 
-      added = Injector.inject(deps)
+      options = command == "add" ? { remove_timestamp: true } : {}
+      added = Injector.inject(deps, options)
 
       if added.any?
         Bundler.ui.confirm "Added to Gemfile:"

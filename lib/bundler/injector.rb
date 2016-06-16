@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 module Bundler
   class Injector
-    def self.inject(new_deps)
-      injector = new(new_deps)
+    def self.inject(new_deps, options = {})
+      injector = new(new_deps, options)
       injector.inject(Bundler.default_gemfile, Bundler.default_lockfile)
     end
 
-    def initialize(new_deps)
+    def initialize(new_deps, options = {})
       @new_deps = new_deps
+      @options = options
     end
 
     def inject(gemfile_path, lockfile_path)
@@ -55,7 +56,9 @@ module Bundler
     def append_to(gemfile_path)
       gemfile_path.open("a") do |f|
         f.puts
-        f.puts "# Added at #{Time.now} by #{`whoami`.chomp}:"
+        unless !!@options[:remove_timestamp]
+          f.puts "# Added at #{Time.now} by #{`whoami`.chomp}:"
+        end
         f.puts new_gem_lines
       end
     end
