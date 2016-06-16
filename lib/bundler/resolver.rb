@@ -408,7 +408,7 @@ module Bundler
             (@strict ?
               filter_dep_specs(dep_specs, locked_spec) :
               sort_dep_specs(dep_specs, locked_spec)).tap do |specs|
-              if ENV['DEBUG_PATCH_RESOLVER'] # MODO: proper debug flag check and proper debug output
+              if ENV['DEBUG_PATCH_RESOLVER'] # MODO: proper debug flag name, check and proper debug output
                 STDERR.puts super_result
                 STDERR.puts "after search_for: #{debug_format_result(dep, specs).inspect}"
               end
@@ -419,7 +419,8 @@ module Bundler
       def debug_format_result(dep, res)
         a = [dep.to_s,
              res.map { |sg| [sg.version, sg.dependencies_for_activated_platforms.map { |dp| [dp.name, dp.requirement.to_s] }] }]
-        [a.first, a.last.map { |sg_data| [sg_data.first.version, sg_data.last.map { |aa| aa.join(' ') }] }, @level]
+        [a.first, a.last.map { |sg_data| [sg_data.first.version, sg_data.last.map { |aa| aa.join(' ') }] },
+         @level, @strict ? :strict : :not_strict, @minimal ? :minimal : :not_minimal]
       end
 
       def filter_dep_specs(specs, locked_spec)
@@ -435,7 +436,7 @@ module Bundler
             must_match = @level == :minor ? [0] : [0, 1]
 
             matches = must_match.map { |idx| gsv.segments[idx] == lsv.segments[idx] }
-            (matches.uniq == [true]) ? gsv.send(:>=, lsv) : false
+            (matches.uniq == [true]) ? (gsv >= lsv) : false
           else
             true
           end

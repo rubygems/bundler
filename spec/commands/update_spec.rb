@@ -443,7 +443,8 @@ describe "bundle update conservative" do
         gem 'foo'
       G
 
-      bundle "update --patch foo", {:env => {'DEBUG_PATCH_RESOLVER' => true}}
+      # bundle "update --patch foo", {:env => {'DEBUG_PATCH_RESOLVER' => true}}
+      bundle "update --patch foo"
 
       should_be_installed "foo 1.0.1"
     end

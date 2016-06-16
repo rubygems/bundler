@@ -49,12 +49,20 @@ module Spec
       build_spec(*args, &blk).first
     end
 
-    def locked(name, versions)
-      Bundler::SpecSet.new(build_spec(name, Array(versions)))
+    def locked(*args)
+      Bundler::SpecSet.new(args.map do |name, version|
+        gem(name, version)
+      end)
     end
 
-    def should_consv_resolve_and_include(level, locked, specs)
-      searcher = Bundler::Resolver::UpdateOptions.new(locked).tap { |s| s.level = level }
+    def should_consv_resolve_and_include(opts, unlock, specs)
+      # empty unlock means unlock all
+      opts = Array(opts)
+      searcher = Bundler::Resolver::UpdateOptions.new(@locked, unlock).tap do |s|
+        s.level = opts.first
+        s.strict = opts.include?(:strict)
+        s.minimal = opts.include?(:minimal)
+      end
       should_resolve_and_include specs, [{}, [], nil, searcher]
     end
 
