@@ -30,7 +30,7 @@ module Bundler
         options = normalize_hash(options)
         return super unless options && options.key?("type")
 
-        plugin("bundler-source-#{options["type"].to_s}")
+        plugin("bundler-source-#{options["type"]}")
       end
     end
   end

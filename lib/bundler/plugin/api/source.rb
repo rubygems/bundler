@@ -63,6 +63,10 @@ module Bundler
 
         def remote!
         end
+
+        def include?(other)
+          other == self
+        end
       end
     end
   end

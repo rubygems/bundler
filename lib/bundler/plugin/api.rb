@@ -34,7 +34,7 @@ module Bundler
       end
 
       def self.source(source, cls = self)
-        self.include Bundler::Plugin::API::Source
+        include Bundler::Plugin::API::Source
         Plugin.add_source source, cls
       end
 
@@ -56,6 +56,10 @@ module Bundler
       def method_missing(name, *args, &blk)
         super unless Bundler.respond_to?(name)
         Bundler.send(name, *args, &blk)
+      end
+
+      def respond_to_missing?(name, include_private = false)
+        Bundler.respond_to?(name) || super
       end
     end
   end

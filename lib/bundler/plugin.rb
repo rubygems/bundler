@@ -160,8 +160,8 @@ module Bundler
 
       index.register_plugin name, path.to_s, @commands.keys, @sources.keys
     ensure
-        @commands = commands
-        @sources = sources
+      @commands = commands
+      @sources = sources
     end
 
     # Executes the plugins.rb file
