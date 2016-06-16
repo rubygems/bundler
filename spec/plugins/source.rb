@@ -2,26 +2,50 @@
 require "spec_helper"
 
 describe "bundler source plugin" do
-  it "installs source automatically from #source :type option" do
-    update_repo2 do
-      build_plugin "bundler-source-psource" do |s|
-        s.write "plugins.rb", <<-RUBY
-            class Cheater < Bundler::Plugin::API
-              source "psource", self
-            end
-        RUBY
+  describe "plugins dsl eval for #source with :type option" do
+    before do
+      update_repo2 do
+        build_plugin "bundler-source-psource" do |s|
+          s.write "plugins.rb", <<-RUBY
+              class Cheater < Bundler::Plugin::API
+                source "psource"
+              end
+          RUBY
+        end
       end
     end
 
-    install_gemfile <<-G
-      source "file://#{gem_repo2}"
-      source "file://#{lib_path("gitp")}", :type => :psource do
+    it "installs bundler-source-* gem when no handler for source is present" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        source "file://#{lib_path("gitp")}", :type => :psource do
+        end
+      G
+
+      plugin_should_be_installed("bundler-source-psource")
+    end
+
+    it "does nothing when a handler is already installed" do
+      update_repo2 do
+        build_plugin "another-psource" do |s|
+          s.write "plugins.rb", <<-RUBY
+              class Cheater < Bundler::Plugin::API
+                source "psource"
+              end
+          RUBY
+        end
       end
-    G
 
-    expect(out).to include("Installed plugin bundler-source-psource")
+      bundle "plugin install another-psource --source file://#{gem_repo2}"
 
-    expect(out).to include("Bundle complete!")
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        source "file://#{lib_path("gitp")}", :type => :psource do
+        end
+      G
+
+      plugin_should_not_be_installed("bundler-source-psource")
+    end
   end
 
   context "with a real source plugin" do

@@ -71,6 +71,13 @@ module Spec
       end
     end
 
+    def plugin_should_not_be_installed(*names)
+      names.each do |name|
+        path = Plugin.installed?(name)
+        expect(path).to be_falsey
+      end
+    end
+
     def should_be_locked
       expect(bundled_app("Gemfile.lock")).to exist
     end

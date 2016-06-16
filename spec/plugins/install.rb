@@ -13,6 +13,7 @@ describe "bundler plugin install" do
     bundle "plugin install no-foo --source file://#{gem_repo1}"
 
     expect(out).to include("Could not find")
+    plugin_should_not_be_installed("no-foo")
   end
 
   it "installs from rubygems source" do
@@ -56,7 +57,7 @@ describe "bundler plugin install" do
 
       expect(out).not_to include("Installed plugin")
 
-      expect(plugin_gems("charlie-1.0")).not_to be_directory
+      plugin_should_not_be_installed("charlie")
     end
 
     it "fails when plugins.rb throws exception on load" do
@@ -70,9 +71,8 @@ describe "bundler plugin install" do
 
       bundle "plugin install chaplin --source file://#{gem_repo2}"
 
-      expect(out).not_to include("Installed plugin")
-
       expect(plugin_gems("chaplin-1.0")).not_to be_directory
+      plugin_should_not_be_installed("chaplin")
     end
   end
 
