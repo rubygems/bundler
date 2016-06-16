@@ -48,7 +48,121 @@ describe "bundler source plugin" do
     end
   end
 
-  context "with a real source plugin" do
+  context "with a minimal source plugin" do
+    before do
+      build_repo2 do
+        build_plugin "bundler-source-mpath" do |s|
+          s.write "plugins.rb", <<-RUBY
+            require "fileutils"
+
+            class MPath < Bundler::Plugin::API
+              source "mpath"
+
+              attr_reader :path
+
+              def initialize(opts)
+                super
+
+                @path = Pathname.new options["uri"]
+              end
+
+              def fetch_gemfiles
+                @gemfiles ||= begin
+                  glob = "{,*,*/*}.gemspec"
+                  if installed?
+                    search_path = install_path
+                  else
+                    search_path = path
+                  end
+                  Dir["\#{search_path.to_s}/\#{glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }
+                end
+              end
+
+              def install(spec, opts)
+                mkdir_p(install_path.parent)
+                FileUtils.cp_r(path, install_path)
+
+                nil
+              end
+            end
+          RUBY
+        end # build_plugin
+      end # build_repo
+
+      build_lib "a-path-gem"
+
+      gemfile <<-G
+        source "file://#{gem_repo2}" # plugin source
+        source "#{lib_path("a-path-gem-1.0")}", :type => :mpath do
+          gem "a-path-gem"
+        end
+      G
+    end
+
+    it "installs" do
+      bundle "install"
+
+      should_be_installed("a-path-gem 1.0")
+    end
+
+    it "writes to lock file" do
+      bundle "install"
+
+      lockfile_should_be <<-G
+        PLUGIN
+          remote: #{lib_path("a-path-gem-1.0")}
+          type: mpath
+          specs:
+            a-path-gem (1.0)
+
+        GEM
+          remote: file:#{gem_repo2}/
+          specs:
+
+        PLATFORMS
+          #{generic_local_platform}
+
+        DEPENDENCIES
+          a-path-gem!
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      G
+    end
+
+    context "with lockfile" do
+      before do
+        lockfile <<-G
+          PLUGIN
+            remote: #{lib_path("a-path-gem-1.0")}
+            type: mpath
+            specs:
+              a-path-gem (1.0)
+
+          GEM
+            remote: file:#{gem_repo2}/
+            specs:
+
+          PLATFORMS
+            #{generic_local_platform}
+
+          DEPENDENCIES
+            a-path-gem!
+
+          BUNDLED WITH
+             #{Bundler::VERSION}
+        G
+      end
+
+      it "installs", :focused do
+        bundle "install"
+
+        should_be_installed("a-path-gem 1.0")
+      end
+    end
+  end
+
+  context "with a more elaborate source plugin" do
     before do
       build_repo2 do
         build_plugin "bundler-source-gitp" do |s|

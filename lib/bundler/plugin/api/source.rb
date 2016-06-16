@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require "uri"
+require "digest/sha1"
 
 module Bundler
   module Plugin
@@ -50,7 +52,8 @@ module Bundler
           out << "  specs:\n"
         end
 
-        def install
+        def install(spec, opts)
+          raise MalformattedPlugin, "Source plugins need to override the install method."
         end
 
         def fetch_gemfiles
@@ -64,8 +67,36 @@ module Bundler
         def remote!
         end
 
+        def cache!
+        end
+
         def include?(other)
           other == self
+        end
+
+        def ==(other)
+          other.is_a?(self.class) && uri == other.uri
+        end
+
+        def uri_hash
+          Digest::SHA1.hexdigest(uri)
+        end
+
+        def gem_install_dir
+          Bundler.install_path
+        end
+
+        def install_path
+          @install_path ||=
+            begin
+              base_name = File.basename(URI.parse(uri).normalize.path)
+
+              gem_install_dir.join("#{base_name}-#{uri_hash[0..11]}")
+            end
+        end
+
+        def installed?
+          File.directory?(install_path)
         end
       end
     end
