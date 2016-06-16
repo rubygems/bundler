@@ -372,12 +372,17 @@ module Bundler
     class UpdateOptions
       attr_accessor :level, :strict, :minimal
 
-      def initialize(locked_specs)
+      def initialize(locked_specs=SpecSet.new([]), unlock_gems=[])
         @level_default = :major
         @level = @level_default
         @strict = false
         @minimal = false
         @locked_specs = locked_specs
+        @unlock_gems = unlock_gems
+      end
+
+      def unlocking_gem?(gem_name)
+        @unlock_gems.empty? || @unlock_gems.include?(gem_name)
       end
 
       def level=(value)
@@ -414,7 +419,7 @@ module Bundler
       def debug_format_result(dep, res)
         a = [dep.to_s,
              res.map { |sg| [sg.version, sg.dependencies_for_activated_platforms.map { |dp| [dp.name, dp.requirement.to_s] }] }]
-        [a.first, a.last.map { |sg_data| [sg_data.first.version, sg_data.last.map { |aa| aa.join(' ') }] }]
+        [a.first, a.last.map { |sg_data| [sg_data.first.version, sg_data.last.map { |aa| aa.join(' ') }] }, @level]
       end
 
       def filter_dep_specs(specs, locked_spec)
@@ -440,6 +445,8 @@ module Bundler
       end
 
       # reminder: sort still filters anything older than locked version
+      # :major bundle update behavior can move a gem to an older version
+      # in order to satisfy the dependency tree.
       def sort_dep_specs(specs, locked_spec)
         return specs unless locked_spec
         gem_name = locked_spec.name
@@ -450,29 +457,21 @@ module Bundler
         filtered.sort do |a, b|
           a_ver = a.first.version
           b_ver = b.first.version
-          gem_patch = @gems_to_update.gem_patch_for(gem_name)
-          new_version = gem_patch ? gem_patch.new_version : nil
           case
           when a_ver.segments[0] != b_ver.segments[0]
             b_ver <=> a_ver
           when !@level == :minor && (a_ver.segments[1] != b_ver.segments[1])
             b_ver <=> a_ver
-          when @minimal && !@gems_to_update.unlocking_gem?(gem_name)
+          when @minimal && !unlocking_gem?(gem_name)
             b_ver <=> a_ver
-          when @minimal && @gems_to_update.unlocking_gem?(gem_name) &&
-            (![a_ver, b_ver].include?(locked_version) &&
-              (!new_version || (new_version && a_ver >= new_version && b_ver >= new_version)))
+          when @minimal && unlocking_gem?(gem_name) &&
+            (![a_ver, b_ver].include?(locked_version)) # MODO: revisit this case
             b_ver <=> a_ver
           else
             a_ver <=> b_ver
           end
         end.tap do |result|
-          if @gems_to_update.unlocking_gem?(gem_name)
-            gem_patch = @gems_to_update.gem_patch_for(gem_name)
-            if gem_patch && gem_patch.new_version && @minimal
-              move_version_to_end(specs, gem_patch.new_version, result)
-            end
-          else
+          unless unlocking_gem?(gem_name)
             move_version_to_end(specs, locked_version, result)
           end
         end

@@ -83,8 +83,6 @@ module Bundler
         @locked_sources = []
       end
 
-      @update_opts = Resolver::UpdateOptions.new(@locked_specs)
-
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
       @unlock[:ruby] ||= if @ruby_version && @locked_ruby_version
@@ -95,6 +93,8 @@ module Bundler
         @ruby_version.diff(locked_ruby_version_object)
       end
       @unlocking ||= @unlock[:ruby] ||= (!@locked_ruby_version ^ !@ruby_version)
+
+      @update_opts = Resolver::UpdateOptions.new(@locked_specs, @unlock[:gems])
 
       current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
       add_platform(current_platform)
