@@ -7,7 +7,7 @@ describe "bundler source plugin" do
       update_repo2 do
         build_plugin "bundler-source-psource" do |s|
           s.write "plugins.rb", <<-RUBY
-              class Cheater < Bundler::Plugin::API
+              class OPSource < Bundler::Plugin::API
                 source "psource"
               end
           RUBY
@@ -74,7 +74,7 @@ describe "bundler source plugin" do
                   else
                     search_path = path
                   end
-                  Dir["\#{search_path.to_s}/\#{glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }
+                  Dir["\#{search_path.to_s}/\#{glob}"]
                 end
               end
 
@@ -87,7 +87,7 @@ describe "bundler source plugin" do
             end
           RUBY
         end # build_plugin
-      end # build_repo
+      end
 
       build_lib "a-path-gem"
 
@@ -154,7 +154,7 @@ describe "bundler source plugin" do
         G
       end
 
-      it "installs", :focused do
+      it "installs" do
         bundle "install"
 
         should_be_installed("a-path-gem 1.0")
@@ -190,12 +190,14 @@ describe "bundler source plugin" do
                   if !cached?
                     cache_repo
                   end
+
                   if installed?
                     path = install_path
                   else
                     path = cache_path
                   end
-                  Dir["\#{path}/\#{glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }
+
+                  Dir["\#{path}/\#{glob}"]
                 end
               end
 
@@ -267,8 +269,8 @@ describe "bundler source plugin" do
               end
             end
           RUBY
-        end # build_plugin
-      end # build_repo
+        end
+      end
 
       build_git "ma-gitp-gem"
 
@@ -277,9 +279,8 @@ describe "bundler source plugin" do
         source "file://#{lib_path("ma-gitp-gem-1.0")}", :type => :gitp do
           gem "ma-gitp-gem"
         end
-        #gem 'ma-gitp-gem', :git => "file://#{lib_path("ma-gitp-gem-1.0")}"
       G
-    end # before
+    end
 
     it "handles the source option" do
       bundle "install"
@@ -358,6 +359,3 @@ describe "bundler source plugin" do
     end
   end
 end
-
-# Specs to add:
-# - Shows error for source with type but without block

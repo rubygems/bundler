@@ -27,18 +27,24 @@ module Bundler
       # The plugins should declare that they handle a command through this helper.
       #
       # @param [String] command being handled by them
-      # @param [Class] (optional) class that shall handle the command. If not
+      # @param [Class] (optional) class that handles the command. If not
       #                 provided, the `self` class will be used.
       def self.command(command, cls = self)
         Plugin.add_command command, cls
       end
 
+      # The plugins should declare that they provide a installation source
+      # through this helper.
+      #
+      # @param [String] the source type they provide
+      # @param [Class] (optional) class that handles the source. If not
+      #                 provided, the `self` class will be used.
       def self.source(source, cls = self)
         include Bundler::Plugin::API::Source
         Plugin.add_source source, cls
       end
 
-      # The cache dir to be used by the plugins for persistance storage
+      # The cache dir to be used by the plugins for storage
       #
       # @return [Pathname] path of the cache dir
       def cache

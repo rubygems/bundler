@@ -16,22 +16,55 @@ module Bundler
           @type = opts["type"]
         end
 
+        def installed?
+          File.directory?(install_path)
+        end
+
+        def fetch_gemfiles
+          []
+        end
+
+        def options_to_lock
+          {}
+        end
+
+        def install(spec, opts)
+          raise MalformattedPlugin, "Source plugins need to override the install method."
+        end
+
+        def install_path
+          @install_path ||=
+            begin
+              base_name = File.basename(URI.parse(uri).normalize.path)
+
+              gem_install_dir.join("#{base_name}-#{uri_hash[0..11]}")
+            end
+        end
+
         def specs
-          index = Bundler::Index.new
-
           files = fetch_gemfiles
-          files.each do |file|
-            next unless spec = Bundler.load_gemspec(file)
-            spec.source = self
-            Bundler.rubygems.set_installed_by_version(spec)
-            # Validation causes extension_dir to be calculated, which depends
-            # on #source, so we validate here instead of load_gemspec
-            Bundler.rubygems.validate(spec)
 
-            index << spec
+          Bundler::Index.build do |index|
+            files.each do |file|
+              next unless spec = Bundler.load_gemspec(file)
+              Bundler.rubygems.set_installed_by_version(spec)
+
+              spec.source = self
+              Bundler.rubygems.validate(spec)
+
+              index << spec
+            end
           end
+        end
 
-          index
+        def remote!
+        end
+
+        def cache!
+        end
+
+        def ==(other)
+          other.is_a?(self.class) && uri == other.uri
         end
 
         def unmet_deps
@@ -52,30 +85,8 @@ module Bundler
           out << "  specs:\n"
         end
 
-        def install(spec, opts)
-          raise MalformattedPlugin, "Source plugins need to override the install method."
-        end
-
-        def fetch_gemfiles
-          []
-        end
-
-        def options_to_lock
-          {}
-        end
-
-        def remote!
-        end
-
-        def cache!
-        end
-
         def include?(other)
           other == self
-        end
-
-        def ==(other)
-          other.is_a?(self.class) && uri == other.uri
         end
 
         def uri_hash
@@ -84,19 +95,6 @@ module Bundler
 
         def gem_install_dir
           Bundler.install_path
-        end
-
-        def install_path
-          @install_path ||=
-            begin
-              base_name = File.basename(URI.parse(uri).normalize.path)
-
-              gem_install_dir.join("#{base_name}-#{uri_hash[0..11]}")
-            end
-        end
-
-        def installed?
-          File.directory?(install_path)
         end
       end
     end
