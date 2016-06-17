@@ -268,9 +268,8 @@ module Bundler
           []
         end
       end
-      @update_opts.arrange_dep_specs(dependency,
-        search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }
-      )
+      platform_results = search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }
+      @update_opts.arrange_dep_specs(dependency, platform_results)
     end
 
     def index_for(dependency)
@@ -372,7 +371,7 @@ module Bundler
     class UpdateOptions
       attr_accessor :level, :strict, :minimal
 
-      def initialize(locked_specs=SpecSet.new([]), unlock_gems=[])
+      def initialize(locked_specs = SpecSet.new([]), unlock_gems = [])
         @level_default = :major
         @level = @level_default
         @strict = false
@@ -386,7 +385,12 @@ module Bundler
       end
 
       def level=(value)
-        v = value.to_sym rescue nil
+        v = begin
+          value.to_sym
+        rescue
+          nil
+        end
+
         @level = [:major, :minor, :patch].include?(v) ? v : @level_default
       end
 
@@ -397,29 +401,31 @@ module Bundler
         super_result = "super search_for: #{debug_format_result(dep, dep_specs).inspect}"
 
         # MODO: figure out caching here plus what search_for provides
-        res = # @conservative_search_for[dep] ||=
-          begin
-            gem_name = dep.name
+        # @conservative_search_for[dep] ||=
+        begin
+          gem_name = dep.name
 
-            # An Array per version returned, different entries for different platforms.
-            # We just need the version here so it's ok to hard code this to the first instance.
-            locked_spec = @locked_specs[gem_name].first
+          # An Array per version returned, different entries for different platforms.
+          # We just need the version here so it's ok to hard code this to the first instance.
+          locked_spec = @locked_specs[gem_name].first
 
-            (@strict ?
-              filter_dep_specs(dep_specs, locked_spec) :
-              sort_dep_specs(dep_specs, locked_spec)).tap do |specs|
-              if ENV['DEBUG_PATCH_RESOLVER'] # MODO: proper debug flag name, check and proper debug output
-                STDERR.puts super_result
-                STDERR.puts "after search_for: #{debug_format_result(dep, specs).inspect}"
-              end
+          if @strict
+            filter_dep_specs(dep_specs, locked_spec)
+          else
+            sort_dep_specs(dep_specs, locked_spec)
+          end.tap do |specs|
+            if ENV["DEBUG_PATCH_RESOLVER"] # MODO: proper debug flag name, check and proper debug output
+              STDERR.puts super_result
+              STDERR.puts "after search_for: #{debug_format_result(dep, specs).inspect}"
             end
           end
+        end
       end
 
       def debug_format_result(dep, res)
         a = [dep.to_s,
-             res.map { |sg| [sg.version, sg.dependencies_for_activated_platforms.map { |dp| [dp.name, dp.requirement.to_s] }] }]
-        [a.first, a.last.map { |sg_data| [sg_data.first.version, sg_data.last.map { |aa| aa.join(' ') }] },
+             res.map {|sg| [sg.version, sg.dependencies_for_activated_platforms.map {|dp| [dp.name, dp.requirement.to_s] }] }]
+        [a.first, a.last.map {|sg_data| [sg_data.first.version, sg_data.last.map {|aa| aa.join(" ") }] },
          @level, @strict ? :strict : :not_strict, @minimal ? :minimal : :not_minimal]
       end
 
@@ -435,7 +441,7 @@ module Bundler
 
             must_match = @level == :minor ? [0] : [0, 1]
 
-            matches = must_match.map { |idx| gsv.segments[idx] == lsv.segments[idx] }
+            matches = must_match.map {|idx| gsv.segments[idx] == lsv.segments[idx] }
             (matches.uniq == [true]) ? (gsv >= lsv) : false
           else
             true
@@ -453,7 +459,7 @@ module Bundler
         gem_name = locked_spec.name
         locked_version = locked_spec.version
 
-        filtered = specs.select { |s| s.first.version >= locked_version }
+        filtered = specs.select {|s| s.first.version >= locked_version }
 
         filtered.sort do |a, b|
           a_ver = a.first.version
@@ -466,7 +472,7 @@ module Bundler
           when @minimal && !unlocking_gem?(gem_name)
             b_ver <=> a_ver
           when @minimal && unlocking_gem?(gem_name) &&
-            (![a_ver, b_ver].include?(locked_version)) # MODO: revisit this case
+            ![a_ver, b_ver].include?(locked_version) # MODO: revisit this case
             b_ver <=> a_ver
           else
             a_ver <=> b_ver
@@ -479,11 +485,10 @@ module Bundler
       end
 
       def move_version_to_end(specs, version, result)
-        spec_group = specs.detect { |s| s.first.version.to_s == version.to_s }
-        if spec_group
-          result.reject! { |s| s.first.version.to_s === version.to_s }
-          result << spec_group
-        end
+        spec_group = specs.detect {|s| s.first.version.to_s == version.to_s }
+        return unless spec_group
+        result.reject! {|s| s.first.version.to_s == version.to_s }
+        result << spec_group
       end
     end
   end

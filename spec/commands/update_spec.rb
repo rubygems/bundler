@@ -428,7 +428,7 @@ end
 
 describe "bundle update conservative" do
   context "patch preferred" do
-    it "single gem without dependencies" do
+    it "single gem without dependencies name specified" do
       build_repo4 do
         build_gem "foo", %w(1.0.0 1.0.1 1.1.0 2.0.0)
       end
@@ -448,10 +448,30 @@ describe "bundle update conservative" do
 
       should_be_installed "foo 1.0.1"
     end
+
+    it "single gem without dependencies update all" do
+      build_repo4 do
+        build_gem "foo", %w(1.0.0 1.0.1 1.1.0 2.0.0)
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo', '1.0.0'
+      G
+
+      gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo'
+      G
+
+      # bundle "update --patch foo", {:env => {'DEBUG_PATCH_RESOLVER' => true}}
+      bundle "update --patch"
+
+      should_be_installed "foo 1.0.1"
+    end
   end
 
   context "minor preferred" do
-
   end
 
   context "strict" do
@@ -461,6 +481,5 @@ describe "bundle update conservative" do
   end
 
   context "dry run" do
-
   end
 end

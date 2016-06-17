@@ -39,7 +39,7 @@ module Bundler
         Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby])
       end
 
-      patch_level = [:major, :minor, :patch].detect { |v| options.keys.include?(v.to_s) }
+      patch_level = [:major, :minor, :patch].detect {|v| options.keys.include?(v.to_s) }
       Bundler.definition.update_opts.level = patch_level
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]

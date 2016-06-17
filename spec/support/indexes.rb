@@ -13,7 +13,7 @@ module Spec
 
     alias_method :platforms, :platform
 
-    def resolve(args=[])
+    def resolve(args = [])
       @platforms ||= ["ruby"]
       deps = []
       @deps.each do |d|
@@ -30,7 +30,7 @@ module Spec
       expect(got).to eq(specs.sort)
     end
 
-    def should_resolve_and_include(specs, args=[])
+    def should_resolve_and_include(specs, args = [])
       got = resolve(args)
       got = got.map(&:full_name).sort
       specs.each do |s|
