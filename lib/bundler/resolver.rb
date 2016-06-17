@@ -172,14 +172,14 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil, update_opts = UpdateOptions.new)
+    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil, dependency_search = DependencySearch.new)
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base, ruby_version, update_opts)
+      resolver = new(index, source_requirements, base, ruby_version, dependency_search)
       result = resolver.start(requirements)
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base, ruby_version, update_opts = UpdateOptions.new)
+    def initialize(index, source_requirements, base, ruby_version, dependency_search = DependencySearch.new)
       @index = index
       @source_requirements = source_requirements
       @base = base
@@ -188,7 +188,7 @@ module Bundler
       @base_dg = Molinillo::DependencyGraph.new
       @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
       @ruby_version = ruby_version
-      @update_opts = update_opts
+      @dependency_search = dependency_search
     end
 
     def start(requirements)
@@ -269,7 +269,7 @@ module Bundler
         end
       end
       platform_results = search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }
-      @update_opts.arrange_dep_specs(dependency, platform_results)
+      @dependency_search.arrange_dep_specs(dependency, platform_results)
     end
 
     def index_for(dependency)
@@ -367,8 +367,7 @@ module Bundler
       version_platform_strs.join(", ")
     end
 
-    # MODO: Rename DependencySearcher
-    class UpdateOptions
+    class DependencySearch
       attr_accessor :level, :strict, :minimal
 
       def initialize(locked_specs = SpecSet.new([]), unlock_gems = [])
@@ -385,6 +384,7 @@ module Bundler
       end
 
       def level=(value)
+        # MODO: figure this out mo' bettah
         v = begin
           value.to_sym
         rescue
