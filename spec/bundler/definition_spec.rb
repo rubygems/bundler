@@ -73,6 +73,7 @@ describe Bundler::Definition do
     it "for a path gem with deps and no changes" do
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
         s.add_dependency "rack", "1.0"
+        s.add_development_dependency "net-ssh", "1.0"
       end
 
       install_gemfile <<-G
