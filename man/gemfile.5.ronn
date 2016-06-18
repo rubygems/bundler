@@ -15,7 +15,7 @@ directory as the `Rakefile`.
 A `Gemfile` is evaluated as Ruby code, in a context which makes available
 a number of methods used to describe the gem requirements.
 
-## GLOBAL SOURCES (#source)
+## GLOBAL SOURCES
 
 At the top of the `Gemfile`, add a line for the `Rubygems` source that contains
 the gems listed in the `Gemfile`.
@@ -33,7 +33,7 @@ be selected for gems that need to use a non-standard repository, suppressing
 this warning, by using the [`:source` option](#SOURCE-source-) or a
 [`source` block](#BLOCK-FORM-OF-SOURCE-GIT-PATH-GROUP-and-PLATFORMS).
 
-### CREDENTIALS (#credentials)
+### CREDENTIALS
 
 Some gem sources require a username and password. Use [bundle config(1)][bundle-config] to set
 the username and password for any of the sources that need it. The command must
@@ -50,7 +50,7 @@ include the credentials in the Gemfile as part of the source URL.
 Credentials in the source URL will take precedence over credentials set using
 `config`.
 
-## RUBY (#ruby)
+## RUBY
 
 If your application requires a specific Ruby version or engine, specify your
 requirements using the `ruby` method, with the following arguments.
@@ -64,12 +64,12 @@ the Ruby version that the engine is compatible with.
 
     ruby "1.9.3"
 
-### ENGINE (:engine)
+### ENGINE
 
 Each application _may_ specify a Ruby engine. If an engine is specified, an
 engine version _must_ also be specified.
 
-### ENGINE VERSION (:engine_version)
+### ENGINE VERSION
 
 Each application _may_ specify a Ruby engine version. If an engine version is
 specified, an engine _must_ also be specified. If the engine is "ruby" the
@@ -77,13 +77,13 @@ engine version specified _must_ match the Ruby version.
 
     ruby "1.8.7", :engine => "jruby", :engine_version => "1.6.7"
 
-### PATCHLEVEL (:patchlevel)
+### PATCHLEVEL
 
 Each application _may_ specify a Ruby patchlevel.
 
     ruby "2.0.0", :patchlevel => "247"
 
-## GEMS (#gem)
+## GEMS
 
 Specify gem requirements using the `gem` method, with the following arguments.
 All parameters are `OPTIONAL` unless otherwise specified.
@@ -101,7 +101,7 @@ Each _gem_ `MAY` have one or more version specifiers.
     gem "nokogiri", ">= 1.4.2"
     gem "RedCloth", ">= 4.1.0", "< 4.2.0"
 
-### REQUIRE AS (:require)
+### REQUIRE AS
 
 Each _gem_ `MAY` specify files that should be used when autorequiring via
 `Bundler.require`. You may pass an array with multiple files or `true` if file
@@ -118,7 +118,7 @@ The argument defaults to the name of the gem. For example, these are identical:
     gem "nokogiri", :require => "nokogiri"
     gem "nokogiri", :require => true
 
-### GROUPS (:group or :groups)
+### GROUPS
 
 Each _gem_ `MAY` specify membership in one or more groups. Any _gem_ that does
 not specify membership in any group is placed in the `default` group.
@@ -162,7 +162,7 @@ create a single canonical list of all of the required gems and their dependencie
 This means that you cannot list different versions of the same gems in different
 groups. For more details, see [Understanding Bundler](http://bundler.io/rationale.html).
 
-### PLATFORMS (:platforms)
+### PLATFORMS
 
 If a gem should only be used in a particular platform or set of platforms, you can
 specify them. Platforms are essentially identical to groups, except that you do not
@@ -240,7 +240,7 @@ All operations involving groups (`bundle install`, `Bundler.setup`,
 `Bundler.require`) behave exactly the same as if any groups not
 matching the current platform were explicitly excluded.
 
-### SOURCE (:source)
+### SOURCE
 
 You can select an alternate Rubygems repository for a gem using the ':source'
 option.
@@ -259,7 +259,7 @@ Selecting a specific source repository this way also suppresses the ambiguous
 gem warning described above in
 [GLOBAL SOURCES (#source)](#GLOBAL-SOURCES-source-).
 
-### GIT (:git)
+### GIT
 
 If necessary, you can specify that a gem is located at a particular
 git repository using the `:git` parameter. The repository can be accessed via
@@ -333,7 +333,7 @@ and then installs the resulting gem. The `gem build` command,
 which comes standard with Rubygems, evaluates the `.gemspec` in
 the context of the directory in which it is located.
 
-### GIT SOURCE (:git_source)
+### GIT SOURCE
 
 A custom git source can be defined via the `git_source` method. Provide the source's name
 as an argument, and a block which receives a single argument and interpolates it into a
@@ -346,7 +346,7 @@ In addition, if you wish to choose a specific branch:
 
     gem "rails", :stash => "forks/rails", :branch => "branch_name"
 
-### GITHUB (:github)
+### GITHUB
 
 `NOTE`: This shorthand should be avoided until Bundler 2.0, since it
 currently expands to an insecure `git://` URL. This allows a
@@ -366,7 +366,7 @@ Are both equivalent to
 
 Since the `github` method is a specialization of `git_source`, it accepts a `:branch` named argument.
 
-### GIST (:gist)
+### GIST
 
 If the git repository you want to use is hosted as a Github Gist and is public, you can use
 the :gist shorthand to specify the gist identifier (without the trailing ".git").
@@ -379,7 +379,7 @@ Is equivalent to:
 
 Since the `gist` method is a specialization of `git_source`, it accepts a `:branch` named argument.
 
-### BITBUCKET (:bitbucket)
+### BITBUCKET
 
 If the git repository you want to use is hosted on Bitbucket and is public, you can use the
 :bitbucket shorthand to specify the bitbucket username and repository name (without the
@@ -395,7 +395,7 @@ Are both equivalent to
 
 Since the `bitbucket` method is a specialization of `git_source`, it accepts a `:branch` named argument.
 
-### PATH (:path)
+### PATH
 
 You can specify that a gem is located in a particular location
 on the file system. Relative paths are resolved relative to the
@@ -451,7 +451,7 @@ In the case of the `git` block form, the `:ref`, `:branch`, `:tag`,
 and `:submodules` options may be passed to the `git` method, and
 all gems in the block will inherit those options.
 
-## INSTALL_IF (#install_if)
+## INSTALL_IF
 
 The `install_if` method allows gems to be installed based on a proc or lambda.
 This is especially useful for optional gems that can only be used if certain
@@ -461,7 +461,7 @@ software is installed or some other conditions are met.
       gem "pasteboard"
     end
 
-## GEMSPEC (#gemspec)
+## GEMSPEC
 
 If you wish to use Bundler to help install dependencies for a gem while it is
 being developed, use the `gemspec` method to pull in the dependencies listed in
