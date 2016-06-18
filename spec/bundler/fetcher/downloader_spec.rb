@@ -224,6 +224,18 @@ describe Bundler::Fetcher::Downloader do
           expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
             "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint")
         end
+
+        context "when the there are credentials provided in the request" do
+          let(:uri) { URI("http://username:password@www.uri-to-fetch.com/api/v2/endpoint") }
+          before do
+            allow(net_http_get).to receive(:basic_auth).with("username", "password")
+          end
+
+          it "should raise a Bundler::HTTPError that doesn't contain the password" do
+            expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
+              "Network error while fetching http://username@www.uri-to-fetch.com/api/v2/endpoint")
+          end
+        end
       end
 
       context "when error message is about no route to host" do
