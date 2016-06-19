@@ -25,6 +25,36 @@ module Bundler
       Dsl.evaluate(gemfile, lockfile, unlock)
     end
 
+    def to_ruby
+      rubify = proc do |obj|
+        case obj
+        when RubyVersion
+          "ruby #{rubify.call(obj.versions)}"
+        when Array
+          obj.map(&rubify).join(", ")
+        when Hash
+          "{ #{obj.map {|k, v| "#{rubify.call(k)} => #{rubify.call(v)}" }.join(", ")} }"
+        when NilClass, Symbol, TrueClass, FalseClass
+          obj.inspect
+        when Dependency
+          reqs = rubify.call(obj.requirement)
+          "gem #{rubify.call(obj.name)}#{",\n    #{reqs}" unless reqs.empty?},\n    #{rubify.call(obj.options)}".strip
+        when SourceList
+          obj.rubygems_primary_remotes.map {|r| "source #{rubify.call(r)}" }.join("\n")
+        else
+          "#{obj.to_s.dump}.freeze"
+        end
+      end
+      String.new.tap do |gemfile|
+        gemfile << rubify.call(@ruby_version) << "\n" if @ruby_version
+        gemfile << rubify.call(sources) << "\n"
+        gemfile << "group " << rubify.call(@optional_groups) << ", :optional => true" << "\n" unless Array(@optional_groups).empty?
+        dependencies.sort_by {|d| [d.name, d.groups] }.each do |dep|
+          gemfile << rubify.call(dep) << "\n"
+        end
+      end.gsub(/[\n]{2,}/, "\n").gsub(/[^\s][ ]{2,}/, " ").strip << "\n"
+    end
+
     #
     # How does the new system work?
     #

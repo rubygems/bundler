@@ -280,8 +280,10 @@ module Bundler
       opts
     end
 
+    VALID_KEYS = %w(group groups git path glob name branch ref tag require submodules platform platforms type source install_if).freeze
+
     def valid_keys
-      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source install_if)
+      @valid_keys ||= VALID_KEYS
     end
 
     def normalize_options(name, version, opts)

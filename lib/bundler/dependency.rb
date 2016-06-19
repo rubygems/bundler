@@ -78,6 +78,20 @@ module Bundler
       @autorequire = Array(options["require"] || []) if options.key?("require")
     end
 
+    def options
+      options = {
+        "type" => type != :runtime && type || nil,
+        "group" => @groups != [:default] && @groups || nil,
+        "platforms" => @platforms,
+        "env" => @env,
+        "require" => @autorequire,
+        "install_if" => @should_include,
+      }
+      options.merge!(source.options) if source
+      options["source"] = options.delete("remote")
+      options.reject {|k, v| !Dsl::VALID_KEYS.include?(k) || Array(v).empty? }
+    end
+
     def gem_platforms(valid_platforms)
       return valid_platforms if @platforms.empty?
 
