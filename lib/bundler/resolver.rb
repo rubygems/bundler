@@ -234,8 +234,6 @@ module Bundler
       Bundler.ui.info ".", false
     end
 
-  private
-
     include Molinillo::SpecificationProvider
 
     def dependencies_for(specification)
@@ -307,6 +305,8 @@ module Bundler
         ]
       end
     end
+
+  private
 
     def amount_constrained(dependency)
       @amount_constrained ||= {}
