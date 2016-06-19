@@ -216,9 +216,11 @@ module Bundler
       @resolve ||= begin
         last_resolve = converge_locked_specs
         if Bundler.settings[:frozen] || (!@unlocking && nothing_changed?)
+          Bundler.ui.debug("Found no changes, using resolution from the lockfile")
           last_resolve
         else
           # Run a resolve against the locally available gems
+          Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies")
           last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version)
         end
       end
@@ -480,14 +482,21 @@ module Bundler
         end
       end
 
-      !locked || unlocking || dependencies_for_source_changed?(locked) || source.specs != locked.specs
+      !locked || unlocking || dependencies_for_source_changed?(source) || specs_for_source_changed?(source)
     end
 
     def dependencies_for_source_changed?(source)
       deps_for_source = @dependencies.select {|s| s.source == source }
       locked_deps_for_source = @locked_deps.select {|s| s.source == source }
 
-      deps_for_source != locked_deps_for_source
+      Set.new(deps_for_source) != Set.new(locked_deps_for_source)
+    end
+
+    def specs_for_source_changed?(source)
+      locked_index = Index.new
+      locked_index.use(@locked_specs.select {|s| source.can_lock?(s) })
+
+      source.specs != locked_index
     end
 
     # Get all locals and override their matching sources.

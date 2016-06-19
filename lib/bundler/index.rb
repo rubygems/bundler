@@ -134,8 +134,14 @@ module Bundler
     def ==(other)
       all? do |spec|
         other_spec = other[spec].first
-        other_spec && (spec.dependencies & other_spec.dependencies).empty? && spec.source == other_spec.source
+        other_spec && dependencies_eql?(spec, other_spec) && spec.source == other_spec.source
       end
+    end
+
+    def dependencies_eql?(spec, other_spec)
+      deps       = spec.dependencies.select {|d| d.type != :development }
+      other_deps = other_spec.dependencies.select {|d| d.type != :development }
+      Set.new(deps) == Set.new(other_deps)
     end
 
     def add_source(index)
