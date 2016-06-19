@@ -96,7 +96,7 @@ module Bundler
 
   def self.with_friendly_errors
     yield
-  rescue Exception => e
+  rescue => e
     FriendlyErrors.log_error(e)
     exit FriendlyErrors.exit_status(e)
   end

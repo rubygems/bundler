@@ -39,7 +39,8 @@ module Bundler
       @gemfile = expanded_gemfile_path
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
-    rescue Exception => e
+    rescue StandardError, SyntaxError => e
+
       message = "There was an error " \
         "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \
         "`#{File.basename gemfile.to_s}`: #{e.message}"

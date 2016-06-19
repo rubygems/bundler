@@ -63,7 +63,7 @@ module Bundler
       Kernel.load(file)
     rescue SystemExit
       raise
-    rescue Exception => e # rubocop:disable Lint/RescueException
+    rescue => e
       Bundler.ui = ui
       Bundler.ui.error "bundler: failed to load command: #{cmd} (#{file})"
       backtrace = e.backtrace.take_while {|bt| !bt.start_with?(__FILE__) }
