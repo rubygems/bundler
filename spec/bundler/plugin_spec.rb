@@ -70,10 +70,14 @@ describe Bundler::Plugin do
 
   describe "evaluate gemfile for plugins" do
     let(:definition) { double("definition") }
+    let(:builder) { double("builder") }
     let(:gemfile) { bundled_app("Gemfile") }
 
     before do
-      allow(Plugin::DSL).to receive(:evaluate) { definition }
+      allow(Plugin::DSL).to receive(:new) { builder }
+      allow(builder).to receive(:eval_gemfile)
+      allow(builder).to receive(:to_definition) { definition }
+      allow(builder).to receive(:auto_plugins) { [] }
     end
 
     it "doesn't calls installer without any plugins" do

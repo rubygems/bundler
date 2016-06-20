@@ -39,18 +39,19 @@ module Bundler
     #
     # @param [Pathname] gemfile path
     def gemfile_install(gemfile = nil, &inline)
+      builder = DSL.new
       if block_given?
-        builder = DSL.new
         builder.instance_eval(&inline)
-        definition = builder.to_definition(nil, true)
       else
-        definition = DSL.evaluate(gemfile, nil, {})
+        builder.eval_gemfile(gemfile)
       end
+      definition = builder.to_definition(nil, true)
+
       return if definition.dependencies.empty?
 
       plugins = Installer.new.install_definition(definition)
 
-      save_plugins plugins
+      save_plugins plugins, builder.auto_plugins
     end
 
     # The index object used to store the details about the plugin
@@ -126,11 +127,12 @@ module Bundler
     # Post installation processing and registering with index
     #
     # @param [Hash] plugins mapped to their installtion path
-    def save_plugins(plugins)
+    # @param [Array<String>] names of auto added source plugins that can be ignored
+    def save_plugins(plugins, optionals = [])
       plugins.each do |name, path|
         path = Pathname.new path
         validate_plugin! path
-        register_plugin name, path
+        register_plugin name, path, optionals.include?(name)
         Bundler.ui.info "Installed plugin #{name}"
       end
     end
@@ -151,7 +153,9 @@ module Bundler
     #
     # @param [String] name the name of the plugin
     # @param [Pathname] path the path where the plugin is installed at
-    def register_plugin(name, path)
+    # @param [Boolean] optional_plugin, removed if there is conflict (used for
+    #                       default source plugins)
+    def register_plugin(name, path, optional)
       commands = @commands
       sources = @sources
 
@@ -164,7 +168,11 @@ module Bundler
         raise MalformattedPlugin, "#{e.class}: #{e.message}"
       end
 
-      index.register_plugin name, path.to_s, @commands.keys, @sources.keys
+      if optional && @sources.keys.any? { |s| source? s }
+        Bundler.rm_rf(path)
+      else
+        index.register_plugin name, path.to_s, @commands.keys, @sources.keys
+      end
     ensure
       @commands = commands
       @sources = sources

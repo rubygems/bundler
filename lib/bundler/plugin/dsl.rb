@@ -12,9 +12,12 @@ module Bundler
       # They will be handled by method_missing
       [:gemspec, :gem, :path, :install_if, :platforms, :env].each {|m| undef_method m }
 
+      attr_reader :auto_plugins
+
       def initialize
         super
         @sources = Plugin::SourceList.new
+        @auto_plugins = [] # The source plugins inferred from :type
       end
 
       def plugin(name, *args)
@@ -30,7 +33,9 @@ module Bundler
         options = normalize_hash(options)
         return super unless options.key?("type")
 
-        plugin("bundler-source-#{options["type"]}") unless Plugin.source? options["type"]
+        plugin_name = "bundler-source-#{options["type"]}"
+        plugin(plugin_name)
+        @auto_plugins << plugin_name
       end
     end
   end

@@ -58,7 +58,7 @@ describe "bundler source plugin" do
         end
       end
 
-      context "explicit presence in gemfile", :focused do
+      context "explicit presence in gemfile" do
         before do
           install_gemfile <<-G
             source "file://#{gem_repo2}"
@@ -72,6 +72,10 @@ describe "bundler source plugin" do
 
         it "completes successfully" do
           expect(out).to include("Bundle complete!")
+        end
+
+        it "installs the explicit one" do
+          plugin_should_be_installed("another-psource")
         end
 
         it "doesn't install the default one" do
