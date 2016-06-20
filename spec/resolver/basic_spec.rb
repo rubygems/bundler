@@ -178,12 +178,8 @@ describe "Resolving" do
       should_consv_resolve_and_include [:minor, :minimal], [], %w(foo-1.4.4 bar-2.0.4)
     end
 
-    it 'will not revert to a previous version'
-
-    it 'has taken care of all MODOs'
-
-    it 'has moved DependencySearch into its own file'
-
-    it 'has moved search_for impl out of Resolver into DependencySearch' # method called by Molinillo, but bulk can go off to dep_search
+    it "will not revert to a previous version"
+    it "has taken care of all MODOs"
+    it "bring over all sort/filter specs from bundler-patch"
   end
 end

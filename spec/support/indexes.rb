@@ -58,7 +58,7 @@ module Spec
     def should_consv_resolve_and_include(opts, unlock, specs)
       # empty unlock means unlock all
       opts = Array(opts)
-      search = Bundler::Resolver::DependencySearch.new(@locked, unlock).tap do |s|
+      search = Bundler::GemVersionPromoter.new(@locked, unlock).tap do |s|
         s.level = opts.first
         s.strict = opts.include?(:strict)
         s.minimal = opts.include?(:minimal)
