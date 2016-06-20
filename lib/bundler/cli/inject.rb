@@ -1,14 +1,12 @@
 # frozen_string_literal: true
-require "bundler/cli/common"
 module Bundler
   class CLI::Inject
-    attr_reader :options, :name, :version, :gems, :command
-    def initialize(options, name, version, gems, command = "inject")
+    attr_reader :options, :name, :version, :gems
+    def initialize(options, name, version, gems)
       @options = options
       @name = name
       @version = version || last_version_number
       @gems = gems
-      @command = command
     end
 
     def run
@@ -22,7 +20,6 @@ module Bundler
         deps << Bundler::Dependency.new(gem_name, gem_version)
       end
 
-      options = command == "add" ? { remove_timestamp: true } : {}
       added = Injector.inject(deps, options)
 
       if added.any?
