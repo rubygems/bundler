@@ -103,7 +103,7 @@ module Bundler
     def source(name)
       raise UnknownSourceError, "Source #{name} not found" unless source? name
 
-      load_plugin index.source_plugin name unless @sources.key? name
+      load_plugin(index.source_plugin(name)) unless @sources.key? name
 
       @sources[name]
     end
@@ -168,7 +168,7 @@ module Bundler
         raise MalformattedPlugin, "#{e.class}: #{e.message}"
       end
 
-      if optional && @sources.keys.any? { |s| source? s }
+      if optional && @sources.keys.any? {|s| source? s }
         Bundler.rm_rf(path)
       else
         index.register_plugin name, path.to_s, @commands.keys, @sources.keys

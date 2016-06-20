@@ -128,7 +128,7 @@ module Bundler
     def source(source, *args, &blk)
       options = args.last.is_a?(Hash) ? args.pop.dup : {}
       options = normalize_hash(options)
-      if options && options.key?("type")
+      if options.key?("type")
         options["type"] = options["type"].to_s
         unless Plugin.source?(options["type"])
           raise "No sources available for #{options["type"]}"
