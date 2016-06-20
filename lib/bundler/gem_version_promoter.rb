@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 module Bundler
   class GemVersionPromoter
-    attr_accessor :level, :strict, :minimal
+    attr_reader :level
+    attr_accessor :strict, :minimal
 
     def initialize(locked_specs = SpecSet.new([]), unlock_gems = [])
       @level_default = :major
@@ -31,7 +32,7 @@ module Bundler
         gem_name = dep.name
 
         # An Array per version returned, different entries for different platforms.
-        # We just need the version here so it's ok to hard code this to the first instance.
+        # We only need the version here so it's ok to hard code this to the first instance.
         locked_spec = @locked_specs[gem_name].first
 
         if @strict

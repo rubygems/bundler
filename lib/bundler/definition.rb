@@ -94,7 +94,7 @@ module Bundler
       end
       @unlocking ||= @unlock[:ruby] ||= (!@locked_ruby_version ^ !@ruby_version)
 
-      @gem_version_promoter = GemVersionPromoter.new(@locked_specs, @unlock[:gems])
+      @gem_version_promoter = create_gem_version_promoter
 
       current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
       add_platform(current_platform)
@@ -123,6 +123,22 @@ module Bundler
           ld.instance_variable_set(:@type, d.type)
         end
       end
+    end
+
+    def create_gem_version_promoter
+      # MODO: unit test this
+      locked_specs = begin
+        if @unlocking && @locked_specs.empty?
+          # Definition uses an empty set of locked_specs to indicate all gems
+          # are unlocked, but GemVersionPromoter needs the locked_specs
+          # for conservative comparison.
+          locked = Bundler::LockfileParser.new(@lockfile_contents)
+          Bundler::SpecSet.new(locked.specs)
+        else
+          @locked_specs
+        end
+      end
+      GemVersionPromoter.new(locked_specs, @unlock[:gems])
     end
 
     def resolve_with_cache!
