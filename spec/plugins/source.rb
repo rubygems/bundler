@@ -176,6 +176,7 @@ describe "bundler source plugin" do
                 super
 
                 @ref = options["ref"] || options["branch"] || options["tag"] || "master"
+                @unlocked = false
               end
 
               def eql?(other)
@@ -216,6 +217,11 @@ describe "bundler source plugin" do
                 {"revision" => revision}
               end
 
+              def unlock!
+                @unlocked = true
+                @revision = latest_revision
+              end
+
             private
 
               def cache_path
@@ -235,10 +241,17 @@ describe "bundler source plugin" do
               end
 
               def revision
-                @revision ||= locked_revision || begin
-                  Dir.chdir cache_path do
-                    `git rev-parse --verify \#{@ref}`.strip
-                  end
+                @revision ||= locked_revision || latest_revision
+              end
+
+              def latest_revision
+                if !cached? || @unlocked
+                  rm_rf(cache_path)
+                  cache_repo
+                end
+
+                Dir.chdir cache_path do
+                  `git rev-parse --verify \#{@ref}`.strip
                 end
               end
 
@@ -353,6 +366,18 @@ describe "bundler source plugin" do
         run <<-RUBY
           require 'ma-gitp-gem'
           puts "WIN" unless defined?(MAGITPGEM_PREV_REF)
+        RUBY
+        expect(out).to eq("WIN")
+      end
+
+
+      it "updates the deps on bundler update", :focused do
+        update_git "ma-gitp-gem"
+        bundle "update ma-gitp-gem"
+
+        run <<-RUBY
+          require 'ma-gitp-gem'
+          puts "WIN" if defined?(MAGITPGEM_PREV_REF)
         RUBY
         expect(out).to eq("WIN")
       end

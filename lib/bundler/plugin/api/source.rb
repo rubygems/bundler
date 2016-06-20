@@ -63,6 +63,9 @@ module Bundler
         def cache!
         end
 
+        def unlock!
+        end
+
         def ==(other)
           other.is_a?(self.class) && uri == other.uri
         end

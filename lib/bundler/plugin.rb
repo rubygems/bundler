@@ -95,7 +95,7 @@ module Bundler
 
     # Checks if any plugin declares the source
     def source?(name)
-      !index.source_plugin(name).nil?
+      !index.source_plugin(name.to_s).nil?
     end
 
     # @return [Class] that handles the source. The calss includes API::Source
