@@ -84,7 +84,7 @@ describe "bundler version trampolining" do
       bundle "--version", :expect_err => true
       expect(err).to start_with(<<-E.strip)
 Installing the inferred bundler version (= 9999) failed.
-If you'd like to update to the current bundler version (1.12.5) in this project, run `bundle update --bundler`.
+If you'd like to update to the current bundler version (#{Bundler::VERSION}) in this project, run `bundle update --bundler`.
 The error was:
       E
     end
