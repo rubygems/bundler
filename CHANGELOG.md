@@ -1,3 +1,45 @@
+## 1.13.0.pre.1 (2016-06-20)
+
+Performance:
+
+  - speed up gemfile resolution during `bundle install` by between 4x-100x (#4376, @segiddins)
+  - generally reduce object allocations when using bundler (@segiddins)
+  - speed up bin generation for path gems with many files (#2846, @segiddins)
+  - fix detecting path spec changes to avoid re-resolving unnecessarily (@jrafanie)
+
+Features:
+
+  - automatically trampoline to the bundler version locked in the lockfile, only updating to the running version on `bundle update --bundler` (@segiddins)
+  - laying the groundwork for plugin support, which is currently unsuppported, undocumented, disabled by default, and liable to change without notice (@asutoshpalai)
+  - allow `bundle viz --without` to accept multiple `:`-delimited groups (@mobilutz)
+  - support for RubyGems 2.6.4 (#4368, @segiddins, @RochesterinNYC)
+  - colorize updated gem versions (#4334, @bronzdoc)
+  - add the `--standalone` flag to `bundle binstubs` (#4594, @b-ggs)
+  - update the `bundle gem` CoC to contributor covenant v1.4 (@cllns)
+  - use a custom YAML serializer to make config file consistent (@segiddins)
+  - filter credentials from error messages (bundler/bundler-features#111, @RochesterinNYC, @sandlerr)
+  - support relative paths used inside a nested invocation of `eval_gemfile` (#4584, @RochesterinNYC)
+  - fail gracefully when attempting to install a yanked gem (#4344, @allenzhao)
+  - automatically install an inline gemfile when gems are missing locally (@segiddins)
+  - allow conflicts for gems resolved via `gemspec` (@segiddins)
+  - add `--add-platform` option to `bundle lock` (@segiddins)
+  - fail gracefully when a resolved spec's `required_ruby_version` or `required_rubygems_version` is incompatible (@segiddins)
+
+Bugfixes:
+
+  - implicitly unlock the resolved ruby version when the declared requirements in the gemfile are incompatible with the locked version (#4595, #4627, @segiddins)
+  - add support for quoted paths in `$PATH` (#4323, @segiddins)
+  - check out missing git repos that are not being installed (#3981, @asutoshpalai)
+  - write `bundler/setup.rb` to a consistent path (@glennpratt)
+  - open editor in `bundle open` with a clean environment (@sj26)
+  - resolve infinitely recursive copy when running `bundle package --all` with a `gemspec` in the gemfile (#4392, #4430, @RochesterinNYC)
+  - fail gracefully when encountering an `Errno::ENOTSUP` (#4394, @segiddins)
+  - fail gracefully when encountering an `Errno::EHOSTUNREACH` (#4642, @allenzhao)
+  - fix loading config files with very long values (#4370, @segiddins)
+  - only show potential updates for gemfile platforms in `bundle outdated` (#4450, @RochesterinNYC)
+  - allow running `bundle install --deployment` after `bundle package --all` with path gems (#2175, @allenzhao)
+  - add support for patchlevels in ruby versions in the gemfile and gemspecs (#4593, @chalkos)
+
 ## 1.12.5 (2016-05-25)
 
 Bugfixes:
