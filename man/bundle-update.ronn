@@ -34,6 +34,9 @@ gem.
 * `--ruby`:
   Update the locked version of Ruby to the current version of Ruby.
 
+* `--bundler`:
+  Update the locked version of bundler to the invoked bundler version.
+
 ## UPDATING ALL GEMS
 
 If you run `bundle update` with no parameters, bundler will ignore
