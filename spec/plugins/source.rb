@@ -192,7 +192,7 @@ describe "bundler source plugin" do
                     cache_repo
                   end
 
-                  if installed?
+                  if installed? && !@unlocked
                     path = install_path
                   else
                     path = cache_path
@@ -214,7 +214,9 @@ describe "bundler source plugin" do
               end
 
               def options_to_lock
-                {"revision" => revision}
+                opts = {"revision" => revision}
+                opts["ref"] = ref if ref != "master"
+                opts
               end
 
               def unlock!
@@ -370,8 +372,7 @@ describe "bundler source plugin" do
         expect(out).to eq("WIN")
       end
 
-
-      it "updates the deps on bundler update", :focused do
+      it "updates the deps on bundler update" do
         update_git "ma-gitp-gem"
         bundle "update ma-gitp-gem"
 
@@ -380,6 +381,19 @@ describe "bundler source plugin" do
           puts "WIN" if defined?(MAGITPGEM_PREV_REF)
         RUBY
         expect(out).to eq("WIN")
+      end
+
+      it "updates the deps on change in gemfile" do
+        update_git "ma-gitp-gem", "1.1", :path => lib_path("ma-gitp-gem-1.0"), :gemspec => true
+        gemfile <<-G
+          source "file://#{gem_repo2}" # plugin source
+          source "file://#{lib_path("ma-gitp-gem-1.0")}", :type => :gitp do
+            gem "ma-gitp-gem", "1.1"
+          end
+        G
+        bundle "install"
+
+        should_be_installed("ma-gitp-gem 1.1")
       end
     end
   end
