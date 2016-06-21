@@ -21,7 +21,8 @@ module Bundler
         end
       end
 
-      @level = [:major, :minor, :patch].include?(v) ? v : @level_default
+      raise ArgumentError, "Unexpected level #{v}. Must be :major, :minor or :patch" unless [:major, :minor, :patch].include?(v)
+      @level = v
     end
 
     def sort_versions(dep, dep_specs)

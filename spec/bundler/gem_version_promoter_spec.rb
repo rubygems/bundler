@@ -127,5 +127,33 @@ describe Bundler::GemVersionPromoter do
         expect(gvp.sort_versions(dep, sg)).to_not eq []
       end
     end
+
+    context "level error handling" do
+      subject { Bundler::GemVersionPromoter.new }
+
+      it "should raise if not major, minor or patch is passed" do
+        expect { subject.level = :minjor }.to raise_error ArgumentError
+      end
+
+      it "should raise if invalid classes passed" do
+        [123, nil].each do |value|
+          expect { subject.level = value }.to raise_error ArgumentError
+        end
+      end
+
+      it "should accept major, minor patch symbols" do
+        [:major, :minor, :patch].each do |value|
+          subject.level = value
+          expect(subject.level).to eq value
+        end
+      end
+
+      it "should accept major, minor patch strings" do
+        %w(major minor patch).each do |value|
+          subject.level = value
+          expect(subject.level).to eq value.to_sym
+        end
+      end
+    end
   end
 end

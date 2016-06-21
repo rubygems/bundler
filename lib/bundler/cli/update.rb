@@ -40,7 +40,7 @@ module Bundler
       end
 
       patch_level = [:major, :minor, :patch].detect {|v| options.keys.include?(v.to_s) }
-      Bundler.definition.gem_version_promoter.level = patch_level
+      Bundler.definition.gem_version_promoter.level = patch_level || :major
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
