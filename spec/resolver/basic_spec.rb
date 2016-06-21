@@ -134,12 +134,6 @@ describe "Resolving" do
       should_conservative_resolve_and_include [:patch, :strict], [], %w(foo-1.4.4 bar-2.0.5)
     end
 
-    it "resolves all gems to latest patch minimal" do
-      # MODO: remove minimal
-      # minimal is set, so foo goes up the next available to 1.4.4 and bar goes up to next available 2.0.4
-      should_conservative_resolve_and_include [:patch, :minimal], [], %w(foo-1.4.4 bar-2.0.4)
-    end
-
     it "resolves foo only to latest patch - same dependency case" do
       @locked = locked(%w(foo 1.3.7), %w(bar 2.0.3))
       # bar is locked, and the lock holds here because the dependency on bar doesn't change on the matching foo version.
@@ -183,15 +177,6 @@ describe "Resolving" do
     it "resolves all gems to latest minor strict" do
       # strict is set, so foo can only go up to 1.5.0 to avoid bar going up a major version
       should_conservative_resolve_and_include [:minor, :strict], [], %w(foo-1.5.0 bar-2.1.1)
-    end
-
-    it "resolves all gems to latest minor minimal" do
-      # MODO: remove minimal
-      # minimal is set, and it takes precedence over minor. not sure what is the PoLS in this case. Not sure
-      # if minimal is a great option in the first place. It exists to help a case where there are many, many
-      # versions and I'd rather go from 1.0.2 to 1.0.3 instead of 1.0.45. But, we could consider killing the
-      # minimal option altogether. If that's what you need, use the Gemfile dependency.
-      should_conservative_resolve_and_include [:minor, :minimal], [], %w(foo-1.4.4 bar-2.0.4)
     end
 
     it "could revert to a previous version"

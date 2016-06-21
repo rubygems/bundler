@@ -61,7 +61,6 @@ module Spec
       search = Bundler::GemVersionPromoter.new(@locked, unlock).tap do |s|
         s.level = opts.first
         s.strict = opts.include?(:strict)
-        s.minimal = opts.include?(:minimal)
       end
       should_resolve_and_include specs, [{}, @base, nil, search]
     end

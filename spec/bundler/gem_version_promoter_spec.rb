@@ -17,7 +17,6 @@ describe Bundler::GemVersionPromoter do
       make_instance(Bundler::SpecSet.new([]), ["foo"]).tap do |p|
         p.level = options[:level] if options[:level]
         p.strict = options[:strict] if options[:strict]
-        p.minimal = options[:minimal] if options[:minimal]
       end
     end
 
@@ -25,7 +24,6 @@ describe Bundler::GemVersionPromoter do
       make_instance(Bundler::SpecSet.new([]), ["bar"]).tap do |p|
         p.level = options[:level] if options[:level]
         p.strict = options[:strict] if options[:strict]
-        p.minimal = options[:minimal] if options[:minimal]
       end
     end
 
@@ -69,7 +67,7 @@ describe Bundler::GemVersionPromoter do
     end
 
     context "filter specs (strict) (minor preferred)" do
-      it "should have specs"
+      it "should have specs" # MODO: so, y'know, like, maybe ... make some?
     end
 
     context "sort specs (not strict) (minor not allowed)" do
@@ -104,24 +102,6 @@ describe Bundler::GemVersionPromoter do
           build_spec("foo", "1.7.9").first)
         expect(versions(res)).to eq %w(2.0.0 1.8.0 1.7.9)
       end
-
-      it "when prefer_minimal, and not updating this gem, order is strictly oldest to newest" do
-        keep_locked(:minimal => true)
-        versions = %w(1.7.5 1.7.8 1.7.9 1.8.0 2.0.0 2.1.0 3.0.0 3.0.1 3.1.0)
-        res = @gvp.sort_dep_specs(
-          build_spec_group("foo", versions),
-          build_spec("foo", "1.7.5").first)
-        expect(versions(res)).to eq versions.reverse
-      end
-
-      it "when prefer_minimal, and updating this gem, order is oldest to newest except current" do
-        unlocking(:minimal => true)
-        versions = %w(1.7.5 1.7.8 1.7.9 1.8.0 2.0.0 2.1.0 3.0.0 3.0.1 3.1.0)
-        res = @gvp.sort_dep_specs(
-          build_spec_group("foo", versions),
-          build_spec("foo", "1.7.5").first)
-        expect(versions(res)).to eq %w(3.1.0 3.0.1 3.0.0 2.1.0 2.0.0 1.8.0 1.7.5 1.7.9 1.7.8)
-      end
     end
 
     context "sort specs (not strict) (minor allowed)" do
@@ -132,10 +112,6 @@ describe Bundler::GemVersionPromoter do
           build_spec("foo", "0.2.0").first)
         expect(versions(res)).to eq %w(2.0.0 2.0.1 1.0.0 0.2.0 0.3.0 0.3.1 0.9.0)
       end
-
-      it "new version specified"
-
-      it "new version specified, prefer_minimal"
     end
 
     context "caching search results" do

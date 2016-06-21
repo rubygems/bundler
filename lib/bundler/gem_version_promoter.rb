@@ -2,13 +2,12 @@
 module Bundler
   class GemVersionPromoter
     attr_reader :level, :locked_specs, :unlock_gems
-    attr_accessor :strict, :minimal
+    attr_accessor :strict
 
     def initialize(locked_specs = SpecSet.new([]), unlock_gems = [])
       @level_default = :major
       @level = @level_default
       @strict = false
-      @minimal = false
       @locked_specs = locked_specs
       @unlock_gems = unlock_gems
       @sort_versions = {}
@@ -93,11 +92,6 @@ module Bundler
           b_ver <=> a_ver
         when !(@level == :minor) && (a_ver.segments[1] != b_ver.segments[1])
           b_ver <=> a_ver
-        when @minimal && !unlocking_gem?(gem_name)
-          b_ver <=> a_ver
-        when @minimal && unlocking_gem?(gem_name) &&
-          ![a_ver, b_ver].include?(locked_version) # MODO: revisit this case
-          b_ver <=> a_ver
         else
           a_ver <=> b_ver
         end
@@ -123,7 +117,7 @@ module Bundler
       a = [dep.to_s,
            res.map {|sg| [sg.version, sg.dependencies_for_activated_platforms.map {|dp| [dp.name, dp.requirement.to_s] }] }]
       [a.first, a.last.map {|sg_data| [sg_data.first.version, sg_data.last.map {|aa| aa.join(" ") }] },
-       @level, @strict ? :strict : :not_strict, @minimal ? :minimal : :not_minimal]
+       @level, @strict ? :strict : :not_strict]
     end
   end
 end
