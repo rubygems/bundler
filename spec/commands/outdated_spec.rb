@@ -257,6 +257,21 @@ describe "bundle outdated" do
     end
   end
 
+  context "update available for a gem on the same platform while multiple platforms used for gem" do
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "laduradura", '= 5.15.2', :platforms => [:ruby, :jruby]
+      G
+    end
+
+    it "reports that updates are available" do
+      bundle "outdated"
+      expect(out).to include("Outdated gems included in the bundle:")
+      expect(out).to include("laduradura (newest 5.15.3, installed 5.15.2, requested = 5.15.2)")
+    end
+  end
+
   shared_examples_for "version update is detected" do
     it "reports that a gem has a newer version" do
       subject
