@@ -26,7 +26,8 @@ module Bundler
     end
 
     def sort_versions(dep, dep_specs)
-      before_result = "before sort_versions: #{debug_format_result(dep, dep_specs).inspect}"
+      # MODO Revisit env name - also see below
+      before_result = "before sort_versions: #{debug_format_result(dep, dep_specs).inspect}" if ENV["DEBUG_PATCH_RESOLVER"]
 
       result = @sort_versions[dep] ||= begin
         gem_name = dep.name
@@ -46,6 +47,7 @@ module Bundler
           end
         end
       end
+      # MODO: flush out this problem by freezing it?
       result.dup # not ideal, but elsewhere in bundler the resulting array is occasionally emptied, corrupting the cache.
     end
 
