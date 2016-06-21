@@ -29,9 +29,12 @@ The error was: #{e}
     EOS
   end
 
-  Gem.loaded_specs.delete("bundler") unless defined?(Bundler)
+  if deleted_spec = Gem.loaded_specs.delete("bundler")
+    deleted_spec.full_require_paths.each {|path| $:.delete(path) }
+  else
+    $:.delete(File.expand_path("../..", __FILE__))
+  end
   gem "bundler", version
-  $:.delete(File.expand_path("../..", __FILE__))
 else
   begin
     gem "bundler", version
