@@ -79,6 +79,11 @@ module Bundler
         tell_me(msg, nil, newline)
       end
 
+      def major_deprecation(message)
+        return unless Bundler.settings[:major_deprecations]
+        warn(message)
+      end
+
       def silence
         old_level = @level
         @level = "silent"

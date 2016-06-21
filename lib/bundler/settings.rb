@@ -11,6 +11,7 @@ module Bundler
       gem.coc
       gem.mit
       ignore_messages
+      major_deprecations
       no_install
       no_prune
       plugins

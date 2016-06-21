@@ -40,6 +40,9 @@ module Bundler
       def trace(message, newline = nil)
       end
 
+      def major_deprecation(message)
+      end
+
       def silence
         yield
       end
