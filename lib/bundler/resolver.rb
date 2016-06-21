@@ -270,6 +270,7 @@ module Bundler
       end
       platform_results = search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }
       return platform_results if @gem_version_promoter.level == :major # default behavior
+      # MODO: put this inside the cache
       @gem_version_promoter.sort_versions(dependency, platform_results)
     end
 

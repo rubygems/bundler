@@ -117,69 +117,87 @@ describe "Resolving" do
       end
       dep "foo"
 
+      # base represents declared dependencies in the Gemfile that are still satisfied by the lockfile
+      @base = Bundler::SpecSet.new([])
+
+      # locked represents versions in lockfile
       @locked = locked(%w(foo 1.4.3), %w(bar 2.0.3))
     end
 
     it "resolves all gems to latest patch" do
       # strict is not set, so bar goes up a minor version due to dependency from foo 1.4.5
-      should_consv_resolve_and_include :patch, [], %w(foo-1.4.5 bar-2.1.1)
+      should_conservative_resolve_and_include :patch, [], %w(foo-1.4.5 bar-2.1.1)
     end
 
     it "resolves all gems to latest patch strict" do
       # strict is set, so foo can only go up to 1.4.4 to avoid bar going up a minor version, and bar can go up to 2.0.5
-      should_consv_resolve_and_include [:patch, :strict], [], %w(foo-1.4.4 bar-2.0.5)
+      should_conservative_resolve_and_include [:patch, :strict], [], %w(foo-1.4.4 bar-2.0.5)
     end
 
     it "resolves all gems to latest patch minimal" do
+      # MODO: remove minimal
       # minimal is set, so foo goes up the next available to 1.4.4 and bar goes up to next available 2.0.4
-      should_consv_resolve_and_include [:patch, :minimal], [], %w(foo-1.4.4 bar-2.0.4)
+      should_conservative_resolve_and_include [:patch, :minimal], [], %w(foo-1.4.4 bar-2.0.4)
     end
 
     it "resolves foo only to latest patch - same dependency case" do
       @locked = locked(%w(foo 1.3.7), %w(bar 2.0.3))
       # bar is locked, and the lock holds here because the dependency on bar doesn't change on the matching foo version.
-      should_consv_resolve_and_include :patch, ["foo"], %w(foo-1.3.8 bar-2.0.3)
+      should_conservative_resolve_and_include :patch, ["foo"], %w(foo-1.3.8 bar-2.0.3)
     end
 
-    it "resolves foo only to latest patch - changing dependency case" do
-      # bar is locked, but locks don't apply to _changing_ dependencies and since the dependency of the
-      # selected foo gem changes, the latest matching of bar-2.1.1
-      # (this could be considered a bug, but possibly hard to solve for)
-      should_consv_resolve_and_include :patch, ["foo"], %w(foo-1.4.5 bar-2.1.1)
+    it "resolves foo only to latest patch - changing dependency not declared case" do
+      # foo is the only gem being requested for update, therefore bar is locked, but bar is NOT
+      # declared as a dependency in the Gemfile. In this case, locks don't apply to _changing_
+      # dependencies and since the dependency of the selected foo gem changes, the latest matching
+      # dependency of "bar", "~> 2.1" -- bar-2.1.1 -- is selected. This is not a bug and follows
+      # the long-standing documented Conservative Updating behavior of bundle install.
+      # http://bundler.io/v1.12/man/bundle-install.1.html#CONSERVATIVE-UPDATING
+      should_conservative_resolve_and_include :patch, ["foo"], %w(foo-1.4.5 bar-2.1.1)
+    end
+
+    it "resolves foo only to latest patch - changing dependency declared case" do
+      # bar is locked AND a declared dependency in the Gemfile, so it will not move, and therefore
+      # foo can only move up to 1.4.4.
+      @base << build_spec("bar", "2.0.3").first
+      should_conservative_resolve_and_include :patch, ["foo"], %w(foo-1.4.4 bar-2.0.3)
     end
 
     it "resolves foo only to latest patch strict" do
       # adding strict helps solve the possibly unexpected behavior of bar changing in the prior test case,
       # because no versions will be returned for bar ~> 2.1, so the engine falls back to ~> 2.0 (turn on
       # debugging to see this happen).
-      should_consv_resolve_and_include [:patch, :strict], ["foo"], %w(foo-1.4.4 bar-2.0.3)
+      should_conservative_resolve_and_include [:patch, :strict], ["foo"], %w(foo-1.4.4 bar-2.0.3)
     end
 
     it "resolves bar only to latest patch" do
       # bar is locked, so foo can only go up to 1.4.4
-      should_consv_resolve_and_include :patch, ["bar"], %w(foo-1.4.3 bar-2.0.5)
+      should_conservative_resolve_and_include :patch, ["bar"], %w(foo-1.4.3 bar-2.0.5)
     end
 
     it "resolves all gems to latest minor" do
       # strict is not set, so bar goes up a major version due to dependency from foo 1.4.5
-      should_consv_resolve_and_include :minor, [], %w(foo-1.5.1 bar-3.0.0)
+      should_conservative_resolve_and_include :minor, [], %w(foo-1.5.1 bar-3.0.0)
     end
 
     it "resolves all gems to latest minor strict" do
       # strict is set, so foo can only go up to 1.5.0 to avoid bar going up a major version
-      should_consv_resolve_and_include [:minor, :strict], [], %w(foo-1.5.0 bar-2.1.1)
+      should_conservative_resolve_and_include [:minor, :strict], [], %w(foo-1.5.0 bar-2.1.1)
     end
 
     it "resolves all gems to latest minor minimal" do
+      # MODO: remove minimal
       # minimal is set, and it takes precedence over minor. not sure what is the PoLS in this case. Not sure
       # if minimal is a great option in the first place. It exists to help a case where there are many, many
       # versions and I'd rather go from 1.0.2 to 1.0.3 instead of 1.0.45. But, we could consider killing the
       # minimal option altogether. If that's what you need, use the Gemfile dependency.
-      should_consv_resolve_and_include [:minor, :minimal], [], %w(foo-1.4.4 bar-2.0.4)
+      should_conservative_resolve_and_include [:minor, :minimal], [], %w(foo-1.4.4 bar-2.0.4)
     end
 
-    it "will not revert to a previous version"
-    it "has taken care of all MODOs"
+    it "could revert to a previous version"
+
+    it "will not revert to a previous version in strict mode"
+
     it "bring over all sort/filter specs from bundler-patch"
   end
 end

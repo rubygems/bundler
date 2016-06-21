@@ -208,12 +208,16 @@ module Bundler
       "Update ruby specified in Gemfile.lock"
     method_option "bundler", :type => :string, :lazy_default => "> 0.a", :banner =>
       "Update the locked version of bundler"
+
+    # MODO: hide these from help to release undocumented?
     method_option "patch", :type => :boolean, :banner =>
       "Prefer updating only to next patch version"
     method_option "minor", :type => :boolean, :banner =>
       "Prefer updating only to next minor version"
     method_option "major", :type => :boolean, :banner =>
       "Prefer updating to next major version (default)"
+    method_option "strict", :type => :boolean, :banner =>
+      "Do not allow any gem to be updated past latest --patch/--minor/--major"
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run

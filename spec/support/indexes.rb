@@ -55,7 +55,7 @@ module Spec
       end)
     end
 
-    def should_consv_resolve_and_include(opts, unlock, specs)
+    def should_conservative_resolve_and_include(opts, unlock, specs)
       # empty unlock means unlock all
       opts = Array(opts)
       search = Bundler::GemVersionPromoter.new(@locked, unlock).tap do |s|
@@ -63,7 +63,7 @@ module Spec
         s.strict = opts.include?(:strict)
         s.minimal = opts.include?(:minimal)
       end
-      should_resolve_and_include specs, [{}, [], nil, search]
+      should_resolve_and_include specs, [{}, @base, nil, search]
     end
 
     def an_awesome_index

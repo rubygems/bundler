@@ -426,6 +426,7 @@ describe "bundle update --ruby" do
   end
 end
 
+# these specs are slow and focus on integration and therefore are not exhaustive. unit specs elsewhere handle that.
 describe "bundle update conservative" do
   context "patch preferred" do
     it "single gem without dependencies name specified" do
@@ -443,7 +444,6 @@ describe "bundle update conservative" do
         gem 'foo'
       G
 
-      # bundle "update --patch foo", {:env => {'DEBUG_PATCH_RESOLVER' => true}}
       bundle "update --patch foo"
 
       should_be_installed "foo 1.0.1"
@@ -464,14 +464,16 @@ describe "bundle update conservative" do
         gem 'foo'
       G
 
-      # bundle "update --patch foo", {:env => {'DEBUG_PATCH_RESOLVER' => true}}
       bundle "update --patch"
 
       should_be_installed "foo 1.0.1"
     end
+
+    it "warns on minor or major increment elsewhere"
   end
 
   context "minor preferred" do
+    it "warns on major increment elsewhere"
   end
 
   context "strict" do
@@ -481,5 +483,8 @@ describe "bundle update conservative" do
   end
 
   context "dry run" do
+    it "should show what would happen"
+
+    it "should replace/be the same as what outdated shows"
   end
 end
