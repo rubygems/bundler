@@ -18,6 +18,12 @@ module Bundler
       # be (preferably should be) overridden as per the plugins' needs safely
       # (as long as they behave as expected).
       # On overriding `initialize` you should call super first.
+      #
+      # If required plugin should override `hash`, `==` and `eql?` methods to be
+      # able to match objects representing same sources, but may be created in
+      # different situation (like form gemfile and lockfile). The default ones
+      # checks only for class and uri, but elaborate source plugins may need
+      # more comparisons (like, git checking on branch or tag).
       module Source
         attr_reader :uri, :options
         attr_accessor :dependency_names
@@ -121,6 +127,12 @@ module Bundler
         # lockfile. To converge the sources, it is necessary that they match.
         def ==(other)
           other.is_a?(self.class) && uri == other.uri
+        end
+
+        alias_method :eql?, :==
+
+        def hash
+          [self.class, uri].hash
         end
 
         def installed?

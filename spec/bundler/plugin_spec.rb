@@ -167,7 +167,7 @@ describe Bundler::Plugin do
     end
 
     it "loads the plugin, if not loaded" do
-      allow(index).to receive(:source_plugin).with("foo-bar") {"plugin_name"}
+      allow(index).to receive(:source_plugin).with("foo-bar") { "plugin_name" }
 
       expect(subject).to receive(:load_plugin).with("plugin_name")
       subject.source("foo-bar")
@@ -184,7 +184,7 @@ describe Bundler::Plugin do
 
   describe "#source_from_lock" do
     it "returns instance of registered class initialized with locked opts" do
-      opts = {"type" => "l_source", "remote" => "xyz", "other" => "random"}
+      opts = { "type" => "l_source", "remote" => "xyz", "other" => "random" }
       allow(index).to receive(:source_plugin).with("l_source") { "plugin_name" }
 
       stub_const "SClass", Class.new
@@ -192,7 +192,7 @@ describe Bundler::Plugin do
       subject.add_source("l_source", SClass)
 
       expect(SClass).to receive(:new).with(hash_including(
-        "type" => "l_source", "uri" => "xyz", "other" => "random")) { s_instance }
+                                             "type" => "l_source", "uri" => "xyz", "other" => "random")) { s_instance }
       expect(subject.source_from_lock(opts)).to be(s_instance)
     end
   end

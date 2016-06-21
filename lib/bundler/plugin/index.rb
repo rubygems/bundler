@@ -35,6 +35,8 @@ module Bundler
       # @param [String] path where the plugin is installed
       # @param [Array<String>] commands that are handled by the plugin
       def register_plugin(name, path, commands, sources)
+        old_commands = @commands.dup
+
         common = commands & @commands.keys
         raise CommandConflict.new(name, common) unless common.empty?
         commands.each {|c| @commands[c] = name }
@@ -45,6 +47,9 @@ module Bundler
 
         @plugin_paths[name] = path
         save_index
+      rescue
+        @commands = old_commands
+        raise
       end
 
       # Path where the index file is stored

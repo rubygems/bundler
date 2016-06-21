@@ -34,8 +34,10 @@ module Bundler
         return super unless options.key?("type")
 
         plugin_name = "bundler-source-#{options["type"]}"
-        plugin(plugin_name)
-        @auto_plugins << plugin_name
+        unless @auto_plugins.include? plugin_name
+          plugin(plugin_name)
+          @auto_plugins << plugin_name
+        end
       end
     end
   end
