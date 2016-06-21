@@ -128,10 +128,6 @@ module Bundler
 
     def parse_source(line)
       case line
-      when *SOURCE
-        @current_source = nil
-        @opts = {}
-        @type = line
       when SPECS
         case @type
         when PATH
@@ -167,6 +163,10 @@ module Bundler
         else
           @opts[key] = value
         end
+      when *SOURCE
+        @current_source = nil
+        @opts = {}
+        @type = line
       else
         parse_spec(line)
       end
