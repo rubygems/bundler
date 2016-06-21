@@ -445,6 +445,8 @@ module Bundler
     end
 
     desc "add GEM [VERSION]", "Add the specified gem to the bottom of Gemfile"
+    method_option "group", :type => :array, :desc => "Specify a group to add the gem in"
+    method_option "source", :type => :array, :desc => "Specify the gem's source"
     method_option "pre", :type => :boolean, :default => false, :desc => "Check for newer pre-release gems"
     method_option "append-timestamp", :type => :boolean, :default => false, :desc => "Append timestamp to Gemfile"
     def add(name, version = nil, *gems)

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "pry-byebug"
 module Bundler
   class Injector
     def self.inject(new_deps, options = {})
@@ -49,6 +50,7 @@ module Bundler
 
     def new_gem_lines
       @new_deps.map do |d|
+        binding.pry
         %(gem '#{d.name}', '#{d.requirement}')
       end.join("\n")
     end

@@ -1,23 +1,25 @@
 # frozen_string_literal: true
 module Bundler
   class CLI::Inject
-    attr_reader :options, :name, :version, :gems
+    attr_reader :options, :name, :version, :groups, :source, :gems
     def initialize(options, name, version, gems)
       @options = options
       @name = name
       @version = version || last_version_number
+      @groups = options[:groups]
+      @source = options[:source]
       @gems = gems
     end
 
     def run
       # The required arguments allow Thor to give useful feedback when the arguments
       # are incorrect. This adds those first two arguments onto the list as a whole.
-      gems.unshift(version).unshift(name)
+      gems.unshift(source).unshift(groups).unshift(version).unshift(name)
 
       # Build an array of Dependency objects out of the arguments
       deps = []
-      gems.each_slice(2) do |gem_name, gem_version|
-        deps << Bundler::Dependency.new(gem_name, gem_version)
+      gems.each_slice(4) do |gem_name, gem_version, gem_groups, gem_source|
+        deps << Bundler::Dependency.new(gem_name, gem_version, { groups: gem_groups, source: gem_source })
       end
 
       added = Injector.inject(deps, options)
