@@ -101,9 +101,6 @@ module Bundler
         end
 
         # Set internal representation to fetch the gems/specs from remote.
-        #
-        # It is preferable not to use any remote calls if this method is not
-        # called.
         def remote!
         end
 
@@ -111,9 +108,17 @@ module Bundler
         def cache!
         end
 
+        # This is called to update the spec and installation.
+        #
+        # If the source plugin is loaded from lockfile or otherwise, it shall
+        # refresh the cache/specs (e.g. git sources can make a fresh clone).
         def unlock!
         end
 
+        # This shall check if two source object represent the same source.
+        #
+        # The sources objects are constructed from Gemfile as well as from
+        # lockfile. To converge the sources, it is necessary that they match.
         def ==(other)
           other.is_a?(self.class) && uri == other.uri
         end

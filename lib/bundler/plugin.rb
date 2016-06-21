@@ -155,7 +155,7 @@ module Bundler
     # @param [Pathname] path the path where the plugin is installed at
     # @param [Boolean] optional_plugin, removed if there is conflict (used for
     #                       default source plugins)
-    def register_plugin(name, path, optional)
+    def register_plugin(name, path, optional = false)
       commands = @commands
       sources = @sources
 
