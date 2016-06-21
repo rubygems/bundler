@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "read source plugins" do
+describe "real source plugins" do
   context "with a minimal source plugin" do
     before do
       build_repo2 do
@@ -20,8 +20,8 @@ describe "read source plugins" do
                 @path = Pathname.new options["uri"]
               end
 
-              def fetch_gemfiles
-                @gemfiles ||= begin
+              def fetch_gemspec_files
+                @spec_files ||= begin
                   glob = "{,*,*/*}.gemspec"
                   if installed?
                     search_path = install_path
@@ -63,7 +63,7 @@ describe "read source plugins" do
       bundle "install"
 
       lockfile_should_be <<-G
-        PLUGIN
+        PLUGIN SOURCE
           remote: #{lib_path("a-path-gem-1.0")}
           type: mpath
           specs:
@@ -87,7 +87,7 @@ describe "read source plugins" do
     context "with lockfile" do
       before do
         lockfile <<-G
-          PLUGIN
+          PLUGIN SOURCE
             remote: #{lib_path("a-path-gem-1.0")}
             type: mpath
             specs:
@@ -139,8 +139,8 @@ describe "read source plugins" do
 
               alias_method :==, :eql?
 
-              def fetch_gemfiles
-                @gemfiles ||= begin
+              def fetch_gemspec_files
+                @spec_files ||= begin
                   glob = "{,*,*/*}.gemspec"
                   if !cached?
                     cache_repo
@@ -262,7 +262,7 @@ describe "read source plugins" do
       bundle "install"
 
       lockfile_should_be <<-G
-        PLUGIN
+        PLUGIN SOURCE
           remote: file://#{lib_path("ma-gitp-gem-1.0")}
           type: gitp
           revision: #{revision}
@@ -288,7 +288,7 @@ describe "read source plugins" do
       before do
         revision = revision_for(lib_path("ma-gitp-gem-1.0"))
         lockfile <<-G
-          PLUGIN
+          PLUGIN SOURCE
             remote: file://#{lib_path("ma-gitp-gem-1.0")}
             type: gitp
             revision: #{revision}

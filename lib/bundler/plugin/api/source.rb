@@ -10,9 +10,9 @@ module Bundler
       # `uri_hash`, `gem_install_dir`; they are helpers).
       #
       # Defaults for methods, where ever possible are provided which is
-      # expected to work. But, all source plugins have to override `fetch_gemfiles`
-      # and `install`. Defaults are also not provided for `remote!`, `cache!`
-      # and `unlock!`.
+      # expected to work. But, all source plugins have to override
+      # `fetch_gemspec_files` and `install`. Defaults are also not provided for
+      # `remote!`, `cache!` and `unlock!`.
       #
       # The defaults shall work for most situations but nevertheless they can
       # be (preferably should be) overridden as per the plugins' needs safely
@@ -23,7 +23,20 @@ module Bundler
       # able to match objects representing same sources, but may be created in
       # different situation (like form gemfile and lockfile). The default ones
       # checks only for class and uri, but elaborate source plugins may need
-      # more comparisons (like, git checking on branch or tag).
+      # more comparisons (e.g. git checking on branch or tag).
+      #
+      # @!attribute [r] uri
+      #   @return [String] the remote specified with `source` block in Gemfile
+      #
+      # @!attribute [r] options
+      #   @return [String] options passed during initialization (either from
+      #     lockfile or Gemfile)
+      #
+      # @!attribute [rw] dependency_names
+      #   @return [Array<String>] Names of dependencies that the source should
+      #     try to resolve. It is not necessary to use this list intenally. This
+      #     is present to be compatible with `Definition` and is used by
+      #     rubygems source.
       module Source
         attr_reader :uri, :options
         attr_accessor :dependency_names
@@ -41,8 +54,9 @@ module Bundler
         #
         # Note: If the spec method is overridden, this function is not necessary
         #
-        # @return [Array<String>] paths of the gemfiles that can be installed
-        def fetch_gemfiles
+        # @return [Array<String>] paths of the gemspec files for gems that can
+        #                         be installed
+        def fetch_gemspec_files
           []
         end
 
@@ -78,7 +92,7 @@ module Bundler
             end
         end
 
-        # Parses the gemfiles to find the specs for the gems that can be
+        # Parses the gemspec files to find the specs for the gems that can be
         # satisfied by the source.
         #
         # Few important points to keep in mind:
@@ -91,7 +105,7 @@ module Bundler
         #
         # @return [Bundler::Index] index containing the specs
         def specs
-          files = fetch_gemfiles
+          files = fetch_gemspec_files
 
           Bundler::Index.build do |index|
             files.each do |file|
@@ -123,18 +137,31 @@ module Bundler
 
         # This shall check if two source object represent the same source.
         #
+        # The comparison shall take place only on the attribute that can be
+        # inferred from the options passed from Gemfile and not on attibutes
+        # that are used to pin down the gem to specific version (e.g. Git
+        # sources should compare on branch and tag but not on commit hash)
+        #
         # The sources objects are constructed from Gemfile as well as from
         # lockfile. To converge the sources, it is necessary that they match.
+        #
+        # The same applies for `eql?` and `hash`
         def ==(other)
           other.is_a?(self.class) && uri == other.uri
         end
 
+        # When overriding `eql?` please preserve the behaviour as mentioned in
+        # docstring for `==` method.
         alias_method :eql?, :==
 
+        # When overriding `hash` please preserve the behaviour as mentioned in
+        # docstring for `==` method, i.e. two methods equal by above comparison
+        # should have same hash.
         def hash
           [self.class, uri].hash
         end
 
+        # A helper method, not necessary if not used internally.
         def installed?
           File.directory?(install_path)
         end
@@ -148,7 +175,7 @@ module Bundler
         end
 
         def to_lock
-          out = String.new("PLUGIN\n")
+          out = String.new("#{LockfileParser::PLUGIN}\n")
           out << "  remote: #{@uri}\n"
           out << "  type: #{@type}\n"
           options_to_lock.each do |opt, value|

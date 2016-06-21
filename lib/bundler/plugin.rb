@@ -128,11 +128,11 @@ module Bundler
     #
     # @param [Hash] plugins mapped to their installtion path
     # @param [Array<String>] names of auto added source plugins that can be ignored
-    def save_plugins(plugins, optionals = [])
+    def save_plugins(plugins, optional_plugins = [])
       plugins.each do |name, path|
         path = Pathname.new path
         validate_plugin! path
-        register_plugin name, path, optionals.include?(name)
+        register_plugin name, path, optional_plugins.include?(name)
         Bundler.ui.info "Installed plugin #{name}"
       end
     end
@@ -153,9 +153,9 @@ module Bundler
     #
     # @param [String] name the name of the plugin
     # @param [Pathname] path the path where the plugin is installed at
-    # @param [Boolean] optional_plugin, removed if there is conflict (used for
-    #                       default source plugins)
-    def register_plugin(name, path, optional = false)
+    # @param [Boolean] optional_plugin, removed if there is conflict with any
+    #                     other plugin (used for default source plugins)
+    def register_plugin(name, path, optional_plugin = false)
       commands = @commands
       sources = @sources
 
@@ -168,7 +168,7 @@ module Bundler
         raise MalformattedPlugin, "#{e.class}: #{e.message}"
       end
 
-      if optional && @sources.keys.any? {|s| source? s }
+      if optional_plugin && @sources.keys.any? {|s| source? s }
         Bundler.rm_rf(path)
       else
         index.register_plugin name, path.to_s, @commands.keys, @sources.keys

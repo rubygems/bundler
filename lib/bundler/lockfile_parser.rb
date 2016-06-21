@@ -22,7 +22,7 @@ module Bundler
     GIT          = "GIT".freeze
     GEM          = "GEM".freeze
     PATH         = "PATH".freeze
-    PLUGIN       = "PLUGIN".freeze
+    PLUGIN       = "PLUGIN SOURCE".freeze
     SPECS        = "  specs:".freeze
     OPTIONS      = /^  ([a-z]+): (.*)$/i
     SOURCE       = [GIT, GEM, PATH, PLUGIN].freeze
@@ -128,7 +128,7 @@ module Bundler
 
     def parse_source(line)
       case line
-      when GIT, GEM, PATH, PLUGIN
+      when *SOURCE
         @current_source = nil
         @opts = {}
         @type = line

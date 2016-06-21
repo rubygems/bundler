@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Bundler
-  # Dsl to parse the Gemfile looking for plugins to install
   module Plugin
+    # Dsl to parse the Gemfile looking for plugins to install
     class DSL < Bundler::Dsl
       class PluginGemfileError < PluginError; end
       alias_method :_gem, :gem # To use for plugin installation as gem
@@ -12,6 +12,14 @@ module Bundler
       # They will be handled by method_missing
       [:gemspec, :gem, :path, :install_if, :platforms, :env].each {|m| undef_method m }
 
+      # This lists the plugins that was added automatically and not specified by
+      # the user.
+      #
+      # When we encounter :type attribute with a source block, we add a plugin
+      # by name bundler-source-<type> to list of plugins to be installed.
+      #
+      # These plugins are optional and are not installed when there is conflict
+      # with any other plugin.
       attr_reader :auto_plugins
 
       def initialize
@@ -34,10 +42,11 @@ module Bundler
         return super unless options.key?("type")
 
         plugin_name = "bundler-source-#{options["type"]}"
-        unless @auto_plugins.include? plugin_name
-          plugin(plugin_name)
-          @auto_plugins << plugin_name
-        end
+
+        return if @auto_plugins.include? plugin_name
+
+        plugin(plugin_name)
+        @auto_plugins << plugin_name
       end
     end
   end

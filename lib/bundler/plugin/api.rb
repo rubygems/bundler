@@ -65,7 +65,7 @@ module Bundler
       end
 
       def respond_to_missing?(name, include_private = false)
-        Bundler.respond_to?(name) || super
+        Bundler.respond_to?(name, include_private) || super
       end
     end
   end
