@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Bundler
   class GemVersionPromoter
-    attr_reader :level
+    attr_reader :level, :locked_specs, :unlock_gems
     attr_accessor :strict, :minimal
 
     def initialize(locked_specs = SpecSet.new([]), unlock_gems = [])

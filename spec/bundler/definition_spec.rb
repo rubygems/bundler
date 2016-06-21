@@ -133,4 +133,22 @@ describe Bundler::Definition do
       G
     end
   end
+
+  describe "initialize" do
+    context "gem version promoter" do
+      before :each do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "foo"
+        G
+      end
+
+      it "should get a locked specs list when updating all" do
+        definition = Bundler::Definition.new(bundled_app("Gemfile.lock"), [], Bundler::SourceList.new, true)
+        locked_specs = definition.gem_version_promoter.locked_specs
+        expect(locked_specs.to_a.map(&:name)).to eq ["foo"]
+        expect(definition.instance_variable_get("@locked_specs").empty?).to eq true
+      end
+    end
+  end
 end

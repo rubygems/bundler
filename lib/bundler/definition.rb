@@ -126,7 +126,6 @@ module Bundler
     end
 
     def create_gem_version_promoter
-      # MODO: unit test this
       locked_specs = begin
         if @unlocking && @locked_specs.empty?
           # Definition uses an empty set of locked_specs to indicate all gems
