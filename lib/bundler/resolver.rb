@@ -179,7 +179,7 @@ module Bundler
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base, ruby_version, gem_version_promoter = GemVersionPromoter.new)
+    def initialize(index, source_requirements, base, ruby_version, gem_version_promoter)
       @index = index
       @source_requirements = source_requirements
       @base = base
