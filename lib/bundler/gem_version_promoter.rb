@@ -33,9 +33,9 @@ module Bundler
 
         # An Array per version returned, different entries for different platforms.
         # We only need the version here so it's ok to hard code this to the first instance.
-        locked_spec = @locked_specs[gem_name].first
+        locked_spec = locked_specs[gem_name].first
 
-        if @strict
+        if strict
           filter_dep_specs(dep_specs, locked_spec)
         else
           sort_dep_specs(dep_specs, locked_spec)
@@ -62,7 +62,7 @@ module Bundler
           gsv = gem_spec.version
           lsv = locked_spec.version
 
-          must_match = @level == :minor ? [0] : [0, 1]
+          must_match = level == :minor ? [0] : [0, 1]
 
           matches = must_match.map {|idx| gsv.segments[idx] == lsv.segments[idx] }
           (matches.uniq == [true]) ? (gsv >= lsv) : false
@@ -90,7 +90,7 @@ module Bundler
         case
         when a_ver.segments[0] != b_ver.segments[0]
           b_ver <=> a_ver
-        when !(@level == :minor) && (a_ver.segments[1] != b_ver.segments[1])
+        when !(level == :minor) && (a_ver.segments[1] != b_ver.segments[1])
           b_ver <=> a_ver
         else
           a_ver <=> b_ver
@@ -103,7 +103,7 @@ module Bundler
     end
 
     def unlocking_gem?(gem_name)
-      @unlock_gems.empty? || @unlock_gems.include?(gem_name)
+      unlock_gems.empty? || unlock_gems.include?(gem_name)
     end
 
     def move_version_to_end(specs, version, result)
@@ -116,8 +116,7 @@ module Bundler
     def debug_format_result(dep, res)
       a = [dep.to_s,
            res.map {|sg| [sg.version, sg.dependencies_for_activated_platforms.map {|dp| [dp.name, dp.requirement.to_s] }] }]
-      [a.first, a.last.map {|sg_data| [sg_data.first.version, sg_data.last.map {|aa| aa.join(" ") }] },
-       @level, @strict ? :strict : :not_strict]
+      [a.first, last_map, level, strict ? :strict : :not_strict]
     end
   end
 end
