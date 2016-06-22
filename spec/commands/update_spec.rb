@@ -428,58 +428,76 @@ end
 
 # these specs are slow and focus on integration and therefore are not exhaustive. unit specs elsewhere handle that.
 describe "bundle update conservative" do
-  context "patch preferred" do
-    it "single gem without dependencies name specified" do
-      build_repo4 do
-        build_gem "foo", %w(1.0.0 1.0.1 1.1.0 2.0.0)
+  before do
+    build_repo4 do
+      build_gem "foo", %w(1.4.3 1.4.4) do |s|
+        s.add_dependency "bar", "~> 2.0"
       end
-
-      install_gemfile <<-G
-        source "file://#{gem_repo4}"
-        gem 'foo', '1.0.0'
-      G
-
-      gemfile <<-G
-        source "file://#{gem_repo4}"
-        gem 'foo'
-      G
-
-      bundle "update --patch foo"
-
-      should_be_installed "foo 1.0.1"
+      build_gem "foo", %w(1.4.5 1.5.0) do |s|
+        s.add_dependency "bar", "~> 2.1"
+      end
+      build_gem "foo", %w(1.5.1) do |s|
+        s.add_dependency "bar", "~> 3.0"
+      end
+      build_gem "bar", %w(2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0)
+      build_gem "qux", %w(1.0.0 1.0.1 1.1.0 2.0.0)
     end
 
-    it "single gem without dependencies update all" do
-      build_repo4 do
-        build_gem "foo", %w(1.0.0 1.0.1 1.1.0 2.0.0)
-      end
+    # establish a lockfile set to 1.4.3
+    install_gemfile <<-G
+      source "file://#{gem_repo4}"
+      gem 'foo', '1.4.3'
+      gem 'bar', '2.0.3'
+      gem 'qux', '1.0.0'
+    G
 
-      install_gemfile <<-G
-        source "file://#{gem_repo4}"
-        gem 'foo', '1.0.0'
-      G
+    # remove 1.4.3 requirement and bar altogether
+    # to setup update specs below
+    gemfile <<-G
+      source "file://#{gem_repo4}"
+      gem 'foo'
+      gem 'qux'
+    G
+  end
 
-      gemfile <<-G
-        source "file://#{gem_repo4}"
-        gem 'foo'
-      G
+  context "patch preferred" do
+    it "single gem updates dependent gem to minor" do
+      bundle "update --patch foo"
 
+      should_be_installed "foo 1.4.5", "bar 2.1.1", "qux 1.0.0"
+    end
+
+    it "update all" do
       bundle "update --patch"
 
-      should_be_installed "foo 1.0.1"
+      should_be_installed "foo 1.4.5", "bar 2.1.1", "qux 1.0.1"
     end
 
     it "warns on minor or major increment elsewhere"
   end
 
   context "minor preferred" do
+    it "single gem updates dependent gem to major" do
+      bundle "update --minor foo"
+
+      should_be_installed "foo 1.5.1", "bar 3.0.0", "qux 1.0.0"
+    end
+
     it "warns on major increment elsewhere"
   end
 
   context "strict" do
-    it "patch preferred"
+    it "patch preferred" do
+      bundle "update --patch foo bar --strict"
 
-    it "minor preferred"
+      should_be_installed "foo 1.4.4", "bar 2.0.5", "qux 1.0.0"
+    end
+
+    it "minor preferred" do
+      bundle "update --minor --strict"
+
+      should_be_installed "foo 1.5.0", "bar 2.1.1", "qux 1.1.0"
+    end
   end
 
   context "dry run" do
