@@ -94,7 +94,7 @@ describe "real source plugins" do
       expect(out).to eq(bundle("show a-path-gem"))
     end
 
-    describe "bundle cache" do
+    describe "bundle cache/package" do
       let(:uri_hash) { Digest::SHA1.hexdigest(lib_path("a-path-gem-1.0").to_s) }
       it "copies repository to vendor cache and uses it" do
         bundle "install"
@@ -111,6 +111,16 @@ describe "real source plugins" do
       it "copies repository to vendor cache and uses it even when installed with bundle --path" do
         bundle "install --path vendor/bundle"
         bundle "cache --all"
+
+        expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}")).to exist
+
+        FileUtils.rm_rf lib_path("a-path-gem-1.0")
+        should_be_installed("a-path-gem 1.0")
+      end
+
+      it "bundler package copies repository to vendor cache" do
+        bundle "install --path vendor/bundle"
+        bundle "package --all"
 
         expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}")).to exist
 
