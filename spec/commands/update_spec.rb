@@ -449,7 +449,7 @@ describe "bundle update conservative" do
       should_be_installed "foo 1.0.1"
     end
 
-    it "single gem without dependencies update all with debugging" do
+    it "single gem without dependencies update all" do
       build_repo4 do
         build_gem "foo", %w(1.0.0 1.0.1 1.1.0 2.0.0)
       end
@@ -464,7 +464,7 @@ describe "bundle update conservative" do
         gem 'foo'
       G
 
-      bundle "update --patch", :env => { "DEBUG_RESOLVER" => true }
+      bundle "update --patch"
 
       should_be_installed "foo 1.0.1"
     end
