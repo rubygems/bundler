@@ -79,17 +79,8 @@ module Bundler
         tell_me(msg, nil, newline)
       end
 
-      def major_deprecation(message)
-        return unless Bundler.settings[:major_deprecations]
-        warn(message)
-      end
-
       def silence
-        old_level = @level
-        @level = "silent"
-        yield
-      ensure
-        @level = old_level
+        with_level("silent")
       end
 
     private
@@ -113,6 +104,14 @@ module Bundler
         strip_leading_spaces(text).split("\n").collect do |line|
           line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1\n").strip : line
         end * "\n"
+      end
+
+      def with_level(level)
+        original = @level
+        @level = level
+        yield
+      ensure
+        @level = original
       end
     end
   end

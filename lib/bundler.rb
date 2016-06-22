@@ -92,6 +92,8 @@ module Bundler
 
       definition.validate_ruby!
 
+      SharedHelpers.print_major_deprecations!
+
       if groups.empty?
         # Load all groups, but only once
         @setup = load.setup
