@@ -250,28 +250,34 @@ module Bundler
         if vertex = @base_dg.vertex_named(dependency.name)
           locked_requirement = vertex.payload.requirement
         end
-        if results.any?
-          nested = []
-          results.each do |spec|
-            version, specs = nested.last
-            if version == spec.version
-              specs << spec
-            else
-              nested << [spec.version, [spec]]
+        spec_groups = begin
+          if results.any?
+            nested = []
+            results.each do |spec|
+              version, specs = nested.last
+              if version == spec.version
+                specs << spec
+              else
+                nested << [spec.version, [spec]]
+              end
             end
+            nested.reduce([]) do |groups, (version, specs)|
+              next groups if locked_requirement && !locked_requirement.satisfied_by?(version)
+              groups << SpecGroup.new(specs)
+            end
+          else
+            []
           end
-          nested.reduce([]) do |groups, (version, specs)|
-            next groups if locked_requirement && !locked_requirement.satisfied_by?(version)
-            groups << SpecGroup.new(specs)
-          end
-        else
-          []
         end
+        # MODO: ideally trying to get GVP to sort by major. but some test cases aren't showing consistent order
+        # by default. (so we don't have to have this conditional here)
+        if @gem_version_promoter.level != :major
+          @gem_version_promoter.sort_versions(dependency, spec_groups)
+        else
+          spec_groups
+        end # .tap {|sg| STDERR.puts "sg>> #{sg.inspect}" }
       end
-      platform_results = search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }
-      return platform_results if @gem_version_promoter.level == :major # default behavior
-      # MODO: put this inside the cache
-      @gem_version_promoter.sort_versions(dependency, platform_results)
+      search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }
     end
 
     def index_for(dependency)

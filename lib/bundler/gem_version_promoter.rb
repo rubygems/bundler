@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 module Bundler
+  # MODO: docs
   class GemVersionPromoter
     attr_reader :level, :locked_specs, :unlock_gems
     attr_accessor :strict
 
+    # MODO: docs
     def initialize(locked_specs = SpecSet.new([]), unlock_gems = [])
       @level_default = :major
       @level = @level_default
@@ -13,6 +15,7 @@ module Bundler
       @sort_versions = {}
     end
 
+    # MODO: docs
     def level=(value)
       v = begin
         case value
@@ -25,6 +28,7 @@ module Bundler
       @level = v
     end
 
+    # MODO: docs
     def sort_versions(dep, dep_specs)
       before_result = "before sort_versions: #{debug_format_result(dep, dep_specs).inspect}" if ENV["DEBUG_RESOLVER"]
 
@@ -53,13 +57,9 @@ module Bundler
   private
 
     def filter_dep_specs(specs, locked_spec)
-      res = specs.select do |sg|
-        # SpecGroup is grouped by name/version, multiple entries for multiple platforms.
-        # We only need the name, which will be the same, so hard coding to first is ok.
-        gem_spec = sg.first
-
-        if locked_spec
-          gsv = gem_spec.version
+      res = specs.select do |spec_group|
+        if locked_spec && !(level == :major)
+          gsv = spec_group.version
           lsv = locked_spec.version
 
           must_match = level == :minor ? [0] : [0, 1]
@@ -74,20 +74,19 @@ module Bundler
       sort_dep_specs(res, locked_spec)
     end
 
-    # reminder: sort still filters anything older than locked version
-    # :major bundle update behavior can move a gem to an older version
-    # in order to satisfy the dependency tree.
     def sort_dep_specs(specs, locked_spec)
       return specs unless locked_spec
       gem_name = locked_spec.name
       locked_version = locked_spec.version
 
-      filtered = specs.select {|s| s.first.version >= locked_version }
+      filtered = specs.select {|s| s.version >= locked_version }
 
       filtered.sort do |a, b|
-        a_ver = a.first.version
-        b_ver = b.first.version
+        a_ver = a.version
+        b_ver = b.version
         case
+        when level == :major
+          a_ver <=> b_ver
         when a_ver.segments[0] != b_ver.segments[0]
           b_ver <=> a_ver
         when !(level == :minor) && (a_ver.segments[1] != b_ver.segments[1])
@@ -107,15 +106,16 @@ module Bundler
     end
 
     def move_version_to_end(specs, version, result)
-      spec_group = specs.detect {|s| s.first.version.to_s == version.to_s }
+      spec_group = specs.detect {|s| s.version.to_s == version.to_s }
       return unless spec_group
-      result.reject! {|s| s.first.version.to_s == version.to_s }
+      result.reject! {|s| s.version.to_s == version.to_s }
       result << spec_group
     end
 
     def debug_format_result(dep, res)
       a = [dep.to_s,
            res.map {|sg| [sg.version, sg.dependencies_for_activated_platforms.map {|dp| [dp.name, dp.requirement.to_s] }] }]
+      last_map = a.last.map {|sg_data| [sg_data.first.version, sg_data.last.map {|aa| aa.join(" ") }] }
       [a.first, last_map, level, strict ? :strict : :not_strict]
     end
   end

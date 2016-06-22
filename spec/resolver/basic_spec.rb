@@ -113,6 +113,7 @@ describe "Resolving" do
         gem("foo", "1.4.5") { dep "bar", "~> 2.1" }
         gem("foo", "1.5.0") { dep "bar", "~> 2.1" }
         gem("foo", "1.5.1") { dep "bar", "~> 3.0" }
+        gem("foo", "2.0.0") { dep "bar", "~> 3.0" }
         gem "bar", %w(2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0)
       end
       dep "foo"
@@ -177,6 +178,14 @@ describe "Resolving" do
     it "resolves all gems to latest minor strict" do
       # strict is set, so foo can only go up to 1.5.0 to avoid bar going up a major version
       should_conservative_resolve_and_include [:minor, :strict], [], %w(foo-1.5.0 bar-2.1.1)
+    end
+
+    it "resolves all gems to latest major" do
+      should_conservative_resolve_and_include :major, [], %w(foo-2.0.0 bar-3.0.0)
+    end
+
+    it "resolves all gems to latest major strict" do
+      should_conservative_resolve_and_include [:major, :strict], [], %w(foo-2.0.0 bar-3.0.0)
     end
 
     it "could revert to a previous version"

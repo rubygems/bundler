@@ -13,14 +13,14 @@ describe Bundler::GemVersionPromoter do
       end
     end
 
-    def unlocking(options = {})
+    def unlocking(options)
       make_instance(Bundler::SpecSet.new([]), ["foo"]).tap do |p|
         p.level = options[:level] if options[:level]
         p.strict = options[:strict] if options[:strict]
       end
     end
 
-    def keep_locked(options = {})
+    def keep_locked(options)
       make_instance(Bundler::SpecSet.new([]), ["bar"]).tap do |p|
         p.level = options[:level] if options[:level]
         p.strict = options[:strict] if options[:strict]
@@ -28,7 +28,7 @@ describe Bundler::GemVersionPromoter do
     end
 
     def build_spec_group(name, version)
-      build_spec(name, version).map {|s| Array(s) }
+      Bundler::Resolver::SpecGroup.new(build_spec(name, version))
     end
 
     # Rightmost (highest array index) in result is most preferred.
@@ -50,7 +50,7 @@ describe Bundler::GemVersionPromoter do
       end
 
       it "when unlocking prefer next release first" do
-        unlocking
+        unlocking(:level => :patch)
         res = @gvp.filter_dep_specs(
           build_spec_group("foo", %w(1.7.8 1.7.9 1.8.0)),
           build_spec("foo", "1.7.8").first)
@@ -58,7 +58,7 @@ describe Bundler::GemVersionPromoter do
       end
 
       it "when unlocking keep current when already at latest release" do
-        unlocking
+        unlocking(:level => :patch)
         res = @gvp.filter_dep_specs(
           build_spec_group("foo", %w(1.7.9 1.8.0 2.0.0)),
           build_spec("foo", "1.7.9").first)
@@ -72,7 +72,7 @@ describe Bundler::GemVersionPromoter do
 
     context "sort specs (not strict) (minor not allowed)" do
       it "when not unlocking, same order but make sure build_spec version is most preferred to stay put" do
-        keep_locked
+        keep_locked(:level => :patch)
         res = @gvp.sort_dep_specs(
           build_spec_group("foo", %w(1.7.6 1.7.7 1.7.8 1.7.9 1.8.0 1.8.1 2.0.0 2.0.1)),
           build_spec("foo", "1.7.7").first)
@@ -80,7 +80,7 @@ describe Bundler::GemVersionPromoter do
       end
 
       it "when unlocking favor next release, then current over minor increase" do
-        unlocking
+        unlocking(:level => :patch)
         res = @gvp.sort_dep_specs(
           build_spec_group("foo", %w(1.7.7 1.7.8 1.7.9 1.8.0)),
           build_spec("foo", "1.7.8").first)
@@ -88,7 +88,7 @@ describe Bundler::GemVersionPromoter do
       end
 
       it "when unlocking do proper integer comparison, not string" do
-        unlocking
+        unlocking(:level => :patch)
         res = @gvp.sort_dep_specs(
           build_spec_group("foo", %w(1.7.7 1.7.8 1.7.9 1.7.15 1.8.0)),
           build_spec("foo", "1.7.8").first)
@@ -96,7 +96,7 @@ describe Bundler::GemVersionPromoter do
       end
 
       it "leave current when unlocking but already at latest release" do
-        unlocking
+        unlocking(:level => :patch)
         res = @gvp.sort_dep_specs(
           build_spec_group("foo", %w(1.7.9 1.8.0 2.0.0)),
           build_spec("foo", "1.7.9").first)
