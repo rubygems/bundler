@@ -26,7 +26,7 @@ describe Bundler::Plugin do
 
     before do
       allow(installer).to receive(:install).with(["new-plugin"], opts) do
-        { "new_plugin" => lib_path("new-plugin") }
+        { "new-plugin" => lib_path("new-plugin") }
       end
     end
 
@@ -56,7 +56,7 @@ describe Bundler::Plugin do
         allow(installer).to receive(:install).
           with(["new-plugin", "another-plugin"], opts) do
           {
-            "new_plugin" => lib_path("new-plugin"),
+            "new-plugin" => lib_path("new-plugin"),
             "another-plugin" => lib_path("another-plugin"),
           }
         end.once
@@ -96,7 +96,7 @@ describe Bundler::Plugin do
       end
 
       before do
-        allow(definition).to receive(:dependencies) { [1, 2] }
+        allow(definition).to receive(:dependencies) { [Bundler::Dependency.new("new-plugin", ">=0"), Bundler::Dependency.new("another-plugin", ">=0")] }
         allow(installer).to receive(:install_definition) { plugin_paths }
       end
 

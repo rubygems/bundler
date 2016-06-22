@@ -28,15 +28,11 @@ module Bundler
       # @param [Definition] definiton object
       # @return [Hash] map of plugin names to thier paths
       def install_definition(definition)
-        plugins = definition.dependencies.map(&:name)
-
         def definition.lock(*); end
         definition.resolve_remotely!
         specs = definition.specs
 
-        paths = install_from_specs specs
-
-        Hash[paths.select {|name, _| plugins.include? name }]
+        install_from_specs specs
       end
 
     private

@@ -50,21 +50,21 @@ describe Bundler::Plugin::Installer do
         expected = { "ga-plugin" => Bundler::Plugin.root.join("bundler", "gems", "ga-plugin-#{rev[0..11]}").to_s }
 
         opts = { :git => "file://#{lib_path("ga-plugin")}" }
-        expect(installer.install(["ga-plugin"], opts)).to eq(expected)
+        expect(installer.install(["ga-plugin"], opts)).to include(expected)
       end
 
       it "returns the installation path after installing rubygems plugins" do
         opts = { :source => "file://#{gem_repo2}" }
         expect(installer.install(["re-plugin"], opts)).
-          to eq("re-plugin" => plugin_gems("re-plugin-1.0").to_s)
+          to include("re-plugin" => plugin_gems("re-plugin-1.0").to_s)
       end
 
       it "accepts multiple plugins" do
         opts = { :source => "file://#{gem_repo2}" }
 
         expect(installer.install(["re-plugin", "ma-plugin"], opts)).
-          to eq("re-plugin" => plugin_gems("re-plugin-1.0").to_s,
-                "ma-plugin" => plugin_gems("ma-plugin-1.0").to_s)
+          to include("re-plugin" => plugin_gems("re-plugin-1.0").to_s,
+                     "ma-plugin" => plugin_gems("ma-plugin-1.0").to_s)
       end
     end
   end
