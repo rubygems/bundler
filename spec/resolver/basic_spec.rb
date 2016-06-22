@@ -191,7 +191,5 @@ describe "Resolving" do
     it "could revert to a previous version"
 
     it "will not revert to a previous version in strict mode"
-
-    it "bring over all sort/filter specs from bundler-patch"
   end
 end
