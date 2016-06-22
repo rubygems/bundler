@@ -67,5 +67,12 @@ describe "major deprecations" do
     describe "bundle check" do
       it_behaves_like "environmental deprecations", proc { bundle :check }
     end
+
+    describe "bundle update --quiet" do
+      it "does not print any deprecations" do
+        bundle :update, :quiet => true
+        expect(warnings).not_to have_major_deprecation
+      end
+    end
   end
 end
