@@ -114,20 +114,6 @@ describe Bundler::GemVersionPromoter do
       end
     end
 
-    context "caching search results" do
-      it "should dup the output to protect the cache" do
-        # Bundler will (somewhere) do this on occasion during a large resolution.
-        # Let's protect against it.
-        gvp = Bundler::GemVersionPromoter.new
-
-        dep = Bundler::DepProxy.new(Gem::Dependency.new("foo", ">= 0"), "ruby")
-        sg = build_spec_group("foo", %w(2.4.0))
-        res = gvp.sort_versions(dep, sg)
-        res.clear
-        expect(gvp.sort_versions(dep, sg)).to_not eq []
-      end
-    end
-
     context "level error handling" do
       subject { Bundler::GemVersionPromoter.new }
 
