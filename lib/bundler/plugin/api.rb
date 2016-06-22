@@ -40,7 +40,7 @@ module Bundler
       # @param [Class] (optional) class that handles the source. If not
       #                 provided, the `self` class will be used.
       def self.source(source, cls = self)
-        cls.include Bundler::Plugin::API::Source
+        cls.send :include, Bundler::Plugin::API::Source
         Plugin.add_source source, cls
       end
 

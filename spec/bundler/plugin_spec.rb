@@ -77,7 +77,7 @@ describe Bundler::Plugin do
       allow(Plugin::DSL).to receive(:new) { builder }
       allow(builder).to receive(:eval_gemfile).with(gemfile)
       allow(builder).to receive(:to_definition) { definition }
-      allow(builder).to receive(:auto_plugins) { [] }
+      allow(builder).to receive(:inferred_plugins) { [] }
     end
 
     it "doesn't calls installer without any plugins" do
@@ -108,7 +108,7 @@ describe Bundler::Plugin do
       end
 
       it "should pass the optional plugins to #register_plugin" do
-        allow(builder).to receive(:auto_plugins) { ["another-plugin"] }
+        allow(builder).to receive(:inferred_plugins) { ["another-plugin"] }
 
         expect(subject).to receive(:register_plugin).
           with("new-plugin", plugin_paths["new-plugin"], false).once

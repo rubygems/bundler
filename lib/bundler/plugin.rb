@@ -51,7 +51,7 @@ module Bundler
 
       plugins = Installer.new.install_definition(definition)
 
-      save_plugins plugins, builder.auto_plugins
+      save_plugins plugins, builder.inferred_plugins
     end
 
     # The index object used to store the details about the plugin
@@ -126,8 +126,8 @@ module Bundler
 
     # Post installation processing and registering with index
     #
-    # @param [Hash] plugins mapped to their installtion path
-    # @param [Array<String>] names of auto added source plugins that can be ignored
+    # @param [Hash] plugins mapped to their installation path
+    # @param [Array<String>] names of inferred source plugins that can be ignored
     def save_plugins(plugins, optional_plugins = [])
       plugins.each do |name, path|
         path = Pathname.new path

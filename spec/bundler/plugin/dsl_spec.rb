@@ -21,12 +21,12 @@ describe Bundler::Plugin::DSL do
   end
 
   describe "source block" do
-    it "adds #source with :type to list and also auto_plugins list" do
+    it "adds #source with :type to list and also inferred_plugins list" do
       expect(dsl).to receive(:plugin).with("bundler-source-news").once
 
       dsl.source("some_random_url", :type => "news") {}
 
-      expect(dsl.auto_plugins).to eq(["bundler-source-news"])
+      expect(dsl.inferred_plugins).to eq(["bundler-source-news"])
     end
 
     it "registers a source type plugin only once for multiple declataions" do

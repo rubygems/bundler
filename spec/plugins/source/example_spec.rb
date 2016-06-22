@@ -56,6 +56,8 @@ describe "real source plugins" do
     it "installs" do
       bundle "install"
 
+      expect(out).to include("Bundle complete!")
+
       should_be_installed("a-path-gem 1.0")
     end
 

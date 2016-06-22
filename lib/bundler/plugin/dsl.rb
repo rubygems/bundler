@@ -20,12 +20,12 @@ module Bundler
       #
       # These plugins are optional and are not installed when there is conflict
       # with any other plugin.
-      attr_reader :auto_plugins
+      attr_reader :inferred_plugins
 
       def initialize
         super
         @sources = Plugin::SourceList.new
-        @auto_plugins = [] # The source plugins inferred from :type
+        @inferred_plugins = [] # The source plugins inferred from :type
       end
 
       def plugin(name, *args)
@@ -43,10 +43,10 @@ module Bundler
 
         plugin_name = "bundler-source-#{options["type"]}"
 
-        return if @auto_plugins.include? plugin_name
+        return if @inferred_plugins.include? plugin_name
 
         plugin(plugin_name)
-        @auto_plugins << plugin_name
+        @inferred_plugins << plugin_name
       end
     end
   end
