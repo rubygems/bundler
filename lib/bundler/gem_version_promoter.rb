@@ -26,8 +26,7 @@ module Bundler
     end
 
     def sort_versions(dep, dep_specs)
-      # MODO Revisit env name - also see below
-      before_result = "before sort_versions: #{debug_format_result(dep, dep_specs).inspect}" if ENV["DEBUG_PATCH_RESOLVER"]
+      before_result = "before sort_versions: #{debug_format_result(dep, dep_specs).inspect}" if ENV["DEBUG_RESOLVER"]
 
       result = @sort_versions[dep] ||= begin
         gem_name = dep.name
@@ -41,9 +40,9 @@ module Bundler
         else
           sort_dep_specs(dep_specs, locked_spec)
         end.tap do |specs|
-          if ENV["DEBUG_PATCH_RESOLVER"] # MODO: proper debug flag name, check and proper debug output
-            STDERR.puts before_result
-            STDERR.puts " after sort_versions: #{debug_format_result(dep, specs).inspect}"
+          if ENV["DEBUG_RESOLVER"]
+            Bundler.ui.debug before_result
+            Bundler.ui.debug " after sort_versions: #{debug_format_result(dep, specs).inspect}"
           end
         end
       end
