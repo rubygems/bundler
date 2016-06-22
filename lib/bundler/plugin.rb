@@ -22,9 +22,8 @@ module Bundler
     # Installs a new plugin by the given name
     #
     # @param [Array<String>] names the name of plugin to be installed
-    # @param [Hash] options various parameters as described in description
-    # @option options [String] :source rubygems source to fetch the plugin gem from
-    # @option options [String] :version (optional) the version of the plugin to install
+    # @param [Hash] options various parameters as described in description.
+    #               Refer to cli/plugin for available options
     def install(names, options)
       paths = Installer.new.install(names, options)
 
@@ -38,6 +37,7 @@ module Bundler
     # specified by plugin method
     #
     # @param [Pathname] gemfile path
+    # @param [Proc] block that can be evaluated for (inline) Gemfile
     def gemfile_install(gemfile = nil, &inline)
       builder = DSL.new
       if block_given?
@@ -130,7 +130,9 @@ module Bundler
 
     # Post installation processing and registering with index
     #
-    # @param [Hash] plugins mapped to their installation path
+    # @param [Array<String>] plugins list to be installed
+    # @param [Hash] names of plugin mapped to installation path (currently they
+    #               contain all the installation paths, including plugins)
     # @param [Array<String>] names of inferred source plugins that can be ignored
     def save_plugins(plugins, paths, optional_plugins = [])
       plugins.each do |name|
@@ -146,7 +148,7 @@ module Bundler
     # At present it only checks whether it contains plugins.rb file
     #
     # @param [Pathname] plugin_path the path plugin is installed at
-    # @raise [Error] if plugins.rb file is not found
+    # @raise [MalformattedPlugin] if plugins.rb file is not found
     def validate_plugin!(plugin_path)
       plugin_file = plugin_path.join(PLUGIN_FILE_NAME)
       raise MalformattedPlugin, "#{PLUGIN_FILE_NAME} was not found in the plugin." unless plugin_file.file?
@@ -159,6 +161,8 @@ module Bundler
     # @param [Pathname] path the path where the plugin is installed at
     # @param [Boolean] optional_plugin, removed if there is conflict with any
     #                     other plugin (used for default source plugins)
+    #
+    # @raise [MalformattedPlugin] if plugins.rb raises any error
     def register_plugin(name, path, optional_plugin = false)
       commands = @commands
       sources = @sources

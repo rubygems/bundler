@@ -28,12 +28,14 @@ module Bundler
         load_index
       end
 
-      # This function is to be called when a new plugin is installed. This function shall add
-      # the functions of the plugin to existing maps and also the name to source location.
+      # This function is to be called when a new plugin is installed. This
+      # function shall add the functions of the plugin to existing maps and also
+      # the name to source location.
       #
       # @param [String] name of the plugin to be registered
       # @param [String] path where the plugin is installed
       # @param [Array<String>] commands that are handled by the plugin
+      # @param [Array<String>] sources that are handled by the plugin
       def register_plugin(name, path, commands, sources)
         old_commands = @commands.dup
 
@@ -80,7 +82,8 @@ module Bundler
 
     private
 
-      # Reads the index file from the directory and initializes the instance variables.
+      # Reads the index file from the directory and initializes the instance
+      # variables.
       def load_index
         SharedHelpers.filesystem_access(index_file, :read) do |index_f|
           valid_file = index_f && index_f.exist? && !index_f.size.zero?
@@ -94,8 +97,9 @@ module Bundler
         end
       end
 
-      # Should be called when any of the instance variables change. Stores the instance
-      # variables in YAML format. (The instance variables are supposed to be only String key value pairs)
+      # Should be called when any of the instance variables change. Stores the
+      # instance variables in YAML format. (The instance variables are supposed
+      # to be only String key value pairs)
       def save_index
         index = {
           "plugin_paths" => @plugin_paths,
