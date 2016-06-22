@@ -131,9 +131,8 @@ module Bundler
       if RUBY_VERSION < "2"
         major_deprecation("Bundler will only support ruby >= 2.0, you are running #{RUBY_VERSION}")
       end
-      unless Bundler.rubygems.provides?(">= 2")
-        major_deprecation("Bundler will only support rubygems >= 2.4, you are running #{self.class.version}")
-      end
+      return if Bundler.rubygems.provides?(">= 2")
+      major_deprecation("Bundler will only support rubygems >= 2.4, you are running #{self.class.version}")
     end
 
   private
