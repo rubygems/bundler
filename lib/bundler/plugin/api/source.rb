@@ -184,6 +184,10 @@ module Bundler
           out << "  specs:\n"
         end
 
+        def to_s
+          "plugin source for #{options[:type]} with uri #{uri}"
+        end
+
         def include?(other)
           other == self
         end
