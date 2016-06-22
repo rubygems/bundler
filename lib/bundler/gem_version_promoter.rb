@@ -7,8 +7,7 @@ module Bundler
 
     # MODO: docs
     def initialize(locked_specs = SpecSet.new([]), unlock_gems = [])
-      @level_default = :major
-      @level = @level_default
+      @level = :major
       @strict = false
       @locked_specs = locked_specs
       @unlock_gems = unlock_gems
@@ -17,11 +16,9 @@ module Bundler
 
     # MODO: docs
     def level=(value)
-      v = begin
-        case value
-        when String, Symbol
-          value.to_sym
-        end
+      v = case value
+          when String, Symbol
+            value.to_sym
       end
 
       raise ArgumentError, "Unexpected level #{v}. Must be :major, :minor or :patch" unless [:major, :minor, :patch].include?(v)
@@ -45,8 +42,8 @@ module Bundler
           sort_dep_specs(dep_specs, locked_spec)
         end.tap do |specs|
           if ENV["DEBUG_RESOLVER"]
-            Bundler.ui.debug before_result
-            Bundler.ui.debug " after sort_versions: #{debug_format_result(dep, specs).inspect}"
+            STDERR.puts before_result
+            STDERR.puts " after sort_versions: #{debug_format_result(dep, specs).inspect}"
           end
         end
       end
@@ -54,15 +51,23 @@ module Bundler
       result.dup # not ideal, but elsewhere in bundler the resulting array is occasionally emptied, corrupting the cache.
     end
 
+    def major?
+      level == :major
+    end
+
+    def minor?
+      level == :minor
+    end
+
   private
 
     def filter_dep_specs(specs, locked_spec)
       res = specs.select do |spec_group|
-        if locked_spec && !(level == :major)
+        if locked_spec && !major?
           gsv = spec_group.version
           lsv = locked_spec.version
 
-          must_match = level == :minor ? [0] : [0, 1]
+          must_match = minor? ? [0] : [0, 1]
 
           matches = must_match.map {|idx| gsv.segments[idx] == lsv.segments[idx] }
           (matches.uniq == [true]) ? (gsv >= lsv) : false
@@ -79,24 +84,27 @@ module Bundler
       gem_name = locked_spec.name
       locked_version = locked_spec.version
 
-      filtered = specs.select {|s| s.version >= locked_version }
+      specs = specs.select {|s| s.version >= locked_version } unless major?
 
-      filtered.sort do |a, b|
+      specs.sort do |a, b|
         a_ver = a.version
         b_ver = b.version
         case
-        when level == :major
+        when major?
           a_ver <=> b_ver
         when a_ver.segments[0] != b_ver.segments[0]
           b_ver <=> a_ver
-        when !(level == :minor) && (a_ver.segments[1] != b_ver.segments[1])
+        when !minor? && (a_ver.segments[1] != b_ver.segments[1])
           b_ver <=> a_ver
         else
           a_ver <=> b_ver
         end
       end.tap do |result|
-        unless unlocking_gem?(gem_name)
-          move_version_to_end(specs, locked_version, result)
+        # default :major behavior in Bundler does not do this
+        unless major?
+          unless unlocking_gem?(gem_name)
+            move_version_to_end(specs, locked_version, result)
+          end
         end
       end
     end
