@@ -47,7 +47,7 @@ module Bundler
       # The cache dir to be used by the plugins for storage
       #
       # @return [Pathname] path of the cache dir
-      def cache
+      def cache_dir
         Plugin.cache.join("plugins")
       end
 

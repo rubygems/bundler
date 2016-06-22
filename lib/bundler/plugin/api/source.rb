@@ -121,11 +121,17 @@ module Bundler
         end
 
         # Set internal representation to fetch the gems/specs from remote.
+        #
+        # When this is called, the source should try to fetch the specs and
+        # install from remote path.
         def remote!
         end
 
-        # Set internal representation to fetch the gems/specs from cache.
-        def cache!
+        # Set internal representation to fetch the gems/specs from app cache.
+        #
+        # When this is called, the source should try to fetch the specs and
+        # install from the path provided by `app_cache_path`.
+        def cached!
         end
 
         # This is called to update the spec and installation.
@@ -133,6 +139,36 @@ module Bundler
         # If the source plugin is loaded from lockfile or otherwise, it shall
         # refresh the cache/specs (e.g. git sources can make a fresh clone).
         def unlock!
+        end
+
+        # Name of directory where plugin the is expected to cache the gems when
+        # #cache is called.
+        #
+        # Also this name is matched against the directories in cache for pruning
+        #
+        # This is used by `app_cache_path`
+        def app_cache_dirname
+          base_name = File.basename(URI.parse(uri).normalize.path)
+          "#{base_name}-#{uri_hash}"
+        end
+
+        # This method is called while caching to save copy of the gems that the
+        # source can resolve to path provided by `app_cache_app`so that they can
+        # be reinstalled from the cache without querying the remote (i.e. an
+        # alternative to remote)
+        #
+        # This is stored with the app and source plugins should try to provide
+        # specs and install only from this cache when `cached!` is called.
+        #
+        # This cache is different from the internal caching that can be done
+        # at sub paths of `cache_path` (from API). This can be though as caching
+        # by bundler.
+        def cache(spec, custom_path = nil)
+          new_cache_path = app_cache_path(custom_path)
+
+          FileUtils.rm_rf(new_cache_path)
+          FileUtils.cp_r(install_path, new_cache_path)
+          FileUtils.touch(app_cache_path.join(".bundlecache"))
         end
 
         # This shall check if two source object represent the same source.
@@ -166,14 +202,33 @@ module Bundler
           File.directory?(install_path)
         end
 
+        # The full path where the plugin should cache the gem so that it can be
+        # installed latter.
+        #
+        # Note: Do not override if you don't know what you are doing.
+        def app_cache_path(custom_path = nil)
+          @app_cache_path ||= Bundler.app_cache(custom_path).join(app_cache_dirname)
+        end
+
+        # Used by definition.
+        #
+        # Note: Do not override if you don't know what you are doing.
         def unmet_deps
           specs.unmet_dependency_names
         end
 
+        # Note: Do not override if you don't know what you are doing.
         def can_lock?(spec)
           spec.source == self
         end
 
+        # Generates the content to be entered into the lockfile.
+        # Saves type and remote and also calls to `options_to_lock`.
+        #
+        # Plugin should use `options_to_lock` to save information in lockfile
+        # and not override this.
+        #
+        # Note: Do not override if you don't know what you are doing.
         def to_lock
           out = String.new("#{LockfileParser::PLUGIN}\n")
           out << "  remote: #{@uri}\n"
@@ -188,6 +243,7 @@ module Bundler
           "plugin source for #{options[:type]} with uri #{uri}"
         end
 
+        # Note: Do not override if you don't know what you are doing.
         def include?(other)
           other == self
         end
@@ -196,6 +252,7 @@ module Bundler
           Digest::SHA1.hexdigest(uri)
         end
 
+        # Note: Do not override if you don't know what you are doing.
         def gem_install_dir
           Bundler.install_path
         end

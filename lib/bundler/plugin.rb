@@ -49,10 +49,13 @@ module Bundler
 
       return if definition.dependencies.empty?
 
-      plugins = definition.dependencies.map(&:name)
+      plugins = definition.dependencies.map(&:name).reject {|p| index.installed? p }
       install_paths = Installer.new.install_definition(definition)
 
       save_plugins plugins, install_paths, builder.inferred_plugins
+    rescue => e
+      Bundler.ui.error "Failed to install plugin: #{e.message}\n  #{e.backtrace[0]}"
+      raise
     end
 
     # The index object used to store the details about the plugin
@@ -133,8 +136,8 @@ module Bundler
       plugins.each do |name|
         path = Pathname.new paths[name]
         validate_plugin! path
-        register_plugin name, path, optional_plugins.include?(name)
-        Bundler.ui.info "Installed plugin #{name}"
+        installed = register_plugin name, path, optional_plugins.include?(name)
+        Bundler.ui.info "Installed plugin #{name}" if installed
       end
     end
 
@@ -171,8 +174,10 @@ module Bundler
 
       if optional_plugin && @sources.keys.any? {|s| source? s }
         Bundler.rm_rf(path)
+        false
       else
         index.register_plugin name, path.to_s, @commands.keys, @sources.keys
+        true
       end
     ensure
       @commands = commands

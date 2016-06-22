@@ -96,6 +96,7 @@ describe Bundler::Plugin do
       end
 
       before do
+        allow(index).to receive(:installed?) { nil }
         allow(definition).to receive(:dependencies) { [Bundler::Dependency.new("new-plugin", ">=0"), Bundler::Dependency.new("another-plugin", ">=0")] }
         allow(installer).to receive(:install_definition) { plugin_paths }
       end

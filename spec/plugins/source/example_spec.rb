@@ -86,6 +86,39 @@ describe "real source plugins" do
       G
     end
 
+    it "provides correct #full_gem_path" do
+      bundle "install"
+      run <<-RUBY
+        puts Bundler.rubygems.find_name('a-path-gem').first.full_gem_path
+      RUBY
+      expect(out).to eq(bundle("show a-path-gem"))
+    end
+
+    describe "bundle cache" do
+      let(:uri_hash) { Digest::SHA1.hexdigest(lib_path("a-path-gem-1.0").to_s) }
+      it "copies repository to vendor cache and uses it" do
+        bundle "install"
+        bundle "cache --all"
+
+        expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}")).to exist
+        expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}/.git")).not_to exist
+        expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}/.bundlecache")).to be_file
+
+        FileUtils.rm_rf lib_path("a-path-gem-1.0")
+        should_be_installed("a-path-gem 1.0")
+      end
+
+      it "copies repository to vendor cache and uses it even when installed with bundle --path" do
+        bundle "install --path vendor/bundle"
+        bundle "cache --all"
+
+        expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}")).to exist
+
+        FileUtils.rm_rf lib_path("a-path-gem-1.0")
+        should_be_installed("a-path-gem 1.0")
+      end
+    end
+
     context "with lockfile" do
       before do
         lockfile <<-G
@@ -180,10 +213,14 @@ describe "real source plugins" do
                 @revision = latest_revision
               end
 
+              def app_cache_dirname
+                "\#{base_name}-\#{shortref_for_path(revision)}"
+              end
+
             private
 
               def cache_path
-                @cache_path ||= cache.join("gitp", base_name)
+                @cache_path ||= cache_dir.join("gitp", base_name)
               end
 
               def cache_repo
@@ -218,14 +255,14 @@ describe "real source plugins" do
               end
 
               def shortref_for_path(ref)
-                ref[0..12]
+                ref[0..11]
               end
 
               def install_path
                 @install_path ||= begin
                   git_scope = "\#{base_name}-\#{shortref_for_path(revision)}"
 
-                  path = super.join(git_scope)
+                  path = gem_install_dir.join(git_scope)
 
                   if !path.exist? && requires_sudo?
                     user_bundle_path.join(ruby_scope).join(git_scope)
@@ -350,6 +387,28 @@ describe "real source plugins" do
         bundle "install"
 
         should_be_installed("ma-gitp-gem 1.1")
+      end
+    end
+
+    describe "bundle cache with gitp" do
+      it "copies repository to vendor cache and uses it" do
+        git = build_git "foo"
+        ref = git.ref_for("master", 11)
+
+        install_gemfile <<-G
+          source "file://#{gem_repo2}" # plugin source
+          source  '#{lib_path("foo-1.0")}', :type => :gitp do
+            gem "foo"
+          end
+        G
+
+        bundle "cache --all"
+        expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
+        expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
+        expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
+
+        FileUtils.rm_rf lib_path("foo-1.0")
+        should_be_installed "foo 1.0"
       end
     end
   end
