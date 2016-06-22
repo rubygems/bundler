@@ -374,7 +374,7 @@ module Bundler
     def normalize_source(source)
       case source
       when :gemcutter, :rubygems, :rubyforge
-        Bundler.ui.warn "The source :#{source} is deprecated because HTTP " \
+        Bundler::SharedHelpers.major_deprecation "The source :#{source} is deprecated because HTTP " \
           "requests are insecure.\nPlease change your source to 'https://" \
           "rubygems.org' if possible, or 'http://rubygems.org' if not."
         "http://rubygems.org"

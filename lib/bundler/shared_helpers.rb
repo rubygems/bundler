@@ -127,6 +127,15 @@ module Bundler
       ui.warn("[DEPRECATED FOR #{Bundler::VERSION.split(".").first.to_i + 1}.0] #{message}")
     end
 
+    def print_major_deprecations!
+      if RUBY_VERSION < "2"
+        major_deprecation("Bundler will only support ruby >= 2.0, you are running #{RUBY_VERSION}")
+      end
+      unless Bundler.rubygems.provides?(">= 2")
+        major_deprecation("Bundler will only support rubygems >= 2.4, you are running #{self.class.version}")
+      end
+    end
+
   private
 
     def find_gemfile

@@ -2,22 +2,6 @@
 require "spec_helper"
 
 describe "bundle_ruby" do
-  context "when run" do
-    it "displays a deprecation warning" do
-      gemfile <<-G
-        source "file://#{gem_repo1}"
-        ruby "1.9.3", :engine => 'ruby', :engine_version => '1.9.3'
-
-        gem "foo"
-      G
-
-      bundle_ruby :expect_err => true
-
-      expect(err).to eq("Warning: bundle_ruby will be deprecated in " \
-                        "Bundler 2.0.0.")
-    end
-  end
-
   context "without patchlevel" do
     it "returns the ruby version" do
       gemfile <<-G
