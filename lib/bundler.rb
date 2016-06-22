@@ -408,17 +408,20 @@ module Bundler
     end
 
     def configure_gem_home_and_path
-      blank_home = ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
+      configure_gem_path
+      configure_gem_home
+      bundle_path
+    end
+
+    def configure_gem_path(env = ENV, settings = self.settings)
+      blank_home = env["GEM_HOME"].nil? || env["GEM_HOME"].empty?
       if settings[:disable_shared_gems]
-        ENV["GEM_PATH"] = ""
+        env["GEM_PATH"] = nil
       elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
         paths = possibles.flatten.compact.uniq.reject(&:empty?)
-        ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
+        env["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
       end
-
-      configure_gem_home
-      bundle_path
     end
 
     def configure_gem_home
