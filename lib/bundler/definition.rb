@@ -203,7 +203,7 @@ module Bundler
           last_resolve
         else
           # Run a resolve against the locally available gems
-          last_resolve.merge Resolver.resolve(expanded_dependencies, global_rubygems_index, source_requirements, last_resolve, ruby_version)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version)
         end
       end
     end
@@ -221,18 +221,12 @@ module Bundler
       end
     end
 
-    def global_rubygems_index
-      @global_rubygems_index ||= Index.build do |idx|
-        idx.add_source(sources.rubygems_global.specs) if sources.rubygems_global
-      end
-    end
-
     # used when frozen is enabled so we can find the bundler
     # spec, even if (say) a git gem is not checked out.
     def rubygems_index
       @rubygems_index ||= Index.build do |idx|
-        sources.rubygems_sources.each do |rubygems|
-          idx.add_source rubygems.specs
+        sources.rubygems_sources.each do |s|
+          idx.add_source s.specs
         end
       end
     end
@@ -649,8 +643,8 @@ module Bundler
       # look for that gemspec (or its dependencies)
       source_requirements = {}
       dependencies.each do |dep|
-        next unless dep.source
-        source_requirements[dep.name] = dep.source.specs
+        next unless source = dep.source || sources.rubygems_global
+        source_requirements[dep.name] = source.specs
       end
       source_requirements
     end

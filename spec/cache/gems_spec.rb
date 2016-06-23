@@ -9,6 +9,7 @@ describe "bundle cache" do
       G
 
       system_gems "rack-1.0.0"
+      should_be_installed "rack 1.0.0"
       bundle :cache
     end
 
@@ -29,7 +30,7 @@ describe "bundle cache" do
 
     it "uses the cache as a source when installing gems with --local" do
       system_gems []
-      bundle "install --local"
+      bundle! "install --local"
 
       should_be_installed("rack 1.0.0")
     end

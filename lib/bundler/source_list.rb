@@ -11,6 +11,7 @@ module Bundler
       @path_sources       = []
       @git_sources        = []
       @rubygems_global    = nil
+      @rubygems_local     = Source::Rubygems.new
       @rubygems_sources   = []
     end
 
@@ -28,12 +29,12 @@ module Bundler
       add_source_to_list Source::Rubygems.new(options), @rubygems_sources
     end
 
-    def set_global_rubygems_remote(uri)
+    def global_rubygems_remote=(uri)
       @rubygems_global = Source::Rubygems.new("remotes" => uri)
     end
 
     def rubygems_sources
-      @rubygems_sources + [@rubygems_global].compact
+      @rubygems_sources + [@rubygems_global || @rubygems_local].compact
     end
 
     def rubygems_remotes
@@ -45,7 +46,7 @@ module Bundler
     end
 
     def lock_sources
-      all_sources.sort_by(&:to_lock)
+      rubygems_sources.sort_by(&:to_s) + git_sources.sort_by(&:to_s) + path_sources.sort_by(&:to_s)
     end
 
     def get(source)

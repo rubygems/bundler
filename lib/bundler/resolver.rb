@@ -336,26 +336,26 @@ module Bundler
 
     def verify_gemfile_dependencies_are_found!(requirements)
       requirements.each do |requirement|
-        next if requirement.name == "bundler"
+        name = requirement.name
+        next if name == "bundler"
         next unless search_for(requirement).empty?
 
-        if (base = @base[requirement.name]) && !base.empty?
+        if (base = @base[name]) && !base.empty?
           version = base.first.version
           message = "You have requested:\n" \
-            "  #{requirement.name} #{requirement.requirement}\n\n" \
-            "The bundle currently has #{requirement.name} locked at #{version}.\n" \
-            "Try running `bundle update #{requirement.name}`\n\n" \
+            "  #{name} #{requirement.requirement}\n\n" \
+            "The bundle currently has #{name} locked at #{version}.\n" \
+            "Try running `bundle update #{name}`\n\n" \
             "If you are updating multiple gems in your Gemfile at once,\n" \
             "try passing them all to `bundle update`"
-        elsif requirement.source
-          name = requirement.name
-          specs = @source_requirements[name][name]
+        elsif source = @source_requirements[name]
+          specs = source[name]
           versions_with_platforms = specs.map {|s| [s.version, s.platform] }
-          message = String.new("Could not find gem '#{requirement}' in #{requirement.source}.\n")
+          message = String.new("Could not find gem '#{requirement}' in #{requirement.source || "the global source or on this machine"}.\n")
           message << if versions_with_platforms.any?
                        "Source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
                      else
-                       "Source does not contain any versions of '#{requirement}'"
+                       "Source does not contain any versions of '#{requirement}'."
                      end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \

@@ -128,7 +128,7 @@ module Bundler
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
         check_primary_source_safety(@sources)
-        @sources.set_global_rubygems_remote(source)
+        @sources.global_rubygems_remote = source
       end
     end
 
