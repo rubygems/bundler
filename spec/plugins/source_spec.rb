@@ -82,6 +82,28 @@ describe "bundler source plugin" do
           plugin_should_not_be_installed("bundler-source-psource")
         end
       end
+
+      context "explicit default source" do
+        before do
+          install_gemfile <<-G
+            source "file://#{gem_repo2}"
+
+            plugin "bundler-source-psource"
+
+            source "file://#{lib_path("gitp")}", :type => :psource do
+            end
+          G
+        end
+
+        it "completes successfully" do
+          expect(out).to include("Bundle complete!")
+        end
+
+        it "installs the default one" do
+          plugin_should_be_installed("bundler-source-psource")
+        end
+      end
+
     end
   end
 end

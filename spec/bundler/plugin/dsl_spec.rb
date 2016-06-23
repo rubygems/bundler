@@ -30,7 +30,7 @@ describe Bundler::Plugin::DSL do
     end
 
     it "registers a source type plugin only once for multiple declataions" do
-      expect(dsl).to receive(:plugin).with("bundler-source-news").once
+      expect(dsl).to receive(:plugin).with("bundler-source-news").and_call_original.once
 
       dsl.source("some_random_url", :type => "news") {}
       dsl.source("another_random_url", :type => "news") {}

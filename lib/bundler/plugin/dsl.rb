@@ -43,7 +43,7 @@ module Bundler
 
         plugin_name = "bundler-source-#{options["type"]}"
 
-        return if @inferred_plugins.include? plugin_name
+        return if @dependencies.any? {|d| d.name == plugin_name }
 
         plugin(plugin_name)
         @inferred_plugins << plugin_name
