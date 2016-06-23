@@ -59,6 +59,10 @@ describe "bundle install with gems on multiple sources" do
           build_gem "rack", "1.0.0" do |s|
             s.write "lib/rack.rb", "RACK = 'FAIL'"
           end
+
+          build_gem "rack-obama" do |s|
+            s.add_dependency "rack"
+          end
         end
 
         gemfile <<-G
@@ -72,7 +76,7 @@ describe "bundle install with gems on multiple sources" do
       end
 
       it "installs the gems without any warning" do
-        bundle :install
+        bundle! :install
         expect(out).not_to include("Warning")
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
@@ -86,6 +90,10 @@ describe "bundle install with gems on multiple sources" do
           build_gem "rack", "1.0.0" do |s|
             s.write "lib/rack.rb", "RACK = 'FAIL'"
           end
+
+          build_gem "rack-obama" do |s|
+            s.add_dependency "rack"
+          end
         end
 
         gemfile <<-G
@@ -96,7 +104,7 @@ describe "bundle install with gems on multiple sources" do
       end
 
       it "installs the gems without any warning" do
-        bundle :install
+        bundle! :install
         expect(out).not_to include("Warning")
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
