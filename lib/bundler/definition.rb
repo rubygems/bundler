@@ -218,6 +218,33 @@ module Bundler
           dependency_names -= pinned_spec_names(source.specs)
           dependency_names.push(*source.unmet_deps).uniq!
         end
+
+        memoize = proc do |&work|
+          ret = memoize
+          proc do
+            if memoize.equal?(ret)
+              ret = work.call
+            else
+              ret
+            end
+          end
+        end
+
+        # Suppose the gem Foo depends on the gem Bar.  Foo exists in Source A.  Bar has some versions that exist in both
+        # sources A and B.  At this point, the API request will have found all the versions of Bar in source A,
+        # but will not have found any versions of Bar from source B, which is a problem if the requested version
+        # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
+        # each spec we found, we add all possible versions from all sources to the index.
+        loop do
+          idxcount = idx.size
+          sources.all_sources.each do |source|
+            unmet_dependency_names = memoize.call do
+              dependency_names.+(idx.dependency_names).uniq unless idx.size > Source::Rubygems::API_REQUEST_LIMIT
+            end
+            source.double_check_for(unmet_dependency_names, :override_dupes)
+          end
+          break if idxcount == idx.size
+        end
       end
     end
 
@@ -644,7 +671,7 @@ module Bundler
       source_requirements = {}
       dependencies.each do |dep|
         next unless source = dep.source || sources.rubygems_global
-        source_requirements[dep.name] = source.specs
+        source_requirements[dep.name] = source
       end
       source_requirements
     end

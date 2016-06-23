@@ -259,7 +259,8 @@ module Bundler
       platform = dependency.__platform
       dependency = dependency.dep unless dependency.is_a? Gem::Dependency
       search = @search_for[dependency] ||= begin
-        index = @source_requirements[dependency.name] || @index
+        source = @source_requirements[dependency.name]
+        index = (source && source.specs) || @index
         results = index.search(dependency, @base[dependency.name])
         if vertex = @base_dg.vertex_named(dependency.name)
           locked_requirement = vertex.payload.requirement
@@ -349,13 +350,13 @@ module Bundler
             "If you are updating multiple gems in your Gemfile at once,\n" \
             "try passing them all to `bundle update`"
         elsif source = @source_requirements[name]
-          specs = source[name]
+          specs = source.specs[name]
           versions_with_platforms = specs.map {|s| [s.version, s.platform] }
-          message = String.new("Could not find gem '#{requirement}' in #{requirement.source || "the global source or on this machine"}.\n")
+          message = String.new("Could not find gem '#{requirement}' in #{source}.\n")
           message << if versions_with_platforms.any?
-                       "Source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
+                       "The source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
                      else
-                       "Source does not contain any versions of '#{requirement}'."
+                       "The source does not contain any versions of '#{requirement}'."
                      end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
