@@ -140,4 +140,16 @@ describe Bundler do
       it_behaves_like "it returns the correct executable"
     end
   end
+
+  describe "configuration" do
+    context "disable_shared_gems" do
+      it "should unset GEM_PATH with nil" do
+        env = {}
+        settings = { :disable_shared_gems => true }
+        Bundler.send(:configure_gem_path, env, settings)
+        expect(env.keys).to include("GEM_PATH")
+        expect(env["GEM_PATH"]).to be_nil
+      end
+    end
+  end
 end
