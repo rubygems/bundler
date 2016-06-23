@@ -79,8 +79,8 @@ module Bundler
         tell_me(msg, nil, newline)
       end
 
-      def silence
-        with_level("silent")
+      def silence(&blk)
+        with_level("silent", &blk)
       end
 
     private
