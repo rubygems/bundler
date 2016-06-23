@@ -203,7 +203,7 @@ module Bundler
           last_resolve
         else
           # Run a resolve against the locally available gems
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, global_rubygems_index, source_requirements, last_resolve, ruby_version)
         end
       end
     end
@@ -218,6 +218,12 @@ module Bundler
           dependency_names -= pinned_spec_names(source.specs)
           dependency_names.push(*source.unmet_deps).uniq!
         end
+      end
+    end
+
+    def global_rubygems_index
+      @global_rubygems_index ||= Index.build do |idx|
+        idx.add_source(sources.rubygems_global.specs) if sources.rubygems_global
       end
     end
 
@@ -495,19 +501,6 @@ module Bundler
 
     def converge_sources
       changes = false
-
-      # Get the Rubygems sources from the gems.locked
-      locked_gem_sources = @locked_sources.select {|s| s.is_a?(Source::Rubygems) }
-      # Get the Rubygems remotes from the gems.rb
-      actual_remotes = sources.rubygems_remotes
-
-      # If there is a Rubygems source in both
-      if !locked_gem_sources.empty? && !actual_remotes.empty?
-        locked_gem_sources.each do |locked_gem|
-          # Merge the remotes from the gems.rb into the gems.locked
-          changes |= locked_gem.replace_remotes(actual_remotes)
-        end
-      end
 
       # Replace the sources from the gems.rb with the sources from the gems.locked,
       # if they exist in the gems.locked and are `==`. If you can't find an equivalent

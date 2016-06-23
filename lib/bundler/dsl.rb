@@ -132,7 +132,7 @@ module Bundler
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
         check_primary_source_safety(@sources)
-        @sources.add_rubygems_remote(source)
+        @sources.set_global_rubygems_remote(source)
       end
     end
 
@@ -384,8 +384,8 @@ module Bundler
       end
     end
 
-    def check_primary_source_safety(source)
-      return unless source.rubygems_primary_remotes.any?
+    def check_primary_source_safety(source_list)
+      return if source_list.rubygems_global.nil?
 
       raise GemspecError, "This #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
         "Each source after the first must include a block to indicate which gems " \

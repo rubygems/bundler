@@ -30,7 +30,7 @@ describe "bundle install with gems on multiple sources" do
 
       it "errors when disable_multisource is set" do
         bundle "config disable_multisource true"
-        bundle :install
+        bundle :install, :expect_err => true
         expect(err).to include("Each source after the first must include a block")
         expect(exitstatus).to eq(14) if exitstatus
       end
