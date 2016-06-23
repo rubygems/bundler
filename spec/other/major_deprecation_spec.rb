@@ -6,7 +6,7 @@ describe "major deprecations" do
     diffable
     match do |actual|
       actual.split(/^\[DEPRECATED FOR 2\.0\]\s*/).any? do |d|
-        !d.empty? && values_match?(expected, d)
+        !d.empty? && values_match?(expected, d.strip)
       end
     end
   end
@@ -51,7 +51,7 @@ describe "major deprecations" do
       describe "rubygems version", :rubygems => "< 2.0" do
         it "requires a newer rubygems version" do
           instance_eval(&trigger)
-          expect(warnings).to have_major_deprecation "Bundler will only support rubygems >= 2.4, you are running #{Gem::VERSION}"
+          expect(warnings).to have_major_deprecation "Bundler will only support rubygems >= 2.0, you are running #{Gem::VERSION}"
         end
       end
     end
