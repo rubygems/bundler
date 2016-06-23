@@ -48,10 +48,6 @@ module Bundler
         o.is_a?(Rubygems) && (o.credless_remotes - credless_remotes).empty?
       end
 
-      def can_lock?(spec)
-        spec.source.is_a?(Rubygems)
-      end
-
       def options
         { "remotes" => @remotes.map(&:to_s) }
       end
