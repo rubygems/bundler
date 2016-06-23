@@ -82,17 +82,17 @@ module Bundler
       gem_name = locked_spec.name
       locked_version = locked_spec.version
 
-      specs = specs.select {|s| s.version >= locked_version } unless major?
-
       specs.sort do |a, b|
         a_ver = a.version
         b_ver = b.version
         case
         when major?
           a_ver <=> b_ver
-        when a_ver.segments[0] != b_ver.segments[0]
+        when either_version_older_than_locked(locked_version, a_ver, b_ver)
+          a_ver <=> b_ver
+        when segments_do_not_match(:major, a_ver, b_ver)
           b_ver <=> a_ver
-        when !minor? && (a_ver.segments[1] != b_ver.segments[1])
+        when !minor? && segments_do_not_match(:minor, a_ver, b_ver)
           b_ver <=> a_ver
         else
           a_ver <=> b_ver
@@ -105,6 +105,15 @@ module Bundler
           end
         end
       end
+    end
+
+    def either_version_older_than_locked(locked_version, a_ver, b_ver)
+      a_ver < locked_version || b_ver < locked_version
+    end
+
+    def segments_do_not_match(level, a_ver, b_ver)
+      index = [:major, :minor].index(level)
+      a_ver.segments[index] != b_ver.segments[index]
     end
 
     def unlocking_gem?(gem_name)

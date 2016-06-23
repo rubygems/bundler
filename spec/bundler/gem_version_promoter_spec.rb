@@ -88,9 +88,9 @@ describe Bundler::GemVersionPromoter do
       it "when not unlocking, same order but make sure build_spec version is most preferred to stay put" do
         keep_locked(:level => :patch)
         res = @gvp.sort_dep_specs(
-          build_spec_group("foo", %w(1.7.6 1.7.7 1.7.8 1.7.9 1.8.0 1.8.1 2.0.0 2.0.1)),
+          build_spec_group("foo", %w(1.5.4 1.6.5 1.7.6 1.7.7 1.7.8 1.7.9 1.8.0 1.8.1 2.0.0 2.0.1)),
           build_spec("foo", "1.7.7").first)
-        expect(versions(res)).to eq %w(2.0.0 2.0.1 1.8.0 1.8.1 1.7.8 1.7.9 1.7.7)
+        expect(versions(res)).to eq %w(1.5.4 1.6.5 1.7.6 2.0.0 2.0.1 1.8.0 1.8.1 1.7.8 1.7.9 1.7.7)
       end
 
       it "when unlocking favor next release, then current over minor increase" do
@@ -98,7 +98,7 @@ describe Bundler::GemVersionPromoter do
         res = @gvp.sort_dep_specs(
           build_spec_group("foo", %w(1.7.7 1.7.8 1.7.9 1.8.0)),
           build_spec("foo", "1.7.8").first)
-        expect(versions(res)).to eq %w(1.8.0 1.7.8 1.7.9)
+        expect(versions(res)).to eq %w(1.7.7 1.8.0 1.7.8 1.7.9)
       end
 
       it "when unlocking do proper integer comparison, not string" do
@@ -106,7 +106,7 @@ describe Bundler::GemVersionPromoter do
         res = @gvp.sort_dep_specs(
           build_spec_group("foo", %w(1.7.7 1.7.8 1.7.9 1.7.15 1.8.0)),
           build_spec("foo", "1.7.8").first)
-        expect(versions(res)).to eq %w(1.8.0 1.7.8 1.7.9 1.7.15)
+        expect(versions(res)).to eq %w(1.7.7 1.8.0 1.7.8 1.7.9 1.7.15)
       end
 
       it "leave current when unlocking but already at latest release" do

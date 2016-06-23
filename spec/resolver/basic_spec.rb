@@ -188,8 +188,45 @@ describe "Resolving" do
       should_conservative_resolve_and_include [:major, :strict], [], %w(foo-2.0.0 bar-3.0.0)
     end
 
-    it "could revert to a previous version"
+    # Why would this happen in real life? If bar 2.2 has a bug that the author of foo wants to bypass
+    # by reverting the dependency, the author of foo could release a new gem with an older requirement.
+    context "revert to previous" do
+      before :each do
+        @index = build_index do
+          gem("foo", "1.4.3") { dep "bar", "~> 2.2" }
+          gem("foo", "1.4.4") { dep "bar", "~> 2.1.0" }
+          gem("foo", "1.5.0") { dep "bar", "~> 2.0.0" }
+          gem "bar", %w(2.0.5 2.1.1 2.2.3)
+        end
+        dep "foo"
 
-    it "will not revert to a previous version in strict mode"
+        # base represents declared dependencies in the Gemfile that are still satisfied by the lockfile
+        @base = Bundler::SpecSet.new([])
+
+        # locked represents versions in lockfile
+        @locked = locked(%w(foo 1.4.3), %w(bar 2.2.3))
+      end
+
+      after :each do
+        ENV["DEBUG_RESOLVER"] = nil
+      end
+
+      it "could revert to a previous version level patch" do
+        should_conservative_resolve_and_include :patch, [], %w(foo-1.4.4 bar-2.1.1)
+      end
+
+      it "will not revert to a previous version in strict mode level patch" do
+        ENV["DEBUG_RESOLVER"] = "true"
+        should_conservative_resolve_and_include [:patch, :strict], [], %w(foo-1.4.3 bar-2.1.1)
+      end
+
+      it "could revert to a previous version level minor" do
+        should_conservative_resolve_and_include :minor, [], %w(foo-1.5.0 bar-2.0.5)
+      end
+
+      it "will not revert to a previous version in strict mode level minor" do
+        should_conservative_resolve_and_include [:minor, :strict], [], %w(foo-1.4.3 bar-2.1.1)
+      end
+    end
   end
 end
