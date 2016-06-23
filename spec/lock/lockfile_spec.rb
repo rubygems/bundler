@@ -30,15 +30,15 @@ describe "the lockfile format" do
 
   it "updates the lockfile's bundler version if current ver. is newer" do
     lockfile <<-L
-      GIT
-        remote: git://github.com/nex3/haml.git
-        revision: 8a2271f
-        specs:
-
       GEM
         remote: file://#{gem_repo1}/
         specs:
           rack (1.0.0)
+
+      GIT
+        remote: git://github.com/nex3/haml.git
+        revision: 8a2271f
+        specs:
 
       PLATFORMS
         #{generic_local_platform}
@@ -426,6 +426,9 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for("master")}
@@ -457,15 +460,15 @@ describe "the lockfile format" do
     G
 
     lockfile <<-L
-      GIT
-        remote: git://github.com/nex3/haml.git
-        revision: 8a2271f
-        specs:
-
       GEM
         remote: file://#{gem_repo1}/
         specs:
           rack (1.0.0)
+
+      GIT
+        remote: git://github.com/nex3/haml.git
+        revision: 8a2271f
+        specs:
 
       PLATFORMS
         #{not_local}
