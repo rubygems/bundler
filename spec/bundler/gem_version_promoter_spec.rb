@@ -40,7 +40,7 @@ describe Bundler::GemVersionPromoter do
     # be returned, allowing Bundler the best chance to resolve all
     # dependencies, but sometimes resulting in upgrades that some
     # would not consider conservative.
-    context "filter specs (strict) (minor not allowed)" do
+    context "filter specs (strict) level patch" do
       it "when keeping build_spec, keep current, next release" do
         keep_locked(:level => :patch)
         res = @gvp.filter_dep_specs(
@@ -66,11 +66,25 @@ describe Bundler::GemVersionPromoter do
       end
     end
 
-    context "filter specs (strict) (minor preferred)" do
-      it "should have specs" # MODO: so, y'know, like, maybe ... make some?
+    context "filter specs (strict) level minor" do
+      it "when unlocking favor next releases, remove minor and major increases" do
+        unlocking(:level => :minor)
+        res = @gvp.filter_dep_specs(
+          build_spec_group("foo", %w(0.2.0 0.3.0 0.3.1 0.9.0 1.0.0 2.0.0 2.0.1)),
+          build_spec("foo", "0.2.0").first)
+        expect(versions(res)).to eq %w(0.2.0 0.3.0 0.3.1 0.9.0)
+      end
+
+      it "when keep locked, keep current, then favor next release, remove minor and major increases" do
+        keep_locked(:level => :minor)
+        res = @gvp.filter_dep_specs(
+          build_spec_group("foo", %w(0.2.0 0.3.0 0.3.1 0.9.0 1.0.0 2.0.0 2.0.1)),
+          build_spec("foo", "0.2.0").first)
+        expect(versions(res)).to eq %w(0.3.0 0.3.1 0.9.0 0.2.0)
+      end
     end
 
-    context "sort specs (not strict) (minor not allowed)" do
+    context "sort specs (not strict) level patch" do
       it "when not unlocking, same order but make sure build_spec version is most preferred to stay put" do
         keep_locked(:level => :patch)
         res = @gvp.sort_dep_specs(
@@ -104,7 +118,7 @@ describe Bundler::GemVersionPromoter do
       end
     end
 
-    context "sort specs (not strict) (minor allowed)" do
+    context "sort specs (not strict) level minor" do
       it "when unlocking favor next release, then minor increase over current" do
         unlocking(:level => :minor)
         res = @gvp.sort_dep_specs(
