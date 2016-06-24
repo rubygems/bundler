@@ -82,7 +82,7 @@ describe "bundle install with git sources" do
         gem "foo", "1.1", :git => "#{lib_path("foo-1.0")}"
       G
 
-      expect(err).to include("Source contains 'foo' at: 1.0 ruby")
+      expect(err).to include("The source contains 'foo' at: 1.0")
     end
 
     it "complains with version and platform if pinned specs don't exist in the git repo" do
@@ -98,7 +98,7 @@ describe "bundle install with git sources" do
         end
       G
 
-      expect(err).to include("Source contains 'only_java' at: 1.0 java")
+      expect(err).to include("The source contains 'only_java' at: 1.0 java")
     end
 
     it "complains with multiple versions and platforms if pinned specs don't exist in the git repo" do
@@ -119,7 +119,7 @@ describe "bundle install with git sources" do
         end
       G
 
-      expect(err).to include("Source contains 'only_java' at: 1.0 java, 1.1 java")
+      expect(err).to include("The source contains 'only_java' at: 1.0 java, 1.1 java")
     end
 
     it "still works after moving the application directory" do
