@@ -95,12 +95,13 @@ describe "post bundle message" do
 
     describe "with misspelled or non-existent gem name" do
       it "should report a helpful error message" do
-        install_gemfile <<-G
+        install_gemfile <<-G, :expect_err => true
           source "file://#{gem_repo1}"
           gem "rack"
           gem "not-a-gem", :group => :development
         G
-        expect(err).to include("Could not find gem 'not-a-gem' in any of the gem sources listed in your gems.rb or available on this machine.")
+        expect(err).to include("Could not find gem 'not-a-gem' in rubygems repository").
+          and include("or installed locally.\nThe source does not contain any versions of 'not-a-gem'.")
       end
     end
   end
