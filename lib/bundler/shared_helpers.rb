@@ -120,6 +120,21 @@ module Bundler
       namespace.const_get(constant_name)
     end
 
+    def major_deprecation(message)
+      return unless prints_major_deprecations?
+      @major_deprecation_ui ||= Bundler::UI::Shell.new("no-color" => true)
+      ui = Bundler.ui.is_a?(@major_deprecation_ui.class) ? Bundler.ui : @major_deprecation_ui
+      ui.warn("[DEPRECATED FOR #{Bundler::VERSION.split(".").first.to_i + 1}.0] #{message}")
+    end
+
+    def print_major_deprecations!
+      if RUBY_VERSION < "2"
+        major_deprecation("Bundler will only support ruby >= 2.0, you are running #{RUBY_VERSION}")
+      end
+      return if Bundler.rubygems.provides?(">= 2")
+      major_deprecation("Bundler will only support rubygems >= 2.0, you are running #{Bundler.rubygems.version}")
+    end
+
   private
 
     def find_gemfile
@@ -205,6 +220,14 @@ module Bundler
         end
         $LOAD_PATH.uniq!
       end
+    end
+
+    def prints_major_deprecations?
+      require "bundler"
+      return false unless Bundler.settings[:major_deprecations]
+      require "bundler/deprecate"
+      return false if Bundler::Deprecate.skip
+      true
     end
 
     extend self
