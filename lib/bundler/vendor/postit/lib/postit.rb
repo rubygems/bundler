@@ -1,10 +1,10 @@
-require 'postit/environment'
-require 'postit/installer'
-require 'postit/parser'
-require 'postit/version'
+require 'bundler/vendor/postit/lib/postit/environment'
+require 'bundler/vendor/postit/lib/postit/installer'
+require 'bundler/vendor/postit/lib/postit/parser'
+require 'bundler/vendor/postit/lib/postit/version'
 require 'rubygems'
 
-module BundlerVendoredPostIt
+module BundlerVendoredPostIt::PostIt
   def self.setup
     load File.expand_path('../postit/setup.rb', __FILE__)
   end

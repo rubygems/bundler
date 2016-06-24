@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-postit_lib = File.expand_path("../vendor/postit/lib", __FILE__)
-$:.unshift(postit_lib)
-require "postit"
+module BundlerVendoredPostIt; end
+require "bundler/vendor/postit/lib/postit"
 require "rubygems"
 
-environment = BundlerVendoredPostIt::Environment.new([])
+environment = BundlerVendoredPostIt::PostIt::Environment.new([])
 version = Gem::Requirement.new(environment.bundler_version)
 
 installed_version =
@@ -19,7 +18,7 @@ installed_version &&= Gem::Version.new(installed_version)
 
 if !version.satisfied_by?(installed_version)
   begin
-    installer = BundlerVendoredPostIt::Installer.new(version)
+    installer = BundlerVendoredPostIt::PostIt::Installer.new(version)
     installer.install!
   rescue => e
     abort <<-EOS.strip
@@ -53,5 +52,3 @@ end
 if !Gem::Version.correct?(running_version.to_s) || !version.satisfied_by?(Gem::Version.create(running_version))
   abort "The running bundler (#{running_version}) does not match the required `#{version}`"
 end
-
-$:.delete_at($:.find_index(postit_lib))

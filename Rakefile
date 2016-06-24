@@ -309,11 +309,8 @@ begin
   Automatiek::RakeTask.new("postit") do |lib|
     lib.download = { :github => "https://github.com/bundler/postit" }
     lib.namespace = "PostIt"
+    lib.prefix = "BundlerVendoredPostIt"
     lib.vendor_lib = "lib/bundler/vendor/postit"
-
-    def lib.namespace_files
-      process_files(namespace, "BundlerVendoredPostIt")
-    end
   end
 rescue LoadError
   namespace :vendor do
