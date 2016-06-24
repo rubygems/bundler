@@ -3,9 +3,33 @@ require "uri"
 
 module Bundler
   class Settings
-    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check disable_shared_gems ignore_messages gem.mit gem.coc silence_root_warning no_install plugins).freeze
-    NUMBER_KEYS = %w(retry timeout redirect ssl_verify_mode).freeze
-    DEFAULT_CONFIG = { :retry => 3, :timeout => 10, :redirect => 5 }.freeze
+    BOOL_KEYS = %w(
+      cache_all
+      disable_local_branch_check
+      disable_shared_gems
+      frozen
+      gem.coc
+      gem.mit
+      ignore_messages
+      major_deprecations
+      no_install
+      no_prune
+      plugins
+      silence_root_warning
+    ).freeze
+
+    NUMBER_KEYS = %w(
+      redirect
+      retry
+      ssl_verify_mode
+      timeout
+    ).freeze
+
+    DEFAULT_CONFIG = {
+      :redirect => 5,
+      :retry => 3,
+      :timeout => 10,
+    }.freeze
 
     def initialize(root = nil)
       @root          = root

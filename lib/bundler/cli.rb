@@ -12,6 +12,8 @@ module Bundler
     rescue Exception => e
       Bundler.ui = UI::Shell.new
       raise e
+    ensure
+      Bundler::SharedHelpers.print_major_deprecations!
     end
 
     def initialize(*args)

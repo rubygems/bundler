@@ -92,6 +92,8 @@ module Bundler
 
       definition.validate_ruby!
 
+      SharedHelpers.print_major_deprecations!
+
       if groups.empty?
         # Load all groups, but only once
         @setup = load.setup
@@ -209,6 +211,7 @@ module Bundler
     # @deprecated Use `original_env` instead
     # @return [Hash] Environment with all bundler-related variables removed
     def clean_env
+      Bundler::SharedHelpers.major_deprecation("`Bundler.clean_env` has weird edge cases, use `.original_env` instead")
       env = original_env
 
       if env.key?("BUNDLE_ORIG_MANPATH")
