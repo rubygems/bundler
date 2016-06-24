@@ -6,8 +6,9 @@ describe "bundle install with explicit source paths" do
     build_lib "foo"
 
     install_gemfile <<-G
-      path "#{lib_path("foo-1.0")}"
-      gem 'foo'
+      path "#{lib_path("foo-1.0")}" do
+        gem 'foo'
+      end
     G
 
     should_be_installed("foo 1.0")
@@ -273,8 +274,9 @@ describe "bundle install with explicit source paths" do
     end
 
     install_gemfile <<-G
-      path "#{lib_path("foo-1.0")}"
-      gem 'foo'
+      path "#{lib_path("foo-1.0")}" do
+        gem 'foo'
+      end
     G
 
     bundle "exec foobar"
