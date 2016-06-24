@@ -11,8 +11,8 @@ module Bundler
 
     attr_accessor :stub
 
-    def to_yaml
-      _remote_specification.to_yaml
+    def encode_with(*args)
+      _remote_specification.encode_with(*args)
     end
 
   private
