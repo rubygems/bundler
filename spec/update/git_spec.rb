@@ -334,16 +334,16 @@ describe "bundle update" do
       bundle "update --source bar"
 
       lockfile_should_be <<-G
+        GEM
+          remote: file:#{gem_repo2}/
+          specs:
+            rack (1.0.0)
+
         GIT
           remote: #{@git.path}
           revision: #{ref}
           specs:
             foo (2.0)
-
-        GEM
-          remote: file:#{gem_repo2}/
-          specs:
-            rack (1.0.0)
 
         PLATFORMS
           ruby
