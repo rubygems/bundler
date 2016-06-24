@@ -385,7 +385,7 @@ module Bundler
     end
 
     def check_primary_source_safety(source_list)
-      return if source_list.rubygems_global.nil?
+      return if source_list.global_rubygems_source.nil?
 
       raise GemspecError, "This #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
         "Each source after the first must include a block to indicate which gems " \
