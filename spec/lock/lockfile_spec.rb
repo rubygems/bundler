@@ -495,6 +495,9 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for("master")}
@@ -521,6 +524,9 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for("omg")}
@@ -548,6 +554,9 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for("omg")}
@@ -574,6 +583,9 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: #{lib_path("foo-1.0")}
         specs:
@@ -794,6 +806,9 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: foo
         specs:
@@ -803,7 +818,7 @@ describe "the lockfile format" do
         #{generic_local_platform}
 
       DEPENDENCIES
-        foo
+        foo!
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -820,6 +835,9 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: ../foo
         specs:
@@ -829,7 +847,7 @@ describe "the lockfile format" do
         #{generic_local_platform}
 
       DEPENDENCIES
-        foo
+        foo!
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -846,6 +864,9 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: foo
         specs:
@@ -855,7 +876,7 @@ describe "the lockfile format" do
         #{generic_local_platform}
 
       DEPENDENCIES
-        foo
+        foo!
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -870,6 +891,9 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: ../foo
         specs:
