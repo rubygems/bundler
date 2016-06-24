@@ -129,13 +129,7 @@ module Bundler
         when GEM
           @opts["remotes"] = @opts.delete("remote")
         end
-        @current_source = TYPES[@type].from_lock(@opts)
-        # Strip out duplicate sections
-        if @sources.include?(@current_source)
-          @current_source = @sources.find {|s| s == @current_source }
-        else
-          @sources << @current_source
-        end
+        add_source(TYPES[@type].from_lock(@opts))
       when OPTIONS
         value = $2
         value = true if value == "true"
@@ -151,6 +145,16 @@ module Bundler
         end
       else
         parse_spec(line)
+      end
+    end
+
+    def add_source(source)
+      # Strip out duplicate sections
+      if @sources.include?(source) && !source.instance_of?(Bundler::Source::Path)
+        @current_source = @sources.find {|s| s == @current_source }
+      else
+        @current_source = source
+        @sources << @current_source
       end
     end
 
