@@ -92,7 +92,7 @@ module Bundler
         end
         @ruby_version.diff(locked_ruby_version_object)
       end
-      @unlocking ||= @unlock[:ruby] || (!@locked_ruby_version ^ !@ruby_version)
+      @unlocking ||= @unlock[:ruby] ||= (!@locked_ruby_version ^ !@ruby_version)
 
       current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
       add_platform(current_platform)
@@ -220,7 +220,7 @@ module Bundler
           last_resolve
         else
           # Run a resolve against the locally available gems
-          Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies")
+          Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
           last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version)
         end
       end
@@ -460,6 +460,27 @@ module Bundler
 
     def nothing_changed?
       !@source_changes && !@dependency_changes && !@new_platform && !@path_changes && !@local_changes
+    end
+
+    def change_reason
+      if @unlocking
+        unlock_reason = @unlock.reject {|_k, v| Array(v).empty? }.map do |k, v|
+          if v == true
+            k.to_s
+          else
+            v = Array(v)
+            "#{k}: (#{v.join(", ")})"
+          end
+        end.join(", ")
+        return "bundler is unlocking #{unlock_reason}"
+      end
+      [
+        [@source_changes, "the list of sources changed"],
+        [@dependency_changes, "the dependencies in your gemfile changed"],
+        [@new_platform, "you added a new platform to your gemfile"],
+        [@path_changes, "the gemspecs for path gems changed"],
+        [@local_changes, "the gemspecs for git local gems changed"],
+      ].select(&:first).map(&:last).join(", ")
     end
 
     def pretty_dep(dep, source = false)
