@@ -150,6 +150,16 @@ module Bundler
     end
 
     def path(path, options = {}, &blk)
+      unless block_given?
+        msg = "You can no longer specify a path source by itself. Instead, \n" \
+              "either use the :path option on a gem, or specify the gems that \n" \
+              "bundler should find in the path source by passing a block to \n" \
+              "the path method, like: \n\n" \
+              "  path 'dir/containing/rails' do\n" \
+              "    gem 'rails'\n" \
+              "  end"
+        raise DeprecatedError, msg
+      end
       source_options = normalize_hash(options).merge("path" => Pathname.new(path), "root_path" => gemfile_root)
       source = @sources.add_path_source(source_options)
       with_source(source, &blk)
