@@ -8,6 +8,7 @@ describe "real source plugins" do
         build_plugin "bundler-source-mpath" do |s|
           s.write "plugins.rb", <<-RUBY
             require "fileutils"
+            require "bundler-source-mpath"
 
             class MPath < Bundler::Plugin::API
               source "mpath"

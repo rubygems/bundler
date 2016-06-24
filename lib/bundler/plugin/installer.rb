@@ -84,6 +84,7 @@ module Bundler
 
         specs.each do |spec|
           spec.source.install spec
+          spec.add_self_to_load_path
 
           paths[spec.name] = spec.full_gem_path
         end
