@@ -18,7 +18,7 @@ module Bundler
       handled = {}
       deps = dependencies.dup
       specs = []
-      skip << "bundler"
+      skip += ["bundler"]
 
       until deps.empty?
         dep = deps.shift
