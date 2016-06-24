@@ -5,14 +5,14 @@ module Bundler
   class SourceList
     attr_reader :path_sources,
       :git_sources,
-      :rubygems_global
+      :global_rubygems_source
 
     def initialize
-      @path_sources       = []
-      @git_sources        = []
-      @rubygems_global    = nil
-      @rubygems_local     = Source::Rubygems.new
-      @rubygems_sources   = []
+      @path_sources           = []
+      @git_sources            = []
+      @global_rubygems_source = nil
+      @rubygems_local         = Source::Rubygems.new
+      @rubygems_sources       = []
     end
 
     def add_path_source(options = {})
@@ -30,11 +30,15 @@ module Bundler
     end
 
     def global_rubygems_remote=(uri)
-      @rubygems_global = Source::Rubygems.new("remotes" => uri)
+      @global_rubygems_source = Source::Rubygems.new("remotes" => uri)
+    end
+
+    def default_source
+      @global_rubygems_source || @rubygems_local
     end
 
     def rubygems_sources
-      @rubygems_sources + [@rubygems_global || @rubygems_local]
+      @rubygems_sources + [default_source]
     end
 
     def rubygems_remotes
