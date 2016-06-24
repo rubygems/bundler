@@ -112,7 +112,7 @@ module Gem
   end
 
   class Dependency
-    attr_accessor :source, :groups
+    attr_accessor :source, :groups, :all_sources
 
     alias_method :eql?, :==
 

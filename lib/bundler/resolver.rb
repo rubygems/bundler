@@ -54,11 +54,18 @@ module Bundler
             o << %(the gems in your #{SharedHelpers.gemfile_name}, which may resolve the conflict.\n)
           elsif !conflict.existing
             o << "\n"
+            relevant_sources = if conflict.requirement.source
+              [conflict.requirement.source]
+            elsif conflict.requirement.all_sources
+              conflict.requirement.all_sources
+            else
+              raise "no source set for #{conflict}"
+            end.compact.uniq
             if conflict.requirement_trees.first.size > 1
               o << "Could not find gem '#{conflict.requirement}', which is required by "
-              o << "gem '#{conflict.requirement_trees.first[-2]}', in any of the sources."
+              o << "gem '#{conflict.requirement_trees.first[-2]}', in any of the relevant sources:\n  #{relevant_sources * "\n  "}"
             else
-              o << "Could not find gem '#{conflict.requirement}' in any of the sources\n"
+              o << "Could not find gem '#{conflict.requirement}' in any of the relevant sources:\n   #{relevant_sources * "\n  "}"
             end
           end
           o
@@ -259,8 +266,17 @@ module Bundler
       platform = dependency.__platform
       dependency = dependency.dep unless dependency.is_a? Gem::Dependency
       search = @search_for[dependency] ||= begin
-        source = @source_requirements[dependency.name]
-        index = (source && source.specs) || @index
+        index = Index.build do |idx|
+          if source = @source_requirements[dependency.name]
+            idx.add_source source.specs
+          elsif dependency.all_sources
+            dependency.all_sources.each {|s| idx.add_source(s.specs) if s }
+          else
+            idx.add_source @source_requirements[:default].specs
+          end
+        end
+        # source = @source_requirements[dependency.name]
+        # index = (source && source.specs) || @index
         results = index.search(dependency, @base[dependency.name])
         if vertex = @base_dg.vertex_named(dependency.name)
           locked_requirement = vertex.payload.requirement
@@ -304,8 +320,23 @@ module Bundler
       requirement.matches_spec?(spec)
     end
 
+    def relevant_sources_for_vertex(vertex)
+      if vertex.root?
+        [@source_requirements[vertex.name]]
+      else
+        vertex.recursive_predecessors.map do |v|
+          @source_requirements[v.name]
+        end << @source_requirements[:default]
+      end
+    end
+
+    # def valid_source_for_spec?(spec, vertex)
+    #   relevant_sources_for_vertex(vertex).include?(spec.source)
+    # end
+
     def sort_dependencies(dependencies, activated, conflicts)
       dependencies.sort_by do |dependency|
+        dependency.all_sources = relevant_sources_for_vertex(activated.vertex_named(dependency.name))
         name = name_for(dependency)
         [
           activated.vertex_named(name).payload ? 0 : 1,

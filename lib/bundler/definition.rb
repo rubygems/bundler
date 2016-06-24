@@ -668,9 +668,10 @@ module Bundler
       # Record the specs available in each gem's source, so that those
       # specs will be available later when the resolver knows where to
       # look for that gemspec (or its dependencies)
-      source_requirements = {}
+      default = sources.rubygems_sources.last
+      source_requirements = { :default => default }
       dependencies.each do |dep|
-        next unless source = dep.source || sources.rubygems_global
+        next unless source = dep.source || default
         source_requirements[dep.name] = source
       end
       source_requirements
