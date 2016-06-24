@@ -362,19 +362,21 @@ module Bundler
     def replace_bin_path(specs)
       gem_class = (class << Gem; self; end)
 
-      redefine_method(gem_class, :find_spec_for_exe) do |name, *args|
+      redefine_method(gem_class, :find_spec_for_exe) do |gem_name, *args|
         exec_name = args.first
 
         spec = if exec_name
-          specs.find {|s| s.executables.include?(exec_name) }
+          specs.find {|s| s.name == gem_name && s.executables.include?(exec_name) } ||
+            specs.find {|s| s.executables.include?(exec_name) }
         else
-          specs.find {|s| s.name == name }
+          specs.find {|s| s.name == gem_name }
         end
         raise(Gem::Exception, "can't find executable #{exec_name}") unless spec
         raise Gem::Exception, "no default executable for #{spec.full_name}" unless exec_name ||= spec.default_executable
         unless spec.name == name
-          warn "Bundler is using a binstub that was created for a different gem.\n" \
-            "This is deprecated, in future versions you may need to `bundle binstub #{name}` " \
+          Bundler::SharedHelpers.major_deprecation \
+            "Bundler is using a binstub that was created for a different gem.\n" \
+            "You should run `bundle binstub #{gem_name}` " \
             "to work around a system/bundle conflict."
         end
         spec

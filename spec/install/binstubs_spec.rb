@@ -20,4 +20,31 @@ describe "bundle install" do
       expect(system_gem_path("altbin/rackup")).to exist
     end
   end
+
+  describe "when multiple gems contain the same exe" do
+    before do
+      update_repo gem_repo1 do
+        build_gem "fake", "14" do |s|
+          s.executables = "rackup"
+        end
+      end
+
+      install_gemfile <<-G, :binstubs => true
+        source "file://#{gem_repo1}"
+        gem "fake"
+        gem "rack"
+      G
+    end
+
+    it "prints a deprecation notice" do
+      bundle "config major_deprecations true"
+      gembin("rackup")
+      expect(out).to include("Bundler is using a binstub that was created for a different gem.")
+    end
+
+    it "loads the correct spec's executable" do
+      gembin("rackup")
+      expect(out).to eq("1.0.0")
+    end
+  end
 end
