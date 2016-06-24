@@ -59,6 +59,17 @@ module Bundler
         Bundler.tmp(["plugin", *names].join("-"))
       end
 
+      # Change directory helper that provides thread safety
+      #
+      # Sources should use this since, if possible, they are run in parallel
+      # threads
+      #
+      # @param [String] directory
+      # @param [Proc] block to execute
+      def chdir(dir, &blk)
+        SharedHelpers.chdir(dir, &blk)
+      end
+
       def method_missing(name, *args, &blk)
         super unless Bundler.respond_to?(name)
         Bundler.send(name, *args, &blk)

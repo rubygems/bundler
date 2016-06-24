@@ -197,7 +197,16 @@ module Bundler
       # done to avoid conflicts
       path = index.plugin_path(name)
 
+      if insert_index = Bundler.rubygems.load_path_insert_index
+        $LOAD_PATH.insert(insert_index, path.join("lib").to_s)
+      else
+        $LOAD_PATH.unshift(path.join("lib").to_s)
+      end
+
       load path.join(PLUGIN_FILE_NAME)
+    rescue => e
+      Bundler.ui.error "Failed loading plugin #{name}: #{e.message}"
+      raise
     end
 
     class << self
