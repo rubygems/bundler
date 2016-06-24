@@ -473,7 +473,7 @@ describe "bundle update conservative" do
       should_be_installed "foo 1.4.5", "bar 2.1.1", "qux 1.0.1"
     end
 
-    it "warns on minor or major increment elsewhere"
+    it "warns on minor or major increment elsewhere" ## include in prior test
   end
 
   context "minor preferred" do
@@ -483,7 +483,9 @@ describe "bundle update conservative" do
       should_be_installed "foo 1.5.1", "bar 3.0.0", "qux 1.0.0"
     end
 
-    it "warns on major increment elsewhere"
+    it "warns on major increment elsewhere" ## include in prior test
+
+    it "warns when something unlocked doesn't update at all"
   end
 
   context "strict" do
@@ -500,9 +502,9 @@ describe "bundle update conservative" do
     end
   end
 
-  context "dry run" do
-    it "should show what would happen"
+  context "other commands" do
+    it "Installer could support --dry-run flag for install and update"
 
-    it "should replace/be the same as what outdated shows"
+    it "outdated should conform its flags to the resolver flags"
   end
 end

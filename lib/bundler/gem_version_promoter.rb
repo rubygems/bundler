@@ -1,11 +1,35 @@
 # frozen_string_literal: true
 module Bundler
-  # MODO: docs
+  # This class contains all of the logic for determining the next version of a
+  # Gem to update to based on the requested level (patch, minor, major).
+  # Primarily designed to work with Resolver which will provide it the list of
+  # available dependency versions as found in its index, before returning it to
+  # to the resolution engine to select the best version.
   class GemVersionPromoter
     attr_reader :level, :locked_specs, :unlock_gems
+
+    # By default, strict is false, meaning every available version of a gem
+    # is returned from sort_versions. The order gives preference to the
+    # requested level (:patch, :minor, :major) but in complicated requirement
+    # cases some gems will by necessity by promoted past the requested level,
+    # or even reverted to older versions.
+    #
+    # If strict is set to true, the results from sort_versions will be
+    # truncated, eliminating any version outside the current level scope.
+    # This can lead to unexpected outcomes or even VersionConflict exceptions
+    # that report a version of a gem not existing for versions that indeed do
+    # existing in the referenced source.
     attr_accessor :strict
 
-    # MODO: docs
+    # Given a list of locked_specs and a list of gems to unlock creates a
+    # GemVersionPromoter instance.
+    #
+    # @param locked_specs [SpecSet] All current locked specs. Unlike Definition
+    #   where this list is empty if all gems are being updated, this should
+    #   always be populated for all gems so this class can properly function.
+    # @param unlock_gems [String] List of gem names being unlocked. If empty,
+    #   all gems will be considered unlocked.
+    # @return [GemVersionPromoter]
     def initialize(locked_specs = SpecSet.new([]), unlock_gems = [])
       @level = :major
       @strict = false
@@ -14,7 +38,7 @@ module Bundler
       @sort_versions = {}
     end
 
-    # MODO: docs
+    # @param value [Symbol] One of three Symbols: :major, :minor or :patch.
     def level=(value)
       v = case value
           when String, Symbol
@@ -25,9 +49,18 @@ module Bundler
       @level = v
     end
 
-    # MODO: docs
-    def sort_versions(dep, dep_specs)
-      before_result = "before sort_versions: #{debug_format_result(dep, dep_specs).inspect}" if ENV["DEBUG_RESOLVER"]
+    # Given a Dependency and an Array of SpecGroups of available versions for a
+    # gem, this method will return the Array of SpecGroups sorted (and possibly
+    # truncated if strict is true) in an order to give preference to the current
+    # level (:major, :minor or :patch) when resolution is deciding what versions
+    # best resolve all dependencies in the bundle.
+    # @param dep [Dependency] The Dependency of the gem.
+    # @param spec_groups [SpecGroup] An array of SpecGroups for the same gem
+    #    named in the @dep param.
+    # @return [SpecGroup] A new instance of the SpecGroup Array sorted and
+    #    possibly filtered.
+    def sort_versions(dep, spec_groups)
+      before_result = "before sort_versions: #{debug_format_result(dep, spec_groups).inspect}" if ENV["DEBUG_RESOLVER"]
 
       @sort_versions[dep] ||= begin
         gem_name = dep.name
@@ -37,9 +70,9 @@ module Bundler
         locked_spec = locked_specs[gem_name].first
 
         if strict
-          filter_dep_specs(dep_specs, locked_spec)
+          filter_dep_specs(spec_groups, locked_spec)
         else
-          sort_dep_specs(dep_specs, locked_spec)
+          sort_dep_specs(spec_groups, locked_spec)
         end.tap do |specs|
           if ENV["DEBUG_RESOLVER"]
             STDERR.puts before_result
@@ -49,18 +82,20 @@ module Bundler
       end
     end
 
+    # @return [bool] Convenience method for testing value of level variable.
     def major?
       level == :major
     end
 
+    # @return [bool] Convenience method for testing value of level variable.
     def minor?
       level == :minor
     end
 
   private
 
-    def filter_dep_specs(specs, locked_spec)
-      res = specs.select do |spec_group|
+    def filter_dep_specs(spec_groups, locked_spec)
+      res = spec_groups.select do |spec_group|
         if locked_spec && !major?
           gsv = spec_group.version
           lsv = locked_spec.version
@@ -77,12 +112,12 @@ module Bundler
       sort_dep_specs(res, locked_spec)
     end
 
-    def sort_dep_specs(specs, locked_spec)
-      return specs unless locked_spec
+    def sort_dep_specs(spec_groups, locked_spec)
+      return spec_groups unless locked_spec
       gem_name = locked_spec.name
       locked_version = locked_spec.version
 
-      specs.sort do |a, b|
+      spec_groups.sort do |a, b|
         a_ver = a.version
         b_ver = b.version
         case
@@ -101,7 +136,7 @@ module Bundler
         # default :major behavior in Bundler does not do this
         unless major?
           unless unlocking_gem?(gem_name)
-            move_version_to_end(specs, locked_version, result)
+            move_version_to_end(spec_groups, locked_version, result)
           end
         end
       end
@@ -120,16 +155,16 @@ module Bundler
       unlock_gems.empty? || unlock_gems.include?(gem_name)
     end
 
-    def move_version_to_end(specs, version, result)
-      spec_group = specs.detect {|s| s.version.to_s == version.to_s }
+    def move_version_to_end(spec_groups, version, result)
+      spec_group = spec_groups.detect {|s| s.version.to_s == version.to_s }
       return unless spec_group
       result.reject! {|s| s.version.to_s == version.to_s }
       result << spec_group
     end
 
-    def debug_format_result(dep, res)
+    def debug_format_result(dep, spec_groups)
       a = [dep.to_s,
-           res.map {|sg| [sg.version, sg.dependencies_for_activated_platforms.map {|dp| [dp.name, dp.requirement.to_s] }] }]
+           spec_groups.map {|sg| [sg.version, sg.dependencies_for_activated_platforms.map {|dp| [dp.name, dp.requirement.to_s] }] }]
       last_map = a.last.map {|sg_data| [sg_data.first.version, sg_data.last.map {|aa| aa.join(" ") }] }
       [a.first, last_map, level, strict ? :strict : :not_strict]
     end
