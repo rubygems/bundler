@@ -54,6 +54,7 @@ module Bundler
             o << %(the gems in your #{SharedHelpers.gemfile_name}, which may resolve the conflict.\n)
           elsif !conflict.existing
             o << "\n"
+
             relevant_sources = if conflict.requirement.source
               [conflict.requirement.source]
             elsif conflict.requirement.all_sources
@@ -61,11 +62,12 @@ module Bundler
             else
               raise "no source set for #{conflict}"
             end.compact.uniq
+
             if conflict.requirement_trees.first.size > 1
-              o << "Could not find gem '#{conflict.requirement}', which is required by "
-              o << "gem '#{conflict.requirement_trees.first[-2]}', in any of the relevant sources:\n  #{relevant_sources * "\n  "}"
+              o << "Could not find gem '#{printable_dep(conflict.requirement)}', which is required by "
+              o << "gem '#{printable_dep(conflict.requirement_trees.first[-2])}', in any of the relevant sources:\n  #{relevant_sources * "\n  "}\n"
             else
-              o << "Could not find gem '#{conflict.requirement}' in any of the relevant sources:\n   #{relevant_sources * "\n  "}"
+              o << "Could not find gem '#{printable_dep(conflict.requirement)}' in any of the relevant sources:\n   #{relevant_sources * "\n  "}\n"
             end
           end
           o
@@ -402,7 +404,8 @@ module Bundler
         version = vwp.first
         platform = vwp.last
         version_platform_str = String.new(version.to_s)
-        version_platform_str << " #{platform}" unless platform.nil?
+        version_platform_str << " #{platform}" unless platform.nil? || platform == Gem::Platform::RUBY
+        version_platform_str
       end
       version_platform_strs.join(", ")
     end
