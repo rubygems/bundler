@@ -259,6 +259,7 @@ describe "bundle install with gems on multiple sources" do
         it "installs all gems without warning" do
           bundle :install
           expect(out).not_to include("Warning")
+          expect(err).not_to include("Warning")
           should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
         end
       end
@@ -273,8 +274,11 @@ describe "bundle install with gems on multiple sources" do
         end
 
         it "does not find the dependency" do
-          bundle :install
-          expect(out).to include("Could not find gem 'rack (>= 0) ruby'")
+          bundle :install, :expect_err => true
+          expect(err).to include strip_whitespace(<<-E).strip
+            Could not find gem 'rack', which is required by gem 'depends_on_rack', in any of the relevant sources:
+              rubygems repository file:#{gem_repo2}/ or installed locally
+          E
         end
       end
 
@@ -292,8 +296,9 @@ describe "bundle install with gems on multiple sources" do
         end
 
         it "installs the dependency from the top-level source without warning" do
-          bundle :install
+          bundle :install, :expect_err => true
           expect(out).not_to include("Warning")
+          expect(err).not_to include("Warning")
           should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
         end
       end

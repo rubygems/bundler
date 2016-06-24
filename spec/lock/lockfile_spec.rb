@@ -788,8 +788,9 @@ describe "the lockfile format" do
     build_lib "foo", :path => bundled_app("foo")
 
     install_gemfile <<-G
-      path "foo"
-      gem "foo"
+      path "foo" do
+        gem "foo"
+      end
     G
 
     lockfile_should_be <<-G
@@ -813,8 +814,9 @@ describe "the lockfile format" do
     build_lib "foo", :path => bundled_app(File.join("..", "foo"))
 
     install_gemfile <<-G
-      path "../foo"
-      gem "foo"
+      path "../foo" do
+        gem "foo"
+      end
     G
 
     lockfile_should_be <<-G
@@ -838,8 +840,9 @@ describe "the lockfile format" do
     build_lib "foo", :path => bundled_app("foo")
 
     install_gemfile <<-G
-      path File.expand_path("../foo", __FILE__)
-      gem "foo"
+      path File.expand_path("../foo", __FILE__) do
+        gem "foo"
+      end
     G
 
     lockfile_should_be <<-G

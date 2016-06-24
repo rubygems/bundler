@@ -34,7 +34,7 @@ module Bundler
     end
 
     def rubygems_sources
-      @rubygems_sources + [@rubygems_global || @rubygems_local].compact
+      @rubygems_sources + [@rubygems_global || @rubygems_local]
     end
 
     def rubygems_remotes
