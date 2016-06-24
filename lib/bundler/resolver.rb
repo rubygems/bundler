@@ -332,10 +332,6 @@ module Bundler
       end
     end
 
-    # def valid_source_for_spec?(spec, vertex)
-    #   relevant_sources_for_vertex(vertex).include?(spec.source)
-    # end
-
     def sort_dependencies(dependencies, activated, conflicts)
       dependencies.sort_by do |dependency|
         dependency.all_sources = relevant_sources_for_vertex(activated.vertex_named(dependency.name))
