@@ -226,6 +226,122 @@ describe "bundle install with gems on multiple sources" do
       end
     end
 
+    context "installing with dependencies from a monorepo" do
+      def should_be_installed_from_source(names_and_sources)
+        names_and_sources.each do |full_name, source|
+          should_be_installed full_name
+          name = full_name.split(" ", 2).first
+          run! <<-R
+            begin
+              require '#{name}/source.rb'
+              puts #{Spec::Builders.constantize(name)}_SOURCE
+            rescue LoadError, NameError
+              puts
+            end
+          R
+          expect(out).to eq(source.to_s), "#{full_name} came from #{out.inspect} instead of #{source.inspect}"
+        end
+      end
+
+      before do
+        build_lib "actionpack", "2.3.2", :path => lib_path("rails-2.3.2/actionpack") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.add_dependency "activesupport", "2.3.2"
+        end
+        build_lib "activerecord", "2.3.2", :path => lib_path("rails-2.3.2/activerecord") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.add_dependency "activesupport", "2.3.2"
+        end
+        build_lib "actionmailer", "2.3.2", :path => lib_path("rails-2.3.2/actionmailer") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.add_dependency "activesupport", "2.3.2"
+        end
+        build_lib "activeresource", "2.3.2", :path => lib_path("rails-2.3.2/activeresource") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.add_dependency "activesupport", "2.3.2"
+        end
+        build_lib "activesupport", "2.3.2", :path => lib_path("rails-2.3.2/activesupport") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+        end
+        build_git "rails", "2.3.2" do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.executables = "rails"
+          s.add_dependency "rake",           "10.0.2"
+          s.add_dependency "actionpack",     s.version
+          s.add_dependency "activerecord",   s.version
+          s.add_dependency "actionmailer",   s.version
+          s.add_dependency "activeresource", s.version
+        end
+      end
+
+      context "when depending on rails via git without a rubygems source" do
+        before do
+          build_lib "rake", "10.0.2" do |s|
+            s.write "lib/rake/source.rb", "RAKE_SOURCE = 'rake-git'"
+          end
+          install_gemfile <<-G
+            gem "rake", :path => #{lib_path("rake-10.0.2").to_s.dump}
+            gem "rails", :git => #{lib_path("rails-2.3.2").to_s.dump}
+          G
+        end
+
+        it "pulls all dependencies from the rails repo" do
+          should_be_installed_from_source("actionmailer 2.3.2" => "rails-git",
+                                          "actionpack 2.3.2" => "rails-git",
+                                          "activerecord 2.3.2" => "rails-git",
+                                          "activeresource 2.3.2" => "rails-git",
+                                          "activesupport 2.3.2" => "rails-git",
+                                          "rails 2.3.2" => "rails-git",
+                                          "rake 10.0.2" => "rake-git")
+        end
+      end
+
+      context "when depending on rails via git with a rubygems source" do
+        before do
+          update_repo gem_repo1 do
+            build_gem "rake", "10.0.2"
+          end
+          install_gemfile <<-G
+            source "file://#{gem_repo1}/"
+            gem "rails", :git => #{lib_path("rails-2.3.2").to_s.dump}
+          G
+        end
+
+        it "pulls all dependencies from the rails repo" do
+          should_be_installed_from_source("actionmailer 2.3.2" => "rails-git",
+                                          "actionpack 2.3.2" => "rails-git",
+                                          "activerecord 2.3.2" => "rails-git",
+                                          "activeresource 2.3.2" => "rails-git",
+                                          "activesupport 2.3.2" => "rails-git",
+                                          "rails 2.3.2" => "rails-git",
+                                          "rake 10.0.2" => nil)
+        end
+      end
+
+      context "when depending on rails via git with a rubygems source and a transitive dep is made explicit" do
+        before do
+          update_repo gem_repo1 do
+            build_gem "rake", "10.0.2"
+          end
+          install_gemfile <<-G
+            source "file://#{gem_repo1}/"
+            gem "rails", :git => #{lib_path("rails-2.3.2").to_s.dump}
+            gem "actionmailer"
+          G
+        end
+
+        it "pulls all dependencies from the rails repo" do
+          should_be_installed_from_source("actionmailer 2.3.2" => nil,
+                                          "actionpack 2.3.2" => "rails-git",
+                                          "activerecord 2.3.2" => "rails-git",
+                                          "activeresource 2.3.2" => "rails-git",
+                                          "activesupport 2.3.2" => nil,
+                                          "rails 2.3.2" => "rails-git",
+                                          "rake 10.0.2" => nil)
+        end
+      end
+    end
+
     context "when a top-level gem has an indirect dependency" do
       before do
         build_repo gem_repo2 do
