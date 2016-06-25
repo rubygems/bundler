@@ -240,6 +240,23 @@ describe "bundle update in more complicated situations" do
     bundle "update thin"
     should_be_installed "thin 2.0", "rack 1.2", "rack-obama 1.0"
   end
+
+  it "will update only from pinned source" do
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      source "file://#{gem_repo1}" do
+        gem "thin"
+      end
+    G
+
+    update_repo2 do
+      build_gem "thin", "2.0"
+    end
+
+    bundle "update"
+    should_be_installed "thin 1.0"
+  end
 end
 
 describe "bundle update without a Gemfile.lock" do
