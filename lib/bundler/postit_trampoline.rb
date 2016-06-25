@@ -49,6 +49,12 @@ rescue LoadError, NameError
   nil
 end
 
+if installed_version.to_s != running_version.to_s
+  puts <<-WARN
+You're running Bundler #{installed_version.to_s} but this project uses #{running_version.to_s}. To update, run `bundle update --bundler`. You won't see this message again unless you upgrade to a newer version of Bundler.\n
+  WARN
+end
+
 if !Gem::Version.correct?(running_version.to_s) || !version.satisfied_by?(Gem::Version.create(running_version))
   abort "The running bundler (#{running_version}) does not match the required `#{version}`"
 end
