@@ -4,14 +4,14 @@ require "spec_helper"
 describe "bundle install with gem sources" do
   describe "install time dependencies" do
     it "installs gems with implicit rake dependencies" do
-      install_gemfile <<-G
+      install_gemfile! <<-G
         source "file://#{gem_repo1}"
         gem "with_implicit_rake_dep"
         gem "another_implicit_rake_dep"
         gem "rake"
       G
 
-      run <<-R
+      run! <<-R
         require 'implicit_rake_dep'
         require 'another_implicit_rake_dep'
         puts IMPLICIT_RAKE_DEP
@@ -32,7 +32,7 @@ describe "bundle install with gem sources" do
         f.write Gem.deflate(Marshal.dump(spec))
       end
 
-      install_gemfile <<-G
+      install_gemfile! <<-G
         source "file://#{gem_repo2}"
         gem "actionpack", "2.3.2"
       G
@@ -42,7 +42,7 @@ describe "bundle install with gem sources" do
 
     describe "with crazy rubygem plugin stuff" do
       it "installs plugins" do
-        install_gemfile <<-G
+        install_gemfile! <<-G
           source "file://#{gem_repo1}"
           gem "net_b"
         G
@@ -51,7 +51,7 @@ describe "bundle install with gem sources" do
       end
 
       it "installs plugins depended on by other plugins" do
-        install_gemfile <<-G
+        install_gemfile! <<-G
           source "file://#{gem_repo1}"
           gem "net_a"
         G
@@ -60,7 +60,7 @@ describe "bundle install with gem sources" do
       end
 
       it "installs multiple levels of dependencies" do
-        install_gemfile <<-G
+        install_gemfile! <<-G
           source "file://#{gem_repo1}"
           gem "net_c"
           gem "net_e"
