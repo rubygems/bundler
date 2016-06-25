@@ -470,19 +470,11 @@ module Bundler
     end
 
     # Check if the specs of the given source changed
-    # according to the locked source. A block should be
-    # in order to specify how the locked version of
-    # the source should be found.
-    def specs_changed?(source, &block)
-      locked = @locked_sources.find(&block)
+    # according to the locked source.
+    def specs_changed?(source)
+      locked = @locked_sources.find(source)
 
-      if locked
-        unlocking = @locked_specs.any? do |locked_spec|
-          locked_spec.source.class == locked.class && locked_spec.source != locked
-        end
-      end
-
-      !locked || unlocking || dependencies_for_source_changed?(source) || specs_for_source_changed?(source)
+      !locked || dependencies_for_source_changed?(source) || specs_for_source_changed?(source)
     end
 
     def dependencies_for_source_changed?(source)
@@ -515,15 +507,13 @@ module Bundler
       end
 
       locals.any? do |source, changed|
-        changed || specs_changed?(source) {|o| source.class == o.class && source.uri == o.uri }
+        changed || specs_changed?(source)
       end
     end
 
     def converge_paths
       sources.path_sources.any? do |source|
-        specs_changed?(source) do |ls|
-          ls.class == source.class && ls.path == source.path
-        end
+        specs_changed?(source)
       end
     end
 

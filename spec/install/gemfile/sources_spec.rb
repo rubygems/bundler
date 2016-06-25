@@ -413,4 +413,36 @@ describe "bundle install with gems on multiple sources" do
       should_be_installed("bar 0.1")
     end
   end
+
+  context "re-resolving" do
+    context "when there is a mix of sources in the gemfile" do
+      before do
+        build_repo3
+        build_lib "path1"
+        build_lib "path2"
+        build_git "git1"
+        build_git "git2"
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rails"
+
+          source "file://#{gem_repo3}" do
+            gem "rack"
+          end
+
+          gem "path1", :path => "#{lib_path("path1-1.0")}"
+          gem "path2", :path => "#{lib_path("path2-1.0")}"
+          gem "git1",  :git  => "#{lib_path("git1-1.0")}"
+          gem "git2",  :git  => "#{lib_path("git2-1.0")}"
+        G
+      end
+
+      it "does not re-resolve" do
+        bundle :install, :verbose => true
+        expect(out).to include("using resolution from the lockfile")
+        expect(out).not_to include("re-resolving dependencies")
+      end
+    end
+  end
 end
