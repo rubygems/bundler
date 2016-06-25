@@ -143,6 +143,31 @@ describe "bundle install from an existing gemspec" do
     expect(@err).not_to match(/ahh/)
   end
 
+  context "when the gemspec has a required_ruby_version" do
+    before do
+      build_lib "foo", :path => bundled_app do |s|
+        s.required_ruby_version = ">= 2.0"
+      end
+    end
+
+    it "uses the ruby version in the gemspec" do
+      install_gemfile! <<-G
+        gemspec
+      G
+      run! "puts Bundler.definition.ruby_version"
+      expect(out).to eq("ruby >= 2.0")
+    end
+
+    it "prefers the explicit ruby version" do
+      install_gemfile! <<-G
+        ruby "< 9999"
+        gemspec
+      G
+      run! "puts Bundler.definition.ruby_version"
+      expect(out).to eq("ruby < 9999")
+    end
+  end
+
   context "when child gemspecs conflict with a released gemspec" do
     before do
       # build the "parent" gem that depends on another gem in the same repo
