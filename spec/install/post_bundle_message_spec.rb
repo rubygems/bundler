@@ -81,6 +81,20 @@ describe "post bundle message" do
         expect(out).to include("Gems in the groups emo, obama and test were not installed")
         expect(out).to include(bundle_complete_message)
       end
+
+      it "with an absolute --path inside the cwd" do
+        bundle "install --path #{bundled_app}/cache"
+        expect(out).to include("Bundled gems are installed into ./cache")
+        expect(out).to_not include("Gems in the group")
+        expect(out).to include(bundle_complete_message)
+      end
+
+      it "with an absolute --path outside the cwd" do
+        bundle "install --path #{bundled_app}_cache"
+        expect(out).to include("Bundled gems are installed into #{bundled_app}_cache")
+        expect(out).to_not include("Gems in the group")
+        expect(out).to include(bundle_complete_message)
+      end
     end
 
     describe "with misspelled or non-existent gem name" do
