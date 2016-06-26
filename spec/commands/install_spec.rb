@@ -3,18 +3,6 @@ require "spec_helper"
 
 describe "bundle install with gem sources" do
   describe "the simple case" do
-    it "warns user (once) if Bundler is outdated" do
-      gemfile <<-G
-        source "file://#{gem_repo1}"
-      G
-
-      bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => "999" }
-      expect(out).to include("You're running Bundler 999 but this project uses #{Bundler::VERSION}.")
-
-      bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => "999" }
-      expect(out).not_to include("You're running Bundler 999 but this project uses #{Bundler::VERSION}.")
-    end
-
     it "prints output and returns if no dependencies are specified" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -495,6 +483,21 @@ describe "bundle install with gem sources" do
       expect(exitstatus).to eq(17) if exitstatus
       expect(out).to eq("Please CGI escape your usernames and passwords before " \
                         "setting them for authentication.")
+    end
+  end
+
+  describe "warns user if Bundler is outdated" do
+    it "warns only once and is > 1.13.0.pre.1" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+      G
+      ENV["BUNDLER_VERSION"] = "1.13.0.pre.1"
+
+      bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => "999" }
+      expect(out).to include("You're running Bundler 999 but this project uses #{ENV["BUNDLER_VERSION"]}.")
+
+      bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => "999" }
+      expect(out).not_to include("You're running Bundler 999 but this project uses #{ENV["BUNDLER_VERSION"]}.")
     end
   end
 end

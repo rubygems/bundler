@@ -51,7 +51,7 @@ end
 
 if Gem::Version.new(running_version) >= Gem::Version.new("1.13.0.pre.1")
   ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] = installed_version.to_s
-else
+elsif ARGV.any? {|a| %w(install i).include? a }
   puts <<-WARN.strip
 You're running Bundler #{installed_version} but this project uses #{running_version}. To update, run `bundle update --bundler`.\n
   WARN
