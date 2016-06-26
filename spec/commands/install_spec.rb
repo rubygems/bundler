@@ -3,6 +3,18 @@ require "spec_helper"
 
 describe "bundle install with gem sources" do
   describe "the simple case" do
+    it "warns user (once) if Bundler is outdated" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+      G
+
+      bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => "999" }
+      expect(out).to include("You're running Bundler 999 but this project uses #{Bundler::VERSION}.")
+
+      bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => "999" }
+      expect(out).not_to include("You're running Bundler 999 but this project uses #{Bundler::VERSION}.")
+    end
+
     it "prints output and returns if no dependencies are specified" do
       gemfile <<-G
         source "file://#{gem_repo1}"

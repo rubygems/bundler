@@ -7,6 +7,21 @@ describe "bundler version trampolining" do
     FileUtils.rm_rf(system_gem_path)
     FileUtils.cp_r(base_system_gems, system_gem_path)
   end
+  context "warnings" do
+    it "warns user if Bundler is outdated and is < 1.13.0.pre.1" do
+      ENV["BUNDLER_VERSION"] = "1.12.0"
+      bundle! "--version"
+      expect(out).to include(<<-WARN.strip)
+You're running Bundler #{Bundler::VERSION} but this project uses #{ENV["BUNDLER_VERSION"]}. To update, run `bundle update --bundler`.\n
+      WARN
+
+      ENV["BUNDLER_VERSION"] = "1.13.0.pre.1"
+      bundle! "--version"
+      expect(out).not_to include(<<-WARN.strip)
+You're running Bundler #{Bundler::VERSION} but this project uses #{ENV["BUNDLER_VERSION"]}. To update, run `bundle update --bundler`.\n
+      WARN
+    end
+  end
 
   context "version guessing" do
     shared_examples_for "guesses" do |version|
