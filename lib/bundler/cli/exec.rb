@@ -60,6 +60,7 @@ module Bundler
       ui = Bundler.ui
       Bundler.ui = nil
       require "bundler/setup"
+      trap("INT", "DEFAULT")
       Kernel.load(file)
     rescue SystemExit
       raise
