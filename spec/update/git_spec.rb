@@ -157,8 +157,7 @@ describe "bundle update" do
         expect(out).to eq("GIT")
       end
 
-      it "it unlocks the source when submodules are removed from git source" do
-        pending "This would require actually removing the submodule from the clone"
+      it "unlocks the source when submodules are removed from git source", :git => ">= 2.9.0" do
         install_gemfile <<-G, :expect_err => true
           git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
