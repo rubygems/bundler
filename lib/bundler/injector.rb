@@ -50,8 +50,9 @@ module Bundler
 
     def new_gem_lines
       @new_deps.map do |d|
-        binding.pry
-        %(gem '#{d.name}', '#{d.requirement}')
+        groups = ", :group => #{d.groups.to_s}" if !d.groups.nil?
+        source = ", :source => '#{d.source}'" if !d.source.nil?
+        %(gem '#{d.name}', '#{d.requirement}'#{groups}#{source})
       end.join("\n")
     end
 

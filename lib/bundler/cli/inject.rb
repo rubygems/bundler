@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "pry-byebug"
 module Bundler
   class CLI::Inject
     attr_reader :options, :name, :version, :groups, :source, :gems
@@ -19,7 +20,10 @@ module Bundler
       # Build an array of Dependency objects out of the arguments
       deps = []
       gems.each_slice(4) do |gem_name, gem_version, gem_groups, gem_source|
-        deps << Bundler::Dependency.new(gem_name, gem_version, { groups: gem_groups, source: gem_source })
+        ops = Gem::Requirement::OPS.map {|key, val| key }
+        has_op = ops.any? {|op| gem_version.start_with? op }
+        gem_version = "~> #{gem_version}" if !has_op
+        deps << Bundler::Dependency.new(gem_name, gem_version, { "group" => gem_groups, "source" => gem_source })
       end
 
       added = Injector.inject(deps, options)
