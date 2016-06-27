@@ -3,6 +3,7 @@ module Bundler
   module UI
     class Silent
       def add_color(string, color)
+        string
       end
 
       def info(message, newline = nil)
