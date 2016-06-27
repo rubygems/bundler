@@ -57,8 +57,18 @@ describe Bundler::Source do
         context "with a different version" do
           let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "< 1.5") }
 
-          it "should return a string with the spec name and version and locked spec version" do
-            expect(subject.version_message(spec)).to eq("nokogiri >= 1.6 (\e[32mwas < 1.5\e[0m)")
+          context "with color" do
+            before { Bundler.ui = Bundler::UI::Shell.new }
+
+            it "should return a string with the spec name and version and locked spec version" do
+              expect(subject.version_message(spec)).to eq("nokogiri >= 1.6 (\e[32mwas < 1.5\e[0m)")
+            end
+          end
+
+          context "without color" do
+            it "should return a string with the spec name and version and locked spec version" do
+              expect(subject.version_message(spec)).to eq("nokogiri >= 1.6 (was < 1.5)")
+            end
           end
         end
       end
