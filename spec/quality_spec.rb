@@ -28,7 +28,9 @@ describe "The library itself" do
 
     failing_lines = []
     File.readlines(filename).each_with_index do |line, number|
-      failing_lines << number + 1 if line =~ debugging_mechanisms_regex
+      if line =~ debugging_mechanisms_regex && !line.end_with?("# ignore quality_spec\n")
+        failing_lines << number + 1
+      end
     end
 
     return if failing_lines.empty?

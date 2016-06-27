@@ -552,16 +552,16 @@ describe "bundle exec" do
           Thread.new do
             puts 'Started' # For process sync
             STDOUT.flush
-            sleep 1
-            raise "No Interrupt received" # So that this thread exits
+            sleep 1 # ignore quality_spec
+            raise "Didn't receive INT at all"
           end.join
         rescue Interrupt
+          puts "foo"
         end
-        puts "foo"
       RUBY
 
       it do
-        bundle("exec #{path}") do |_i, o, thr|
+        bundle("exec #{path}") do |_, o, thr|
           o.gets # Consumes 'Started' and ensures that thread has started
           Process.kill("INT", thr.pid)
         end
