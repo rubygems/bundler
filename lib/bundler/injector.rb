@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "pry-byebug"
 module Bundler
   class Injector
     def self.inject(new_deps, options = {})
@@ -50,9 +49,11 @@ module Bundler
 
     def new_gem_lines
       @new_deps.map do |d|
-        groups = ", :group => #{d.groups.to_s}" if !d.groups.nil?
-        source = ", :source => '#{d.source}'" if !d.source.nil?
-        %(gem '#{d.name}', '#{d.requirement}'#{groups}#{source})
+        name = "'#{d.name}'"
+        requirement = ", '#{d.requirement}'"
+        group = ", :group => #{d.groups}" if d.groups != Array(:default)
+        source = ", :source => '#{d.source}'" unless d.source.nil?
+        %(gem #{name}#{requirement}#{group}#{source})
       end.join("\n")
     end
 

@@ -1,13 +1,12 @@
 # frozen_string_literal: true
-require "pry-byebug"
 module Bundler
   class CLI::Inject
-    attr_reader :options, :name, :version, :groups, :source, :gems
+    attr_reader :options, :name, :version, :group, :source, :gems
     def initialize(options, name, version, gems)
       @options = options
       @name = name
       @version = version || last_version_number
-      @groups = options[:groups]
+      @group = options[:group]
       @source = options[:source]
       @gems = gems
     end
@@ -15,15 +14,15 @@ module Bundler
     def run
       # The required arguments allow Thor to give useful feedback when the arguments
       # are incorrect. This adds those first two arguments onto the list as a whole.
-      gems.unshift(source).unshift(groups).unshift(version).unshift(name)
+      gems.unshift(source).unshift(group).unshift(version).unshift(name)
 
       # Build an array of Dependency objects out of the arguments
       deps = []
-      gems.each_slice(4) do |gem_name, gem_version, gem_groups, gem_source|
-        ops = Gem::Requirement::OPS.map {|key, val| key }
+      gems.each_slice(4) do |gem_name, gem_version, gem_group, gem_source|
+        ops = Gem::Requirement::OPS.map {|key, _val| key }
         has_op = ops.any? {|op| gem_version.start_with? op }
-        gem_version = "~> #{gem_version}" if !has_op
-        deps << Bundler::Dependency.new(gem_name, gem_version, { "group" => gem_groups, "source" => gem_source })
+        gem_version = "~> #{gem_version}" unless has_op
+        deps << Bundler::Dependency.new(gem_name, gem_version, "group" => gem_group, "source" => gem_source)
       end
 
       added = Injector.inject(deps, options)
