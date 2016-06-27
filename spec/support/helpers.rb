@@ -204,6 +204,7 @@ module Spec
       opts[:retry] ||= 0
       bundle :install, opts
     end
+    bang :install_gemfile
 
     def lock_gemfile(*args)
       gemfile(*args)
