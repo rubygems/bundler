@@ -123,7 +123,11 @@ module Bundler
             git_retry %(fetch --force --quiet --tags "#{path}")
             git "reset --hard #{@revision}"
 
-            git_retry "submodule update --init --recursive" if submodules
+            if submodules
+              git_retry "submodule update --init --recursive"
+            elsif Gem::Version.create(version) >= Gem::Version.create("2.9.0")
+              git_retry "submodule deinit --all"
+            end
           end
         end
 
