@@ -118,7 +118,7 @@ module Bundler
 
     def warn_if_outdated
       return if ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"].nil?
-      installed_version = Gem::Version.new(ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"])
+      installed_version = Gem::Version.new(ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"].dup)
       running_version = Gem::Version.new(Bundler::VERSION)
       if Bundler.settings[:warned_version].nil? || running_version > Gem::Version.new(Bundler.settings[:warned_version])
         Bundler.settings[:warned_version] = running_version

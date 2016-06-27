@@ -49,9 +49,10 @@ rescue LoadError, NameError
   nil
 end
 
-if Gem::Version.new(running_version) >= Gem::Version.new("1.13.0.pre.1")
+if Gem::Version.new(running_version) >= Gem::Version.new("1.13.0.pre.1".dup)
   ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] = installed_version.to_s
 elsif ARGV.any? {|a| %w(install i).include? a }
+  # TODO: Change this to warn in Bundler 2.0
   puts <<-WARN.strip
 You're running Bundler #{installed_version} but this project uses #{running_version}. To update, run `bundle update --bundler`.\n
   WARN

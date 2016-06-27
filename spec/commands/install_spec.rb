@@ -491,13 +491,12 @@ describe "bundle install with gem sources" do
       gemfile <<-G
         source "file://#{gem_repo1}"
       G
-      ENV["BUNDLER_VERSION"] = "1.13.0.pre.1"
 
       bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => "999" }
-      expect(out).to include("You're running Bundler 999 but this project uses #{ENV["BUNDLER_VERSION"]}.")
+      expect(out).to include("You're running Bundler 999 but this project uses #{Bundler::VERSION}.")
 
       bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => "999" }
-      expect(out).not_to include("You're running Bundler 999 but this project uses #{ENV["BUNDLER_VERSION"]}.")
+      expect(out).not_to include("You're running Bundler 999 but this project uses #{Bundler::VERSION}.")
     end
   end
 end
