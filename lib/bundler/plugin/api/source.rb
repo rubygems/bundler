@@ -32,13 +32,16 @@ module Bundler
       #   @return [String] options passed during initialization (either from
       #     lockfile or Gemfile)
       #
+      # @!attribute [r] name
+      #   @return [String] name that can be used to uniquely identify a source
+      #
       # @!attribute [rw] dependency_names
       #   @return [Array<String>] Names of dependencies that the source should
       #     try to resolve. It is not necessary to use this list intenally. This
       #     is present to be compatible with `Definition` and is used by
       #     rubygems source.
       module Source
-        attr_reader :uri, :options
+        attr_reader :uri, :options, :name
         attr_accessor :dependency_names
 
         def initialize(opts)
@@ -46,6 +49,7 @@ module Bundler
           @dependency_names = []
           @uri = opts["uri"]
           @type = opts["type"]
+          @name = opts["name"] || "#{@type} at #{@uri}"
         end
 
         # This is used by the default `spec` method to constructs the
@@ -255,6 +259,15 @@ module Bundler
         # Note: Do not override if you don't know what you are doing.
         def gem_install_dir
           Bundler.install_path
+        end
+
+        # It is used to obtain the full_gem_path.
+        #
+        # spec's loaded_from path is expanded against this to get full_gem_path
+        #
+        # Note: Do not override if you don't know what you are doing.
+        def root
+          Bundler.root
         end
       end
     end
