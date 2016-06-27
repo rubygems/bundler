@@ -1,3 +1,20 @@
+## 1.13.0.rc.1 (2016-06-27)
+
+Features:
+
+  - when `bundle config major_deprecations` or `BUNDLE_MAJOR_DEPRECATIONS` is set, deprecation warnings for bundler 2 will be printed (@segiddins)
+  - when running with `--verbose`, bundler will print the reason it is re-resolving a gemfile (@segiddins)
+
+Bug fixes:
+
+  - fix support for running RubyGems 1.x on Ruby 2.3 (#4698, @segiddins)
+  - fix bundle exec'ing to a ruby file when gems are installed into a path (#4592, @chrismo)
+  - when multiple specs in a bundle have the same executable, prefer activating the one from the requested gem (#4705, @segiddins)
+  - stop changing the load path to require the vendored postit when trampolining (@segiddins)
+  - ensure relative paths are properly printed after completing an installation (@jenseng)
+  - fix re-resolving when there are multiple unchanged path sources (@segiddins)
+  - de-init submodules when running git 2.9 and requesting a git gem without submodules (@segiddins)
+
 ## 1.13.0.pre.1 (2016-06-20)
 
 Performance:
