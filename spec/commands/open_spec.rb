@@ -60,7 +60,7 @@ describe "bundle open" do
 
   it "select the gem from many match gems" do
     env = { "EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor" }
-    bundle "open active", :env => env do |input|
+    bundle "open active", :env => env do |input, _, _|
       input.puts "2"
     end
 

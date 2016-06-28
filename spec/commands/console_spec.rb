@@ -12,7 +12,7 @@ describe "bundle console" do
   end
 
   it "starts IRB with the default group loaded" do
-    bundle "console" do |input|
+    bundle "console" do |input, _, _|
       input.puts("puts RACK")
       input.puts("exit")
     end
@@ -20,7 +20,7 @@ describe "bundle console" do
   end
 
   it "uses IRB as default console" do
-    bundle "console" do |input|
+    bundle "console" do |input, _, _|
       input.puts("__method__")
       input.puts("exit")
     end
@@ -34,7 +34,7 @@ describe "bundle console" do
     G
     bundle "config console pry"
 
-    bundle "console" do |input|
+    bundle "console" do |input, _, _|
       input.puts("__method__")
       input.puts("exit")
     end
@@ -45,7 +45,7 @@ describe "bundle console" do
     bundle "config console pry"
     # make sure pry isn't there
 
-    bundle "console" do |input|
+    bundle "console" do |input, _, _|
       input.puts("__method__")
       input.puts("exit")
     end
@@ -53,7 +53,7 @@ describe "bundle console" do
   end
 
   it "doesn't load any other groups" do
-    bundle "console" do |input|
+    bundle "console" do |input, _, _|
       input.puts("puts ACTIVESUPPORT")
       input.puts("exit")
     end
@@ -62,7 +62,7 @@ describe "bundle console" do
 
   describe "when given a group" do
     it "loads the given group" do
-      bundle "console test" do |input|
+      bundle "console test" do |input, _, _|
         input.puts("puts ACTIVESUPPORT")
         input.puts("exit")
       end
@@ -70,7 +70,7 @@ describe "bundle console" do
     end
 
     it "loads the default group" do
-      bundle "console test" do |input|
+      bundle "console test" do |input, _, _|
         input.puts("puts RACK")
         input.puts("exit")
       end
@@ -78,7 +78,7 @@ describe "bundle console" do
     end
 
     it "doesn't load other groups" do
-      bundle "console test" do |input|
+      bundle "console test" do |input, _, _|
         input.puts("puts RACK_MIDDLEWARE")
         input.puts("exit")
       end
@@ -96,7 +96,7 @@ describe "bundle console" do
     G
 
     bundle "config auto_install 1"
-    bundle :console do |input|
+    bundle :console do |input, _, _|
       input.puts("puts 'hello'")
       input.puts("exit")
     end

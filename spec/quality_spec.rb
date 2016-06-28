@@ -28,7 +28,9 @@ describe "The library itself" do
 
     failing_lines = []
     File.readlines(filename).each_with_index do |line, number|
-      failing_lines << number + 1 if line =~ debugging_mechanisms_regex
+      if line =~ debugging_mechanisms_regex && !line.end_with?("# ignore quality_spec\n")
+        failing_lines << number + 1
+      end
     end
 
     return if failing_lines.empty?
@@ -200,7 +202,7 @@ describe "The library itself" do
       lib_files = `git ls-files -z`.split("\x0").grep(/\.rb$/) - exclusions
       lib_files.reject! {|f| f.start_with?("bundler/vendor") }
       lib_files.map! {|f| f.chomp(".rb") }
-      sys_exec("ruby -w -I. ", :expect_err) do |input|
+      sys_exec("ruby -w -I. ", :expect_err) do |input, _, _|
         lib_files.each do |f|
           input.puts "require '#{f}'"
         end

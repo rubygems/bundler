@@ -544,5 +544,32 @@ describe "bundle exec" do
 
       it_behaves_like "it runs"
     end
+
+    context "signals being trapped by bundler" do
+      let(:executable) { strip_whitespace <<-RUBY }
+        #{shebang}
+        begin
+          Thread.new do
+            puts 'Started' # For process sync
+            STDOUT.flush
+            sleep 1 # ignore quality_spec
+            raise "Didn't receive INT at all"
+          end.join
+        rescue Interrupt
+          puts "foo"
+        end
+      RUBY
+
+      it "receives the signal" do
+        skip "popen3 doesn't provide a way to get pid " unless RUBY_VERSION >= "1.9.3"
+
+        bundle("exec #{path}") do |_, o, thr|
+          o.gets # Consumes 'Started' and ensures that thread has started
+          Process.kill("INT", thr.pid)
+        end
+
+        expect(out).to eq("foo")
+      end
+    end
   end
 end

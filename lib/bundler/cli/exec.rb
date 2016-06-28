@@ -5,6 +5,8 @@ module Bundler
   class CLI::Exec
     attr_reader :options, :args, :cmd
 
+    RESERVED_SIGNALS = %w(SEGV BUS ILL FPE VTALRM KILL STOP).freeze
+
     def initialize(options, args)
       @options = options
       @cmd = args.shift
@@ -60,6 +62,8 @@ module Bundler
       ui = Bundler.ui
       Bundler.ui = nil
       require "bundler/setup"
+      signals = Signal.list.keys - RESERVED_SIGNALS
+      signals.each {|s| trap(s, "DEFAULT") }
       Kernel.load(file)
     rescue SystemExit
       raise

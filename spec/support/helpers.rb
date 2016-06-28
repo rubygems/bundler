@@ -98,7 +98,7 @@ module Spec
       end.join
 
       cmd = "#{env} #{sudo} #{Gem.ruby} -I#{lib}:#{spec} #{requires_str} #{bundle_bin} #{cmd}#{args}"
-      sys_exec(cmd, expect_err) {|i| yield i if block_given? }
+      sys_exec(cmd, expect_err) {|i, o, thr| yield i, o, thr if block_given? }
     end
     bang :bundle
 
@@ -116,7 +116,7 @@ module Spec
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin}"
 
-      sys_exec(cmd, expect_err) {|i| yield i if block_given? }
+      sys_exec(cmd, expect_err) {|i, o, thr| yield i, o, thr if block_given? }
     end
 
     def ruby(ruby, options = {})
@@ -151,7 +151,7 @@ module Spec
 
     def sys_exec(cmd, expect_err = false)
       Open3.popen3(cmd.to_s) do |stdin, stdout, stderr, wait_thr|
-        yield stdin if block_given?
+        yield stdin, stdout, wait_thr if block_given?
         stdin.close
 
         @out = Thread.new { stdout.read }.value.strip
