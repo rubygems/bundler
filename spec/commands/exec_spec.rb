@@ -545,7 +545,7 @@ describe "bundle exec" do
       it_behaves_like "it runs"
     end
 
-    context "accepts the INT signal" do
+    context "signals being trapped by bundler" do
       let(:executable) { strip_whitespace <<-RUBY }
         #{shebang}
         begin
@@ -560,7 +560,7 @@ describe "bundle exec" do
         end
       RUBY
 
-      it do
+      it "receives the signal" do
         skip "popen3 doesn't provide a way to get pid " unless RUBY_VERSION >= "1.9.3"
 
         bundle("exec #{path}") do |_, o, thr|
