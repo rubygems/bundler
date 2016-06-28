@@ -62,8 +62,6 @@ module Bundler
       @state        = nil
       @specs        = {}
 
-      @rubygems_aggregate = Source::Rubygems.new
-
       if lockfile.match(/<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|/)
         raise LockfileError, "Your #{SharedHelpers.lockfile_name} contains merge conflicts.\n" \
           "Run `git checkout HEAD -- #{SharedHelpers.lockfile_name}` first to get a clean lock."
@@ -87,7 +85,6 @@ module Bundler
           send("parse_#{@state}", line)
         end
       end
-      @sources << @rubygems_aggregate
       @specs = @specs.values
       warn_for_outdated_bundler_version
     rescue ArgumentError => e
@@ -129,23 +126,10 @@ module Bundler
         @type = line
       when SPECS
         case @type
-        when PATH
-          @current_source = TYPES[@type].from_lock(@opts)
-          @sources << @current_source
-        when GIT
-          @current_source = TYPES[@type].from_lock(@opts)
-          # Strip out duplicate GIT sections
-          if @sources.include?(@current_source)
-            @current_source = @sources.find {|s| s == @current_source }
-          else
-            @sources << @current_source
-          end
         when GEM
-          Array(@opts["remote"]).each do |url|
-            @rubygems_aggregate.add_remote(url)
-          end
-          @current_source = @rubygems_aggregate
+          @opts["remotes"] = @opts.delete("remote")
         end
+        add_source(TYPES[@type].from_lock(@opts))
       when OPTIONS
         value = $2
         value = true if value == "true"
@@ -161,6 +145,16 @@ module Bundler
         end
       else
         parse_spec(line)
+      end
+    end
+
+    def add_source(source)
+      # Strip out duplicate sections
+      if @sources.include?(source) && !source.instance_of?(Bundler::Source::Path)
+        @current_source = @sources.find {|s| s == @current_source }
+      else
+        @current_source = source
+        @sources << @current_source
       end
     end
 

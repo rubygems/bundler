@@ -30,7 +30,7 @@ describe "bundle install with gems on multiple sources" do
 
       it "errors when disable_multisource is set" do
         bundle "config disable_multisource true"
-        bundle :install
+        bundle :install, :expect_err => true
         expect(err).to include("Each source after the first must include a block")
         expect(exitstatus).to eq(14) if exitstatus
       end
@@ -59,6 +59,10 @@ describe "bundle install with gems on multiple sources" do
           build_gem "rack", "1.0.0" do |s|
             s.write "lib/rack.rb", "RACK = 'FAIL'"
           end
+
+          build_gem "rack-obama" do |s|
+            s.add_dependency "rack"
+          end
         end
 
         gemfile <<-G
@@ -72,7 +76,7 @@ describe "bundle install with gems on multiple sources" do
       end
 
       it "installs the gems without any warning" do
-        bundle :install
+        bundle! :install
         expect(out).not_to include("Warning")
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
@@ -86,6 +90,10 @@ describe "bundle install with gems on multiple sources" do
           build_gem "rack", "1.0.0" do |s|
             s.write "lib/rack.rb", "RACK = 'FAIL'"
           end
+
+          build_gem "rack-obama" do |s|
+            s.add_dependency "rack"
+          end
         end
 
         gemfile <<-G
@@ -96,13 +104,13 @@ describe "bundle install with gems on multiple sources" do
       end
 
       it "installs the gems without any warning" do
-        bundle :install
+        bundle! :install
         expect(out).not_to include("Warning")
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
     end
 
-    context "with an indirect dependency" do
+    context "when a pinned gem has an indirect dependency" do
       before do
         build_repo gem_repo3 do
           build_gem "depends_on_rack", "1.0.1" do |s|
@@ -150,7 +158,17 @@ describe "bundle install with gems on multiple sources" do
 
           it "installs from the same source without any warning" do
             bundle :install
-            expect(out).not_to include("Warning")
+
+            expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+            expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+
+            # when there is already a lock file, and the gems are missing, so try again
+            system_gems []
+            bundle :install
+
+            expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+            expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
             should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
@@ -214,6 +232,207 @@ describe "bundle install with gems on multiple sources" do
           end
 
           pending "this should have a test or be removed"
+        end
+      end
+    end
+
+    context "installing with dependencies from a monorepo" do
+      def should_be_installed_from_source(names_and_sources)
+        names_and_sources.each do |full_name, source|
+          name, version = full_name.split(" ", 2)
+          constant_name = Spec::Builders.constantize(name)
+          run! <<-RUBY
+            begin
+              require '#{name}'
+              puts begin
+                #{constant_name}
+              rescue NameError
+                #{name[0].upcase + name[1..-1]}::VERSION
+              end
+            rescue LoadError, NameError
+              puts '-'
+            end
+
+            begin
+              require '#{name}/source'
+              puts #{constant_name}_SOURCE
+            rescue LoadError, NameError
+              puts '-'
+            end
+          RUBY
+          actual_version, actual_source = out.split("\n")
+          expect(actual_version).to eq(version), "Expected #{name} to be at version #{version}, instead was at #{actual_version}"
+          expect(actual_source).to eq(source || "-"), "#{full_name} came from #{actual_source.inspect} instead of #{source.inspect}"
+        end
+      end
+
+      before do
+        build_lib "actionpack", "2.3.2", :path => lib_path("rails-2.3.2/actionpack") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.add_dependency "activesupport", "2.3.2"
+        end
+        build_lib "activerecord", "2.3.2", :path => lib_path("rails-2.3.2/activerecord") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.add_dependency "activesupport", "2.3.2"
+        end
+        build_lib "actionmailer", "2.3.2", :path => lib_path("rails-2.3.2/actionmailer") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.add_dependency "activesupport", "2.3.2"
+        end
+        build_lib "activeresource", "2.3.2", :path => lib_path("rails-2.3.2/activeresource") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.add_dependency "activesupport", "2.3.2"
+        end
+        build_lib "activesupport", "2.3.2", :path => lib_path("rails-2.3.2/activesupport") do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+        end
+        build_git "rails", "2.3.2" do |s|
+          s.write "lib/#{s.name}/source.rb", "#{Spec::Builders.constantize(s.name)}_SOURCE = 'rails-git'"
+          s.executables = "rails"
+          s.add_dependency "rake",           "10.0.2"
+          s.add_dependency "actionpack",     s.version
+          s.add_dependency "activerecord",   s.version
+          s.add_dependency "actionmailer",   s.version
+          s.add_dependency "activeresource", s.version
+        end
+      end
+
+      context "when depending on rails via git without a rubygems source" do
+        before do
+          build_lib "rake", "10.0.2" do |s|
+            s.write "lib/rake/source.rb", "RAKE_SOURCE = 'rake-git'"
+          end
+          install_gemfile <<-G
+            gem "rake", :path => #{lib_path("rake-10.0.2").to_s.dump}
+            gem "rails", :git => #{lib_path("rails-2.3.2").to_s.dump}
+          G
+        end
+
+        it "pulls all dependencies from the rails repo" do
+          should_be_installed_from_source("actionmailer 2.3.2" => "rails-git",
+                                          "actionpack 2.3.2" => "rails-git",
+                                          "activerecord 2.3.2" => "rails-git",
+                                          "activeresource 2.3.2" => "rails-git",
+                                          "activesupport 2.3.2" => "rails-git",
+                                          "rails 2.3.2" => "rails-git",
+                                          "rake 10.0.2" => "rake-git")
+        end
+      end
+
+      context "when depending on rails via git with a rubygems source" do
+        before do
+          install_gemfile <<-G
+            source "file://#{gem_repo1}/"
+            gem "rails", :git => #{lib_path("rails-2.3.2").to_s.dump}
+          G
+        end
+
+        it "pulls all dependencies from the rails repo" do
+          should_be_installed_from_source("actionmailer 2.3.2" => "rails-git",
+                                          "actionpack 2.3.2" => "rails-git",
+                                          "activerecord 2.3.2" => "rails-git",
+                                          "activeresource 2.3.2" => "rails-git",
+                                          "activesupport 2.3.2" => "rails-git",
+                                          "rails 2.3.2" => "rails-git",
+                                          "rake 10.0.2" => nil)
+        end
+      end
+
+      context "when depending on rails via git with a rubygems source and a transitive dep is made explicit" do
+        before do
+          install_gemfile <<-G
+            source "file://#{gem_repo1}/"
+            gem "rails", :git => #{lib_path("rails-2.3.2").to_s.dump}
+            gem "actionmailer"
+          G
+        end
+
+        it "pulls all dependencies from the rails repo" do
+          should_be_installed_from_source("actionmailer 2.3.2" => nil,
+                                          "actionpack 2.3.2" => "rails-git",
+                                          "activerecord 2.3.2" => "rails-git",
+                                          "activeresource 2.3.2" => "rails-git",
+                                          "activesupport 2.3.2" => nil,
+                                          "rails 2.3.2" => "rails-git",
+                                          "rake 10.0.2" => nil)
+        end
+      end
+    end
+
+    context "when a top-level gem has an indirect dependency" do
+      before do
+        build_repo gem_repo2 do
+          build_gem "depends_on_rack", "1.0.1" do |s|
+            s.add_dependency "rack"
+          end
+        end
+
+        build_repo gem_repo3 do
+          build_gem "unrelated_gem", "1.0.0"
+        end
+
+        gemfile <<-G
+          source "file://#{gem_repo2}"
+
+          gem "depends_on_rack"
+
+          source "file://#{gem_repo3}" do
+            gem "unrelated_gem"
+          end
+        G
+      end
+
+      context "and the dependency is only in the top-level source" do
+        before do
+          update_repo gem_repo2 do
+            build_gem "rack", "1.0.0"
+          end
+        end
+
+        it "installs all gems without warning" do
+          bundle :install
+          expect(out).not_to include("Warning")
+          expect(err).not_to include("Warning")
+          should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
+        end
+      end
+
+      context "and the dependency is only in a pinned source" do
+        before do
+          update_repo gem_repo3 do
+            build_gem "rack", "1.0.0" do |s|
+              s.write "lib/rack.rb", "RACK = 'FAIL'"
+            end
+          end
+        end
+
+        it "does not find the dependency" do
+          bundle :install, :expect_err => true
+          expect(err).to include strip_whitespace(<<-E).strip
+            Could not find gem 'rack', which is required by gem 'depends_on_rack', in any of the relevant sources:
+              rubygems repository file:#{gem_repo2}/ or installed locally
+          E
+        end
+      end
+
+      context "and the dependency is in both the top-level and a pinned source" do
+        before do
+          update_repo gem_repo2 do
+            build_gem "rack", "1.0.0"
+          end
+
+          update_repo gem_repo3 do
+            build_gem "rack", "1.0.0" do |s|
+              s.write "lib/rack.rb", "RACK = 'FAIL'"
+            end
+          end
+        end
+
+        it "installs the dependency from the top-level source without warning" do
+          bundle :install, :expect_err => true
+          expect(out).not_to include("Warning")
+          expect(err).not_to include("Warning")
+          should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
         end
       end
     end

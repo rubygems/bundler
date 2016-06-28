@@ -89,7 +89,7 @@ describe Bundler::Fetcher::Downloader do
       let(:http_response) { Net::HTTPNotFound.new("1.1", 404, "Not Found") }
 
       it "should raise a Bundler::Fetcher::FallbackError with Net::HTTPNotFound" do
-        expect { subject.fetch(uri, options, counter) }.to raise_error(Bundler::Fetcher::FallbackError, "Net::HTTPNotFound")
+        expect { subject.fetch(uri, options, counter) }.to raise_error(Bundler::Fetcher::FallbackError, "Net::HTTPNotFound (#{uri})")
       end
     end
 

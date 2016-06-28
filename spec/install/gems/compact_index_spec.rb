@@ -222,8 +222,6 @@ The checksum of /versions does not match the checksum provided by the server! So
   end
 
   it "fetches again when more dependencies are found in subsequent sources" do
-    pending "This test only passed with multiple primary sources. We need to " \
-      "fix it to work with pinned sources, too."
     build_repo2 do
       build_gem "back_deps" do |s|
         s.add_dependency "foo"
@@ -256,7 +254,6 @@ The checksum of /versions does not match the checksum provided by the server! So
       end
     end
 
-    pending "this should not be ambiguous. rack 1.2 should come from the extra source."
     gemfile <<-G
       source "#{source_uri}" do; end
       source "#{source_uri}/extra"
@@ -267,7 +264,6 @@ The checksum of /versions does not match the checksum provided by the server! So
   end
 
   it "considers all possible versions of dependencies from all api gem sources" do
-    pending "this is currently broken with a pinned source. we need to fix it."
     # In this scenario, the gem "somegem" only exists in repo4.  It depends on specific version of activesupport that
     # exists only in repo1.  There happens also be a version of activesupport in repo4, but not the one that version 1.0.0
     # of somegem wants. This test makes sure that bundler actually finds version 1.2.3 of active support in the other
@@ -293,7 +289,6 @@ The checksum of /versions does not match the checksum provided by the server! So
   end
 
   it "prints API output properly with back deps" do
-    pending "back deps are currently broken with pinned sources :'("
     build_repo2 do
       build_gem "back_deps" do |s|
         s.add_dependency "foo"
@@ -315,7 +310,6 @@ The checksum of /versions does not match the checksum provided by the server! So
   end
 
   it "does not fetch every spec if the index of gems is large when doing back deps" do
-    pending "back deps: still broken"
     build_repo2 do
       build_gem "back_deps" do |s|
         s.add_dependency "foo"
@@ -352,7 +346,6 @@ The checksum of /versions does not match the checksum provided by the server! So
   end
 
   it "fetches again when more dependencies are found in subsequent sources using --deployment" do
-    pending "back deps also broken in deployment mode"
     build_repo2 do
       build_gem "back_deps" do |s|
         s.add_dependency "foo"

@@ -48,10 +48,6 @@ module Bundler
         o.is_a?(Rubygems) && (o.credless_remotes - credless_remotes).empty?
       end
 
-      def can_lock?(spec)
-        spec.source.is_a?(Rubygems)
-      end
-
       def options
         { "remotes" => @remotes.map(&:to_s) }
       end
@@ -69,8 +65,12 @@ module Bundler
       end
 
       def to_s
-        remote_names = remotes.map(&:to_s).join(", ")
-        "rubygems repository #{remote_names}"
+        if remotes.empty?
+          "locally installed gems"
+        else
+          remote_names = remotes.map(&:to_s).join(", ")
+          "rubygems repository #{remote_names} or installed locally"
+        end
       end
       alias_method :name, :to_s
 
@@ -234,6 +234,20 @@ module Bundler
         end
       end
 
+      def double_check_for(unmet_dependency_names, override_dupes = false, index = specs)
+        return unless @allow_remote
+        raise ArgumentError, "missing index" unless index
+
+        return unless api_fetchers.any?
+
+        unmet_dependency_names = unmet_dependency_names.call
+        Bundler.ui.debug "#{self}: 2x check for #{unmet_dependency_names}"
+
+        return if unmet_dependency_names && unmet_dependency_names.empty?
+
+        fetch_names(api_fetchers, unmet_dependency_names, index, override_dupes)
+      end
+
     protected
 
       def credless_remotes
@@ -337,62 +351,28 @@ module Bundler
           index_fetchers = fetchers - api_fetchers
 
           # gather lists from non-api sites
-          index_fetchers.each do |f|
-            Bundler.ui.info "Fetching source index from #{f.uri}"
-            idx.use f.specs_with_retry(nil, self)
-          end
+          fetch_names(index_fetchers, nil, idx, false)
 
           # because ensuring we have all the gems we need involves downloading
           # the gemspecs of those gems, if the non-api sites contain more than
-          # about 100 gems, we treat all sites as non-api for speed.
+          # about 500 gems, we treat all sites as non-api for speed.
           allow_api = idx.size < API_REQUEST_LIMIT && dependency_names.size < API_REQUEST_LIMIT
           Bundler.ui.debug "Need to query more than #{API_REQUEST_LIMIT} gems." \
             " Downloading full index instead..." unless allow_api
 
-          if allow_api
-            api_fetchers.each do |f|
-              Bundler.ui.info "Fetching gem metadata from #{f.uri}", Bundler.ui.debug?
-              idx.use f.specs_with_retry(dependency_names, self)
-              Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
-            end
+          fetch_names(api_fetchers, allow_api && dependency_names, idx, false)
+        end
+      end
 
-            # Suppose the gem Foo depends on the gem Bar.  Foo exists in Source A.  Bar has some versions that exist in both
-            # sources A and B.  At this point, the API request will have found all the versions of Bar in source A,
-            # but will not have found any versions of Bar from source B, which is a problem if the requested version
-            # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
-            # each spec we found, we add all possible versions from all sources to the index.
-            loop do
-              idxcount = idx.size
-              api_fetchers.each do |f|
-                Bundler.ui.info "Fetching version metadata from #{f.uri}", Bundler.ui.debug?
-                idx.use f.specs_with_retry(idx.dependency_names, self), true
-                Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
-              end
-              break if idxcount == idx.size
-            end
-
-            if api_fetchers.any?
-              # it's possible that gems from one source depend on gems from some
-              # other source, so now we download gemspecs and iterate over those
-              # dependencies, looking for gems we don't have info on yet.
-              unmet = idx.unmet_dependency_names
-
-              # if there are any cross-site gems we missed, get them now
-              api_fetchers.each do |f|
-                Bundler.ui.info "Fetching dependency metadata from #{f.uri}", Bundler.ui.debug?
-                idx.use f.specs_with_retry(unmet, self)
-                Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
-              end if unmet.any?
-            else
-              allow_api = false
-            end
-          end
-
-          unless allow_api
-            api_fetchers.each do |f|
-              Bundler.ui.info "Fetching source index from #{f.uri}"
-              idx.use f.specs_with_retry(nil, self)
-            end
+      def fetch_names(fetchers, dependency_names, index, override_dupes)
+        fetchers.each do |f|
+          if dependency_names
+            Bundler.ui.info "Fetching gem metadata from #{f.uri}", Bundler.ui.debug?
+            index.use f.specs_with_retry(dependency_names, self), override_dupes
+            Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
+          else
+            Bundler.ui.info "Fetching source index from #{f.uri}"
+            index.use f.specs_with_retry(nil, self), override_dupes
           end
         end
       end

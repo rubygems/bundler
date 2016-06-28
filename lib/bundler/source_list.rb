@@ -4,13 +4,15 @@ require "set"
 module Bundler
   class SourceList
     attr_reader :path_sources,
-      :git_sources
+      :git_sources,
+      :global_rubygems_source
 
     def initialize
-      @path_sources       = []
-      @git_sources        = []
-      @rubygems_aggregate = Source::Rubygems.new
-      @rubygems_sources   = []
+      @path_sources           = []
+      @git_sources            = []
+      @global_rubygems_source = nil
+      @rubygems_local         = Source::Rubygems.new
+      @rubygems_sources       = []
     end
 
     def add_path_source(options = {})
@@ -27,13 +29,16 @@ module Bundler
       add_source_to_list Source::Rubygems.new(options), @rubygems_sources
     end
 
-    def add_rubygems_remote(uri)
-      @rubygems_aggregate.add_remote(uri)
-      @rubygems_aggregate
+    def global_rubygems_remote=(uri)
+      @global_rubygems_source = Source::Rubygems.new("remotes" => uri)
+    end
+
+    def default_source
+      @global_rubygems_source || @rubygems_local
     end
 
     def rubygems_sources
-      @rubygems_sources + [@rubygems_aggregate]
+      @rubygems_sources + [default_source]
     end
 
     def rubygems_remotes
@@ -44,13 +49,12 @@ module Bundler
       path_sources + git_sources + rubygems_sources
     end
 
-    def get(source)
-      source_list_for(source).find {|s| source == s }
+    def lock_sources
+      rubygems_sources.sort_by(&:to_s) + git_sources.sort_by(&:to_s) + path_sources.sort_by(&:to_s)
     end
 
-    def lock_sources
-      lock_sources = (path_sources + git_sources).sort_by(&:to_s)
-      lock_sources << combine_rubygems_sources
+    def get(source)
+      source_list_for(source).find {|s| source == s }
     end
 
     def replace_sources!(replacement_sources)
@@ -77,10 +81,6 @@ module Bundler
 
     def remote!
       all_sources.each(&:remote!)
-    end
-
-    def rubygems_primary_remotes
-      @rubygems_aggregate.remotes
     end
 
   private

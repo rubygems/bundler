@@ -218,6 +218,27 @@ module Bundler
           dependency_names -= pinned_spec_names(source.specs)
           dependency_names.push(*source.unmet_deps).uniq!
         end
+
+        # Suppose the gem Foo depends on the gem Bar.  Foo exists in Source A.  Bar has some versions that exist in both
+        # sources A and B.  At this point, the API request will have found all the versions of Bar in source A,
+        # but will not have found any versions of Bar from source B, which is a problem if the requested version
+        # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
+        # each spec we found, we add all possible versions from all sources to the index.
+        loop do
+          idxcount = idx.size
+          sources.all_sources.each do |source|
+            names = :names # do this so we only have to traverse to get dependency_names from the index once
+            unmet_dependency_names = proc do
+              if names == :names
+                names = dependency_names.+(idx.dependency_names).uniq unless idx.size > Source::Rubygems::API_REQUEST_LIMIT
+              else
+                names
+              end
+            end
+            source.double_check_for(unmet_dependency_names, :override_dupes)
+          end
+          break if idxcount == idx.size
+        end
       end
     end
 
@@ -225,8 +246,8 @@ module Bundler
     # spec, even if (say) a git gem is not checked out.
     def rubygems_index
       @rubygems_index ||= Index.build do |idx|
-        sources.rubygems_sources.each do |rubygems|
-          idx.add_source rubygems.specs
+        sources.rubygems_sources.each do |s|
+          idx.add_source s.specs
         end
       end
     end
@@ -496,19 +517,6 @@ module Bundler
     def converge_sources
       changes = false
 
-      # Get the Rubygems sources from the gems.locked
-      locked_gem_sources = @locked_sources.select {|s| s.is_a?(Source::Rubygems) }
-      # Get the Rubygems remotes from the gems.rb
-      actual_remotes = sources.rubygems_remotes
-
-      # If there is a Rubygems source in both
-      if !locked_gem_sources.empty? && !actual_remotes.empty?
-        locked_gem_sources.each do |locked_gem|
-          # Merge the remotes from the gems.rb into the gems.locked
-          changes |= locked_gem.replace_remotes(actual_remotes)
-        end
-      end
-
       # Replace the sources from the gems.rb with the sources from the gems.locked,
       # if they exist in the gems.locked and are `==`. If you can't find an equivalent
       # source in the gems.locked, use the one from the gems.rb.
@@ -654,10 +662,11 @@ module Bundler
       # Record the specs available in each gem's source, so that those
       # specs will be available later when the resolver knows where to
       # look for that gemspec (or its dependencies)
-      source_requirements = {}
+      default = sources.default_source
+      source_requirements = { :default => default }
       dependencies.each do |dep|
-        next unless dep.source
-        source_requirements[dep.name] = dep.source.specs
+        next unless source = dep.source || default
+        source_requirements[dep.name] = source
       end
       source_requirements
     end

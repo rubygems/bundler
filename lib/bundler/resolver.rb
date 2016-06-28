@@ -54,11 +54,20 @@ module Bundler
             o << %(the gems in your #{SharedHelpers.gemfile_name}, which may resolve the conflict.\n)
           elsif !conflict.existing
             o << "\n"
-            if conflict.requirement_trees.first.size > 1
-              o << "Could not find gem '#{conflict.requirement}', which is required by "
-              o << "gem '#{conflict.requirement_trees.first[-2]}', in any of the sources."
+
+            relevant_sources = if conflict.requirement.source
+              [conflict.requirement.source]
+            elsif conflict.requirement.all_sources
+              conflict.requirement.all_sources
             else
-              o << "Could not find gem '#{conflict.requirement}' in any of the sources\n"
+              raise "no source set for #{conflict}"
+            end.compact.uniq
+
+            if conflict.requirement_trees.first.size > 1
+              o << "Could not find gem '#{printable_dep(conflict.requirement)}', which is required by "
+              o << "gem '#{printable_dep(conflict.requirement_trees.first[-2])}', in any of the relevant sources:\n  #{relevant_sources * "\n  "}\n"
+            else
+              o << "Could not find gem '#{printable_dep(conflict.requirement)}' in any of the relevant sources:\n   #{relevant_sources * "\n  "}\n"
             end
           end
           o
@@ -259,7 +268,17 @@ module Bundler
       platform = dependency.__platform
       dependency = dependency.dep unless dependency.is_a? Gem::Dependency
       search = @search_for[dependency] ||= begin
-        index = @source_requirements[dependency.name] || @index
+        index = Index.build do |idx|
+          if source = @source_requirements[dependency.name]
+            idx.add_source source.specs
+          elsif dependency.all_sources
+            dependency.all_sources.each {|s| idx.add_source(s.specs) if s }
+          else
+            idx.add_source @source_requirements[:default].specs
+          end
+        end
+        # source = @source_requirements[dependency.name]
+        # index = (source && source.specs) || @index
         results = index.search(dependency, @base[dependency.name])
         if vertex = @base_dg.vertex_named(dependency.name)
           locked_requirement = vertex.payload.requirement
@@ -303,8 +322,19 @@ module Bundler
       requirement.matches_spec?(spec)
     end
 
+    def relevant_sources_for_vertex(vertex)
+      if vertex.root?
+        [@source_requirements[vertex.name]]
+      else
+        vertex.recursive_predecessors.map do |v|
+          @source_requirements[v.name]
+        end << @source_requirements[:default]
+      end
+    end
+
     def sort_dependencies(dependencies, activated, conflicts)
       dependencies.sort_by do |dependency|
+        dependency.all_sources = relevant_sources_for_vertex(activated.vertex_named(dependency.name))
         name = name_for(dependency)
         [
           activated.vertex_named(name).payload ? 0 : 1,
@@ -336,26 +366,26 @@ module Bundler
 
     def verify_gemfile_dependencies_are_found!(requirements)
       requirements.each do |requirement|
-        next if requirement.name == "bundler"
+        name = requirement.name
+        next if name == "bundler"
         next unless search_for(requirement).empty?
 
-        if (base = @base[requirement.name]) && !base.empty?
+        if (base = @base[name]) && !base.empty?
           version = base.first.version
           message = "You have requested:\n" \
-            "  #{requirement.name} #{requirement.requirement}\n\n" \
-            "The bundle currently has #{requirement.name} locked at #{version}.\n" \
-            "Try running `bundle update #{requirement.name}`\n\n" \
+            "  #{name} #{requirement.requirement}\n\n" \
+            "The bundle currently has #{name} locked at #{version}.\n" \
+            "Try running `bundle update #{name}`\n\n" \
             "If you are updating multiple gems in your Gemfile at once,\n" \
             "try passing them all to `bundle update`"
-        elsif requirement.source
-          name = requirement.name
-          specs = @source_requirements[name][name]
+        elsif source = @source_requirements[name]
+          specs = source.specs[name]
           versions_with_platforms = specs.map {|s| [s.version, s.platform] }
-          message = String.new("Could not find gem '#{requirement}' in #{requirement.source}.\n")
+          message = String.new("Could not find gem '#{requirement}' in #{source}.\n")
           message << if versions_with_platforms.any?
-                       "Source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
+                       "The source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
                      else
-                       "Source does not contain any versions of '#{requirement}'"
+                       "The source does not contain any versions of '#{requirement}'."
                      end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
@@ -370,7 +400,8 @@ module Bundler
         version = vwp.first
         platform = vwp.last
         version_platform_str = String.new(version.to_s)
-        version_platform_str << " #{platform}" unless platform.nil?
+        version_platform_str << " #{platform}" unless platform.nil? || platform == Gem::Platform::RUBY
+        version_platform_str
       end
       version_platform_strs.join(", ")
     end

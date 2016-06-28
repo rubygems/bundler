@@ -367,9 +367,9 @@ describe "Bundler.setup" do
       end
 
       gemfile <<-G
-        path "#{lib_path("rack-1.0.0")}"
-        source "file://#{gem_repo1}"
-        gem "rack"
+        path "#{lib_path("rack-1.0.0")}" do
+          gem "rack"
+        end
       G
 
       run "require 'rack'"

@@ -132,7 +132,7 @@ module Bundler
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
         check_primary_source_safety(@sources)
-        @sources.add_rubygems_remote(source)
+        @sources.global_rubygems_remote = source
       end
     end
 
@@ -150,6 +150,16 @@ module Bundler
     end
 
     def path(path, options = {}, &blk)
+      unless block_given?
+        msg = "You can no longer specify a path source by itself. Instead, \n" \
+              "either use the :path option on a gem, or specify the gems that \n" \
+              "bundler should find in the path source by passing a block to \n" \
+              "the path method, like: \n\n" \
+              "  path 'dir/containing/rails' do\n" \
+              "    gem 'rails'\n" \
+              "  end"
+        raise DeprecatedError, msg
+      end
       source_options = normalize_hash(options).merge("path" => Pathname.new(path), "root_path" => gemfile_root)
       source = @sources.add_path_source(source_options)
       with_source(source, &blk)
@@ -384,8 +394,8 @@ module Bundler
       end
     end
 
-    def check_primary_source_safety(source)
-      return unless source.rubygems_primary_remotes.any?
+    def check_primary_source_safety(source_list)
+      return if source_list.global_rubygems_source.nil?
 
       raise GemspecError, "This #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
         "Each source after the first must include a block to indicate which gems " \
