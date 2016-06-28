@@ -3,6 +3,16 @@ module Bundler
   class BundlerError < StandardError
     def self.status_code(code)
       define_method(:status_code) { code }
+      if match = BundlerError.all_errors.find {|_k, v| v == code }
+        error, _ = match
+        raise ArgumentError,
+          "Trying to register #{self} for status code #{code} but #{error} is already registered"
+      end
+      BundlerError.all_errors[self] = code
+    end
+
+    def self.all_errors
+      @all_errors ||= {}
     end
   end
 
@@ -41,7 +51,7 @@ module Bundler
   class LockfileError < BundlerError; status_code(20); end
   class CyclicDependencyError < BundlerError; status_code(21); end
   class GemfileLockNotFound < BundlerError; status_code(22); end
-  class PluginError < BundlerError; status_code(23); end
+  class PluginError < BundlerError; status_code(29); end
   class GemfileEvalError < GemfileError; end
   class MarshalError < StandardError; end
 
