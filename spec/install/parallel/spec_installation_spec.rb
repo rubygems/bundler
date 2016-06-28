@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/installer/parallel_installer"
 
-describe ParallelInstaller::SpecInstallation do
+describe Bundler::ParallelInstaller::SpecInstallation do
   let!(:dep) do
     a_spec = Object.new
     def a_spec.name
@@ -14,7 +14,7 @@ describe ParallelInstaller::SpecInstallation do
   describe "#ready_to_enqueue?" do
     context "when in enqueued state" do
       it "is falsey" do
-        spec = ParallelInstaller::SpecInstallation.new(dep)
+        spec = described_class.new(dep)
         spec.state = :enqueued
         expect(spec.ready_to_enqueue?).to be_falsey
       end
@@ -22,14 +22,14 @@ describe ParallelInstaller::SpecInstallation do
 
     context "when in installed state" do
       it "returns falsey" do
-        spec = ParallelInstaller::SpecInstallation.new(dep)
+        spec = described_class.new(dep)
         spec.state = :installed
         expect(spec.ready_to_enqueue?).to be_falsey
       end
     end
 
     it "returns truthy" do
-      spec = ParallelInstaller::SpecInstallation.new(dep)
+      spec = described_class.new(dep)
       expect(spec.ready_to_enqueue?).to be_truthy
     end
   end
@@ -41,7 +41,7 @@ describe ParallelInstaller::SpecInstallation do
         dependencies << instance_double("SpecInstallation", :spec => "alpha", :name => "alpha", :installed? => true, :all_dependencies => [], :type => :production)
         dependencies << instance_double("SpecInstallation", :spec => "beta", :name => "beta", :installed? => true, :all_dependencies => [], :type => :production)
         all_specs = dependencies + [instance_double("SpecInstallation", :spec => "gamma", :name => "gamma", :installed? => false, :all_dependencies => [], :type => :production)]
-        spec = ParallelInstaller::SpecInstallation.new(dep)
+        spec = described_class.new(dep)
         allow(spec).to receive(:all_dependencies).and_return(dependencies)
         expect(spec.dependencies_installed?(all_specs)).to be_truthy
       end
@@ -53,7 +53,7 @@ describe ParallelInstaller::SpecInstallation do
         dependencies << instance_double("SpecInstallation", :spec => "alpha", :name => "alpha", :installed? => false, :all_dependencies => [], :type => :production)
         dependencies << instance_double("SpecInstallation", :spec => "beta", :name => "beta", :installed? => true, :all_dependencies => [], :type => :production)
         all_specs = dependencies + [instance_double("SpecInstallation", :spec => "gamma", :name => "gamma", :installed? => false, :all_dependencies => [], :type => :production)]
-        spec = ParallelInstaller::SpecInstallation.new(dep)
+        spec = described_class.new(dep)
         allow(spec).to receive(:all_dependencies).and_return(dependencies)
         expect(spec.dependencies_installed?(all_specs)).to be_falsey
       end
@@ -67,7 +67,7 @@ describe ParallelInstaller::SpecInstallation do
         # Add dependency which is not in all_specs
         dependencies << instance_double("SpecInstallation", :spec => "beta", :name => "beta", :installed? => false, :all_dependencies => [], :type => :production)
         dependencies << instance_double("SpecInstallation", :spec => "delta", :name => "delta", :installed? => false, :all_dependencies => [], :type => :production)
-        spec = ParallelInstaller::SpecInstallation.new(dep)
+        spec = described_class.new(dep)
         allow(spec).to receive(:all_dependencies).and_return(dependencies)
         expect { spec.dependencies_installed?(all_specs) }.
           to raise_error(Bundler::LockfileError, /Your Gemfile.lock is corrupt\. The following.*'beta' 'delta'/)
