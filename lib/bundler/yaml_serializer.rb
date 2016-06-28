@@ -27,11 +27,10 @@ module Bundler
 
     ARRAY_REGEX = /
       ^
-      ([ ]*) # indentations
-      (?:-[ ]) # '- ' before array items
+      (?:[ ]*-[ ]) # '- ' before array items
       (['"]?) # optional opening quote
       (.*) # value
-      \2 # matching closing quote
+      \1 # matching closing quote
       $
     /xo
 
@@ -51,18 +50,27 @@ module Bundler
     def load(str)
       res = {}
       stack = [res]
+      last_hash = nil
+      last_empty_key = nil
       str.split("\n").each do |line|
-        if line =~ HASH_REGEX
-          indent, key, _, val = HASH_REGEX.match(line).captures
+        if match = HASH_REGEX.match(line)
+          indent, key, _, val = match.captures
           key = convert_to_backward_compatible_key(key)
           depth = indent.scan(/  /).length
           if val.empty?
             new_hash = {}
             stack[depth][key] = new_hash
             stack[depth + 1] = new_hash
+            last_empty_key = key
+            last_hash = stack[depth]
           else
             stack[depth][key] = val
           end
+        elsif match = ARRAY_REGEX.match(line)
+          _, val = match.captures
+          last_hash[last_empty_key] = [] unless last_hash[last_empty_key].is_a?(Array)
+
+          last_hash[last_empty_key].push(val)
         end
       end
       res

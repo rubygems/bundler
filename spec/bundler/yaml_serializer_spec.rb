@@ -32,6 +32,31 @@ describe Bundler::YAMLSerializer do
 
       expect(serializer.dump(hash)).to eq(expected)
     end
+
+    it "array inside an hash" do
+      hash = {
+        "nested_hash" => {
+          "contains_array" => [
+            "Jack and Jill went up the hill",
+            "To fetch a pail of water.",
+            "Jack fell down and broke his crown,",
+            "And Jill came tumbling after.",
+          ]
+        }
+      }
+
+      expected = strip_whitespace <<-YAML
+        ---
+        nested_hash:
+          contains_array:
+          - "Jack and Jill went up the hill"
+          - "To fetch a pail of water."
+          - "Jack fell down and broke his crown,"
+          - "And Jill came tumbling after."
+      YAML
+
+      expect(serializer.dump(hash)).to eq(expected)
+    end
   end
 
   describe "#load" do
@@ -52,6 +77,7 @@ describe Bundler::YAMLSerializer do
 
     it "works for nested hash" do
       yaml = strip_whitespace <<-YAML
+        ---
         baa:
           baa: "black sheep"
           have: "you any wool?"
@@ -60,6 +86,7 @@ describe Bundler::YAMLSerializer do
       YAML
 
       hash = {
+        ---
         "baa" => {
           "baa" => "black sheep",
           "have" => "you any wool?",
@@ -78,6 +105,27 @@ describe Bundler::YAMLSerializer do
 
       expect(serializer.load(yaml)).to eq("BUNDLE_MIRROR__HTTPS://RUBYGEMS__ORG/" => "http://rubygems-mirror.org")
     end
+
+    it "handles arrays inside hashes" do
+      yaml = strip_whitespace <<-YAML
+        ---
+        nested_hash:
+          contains_array:
+          - "Why shouldn't you write with a broken pencil?"
+          - "Because it's pointless!"
+      YAML
+
+      hash = {
+        "nested_hash" => {
+          "contains_array" => [
+            "Why shouldn't you write with a broken pencil?",
+            "Because it's pointless!"
+          ]
+        }
+      }
+
+      expect(serializer.load(yaml)).to eq(hash)
+    end
   end
 
   describe "against yaml lib" do
@@ -86,6 +134,16 @@ describe Bundler::YAMLSerializer do
         "a_joke" => {
           "my-stand" => "I can totally keep secrets",
           "but" => "The people I tell them to can't :P",
+        },
+        "more" => {
+          "first" => [
+            "Can a kangaroo jump higher than a house?",
+            "Of course, a house doesn’t jump at all."
+          ],
+          "second" => [
+            "What did the sea say to the sand?",
+            "Nothing, it simply waved."
+          ]
         },
         "sales" => {
           "item" => "A Parachute",
