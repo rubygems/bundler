@@ -239,17 +239,30 @@ describe "bundle install with gems on multiple sources" do
     context "installing with dependencies from a monorepo" do
       def should_be_installed_from_source(names_and_sources)
         names_and_sources.each do |full_name, source|
-          should_be_installed full_name
-          name = full_name.split(" ", 2).first
-          run! <<-R
+          name, version = full_name.split(" ", 2)
+          constant_name = Spec::Builders.constantize(name)
+          run! <<-RUBY
             begin
-              require '#{name}/source.rb'
-              puts #{Spec::Builders.constantize(name)}_SOURCE
+              require '#{name}'
+              puts begin
+                #{constant_name}
+              rescue NameError
+                #{name[0].upcase + name[1..-1]}::VERSION
+              end
             rescue LoadError, NameError
-              puts
+              puts '-'
             end
-          R
-          expect(out).to eq(source.to_s), "#{full_name} came from #{out.inspect} instead of #{source.inspect}"
+
+            begin
+              require '#{name}/source'
+              puts #{constant_name}_SOURCE
+            rescue LoadError, NameError
+              puts '-'
+            end
+          RUBY
+          actual_version, actual_source = out.split("\n")
+          expect(actual_version).to eq(version), "Expected #{name} to be at version #{version}, instead was at #{actual_version}"
+          expect(actual_source).to eq(source || "-"), "#{full_name} came from #{actual_source.inspect} instead of #{source.inspect}"
         end
       end
 
