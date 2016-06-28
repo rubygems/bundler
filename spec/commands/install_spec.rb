@@ -487,7 +487,7 @@ describe "bundle install with gem sources" do
   end
 
   describe "warns user if Bundler is outdated" do
-    it "warns only once and is > 1.13.0.pre.1" do
+    it "warns only once and is > 1.13.0.rc.1" do
       gemfile <<-G
         source "file://#{gem_repo1}"
       G

@@ -142,7 +142,7 @@ The error was:
       end
     end
 
-    it "warns user if Bundler is outdated and is < 1.13.0.pre.1" do
+    it "warns user if Bundler is outdated and is < 1.13.0.rc.1" do
       ENV["BUNDLER_VERSION"] = "1.12.0"
       bundle! "install"
       expect(out).to include(<<-WARN.strip)
