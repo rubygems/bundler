@@ -86,7 +86,6 @@ describe Bundler::YAMLSerializer do
       YAML
 
       hash = {
-        ---
         "baa" => {
           "baa" => "black sheep",
           "have" => "you any wool?",
@@ -138,7 +137,7 @@ describe Bundler::YAMLSerializer do
         "more" => {
           "first" => [
             "Can a kangaroo jump higher than a house?",
-            "Of course, a house doesn’t jump at all.",
+            "Of course, a house doesn't jump at all.",
           ],
           "second" => [
             "What did the sea say to the sand?",

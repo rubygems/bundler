@@ -49,14 +49,12 @@ describe Bundler::Plugin::Installer do
           end
         end
 
-        let(:expected) { { "ga-plugin" => Gem::Specification.new("ga-plugin", "1.0") } }
-
         let(:result) do
           installer.install(["ga-plugin"], :git => "file://#{lib_path("ga-plugin")}")
         end
 
         it "returns the installed spec after installing" do
-          expect(result).to include(expected)
+          expect(result["ga-plugin"]).to be_kind_of(Gem::Specification)
         end
 
         it "has expected full gem path" do
