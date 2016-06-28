@@ -41,8 +41,8 @@ describe Bundler::YAMLSerializer do
             "To fetch a pail of water.",
             "Jack fell down and broke his crown,",
             "And Jill came tumbling after.",
-          ]
-        }
+          ],
+        },
       }
 
       expected = strip_whitespace <<-YAML
@@ -119,9 +119,9 @@ describe Bundler::YAMLSerializer do
         "nested_hash" => {
           "contains_array" => [
             "Why shouldn't you write with a broken pencil?",
-            "Because it's pointless!"
-          ]
-        }
+            "Because it's pointless!",
+          ],
+        },
       }
 
       expect(serializer.load(yaml)).to eq(hash)
@@ -138,12 +138,12 @@ describe Bundler::YAMLSerializer do
         "more" => {
           "first" => [
             "Can a kangaroo jump higher than a house?",
-            "Of course, a house doesn’t jump at all."
+            "Of course, a house doesn’t jump at all.",
           ],
           "second" => [
             "What did the sea say to the sand?",
-            "Nothing, it simply waved."
-          ]
+            "Nothing, it simply waved.",
+          ],
         },
         "sales" => {
           "item" => "A Parachute",

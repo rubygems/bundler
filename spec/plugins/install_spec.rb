@@ -45,6 +45,29 @@ describe "bundler plugin install" do
     plugin_should_be_installed("foo", "kung-foo")
   end
 
+  it "works with different load paths" do
+    build_repo2 do
+      build_plugin "testing" do |s|
+        s.write "plugins.rb", <<-RUBY
+          require "fubar"
+          class Test < Bundler::Plugin::API
+            command "check2"
+
+            def exec(command, args)
+              puts "mate"
+            end
+          end
+        RUBY
+        s.require_paths = %w(lib src)
+        s.write("src/fubar.rb")
+      end
+    end
+    bundle "plugin install testing --source file://#{gem_repo2}"
+
+    bundle "check2", "no-color" => false
+    expect(out).to eq("mate")
+  end
+
   context "malformatted plugin" do
     it "fails when plugins.rb is missing" do
       build_repo2 do
