@@ -308,9 +308,6 @@ describe "bundle install with gems on multiple sources" do
 
       context "when depending on rails via git with a rubygems source" do
         before do
-          update_repo gem_repo1 do
-            build_gem "rake", "10.0.2"
-          end
           install_gemfile <<-G
             source "file://#{gem_repo1}/"
             gem "rails", :git => #{lib_path("rails-2.3.2").to_s.dump}
@@ -330,9 +327,6 @@ describe "bundle install with gems on multiple sources" do
 
       context "when depending on rails via git with a rubygems source and a transitive dep is made explicit" do
         before do
-          update_repo gem_repo1 do
-            build_gem "rake", "10.0.2"
-          end
           install_gemfile <<-G
             source "file://#{gem_repo1}/"
             gem "rails", :git => #{lib_path("rails-2.3.2").to_s.dump}
