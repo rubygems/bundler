@@ -42,7 +42,7 @@ module Bundler
     PATTERN = /
       ruby\s
       ([\d.]+) # ruby version
-      (?:p(\d+))? # optional patchlevel
+      (?:p(-?\d+))? # optional patchlevel
       (?:\s\((\S+)\s(.+)\))? # optional engine info
     /xo
 
@@ -115,7 +115,9 @@ module Bundler
                             else
                               raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
       end
-      @ruby_version ||= RubyVersion.new(ruby_version, RUBY_PATCHLEVEL.to_s, ruby_engine, ruby_engine_version)
+      patchlevel = RUBY_PATCHLEVEL.to_s
+
+      @ruby_version ||= RubyVersion.new(ruby_version, patchlevel, ruby_engine, ruby_engine_version)
     end
 
     def to_gem_version_with_patchlevel
