@@ -25,11 +25,11 @@ module Bundler
     # @param [Hash] options various parameters as described in description.
     #               Refer to cli/plugin for available options
     def install(names, options)
-      paths = Installer.new.install(names, options)
+      specs = Installer.new.install(names, options)
 
-      save_plugins names, paths
+      save_plugins names, specs
     rescue PluginError => e
-      paths.values.map {|path| Bundler.rm_rf(path) } if paths
+      specs.values.map {|spec| Bundler.rm_rf(spec.full_gem_path) } if specs
       Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace[0]}"
     end
 
@@ -50,9 +50,9 @@ module Bundler
       return if definition.dependencies.empty?
 
       plugins = definition.dependencies.map(&:name).reject {|p| index.installed? p }
-      install_paths = Installer.new.install_definition(definition)
+      installed_specs = Installer.new.install_definition(definition)
 
-      save_plugins plugins, install_paths, builder.inferred_plugins
+      save_plugins plugins, installed_specs, builder.inferred_plugins
     rescue => e
       Bundler.ui.error "Failed to install plugin: #{e.message}\n  #{e.backtrace[0]}"
       raise
@@ -131,14 +131,14 @@ module Bundler
     # Post installation processing and registering with index
     #
     # @param [Array<String>] plugins list to be installed
-    # @param [Hash] names of plugin mapped to installation path (currently they
-    #               contain all the installation paths, including plugins)
+    # @param [Hash] specs of plugins mapped to installation path (currently they
+    #               contain all the installed specs, including plugins)
     # @param [Array<String>] names of inferred source plugins that can be ignored
-    def save_plugins(plugins, paths, optional_plugins = [])
+    def save_plugins(plugins, specs, optional_plugins = [])
       plugins.each do |name|
-        path = Pathname.new paths[name]
-        validate_plugin! path
-        installed = register_plugin name, path, optional_plugins.include?(name)
+        spec = specs[name]
+        validate_plugin! Pathname.new(spec.full_gem_path)
+        installed = register_plugin name, spec, optional_plugins.include?(name)
         Bundler.ui.info "Installed plugin #{name}" if installed
       end
     end
@@ -158,17 +158,21 @@ module Bundler
     # actions it registers for and then passes the data to index to be stored.
     #
     # @param [String] name the name of the plugin
-    # @param [Pathname] path the path where the plugin is installed at
+    # @param [Specification] spec of installed plugin
     # @param [Boolean] optional_plugin, removed if there is conflict with any
     #                     other plugin (used for default source plugins)
     #
     # @raise [MalformattedPlugin] if plugins.rb raises any error
-    def register_plugin(name, path, optional_plugin = false)
+    def register_plugin(name, spec, optional_plugin = false)
       commands = @commands
       sources = @sources
 
       @commands = {}
       @sources = {}
+
+      load_paths = spec.load_paths
+      add_to_load_path(load_paths)
+      path = Pathname.new spec.full_gem_path
 
       begin
         load path.join(PLUGIN_FILE_NAME), true
@@ -180,7 +184,7 @@ module Bundler
         Bundler.rm_rf(path)
         false
       else
-        index.register_plugin name, path.to_s, @commands.keys, @sources.keys
+        index.register_plugin name, path.to_s, load_paths, @commands.keys, @sources.keys
         true
       end
     ensure
@@ -197,11 +201,7 @@ module Bundler
       # done to avoid conflicts
       path = index.plugin_path(name)
 
-      if insert_index = Bundler.rubygems.load_path_insert_index
-        $LOAD_PATH.insert(insert_index, path.join("lib").to_s)
-      else
-        $LOAD_PATH.unshift(path.join("lib").to_s)
-      end
+      add_to_load_path(index.load_paths(name))
 
       load path.join(PLUGIN_FILE_NAME)
     rescue => e
@@ -209,8 +209,17 @@ module Bundler
       raise
     end
 
+    def add_to_load_path(load_paths)
+      if insert_index = Bundler.rubygems.load_path_insert_index
+        $LOAD_PATH.insert(insert_index, *load_paths)
+      else
+        $LOAD_PATH.unshift(*load_paths)
+      end
+    end
+
     class << self
-      private :load_plugin, :register_plugin, :save_plugins, :validate_plugin!
+      private :load_plugin, :register_plugin, :save_plugins, :validate_plugin!,
+        :add_to_load_path
     end
   end
 end

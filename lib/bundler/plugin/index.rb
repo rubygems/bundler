@@ -24,6 +24,7 @@ module Bundler
         @plugin_paths = {}
         @commands = {}
         @sources = {}
+        @load_paths = {}
 
         load_index
       end
@@ -34,9 +35,10 @@ module Bundler
       #
       # @param [String] name of the plugin to be registered
       # @param [String] path where the plugin is installed
+      # @param [Array<String>] load_paths for the plugin
       # @param [Array<String>] commands that are handled by the plugin
       # @param [Array<String>] sources that are handled by the plugin
-      def register_plugin(name, path, commands, sources)
+      def register_plugin(name, path, load_paths, commands, sources)
         old_commands = @commands.dup
 
         common = commands & @commands.keys
@@ -48,6 +50,7 @@ module Bundler
         sources.each {|k| @sources[k] = name }
 
         @plugin_paths[name] = path
+        @load_paths[name] = load_paths
         save_index
       rescue
         @commands = old_commands
@@ -61,6 +64,10 @@ module Bundler
 
       def plugin_path(name)
         Pathname.new @plugin_paths[name]
+      end
+
+      def load_paths(name)
+        @load_paths[name]
       end
 
       # Fetch the name of plugin handling the command
@@ -92,6 +99,7 @@ module Bundler
           require "bundler/yaml_serializer"
           index = YAMLSerializer.load(data)
           @plugin_paths = index["plugin_paths"] || {}
+          @load_paths = index["load_paths"] || {}
           @commands = index["commands"] || {}
           @sources = index["sources"] || {}
         end
@@ -103,6 +111,7 @@ module Bundler
       def save_index
         index = {
           "plugin_paths" => @plugin_paths,
+          "load_paths" => @load_paths,
           "commands" => @commands,
           "sources" => @sources,
         }
