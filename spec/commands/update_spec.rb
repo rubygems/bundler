@@ -502,6 +502,14 @@ describe "bundle update conservative" do
     end
   end
 
+  context "error handling" do
+    it "raises if too many flags are provided" do
+      bundle "update --patch --minor"
+
+      expect(out).to eq "Provide only one of the following options: minor, patch"
+    end
+  end
+
   context "other commands" do
     it "Installer could support --dry-run flag for install and update"
 
