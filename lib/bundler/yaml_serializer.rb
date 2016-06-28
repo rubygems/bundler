@@ -16,6 +16,8 @@ module Bundler
         yaml << k << ":"
         if v.is_a?(Hash)
           yaml << dump_hash(v).gsub(/^(?!$)/, "  ") # indent all non-empty lines
+        elsif v.is_a?(Array) # Expected to be array of strings
+          yaml << "\n- " << v.map {|s| s.to_s.gsub(/\s+/, " ").inspect }.join("\n- ") << "\n"
         else
           yaml << " " << v.to_s.gsub(/\s+/, " ").inspect << "\n"
         end
@@ -23,11 +25,21 @@ module Bundler
       yaml
     end
 
-    SCAN_REGEX = /
+    ARRAY_REGEX = /
+      ^
+      ([ ]*) # indentations
+      (?:-[ ]) # '- ' before array items
+      (['"]?) # optional opening quote
+      (.*) # value
+      \2 # matching closing quote
+      $
+    /xo
+
+    HASH_REGEX = /
       ^
       ([ ]*) # indentations
       (.*) # key
-      (?::(?=\s)) # :  (without the lookahead the #key includes this when : is present in value)
+      (?::(?=(?:\s|$))) # :  (without the lookahead the #key includes this when : is present in value)
       [ ]?
       (?: !\s)? # optional exclamation mark found with ruby 1.9.3
       (['"]?) # optional opening quote
@@ -39,15 +51,18 @@ module Bundler
     def load(str)
       res = {}
       stack = [res]
-      str.scan(SCAN_REGEX).each do |(indent, key, _, val)|
-        key = convert_to_backward_compatible_key(key)
-        depth = indent.scan(/  /).length
-        if val.empty?
-          new_hash = {}
-          stack[depth][key] = new_hash
-          stack[depth + 1] = new_hash
-        else
-          stack[depth][key] = val
+      str.split("\n").each do |line|
+        if line =~ HASH_REGEX
+          indent, key, _, val = HASH_REGEX.match(line).captures
+          key = convert_to_backward_compatible_key(key)
+          depth = indent.scan(/  /).length
+          if val.empty?
+            new_hash = {}
+            stack[depth][key] = new_hash
+            stack[depth + 1] = new_hash
+          else
+            stack[depth][key] = val
+          end
         end
       end
       res
