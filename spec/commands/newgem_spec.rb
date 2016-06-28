@@ -743,7 +743,7 @@ describe "bundle gem" do
     it "asks about test framework" do
       global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__COC" => "false"
 
-      bundle "gem foobar" do |input|
+      bundle "gem foobar" do |input, _, _|
         input.puts "rspec"
       end
 
@@ -766,7 +766,7 @@ describe "bundle gem" do
 
       bundle :config
 
-      bundle "gem foobar" do |input|
+      bundle "gem foobar" do |input, _, _|
         input.puts "yes"
       end
 
@@ -776,7 +776,7 @@ describe "bundle gem" do
     it "asks about CoC" do
       global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false"
 
-      bundle "gem foobar" do |input|
+      bundle "gem foobar" do |input, _, _|
         input.puts "yes"
       end
 

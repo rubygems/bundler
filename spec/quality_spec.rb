@@ -202,7 +202,7 @@ describe "The library itself" do
       lib_files = `git ls-files -z`.split("\x0").grep(/\.rb$/) - exclusions
       lib_files.reject! {|f| f.start_with?("bundler/vendor") }
       lib_files.map! {|f| f.chomp(".rb") }
-      sys_exec("ruby -w -I. ", :expect_err) do |input|
+      sys_exec("ruby -w -I. ", :expect_err) do |input, _, _|
         lib_files.each do |f|
           input.puts "require '#{f}'"
         end

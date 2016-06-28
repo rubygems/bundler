@@ -929,7 +929,7 @@ G
         #{ruby_version_correct}
       G
 
-      bundle "console" do |input|
+      bundle "console" do |input, _, _|
         input.puts("puts RACK")
         input.puts("exit")
       end
@@ -947,7 +947,7 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        bundle "console" do |input|
+        bundle "console" do |input, _, _|
           input.puts("puts RACK")
           input.puts("exit")
         end

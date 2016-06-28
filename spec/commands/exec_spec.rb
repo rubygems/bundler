@@ -561,6 +561,8 @@ describe "bundle exec" do
       RUBY
 
       it do
+        skip "popen3 doesn't provide a way to get pid " unless RUBY_VERSION >= "1.9.3"
+
         bundle("exec #{path}") do |_, o, thr|
           o.gets # Consumes 'Started' and ensures that thread has started
           Process.kill("INT", thr.pid)
