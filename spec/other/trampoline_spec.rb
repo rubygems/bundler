@@ -146,7 +146,7 @@ The error was:
       ENV["BUNDLER_VERSION"] = "1.12.0"
       bundle! "install"
       expect(out).to include(<<-WARN.strip)
-You're running Bundler #{Bundler::VERSION} but this project uses #{ENV["BUNDLER_VERSION"]}. To update, run `bundle update --bundler`.\n
+You're running Bundler #{Bundler::VERSION} but this project uses #{ENV["BUNDLER_VERSION"]}. To update, run `bundle update --bundler`.
       WARN
     end
   end
