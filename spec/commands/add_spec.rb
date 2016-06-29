@@ -32,14 +32,23 @@ describe "bundle add" do
       expect(bundled_app("Gemfile").read).to include("gem 'activesupport', '~> 2.3.5'")
     end
 
-    it "adds the gem with the last prerelease version" do
+    it "`--pre` flag adds the gem with the latest prerelease version" do
       update_repo2 do
-        build_gem "activesupport", "3.0.0"
         build_gem "activesupport", "3.0.0.beta"
       end
 
       bundle "add activesupport --pre"
       expect(bundled_app("Gemfile").read).to include("gem 'activesupport', '~> 3.0.0.beta'")
+    end
+
+    it "`--pre` flag adds the gem with the latest non-prerelease version if it is available" do
+      update_repo2 do
+        build_gem "activesupport", "3.0.0.beta"
+        build_gem "activesupport", "3.0.0"
+      end
+
+      bundle "add activesupport --pre"
+      expect(bundled_app("Gemfile").read).to include("gem 'activesupport', '~> 3.0.0'")
     end
   end
 
