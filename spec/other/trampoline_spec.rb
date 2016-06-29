@@ -131,7 +131,7 @@ The error was:
         puts Bundler::VERSION
       R
       expect(err).to be_empty
-      expect(out).to eq("1.12.0")
+      expect(out).to include("1.12.0")
     end
   end
 
