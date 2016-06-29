@@ -265,10 +265,17 @@ describe "bundle outdated" do
       G
     end
 
-    it "reports that updates are available" do
+    it "reports that updates are available if the Ruby platform is used" do
       bundle "outdated"
-      expect(out).to include("Outdated gems included in the bundle:")
-      expect(out).to include("laduradura (newest 5.15.3, installed 5.15.2, requested = 5.15.2)")
+      expect(out).to include("Bundle up to date!")
+    end
+
+    it "reports that updates are available if the JRuby platform is used" do
+      simulate_ruby_engine "jruby" do
+        bundle "outdated"
+        expect(out).to include("Outdated gems included in the bundle:")
+        expect(out).to include("laduradura (newest 5.15.3, installed 5.15.2, requested = 5.15.2)")
+      end
     end
   end
 
