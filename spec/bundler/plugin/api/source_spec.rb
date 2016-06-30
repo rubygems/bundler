@@ -13,7 +13,7 @@ describe Bundler::Plugin::API::Source do
 
   describe "attributes" do
     it "allows access to uri" do
-      expect(source.uri).to be("uri://to/test")
+      expect(source.uri).to eq("uri://to/test")
     end
 
     it "allows access to name" do
