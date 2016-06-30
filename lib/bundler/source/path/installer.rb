@@ -24,7 +24,7 @@ module Bundler
         end
 
         def post_install
-          SharedHelpers.chdir(@gem_dir) do
+          SharedHelpers.chdir(gem_dir) do
             run_hooks(:pre_install)
 
             unless @disable_extentions
