@@ -64,7 +64,7 @@ describe Bundler::Plugin::API::Source do
 
     context "with additional options to lock" do
       before do
-        allow(source).to receive(:options_to_lock) { { "first" => "option", "second" => "option to lock" } }
+        allow(source).to receive(:options_to_lock) { { "first" => "option" } }
       end
 
       it "includes them" do
@@ -73,7 +73,6 @@ describe Bundler::Plugin::API::Source do
             remote: #{uri}
             type: #{type}
             first: option
-            second: option to lock
             specs:
         L
 

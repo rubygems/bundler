@@ -48,13 +48,13 @@ describe Bundler::Plugin::API do
     subject(:api) { UserPluginClass.new }
 
     # A test of delegation
-    it "provides the Bundler's functions", :focused do
+    it "provides the Bundler's functions" do
       expect(Bundler).to receive(:an_unkown_function).once
 
       api.an_unkown_function
     end
 
-    it "includes Bundler::SharedHelpers' functions", :focused do
+    it "includes Bundler::SharedHelpers' functions" do
       expect(Bundler::SharedHelpers).to receive(:an_unkown_helper).once
 
       api.an_unkown_helper
