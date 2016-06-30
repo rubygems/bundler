@@ -218,7 +218,6 @@ module Bundler
 
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
       end
-
     end
   end
 end

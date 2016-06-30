@@ -97,7 +97,7 @@ describe "real source plugins" do
       expect(out).to eq(bundle("show a-path-gem"))
     end
 
-    it "installs the gem executables", :focused do
+    it "installs the gem executables" do
       build_lib "gem-with-bin" do |s|
         s.executables = ["foo"]
       end
@@ -228,7 +228,7 @@ describe "real source plugins" do
                   `git reset --hard \#{revision}`
                 end
 
-                post_install
+                post_install(spec)
 
                 nil
               end
