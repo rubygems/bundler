@@ -84,6 +84,24 @@ module Bundler
           raise MalformattedPlugin, "Source plugins need to override the install method."
         end
 
+        # It builds extensions, generates bins and installs them for the spec
+        # provided.
+        #
+        # It depends on `spec.loaded_from` to get full_gem_path. The source
+        # plugins should set that.
+        #
+        # It should be called in `install` after the plugin is done placing the
+        # gem at correct install location.
+        #
+        # It also runs Gem hooks `post_install`, `post_build` and `post_install`
+        #
+        # Note: Do not override if you don't know what you are doing.
+        def post_install(spec, disable_exts = false)
+          opts = { :env_shebang => false, :disable_extensions => disable_exts }
+          installer = Bundler::Source::Path::Installer.new(spec, opts)
+          installer.post_install
+        end
+
         # A default installation path to install a single gem. If the source
         # servers multiple gems, it's not of much use and the source should one
         # of its own.

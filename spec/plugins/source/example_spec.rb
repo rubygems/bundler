@@ -37,6 +37,8 @@ describe "real source plugins" do
                 mkdir_p(install_path.parent)
                 FileUtils.cp_r(path, install_path)
 
+                post_install(spec)
+
                 nil
               end
             end
@@ -93,6 +95,22 @@ describe "real source plugins" do
         puts Bundler.rubygems.find_name('a-path-gem').first.full_gem_path
       RUBY
       expect(out).to eq(bundle("show a-path-gem"))
+    end
+
+    it "installs the gem executables", :focused do
+      build_lib "gem-with-bin" do |s|
+        s.executables = ["foo"]
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}" # plugin source
+        source "#{lib_path("gem-with-bin-1.0")}", :type => :mpath do
+          gem "gem-with-bin"
+        end
+      G
+
+      bundle "exec foo"
+      expect(out).to eq("1.0")
     end
 
     describe "bundle cache/package" do
@@ -209,6 +227,8 @@ describe "real source plugins" do
                 Dir.chdir install_path do
                   `git reset --hard \#{revision}`
                 end
+
+                post_install
 
                 nil
               end

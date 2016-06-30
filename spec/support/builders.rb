@@ -532,7 +532,7 @@ module Spec
         @spec.executables.each do |file|
           executable = "#{@spec.bindir}/#{file}"
           @spec.files << executable
-          write executable, "#!/usr/bin/env ruby\nrequire '#{@name}' ; puts #{@name.upcase}"
+          write executable, "#!/usr/bin/env ruby\nrequire '#{@name}' ; puts #{Builders.constantize(@name)}"
         end
       end
 
