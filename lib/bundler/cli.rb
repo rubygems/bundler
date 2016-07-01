@@ -16,6 +16,10 @@ module Bundler
       Bundler::SharedHelpers.print_major_deprecations!
     end
 
+    def self.dispatch(*)
+      super {|i| i.send(:print_command) }
+    end
+
     def initialize(*args)
       super
       Bundler.reset!
@@ -516,6 +520,16 @@ module Bundler
         invoke :install, []
         Bundler.reset!
       end
+    end
+
+    def print_command
+      _, _, config = @_initializer
+      current_command = config[:current_command].name
+      return if current_command == "exec"
+      command = ["bundle", current_command] + args
+      command << Thor::Options.to_switches(options)
+      command.reject!(&:empty?)
+      Bundler.ui.info "Running `#{command * " "}` with bundler #{Bundler::VERSION}"
     end
   end
 end
