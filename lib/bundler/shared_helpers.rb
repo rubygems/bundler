@@ -22,7 +22,6 @@ module Bundler
 
     def default_gemfile
       gemfile = find_gemfile
-      deprecate_gemfile(gemfile)
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
       Pathname.new(gemfile)
     end
@@ -129,6 +128,7 @@ module Bundler
     end
 
     def print_major_deprecations!
+      deprecate_gemfile(find_gemfile) if find_gemfile == find_file("Gemfile")
       if RUBY_VERSION < "2"
         major_deprecation("Bundler will only support ruby >= 2.0, you are running #{RUBY_VERSION}")
       end
@@ -231,13 +231,9 @@ module Bundler
     end
 
     def deprecate_gemfile(gemfile)
-      if gemfile && File.basename(gemfile) == "Gemfile"
-        Bundler.respond_to?(:ui) && Bundler.ui.deprecate(
-          "Gemfile and Gemfile.lock are " \
-          "deprecated and will be replaced with gems.rb and " \
-          "gems.locked in Bundler 2.0.", true
-        )
-      end
+      return unless gemfile && File.basename(gemfile) == "Gemfile"
+      Bundler::SharedHelpers.major_deprecation \
+        "gems.rb and gems.locked will be prefered to Gemfile and Gemfile.lock."
     end
 
     extend self

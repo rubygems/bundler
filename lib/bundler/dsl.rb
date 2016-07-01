@@ -422,7 +422,7 @@ module Bundler
           "should come from that source. To downgrade this error to a warning, run " \
           "`bundle config --delete disable_multisource`"
       else
-        Bundler.ui.deprecate "Your Gemfile contains multiple primary sources. " \
+        Bundler::SharedHelpers.major_deprecation "Your Gemfile contains multiple primary sources. " \
           "Using `source` more than once without a block is a security risk, and " \
           "may result in installing unexpected gems. To resolve this warning, use " \
           "a block to indicate which gems should come from the secondary source. " \
@@ -433,18 +433,19 @@ module Bundler
 
     def warn_github_source_change(repo_name)
       # TODO: 2.0 remove deprecation
-      Bundler.ui.deprecate "The :github option uses the git: protocol, which is not secure. " \
+      Bundler::SharedHelpers.major_deprecation "The :github option uses the git: protocol, which is not secure. " \
         "Bundler 2.0 will use the https: protocol, which is secure. Enable this change now by " \
         "running `bundle config github.https true`."
     end
 
     def warn_deprecated_git_source(name, repo_string)
       # TODO: 2.0 remove deprecation
-      Bundler.ui.deprecate "The :#{name} git source is deprecated, and will be removed " \
-        "in Bundler 2.0. Add this code to your Gemfile to ensure it continues to work:\n" \
-        "    git_source(:#{name}) do |repo_name|\n" \
-        "      \"#{repo_string}\"\n" \
-        "    end", true
+      Bundler::SharedHelpers.major_deprecation <<-EOS
+The :#{name} git source is deprecated, and will be removed in Bundler 2.0. Add this code to your Gemfile to ensure it continues to work:
+    git_source(:#{name}) do |repo_name|
+      "#{repo_string}"
+    end
+      EOS
     end
 
     class DSLError < GemfileError

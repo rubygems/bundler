@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-$stderr.puts "DEPRECATION: Bundler no longer integrates with " \
+require "bundler/shared_helpers"
+Bundler::SharedHelpers.major_deprecation "Bundler no longer integrates with " \
   "Capistrano, but Capistrano provides its own integration with " \
   "Bundler via the capistrano-bundler gem. Use it instead."
 
