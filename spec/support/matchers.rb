@@ -1,15 +1,28 @@
 # frozen_string_literal: true
 module Spec
   module Matchers
+    MAJOR_DEPRECATION = /^\[DEPRECATED FOR 2\.0\]\s*/
+
     RSpec::Matchers.define :lack_errors do
+      diffable
       match do |actual|
-        actual.gsub(/(^DEPRECATION:.+[\n]?)/, "") == ""
+        actual.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "") == ""
       end
     end
 
     RSpec::Matchers.define :eq_err do |expected|
+      diffable
       match do |actual|
-        actual.gsub(/(^DEPRECATION:.+\n)/, "") == expected
+        actual.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "") == expected
+      end
+    end
+
+    RSpec::Matchers.define :have_major_deprecation do |expected|
+      diffable
+      match do |actual|
+        actual.split(MAJOR_DEPRECATION).any? do |d|
+          !d.empty? && values_match?(expected, d.strip)
+        end
       end
     end
 

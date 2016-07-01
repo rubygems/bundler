@@ -22,9 +22,9 @@ module Bundler
     end
 
     def add_git_source(options = {})
-      source = add_source_to_list(Source::Git.new(options), git_sources)
-      warn_on_git_protocol(source)
-      source
+      add_source_to_list(Source::Git.new(options), git_sources).tap do |source|
+        warn_on_git_protocol(source)
+      end
     end
 
     def add_rubygems_source(options = {})
