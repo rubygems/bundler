@@ -36,7 +36,7 @@ module Spec
         FileUtils.rm_rf(Path.base_system_gems)
         FileUtils.mkdir_p(Path.base_system_gems)
         puts "installing gems for the tests to use..."
-        DEPS.each {|n, v| install_gem(n, v) }
+        DEPS.sort {|a, _| a[1].nil? ? 1 : -1 }.each {|n, v| install_gem(n, v) }
         File.open(manifest_path, "w") {|f| f << manifest.join }
       end
 
