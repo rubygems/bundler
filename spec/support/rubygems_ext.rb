@@ -6,7 +6,10 @@ module Spec
   module Rubygems
     DEPS = begin
       deps = {
-        "fakeweb artifice rack compact_index" => nil,
+        # rack 2.x requires Ruby version >= 2.2.2.
+        # artifice doesn't support rack 2.x now.
+        "rack" => "< 2",
+        "fakeweb artifice compact_index" => nil,
         "sinatra" => "1.2.7",
         # Rake version has to be consistent for tests to pass
         "rake" => "10.0.2",
@@ -44,7 +47,7 @@ module Spec
 
     def self.install_gem(name, version = nil)
       cmd = "gem install #{name} --no-rdoc --no-ri"
-      cmd += " --version #{version}" if version
+      cmd += " --version '#{version}'" if version
       system(cmd) || raise("Installing gem #{name} for the tests to use failed!")
     end
 
