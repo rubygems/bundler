@@ -84,7 +84,7 @@ module Spec
 
       options["no-color"] = true unless options.key?("no-color") || cmd.to_s.start_with?("exec", "exe", "ex", "e", "conf")
 
-      bundle_bin = File.expand_path("../../../exe/bundle", __FILE__)
+      bundle_bin = options.delete("bundle_bin") || File.expand_path("../../../exe/bundle", __FILE__)
 
       requires = options.delete(:requires) || []
       requires << File.expand_path("../fakeweb/" + options.delete(:fakeweb) + ".rb", __FILE__) if options.key?(:fakeweb)
@@ -101,6 +101,11 @@ module Spec
       sys_exec(cmd, expect_err) {|i, o, thr| yield i, o, thr if block_given? }
     end
     bang :bundle
+
+    def bundler(cmd, options = {})
+      options["bundle_bin"] = File.expand_path("../../../exe/bundler", __FILE__)
+      bundle(cmd, options)
+    end
 
     def bundle_ruby(options = {})
       expect_err = options.delete(:expect_err)

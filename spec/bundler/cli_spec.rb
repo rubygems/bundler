@@ -55,3 +55,10 @@ describe "bundle executable" do
     end
   end
 end
+
+describe "bundler executable" do
+  it "shows the bundler version just as the `bundle` executable does" do
+    bundler "--version"
+    expect(out).to eq("Bundler version #{Bundler::VERSION}")
+  end
+end
