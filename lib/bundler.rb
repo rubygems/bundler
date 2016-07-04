@@ -206,7 +206,7 @@ module Bundler
 
       path = bundle_path
       path = path.parent until path.exist?
-      sudo_present = !(`which sudo` rescue '').empty?
+      sudo_present = in_path("sudo") 
 
       @checked_for_sudo = true
       @requires_sudo = settings.allow_sudo? && !File.writable?(path) && sudo_present
@@ -218,6 +218,10 @@ module Bundler
       else
         FileUtils.mkdir_p(path)
       end
+    end
+
+    def in_path(exec)
+      ENV['PATH'].split(File::PATH_SEPARATOR).inject(false) {|a,folder| a ||= File.exist?(File.join(folder,exec)) }
     end
 
     def sudo(str)
