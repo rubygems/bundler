@@ -33,20 +33,9 @@ module Bundler
     end
 
     def install
-      desc "Build #{name}-#{version}.gem into the pkg directory"
-      task 'build' do
-        build_gem
-      end
-
-      desc "Build and install #{name}-#{version}.gem into system gems"
-      task 'install' do
-        install_gem
-      end
-
-      desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
-      task 'release' do
-        release_gem
-      end
+      define_build_task
+      define_install_task
+      define_release_task
 
       GemHelper.instance = self
     end
@@ -80,6 +69,27 @@ module Bundler
     end
 
     protected
+    def define_build_task
+      desc "Build #{name}-#{version}.gem into the pkg directory"
+      task 'build' do
+        build_gem
+      end
+    end
+
+    def define_install_task
+      desc "Build and install #{name}-#{version}.gem into system gems"
+      task 'install' do
+        install_gem
+      end
+    end
+
+    def define_release_task
+      desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
+      task 'release' do
+        release_gem
+      end
+    end
+
     def rubygem_push(path)
       if Pathname.new("~/.gem/credentials").expand_path.exist?
         sh("gem push '#{path}'")
