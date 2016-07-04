@@ -14,7 +14,8 @@ module Bundler
 
     def initialize(*)
       super
-      ENV['BUNDLE_GEMFILE']   = File.expand_path(options[:gemfile]) if options[:gemfile]
+      custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
+      ENV['BUNDLE_GEMFILE']   = File.expand_path(custom_gemfile) if custom_gemfile
       Bundler::Retry.attempts = options[:retry] || Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
     rescue UnknownArgumentError => e

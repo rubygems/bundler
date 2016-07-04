@@ -86,6 +86,12 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `bin` (`BUNDLE_BIN`):
   Install executables from gems in the bundle to the specified directory.
   Defaults to `false`.
+* `gemfile` (`BUNDLE_GEMFILE`):
+  The name of the file that bundler should use as the `Gemfile`. This location
+  of this file also sets the root of the project, which is used to resolve
+  relative paths in the `Gemfile`, among other things. By default, bundler
+  will search up from the current working directory until it finds a
+  `Gemfile`.
 * `ssl_ca_cert` (`BUNDLE_SSL_CA_CERT`):
   Path to a designated CA certificate file or folder containing multiple
   certificates for trusted CAs in PEM format.
@@ -99,18 +105,6 @@ flag to the [bundle install(1)][bundle-install] command.
 You can set them globally either via environment variables or `bundle config`,
 whichever is preferable for your setup. If you use both, environment variables
 will take preference over global settings.
-
-An additional setting is available only as an environment variable:
-
-* `BUNDLE_GEMFILE`:
-  The name of the file that bundler should use as the `Gemfile`. This location
-  of this file also sets the root of the project, which is used to resolve
-  relative paths in the `Gemfile`, among other things. By default, bundler
-  will search up from the current working directory until it finds a
-  `Gemfile`.
-
-Bundler will ignore any `BUNDLE_GEMFILE` entries in local or global
-configuration files.
 
 ## LOCAL GIT REPOS
 

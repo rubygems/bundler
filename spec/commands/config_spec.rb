@@ -259,5 +259,23 @@ E
       expect(out).to match(long_string_without_special_characters)
     end
   end
+end
 
+describe "setting gemfile via config" do
+  context "when only the non-default Gemfile exists" do
+    before do
+      gemfile bundled_app("NotGemfile"), <<-G
+      source "file://#{gem_repo1}"
+      gem 'rack'
+      G
+    end
+    it "persists the gemfile location to .bundle/config" do
+
+      bundle "config --local gemfile #{bundled_app("NotGemfile")}"
+      expect(File.exists?(".bundle/config")).to eq(true)
+
+      bundle "config"
+      expect(out).to include("NotGemfile")
+    end
+  end
 end
