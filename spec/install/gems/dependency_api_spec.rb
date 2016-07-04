@@ -230,6 +230,31 @@ describe "gemcutter's dependency API" do
     end
   end
 
+  it "should handle dependencies with versions in multiple sources" do
+    FileUtils.rm_rf upstream_gem_repo
+    build_repo upstream_gem_repo do
+      build_gem "from-upstream", "1.0.0"
+      build_gem "from-upstream", "1.1.0"
+    end
+
+    FileUtils.rm_rf local_gem_repo
+    build_repo local_gem_repo do
+      build_gem "site-local", "1.0.0" do |s|
+        s.add_dependency "from-upstream", "~> 1.1"
+      end
+      build_gem "from-upstream", "1.0.1"
+    end
+
+    gemfile <<-G
+      source "#{source_uri}/upstream"
+      source "#{source_uri}/local"
+      gem "site-local", "~> 1.0"
+    G
+
+    bundle :install, :artifice => "local_endpoint_with_api"
+    should_be_installed "site-local 1.0.0"
+  end
+
   it "fetches again when more dependencies are found in subsequent sources" do
     build_repo2 do
       build_gem "back_deps" do |s|

@@ -56,6 +56,14 @@ module Spec
       tmp("gems/remote3", *args)
     end
 
+    def local_gem_repo(*args)
+      tmp("gems/remote_local", *args)
+    end
+
+    def upstream_gem_repo(*args)
+      tmp("gems/remote_upstream", *args)
+    end
+
     def security_repo(*args)
       tmp("gems/security_repo", *args)
     end
