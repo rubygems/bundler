@@ -238,7 +238,10 @@ module Bundler
           # Raises ArgumentError if the file is not valid YAML
         rescue ArgumentError, SyntaxError, Gem::EndOfYAMLException, Gem::Exception
           begin
-            eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
+            old_verbose, $VERBOSE = $VERBOSE, nil
+            result = eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
+            $VERBOSE = old_verbose
+            result
           rescue LoadError => e
             original_line = e.backtrace.find { |line| line.include?(path.to_s) }
             msg  = "There was a LoadError while evaluating #{path.basename}:\n  #{e.message}"
