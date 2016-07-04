@@ -277,6 +277,11 @@ module Bundler
 
         if exec_name
           spec = specs.find { |s| s.executables.include?(exec_name) }
+          unless spec.name == name
+            warn "Bundler is using a binstub that was created for a different gem.\n" \
+              "This is deprecated, in future versions you may need to `bundle binstub #{name}` " \
+              "to work around a system/bundle conflict."
+          end
           spec or raise Gem::Exception, "can't find executable #{exec_name}"
         else
           spec = specs.find  { |s| s.name == name }
