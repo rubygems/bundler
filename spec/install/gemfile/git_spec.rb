@@ -1069,7 +1069,7 @@ describe "bundle install with git sources" do
           gem 'foo'
         end
       G
-      bundle "package --all"
+      bundle "package"
       simulate_new_machine
 
       bundle "install", :env => { "PATH" => "" }
