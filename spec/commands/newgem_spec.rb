@@ -200,6 +200,18 @@ describe "bundle gem" do
       end
     end
 
+    context "--license parameter set to GPL" do
+      before do
+        reset!
+        in_app_root
+        bundle "gem #{gem_name} --license GPL"
+      end
+      
+      it "sets gemspec license to GPL" do
+        expect(generated_gem.gemspec.license).to eq("GPL")
+      end
+    end
+    
     context "--edit option" do
       it "opens the generated gemspec in the user's text editor" do
         reset!
@@ -397,6 +409,18 @@ describe "bundle gem" do
       it "defaults to rspec" do
         expect(bundled_app("test-gem/spec/spec_helper.rb")).to exist
         expect(bundled_app("test-gem/test/minitest_helper.rb")).to_not exist
+      end
+    end
+
+    context "--license parameter set to GPL" do
+      before do
+        reset!
+        in_app_root
+        bundle "gem #{gem_name} --license GPL"
+      end
+      
+      it "sets gemspec license to GPL" do
+        expect(generated_gem.gemspec.license).to eq("GPL")
       end
     end
   end
