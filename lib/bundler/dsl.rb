@@ -164,7 +164,7 @@ module Bundler
               "either use the :git option on a gem, or specify the gems that \n" \
               "bundler should find in the git source by passing a block to \n" \
               "the git method, like: \n\n" \
-              "  git 'git://github.com/rails/rails.git' do\n" \
+              "  git 'https://github.com/rails/rails.git' do\n" \
               "    gem 'rails'\n" \
               "  end"
         raise DeprecatedError, msg
@@ -250,7 +250,7 @@ module Bundler
         #     "https://github.com/#{repo_name}.git"
         #   end
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        "git://github.com/#{repo_name}.git"
+        "https://github.com/#{repo_name}.git"
       end
 
       git_source(:gist) {|repo_name| "https://gist.github.com/#{repo_name}.git" }
