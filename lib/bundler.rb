@@ -144,7 +144,11 @@ module Bundler
     end
 
     def user_bundle_path
-      Pathname.new(Bundler.rubygems.user_home).join(".bundler")
+      if ENV['BUNDLE_USER_PATH']
+        Pathname.new(ENV['BUNDLE_USER_PATH']).join('bundler')
+      else
+        Pathname.new(Gem.user_home).join(".bundler")
+      end
     end
 
     def home
