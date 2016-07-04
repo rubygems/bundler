@@ -497,6 +497,20 @@ module Bundler
       Dir.chdir(target) { `git init`; `git add .` }
     end
 
+    desc "ack QUERY", "Searches your gem bundle for the given query using Ack"
+    def ack(query)
+      ack_installed = system("which ack > /dev/null 2>&1")
+
+      if ack_installed
+        gem_dirs = Bundler.load.specs.map(&:full_gem_path).join(' ')
+        cmd  = %{ack -i "#{query}" #{gem_dirs}}
+        exec cmd  
+      else
+        Bundler.ui.warn "Make sure you have Ack installed. On IOS you can install it with:"
+        Bundler.ui.warn "`brew install ack`"
+      end
+    end
+
     def self.source_root
       File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
     end
