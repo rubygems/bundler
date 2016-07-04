@@ -2,6 +2,11 @@ $:.unshift File.expand_path('..', __FILE__)
 $:.unshift File.expand_path('../../lib', __FILE__)
 
 begin
+  gem 'psych'
+rescue Gem::LoadError
+end
+
+begin
   require 'psych'
 rescue LoadError
 ensure
