@@ -206,7 +206,7 @@ module Bundler
 
       path = bundle_path
       path = path.parent until path.exist?
-      sudo_present = !(`which sudo` rescue '').empty?
+      sudo_present = !(`which sudo 2>/dev/null` rescue '').empty?
 
       @checked_for_sudo = true
       @requires_sudo = settings.allow_sudo? && !File.writable?(path) && sudo_present
