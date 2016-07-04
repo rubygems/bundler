@@ -205,18 +205,19 @@ module Bundler
         @cached_specs ||= begin
           idx = installed_specs.dup
 
-          path = Bundler.app_cache
-          Dir["#{path}/*.gem"].each do |gemfile|
-            next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
+          caches.each do |path|
+            Dir["#{path}/*.gem"].each do |gemfile|
+              next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
 
-            begin
-              s ||= Bundler.rubygems.spec_from_gem(gemfile)
-            rescue Gem::Package::FormatError
-              raise GemspecError, "Could not read gem at #{gemfile}. It may be corrupted."
+              begin
+                s ||= Bundler.rubygems.spec_from_gem(gemfile)
+              rescue Gem::Package::FormatError
+                raise GemspecError, "Could not read gem at #{gemfile}. It may be corrupted."
+              end
+
+              s.source = self
+              idx << s
             end
-
-            s.source = self
-            idx << s
           end
         end
 

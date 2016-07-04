@@ -20,3 +20,6 @@ spec/reports
 
 # Netbeans
 nbproject
+
+# Rubymine
+.idea
