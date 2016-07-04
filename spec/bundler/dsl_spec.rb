@@ -29,7 +29,7 @@ describe Bundler::Dsl do
     context "default hosts (git, gist)" do
       it "converts :github to :git" do
         subject.gem("sparks", :github => "indirect/sparks")
-        github_uri = "git://github.com/indirect/sparks.git"
+        github_uri = "https://github.com/indirect/sparks.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
       end
 
@@ -47,7 +47,7 @@ describe Bundler::Dsl do
 
       it "converts 'rails' to 'rails/rails'" do
         subject.gem("rails", :github => "rails")
-        github_uri = "git://github.com/rails/rails.git"
+        github_uri = "https://github.com/rails/rails.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
       end
 
@@ -209,7 +209,7 @@ describe Bundler::Dsl do
         end
 
         subject.dependencies.each do |d|
-          expect(d.source.uri).to eq("git://github.com/spree/spree.git")
+          expect(d.source.uri).to eq("https://github.com/spree/spree.git")
         end
       end
     end
