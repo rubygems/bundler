@@ -14,6 +14,7 @@ describe Bundler::Env do
       expect(out).to include(Gem::VERSION)
       expect(out).to include(env.send(:ruby_version))
       expect(out).to include(env.send(:git_version))
+      expect(out).to include(OpenSSL::OPENSSL_VERSION)
     end
 
     context "when there is a Gemfile and a lockfile and print_gemfile is true" do
