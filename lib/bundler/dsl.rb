@@ -250,7 +250,7 @@ module Bundler
         #     "https://github.com/#{repo_name}.git"
         #   end
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        "git://github.com/#{repo_name}.git"
+        "https://github.com/#{repo_name}.git"
       end
 
       git_source(:gist) {|repo_name| "https://gist.github.com/#{repo_name}.git" }
