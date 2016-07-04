@@ -49,6 +49,14 @@ rescue LoadError, NameError
   nil
 end
 
+if Gem::Requirement.new(">= 1.13.pre".dup).satisfied_by?(Gem::Version.new(running_version))
+  ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] = installed_version.to_s
+elsif ARGV.empty? || ARGV.any? {|a| %w(install i).include? a }
+  puts <<-WARN.strip
+You're running Bundler #{installed_version} but this project uses #{running_version}. To update, run `bundle update --bundler`.
+  WARN
+end
+
 if !Gem::Version.correct?(running_version.to_s) || !version.satisfied_by?(Gem::Version.create(running_version))
   abort "The running bundler (#{running_version}) does not match the required `#{version}`"
 end

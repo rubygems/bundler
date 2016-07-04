@@ -131,7 +131,23 @@ The error was:
         puts Bundler::VERSION
       R
       expect(err).to be_empty
-      expect(out).to eq("1.12.0")
+      expect(out).to include("1.12.0")
+    end
+  end
+
+  context "warnings" do
+    before do
+      simulate_bundler_version("1.12.0") do
+        install_gemfile ""
+      end
+    end
+
+    it "warns user if Bundler is outdated and is < 1.13.0.rc.1" do
+      ENV["BUNDLER_VERSION"] = "1.12.0"
+      bundle! "install"
+      expect(out).to include(<<-WARN.strip)
+You're running Bundler #{Bundler::VERSION} but this project uses #{ENV["BUNDLER_VERSION"]}. To update, run `bundle update --bundler`.
+      WARN
     end
   end
 end

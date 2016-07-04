@@ -11,6 +11,8 @@ module Bundler
 
       warn_if_root
 
+      warn_if_outdated
+
       [:with, :without].each do |option|
         if options[option]
           options[option] = options[option].join(":").tr(" ", ":").split(":")
@@ -112,6 +114,19 @@ module Bundler
       Bundler.ui.warn "Don't run Bundler as root. Bundler can ask for sudo " \
         "if it is needed, and installing your bundle as root will break this " \
         "application for all non-root users on this machine.", :wrap => true
+    end
+
+    def warn_if_outdated
+      return if ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"].nil?
+      installed_version = Gem::Version.new(ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"].dup)
+      running_version = Gem::Version.new(Bundler::VERSION)
+      if Bundler.settings[:warned_version].nil? || running_version > Gem::Version.new(Bundler.settings[:warned_version])
+        Bundler.settings[:warned_version] = running_version
+        Bundler.ui.warn "You're running Bundler #{installed_version} but this " \
+          "project uses #{running_version}. To update, run `bundle update " \
+          "--bundler`. You won't see this message again unless you upgrade " \
+          "to a newer version of Bundler.", :wrap => true
+      end
     end
 
     def confirm_without_groups
