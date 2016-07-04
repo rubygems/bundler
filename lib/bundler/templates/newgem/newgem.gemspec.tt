@@ -13,9 +13,16 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = <%=config[:name].inspect%>
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  if File.directory?("#{File.dirname __FILE__}/.git") &&
+     system('git status > /dev/null 2>&1')
+    s.files       = `git ls-files`.split("\n")
+    s.test_files  = `git ls-files -- {test,spec,features}/*`.split("\n")
+    s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  else
+    s.files       = Dir.glob('**/*')
+    s.test_files  = Dir.glob('{test,spec,features}/**/*')
+    s.executables = Dir.glob('bin/*').map{ |f| File.basename(f) }
+  end
   s.require_paths = ["lib"]
 
   # specify any dependencies here; for example:
