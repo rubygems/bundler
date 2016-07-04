@@ -127,11 +127,17 @@ module Bundler
 
     def source(source, &blk)
       source = normalize_source(source)
+
+      if source == :default
+        Bundler.rubygems.configuration
+        source = Bundler.rubygems.sources
+      end
+
       if block_given?
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
         check_primary_source_safety(@sources)
-        @sources.add_rubygems_remote(source)
+        Array(source || []).reverse_each {|r| @sources.add_rubygems_remote(r) }
       end
     end
 
@@ -378,7 +384,7 @@ module Bundler
           "requests are insecure.\nPlease change your source to 'https://" \
           "rubygems.org' if possible, or 'http://rubygems.org' if not."
         "http://rubygems.org"
-      when String
+      when String, :default
         source
       else
         raise GemfileError, "Unknown source '#{source}'"

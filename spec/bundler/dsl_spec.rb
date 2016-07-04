@@ -247,4 +247,16 @@ describe Bundler::Dsl do
       end
     end
   end
+
+  describe "#source" do
+    it ":default is using sources specified by RubyGems" do
+      other_source = double("default-source")
+      allow(Bundler::Source::Rubygems).to receive(:new).and_return(other_source)
+      allow(other_source).to receive(:remotes).and_return([])
+
+      expect(other_source).to receive(:add_remote).with(Gem.default_sources.last)
+
+      subject.source :default
+    end
+  end
 end
