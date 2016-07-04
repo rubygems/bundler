@@ -1,4 +1,5 @@
 require "spec_helper"
+require 'rake'
 require 'bundler/gem_helper'
 
 describe "Bundler::GemHelper tasks" do
@@ -59,6 +60,36 @@ describe "Bundler::GemHelper tasks" do
 
     it "uses a shell UI for output" do
       Bundler.ui.should be_a(Bundler::UI::Shell)
+    end
+
+    describe 'install_tasks' do
+      before(:each) do
+        @saved, Rake.application = Rake.application, Rake::Application.new
+      end
+
+      after(:each) do
+        Rake.application = @saved
+      end
+
+      it "defines Rake tasks" do
+        names = %w[build install release]
+
+        names.each { |name|
+          proc { Rake.application[name] }.should raise_error(/Don't know how to build task/)
+        }
+
+        @helper.install
+
+        names.each { |name|
+          proc { Rake.application[name] }.should_not raise_error
+          Rake.application[name].should be_instance_of Rake::Task
+        }
+      end
+
+      it "provides a way to access the gemspec object" do
+        @helper.install
+        Bundler::GemHelper.gemspec.name.should == 'test'
+      end
     end
 
     describe 'build' do

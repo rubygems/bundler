@@ -6,16 +6,26 @@ module Bundler
   class GemHelper
     include Rake::DSL if defined? Rake::DSL
 
-    def self.install_tasks(opts = {})
-      dir = opts[:dir] || Dir.pwd
-      self.new(dir, opts[:name]).install
+    class << self
+      # set when install'd.
+      attr_accessor :instance
+
+      def install_tasks(opts = {})
+        new(opts[:dir], opts[:name]).install
+      end
+
+      def gemspec(&block)
+        gemspec = instance.gemspec
+        block.call(gemspec) if block
+        gemspec
+      end
     end
 
     attr_reader :spec_path, :base, :gemspec
 
-    def initialize(base, name = nil)
+    def initialize(base = nil, name = nil)
       Bundler.ui = UI::Shell.new(Thor::Base.shell.new)
-      @base = base
+      @base = (base ||= Dir.pwd)
       gemspecs = name ? [File.join(base, "#{name}.gemspec")] : Dir[File.join(base, "{,*}.gemspec")]
       raise "Unable to determine name from existing gemspec. Use :name => 'gemname' in #install_tasks to manually set it." unless gemspecs.size == 1
       @spec_path = gemspecs.first
@@ -37,6 +47,8 @@ module Bundler
       task 'release' do
         release_gem
       end
+
+      GemHelper.instance = self
     end
 
     def build_gem
