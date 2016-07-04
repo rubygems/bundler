@@ -63,7 +63,7 @@ module Bundler
 
     def apply_func(obj, i)
       @func.call(obj, i)
-    rescue Exception => e
+    rescue => e
       WrappedException.new(e)
     end
 

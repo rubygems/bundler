@@ -9,7 +9,7 @@ module Bundler
 
     def self.start(*)
       super
-    rescue Exception => e
+    rescue => e
       Bundler.ui = UI::Shell.new
       raise e
     ensure

@@ -241,7 +241,7 @@ module Bundler
       gem_from_path(path, security_policies[policy]).spec
     rescue Gem::Package::FormatError
       raise GemspecError, "Could not read gem at #{path}. It may be corrupted."
-    rescue Exception, Gem::Exception, Gem::Security::Exception => e
+    rescue StandardError, Gem::Exception, Gem::Security::Exception => e
       if e.is_a?(Gem::Security::Exception) ||
           e.message =~ /unknown trust policy|unsigned gem/i ||
           e.message =~ /couldn't verify (meta)?data signature/i
