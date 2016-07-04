@@ -20,7 +20,16 @@ module Bundler
     end
 
     def add_git_source(options = {})
-      add_source_to_list Source::Git.new(options), git_sources
+      source = add_source_to_list Source::Git.new(options), git_sources
+      uri = source.uri
+      if uri =~ %r{^git:} && !Bundler.settings["ignore_git_warning"] && !Bundler.settings["ignore_git_warning.#{uri}"]
+        Bundler.ui.warn "The git source `#{uri}` uses the `git` protocol, " \
+                        "please consider changing it to `https`, which is more secure. " \
+                        "You can ignore this message for all git sources by running "
+                        "`bundle config ignore_git_warning true`, or for just this " \
+                        "source by running `bundle config ignore_git_warning.#{uri} true`."
+      end
+      source
     end
 
     def add_rubygems_source(options = {})
