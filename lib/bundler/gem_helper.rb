@@ -24,19 +24,22 @@ module Bundler
 
     def install
       desc "Build #{name}-#{version}.gem into the pkg directory"
-      task 'build' do
+      task 'bundler_build' do
         build_gem
       end
+      task :build => :bundler_build
 
       desc "Build and install #{name}-#{version}.gem into system gems"
-      task 'install' do
+      task 'bundler_install' do
         install_gem
       end
+      task :install => :bundler_install
 
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
-      task 'release' do
+      task 'bundler_release' do
         release_gem
       end
+      task :release => :bundler_release
     end
 
     def build_gem
