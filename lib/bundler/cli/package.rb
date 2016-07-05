@@ -19,6 +19,8 @@ module Bundler
       # TODO: move cache contents here now that all bundles are locked
       custom_path = Pathname.new(options[:path]) if options[:path]
       Bundler.load.cache(custom_path)
+
+      build_gems if options["build"]
     end
 
   private
@@ -41,6 +43,22 @@ module Bundler
           "to package them as well, please pass the --all flag. This will be the default " \
           "on Bundler 2.0."
       end
+    end
+
+    def build_gems
+      buildable_gem_paths.each do |gem_path|
+        `gem build '#{gem_path}'`
+        FileUtils.mv(built_gem_path, Bundler.settings.app_cache_path)
+        FileUtils.rm_rf File.expand_path("..", gem_path)
+      end
+    end
+
+    def buildable_gem_paths
+      Dir[Bundler.root.join(Bundler.settings.app_cache_path).join("*/*.gemspec")]
+    end
+
+    def built_gem_path
+      Dir[File.join(Bundler.root, "*.gem")].sort_by {|f| File.mtime(f) }.last
     end
   end
 end

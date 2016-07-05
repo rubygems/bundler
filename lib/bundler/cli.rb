@@ -290,6 +290,8 @@ module Bundler
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     method_option "frozen", :type => :boolean, :banner =>
       "Do not allow the Gemfile.lock to be updated after this package operation's install"
+    method_option "build", :type => :boolean, :banner =>
+      "Build gems in app cache directory"
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
