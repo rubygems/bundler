@@ -474,6 +474,24 @@ module Bundler
       Inject.new(options, name, version, gems).run
     end
 
+    desc "doctor [OPTIONS]", "Checks the bundle for common problems"
+    long_desc <<-D
+      Doctor scans the OS dependencies of each of the gems requested in the Gemfile. If
+      missing dependencies are detected, Bundler prints them and exits status 1.
+      Otherwise, Bundler prints a success message and exits with a status of 0.
+
+      The bundle's gem dependencies must all be installed to run this command; if
+      they are not, Bundler prints an error message and exits with a status of 2.
+    D
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
+    method_option "quiet", :type => :boolean, :banner =>
+        "Only output warnings and errors."
+    def doctor
+      require "bundler/cli/doctor"
+      Doctor.new(options).run
+    end
+
     if Bundler.settings[:plugins]
       require "bundler/cli/plugin"
       desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
