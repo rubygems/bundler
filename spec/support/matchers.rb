@@ -59,7 +59,8 @@ module Spec
         version_const = name == "bundler" ? "Bundler::VERSION" : Spec::Builders.constantize(name)
         run! "require '#{name}.rb'; puts #{version_const}", *groups
         expect(out).not_to be_empty, "#{name} is not installed"
-        actual_version, actual_platform = out.split(/\s+/, 2)
+        out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
+        actual_version, actual_platform = out.strip.split(/\s+/, 2)
         expect(Gem::Version.new(actual_version)).to eq(Gem::Version.new(version))
         expect(actual_platform).to eq(platform)
       end
