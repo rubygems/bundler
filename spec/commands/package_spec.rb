@@ -220,6 +220,28 @@ describe "bundle package" do
       expect(out).to include("frozen")
     end
   end
+
+  context "with --build" do
+    before do
+      build_repo2 do
+        build_git "foo", :path => lib_path("foo")
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", "2.3.5"
+        gem "foo", :git => "#{lib_path("foo")}"
+      G
+
+      bundle "install"
+    end
+
+    it "packages gems fetched from git as .gem files" do
+      bundle "package --all --build"
+      expect(bundled_app("vendor/cache/activesupport-2.3.5.gem")).to exist
+      expect(bundled_app("vendor/cache/foo-1.0.gem")).to exist
+    end
+  end
 end
 
 describe "bundle install with gem sources" do
