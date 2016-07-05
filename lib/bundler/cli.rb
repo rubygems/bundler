@@ -525,7 +525,7 @@ module Bundler
     def print_command
       _, _, config = @_initializer
       current_command = config[:current_command].name
-      return if current_command == "exec"
+      return if %w(exec version check platform show help).include?(current_command)
       command = ["bundle", current_command] + args
       command << Thor::Options.to_switches(options)
       command.reject!(&:empty?)
