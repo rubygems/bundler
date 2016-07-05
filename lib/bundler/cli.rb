@@ -31,7 +31,7 @@ module Bundler
       raise InvalidOption, e.message
     ensure
       self.options ||= {}
-      Bundler.settings[:options_given] = !options.empty?
+      Bundler.settings.cli_flags_given = !options.empty?
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
 
