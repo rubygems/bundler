@@ -7,18 +7,36 @@ describe Bundler::Plugin::API do
       stub_const "UserPluginClass", Class.new(Bundler::Plugin::API)
     end
 
-    it "declares a command plugin with same class as handler" do
-      allow(Bundler::Plugin).
-        to receive(:add_command).with("meh", UserPluginClass).once
+    describe "#command" do
+      it "declares a command plugin with same class as handler" do
+        expect(Bundler::Plugin).
+          to receive(:add_command).with("meh", UserPluginClass).once
 
-      UserPluginClass.command "meh"
+        UserPluginClass.command "meh"
+      end
+
+      it "accepts another class as argument that handles the command" do
+        stub_const "NewClass", Class.new
+        expect(Bundler::Plugin).to receive(:add_command).with("meh", NewClass).once
+
+        UserPluginClass.command "meh", NewClass
+      end
     end
 
-    it "accepts another class as argument that handles the command" do
-      stub_const "NewClass", Class.new
-      allow(Bundler::Plugin).to receive(:add_command).with("meh", NewClass).once
+    describe "#source" do
+      it "declares a source plugin with same class as handler" do
+        expect(Bundler::Plugin).
+          to receive(:add_source).with("a_source", UserPluginClass).once
 
-      UserPluginClass.command "meh", NewClass
+        UserPluginClass.source "a_source"
+      end
+
+      it "accepts another class as argument that handles the command" do
+        stub_const "NewClass", Class.new
+        expect(Bundler::Plugin).to receive(:add_source).with("a_source", NewClass).once
+
+        UserPluginClass.source "a_source", NewClass
+      end
     end
   end
 
@@ -30,8 +48,16 @@ describe Bundler::Plugin::API do
     subject(:api) { UserPluginClass.new }
 
     # A test of delegation
-    it "provides the bundler settings" do
-      expect(api.settings).to eq(Bundler.settings)
+    it "provides the Bundler's functions" do
+      expect(Bundler).to receive(:an_unkown_function).once
+
+      api.an_unkown_function
+    end
+
+    it "includes Bundler::SharedHelpers' functions" do
+      expect(Bundler::SharedHelpers).to receive(:an_unkown_helper).once
+
+      api.an_unkown_helper
     end
 
     context "#tmp" do

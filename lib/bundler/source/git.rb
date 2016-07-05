@@ -170,7 +170,7 @@ module Bundler
           serialize_gemspecs_in(install_path)
           @copied = true
         end
-        generate_bin(spec)
+        generate_bin(spec, !Bundler.rubygems.spec_missing_extensions?(spec))
 
         requires_checkout? ? spec.post_install_message : nil
       end
@@ -222,10 +222,6 @@ module Bundler
       end
 
     private
-
-      def build_extensions(installer)
-        super if Bundler.rubygems.spec_missing_extensions?(installer.spec)
-      end
 
       def serialize_gemspecs_in(destination)
         destination = destination.expand_path(Bundler.root) if destination.relative?

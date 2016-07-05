@@ -203,13 +203,8 @@ module Bundler
           end
         end.compact
 
-        SharedHelpers.chdir(gem_dir) do
-          installer = Path::Installer.new(spec, :env_shebang => false)
-          run_hooks(:pre_install, installer)
-          build_extensions(installer) unless disable_extensions
-          installer.generate_bin
-          run_hooks(:post_install, installer)
-        end
+        installer = Path::Installer.new(spec, :env_shebang => false, :disable_extensions => disable_extensions)
+        installer.post_install
       rescue Gem::InvalidSpecificationException => e
         Bundler.ui.warn "\n#{spec.name} at #{spec.full_gem_path} did not have a valid gemspec.\n" \
                         "This prevents bundler from installing bins or native extensions, but " \
@@ -222,23 +217,6 @@ module Bundler
         end
 
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
-      end
-
-      def build_extensions(installer)
-        installer.build_extensions
-        run_hooks(:post_build, installer)
-      end
-
-      def run_hooks(type, installer)
-        hooks_meth = "#{type}_hooks"
-        return unless Gem.respond_to?(hooks_meth)
-        Gem.send(hooks_meth).each do |hook|
-          result = hook.call(installer)
-          next unless result == false
-          location = " at #{$1}" if hook.inspect =~ /@(.*:\d+)/
-          message = "#{type} hook#{location} failed for #{installer.spec.full_name}"
-          raise InstallHookError, message
-        end
       end
     end
   end

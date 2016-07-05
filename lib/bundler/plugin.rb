@@ -10,45 +10,52 @@ module Bundler
 
     class MalformattedPlugin < PluginError; end
     class UndefinedCommandError < PluginError; end
+    class UnknownSourceError < PluginError; end
 
     PLUGIN_FILE_NAME = "plugins.rb".freeze
 
   module_function
 
     @commands = {}
+    @sources = {}
 
     # Installs a new plugin by the given name
     #
     # @param [Array<String>] names the name of plugin to be installed
-    # @param [Hash] options various parameters as described in description
-    # @option options [String] :source rubygems source to fetch the plugin gem from
-    # @option options [String] :version (optional) the version of the plugin to install
+    # @param [Hash] options various parameters as described in description.
+    #               Refer to cli/plugin for available options
     def install(names, options)
-      paths = Installer.new.install(names, options)
+      specs = Installer.new.install(names, options)
 
-      save_plugins paths
+      save_plugins names, specs
     rescue PluginError => e
-      paths.values.map {|path| Bundler.rm_rf(path) } if paths
-      Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
+      specs.values.map {|spec| Bundler.rm_rf(spec.full_gem_path) } if specs
+      Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace[0]}"
     end
 
     # Evaluates the Gemfile with a limited DSL and installs the plugins
     # specified by plugin method
     #
     # @param [Pathname] gemfile path
+    # @param [Proc] block that can be evaluated for (inline) Gemfile
     def gemfile_install(gemfile = nil, &inline)
+      builder = DSL.new
       if block_given?
-        builder = DSL.new
         builder.instance_eval(&inline)
-        definition = builder.to_definition(nil, true)
       else
-        definition = DSL.evaluate(gemfile, nil, {})
+        builder.eval_gemfile(gemfile)
       end
-      return unless definition.dependencies.any?
+      definition = builder.to_definition(nil, true)
 
-      plugins = Installer.new.install_definition(definition)
+      return if definition.dependencies.empty?
 
-      save_plugins plugins
+      plugins = definition.dependencies.map(&:name).reject {|p| index.installed? p }
+      installed_specs = Installer.new.install_definition(definition)
+
+      save_plugins plugins, installed_specs, builder.inferred_plugins
+    rescue => e
+      Bundler.ui.error "Failed to install plugin: #{e.message}\n  #{e.backtrace[0]}"
+      raise
     end
 
     # The index object used to store the details about the plugin
@@ -71,7 +78,7 @@ module Bundler
       @commands[command] = cls
     end
 
-    # Checks if any plugins handles the command
+    # Checks if any plugin handles the command
     def command?(command)
       !index.command_plugin(command).nil?
     end
@@ -79,11 +86,39 @@ module Bundler
     # To be called from Cli class to pass the command and argument to
     # approriate plugin class
     def exec_command(command, args)
-      raise UndefinedCommandError, "Command #{command} not found" unless command? command
+      raise UndefinedCommandError, "Command `#{command}` not found" unless command? command
 
       load_plugin index.command_plugin(command) unless @commands.key? command
 
       @commands[command].new.exec(command, args)
+    end
+
+    # To be called via the API to register to handle a source plugin
+    def add_source(source, cls)
+      @sources[source] = cls
+    end
+
+    # Checks if any plugin declares the source
+    def source?(name)
+      !index.source_plugin(name.to_s).nil?
+    end
+
+    # @return [Class] that handles the source. The calss includes API::Source
+    def source(name)
+      raise UnknownSourceError, "Source #{name} not found" unless source? name
+
+      load_plugin(index.source_plugin(name)) unless @sources.key? name
+
+      @sources[name]
+    end
+
+    # @param [Hash] The options that are present in the lock file
+    # @return [API::Source] the instance of the class that handles the source
+    #                       type passed in locked_opts
+    def source_from_lock(locked_opts)
+      src = source(locked_opts["type"])
+
+      src.new(locked_opts.merge("uri" => locked_opts["remote"]))
     end
 
     # currently only intended for specs
@@ -95,13 +130,16 @@ module Bundler
 
     # Post installation processing and registering with index
     #
-    # @param [Hash] plugins mapped to their installtion path
-    def save_plugins(plugins)
-      plugins.each do |name, path|
-        path = Pathname.new path
-        validate_plugin! path
-        register_plugin name, path
-        Bundler.ui.info "Installed plugin #{name}"
+    # @param [Array<String>] plugins list to be installed
+    # @param [Hash] specs of plugins mapped to installation path (currently they
+    #               contain all the installed specs, including plugins)
+    # @param [Array<String>] names of inferred source plugins that can be ignored
+    def save_plugins(plugins, specs, optional_plugins = [])
+      plugins.each do |name|
+        spec = specs[name]
+        validate_plugin! Pathname.new(spec.full_gem_path)
+        installed = register_plugin name, spec, optional_plugins.include?(name)
+        Bundler.ui.info "Installed plugin #{name}" if installed
       end
     end
 
@@ -110,21 +148,31 @@ module Bundler
     # At present it only checks whether it contains plugins.rb file
     #
     # @param [Pathname] plugin_path the path plugin is installed at
-    # @raise [Error] if plugins.rb file is not found
+    # @raise [MalformattedPlugin] if plugins.rb file is not found
     def validate_plugin!(plugin_path)
       plugin_file = plugin_path.join(PLUGIN_FILE_NAME)
-      raise MalformattedPlugin, "#{PLUGIN_FILE_NAME} was not found in the plugin!" unless plugin_file.file?
+      raise MalformattedPlugin, "#{PLUGIN_FILE_NAME} was not found in the plugin." unless plugin_file.file?
     end
 
     # Runs the plugins.rb file in an isolated namespace, records the plugin
     # actions it registers for and then passes the data to index to be stored.
     #
     # @param [String] name the name of the plugin
-    # @param [Pathname] path the path where the plugin is installed at
-    def register_plugin(name, path)
+    # @param [Specification] spec of installed plugin
+    # @param [Boolean] optional_plugin, removed if there is conflict with any
+    #                     other plugin (used for default source plugins)
+    #
+    # @raise [MalformattedPlugin] if plugins.rb raises any error
+    def register_plugin(name, spec, optional_plugin = false)
       commands = @commands
+      sources = @sources
 
       @commands = {}
+      @sources = {}
+
+      load_paths = spec.load_paths
+      add_to_load_path(load_paths)
+      path = Pathname.new spec.full_gem_path
 
       begin
         load path.join(PLUGIN_FILE_NAME), true
@@ -132,9 +180,16 @@ module Bundler
         raise MalformattedPlugin, "#{e.class}: #{e.message}"
       end
 
-      index.register_plugin name, path.to_s, @commands.keys
+      if optional_plugin && @sources.keys.any? {|s| source? s }
+        Bundler.rm_rf(path)
+        false
+      else
+        index.register_plugin name, path.to_s, load_paths, @commands.keys, @sources.keys
+        true
+      end
     ensure
       @commands = commands
+      @sources = sources
     end
 
     # Executes the plugins.rb file
@@ -146,11 +201,25 @@ module Bundler
       # done to avoid conflicts
       path = index.plugin_path(name)
 
+      add_to_load_path(index.load_paths(name))
+
       load path.join(PLUGIN_FILE_NAME)
+    rescue => e
+      Bundler.ui.error "Failed loading plugin #{name}: #{e.message}"
+      raise
+    end
+
+    def add_to_load_path(load_paths)
+      if insert_index = Bundler.rubygems.load_path_insert_index
+        $LOAD_PATH.insert(insert_index, *load_paths)
+      else
+        $LOAD_PATH.unshift(*load_paths)
+      end
     end
 
     class << self
-      private :load_plugin, :register_plugin, :save_plugins, :validate_plugin!
+      private :load_plugin, :register_plugin, :save_plugins, :validate_plugin!,
+        :add_to_load_path
     end
   end
 end

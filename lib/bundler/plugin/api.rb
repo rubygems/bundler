@@ -23,19 +23,31 @@ module Bundler
   # and hooks).
   module Plugin
     class API
+      autoload :Source, "bundler/plugin/api/source"
       # The plugins should declare that they handle a command through this helper.
       #
       # @param [String] command being handled by them
-      # @param [Class] (optional) class that shall handle the command. If not
+      # @param [Class] (optional) class that handles the command. If not
       #                 provided, the `self` class will be used.
       def self.command(command, cls = self)
         Plugin.add_command command, cls
       end
 
-      # The cache dir to be used by the plugins for persistance storage
+      # The plugins should declare that they provide a installation source
+      # through this helper.
+      #
+      # @param [String] the source type they provide
+      # @param [Class] (optional) class that handles the source. If not
+      #                 provided, the `self` class will be used.
+      def self.source(source, cls = self)
+        cls.send :include, Bundler::Plugin::API::Source
+        Plugin.add_source source, cls
+      end
+
+      # The cache dir to be used by the plugins for storage
       #
       # @return [Pathname] path of the cache dir
-      def cache
+      def cache_dir
         Plugin.cache.join("plugins")
       end
 
@@ -48,8 +60,16 @@ module Bundler
       end
 
       def method_missing(name, *args, &blk)
-        super unless Bundler.respond_to?(name)
-        Bundler.send(name, *args, &blk)
+        return Bundler.send(name, *args, &blk) if Bundler.respond_to?(name)
+
+        return SharedHelpers.send(name, *args, &blk) if SharedHelpers.respond_to?(name)
+
+        super
+      end
+
+      def respond_to_missing?(name, include_private = false)
+        SharedHelpers.respond_to?(name, include_private) ||
+          Bundler.respond_to?(name, include_private) || super
       end
     end
   end

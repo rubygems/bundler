@@ -532,7 +532,7 @@ module Spec
         @spec.executables.each do |file|
           executable = "#{@spec.bindir}/#{file}"
           @spec.files << executable
-          write executable, "#!/usr/bin/env ruby\nrequire '#{@name}' ; puts #{@name.upcase}"
+          write executable, "#!/usr/bin/env ruby\nrequire '#{@name}' ; puts #{Builders.constantize(@name)}"
         end
       end
 
@@ -629,6 +629,7 @@ module Spec
 
       def _build(options)
         libpath = options[:path] || _default_path
+        update_gemspec = options[:gemspec] || false
 
         Dir.chdir(libpath) do
           silently "git checkout master"
@@ -653,7 +654,7 @@ module Spec
           _default_files.keys.each do |path|
             _default_files[path] += "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
-          super(options.merge(:path => libpath, :gemspec => false))
+          super(options.merge(:path => libpath, :gemspec => update_gemspec))
           `git add *`
           `git commit -m "BUMP"`
         end

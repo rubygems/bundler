@@ -10,6 +10,8 @@ module Bundler
     def run
       Bundler.ui.level = "error" if options[:quiet]
 
+      Plugin.gemfile_install(Bundler.default_gemfile) if Bundler.settings[:plugins]
+
       sources = Array(options[:source])
       groups  = Array(options[:group]).map(&:to_sym)
 

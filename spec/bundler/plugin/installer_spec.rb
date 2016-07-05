@@ -16,20 +16,21 @@ describe Bundler::Plugin::Installer do
     end
 
     describe "with mocked installers" do
-      it "returns the installation path after installing git plugins" do
+      let(:spec) { double(:spec) }
+      it "returns the installed spec after installing git plugins" do
         allow(installer).to receive(:install_git).
-          and_return("new-plugin" => "/git/install/path")
+          and_return("new-plugin" => spec)
 
         expect(installer.install(["new-plugin"], :git => "https://some.ran/dom")).
-          to eq("new-plugin" => "/git/install/path")
+          to eq("new-plugin" => spec)
       end
 
-      it "returns the installation path after installing rubygems plugins" do
+      it "returns the installed spec after installing rubygems plugins" do
         allow(installer).to receive(:install_rubygems).
-          and_return("new-plugin" => "/rubygems/install/path")
+          and_return("new-plugin" => spec)
 
         expect(installer.install(["new-plugin"], :source => "https://some.ran/dom")).
-          to eq("new-plugin" => "/rubygems/install/path")
+          to eq("new-plugin" => spec)
       end
     end
 
@@ -41,30 +42,57 @@ describe Bundler::Plugin::Installer do
         end
       end
 
-      it "returns the installation path after installing git plugins" do
-        build_git "ga-plugin", :path => lib_path("ga-plugin") do |s|
-          s.write "plugins.rb"
+      context "git plugins" do
+        before do
+          build_git "ga-plugin", :path => lib_path("ga-plugin") do |s|
+            s.write "plugins.rb"
+          end
         end
 
-        rev = revision_for(lib_path("ga-plugin"))
-        expected = { "ga-plugin" => Bundler::Plugin.root.join("bundler", "gems", "ga-plugin-#{rev[0..11]}").to_s }
+        let(:result) do
+          installer.install(["ga-plugin"], :git => "file://#{lib_path("ga-plugin")}")
+        end
 
-        opts = { :git => "file://#{lib_path("ga-plugin")}" }
-        expect(installer.install(["ga-plugin"], opts)).to eq(expected)
+        it "returns the installed spec after installing" do
+          expect(result["ga-plugin"]).to be_kind_of(Gem::Specification)
+        end
+
+        it "has expected full gem path" do
+          rev = revision_for(lib_path("ga-plugin"))
+          expect(result["ga-plugin"].full_gem_path).
+            to eq(Bundler::Plugin.root.join("bundler", "gems", "ga-plugin-#{rev[0..11]}").to_s)
+        end
       end
 
-      it "returns the installation path after installing rubygems plugins" do
-        opts = { :source => "file://#{gem_repo2}" }
-        expect(installer.install(["re-plugin"], opts)).
-          to eq("re-plugin" => plugin_gems("re-plugin-1.0").to_s)
+      context "rubygems plugins" do
+        let(:result) do
+          installer.install(["re-plugin"], :source => "file://#{gem_repo2}")
+        end
+
+        it "returns the installed spec after installing " do
+          expect(result["re-plugin"]).to be_kind_of(Bundler::RemoteSpecification)
+        end
+
+        it "has expected full_gem)path" do
+          expect(result["re-plugin"].full_gem_path).
+            to eq(plugin_gems("re-plugin-1.0").to_s)
+        end
       end
 
-      it "accepts multiple plugins" do
-        opts = { :source => "file://#{gem_repo2}" }
+      context "multiple plugins" do
+        let(:result) do
+          installer.install(["re-plugin", "ma-plugin"], :source => "file://#{gem_repo2}")
+        end
 
-        expect(installer.install(["re-plugin", "ma-plugin"], opts)).
-          to eq("re-plugin" => plugin_gems("re-plugin-1.0").to_s,
-                "ma-plugin" => plugin_gems("ma-plugin-1.0").to_s)
+        it "returns the installed spec after installing " do
+          expect(result["re-plugin"]).to be_kind_of(Bundler::RemoteSpecification)
+          expect(result["ma-plugin"]).to be_kind_of(Bundler::RemoteSpecification)
+        end
+
+        it "has expected full_gem)path" do
+          expect(result["re-plugin"].full_gem_path).to eq(plugin_gems("re-plugin-1.0").to_s)
+          expect(result["ma-plugin"].full_gem_path).to eq(plugin_gems("ma-plugin-1.0").to_s)
+        end
       end
     end
   end

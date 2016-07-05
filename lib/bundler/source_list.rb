@@ -2,11 +2,13 @@
 module Bundler
   class SourceList
     attr_reader :path_sources,
-      :git_sources
+      :git_sources,
+      :plugin_sources
 
     def initialize
       @path_sources       = []
       @git_sources        = []
+      @plugin_sources     = []
       @rubygems_aggregate = Source::Rubygems.new
       @rubygems_sources   = []
     end
@@ -27,6 +29,10 @@ module Bundler
       add_source_to_list Source::Rubygems.new(options), @rubygems_sources
     end
 
+    def add_plugin_source(source, options = {})
+      add_source_to_list Plugin.source(source).new(options), @plugin_sources
+    end
+
     def add_rubygems_remote(uri)
       @rubygems_aggregate.add_remote(uri)
       @rubygems_aggregate
@@ -41,7 +47,7 @@ module Bundler
     end
 
     def all_sources
-      path_sources + git_sources + rubygems_sources
+      path_sources + git_sources + plugin_sources + rubygems_sources
     end
 
     def get(source)
@@ -49,14 +55,14 @@ module Bundler
     end
 
     def lock_sources
-      lock_sources = (path_sources + git_sources).sort_by(&:to_s)
+      lock_sources = (path_sources + git_sources + plugin_sources).sort_by(&:to_s)
       lock_sources << combine_rubygems_sources
     end
 
     def replace_sources!(replacement_sources)
       return true if replacement_sources.empty?
 
-      [path_sources, git_sources].each do |source_list|
+      [path_sources, git_sources, plugin_sources].each do |source_list|
         source_list.map! do |source|
           replacement_sources.find {|s| s == source } || source
         end
@@ -92,9 +98,10 @@ module Bundler
 
     def source_list_for(source)
       case source
-      when Source::Git      then git_sources
-      when Source::Path     then path_sources
-      when Source::Rubygems then rubygems_sources
+      when Source::Git          then git_sources
+      when Source::Path         then path_sources
+      when Source::Rubygems     then rubygems_sources
+      when Plugin::API::Source  then plugin_sources
       else raise ArgumentError, "Invalid source: #{source.inspect}"
       end
     end

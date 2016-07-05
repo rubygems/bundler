@@ -13,6 +13,7 @@ describe "bundler plugin install" do
     bundle "plugin install no-foo --source file://#{gem_repo1}"
 
     expect(out).to include("Could not find")
+    plugin_should_not_be_installed("no-foo")
   end
 
   it "installs from rubygems source" do
@@ -44,6 +45,29 @@ describe "bundler plugin install" do
     plugin_should_be_installed("foo", "kung-foo")
   end
 
+  it "works with different load paths" do
+    build_repo2 do
+      build_plugin "testing" do |s|
+        s.write "plugins.rb", <<-RUBY
+          require "fubar"
+          class Test < Bundler::Plugin::API
+            command "check2"
+
+            def exec(command, args)
+              puts "mate"
+            end
+          end
+        RUBY
+        s.require_paths = %w(lib src)
+        s.write("src/fubar.rb")
+      end
+    end
+    bundle "plugin install testing --source file://#{gem_repo2}"
+
+    bundle "check2", "no-color" => false
+    expect(out).to eq("mate")
+  end
+
   context "malformatted plugin" do
     it "fails when plugins.rb is missing" do
       build_repo2 do
@@ -54,9 +78,9 @@ describe "bundler plugin install" do
 
       expect(out).to include("plugins.rb was not found")
 
-      expect(out).not_to include("Installed plugin")
-
       expect(plugin_gems("charlie-1.0")).not_to be_directory
+
+      plugin_should_not_be_installed("charlie")
     end
 
     it "fails when plugins.rb throws exception on load" do
@@ -70,9 +94,9 @@ describe "bundler plugin install" do
 
       bundle "plugin install chaplin --source file://#{gem_repo2}"
 
-      expect(out).not_to include("Installed plugin")
-
       expect(plugin_gems("chaplin-1.0")).not_to be_directory
+
+      plugin_should_not_be_installed("chaplin")
     end
   end
 

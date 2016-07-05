@@ -125,11 +125,26 @@ module Bundler
       @dependencies << dep
     end
 
-    def source(source, &blk)
-      source = normalize_source(source)
-      if block_given?
+    def source(source, *args, &blk)
+      options = args.last.is_a?(Hash) ? args.pop.dup : {}
+      options = normalize_hash(options)
+      if options.key?("type")
+        options["type"] = options["type"].to_s
+        unless Plugin.source?(options["type"])
+          raise "No sources available for #{options["type"]}"
+        end
+
+        unless block_given?
+          raise InvalidOption, "You need to pass a block to #source with :type option"
+        end
+
+        source_opts = options.merge("uri" => source)
+        with_source(@sources.add_plugin_source(options["type"], source_opts), &blk)
+      elsif block_given?
+        source = normalize_source(source)
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
+        source = normalize_source(source)
         check_primary_source_safety(@sources)
         @sources.add_rubygems_remote(source)
       end
