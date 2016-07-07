@@ -111,10 +111,6 @@ module Bundler
         Bundler.root
       end
 
-      def is_a_path?
-        instance_of?(Path)
-      end
-
     private
 
       def expanded_path

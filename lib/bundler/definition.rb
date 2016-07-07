@@ -12,6 +12,7 @@ module Bundler
       :gem_version_promoter,
       :locked_deps,
       :locked_gems,
+      :locked_specs,
       :platforms,
       :requires,
       :ruby_version
@@ -413,8 +414,8 @@ module Bundler
 
       # Check if it is possible that the source is only changed thing
       if (new_deps.empty? && deleted_deps.empty?) && (!new_sources.empty? && !deleted_sources.empty?)
-        new_sources.reject! {|source| source.is_a_path? && source.path.exist? }
-        deleted_sources.reject! {|source| source.is_a_path? && source.path.exist? }
+        new_sources.reject! {|source| source.a_path? && source.path.exist? }
+        deleted_sources.reject! {|source| source.a_path? && source.path.exist? }
       end
 
       if @locked_sources != gemfile_sources
@@ -494,7 +495,16 @@ module Bundler
       !sources.git_sources.empty?
     end
 
-    def calculate_full_gem_list
+    def calculate_non_path_gem_list
+      SpecSet.new(@locked_specs.reject {|locked_spec| locked_spec.source && locked_spec.source.a_path? })
+    end
+
+    def calculate_git_gems
+      @locked_deps.select {|locked_spec| locked_spec.source && locked_spec.source.a_git? }
+    end
+
+    def calculate_path_only_gems
+      @locked_deps.select {|locked_spec| locked_spec.source && locked_spec.source.a_path? && !locked_spec.source.a_git? }
     end
 
     attr_reader :sources
