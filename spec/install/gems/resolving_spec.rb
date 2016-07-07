@@ -105,15 +105,15 @@ describe "bundle install with install-time dependencies" do
   describe "when a required ruby version" do
     context "allows only an older version" do
       it "installs the older version" do
-        update_repo gem_repo1 do
+        build_repo2 do
           build_gem "rack", "9001.0.0" do |s|
             s.required_ruby_version = "> 9000"
           end
         end
 
-        install_gemfile <<-G, :artifice => "compact_index"
+        install_gemfile <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo2 }
           ruby "#{RUBY_VERSION}"
-          source "file://#{gem_repo1}"
+          source "http://localgemserver.test/"
           gem 'rack'
         G
 
@@ -124,14 +124,14 @@ describe "bundle install with install-time dependencies" do
 
     context "allows no gems" do
       it "does not try to install those gems" do
-        update_repo gem_repo1 do
+        build_repo2 do
           build_gem "require_ruby" do |s|
             s.required_ruby_version = "> 9000"
           end
         end
 
-        install_gemfile <<-G, :artifice => "compact_index"
-          source "file://#{gem_repo1}"
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
           gem 'require_ruby'
         G
 
@@ -143,14 +143,14 @@ describe "bundle install with install-time dependencies" do
 
   describe "when a required rubygems version disallows a gem" do
     it "does not try to install those gems" do
-      update_repo gem_repo1 do
+      build_repo2 do
         build_gem "require_rubygems" do |s|
           s.required_rubygems_version = "> 9000"
         end
       end
 
-      install_gemfile <<-G, :artifice => "compact_index"
-        source "file://#{gem_repo1}"
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
         gem 'require_rubygems'
       G
 

@@ -63,7 +63,7 @@ class CompactIndexAPI < Endpoint
       end
     end
 
-    def gems(gem_repo = gem_repo1)
+    def gems(gem_repo = GEM_REPO)
       @gems ||= {}
       @gems[gem_repo] ||= begin
         specs = Bundler::Deprecate.skip_during do
