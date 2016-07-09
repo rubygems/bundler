@@ -129,15 +129,10 @@ module Bundler
           b_ver <=> a_ver
         when !minor? && segments_do_not_match(:minor, a_ver, b_ver)
           b_ver <=> a_ver
+        when !unlocking_gem?(gem_name) && one_version_matches(locked_version, a_ver, b_ver)
+          sort_matching_to_end(locked_version, a_ver, b_ver)
         else
           a_ver <=> b_ver
-        end
-      end.tap do |result|
-        # default :major behavior in Bundler does not do this
-        unless major?
-          unless unlocking_gem?(gem_name)
-            move_version_to_end(spec_groups, locked_version, result)
-          end
         end
       end
     end
@@ -155,11 +150,20 @@ module Bundler
       unlock_gems.empty? || unlock_gems.include?(gem_name)
     end
 
-    def move_version_to_end(spec_groups, version, result)
-      spec_group = spec_groups.detect {|s| s.version.to_s == version.to_s }
-      return unless spec_group
-      result.reject! {|s| s.version.to_s == version.to_s }
-      result << spec_group
+    def one_version_matches(match_version, a_ver, b_ver)
+      [a_ver, b_ver].include?(match_version)
+    end
+
+    def sort_matching_to_end(version, a_ver, b_ver)
+      if a_ver == version
+        1
+      elsif b_ver == version
+        -1
+      else
+        # should never happen, prevents coding error when not using
+        # one_version_matches prior to calling this method
+        raise "Neither version (#{a_ver} or #{b_ver}) matches #{version}"
+      end
     end
 
     def debug_format_result(dep, spec_groups)
