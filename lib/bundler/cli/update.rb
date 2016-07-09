@@ -39,6 +39,13 @@ module Bundler
         Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby])
       end
 
+      patch_level = [:major, :minor, :patch].select {|v| options.keys.include?(v.to_s) }
+      raise ProductionError, "Provide only one of the following options: #{patch_level.join(", ")}" unless patch_level.length <= 1
+      Bundler.definition.gem_version_promoter.tap do |gvp|
+        gvp.level = patch_level.first || :major
+        gvp.strict = options[:strict]
+      end
+
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
       opts = options.dup

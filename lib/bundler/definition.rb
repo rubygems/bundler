@@ -7,7 +7,7 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps
+    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps, :gem_version_promoter
 
     # Given a gemfile and lockfile creates a Bundler definition
     #
@@ -94,6 +94,8 @@ module Bundler
       end
       @unlocking ||= @unlock[:ruby] ||= (!@locked_ruby_version ^ !@ruby_version)
 
+      @gem_version_promoter = create_gem_version_promoter
+
       current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
       add_platform(current_platform)
 
@@ -121,6 +123,21 @@ module Bundler
           ld.instance_variable_set(:@type, d.type)
         end
       end
+    end
+
+    def create_gem_version_promoter
+      locked_specs = begin
+        if @unlocking && @locked_specs.empty? && !@lockfile_contents.empty?
+          # Definition uses an empty set of locked_specs to indicate all gems
+          # are unlocked, but GemVersionPromoter needs the locked_specs
+          # for conservative comparison.
+          locked = Bundler::LockfileParser.new(@lockfile_contents)
+          Bundler::SpecSet.new(locked.specs)
+        else
+          @locked_specs
+        end
+      end
+      GemVersionPromoter.new(locked_specs, @unlock[:gems])
     end
 
     def resolve_with_cache!
@@ -221,7 +238,7 @@ module Bundler
         else
           # Run a resolve against the locally available gems
           Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version, gem_version_promoter)
         end
       end
     end

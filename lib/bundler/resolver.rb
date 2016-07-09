@@ -172,14 +172,14 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil)
+    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil, gem_version_promoter = GemVersionPromoter.new)
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base, ruby_version)
+      resolver = new(index, source_requirements, base, ruby_version, gem_version_promoter)
       result = resolver.start(requirements)
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base, ruby_version)
+    def initialize(index, source_requirements, base, ruby_version, gem_version_promoter)
       @index = index
       @source_requirements = source_requirements
       @base = base
@@ -188,6 +188,7 @@ module Bundler
       @base_dg = Molinillo::DependencyGraph.new
       @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
       @ruby_version = ruby_version
+      @gem_version_promoter = gem_version_promoter
     end
 
     def start(requirements)
@@ -249,7 +250,7 @@ module Bundler
         if vertex = @base_dg.vertex_named(dependency.name)
           locked_requirement = vertex.payload.requirement
         end
-        if results.any?
+        spec_groups = if results.any?
           nested = []
           results.each do |spec|
             version, specs = nested.last
@@ -265,6 +266,13 @@ module Bundler
           end
         else
           []
+        end
+        # GVP handles major itself, but it's still a bit risky to trust it with it
+        # until we get it settled with new behavior. For 2.x it can take over all cases.
+        if @gem_version_promoter.major?
+          spec_groups
+        else
+          @gem_version_promoter.sort_versions(dependency, spec_groups)
         end
       end
       search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }

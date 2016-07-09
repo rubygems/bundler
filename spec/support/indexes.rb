@@ -13,7 +13,7 @@ module Spec
 
     alias_method :platforms, :platform
 
-    def resolve
+    def resolve(args = [])
       @platforms ||= ["ruby"]
       deps = []
       @deps.each do |d|
@@ -21,7 +21,7 @@ module Spec
           deps << Bundler::DepProxy.new(d, p)
         end
       end
-      Bundler::Resolver.resolve(deps, @index)
+      Bundler::Resolver.resolve(deps, @index, *args)
     end
 
     def should_resolve_as(specs)
@@ -30,8 +30,8 @@ module Spec
       expect(got).to eq(specs.sort)
     end
 
-    def should_resolve_and_include(specs)
-      got = resolve
+    def should_resolve_and_include(specs, args = [])
+      got = resolve(args)
       got = got.map(&:full_name).sort
       specs.each do |s|
         expect(got).to include(s)
@@ -47,6 +47,22 @@ module Spec
 
     def gem(*args, &blk)
       build_spec(*args, &blk).first
+    end
+
+    def locked(*args)
+      Bundler::SpecSet.new(args.map do |name, version|
+        gem(name, version)
+      end)
+    end
+
+    def should_conservative_resolve_and_include(opts, unlock, specs)
+      # empty unlock means unlock all
+      opts = Array(opts)
+      search = Bundler::GemVersionPromoter.new(@locked, unlock).tap do |s|
+        s.level = opts.first
+        s.strict = opts.include?(:strict)
+      end
+      should_resolve_and_include specs, [{}, @base, nil, search]
     end
 
     def an_awesome_index

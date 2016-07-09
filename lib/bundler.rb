@@ -30,6 +30,7 @@ module Bundler
   autoload :Fetcher,                "bundler/fetcher"
   autoload :GemHelper,              "bundler/gem_helper"
   autoload :GemHelpers,             "bundler/gem_helpers"
+  autoload :GemVersionPromoter,     "bundler/gem_version_promoter"
   autoload :Graph,                  "bundler/graph"
   autoload :Index,                  "bundler/index"
   autoload :Installer,              "bundler/installer"
