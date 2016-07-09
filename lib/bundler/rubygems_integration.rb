@@ -19,6 +19,10 @@ module Bundler
       Gem::Requirement.new(req_str).satisfied_by?(version)
     end
 
+    def initialize
+      @replaced_methods = {}
+    end
+
     def version
       self.class.version
     end
@@ -283,13 +287,11 @@ module Bundler
 
     def reverse_rubygems_kernel_mixin
       # Disable rubygems' gem activation system
-      ::Kernel.class_eval do
-        if private_method_defined?(:gem_original_require)
-          alias_method :rubygems_require, :require
-          alias_method :require, :gem_original_require
+      kernel = (class << ::Kernel; self; end)
+      [kernel, ::Kernel].each do |k|
+        if k.private_method_defined?(:gem_original_require)
+          redefine_method(k, :require, k.instance_method(:gem_original_require))
         end
-
-        undef gem
       end
     end
 
@@ -298,41 +300,44 @@ module Bundler
 
       executables = specs.map(&:executables).flatten
 
-      ::Kernel.send(:define_method, :gem) do |dep, *reqs|
-        if executables.include? File.basename(caller.first.split(":").first)
-          break
-        end
-        reqs.pop if reqs.last.is_a?(Hash)
-
-        unless dep.respond_to?(:name) && dep.respond_to?(:requirement)
-          dep = Gem::Dependency.new(dep, reqs)
-        end
-
-        spec = specs.find {|s| s.name == dep.name }
-
-        if spec.nil?
-
-          e = Gem::LoadError.new "#{dep.name} is not part of the bundle. Add it to Gemfile."
-          e.name = dep.name
-          if e.respond_to?(:requirement=)
-            e.requirement = dep.requirement
-          else
-            e.version_requirement = dep.requirement
+      kernel = (class << ::Kernel; self; end)
+      [kernel, ::Kernel].each do |kernel_class|
+        redefine_method(kernel_class, :gem) do |dep, *reqs|
+          if executables.include? File.basename(caller.first.split(":").first)
+            break
           end
-          raise e
-        elsif dep !~ spec
-          e = Gem::LoadError.new "can't activate #{dep}, already activated #{spec.full_name}. " \
-                                 "Make sure all dependencies are added to Gemfile."
-          e.name = dep.name
-          if e.respond_to?(:requirement=)
-            e.requirement = dep.requirement
-          else
-            e.version_requirement = dep.requirement
-          end
-          raise e
-        end
+          reqs.pop if reqs.last.is_a?(Hash)
 
-        true
+          unless dep.respond_to?(:name) && dep.respond_to?(:requirement)
+            dep = Gem::Dependency.new(dep, reqs)
+          end
+
+          spec = specs.find {|s| s.name == dep.name }
+
+          if spec.nil?
+
+            e = Gem::LoadError.new "#{dep.name} is not part of the bundle. Add it to Gemfile."
+            e.name = dep.name
+            if e.respond_to?(:requirement=)
+              e.requirement = dep.requirement
+            else
+              e.version_requirement = dep.requirement
+            end
+            raise e
+          elsif dep !~ spec
+            e = Gem::LoadError.new "can't activate #{dep}, already activated #{spec.full_name}. " \
+                                   "Make sure all dependencies are added to Gemfile."
+            e.name = dep.name
+            if e.respond_to?(:requirement=)
+              e.requirement = dep.requirement
+            else
+              e.version_requirement = dep.requirement
+            end
+            raise e
+          end
+
+          true
+        end
       end
     end
 
@@ -463,9 +468,18 @@ module Bundler
       end
     end
 
-    def redefine_method(klass, method, &block)
+    def undo_replacements
+      @replaced_methods.each do |(sym, klass), method|
+        redefine_method(klass, sym, method)
+      end
+      Gem.post_reset_hooks.reject! {|proc| proc.source_location.first == __FILE__ }
+      @replaced_methods.clear
+    end
+
+    def redefine_method(klass, method, unbound_method = nil, &block)
+      # puts "redefining #{klass} #{method} to #{unbound_method || block}"
       begin
-        if klass.instance_method(method) && method != :initialize
+        if instance_method = klass.instance_method(method) and method != :initialize
           # doing this to ensure we also get private methods
           klass.send(:remove_method, method)
         end
@@ -473,7 +487,8 @@ module Bundler
         # method isn't defined
         nil
       end
-      klass.send(:define_method, method, &block)
+      @replaced_methods[[method, klass]] = instance_method
+      klass.send(:define_method, method, unbound_method || block.to_proc)
     end
 
     # Rubygems 1.4 through 1.6
@@ -489,7 +504,7 @@ module Bundler
       def stub_rubygems(specs)
         # Rubygems versions lower than 1.7 use SourceIndex#from_gems_in
         source_index_class = (class << Gem::SourceIndex; self; end)
-        source_index_class.send(:define_method, :from_gems_in) do |*args|
+        redefine_method(source_index, source_index_class) do |*args|
           source_index = Gem::SourceIndex.new
           source_index.spec_dirs = *args
           source_index.add_specs(*specs)
@@ -688,25 +703,23 @@ module Bundler
     end
   end
 
-  if RubygemsIntegration.provides?(">= 2.1.0")
-    @rubygems = RubygemsIntegration::MoreFuture.new
-  elsif RubygemsIntegration.provides?(">= 1.99.99")
-    @rubygems = RubygemsIntegration::Future.new
-  elsif RubygemsIntegration.provides?(">= 1.8.20")
-    @rubygems = RubygemsIntegration::MoreModern.new
-  elsif RubygemsIntegration.provides?(">= 1.8.5")
-    @rubygems = RubygemsIntegration::Modern.new
-  elsif RubygemsIntegration.provides?(">= 1.8.0")
-    @rubygems = RubygemsIntegration::AlmostModern.new
-  elsif RubygemsIntegration.provides?(">= 1.7.0")
-    @rubygems = RubygemsIntegration::Transitional.new
-  elsif RubygemsIntegration.provides?(">= 1.4.0")
-    @rubygems = RubygemsIntegration::Legacy.new
-  else # Rubygems 1.3.6 and 1.3.7
-    @rubygems = RubygemsIntegration::Ancient.new
-  end
-
-  class << self
-    attr_reader :rubygems
+  def self.rubygems
+    @rubygems ||= if RubygemsIntegration.provides?(">= 2.1.0")
+      RubygemsIntegration::MoreFuture.new
+    elsif RubygemsIntegration.provides?(">= 1.99.99")
+      RubygemsIntegration::Future.new
+    elsif RubygemsIntegration.provides?(">= 1.8.20")
+      RubygemsIntegration::MoreModern.new
+    elsif RubygemsIntegration.provides?(">= 1.8.5")
+      RubygemsIntegration::Modern.new
+    elsif RubygemsIntegration.provides?(">= 1.8.0")
+      RubygemsIntegration::AlmostModern.new
+    elsif RubygemsIntegration.provides?(">= 1.7.0")
+      RubygemsIntegration::Transitional.new
+    elsif RubygemsIntegration.provides?(">= 1.4.0")
+      RubygemsIntegration::Legacy.new
+    else # Rubygems 1.3.6 and 1.3.7
+      RubygemsIntegration::Ancient.new
+    end
   end
 end
