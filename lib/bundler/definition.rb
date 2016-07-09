@@ -7,7 +7,7 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps, :gem_version_promoter
+    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps, :gem_version_promoter, :requires
 
     # Given a gemfile and lockfile creates a Bundler definition
     #
@@ -106,6 +106,8 @@ module Bundler
       @source_changes = converge_sources
       @dependency_changes = converge_dependencies
       @local_changes = converge_locals
+
+      @requires = compute_requires
 
       fixup_dependency_types!
     end
@@ -215,7 +217,7 @@ module Bundler
     end
 
     def current_dependencies
-      dependencies.reject {|d| !d.should_include? }
+      dependencies.select(&:should_include?)
     end
 
     def specs_for(groups)
@@ -767,6 +769,18 @@ module Bundler
       # This method will extract the error message like "Could not find foo-1.2.3 in any of the sources"
       # to an array. The first element will be the gem name (e.g. foo), the second will be the version number.
       error.message.scan(/Could not find (\w+)-(\d+(?:\.\d+)+)/).flatten
+    end
+
+    def compute_requires
+      dependencies.reduce({}) do |requires, dep|
+        next unless dep.should_include?
+        requires[dep.name] = Array(dep.autorequire || dep.name).each do |file|
+          # Allow `require: true` as an alias for `require: <name>`
+          file = dep.name if file == true
+          file
+        end
+        requires
+      end
     end
   end
 end
