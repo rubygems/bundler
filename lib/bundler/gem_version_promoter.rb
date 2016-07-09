@@ -114,52 +114,56 @@ module Bundler
 
     def sort_dep_specs(spec_groups, locked_spec)
       return spec_groups unless locked_spec
-      gem_name = locked_spec.name
-      locked_version = locked_spec.version
+      @gem_name = locked_spec.name
+      @locked_version = locked_spec.version
 
-      spec_groups.sort do |a, b|
-        a_ver = a.version
-        b_ver = b.version
+      result = spec_groups.sort do |a, b|
+        @a_ver = a.version
+        @b_ver = b.version
         case
         when major?
-          a_ver <=> b_ver
-        when either_version_older_than_locked(locked_version, a_ver, b_ver)
-          a_ver <=> b_ver
-        when segments_do_not_match(:major, a_ver, b_ver)
-          b_ver <=> a_ver
-        when !minor? && segments_do_not_match(:minor, a_ver, b_ver)
-          b_ver <=> a_ver
+          @a_ver <=> @b_ver
+        when either_version_older_than_locked
+          @a_ver <=> @b_ver
+        when segments_do_not_match(:major)
+          @b_ver <=> @a_ver
+        when !minor? && segments_do_not_match(:minor)
+          @b_ver <=> @a_ver
         else
-          a_ver <=> b_ver
+          @a_ver <=> @b_ver
         end
-      end.tap do |result|
-        # default :major behavior in Bundler does not do this
-        unless major?
-          unless unlocking_gem?(gem_name)
-            move_version_to_end(spec_groups, locked_version, result)
-          end
-        end
+      end
+      post_sort(result)
+    end
+
+    def either_version_older_than_locked
+      @a_ver < @locked_version || @b_ver < @locked_version
+    end
+
+    def segments_do_not_match(level)
+      index = [:major, :minor].index(level)
+      @a_ver.segments[index] != @b_ver.segments[index]
+    end
+
+    def unlocking_gem?
+      unlock_gems.empty? || unlock_gems.include?(@gem_name)
+    end
+
+    # Specific version moves can't always reliably be done during sorting
+    # as not all elements are compared against each other.
+    def post_sort(result)
+      # default :major behavior in Bundler does not do this
+      return result if major?
+      if unlocking_gem?
+        result
+      else
+        move_version_to_end(result, @locked_version)
       end
     end
 
-    def either_version_older_than_locked(locked_version, a_ver, b_ver)
-      a_ver < locked_version || b_ver < locked_version
-    end
-
-    def segments_do_not_match(level, a_ver, b_ver)
-      index = [:major, :minor].index(level)
-      a_ver.segments[index] != b_ver.segments[index]
-    end
-
-    def unlocking_gem?(gem_name)
-      unlock_gems.empty? || unlock_gems.include?(gem_name)
-    end
-
-    def move_version_to_end(spec_groups, version, result)
-      spec_group = spec_groups.detect {|s| s.version.to_s == version.to_s }
-      return unless spec_group
-      result.reject! {|s| s.version.to_s == version.to_s }
-      result << spec_group
+    def move_version_to_end(result, version)
+      move, keep = result.partition {|s| s.version.to_s == version.to_s }
+      keep.concat(move)
     end
 
     def debug_format_result(dep, spec_groups)
