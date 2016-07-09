@@ -9,7 +9,7 @@ describe "bundler plugin install" do
     end
   end
 
-  it "shows propper message when gem in not found in the source" do
+  it "shows proper message when gem in not found in the source" do
     bundle "plugin install no-foo --source file://#{gem_repo1}"
 
     expect(out).to include("Could not find")

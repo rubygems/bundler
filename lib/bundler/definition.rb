@@ -127,7 +127,7 @@ module Bundler
 
     def create_gem_version_promoter
       locked_specs = begin
-        if @unlocking && @locked_specs.empty?
+        if @unlocking && @locked_specs.empty? && !@lockfile_contents.empty?
           # Definition uses an empty set of locked_specs to indicate all gems
           # are unlocked, but GemVersionPromoter needs the locked_specs
           # for conservative comparison.

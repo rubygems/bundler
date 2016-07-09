@@ -136,18 +136,47 @@ describe Bundler::Definition do
 
   describe "initialize" do
     context "gem version promoter" do
-      before :each do
-        install_gemfile <<-G
+      context "with lockfile" do
+        before :each do
+          install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "foo"
-        G
+          G
+        end
+
+        it "should get a locked specs list when updating all" do
+          definition = Bundler::Definition.new(bundled_app("Gemfile.lock"), [], Bundler::SourceList.new, true)
+          locked_specs = definition.gem_version_promoter.locked_specs
+          expect(locked_specs.to_a.map(&:name)).to eq ["foo"]
+          expect(definition.instance_variable_get("@locked_specs").empty?).to eq true
+        end
       end
 
-      it "should get a locked specs list when updating all" do
-        definition = Bundler::Definition.new(bundled_app("Gemfile.lock"), [], Bundler::SourceList.new, true)
-        locked_specs = definition.gem_version_promoter.locked_specs
-        expect(locked_specs.to_a.map(&:name)).to eq ["foo"]
-        expect(definition.instance_variable_get("@locked_specs").empty?).to eq true
+      context "without gemfile or lockfile" do
+        it "should not attempt to parse empty lockfile contents" do
+          definition = Bundler::Definition.new(nil, [], mock_source_list, true)
+          expect(definition.gem_version_promoter.locked_specs.to_a).to eq []
+        end
+      end
+
+      def mock_source_list
+        Class.new do
+          def all_sources
+            []
+          end
+
+          def path_sources
+            []
+          end
+
+          def rubygems_remotes
+            []
+          end
+
+          def replace_sources!(arg)
+            nil
+          end
+        end.new
       end
     end
   end
