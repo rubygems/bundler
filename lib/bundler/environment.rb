@@ -31,6 +31,10 @@ module Bundler
       @definition.current_dependencies
     end
 
+    def requires
+      @definition.requires
+    end
+
     def lock(opts = {})
       @definition.lock(Bundler.default_lockfile, opts[:preserve_unknown_sections])
     end
