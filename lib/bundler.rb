@@ -386,6 +386,11 @@ module Bundler
       @root = nil
       @settings = nil
       @definition = nil
+      if defined?(@rubygems) && @rubygems
+        rubygems.undo_replacements
+        @rubygems = nil
+      end
+      Gem::Specification.reset
     end
 
   private
