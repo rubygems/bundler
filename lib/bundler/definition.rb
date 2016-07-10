@@ -773,7 +773,7 @@ module Bundler
 
     def compute_requires
       dependencies.reduce({}) do |requires, dep|
-        next unless dep.should_include?
+        next requires unless dep.should_include?
         requires[dep.name] = Array(dep.autorequire || dep.name).each do |file|
           # Allow `require: true` as an alias for `require: <name>`
           file = dep.name if file == true

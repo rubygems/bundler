@@ -479,7 +479,7 @@ module Bundler
     def redefine_method(klass, method, unbound_method = nil, &block)
       # puts "redefining #{klass} #{method} to #{unbound_method || block}"
       begin
-        if instance_method = klass.instance_method(method) and method != :initialize
+        if (instance_method = klass.instance_method(method)) && method != :initialize
           # doing this to ensure we also get private methods
           klass.send(:remove_method, method)
         end
