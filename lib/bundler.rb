@@ -89,7 +89,7 @@ module Bundler
 
     def setup(*groups)
       # Return if all groups are already loaded
-      return @setup if defined?(@setup)
+      return @setup if defined?(@setup) && @setup
 
       definition.validate_ruby!
 
@@ -386,6 +386,11 @@ module Bundler
       @root = nil
       @settings = nil
       @definition = nil
+      @setup = nil
+      @load = nil
+      @locked_gems = nil
+      @bundle_path = nil
+      @bin_path = nil
       if defined?(@rubygems) && @rubygems
         rubygems.undo_replacements
         @rubygems = nil
