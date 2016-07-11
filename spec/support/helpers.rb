@@ -13,7 +13,7 @@ module Spec
       FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)
       ENV["BUNDLE_DISABLE_POSTIT"] = "1"
-      Bundler.send(:remove_instance_variable, :@settings) if Bundler.send(:instance_variable_defined?, :@settings)
+      Bundler.reset!
       Bundler.ui = nil
       Bundler.ui # force it to initialize
     end
