@@ -44,7 +44,7 @@ describe "bundle install" do
 
     it "loads the correct spec's executable" do
       gembin("rackup")
-      expect(out).to eq("1.0.0")
+      expect(out).to eq("1.2")
     end
   end
 end

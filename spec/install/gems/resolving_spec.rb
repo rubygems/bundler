@@ -118,7 +118,7 @@ describe "bundle install with install-time dependencies" do
         G
 
         expect(out).to_not include("rack-9001.0.0 requires ruby version > 9000")
-        should_be_installed("rack 1.0")
+        should_be_installed("rack 1.2")
       end
     end
 
