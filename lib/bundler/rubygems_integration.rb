@@ -472,7 +472,9 @@ module Bundler
       @replaced_methods.each do |(sym, klass), method|
         redefine_method(klass, sym, method)
       end
-      Gem.post_reset_hooks.reject! {|proc| proc.source_location.first == __FILE__ }
+      Gem.post_reset_hooks.reject! do |proc|
+        proc.binding.eval("__FILE__") == __FILE__
+      end
       @replaced_methods.clear
     end
 
@@ -488,7 +490,8 @@ module Bundler
         nil
       end
       @replaced_methods[[method, klass]] = instance_method
-      klass.send(:define_method, method, unbound_method || block.to_proc)
+      return unless new_method = unbound_method || (block && block.to_proc)
+      klass.send(:define_method, method, new_method)
     end
 
     # Rubygems 1.4 through 1.6
