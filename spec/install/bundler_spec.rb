@@ -112,7 +112,7 @@ describe "bundle install" do
             rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
       E
-      expect(out).to eq(nice_error)
+      expect(out).to include(nice_error)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -132,7 +132,7 @@ describe "bundle install" do
             rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
       E
-      expect(out).to eq(nice_error)
+      expect(out).to include(nice_error)
     end
 
     it "can install dependencies with newer bundler version" do

@@ -9,7 +9,7 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       gem "linecache", "0.46"
     G
     bundle :lock
-    expect(err).to eq("")
+    expect(err).to lack_errors
     expect(exitstatus).to eq(0) if exitstatus
   end
 
@@ -91,7 +91,7 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
 
     bundle "install --path vendor/bundle", :expect_err => true
     expect(err).not_to include("Could not find rake")
-    expect(err).to be_empty
+    expect(err).to lack_errors
   end
 
   it "checks out git repos when the lockfile is corrupted" do

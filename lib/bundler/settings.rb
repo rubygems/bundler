@@ -31,10 +31,13 @@ module Bundler
       :timeout => 10,
     }.freeze
 
+    attr_accessor :cli_flags_given
+
     def initialize(root = nil)
-      @root          = root
-      @local_config  = load_config(local_config_file)
-      @global_config = load_config(global_config_file)
+      @root            = root
+      @local_config    = load_config(local_config_file)
+      @global_config   = load_config(global_config_file)
+      @cli_flags_given = false
     end
 
     def [](name)
@@ -54,6 +57,19 @@ module Bundler
     end
 
     def []=(key, value)
+      if cli_flags_given
+        command = if value.nil?
+          "bundle config --delete #{key}"
+        else
+          "bundle config #{key} #{Array(value).join(":")}"
+        end
+
+        Bundler::SharedHelpers.major_deprecation \
+          "flags passed to commands " \
+          "will no longer be automatically remembered. Instead please set flags " \
+          "you want remembered between commands using `bundle config " \
+          "<setting name> <setting value>`, i.e. `#{command}`"
+      end
       local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
       set_key(key, value, @local_config, local_config_file)
     end

@@ -90,7 +90,7 @@ describe "bundle update" do
         gem "foo", "1.0", :git => "#{lib_path("foo_two")}"
       G
 
-      expect(err).to be_empty
+      expect(err).to lack_errors
       expect(out).to include("Fetching #{lib_path}/foo_two")
       expect(out).to include("Bundle complete!")
     end

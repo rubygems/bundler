@@ -266,7 +266,7 @@ describe "bundle install with gem sources" do
       end
 
       bundle :install
-      expect(err).to be_empty
+      expect(err).to lack_errors
       should_be_installed "rack 1.0"
     end
 

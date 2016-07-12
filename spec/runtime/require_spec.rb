@@ -120,7 +120,7 @@ describe "Bundler.require" do
       Bundler.require
     R
 
-    expect(err).to eq("ZOMG LOAD ERROR")
+    expect(err).to eq_err("ZOMG LOAD ERROR")
   end
 
   it "displays a helpful message if the required gem throws an error" do
@@ -157,7 +157,7 @@ describe "Bundler.require" do
     RUBY
     run(cmd, :expect_err => true)
 
-    expect(err).to eq("ZOMG LOAD ERROR: cannot load such file -- load-bar")
+    expect(err).to eq_err("ZOMG LOAD ERROR: cannot load such file -- load-bar")
   end
 
   describe "with namespaced gems" do
@@ -193,7 +193,7 @@ describe "Bundler.require" do
       RUBY
       ruby(cmd, :expect_err => true)
 
-      expect(err).to be_empty
+      expect(err).to lack_errors
     end
 
     it "does not mangle explictly given requires" do
@@ -205,7 +205,7 @@ describe "Bundler.require" do
       load_error_run <<-R, "jquery-rails"
         Bundler.require
       R
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(err).to eq_err("ZOMG LOAD ERROR")
     end
 
     it "handles the case where regex fails" do
@@ -227,7 +227,7 @@ describe "Bundler.require" do
       RUBY
       run(cmd, :expect_err => true)
 
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(err).to eq_err("ZOMG LOAD ERROR")
     end
 
     it "doesn't swallow the error when the library has an unrelated error" do
@@ -250,7 +250,7 @@ describe "Bundler.require" do
       RUBY
       run(cmd, :expect_err => true)
 
-      expect(err).to eq("ZOMG LOAD ERROR: cannot load such file -- load-bar")
+      expect(err).to eq_err("ZOMG LOAD ERROR: cannot load such file -- load-bar")
     end
   end
 
@@ -356,7 +356,7 @@ describe "Bundler.require" do
         load_error_run <<-R, "no_such_file_omg"
           Bundler.require
         R
-        expect(err).to eq("ZOMG LOAD ERROR")
+        expect(err).to eq_err("ZOMG LOAD ERROR")
       end
     end
   end
@@ -375,7 +375,7 @@ describe "Bundler.require with platform specific dependencies" do
     G
 
     run "Bundler.require", :expect_err => true
-    expect(err).to be_empty
+    expect(err).to lack_errors
   end
 
   it "requires gems pinned to multiple platforms, including the current one" do
@@ -390,6 +390,6 @@ describe "Bundler.require with platform specific dependencies" do
     run "Bundler.require; puts RACK", :expect_err => true
 
     expect(out).to eq("1.0.0")
-    expect(err).to be_empty
+    expect(err).to lack_errors
   end
 end

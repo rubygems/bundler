@@ -265,13 +265,25 @@ module Bundler
         #     "https://github.com/#{repo_name}.git"
         #   end
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        "git://github.com/#{repo_name}.git"
+        # TODO: 2.0 upgrade this setting to the default
+        if Bundler.settings["github.https"]
+          "https://github.com/#{repo_name}.git"
+        else
+          warn_github_source_change(repo_name)
+          "git://github.com/#{repo_name}.git"
+        end
       end
 
-      git_source(:gist) {|repo_name| "https://gist.github.com/#{repo_name}.git" }
+      # TODO: 2.0 remove this deprecated git source
+      git_source(:gist) do |repo_name|
+        warn_deprecated_git_source(:gist, 'https://gist.github.com/#{repo_name}.git')
+        "https://gist.github.com/#{repo_name}.git"
+      end
 
+      # TODO: 2.0 remove this deprecated git source
       git_source(:bitbucket) do |repo_name|
         user_name, repo_name = repo_name.split "/"
+        warn_deprecated_git_source(:bitbucket, 'https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git')
         repo_name ||= user_name
         "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git"
       end
@@ -403,19 +415,37 @@ module Bundler
     def check_primary_source_safety(source)
       return unless source.rubygems_primary_remotes.any?
 
+      # TODO: 2.0 upgrade from setting to default
       if Bundler.settings[:disable_multisource]
         raise GemspecError, "Warning: this Gemfile contains multiple primary sources. " \
           "Each source after the first must include a block to indicate which gems " \
           "should come from that source. To downgrade this error to a warning, run " \
           "`bundle config --delete disable_multisource`"
       else
-        Bundler.ui.warn "Warning: this Gemfile contains multiple primary sources. " \
+        Bundler::SharedHelpers.major_deprecation "Your Gemfile contains multiple primary sources. " \
           "Using `source` more than once without a block is a security risk, and " \
           "may result in installing unexpected gems. To resolve this warning, use " \
           "a block to indicate which gems should come from the secondary source. " \
           "To upgrade this warning to an error, run `bundle config " \
           "disable_multisource true`."
       end
+    end
+
+    def warn_github_source_change(repo_name)
+      # TODO: 2.0 remove deprecation
+      Bundler::SharedHelpers.major_deprecation "The :github option uses the git: protocol, which is not secure. " \
+        "Bundler 2.0 will use the https: protocol, which is secure. Enable this change now by " \
+        "running `bundle config github.https true`."
+    end
+
+    def warn_deprecated_git_source(name, repo_string)
+      # TODO: 2.0 remove deprecation
+      Bundler::SharedHelpers.major_deprecation <<-EOS
+The :#{name} git source is deprecated, and will be removed in Bundler 2.0. Add this code to your Gemfile to ensure it continues to work:
+    git_source(:#{name}) do |repo_name|
+      "#{repo_string}"
+    end
+      EOS
     end
 
     class DSLError < GemfileError

@@ -60,7 +60,7 @@ end
       bundle "#{cmd} --all"
       bundle "#{cmd} --all"
 
-      expect(err).to eq("")
+      expect(err).to lack_errors
       FileUtils.rm_rf lib_path("foo-1.0")
       should_be_installed "foo 1.0"
     end

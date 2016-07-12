@@ -1,6 +1,31 @@
 # frozen_string_literal: true
 module Spec
   module Matchers
+    MAJOR_DEPRECATION = /^\[DEPRECATED FOR 2\.0\]\s*/
+
+    RSpec::Matchers.define :lack_errors do
+      diffable
+      match do |actual|
+        actual.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "") == ""
+      end
+    end
+
+    RSpec::Matchers.define :eq_err do |expected|
+      diffable
+      match do |actual|
+        actual.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "") == expected
+      end
+    end
+
+    RSpec::Matchers.define :have_major_deprecation do |expected|
+      diffable
+      match do |actual|
+        actual.split(MAJOR_DEPRECATION).any? do |d|
+          !d.empty? && values_match?(expected, d.strip)
+        end
+      end
+    end
+
     RSpec::Matchers.define :have_dep do |*args|
       dep = Bundler::Dependency.new(*args)
 
@@ -34,7 +59,8 @@ module Spec
         version_const = name == "bundler" ? "Bundler::VERSION" : Spec::Builders.constantize(name)
         run! "require '#{name}.rb'; puts #{version_const}", *groups
         expect(out).not_to be_empty, "#{name} is not installed"
-        actual_version, actual_platform = out.split(/\s+/, 2)
+        out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
+        actual_version, actual_platform = out.strip.split(/\s+/, 2)
         expect(Gem::Version.new(actual_version)).to eq(Gem::Version.new(version))
         expect(actual_platform).to eq(platform)
       end

@@ -31,6 +31,7 @@ module Bundler
       raise InvalidOption, e.message
     ensure
       self.options ||= {}
+      Bundler.settings.cli_flags_given = !options.empty?
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
 
@@ -231,9 +232,11 @@ module Bundler
     method_option "outdated", :type => :boolean,
                               :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
+      Bundler::SharedHelpers.major_deprecation("use `bundle show` instead of `bundle list`") if ARGV[0] == "list"
       require "bundler/cli/show"
       Show.new(options, gem_name).run
     end
+    # TODO: 2.0 remove `bundle list`
     map %w(list) => "show"
 
     desc "binstubs GEM [OPTIONS]", "Install the binstubs of the listed gem"
@@ -348,6 +351,7 @@ module Bundler
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
+      # TODO: Remove for 2.0
       require "bundler/cli/console"
       Console.new(options, group).run
     end

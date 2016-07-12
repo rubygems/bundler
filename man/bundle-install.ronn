@@ -43,6 +43,9 @@ update process below under [CONSERVATIVE UPDATING][].
 
 ## OPTIONS
 
+To apply any of `--deployment`, `--path`, `--binstubs`, or `--without` every
+time `bundle install` is run, use `bundle config` (see bundle-config(1)).
+
 * `--binstubs[=<directory>]`:
   Creates a directory (defaults to `~/bin`) and place any executables from the
   gem there. These executables run in Bundler's context. If used, you might add
@@ -93,7 +96,7 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--system`:
   Installs the gems specified in the bundle to the system's Rubygems location.
-  This overrides any previous [remembered][REMEMBERED OPTIONS] use of `--path`.
+  This overrides any previous configuration of `--path`.
 
 * `--no-cache`:
   Do not update the cache in `vendor/cache` with the newly bundled gems. This
@@ -108,8 +111,7 @@ update process below under [CONSERVATIVE UPDATING][].
   setting. Bundler shares this location with Rubygems, `gem install ...` will
   have gem installed there, too. Therefore, gems installed without a
   `--path ...` setting will show up by calling `gem list`. Accodingly, gems
-  installed to other locations will not get listed. This setting is a
-  [remembered option][REMEMBERED OPTIONS].
+  installed to other locations will not get listed.
 
 * `--quiet`:
   Do not print progress information to the standard output. Instead, Bundler
@@ -142,14 +144,12 @@ update process below under [CONSERVATIVE UPDATING][].
   A space-separated list of groups referencing gems to skip during installation.
   If a group is given that is in the remembered list of groups given
   to --with, it is removed from that list.
-  This is a [remembered option][REMEMBERED OPTIONS].
 
 * `--with=<list>`:
   A space-separated list of groups referencing gems to install. If an
   optional group is given it is installed. If a group is given that is
   in the remembered list of groups given to --without, it is removed
-  from that list. This is a [remembered option][REMEMBERED OPTIONS].
-
+  from that list.
 
 ## DEPLOYMENT MODE
 
@@ -273,41 +273,6 @@ sets of dependencies used in development and production. Because of
 the vagaries of the dependency resolution process, this usually
 affects more than the gems you list in your Gemfile(5), and can
 (surprisingly) radically change the gems you are using.
-
-## REMEMBERED OPTIONS
-
-Some options (marked above in the [OPTIONS][] section) are remembered
-between calls to `bundle install`, and by the Bundler runtime.
-
-For instance, if you run `bundle install --without test`, a subsequent
-call to `bundle install` that does not include a `--without` flag will
-remember your previous choice.
-
-In addition, a call to `Bundler.setup` will not attempt to make the
-gems in those groups available on the Ruby load path, as they were
-not installed.
-
-The settings that are remembered are:
-
-* `--deployment`:
-  At runtime, this remembered setting will also result in Bundler
-  raising an exception if the `Gemfile.lock` is out of date.
-
-* `--path`:
-  Subsequent calls to `bundle install` will install gems to the
-  directory originally passed to `--path`. The Bundler runtime
-  will look for gems in that location. You can revert this
-  option by running `bundle install --system`.
-
-* `--binstubs`:
-  Bundler will update the executables every subsequent call to
-  `bundle install`.
-
-* `--without`:
-  As described above, Bundler will skip the gems specified by
-  `--without` in subsequent calls to `bundle install`. The
-  Bundler runtime will also not try to make the gems in the
-  skipped groups available.
 
 ## THE GEMFILE.LOCK
 

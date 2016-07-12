@@ -95,6 +95,14 @@ module Bundler
         end
       end
 
+      def tell_err(message, color = nil, newline = nil)
+        buffer = @shell.send(:prepare_message, message, *color)
+        buffer << "\n" if newline && !message.to_s.end_with?("\n")
+
+        @shell.send(:stderr).print(buffer)
+        @shell.send(:stderr).flush
+      end
+
       def strip_leading_spaces(text)
         spaces = text[/\A\s+/, 0]
         spaces ? text.gsub(/#{spaces}/, "") : text
