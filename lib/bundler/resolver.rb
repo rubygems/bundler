@@ -122,14 +122,17 @@ module Bundler
         @source ||= first.source
       end
 
-      def for?(platform, required_ruby_version)
-        if spec = @specs[platform]
-          if required_ruby_version && spec.respond_to?(:required_ruby_version) && spec_required_ruby_version = spec.required_ruby_version
-            spec_required_ruby_version.satisfied_by?(required_ruby_version.to_gem_version_with_patchlevel)
-          else
-            true
-          end
-        end
+      def for?(platform, ruby_version)
+        spec = @specs[platform]
+        return false unless spec
+
+        return true if ruby_version.nil?
+        # Only allow endpoint specifications since they won't hit the network to
+        # fetch the full gemspec when calling required_ruby_version
+        return true if !spec.is_a?(EndpointSpecification) && !spec.is_a?(Gem::Specification)
+        return true if spec.required_ruby_version.nil?
+
+        spec.required_ruby_version.satisfied_by?(ruby_version.to_gem_version_with_patchlevel)
       end
 
       def to_s

@@ -23,14 +23,14 @@ describe "bundle install" do
 
   describe "when multiple gems contain the same exe" do
     before do
-      update_repo gem_repo1 do
+      build_repo2 do
         build_gem "fake", "14" do |s|
           s.executables = "rackup"
         end
       end
 
       install_gemfile <<-G, :binstubs => true
-        source "file://#{gem_repo1}"
+        source "file://#{gem_repo2}"
         gem "fake"
         gem "rack"
       G
@@ -44,7 +44,7 @@ describe "bundle install" do
 
     it "loads the correct spec's executable" do
       gembin("rackup")
-      expect(out).to eq("1.0.0")
+      expect(out).to eq("1.2")
     end
   end
 end

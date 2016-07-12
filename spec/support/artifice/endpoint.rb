@@ -13,11 +13,12 @@ require "artifice"
 require "sinatra/base"
 
 class Endpoint < Sinatra::Base
+  GEM_REPO = Pathname.new(ENV["BUNDLER_SPEC_GEM_REPO"] || Spec::Path.gem_repo1)
   set :raise_errors, true
   set :show_exceptions, false
 
   helpers do
-    def dependencies_for(gem_names, gem_repo = gem_repo1)
+    def dependencies_for(gem_names, gem_repo = GEM_REPO)
       return [] if gem_names.nil? || gem_names.empty?
 
       require "rubygems"
@@ -50,11 +51,11 @@ class Endpoint < Sinatra::Base
   end
 
   get "/fetch/actual/gem/:id" do
-    File.read("#{gem_repo1}/quick/Marshal.4.8/#{params[:id]}")
+    File.read("#{GEM_REPO}/quick/Marshal.4.8/#{params[:id]}")
   end
 
   get "/gems/:id" do
-    File.read("#{gem_repo1}/gems/#{params[:id]}")
+    File.read("#{GEM_REPO}/gems/#{params[:id]}")
   end
 
   get "/api/v1/dependencies" do
@@ -62,11 +63,11 @@ class Endpoint < Sinatra::Base
   end
 
   get "/specs.4.8.gz" do
-    File.read("#{gem_repo1}/specs.4.8.gz")
+    File.read("#{GEM_REPO}/specs.4.8.gz")
   end
 
   get "/prerelease_specs.4.8.gz" do
-    File.read("#{gem_repo1}/prerelease_specs.4.8.gz")
+    File.read("#{GEM_REPO}/prerelease_specs.4.8.gz")
   end
 end
 

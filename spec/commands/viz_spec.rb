@@ -19,12 +19,12 @@ describe "bundle viz", :ruby => "1.9.3", :if => Bundler.which("dot") do
   end
 
   it "graphs gems that are prereleases" do
-    update_repo(gem_repo1) do
+    build_repo2 do
       build_gem "rack", "1.3.pre"
     end
 
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "file://#{gem_repo2}"
       gem "rack", "= 1.3.pre"
       gem "rack-obama"
     G
