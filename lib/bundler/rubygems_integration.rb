@@ -474,7 +474,7 @@ module Bundler
       end
       Gem.post_reset_hooks.reject! do |proc|
         proc.binding.eval("__FILE__") == __FILE__
-      end
+      end if provides?(">= 1.8")
       @replaced_methods.clear
     end
 
