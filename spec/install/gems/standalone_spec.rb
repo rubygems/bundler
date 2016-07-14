@@ -279,13 +279,26 @@ shared_examples "bundle install --standalone" do
     it "creates stubs that can be executed from anywhere" do
       require "tmpdir"
       Dir.chdir(Dir.tmpdir) do
-        expect(`#{bundled_app("bin/rails")} -v`.chomp).to eql "2.3.2"
+        sys_exec!(%(#{bundled_app("bin/rails")} -v))
+        expect(out).to eq("2.3.2")
       end
+    end
+
+    it "creates stubs that can be symlinked" do
+      pending "File.symlink is unsupported on Windows" if Bundler::WINDOWS
+
+      symlink_dir = tmp("symlink")
+      FileUtils.mkdir_p(symlink_dir)
+      symlink = File.join(symlink_dir, "rails")
+
+      File.symlink(bundled_app("bin/rails"), symlink)
+      sys_exec!("#{symlink} -v")
+      expect(out).to eq("2.3.2")
     end
 
     it "creates stubs with the correct load path" do
       extension_line = File.read(bundled_app("bin/rails")).each_line.find {|line| line.include? "$:.unshift" }.strip
-      expect(extension_line).to eq "$:.unshift File.expand_path '../../bundle', __FILE__"
+      expect(extension_line).to eq "$:.unshift File.expand_path '../../bundle', path.realpath"
     end
   end
 end

@@ -6,7 +6,9 @@
 # this file is here to facilitate running it.
 #
 
-$:.unshift File.expand_path '../<%= standalone_path %>', __FILE__
+require 'pathname'
+path = Pathname.new(__FILE__)
+$:.unshift File.expand_path '../<%= standalone_path %>', path.realpath
 
 require 'bundler/setup'
-load File.expand_path '../<%= executable_path %>', __FILE__
+load File.expand_path '../<%= executable_path %>', path.realpath
