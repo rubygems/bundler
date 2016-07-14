@@ -479,7 +479,6 @@ module Bundler
     end
 
     def redefine_method(klass, method, unbound_method = nil, &block)
-      # puts "redefining #{klass} #{method} to #{unbound_method || block}"
       begin
         if (instance_method = klass.instance_method(method)) && method != :initialize
           # doing this to ensure we also get private methods
@@ -490,8 +489,11 @@ module Bundler
         nil
       end
       @replaced_methods[[method, klass]] = instance_method
-      return unless new_method = unbound_method || (block && block.to_proc)
-      klass.send(:define_method, method, new_method)
+      if unbound_method
+        klass.send(:define_method, method, unbound_method)
+      elsif block
+        klass.send(:define_method, method, &block)
+      end
     end
 
     # Rubygems 1.4 through 1.6
