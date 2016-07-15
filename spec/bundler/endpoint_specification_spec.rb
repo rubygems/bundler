@@ -29,7 +29,8 @@ describe Bundler::EndpointSpecification do
 
       it "should raise the original error" do
         expect { subject.send(:build_dependency, name, [requirement1, requirement2]) }.to raise_error(
-          ArgumentError, "Some error occurred")
+          ArgumentError, "Some error occurred"
+        )
       end
     end
 
@@ -44,7 +45,8 @@ describe Bundler::EndpointSpecification do
 
       it "should raise a Bundler::GemspecError with invalid gemspec message" do
         expect { subject.send(:build_dependency, name, [requirement1, requirement2]) }.to raise_error(
-          Bundler::GemspecError, /Unfortunately, the gem foo \(1\.0\.0\) has an invalid gemspec/)
+          Bundler::GemspecError, /Unfortunately, the gem foo \(1\.0\.0\) has an invalid gemspec/
+        )
       end
     end
   end

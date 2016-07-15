@@ -120,14 +120,13 @@ module Bundler
       result = spec_groups.sort do |a, b|
         @a_ver = a.version
         @b_ver = b.version
-        case
-        when major?
+        if major?
           @a_ver <=> @b_ver
-        when either_version_older_than_locked
+        elsif either_version_older_than_locked
           @a_ver <=> @b_ver
-        when segments_do_not_match(:major)
+        elsif segments_do_not_match(:major)
           @b_ver <=> @a_ver
-        when !minor? && segments_do_not_match(:minor)
+        elsif !minor? && segments_do_not_match(:minor)
           @b_ver <=> @a_ver
         else
           @a_ver <=> @b_ver

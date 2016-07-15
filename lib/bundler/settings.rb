@@ -44,12 +44,11 @@ module Bundler
       key = key_for(name)
       value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
 
-      case
-      when value.nil?
+      if value.nil?
         nil
-      when is_bool(name) || value == "false"
+      elsif is_bool(name) || value == "false"
         to_bool(value)
-      when is_num(name)
+      elsif is_num(name)
         value.to_i
       else
         value

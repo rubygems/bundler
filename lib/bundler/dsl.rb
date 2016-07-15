@@ -522,7 +522,7 @@ The :#{name} git source is deprecated, and will be removed in Bundler 2.0. Add t
 
           lines      = contents.lines.to_a
           indent     = " #  "
-          indicator  = indent.tr('#', ">")
+          indicator  = indent.tr("#", ">")
           first_line = (line_numer.zero?)
           last_line  = (line_numer == (lines.count - 1))
 

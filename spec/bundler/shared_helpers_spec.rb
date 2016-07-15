@@ -27,7 +27,8 @@ describe Bundler::SharedHelpers do
 
       it "raises a GemfileNotFound error" do
         expect { subject.default_gemfile }.to raise_error(
-          Bundler::GemfileNotFound, "Could not locate Gemfile")
+          Bundler::GemfileNotFound, "Could not locate Gemfile"
+        )
       end
     end
   end
@@ -348,7 +349,8 @@ describe Bundler::SharedHelpers do
 
       it "raises a PermissionError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::PermissionError)
+          Bundler::PermissionError
+        )
       end
     end
 
@@ -357,7 +359,8 @@ describe Bundler::SharedHelpers do
 
       it "raises a TemporaryResourceError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::TemporaryResourceError)
+          Bundler::TemporaryResourceError
+        )
       end
     end
 
@@ -366,7 +369,8 @@ describe Bundler::SharedHelpers do
 
       it "raises a VirtualProtocolError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::VirtualProtocolError)
+          Bundler::VirtualProtocolError
+        )
       end
     end
 
@@ -375,7 +379,8 @@ describe Bundler::SharedHelpers do
 
       it "raises a OperationNotSupportedError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::OperationNotSupportedError)
+          Bundler::OperationNotSupportedError
+        )
       end
     end
   end

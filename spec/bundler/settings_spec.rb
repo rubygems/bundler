@@ -204,7 +204,8 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
     it "reads older keys without trailing slashes" do
       settings["mirror.https://rubygems.org"] = "http://rubygems-mirror.org"
       expect(settings.mirror_for("https://rubygems.org/")).to eq(
-        URI("http://rubygems-mirror.org/"))
+        URI("http://rubygems-mirror.org/")
+      )
     end
   end
 

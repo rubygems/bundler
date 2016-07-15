@@ -10,7 +10,7 @@ bundler_spec.dependencies.each do |dep|
   gem dep.name, dep.requirement.to_s
 end
 
-gem "rubocop", "= 0.39.0"
+gem "rubocop", "= 0.41.2"
 
 Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
 

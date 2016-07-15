@@ -108,7 +108,7 @@ module Bundler
           next
         end
 
-        File.open(binstub_path, "w", 0777 & ~File.umask) do |f|
+        File.open(binstub_path, "w", 0o777 & ~File.umask) do |f|
           f.puts ERB.new(template, nil, "-").result(binding)
         end
       end
@@ -138,7 +138,7 @@ module Bundler
       spec.executables.each do |executable|
         next if executable == "bundle"
         executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
-        File.open "#{bin_path}/#{executable}", "w", 0755 do |f|
+        File.open "#{bin_path}/#{executable}", "w", 0o755 do |f|
           f.puts ERB.new(template, nil, "-").result(binding)
         end
       end

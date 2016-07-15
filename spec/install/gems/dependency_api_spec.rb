@@ -40,7 +40,8 @@ describe "gemcutter's dependency API" do
       "activerecord 2.3.2",
       "actionmailer 2.3.2",
       "activeresource 2.3.2",
-      "activesupport 2.3.2")
+      "activesupport 2.3.2"
+    )
   end
 
   it "should handle multiple gem dependencies on the same gem" do
@@ -150,7 +151,8 @@ describe "gemcutter's dependency API" do
       "activesupport 2.3.2",
       "thin 1.0.0",
       "rack 1.0.0",
-      "rails 2.3.2")
+      "rails 2.3.2"
+    )
   end
 
   it "falls back when Gemcutter API doesn't return proper Marshal format" do

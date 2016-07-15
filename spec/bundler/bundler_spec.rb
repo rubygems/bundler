@@ -106,7 +106,7 @@ describe Bundler do
 
   describe "#which" do
     let(:executable) { "executable" }
-    let(:path) { %w(/a /b c ../d "/e") }
+    let(:path) { %w(/a /b c ../d /e) }
     let(:expected) { "executable" }
 
     before do

@@ -102,7 +102,7 @@ describe "bundle exec" do
       f.puts "#!/bin/sh"
       f.puts "echo foobar"
     end
-    File.chmod(0744, "--verbose")
+    File.chmod(0o744, "--verbose")
     with_path_as(".") do
       bundle "exec -- --verbose"
     end
@@ -232,7 +232,7 @@ describe "bundle exec" do
             #!/usr/bin/env ruby
             puts "args: #{ARGV.inspect}"
           RUBY
-          bundled_app("print_args").chmod(0755)
+          bundled_app("print_args").chmod(0o755)
         end
 
         it "shows executable's man page when --help is after the executable" do
@@ -466,7 +466,7 @@ describe "bundle exec" do
 
     before do
       path.open("w") {|f| f << executable }
-      path.chmod(0755)
+      path.chmod(0o755)
 
       install_gemfile <<-G
         gem "rack"

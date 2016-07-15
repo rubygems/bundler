@@ -43,7 +43,8 @@ module Bundler
         Bundler.ui.warn(
           "The RUBYGEMS_GEMDEPS environment variable is set. This enables RubyGems' " \
           "experimental Gemfile mode, which may conflict with Bundler and cause unexpected errors. " \
-          "To remove this warning, unset RUBYGEMS_GEMDEPS.", :wrap => true)
+          "To remove this warning, unset RUBYGEMS_GEMDEPS.", :wrap => true
+        )
       end
     end
 
@@ -72,7 +73,8 @@ module Bundler
         bundle-package
         bundle-update
         bundle-platform
-        gemfile.5)
+        gemfile.5
+      )
 
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)

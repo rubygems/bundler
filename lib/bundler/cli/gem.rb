@@ -126,7 +126,7 @@ module Bundler
 
       executables.each do |file|
         path = target.join(file)
-        executable = (path.stat.mode | 0111)
+        executable = (path.stat.mode | 0o111)
         path.chmod(executable)
       end
 
