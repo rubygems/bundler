@@ -10,6 +10,8 @@ describe Bundler::Plugin do
   let(:spec2) { double(:spec2) }
 
   before do
+    Plugin.reset!
+
     build_lib "new-plugin", :path => lib_path("new-plugin") do |s|
       s.write "plugins.rb"
     end
@@ -207,6 +209,25 @@ describe Bundler::Plugin do
       expect(SClass).to receive(:new).
         with(hash_including("type" => "l_source", "uri" => "xyz", "other" => "random")) { s_instance }
       expect(subject.source_from_lock(opts)).to be(s_instance)
+    end
+  end
+
+  describe "#root" do
+    context "in app dir" do
+      before do
+        gemfile ""
+      end
+
+      it "returns plugin dir in app .bundle path" do
+        expect(subject.root).to eq(bundled_app.join(".bundle/plugin"))
+      end
+    end
+
+    context "outside app dir" do
+      it "returns plugin dir in global bundle path" do
+        Dir.chdir tmp
+        expect(subject.root).to eq(home.join(".bundle/plugin"))
+      end
     end
   end
 end

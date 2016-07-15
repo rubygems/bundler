@@ -176,7 +176,7 @@ describe "bundler plugin install" do
       RUBY
 
       ruby code
-      plugin_should_be_installed("foo")
+      expect(local_plugin_gems("foo-1.0", "plugins.rb")).to exist
     end
   end
 end
