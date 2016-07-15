@@ -400,14 +400,7 @@ module Spec
     end
 
     def capture_output
-      fake_stdout = StringIO.new
-      actual_stdout = $stdout
-      $stdout = fake_stdout
-      yield
-      fake_stdout.rewind
-      fake_stdout.read
-    ensure
-      $stdout = actual_stdout
+      capture(:stdout)
     end
 
     def with_read_only(pattern)
