@@ -276,11 +276,12 @@ module Bundler
     }xo
 
     def load_config(config_file)
-      SharedHelpers.filesystem_access(config_file, :read) do
-        valid_file = config_file && config_file.exist? && !config_file.size.zero?
+      return unless config_file
+      SharedHelpers.filesystem_access(config_file, :read) do |file|
+        valid_file = file.exist? && !file.size.zero?
         return {} if ignore_config? || !valid_file
         require "bundler/yaml_serializer"
-        YAMLSerializer.load config_file.read
+        YAMLSerializer.load file.read
       end
     end
 
