@@ -16,7 +16,7 @@ module Gem
   class Specification
     attr_accessor :remote, :location, :relative_loaded_from
 
-    if instance_methods(false).include?(:source)
+    if instance_methods(false).map(&:to_sym).include?(:source)
       remove_method :source
       attr_writer :source
       def source

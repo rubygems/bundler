@@ -23,7 +23,7 @@ module Bundler
     def default_gemfile
       gemfile = find_gemfile
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
-      Pathname.new(gemfile)
+      Pathname.new(gemfile).untaint
     end
 
     def default_lockfile
@@ -32,7 +32,7 @@ module Bundler
       case gemfile.basename.to_s
       when "gems.rb" then Pathname.new(gemfile.sub(/.rb$/, ".locked"))
       else Pathname.new("#{gemfile}.lock")
-      end
+      end.untaint
     end
 
     def default_bundle_dir
@@ -102,7 +102,7 @@ module Bundler
     #
     # @see {Bundler::PermissionError}
     def filesystem_access(path, action = :write)
-      yield path
+      yield path.dup.untaint
     rescue Errno::EACCES
       raise PermissionError.new(path, action)
     rescue Errno::EAGAIN
@@ -158,7 +158,7 @@ module Bundler
 
     def search_up(*names)
       previous = nil
-      current  = File.expand_path(SharedHelpers.pwd)
+      current  = File.expand_path(SharedHelpers.pwd).untaint
 
       until !File.directory?(current) || current == previous
         if ENV["BUNDLE_SPEC_RUN"]
