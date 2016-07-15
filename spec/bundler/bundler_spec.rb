@@ -19,7 +19,7 @@ describe Bundler do
       end
 
       it "catches YAML syntax errors" do
-        expect { subject }.to raise_error(Bundler::GemspecError)
+        expect { subject }.to raise_error(Bundler::GemspecError, /error while loading `test.gemspec`/)
       end
 
       context "on Rubies with a settable YAML engine", :if => defined?(YAML::ENGINE) do

@@ -417,7 +417,7 @@ module Bundler
 
       # TODO: 2.0 upgrade from setting to default
       if Bundler.settings[:disable_multisource]
-        raise GemspecError, "Warning: this Gemfile contains multiple primary sources. " \
+        raise GemfileError, "Warning: this Gemfile contains multiple primary sources. " \
           "Each source after the first must include a block to indicate which gems " \
           "should come from that source. To downgrade this error to a warning, run " \
           "`bundle config --delete disable_multisource`"

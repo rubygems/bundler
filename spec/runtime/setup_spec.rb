@@ -922,14 +922,17 @@ describe "Bundler.setup" do
     end
 
     it "error intelligently if the gemspec has a LoadError" do
-      update_git "bar", :gemspec => false do |s|
+      ref = update_git "bar", :gemspec => false do |s|
         s.write "bar.gemspec", "require 'foobarbaz'"
-      end
+      end.ref_for("HEAD")
       bundle :install
-      expect(out).to include("was a LoadError while loading bar.gemspec")
-      expect(out).to include("foobarbaz")
-      expect(out).to include("bar.gemspec:1")
-      expect(out).to include("try to require a relative path") if RUBY_VERSION >= "1.9"
+      puts out
+      expect(out.lines.map(&:chomp)).to include(
+        a_string_starting_with("[!] There was an error while loading `bar.gemspec`:"),
+        RUBY_VERSION >= "1.9" ? a_string_starting_with("Does it try to require a relative path? That's been removed in Ruby 1.9.") : "",
+        " #  from #{default_bundle_path "bundler", "gems", "bar-1.0-#{ref[0, 12]}", "bar.gemspec"}:1",
+        " >  require 'foobarbaz'"
+      )
     end
 
     it "evals each gemspec with a binding from the top level" do

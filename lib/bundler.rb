@@ -401,17 +401,13 @@ module Bundler
     def eval_gemspec(path, contents)
       eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
     rescue ScriptError, StandardError => e
-      original_line = e.backtrace.find {|line| line.include?(path.to_s) }
-      msg = String.new
-      msg << "There was a #{e.class} while loading #{path.basename}: \n#{e.message}"
-      msg << " from\n  #{original_line}" if original_line
-      msg << "\n"
+      msg = "There was an error while loading `#{path.basename}`: #{e.message}"
 
       if e.is_a?(LoadError) && RUBY_VERSION >= "1.9"
-        msg << "\nDoes it try to require a relative path? That's been removed in Ruby 1.9."
+        msg += "\nDoes it try to require a relative path? That's been removed in Ruby 1.9"
       end
 
-      raise GemspecError, msg
+      raise GemspecError, Dsl::DSLError.new(msg, path, e.backtrace, contents)
     end
 
     def configure_gem_home_and_path
