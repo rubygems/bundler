@@ -78,7 +78,7 @@ describe "bundler plugin install" do
 
       expect(out).to include("plugins.rb was not found")
 
-      expect(plugin_gems("charlie-1.0")).not_to be_directory
+      expect(global_plugin_gems("charlie-1.0")).not_to be_directory
 
       plugin_should_not_be_installed("charlie")
     end
@@ -94,7 +94,7 @@ describe "bundler plugin install" do
 
       bundle "plugin install chaplin --source file://#{gem_repo2}"
 
-      expect(plugin_gems("chaplin-1.0")).not_to be_directory
+      expect(global_plugin_gems("chaplin-1.0")).not_to be_directory
 
       plugin_should_not_be_installed("chaplin")
     end
@@ -177,6 +177,70 @@ describe "bundler plugin install" do
 
       ruby code
       expect(local_plugin_gems("foo-1.0", "plugins.rb")).to exist
+    end
+  end
+
+  describe "local plugin", :focused do
+    it "is installed when inside an app" do
+      gemfile ""
+      bundle "plugin install foo --source file://#{gem_repo2}"
+
+      plugin_should_be_installed("foo")
+      expect(local_plugin_gems("foo-1.0")).to be_directory
+    end
+
+    context "conflict with global plugin" do
+      before do
+        update_repo2 do
+          build_plugin "fubar" do |s|
+            s.write "plugins.rb", <<-RUBY
+              class Fubar < Bundler::Plugin::API
+                command "shout"
+
+                def exec(command, args)
+                  puts "local_one"
+                end
+              end
+            RUBY
+          end
+        end
+
+        # inside the app
+        gemfile "source 'file://#{gem_repo2}'\nplugin 'fubar'"
+        bundle "install"
+
+        update_repo2 do
+          build_plugin "fubar", "1.1" do |s|
+            s.write "plugins.rb", <<-RUBY
+              class Fubar < Bundler::Plugin::API
+                command "shout"
+
+                def exec(command, args)
+                  puts "global_one"
+                end
+              end
+            RUBY
+          end
+        end
+
+        # outside the app
+        Dir.chdir tmp
+        bundle "plugin install fubar --source file://#{gem_repo2}"
+      end
+
+      it "inside the app takes precedence over global plugin" do
+        Dir.chdir bundled_app
+
+        bundle "shout"
+        expect(out).to eq("local_one")
+      end
+
+      it "outside the app global plugin is used" do
+        Dir.chdir tmp
+
+        bundle "shout"
+        expect(out).to eq("global_one")
+      end
     end
   end
 end

@@ -75,7 +75,7 @@ describe Bundler::Plugin::Installer do
 
         it "has expected full_gem)path" do
           expect(result["re-plugin"].full_gem_path).
-            to eq(plugin_gems("re-plugin-1.0").to_s)
+            to eq(global_plugin_gems("re-plugin-1.0").to_s)
         end
       end
 
@@ -90,8 +90,8 @@ describe Bundler::Plugin::Installer do
         end
 
         it "has expected full_gem)path" do
-          expect(result["re-plugin"].full_gem_path).to eq(plugin_gems("re-plugin-1.0").to_s)
-          expect(result["ma-plugin"].full_gem_path).to eq(plugin_gems("ma-plugin-1.0").to_s)
+          expect(result["re-plugin"].full_gem_path).to eq(global_plugin_gems("re-plugin-1.0").to_s)
+          expect(result["ma-plugin"].full_gem_path).to eq(global_plugin_gems("ma-plugin-1.0").to_s)
         end
       end
     end

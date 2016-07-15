@@ -146,7 +146,7 @@ module Bundler
 
     # Used by specs
     def reset!
-      instance_variables.each {|i| remove_instance_variable(i)}
+      instance_variables.each {|i| remove_instance_variable(i) }
 
       @sources = {}
       @commands = {}
