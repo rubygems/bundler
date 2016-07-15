@@ -517,11 +517,11 @@ module Bundler
       def stub_rubygems(specs)
         # Rubygems versions lower than 1.7 use SourceIndex#from_gems_in
         source_index_class = (class << Gem::SourceIndex; self; end)
-        redefine_method(source_index, source_index_class) do |*args|
-          source_index = Gem::SourceIndex.new
-          source_index.spec_dirs = *args
-          source_index.add_specs(*specs)
-          source_index
+        redefine_method(source_index_class, :from_gems_in) do |*args|
+          Gem::SourceIndex.new.tap do |source_index|
+            source_index.spec_dirs = *args
+            source_index.add_specs(*specs)
+          end
         end
       end
 

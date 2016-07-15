@@ -80,7 +80,7 @@ describe Bundler::Dsl do
     it "handles syntax errors with a useful message" do
       expect(Bundler).to receive(:read_file).with("Gemfile").and_return("}")
       expect { subject.eval_gemfile("Gemfile") }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '}'). Bundler cannot continue./)
+        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '\}'). Bundler cannot continue./)
     end
 
     it "distinguishes syntax errors from evaluation errors" do
