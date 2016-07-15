@@ -136,6 +136,14 @@ module Bundler
       Gem.path
     end
 
+    def reset
+      Gem::Specification.reset
+    end
+
+    def post_reset_hooks
+      Gem.post_reset_hooks
+    end
+
     def gem_cache
       gem_path.map {|p| File.expand_path("cache", p) }
     end
@@ -472,9 +480,9 @@ module Bundler
       @replaced_methods.each do |(sym, klass), method|
         redefine_method(klass, sym, method)
       end
-      Gem.post_reset_hooks.reject! do |proc|
+      post_reset_hooks.reject! do |proc|
         proc.binding.eval("__FILE__") == __FILE__
-      end if provides?(">= 1.8")
+      end
       @replaced_methods.clear
     end
 
@@ -529,6 +537,13 @@ module Bundler
         # These versions of RubyGems always validate in "packaging" mode,
         # which is too strict for the kinds of checks we care about. As a
         # result, validation is disabled on versions of RubyGems below 1.7.
+      end
+
+      def post_reset_hooks
+        []
+      end
+
+      def reset
       end
     end
 
