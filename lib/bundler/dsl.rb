@@ -332,7 +332,20 @@ module Bundler
       install_if = @install_conditionals.dup
       install_if.concat Array(opts.delete("install_if"))
       install_if = install_if.reduce(true) do |memo, val|
-        memo && (val.respond_to?(:call) ? val.call : val)
+        memo && case val
+                when TrueClass, FalseClass, NilClass
+                  val
+                when Proc
+                  val.call
+                when String
+                  begin
+                    eval(val) # rubocop:disable Lint/Eval
+                  rescue
+                    true
+                  end
+                else
+                  true
+                end
       end
 
       platforms = @platforms.dup

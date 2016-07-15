@@ -12,12 +12,16 @@ describe "bundle install with install_if conditionals" do
       install_if(lambda { false }) do
         gem "foo"
       end
+      install_if "!!false" do
+        gem "weakling"
+      end
       gem "rack"
     G
 
     should_be_installed("rack 1.0", "activesupport 2.3.5")
     should_not_be_installed("thin")
     should_not_be_installed("foo")
+    should_not_be_installed("weakling")
 
     lockfile_should_be <<-L
       GEM
@@ -28,6 +32,7 @@ describe "bundle install with install_if conditionals" do
           rack (1.0.0)
           thin (1.0)
             rack
+          weakling (0.0.3)
 
       PLATFORMS
         ruby
@@ -37,6 +42,7 @@ describe "bundle install with install_if conditionals" do
         foo
         rack
         thin
+        weakling
 
       BUNDLED WITH
          #{Bundler::VERSION}
