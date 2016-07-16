@@ -77,6 +77,7 @@ module Bundler
     def ruby_shebang?(file)
       possibilities = [
         "#!/usr/bin/env ruby\n",
+        "#!/usr/bin/env jruby\n",
         "#!#{Gem.ruby}\n",
       ]
       first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }

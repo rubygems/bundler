@@ -265,8 +265,6 @@ describe "bundle install with explicit source paths" do
   end
 
   it "sets up executables" do
-    pending_jruby_shebang_fix
-
     build_lib "foo" do |s|
       s.executables = "foobar"
     end
