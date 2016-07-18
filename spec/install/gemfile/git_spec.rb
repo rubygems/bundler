@@ -70,7 +70,6 @@ describe "bundle install with git sources" do
     end
 
     it "sets up git gem executables on the path" do
-      pending_jruby_shebang_fix
       bundle "exec foobar"
       expect(out).to eq("1.0")
     end

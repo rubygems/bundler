@@ -85,10 +85,6 @@ RSpec.configure do |config|
   original_wd  = Dir.pwd
   original_env = ENV.to_hash
 
-  def pending_jruby_shebang_fix
-    pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
-  end
-
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end

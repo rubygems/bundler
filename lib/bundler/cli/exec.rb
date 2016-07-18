@@ -25,7 +25,11 @@ module Bundler
       if bin_path = Bundler.which(cmd)
         return kernel_load(bin_path, *args) if ruby_shebang?(bin_path)
         # First, try to exec directly to something in PATH
-        kernel_exec([bin_path, cmd], *args)
+        if Bundler.current_ruby.jruby_18?
+          kernel_exec(bin_path, *args)
+        else
+          kernel_exec([bin_path, cmd], *args)
+        end
       else
         # exec using the given command
         kernel_exec(cmd, *args)
@@ -77,6 +81,7 @@ module Bundler
     def ruby_shebang?(file)
       possibilities = [
         "#!/usr/bin/env ruby\n",
+        "#!/usr/bin/env jruby\n",
         "#!#{Gem.ruby}\n",
       ]
       first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }

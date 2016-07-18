@@ -534,8 +534,13 @@ module Spec
         @spec.executables = Array(val)
         @spec.executables.each do |file|
           executable = "#{@spec.bindir}/#{file}"
+          shebang = if Bundler.current_ruby.jruby?
+            "#!/usr/bin/env jruby\n"
+          else
+            "#!/usr/bin/env ruby\n"
+          end
           @spec.files << executable
-          write executable, "#!/usr/bin/env ruby\nrequire '#{@name}' ; puts #{Builders.constantize(@name)}"
+          write executable, "#{shebang}require '#{@name}' ; puts #{Builders.constantize(@name)}"
         end
       end
 
