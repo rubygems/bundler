@@ -2,6 +2,7 @@
 require "spec_helper"
 require "bundler"
 require "bundler/friendly_errors"
+require "cgi"
 
 describe Bundler, "friendly errors" do
   context "with invalid YAML in .gemrc" do
@@ -65,6 +66,25 @@ Second line of the exception message
 END
 
       expect(Bundler::FriendlyErrors.issues_url(exception)).to eq("https://github.com/bundler/bundler/search?q=First+line+of+the+exception+message&type=Issues")
+    end
+
+    it "generates the url without colons" do
+      exception = Exception.new(<<END)
+Exception ::: with ::: colons :::
+END
+      issues_url = Bundler::FriendlyErrors.issues_url(exception)
+      expect(issues_url).not_to include("%3A")
+      expect(issues_url).to eq("https://github.com/bundler/bundler/search?q=#{CGI.escape("Exception     with     colons    ")}&type=Issues")
+    end
+
+    it "removes information after - for Errono::EACCES" do
+      exception = Exception.new(<<END)
+Errno::EACCES: Permission denied @ dir_s_mkdir - /Users/foo/bar/
+END
+      allow(exception).to receive(:is_a?).with(Errno).and_return(true)
+      issues_url = Bundler::FriendlyErrors.issues_url(exception)
+      expect(issues_url).not_to include("/Users/foo/bar")
+      expect(issues_url).to eq("https://github.com/bundler/bundler/search?q=#{CGI.escape("Errno  EACCES  Permission denied @ dir_s_mkdir ")}&type=Issues")
     end
   end
 end
