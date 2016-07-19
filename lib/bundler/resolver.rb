@@ -81,7 +81,9 @@ module Bundler
         @specs        = {}
 
         ALL.each do |p|
-          @specs[p] = reverse.find {|s| s.match_platform(p) }
+          if match = reverse.find {|s| s.match_platform(p) }
+            @specs[p] = match
+          end
         end
       end
 

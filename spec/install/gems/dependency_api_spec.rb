@@ -123,7 +123,7 @@ describe "gemcutter's dependency API" do
       gem "rcov"
     G
 
-    bundle :install, :fakeweb => "windows"
+    bundle :install, :artifice => "windows"
     expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
@@ -204,7 +204,7 @@ describe "gemcutter's dependency API" do
       H
     end
 
-    bundle :install, :artifice => "endpoint_host_redirect", :requires => [lib_path("disable_net_http_persistent.rb")]
+    bundle :install, :artifice => "endpoint_host_redirect", :requires => [lib_path("disable_net_http_persistent.rb")], :in_process_exec => false
     expect(out).to_not match(/Too many redirects/)
     should_be_installed "rack 1.0.0"
   end

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require File.expand_path("../compact_index", __FILE__)
+require File.expand_path("../compact_index_api", __FILE__)
 
 Artifice.deactivate
 
-class CompactIndexExtraApi < CompactIndexAPI
+class Artifice::CompactIndexExtraAPI < Artifice::CompactIndexAPI
   get "/extra/names" do
     etag_response do
       CompactIndex.names(gems(gem_repo4).map(&:name))
@@ -48,4 +48,4 @@ class CompactIndexExtraApi < CompactIndexAPI
   end
 end
 
-Artifice.activate_with(CompactIndexExtraApi)
+Artifice.activate_with(Artifice::CompactIndexExtraAPI)

@@ -2,6 +2,7 @@
 require "fileutils"
 require "pathname"
 require "rbconfig"
+require "set"
 require "thread"
 require "bundler/errors"
 require "bundler/environment_preserver"
@@ -14,9 +15,14 @@ require "bundler/constants"
 require "bundler/current_ruby"
 
 module Bundler
-  environment_preserver = EnvironmentPreserver.new(ENV, %w(PATH GEM_PATH))
-  ORIGINAL_ENV = environment_preserver.restore
-  ENV.replace(environment_preserver.backup)
+  ORIGINAL_ENV = {} # rubocop:disable Style/MutableConstant
+  def self.preserve_env!
+    environment_preserver = EnvironmentPreserver.new(ENV, %w(PATH GEM_PATH))
+    ORIGINAL_ENV.replace environment_preserver.restore
+    ENV.replace(environment_preserver.backup)
+  end
+  preserve_env!
+
   SUDO_MUTEX = Mutex.new
 
   autoload :Definition,             "bundler/definition"
@@ -245,7 +251,7 @@ module Bundler
     end
 
     def clean_exec(*args)
-      with_clean_env { Kernel.exec(*args) }
+      with_clean_env { kernel_exec(*args) }
     end
 
     def default_gemfile
@@ -381,18 +387,37 @@ module Bundler
     end
 
     def reset!
-      @root = nil
-      @settings = nil
+      @bin_path = nil
+      @bundle_path = nil
+      @configured = nil
       @definition = nil
-      @setup = nil
       @load = nil
       @locked_gems = nil
-      @bundle_path = nil
-      @bin_path = nil
+      @root = nil
+      @settings = nil
+      @setup = nil
+      Plugin.module_eval do
+        instance_variables.each do |ivar|
+          if (val = instance_variable_get(ivar)) && val.respond_to?(:clear)
+            val.clear
+          else
+            remove_instance_variable(ivar)
+          end
+        end
+      end
+
+      Installer.ambiguous_gems.clear
+      Installer.post_install_messages.clear
+
+      clear_gemspec_cache
       return unless defined?(@rubygems) && @rubygems
       rubygems.undo_replacements
       rubygems.reset
       @rubygems = nil
+    end
+
+    def kernel_exec(*args)
+      Kernel.exec(*args)
     end
 
   private

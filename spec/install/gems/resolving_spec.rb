@@ -111,7 +111,7 @@ describe "bundle install with install-time dependencies" do
           end
         end
 
-        install_gemfile <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo2 }
+        install_gemfile <<-G, :artifice => "compact_index_api", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo2 }
           ruby "#{RUBY_VERSION}"
           source "http://localgemserver.test/"
           gem 'rack'

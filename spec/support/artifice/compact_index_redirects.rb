@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require File.expand_path("../compact_index", __FILE__)
+require File.expand_path("../compact_index_api", __FILE__)
 
 Artifice.deactivate
 
-class CompactIndexRedirect < CompactIndexAPI
+class Artifice::CompactIndexRedirects < Artifice::CompactIndexAPI
   get "/fetch/actual/gem/:id" do
     redirect "/fetch/actual/gem/#{params[:id]}"
   end
@@ -17,4 +17,4 @@ class CompactIndexRedirect < CompactIndexAPI
   end
 end
 
-Artifice.activate_with(CompactIndexRedirect)
+Artifice.activate_with(Artifice::CompactIndexRedirects)

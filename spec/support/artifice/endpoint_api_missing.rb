@@ -3,7 +3,7 @@ require File.expand_path("../endpoint", __FILE__)
 
 Artifice.deactivate
 
-class EndpointApiMissing < Endpoint
+class Artifice::EndpointApiMissing < Artifice::Endpoint
   get "/fetch/actual/gem/:id" do
     $stderr.puts params[:id]
     if params[:id] == "rack-1.0.gemspec.rz"
@@ -14,4 +14,4 @@ class EndpointApiMissing < Endpoint
   end
 end
 
-Artifice.activate_with(EndpointApiMissing)
+Artifice.activate_with(Artifice::EndpointApiMissing)

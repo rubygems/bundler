@@ -3,7 +3,7 @@ require File.expand_path("../endpoint", __FILE__)
 
 Artifice.deactivate
 
-class EndpointRedirect < Endpoint
+class Artifice::EndpointRedirect < Artifice::Endpoint
   get "/fetch/actual/gem/:id" do
     redirect "/fetch/actual/gem/#{params[:id]}"
   end
@@ -13,4 +13,4 @@ class EndpointRedirect < Endpoint
   end
 end
 
-Artifice.activate_with(EndpointRedirect)
+Artifice.activate_with(Artifice::EndpointRedirect)

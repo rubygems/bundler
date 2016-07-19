@@ -28,7 +28,7 @@ describe "bundle update" do
         source "file://#{gem_repo2}"
         gem "activesupport"
         gem "rack-obama"
-        exit!
+        abort 'ouch'
       G
       bundle "update"
       expect(bundled_app("Gemfile.lock")).to exist

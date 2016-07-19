@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require File.expand_path("../compact_index", __FILE__)
+require File.expand_path("../compact_index_api", __FILE__)
 
 Artifice.deactivate
 
-class CompactIndexHostRedirect < CompactIndexAPI
+class Artifice::CompactIndexHostRedirect < Artifice::CompactIndexAPI
   get "/fetch/actual/gem/:id", :host_name => "localgemserver.test" do
     redirect "http://bundler.localgemserver.test#{request.path_info}"
   end
@@ -17,4 +17,4 @@ class CompactIndexHostRedirect < CompactIndexAPI
   end
 end
 
-Artifice.activate_with(CompactIndexHostRedirect)
+Artifice.activate_with(Artifice::CompactIndexHostRedirect)

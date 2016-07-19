@@ -43,7 +43,7 @@ module Bundler
     def kernel_exec(*args)
       ui = Bundler.ui
       Bundler.ui = nil
-      Kernel.exec(*args)
+      Bundler.kernel_exec(*args)
     rescue Errno::EACCES, Errno::ENOEXEC
       Bundler.ui = ui
       Bundler.ui.error "bundler: not executable: #{cmd}"

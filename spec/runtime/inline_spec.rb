@@ -3,10 +3,8 @@ require "spec_helper"
 
 describe "bundler/inline#gemfile" do
   def script(code, options = {})
-    requires = ["bundler/inline"]
-    requires.unshift File.expand_path("../../support/artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
-    requires = requires.map {|r| "require '#{r}'" }.join("\n")
-    @out = ruby("#{requires}\n\n" + code, options)
+    code = "require 'bundler/inline'\n\n" + strip_whitespace(code)
+    @out = ruby(code, options)
   end
 
   before :each do
@@ -85,7 +83,7 @@ describe "bundler/inline#gemfile" do
 
     script <<-RUBY, :artifice => "endpoint"
       gemfile(true) do
-        source "https://rubygems.org"
+        source "http://localgemserver.test"
         gem "activesupport", :require => true
       end
     RUBY
@@ -104,7 +102,7 @@ describe "bundler/inline#gemfile" do
         end
       end
       gemfile(true, :ui => MyBundlerUI.new) do
-        source "https://rubygems.org"
+        source "http://localgemserver.test"
         gem "activesupport", :require => true
       end
     RUBY
@@ -151,8 +149,8 @@ describe "bundler/inline#gemfile" do
       puts RACK
     RUBY
 
-    expect(out).to eq("1.0.0")
     expect(err).to be_empty
+    expect(out).to eq("1.0.0")
     expect(exitstatus).to be_zero if exitstatus
   end
 

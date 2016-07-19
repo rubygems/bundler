@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require File.expand_path("../compact_index", __FILE__)
+require File.expand_path("../compact_index_api", __FILE__)
 
 Artifice.deactivate
 
-class CompactIndexCredsDiffHost < CompactIndexAPI
+class Artifice::CompactIndexCredsDiffHost < Artifice::CompactIndexAPI
   helpers do
     def auth
       @auth ||= Rack::Auth::Basic::Request.new(request.env)
@@ -35,4 +35,4 @@ class CompactIndexCredsDiffHost < CompactIndexAPI
   end
 end
 
-Artifice.activate_with(CompactIndexCredsDiffHost)
+Artifice.activate_with(Artifice::CompactIndexCredsDiffHost)

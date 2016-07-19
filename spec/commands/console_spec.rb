@@ -2,6 +2,10 @@
 require "spec_helper"
 
 describe "bundle console" do
+  before :all do
+    require "irb"
+  end
+
   before :each do
     install_gemfile <<-G
       source "file://#{gem_repo1}"

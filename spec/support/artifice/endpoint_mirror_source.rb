@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require File.expand_path("../endpoint", __FILE__)
 
-class EndpointMirrorSource < Endpoint
+class Artifice::EndpointMirrorSource < Artifice::Endpoint
   get "/gems/:id" do
     if request.env["HTTP_X_GEMFILE_SOURCE"] == "https://server.example.org/"
       File.read("#{gem_repo1}/gems/#{params[:id]}")
@@ -11,4 +11,4 @@ class EndpointMirrorSource < Endpoint
   end
 end
 
-Artifice.activate_with(EndpointMirrorSource)
+Artifice.activate_with(Artifice::EndpointMirrorSource)

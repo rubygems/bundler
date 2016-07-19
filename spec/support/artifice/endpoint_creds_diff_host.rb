@@ -3,7 +3,7 @@ require File.expand_path("../endpoint", __FILE__)
 
 Artifice.deactivate
 
-class EndpointCredsDiffHost < Endpoint
+class Artifice::EndpointCredsDiffHost < Artifice::Endpoint
   helpers do
     def auth
       @auth ||= Rack::Auth::Basic::Request.new(request.env)
@@ -35,4 +35,4 @@ class EndpointCredsDiffHost < Endpoint
   end
 end
 
-Artifice.activate_with(EndpointCredsDiffHost)
+Artifice.activate_with(Artifice::EndpointCredsDiffHost)

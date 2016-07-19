@@ -118,7 +118,7 @@ describe "Bundler.setup" do
       ENV["RUBYOPT"] = "-Idash_i_dir"
       ENV["RUBYLIB"] = "rubylib_dir"
 
-      ruby <<-RUBY
+      ruby <<-RUBY, :in_process_exec => false
         require 'rubygems'
         require 'bundler'
         Bundler.setup
@@ -140,7 +140,7 @@ describe "Bundler.setup" do
         gem "rails"
       G
 
-      ruby <<-RUBY
+      ruby <<-RUBY, :in_process_exec => false
         require 'rubygems'
         require 'bundler'
         Bundler.setup
@@ -714,7 +714,7 @@ describe "Bundler.setup" do
       source "file://#{gem_repo1}"
     G
 
-    ruby <<-R
+    ruby <<-R, :in_process_exec => false
       if Gem::Specification.method_defined? :extension_dir
         s = Gem::Specification.find_by_name '#{gem_name}'
         s.extension_dir = '#{ext_dir}'
@@ -935,7 +935,7 @@ describe "Bundler.setup" do
     it "evals each gemspec with a binding from the top level" do
       bundle "install"
 
-      ruby <<-RUBY
+      ruby <<-RUBY, :in_process_exec => false
         require 'bundler'
         def Bundler.require(path)
           raise "LOSE"
@@ -1080,7 +1080,7 @@ describe "Bundler.setup" do
   describe "when Psych is not in the Gemfile", :ruby => "~> 2.2" do
     it "does not load Psych" do
       gemfile ""
-      ruby <<-RUBY
+      ruby <<-RUBY, :in_process_exec => false
         require 'bundler/setup'
         puts defined?(Psych::VERSION) ? Psych::VERSION : "undefined"
         require 'psych'

@@ -74,25 +74,25 @@ module Bundler
         root = File.expand_path("../man", __FILE__)
 
         if Bundler.which("man") && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          Kernel.exec "man #{root}/#{command}"
+          Bundler.kernel_exec "man #{root}/#{command}"
         else
           puts File.read("#{root}/#{command}.txt")
         end
       elsif command_path = Bundler.which("bundler-#{cli}")
-        Kernel.exec(command_path, "--help")
+        Bundler.kernel_exec(command_path, "--help")
       else
         super
       end
     end
 
-    def self.handle_no_command_error(command, has_namespace = $thor_runner)
+    def self.handle_no_command_error(command, has_namespace = defined?($thor_runner) && $thor_runner)
       if Bundler.settings[:plugins] && Bundler::Plugin.command?(command)
         return Bundler::Plugin.exec_command(command, ARGV[1..-1])
       end
 
       return super unless command_path = Bundler.which("bundler-#{command}")
 
-      Kernel.exec(command_path, *ARGV[1..-1])
+      Bundler.kernel_exec(command_path, *ARGV[1..-1])
     end
 
     desc "init [OPTIONS]", "Generates a Gemfile into the current working directory"

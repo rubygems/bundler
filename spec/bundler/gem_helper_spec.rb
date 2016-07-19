@@ -10,6 +10,7 @@ describe Bundler::GemHelper do
 
   before(:each) do
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
+    Object.send(:remove_const, :LoremIpsum) if defined?(::LoremIpsum)
     bundle "gem #{app_name}"
   end
 

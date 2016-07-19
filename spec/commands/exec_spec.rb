@@ -429,22 +429,20 @@ describe "bundle exec" do
         gem "foo", :path => "#{lib_path("foo-1.0")}"
       G
 
-      bundle "exec irb", :expect_err => true
+      bundle "exec ruby -e 'puts \"loaded!\"'", :expect_err => true
 
       expect(err).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
       expect(err).to match('"TODO" is not a summary')
+      expect(out).to_not include("loaded!")
     end
   end
 
   describe "with gems bundled for deployment" do
     it "works when calling bundler from another script" do
       gemfile <<-G
-      module Monkey
-        def bin_path(a,b,c)
-          raise Gem::GemNotFoundException.new('Fail')
-        end
+      Bundler.rubygems.redefine_method(Bundler.rubygems.class, :bin_path) do |*args|
+        raise Gem::GemNotFoundException.new('Fail')
       end
-      Bundler.rubygems.extend(Monkey)
       G
       bundle "install --deployment"
       bundle "exec ruby -e '`../../exe/bundler -v`; puts $?.success?'"
@@ -552,7 +550,7 @@ describe "bundle exec" do
         begin
           Thread.new do
             puts 'Started' # For process sync
-            STDOUT.flush
+            $stdout.flush
             sleep 1 # ignore quality_spec
             raise "Didn't receive INT at all"
           end.join

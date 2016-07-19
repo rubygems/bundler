@@ -3,7 +3,7 @@ require File.expand_path("../endpoint", __FILE__)
 
 Artifice.deactivate
 
-class EndpointFallback < Endpoint
+class Artifice::EndpointFallback < Artifice::Endpoint
   DEPENDENCY_LIMIT = 60
 
   get "/api/v1/dependencies" do
@@ -15,4 +15,4 @@ class EndpointFallback < Endpoint
   end
 end
 
-Artifice.activate_with(EndpointFallback)
+Artifice.activate_with(Artifice::EndpointFallback)

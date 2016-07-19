@@ -31,7 +31,7 @@ else
 end
 
 Dir["#{File.expand_path("../support", __FILE__)}/*.rb"].each do |file|
-  require file unless file =~ %r{fakeweb/.*\.rb}
+  require file unless file =~ /hax.rb$/
 end
 
 $debug    = false
@@ -104,7 +104,10 @@ RSpec.configure do |config|
   end
 
   config.after :each do |example|
-    puts @out if defined?(@out) && example.exception
+    if example.exception
+      puts @out if defined?(@out) && !@out.empty?
+      puts @err if defined?(@err) && !@err.empty?
+    end
 
     Dir.chdir(original_wd)
     ENV.replace(original_env)

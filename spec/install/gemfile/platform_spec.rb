@@ -216,7 +216,7 @@ describe "when a gem has no architecture" do
       gem "rcov"
     G
 
-    bundle :install, :fakeweb => "windows"
+    bundle :install, :artifice => "windows"
     should_be_installed "rcov 1.0.0"
   end
 end

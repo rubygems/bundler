@@ -3,7 +3,7 @@ require File.expand_path("../endpoint_fallback", __FILE__)
 
 Artifice.deactivate
 
-class EndpointTimeout < EndpointFallback
+class Artifice::EndpointTimeout < Artifice::EndpointFallback
   SLEEP_TIMEOUT = 15
 
   get "/api/v1/dependencies" do
@@ -11,4 +11,4 @@ class EndpointTimeout < EndpointFallback
   end
 end
 
-Artifice.activate_with(EndpointTimeout)
+Artifice.activate_with(Artifice::EndpointTimeout)

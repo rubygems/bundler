@@ -11,7 +11,7 @@ describe "compact index api" do
       gem "rack"
     G
 
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
@@ -22,7 +22,7 @@ describe "compact index api" do
       gem " sinatra"
     G
 
-    bundle :install, :artifice => "compact_index"
+    bundle :install, :artifice => "compact_index_api"
     expect(out).to include("' sinatra' is not a valid gem name because it contains whitespace.")
   end
 
@@ -32,7 +32,7 @@ describe "compact index api" do
       gem "rails"
     G
 
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed(
       "rails 2.3.2",
@@ -49,7 +49,7 @@ describe "compact index api" do
       gem "net-sftp"
     G
 
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
     should_be_installed "net-sftp 1.1.1"
   end
 
@@ -58,9 +58,9 @@ describe "compact index api" do
       source "#{source_uri}"
       gem "rack"
     G
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
 
-    bundle "install --deployment", :artifice => "compact_index"
+    bundle "install --deployment", :artifice => "compact_index_api"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
@@ -78,7 +78,7 @@ describe "compact index api" do
       end
     G
 
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
 
     should_be_installed("rails 2.3.2")
   end
@@ -94,9 +94,9 @@ describe "compact index api" do
       gem 'foo', :git => "file:///#{lib_path("foo-1.0")}"
     G
 
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
 
-    bundle "install --deployment", :artifice => "compact_index"
+    bundle "install --deployment", :artifice => "compact_index_api"
 
     should_be_installed("rails 2.3.2")
   end
@@ -108,8 +108,8 @@ describe "compact index api" do
       gem 'foo', :git => "file:///#{lib_path("foo-1.0")}"
     G
 
-    bundle "install", :artifice => "compact_index"
-    bundle "install --deployment", :artifice => "compact_index"
+    bundle "install", :artifice => "compact_index_api"
+    bundle "install --deployment", :artifice => "compact_index_api"
 
     expect(exitstatus).to eq(0) if exitstatus
     should_be_installed("foo 1.0")
@@ -123,7 +123,7 @@ describe "compact index api" do
       gem "rcov"
     G
 
-    bundle! :install, :fakeweb => "windows"
+    bundle! :install, :artifice => "windows"
     expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
@@ -161,7 +161,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack"
     G
 
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
@@ -195,7 +195,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       H
     end
 
-    bundle! :install, :artifice => "compact_index_host_redirect", :requires => [lib_path("disable_net_http_persistent.rb")]
+    bundle! :install, :artifice => "compact_index_host_redirect", :requires => [lib_path("disable_net_http_persistent.rb")], :in_process_exec => false
     expect(out).to_not match(/Too many redirects/)
     should_be_installed "rack 1.0.0"
   end
@@ -217,7 +217,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         gem "rack"
       G
 
-      bundle "install --full-index", :artifice => "compact_index"
+      bundle "install --full-index", :artifice => "compact_index_api"
       expect(out).to include("Fetching source index from #{source_uri}")
       should_be_installed "rack 1.0.0"
     end
@@ -228,7 +228,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         gem "rack"
       G
 
-      bundle "update --full-index", :artifice => "compact_index"
+      bundle "update --full-index", :artifice => "compact_index_api"
       expect(out).to include("Fetching source index from #{source_uri}")
       should_be_installed "rack 1.0.0"
     end
@@ -265,6 +265,8 @@ The checksum of /versions does not match the checksum provided by the server! So
         s.executables = "rackup"
       end
     end
+
+    run! "true"
 
     gemfile <<-G
       source "#{source_uri}" do; end
@@ -381,7 +383,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "bundler_dep"
     G
 
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
   end
 
@@ -393,7 +395,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       source "#{source_uri}"
       gem "rails"
     G
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
     should_be_installed "rails 2.3.2"
   end
 
@@ -403,7 +405,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack"
     G
 
-    bundle "install --binstubs", :artifice => "compact_index"
+    bundle "install --binstubs", :artifice => "compact_index_api"
 
     gembin "rackup"
     expect(out).to eq("1.0.0")
@@ -415,7 +417,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack"
     G
 
-    bundle "install --path vendor/bundle", :artifice => "compact_index"
+    bundle "install --path vendor/bundle", :artifice => "compact_index_api"
 
     expect(vendored_gems("bin/rackup")).to exist
   end
@@ -426,7 +428,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack"
     G
 
-    bundle "install --path vendor/bundle --no-clean", :artifice => "compact_index"
+    bundle "install --path vendor/bundle --no-clean", :artifice => "compact_index_api"
 
     expect(vendored_gems("bin/rackup")).to exist
   end
@@ -437,7 +439,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem 'rack-obama'
     G
 
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
     expect(out).to include("Post-install message from rack:")
   end
 
@@ -447,7 +449,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem 'rack_middleware'
     G
 
-    bundle! :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index_api"
     expect(out).to include("Post-install message from rack:")
     expect(out).to include("Rack's post install message")
   end
@@ -664,7 +666,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     G
 
     # Create an empty file to trigger a partial download
-    versions = File.join(Bundler.rubygems.user_home, ".bundle", "cache", "compact_index",
+    versions = File.join(Bundler.rubygems.user_home, ".bundle", "cache", "compact_index_api",
       "localgemserver.test.80.dd34752a738ee965a2a4298dc16db6c5", "versions")
     FileUtils.mkdir_p(File.dirname(versions))
     FileUtils.touch(versions)

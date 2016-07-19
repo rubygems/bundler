@@ -3,22 +3,23 @@ require File.expand_path("../../path.rb", __FILE__)
 require File.expand_path("../../../../lib/bundler/deprecate", __FILE__)
 include Spec::Path
 
-# Set up pretend http gem server with FakeWeb
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/artifice*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].last}"
+$LOAD_PATH.unshift(*Dir[base_system_gems.join("gems/rack-*/lib")])
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/tilt*/lib")].first}"
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/sinatra*/lib")].first}"
 require "artifice"
 require "sinatra/base"
 
-class Endpoint < Sinatra::Base
-  GEM_REPO = Pathname.new(ENV["BUNDLER_SPEC_GEM_REPO"] || Spec::Path.gem_repo1)
+class Artifice::Endpoint < Sinatra::Base
   set :raise_errors, true
   set :show_exceptions, false
 
   helpers do
-    def dependencies_for(gem_names, gem_repo = GEM_REPO)
+    def gem_repo
+      Pathname.new(ENV["BUNDLER_SPEC_GEM_REPO"] || Spec::Path.gem_repo1)
+    end
+
+    def dependencies_for(gem_names)
       return [] if gem_names.nil? || gem_names.empty?
 
       require "rubygems"
@@ -51,11 +52,11 @@ class Endpoint < Sinatra::Base
   end
 
   get "/fetch/actual/gem/:id" do
-    File.read("#{GEM_REPO}/quick/Marshal.4.8/#{params[:id]}")
+    File.read("#{gem_repo}/quick/Marshal.4.8/#{params[:id]}")
   end
 
   get "/gems/:id" do
-    File.read("#{GEM_REPO}/gems/#{params[:id]}")
+    File.read("#{gem_repo}/gems/#{params[:id]}")
   end
 
   get "/api/v1/dependencies" do
@@ -63,12 +64,12 @@ class Endpoint < Sinatra::Base
   end
 
   get "/specs.4.8.gz" do
-    File.read("#{GEM_REPO}/specs.4.8.gz")
+    File.read("#{gem_repo}/specs.4.8.gz")
   end
 
   get "/prerelease_specs.4.8.gz" do
-    File.read("#{GEM_REPO}/prerelease_specs.4.8.gz")
+    File.read("#{gem_repo}/prerelease_specs.4.8.gz")
   end
 end
 
-Artifice.activate_with(Endpoint)
+Artifice.activate_with(Artifice::Endpoint)

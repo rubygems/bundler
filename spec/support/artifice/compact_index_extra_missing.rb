@@ -3,7 +3,7 @@ require File.expand_path("../compact_index_extra", __FILE__)
 
 Artifice.deactivate
 
-class CompactIndexExtraMissing < CompactIndexExtra
+class Artifice::CompactIndexExtraMissing < Artifice::CompactIndexExtra
   get "/extra/fetch/actual/gem/:id" do
     if params[:id] == "missing-1.0.gemspec.rz"
       halt 404
@@ -13,4 +13,4 @@ class CompactIndexExtraMissing < CompactIndexExtra
   end
 end
 
-Artifice.activate_with(CompactIndexExtraMissing)
+Artifice.activate_with(Artifice::CompactIndexExtraMissing)

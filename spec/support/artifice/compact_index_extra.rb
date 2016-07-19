@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require File.expand_path("../compact_index", __FILE__)
+require File.expand_path("../compact_index_api", __FILE__)
 
 Artifice.deactivate
 
-class CompactIndexExtra < CompactIndexAPI
+class Artifice::CompactIndexExtra < Artifice::CompactIndexAPI
   get "/extra/versions" do
     halt 404
   end
@@ -33,4 +33,4 @@ class CompactIndexExtra < CompactIndexAPI
   end
 end
 
-Artifice.activate_with(CompactIndexExtra)
+Artifice.activate_with(Artifice::CompactIndexExtra)

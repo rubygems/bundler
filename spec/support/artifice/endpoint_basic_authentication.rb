@@ -3,7 +3,7 @@ require File.expand_path("../endpoint", __FILE__)
 
 Artifice.deactivate
 
-class EndpointBasicAuthentication < Endpoint
+class Artifice::EndpointBasicAuthentication < Artifice::Endpoint
   before do
     unless env["HTTP_AUTHORIZATION"]
       halt 401, "Authentication info not supplied"
@@ -11,4 +11,4 @@ class EndpointBasicAuthentication < Endpoint
   end
 end
 
-Artifice.activate_with(EndpointBasicAuthentication)
+Artifice.activate_with(Artifice::EndpointBasicAuthentication)

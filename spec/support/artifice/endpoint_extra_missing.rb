@@ -3,7 +3,7 @@ require File.expand_path("../endpoint_extra", __FILE__)
 
 Artifice.deactivate
 
-class EndpointExtraMissing < EndpointExtra
+class Artifice::EndpointExtraMissing < Artifice::EndpointExtra
   get "/extra/fetch/actual/gem/:id" do
     if params[:id] == "missing-1.0.gemspec.rz"
       halt 404
@@ -13,4 +13,4 @@ class EndpointExtraMissing < EndpointExtra
   end
 end
 
-Artifice.activate_with(EndpointExtraMissing)
+Artifice.activate_with(Artifice::EndpointExtraMissing)

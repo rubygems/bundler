@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require File.expand_path("../compact_index", __FILE__)
+require File.expand_path("../compact_index_api", __FILE__)
 
 Artifice.deactivate
 
-class CompactIndexChecksumMismatch < CompactIndexAPI
+class Artifice::CompactIndexChecksumMismatch < Artifice::CompactIndexAPI
   get "/versions" do
     headers "ETag" => quote("123")
     headers "Surrogate-Control" => "max-age=2592000, stale-while-revalidate=60"
@@ -12,4 +12,4 @@ class CompactIndexChecksumMismatch < CompactIndexAPI
   end
 end
 
-Artifice.activate_with(CompactIndexChecksumMismatch)
+Artifice.activate_with(Artifice::CompactIndexChecksumMismatch)

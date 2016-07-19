@@ -4,7 +4,7 @@ require File.expand_path("../endpoint", __FILE__)
 $LOAD_PATH.unshift Dir[base_system_gems.join("gems/compact_index*/lib")].first.to_s
 require "compact_index"
 
-class CompactIndexAPI < Endpoint
+class Artifice::CompactIndexAPI < Artifice::Endpoint
   helpers do
     def load_spec(name, version, platform, gem_repo)
       full_name = "#{name}-#{version}"
@@ -63,7 +63,7 @@ class CompactIndexAPI < Endpoint
       end
     end
 
-    def gems(gem_repo = GEM_REPO)
+    def gems(gem_repo = self.gem_repo)
       @gems ||= {}
       @gems[gem_repo] ||= begin
         specs = Bundler::Deprecate.skip_during do
@@ -111,4 +111,4 @@ class CompactIndexAPI < Endpoint
   end
 end
 
-Artifice.activate_with(CompactIndexAPI)
+Artifice.activate_with(Artifice::CompactIndexAPI)

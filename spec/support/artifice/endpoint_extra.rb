@@ -3,7 +3,7 @@ require File.expand_path("../endpoint", __FILE__)
 
 Artifice.deactivate
 
-class EndpointExtra < Endpoint
+class Artifice::EndpointExtra < Artifice::Endpoint
   get "/extra/api/v1/dependencies" do
     halt 404
   end
@@ -29,4 +29,4 @@ class EndpointExtra < Endpoint
   end
 end
 
-Artifice.activate_with(EndpointExtra)
+Artifice.activate_with(Artifice::EndpointExtra)

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require File.expand_path("../compact_index", __FILE__)
+require File.expand_path("../compact_index_api", __FILE__)
 
 Artifice.deactivate
 
-class CompactIndexStrictBasicAuthentication < CompactIndexAPI
+class Artifice::CompactIndexStrictBasicAuthentication < Artifice::CompactIndexAPI
   before do
     unless env["HTTP_AUTHORIZATION"]
       halt 401, "Authentication info not supplied"
@@ -16,4 +16,4 @@ class CompactIndexStrictBasicAuthentication < CompactIndexAPI
   end
 end
 
-Artifice.activate_with(CompactIndexStrictBasicAuthentication)
+Artifice.activate_with(Artifice::CompactIndexStrictBasicAuthentication)

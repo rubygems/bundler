@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require File.expand_path("../compact_index", __FILE__)
+require File.expand_path("../compact_index_api", __FILE__)
 
 Artifice.deactivate
 
-class CompactIndexConcurrentDownload < CompactIndexAPI
+class Artifice::CompactIndexConcurrentDownload < Artifice::CompactIndexAPI
   get "/versions" do
     versions = File.join(Bundler.rubygems.user_home, ".bundle", "cache", "compact_index",
       "localgemserver.test.80.dd34752a738ee965a2a4298dc16db6c5", "versions")
@@ -28,4 +28,4 @@ class CompactIndexConcurrentDownload < CompactIndexAPI
   end
 end
 
-Artifice.activate_with(CompactIndexConcurrentDownload)
+Artifice.activate_with(Artifice::CompactIndexConcurrentDownload)

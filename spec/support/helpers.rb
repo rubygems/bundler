@@ -16,16 +16,24 @@ module Spec
       Bundler.reset!
       Bundler.ui = nil
       Bundler.ui # force it to initialize
+
+      allow(Bundler).to receive(:kernel_exec) do |*args|
+        out, err, exitstatus = Open3.capture3(*args)
+        puts out unless out.empty?
+        warn err unless err.empty?
+        exit(exitstatus.exitstatus)
+      end
     end
 
     def self.bang(method)
       define_method("#{method}!") do |*args, &blk|
+        invocation = "#{method}!(#{args.map(&:inspect).join(", ")})"
         send(method, *args, &blk).tap do
           if exitstatus && exitstatus != 0
             error = out + "\n" + err
             error.strip!
             raise RuntimeError,
-              "Invoking #{method}!(#{args.map(&:inspect).join(", ")}) failed:\n#{error}",
+              "Invoking #{invocation} failed:\n#{error}",
               caller.drop_while {|bt| bt.start_with?(__FILE__) }
           end
         end
@@ -78,7 +86,7 @@ module Spec
       File.expand_path("../../../spec", __FILE__)
     end
 
-    def bundle(cmd, options = {})
+    def bundle(cmd, options = {}, &blk)
       expect_err = options.delete(:expect_err)
       with_sudo = options.delete(:sudo)
       sudo = with_sudo == :preserve_env ? "sudo -E" : "sudo" if with_sudo
@@ -88,18 +96,25 @@ module Spec
       bundle_bin = options.delete("bundle_bin") || File.expand_path("../../../exe/bundle", __FILE__)
 
       requires = options.delete(:requires) || []
-      requires << File.expand_path("../fakeweb/" + options.delete(:fakeweb) + ".rb", __FILE__) if options.key?(:fakeweb)
-      requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
-      requires << "support/hax"
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
+      ENV["BUNDLER_SPEC_ARTIFICE_ENDPOINT"] = options.delete(:artifice)
 
-      env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}'" }.join(" ")
+      env = options.delete(:env) || {}
+      in_process_exec = options.delete(:in_process_exec) { true }
       args = options.map do |k, v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
 
-      cmd = "#{env} #{sudo} #{Gem.ruby} -I#{lib}:#{spec} #{requires_str} #{bundle_bin} #{cmd}#{args}"
-      sys_exec(cmd, expect_err) {|i, o, thr| yield i, o, thr if block_given? }
+      if !in_process_exec || sudo
+        env = env.map {|k, v| "#{k}='#{v}'" }.join(" ")
+        cmd = "#{env} #{sudo} #{Gem.ruby} -I#{lib}:#{spec} #{requires_str} #{bundle_bin} #{cmd}#{args}"
+        sys_exec(cmd, expect_err) {|i, o, thr| yield i, o, thr if block_given? }
+      else
+        exec_in_process("#{cmd}#{args}".shellsplit, env, blk) do
+          requires.each {|r| require r }
+          Kernel.load(bundle_bin)
+        end
+      end
     end
     bang :bundle
 
@@ -109,28 +124,24 @@ module Spec
     end
 
     def bundle_ruby(options = {})
-      expect_err = options.delete(:expect_err)
-      options["no-color"] = true unless options.key?("no-color")
-
-      bundle_bin = File.expand_path("../../../exe/bundle_ruby", __FILE__)
-
-      requires = options.delete(:requires) || []
-      requires << File.expand_path("../fakeweb/" + options.delete(:fakeweb) + ".rb", __FILE__) if options.key?(:fakeweb)
-      requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
-      requires_str = requires.map {|r| "-r#{r}" }.join(" ")
-
-      env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin}"
-
-      sys_exec(cmd, expect_err) {|i, o, thr| yield i, o, thr if block_given? }
+      options["bundle_bin"] = File.expand_path("../../../exe/bundle_ruby", __FILE__)
+      bundle("", options)
     end
 
-    def ruby(ruby, options = {})
+    def ruby(ruby, options = {}, &blk)
+      in_process_exec = options.delete(:in_process_exec) { true }
       expect_err = options.delete(:expect_err)
-      env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
-      ruby = ruby.gsub(/["`\$]/) {|m| "\\#{m}" }
-      lib_option = options[:no_lib] ? "" : " -I#{lib}"
-      sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"), expect_err)
+      ENV["BUNDLER_SPEC_ARTIFICE_ENDPOINT"] = options.delete(:artifice)
+      if !in_process_exec || options[:no_lib]
+        env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
+        ruby = ruby.gsub(/["`\$]/) {|m| "\\#{m}" }
+        lib_option = options[:no_lib] ? "" : " -I#{lib}"
+        sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"), expect_err)
+      else
+        exec_in_process([], options.delete(:env) || {}, blk) do
+          Kernel.eval(ruby, TOPLEVEL_BINDING, "<ruby -e script>")
+        end
+      end
     end
     bang :ruby
 
@@ -160,15 +171,98 @@ module Spec
         yield stdin, stdout, wait_thr if block_given?
         stdin.close
 
-        @out = Thread.new { stdout.read }.value.strip
-        @err = Thread.new { stderr.read }.value.strip
+        @out = Thread.new { stdout.read }
+        @err = Thread.new { stderr.read }
         @exitstatus = wait_thr && wait_thr.value.exitstatus
+        @out = @out.value.strip
+        @err = @err.value.strip
       end
 
       puts @err unless expect_err || @err.empty? || !$show_err
       @out
     end
     bang :sys_exec
+
+    def exec_in_process(argv, env, user_blk)
+      orig_argv = ARGV.clone
+      load_path = $LOAD_PATH.clone
+      loaded_features = $LOADED_FEATURES.clone
+      loaded_specs = Gem.loaded_specs.clone
+      orig_env = ENV.to_h
+      ui = Bundler.ui
+      constants = Object.constants + [
+        :Artifice,
+        :CompactIndex,
+        :Forwardable,
+        :IRB,
+        :Rack,
+        :Sinatra,
+        :Tilt,
+      ]
+      debug = $debug
+
+      ARGV.replace(argv)
+      ENV.update(Hash[env.map {|k, v| [k.to_s, v.to_s] }])
+      Bundler.reset!
+      Bundler.ui = nil
+      Bundler.preserve_env!
+      Gem.loaded_specs.clear
+      $debug = !env.fetch("DEBUG") { "" }.empty?
+
+      @out = capture(:stdout) do
+        @err = capture(:stderr) do
+          begin
+            Kernel.load File.join(spec, "support/hax.rb")
+            if user_blk
+              reader, writer = IO.pipe
+              STDIN.reopen(reader)
+              Thread.new do
+                begin
+                  yield
+                  nil
+                rescue Object => e
+                  e
+                end
+              end.tap do |wait_thr|
+                user_blk.call(writer, $stdout, wait_thr)
+                writer.close
+                raise wait_thr.value if wait_thr.value
+                reader.close
+              end
+            else
+              yield
+            end
+            @exitstatus = 0
+          rescue SystemExit => e
+            @exitstatus = e.status
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            first = e.backtrace.shift
+            warn "#{first}: #{e} (#{e.class})"
+            e.backtrace.each do |bt|
+              break if bt.start_with?(__FILE__)
+              warn "\tfrom #{bt}"
+            end
+            @exitstatus = 1
+          end
+        end.strip
+      end.strip
+    ensure
+      Kernel.load File.join(spec, "support/unhax.rb")
+      ARGV.replace(orig_argv)
+      ENV.replace(orig_env)
+      $LOAD_PATH.replace(load_path)
+      load_path.map! {|path| File.join(File.expand_path(path), "/") }
+      ($LOADED_FEATURES - loaded_features).each do |feat|
+        unless load_path.any? {|path| feat.start_with?(path) }
+          $LOADED_FEATURES.delete(feat)
+        end
+      end
+      Gem.loaded_specs.replace(loaded_specs)
+      Bundler.ui = ui
+      Bundler.reset!
+      $debug = debug
+      (Object.constants - constants).each {|c| Object.send(:remove_const, c) }
+    end
 
     def config(config = nil, path = bundled_app(".bundle/config"))
       return YAML.load_file(path) unless config

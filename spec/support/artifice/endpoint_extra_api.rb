@@ -3,7 +3,7 @@ require File.expand_path("../endpoint", __FILE__)
 
 Artifice.deactivate
 
-class EndpointExtraApi < Endpoint
+class Artifice::EndpointExtraApi < Artifice::Endpoint
   get "/extra/api/v1/dependencies" do
     deps = dependencies_for(params[:gems], gem_repo4)
     Marshal.dump(deps)
@@ -30,4 +30,4 @@ class EndpointExtraApi < Endpoint
   end
 end
 
-Artifice.activate_with(EndpointExtraApi)
+Artifice.activate_with(Artifice::EndpointExtraApi)
