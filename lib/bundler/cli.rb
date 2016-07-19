@@ -523,6 +523,7 @@ module Bundler
     end
 
     def print_command
+      return unless ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] || Bundler.ui.debug?
       _, _, config = @_initializer
       current_command = config[:current_command].name
       return if %w(exec version check platform show help).include?(current_command)
