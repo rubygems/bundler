@@ -54,6 +54,13 @@ describe "bundle executable" do
       expect(out).not_to include("RUBYGEMS_GEMDEPS")
     end
   end
+
+  context "with --verbose" do
+    it "prints the running command" do
+      bundle! "config", :verbose => true
+      expect(out).to start_with("Running `bundle config --verbose` with bundler #{Bundler::VERSION}")
+    end
+  end
 end
 
 describe "bundler executable" do
