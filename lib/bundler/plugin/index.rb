@@ -24,6 +24,7 @@ module Bundler
         @plugin_paths = {}
         @commands = {}
         @sources = {}
+        @hooks = {}
         @load_paths = {}
 
         load_index(global_index_file, true)
@@ -39,7 +40,7 @@ module Bundler
       # @param [Array<String>] load_paths for the plugin
       # @param [Array<String>] commands that are handled by the plugin
       # @param [Array<String>] sources that are handled by the plugin
-      def register_plugin(name, path, load_paths, commands, sources)
+      def register_plugin(name, path, load_paths, commands, sources, hooks)
         old_commands = @commands.dup
 
         common = commands & @commands.keys
@@ -49,6 +50,8 @@ module Bundler
         common = sources & @sources.keys
         raise SourceConflict.new(name, common) unless common.empty?
         sources.each {|k| @sources[k] = name }
+
+        hooks.each {|e| (@hooks[e] ||= []) << name }
 
         @plugin_paths[name] = path
         @load_paths[name] = load_paths
@@ -98,6 +101,10 @@ module Bundler
         @sources[name]
       end
 
+      def hook_plugins(event)
+        @hooks[event]
+      end
+
     private
 
       # Reads the index file from the directory and initializes the instance
@@ -119,6 +126,7 @@ module Bundler
           @load_paths.merge!(index["load_paths"])
           @commands.merge!(index["commands"])
           @sources.merge!(index["sources"]) unless global
+          @hooks.merge!(index["hooks"])
         end
       end
 
@@ -128,9 +136,10 @@ module Bundler
       def save_index
         index = {
           "plugin_paths" => @plugin_paths,
-          "load_paths" => @load_paths,
-          "commands" => @commands,
-          "sources" => @sources,
+          "load_paths"   => @load_paths,
+          "commands"     => @commands,
+          "sources"      => @sources,
+          "hooks"        => @hooks,
         }
 
         require "bundler/yaml_serializer"

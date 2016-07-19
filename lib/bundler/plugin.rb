@@ -18,6 +18,8 @@ module Bundler
 
     @commands = {}
     @sources = {}
+    @hooks = {}
+    @loaded = []
 
     # Installs a new plugin by the given name
     #
@@ -137,6 +139,19 @@ module Bundler
       src.new(locked_opts.merge("uri" => locked_opts["remote"]))
     end
 
+    def add_hook(event, &block)
+      (@hooks[event.to_s] ||= []) << block
+    end
+
+    def hook(event, *args)
+      plugins = index.hook_plugins(event)
+      return unless plugins
+
+      (plugins - @loaded).each {|name| load_plugin(name) }
+
+      @hooks[event].each {|blk| blk.call(*args) }
+    end
+
     # currently only intended for specs
     #
     # @return [String, nil] installed path
@@ -190,9 +205,11 @@ module Bundler
     def register_plugin(name, spec, optional_plugin = false)
       commands = @commands
       sources = @sources
+      hooks = @hooks
 
       @commands = {}
       @sources = {}
+      @hooks = {}
 
       load_paths = spec.load_paths
       add_to_load_path(load_paths)
@@ -208,12 +225,14 @@ module Bundler
         Bundler.rm_rf(path)
         false
       else
-        index.register_plugin name, path.to_s, load_paths, @commands.keys, @sources.keys
+        index.register_plugin name, path.to_s, load_paths, @commands.keys,
+          @sources.keys, @hooks.keys
         true
       end
     ensure
       @commands = commands
       @sources = sources
+      @hooks = hooks
     end
 
     # Executes the plugins.rb file
@@ -228,6 +247,8 @@ module Bundler
       add_to_load_path(index.load_paths(name))
 
       load path.join(PLUGIN_FILE_NAME)
+
+      @loaded << name
     rescue => e
       Bundler.ui.error "Failed loading plugin #{name}: #{e.message}"
       raise
