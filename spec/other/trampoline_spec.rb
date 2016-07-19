@@ -150,4 +150,11 @@ You're running Bundler #{Bundler::VERSION} but this project uses #{ENV["BUNDLER_
       WARN
     end
   end
+
+  context "with --verbose" do
+    it "prints the running command" do
+      bundle! "config", :verbose => true, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => Bundler::VERSION }
+      expect(out).to start_with("Running `bundle config --verbose` with bundler #{Bundler::VERSION}")
+    end
+  end
 end
