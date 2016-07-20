@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "hook plugins", :focused do
+describe "hook plugins" do
   before do
     build_repo2 do
       build_plugin "before-install-plugin" do |s|

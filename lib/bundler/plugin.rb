@@ -159,12 +159,13 @@ module Bundler
       Index.new.installed?(plugin)
     end
 
-    # Used by specs
     def reset!
       instance_variables.each {|i| remove_instance_variable(i) }
 
       @sources = {}
       @commands = {}
+      @hooks = {}
+      @loaded = []
     end
 
     # Post installation processing and registering with index
