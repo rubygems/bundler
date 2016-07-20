@@ -201,7 +201,8 @@ describe Bundler::Fetcher::Dependency do
 
     it "should log the query list at debug level" do
       expect(Bundler).to receive_message_chain(:ui, :debug).with(
-        "Query Gemcutter Dependency Endpoint API: foo,bar,bundler,rubocop")
+        "Query Gemcutter Dependency Endpoint API: foo,bar,bundler,rubocop"
+      )
       subject.dependency_specs(gem_names)
     end
 
@@ -267,7 +268,8 @@ describe Bundler::Fetcher::Dependency do
 
       it "should return an api calling uri with the gems in the query" do
         expect(subject.dependency_api_uri(gem_names).to_s).to eq(
-          "http://gem-api.com/api/v1/dependencies?gems=foo%2Cbar%2Cbundler%2Crubocop")
+          "http://gem-api.com/api/v1/dependencies?gems=foo%2Cbar%2Cbundler%2Crubocop"
+        )
       end
     end
 
@@ -278,7 +280,8 @@ describe Bundler::Fetcher::Dependency do
 
       it "should return an api calling uri with no query" do
         expect(subject.dependency_api_uri(gem_names).to_s).to eq(
-          "http://gem-api.com/api/v1/dependencies")
+          "http://gem-api.com/api/v1/dependencies"
+        )
       end
     end
   end

@@ -42,7 +42,7 @@ describe "bundle install with gems on multiple sources" do
         bundle "config disable_multisource true"
         bundle :install
         expect(out).to include("Each source after the first must include a block")
-        expect(exitstatus).to eq(14) if exitstatus
+        expect(exitstatus).to eq(4) if exitstatus
       end
     end
 

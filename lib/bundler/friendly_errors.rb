@@ -12,7 +12,7 @@ module Bundler
       when YamlSyntaxError
         Bundler.ui.error error.message
         Bundler.ui.trace error.orig_exception
-      when Dsl::DSLError
+      when Dsl::DSLError, GemspecError
         Bundler.ui.error error.message
       when GemRequireError
         Bundler.ui.error error.message

@@ -25,16 +25,16 @@ module Bundler
   autoload :Deprecate,              "bundler/deprecate"
   autoload :Dsl,                    "bundler/dsl"
   autoload :EndpointSpecification,  "bundler/endpoint_specification"
-  autoload :Environment,            "bundler/environment"
   autoload :Env,                    "bundler/env"
+  autoload :Environment,            "bundler/environment"
   autoload :Fetcher,                "bundler/fetcher"
   autoload :GemHelper,              "bundler/gem_helper"
   autoload :GemHelpers,             "bundler/gem_helpers"
   autoload :GemVersionPromoter,     "bundler/gem_version_promoter"
   autoload :Graph,                  "bundler/graph"
   autoload :Index,                  "bundler/index"
-  autoload :Installer,              "bundler/installer"
   autoload :Injector,               "bundler/injector"
+  autoload :Installer,              "bundler/installer"
   autoload :LazySpecification,      "bundler/lazy_specification"
   autoload :LockfileParser,         "bundler/lockfile_parser"
   autoload :MatchPlatform,          "bundler/match_platform"
@@ -43,16 +43,16 @@ module Bundler
   autoload :RemoteSpecification,    "bundler/remote_specification"
   autoload :Resolver,               "bundler/resolver"
   autoload :Retry,                  "bundler/retry"
-  autoload :RubyVersion,            "bundler/ruby_version"
   autoload :RubyDsl,                "bundler/ruby_dsl"
+  autoload :RubyGemsGemInstaller,   "bundler/rubygems_gem_installer"
+  autoload :RubyVersion,            "bundler/ruby_version"
   autoload :Runtime,                "bundler/runtime"
   autoload :Settings,               "bundler/settings"
   autoload :SharedHelpers,          "bundler/shared_helpers"
-  autoload :SpecSet,                "bundler/spec_set"
-  autoload :StubSpecification,      "bundler/stub_specification"
   autoload :Source,                 "bundler/source"
   autoload :SourceList,             "bundler/source_list"
-  autoload :RubyGemsGemInstaller,   "bundler/rubygems_gem_installer"
+  autoload :SpecSet,                "bundler/spec_set"
+  autoload :StubSpecification,      "bundler/stub_specification"
   autoload :UI,                     "bundler/ui"
   autoload :URICredentialsFilter,   "bundler/uri_credentials_filter"
 
@@ -408,17 +408,13 @@ module Bundler
     def eval_gemspec(path, contents)
       eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
     rescue ScriptError, StandardError => e
-      original_line = e.backtrace.find {|line| line.include?(path.to_s) }
-      msg = String.new
-      msg << "There was a #{e.class} while loading #{path.basename}: \n#{e.message}"
-      msg << " from\n  #{original_line}" if original_line
-      msg << "\n"
+      msg = "There was an error while loading `#{path.basename}`: #{e.message}"
 
       if e.is_a?(LoadError) && RUBY_VERSION >= "1.9"
-        msg << "\nDoes it try to require a relative path? That's been removed in Ruby 1.9."
+        msg += "\nDoes it try to require a relative path? That's been removed in Ruby 1.9"
       end
 
-      raise GemspecError, msg
+      raise GemspecError, Dsl::DSLError.new(msg, path, e.backtrace, contents)
     end
 
     def configure_gem_home_and_path

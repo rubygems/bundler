@@ -24,7 +24,8 @@ module Bundler
         spec = installer.specs.find {|s| s.name == gem_name }
         unless spec
           raise GemNotFound, Bundler::CLI::Common.gem_not_found_message(
-            gem_name, Bundler.definition.specs)
+            gem_name, Bundler.definition.specs
+          )
         end
 
         if spec.name == "bundler"

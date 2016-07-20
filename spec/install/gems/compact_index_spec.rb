@@ -40,7 +40,8 @@ describe "compact index api" do
       "activerecord 2.3.2",
       "actionmailer 2.3.2",
       "activeresource 2.3.2",
-      "activesupport 2.3.2")
+      "activesupport 2.3.2"
+    )
   end
 
   it "should handle multiple gem dependencies on the same gem" do

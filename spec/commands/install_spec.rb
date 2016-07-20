@@ -462,7 +462,7 @@ describe "bundle install with gem sources" do
     end
 
     it "should display a proper message to explain the problem" do
-      FileUtils.chmod(0500, bundled_app("vendor"))
+      FileUtils.chmod(0o500, bundled_app("vendor"))
 
       bundle :install, :path => "vendor"
       expect(out).to include(bundled_app("vendor").to_s)

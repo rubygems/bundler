@@ -264,7 +264,7 @@ module Spec
 
     def break_git!
       FileUtils.mkdir_p(tmp("broken_path"))
-      File.open(tmp("broken_path/git"), "w", 0755) do |f|
+      File.open(tmp("broken_path/git"), "w", 0o755) do |f|
         f.puts "#!/usr/bin/env ruby\nSTDERR.puts 'This is not the git you are looking for'\nexit 1"
       end
 
@@ -273,7 +273,7 @@ module Spec
 
     def with_fake_man
       FileUtils.mkdir_p(tmp("fake_man"))
-      File.open(tmp("fake_man/man"), "w", 0755) do |f|
+      File.open(tmp("fake_man/man"), "w", 0o755) do |f|
         f.puts "#!/usr/bin/env ruby\nputs ARGV.inspect\n"
       end
       with_path_added(tmp("fake_man")) { yield }
@@ -400,14 +400,7 @@ module Spec
     end
 
     def capture_output
-      fake_stdout = StringIO.new
-      actual_stdout = $stdout
-      $stdout = fake_stdout
-      yield
-      fake_stdout.rewind
-      fake_stdout.read
-    ensure
-      $stdout = actual_stdout
+      capture(:stdout)
     end
 
     def with_read_only(pattern)
@@ -418,10 +411,10 @@ module Spec
         end
       end
 
-      Dir[pattern].each(&chmod[0555, 0444])
+      Dir[pattern].each(&chmod[0o555, 0o444])
       yield
     ensure
-      Dir[pattern].each(&chmod[0755, 0644])
+      Dir[pattern].each(&chmod[0o755, 0o644])
     end
 
     def process_file(pathname)

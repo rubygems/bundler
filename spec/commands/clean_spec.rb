@@ -460,7 +460,7 @@ describe "bundle clean" do
 
   describe "when missing permissions" do
     after do
-      FileUtils.chmod(0755, default_bundle_path("cache"))
+      FileUtils.chmod(0o755, default_bundle_path("cache"))
     end
     it "returns a helpful error message" do
       gemfile <<-G
@@ -479,7 +479,7 @@ describe "bundle clean" do
       bundle :install
 
       system_cache_path = default_bundle_path("cache")
-      FileUtils.chmod(0500, system_cache_path)
+      FileUtils.chmod(0o500, system_cache_path)
 
       bundle :clean, :force => true
 

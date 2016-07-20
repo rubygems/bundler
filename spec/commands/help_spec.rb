@@ -39,7 +39,7 @@ describe "bundle help" do
   end
 
   it "looks for a binary and executes it with --help option if it's named bundler-<task>" do
-    File.open(tmp("bundler-testtasks"), "w", 0755) do |f|
+    File.open(tmp("bundler-testtasks"), "w", 0o755) do |f|
       f.puts "#!/usr/bin/env ruby\nputs ARGV.join(' ')\n"
     end
 

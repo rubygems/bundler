@@ -107,7 +107,8 @@ describe "major deprecations" do
         G
 
         expect(warnings).to have_major_deprecation a_string_including(
-          "flags passed to commands will no longer be automatically remembered.")
+          "flags passed to commands will no longer be automatically remembered."
+        )
       end
     end
   end
