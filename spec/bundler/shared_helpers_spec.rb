@@ -209,6 +209,10 @@ describe Bundler::SharedHelpers do
   end
 
   describe "#set_bundle_environment" do
+    before do
+      ENV["BUNDLE_GEMFILE"] = "Gemfile"
+    end
+
     shared_examples_for "ENV['PATH'] gets set correctly" do
       before { Dir.mkdir ".bundle" }
 

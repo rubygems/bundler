@@ -89,7 +89,7 @@ module Bundler
 
     def setup(*groups)
       # Return if all groups are already loaded
-      return @setup if defined?(@setup)
+      return @setup if defined?(@setup) && @setup
 
       definition.validate_ruby!
 
@@ -130,13 +130,11 @@ module Bundler
     end
 
     def locked_gems
-      return @locked_gems if defined?(@locked_gems)
-      if Bundler.default_lockfile.exist?
-        lock = Bundler.read_file(Bundler.default_lockfile)
-        @locked_gems = LockfileParser.new(lock)
-      else
-        @locked_gems = nil
-      end
+      @locked_gems ||=
+        if Bundler.default_lockfile.exist?
+          lock = Bundler.read_file(Bundler.default_lockfile)
+          LockfileParser.new(lock)
+        end
     end
 
     def ruby_scope
@@ -386,6 +384,15 @@ module Bundler
       @root = nil
       @settings = nil
       @definition = nil
+      @setup = nil
+      @load = nil
+      @locked_gems = nil
+      @bundle_path = nil
+      @bin_path = nil
+      return unless defined?(@rubygems) && @rubygems
+      rubygems.undo_replacements
+      rubygems.reset
+      @rubygems = nil
     end
 
   private

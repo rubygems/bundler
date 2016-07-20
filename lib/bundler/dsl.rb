@@ -38,7 +38,7 @@ module Bundler
       original_gemfile = @gemfile
       @gemfile = expanded_gemfile_path
       contents ||= Bundler.read_file(gemfile.to_s)
-      instance_eval(contents, gemfile.to_s, 1)
+      instance_eval(contents.dup.untaint, gemfile.to_s, 1)
     rescue Exception => e
       message = "There was an error " \
         "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \

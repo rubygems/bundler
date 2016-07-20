@@ -16,8 +16,15 @@ module Gem
   class Specification
     attr_accessor :remote, :location, :relative_loaded_from
 
-    remove_method :source if instance_methods(false).include?(:source)
-    attr_accessor :source
+    if instance_methods(false).map(&:to_sym).include?(:source)
+      remove_method :source
+      attr_writer :source
+      def source
+        (defined?(@source) && @source) || Gem::Source::Installed.new
+      end
+    else
+      attr_accessor :source
+    end
 
     alias_method :rg_full_gem_path, :full_gem_path
     alias_method :rg_loaded_from,   :loaded_from
