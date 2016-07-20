@@ -26,7 +26,7 @@ module Bundler
         @sources = {}
         @load_paths = {}
 
-        load_index(global_index_file)
+        load_index(global_index_file, true)
         load_index(local_index_file) if SharedHelpers.in_bundle?
       end
 
@@ -102,7 +102,11 @@ module Bundler
 
       # Reads the index file from the directory and initializes the instance
       # variables.
-      def load_index(index_file)
+      #
+      # It skips the sources if the second param is true
+      # @param [Pathname] index file path
+      # @param [Boolean] is the index file global index
+      def load_index(index_file, global = false)
         SharedHelpers.filesystem_access(index_file, :read) do |index_f|
           valid_file = index_f && index_f.exist? && !index_f.size.zero?
           break unless valid_file
@@ -114,7 +118,7 @@ module Bundler
           @plugin_paths.merge!(index["plugin_paths"])
           @load_paths.merge!(index["load_paths"])
           @commands.merge!(index["commands"])
-          @sources.merge!(index["sources"])
+          @sources.merge!(index["sources"]) unless global
         end
       end
 

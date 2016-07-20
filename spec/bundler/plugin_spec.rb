@@ -10,8 +10,6 @@ describe Bundler::Plugin do
   let(:spec2) { double(:spec2) }
 
   before do
-    Plugin.reset!
-
     build_lib "new-plugin", :path => lib_path("new-plugin") do |s|
       s.write "plugins.rb"
     end

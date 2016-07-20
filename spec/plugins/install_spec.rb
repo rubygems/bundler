@@ -180,7 +180,7 @@ describe "bundler plugin install" do
     end
   end
 
-  describe "local plugin", :focused do
+  describe "local plugin" do
     it "is installed when inside an app" do
       gemfile ""
       bundle "plugin install foo --source file://#{gem_repo2}"
