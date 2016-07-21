@@ -266,5 +266,151 @@ describe "bundle install from an existing gemspec" do
         end
       end
     end
+
+    context "bundled for ruby and jruby" do
+      let(:platform_specific_type) { :runtime }
+      before do
+        build_lib "foo", :path => "." do |s|
+          if platform_specific_type == :runtime
+            s.add_runtime_dependency "platform_specific"
+          elsif platform_specific_type == :development
+            s.add_development_dependency "platform_specific"
+          else
+            raise "wrong dependency type #{platform_specific_type}, can only be :development or :runtime"
+          end
+        end
+
+        %w(ruby jruby).each do |platform|
+          simulate_platform(platform) do
+            install_gemfile <<-G
+              source "file://#{gem_repo1}"
+              gemspec
+            G
+          end
+        end
+      end
+
+      context "on ruby" do
+        before do
+          simulate_platform("ruby")
+          bundle :install
+        end
+
+        context "as a runtime dependency" do
+          it "keeps java dependencies in the lockfile" do
+            should_be_installed "foo 1.0", "platform_specific 1.0 RUBY"
+            expect(lockfile).to eq strip_whitespace(<<-L)
+              PATH
+                remote: .
+                specs:
+                  foo (1.0)
+                    platform_specific
+
+              GEM
+                remote: file:#{gem_repo1}/
+                specs:
+                  platform_specific (1.0)
+                  platform_specific (1.0-java)
+
+              PLATFORMS
+                java
+                ruby
+
+              DEPENDENCIES
+                foo!
+
+              BUNDLED WITH
+                 #{Bundler::VERSION}
+            L
+          end
+        end
+
+        context "as a development dependency" do
+          let(:platform_specific_type) { :development }
+
+          it "keeps java dependencies in the lockfile" do
+            should_be_installed "foo 1.0", "platform_specific 1.0 RUBY"
+            expect(lockfile).to eq strip_whitespace(<<-L)
+              PATH
+                remote: .
+                specs:
+                  foo (1.0)
+
+              GEM
+                remote: file:#{gem_repo1}/
+                specs:
+                  platform_specific (1.0)
+                  platform_specific (1.0-java)
+
+              PLATFORMS
+                java
+                ruby
+
+              DEPENDENCIES
+                foo!
+                platform_specific
+
+              BUNDLED WITH
+                 #{Bundler::VERSION}
+            L
+          end
+        end
+
+        context "with an indirect platform-specific development dependency" do
+          before do
+            build_repo2 do
+              build_gem "indirect_platform_specific" do |s|
+                s.add_runtime_dependency "platform_specific"
+              end
+            end
+
+            build_lib "foo", :path => "." do |s|
+              s.add_development_dependency "indirect_platform_specific"
+            end
+
+            %w(ruby jruby).each do |platform|
+              simulate_platform(platform) do
+                install_gemfile <<-G
+                  source "file://#{gem_repo2}"
+                  gemspec
+                G
+              end
+            end
+
+            simulate_platform "ruby"
+            bundle :install
+          end
+
+          it "keeps java dependencies in the lockfile" do
+            should_be_installed "foo 1.0", "indirect_platform_specific 1.0", "platform_specific 1.0 RUBY"
+            expect(lockfile).to eq strip_whitespace(<<-L)
+              PATH
+                remote: .
+                specs:
+                  foo (1.0)
+
+              GEM
+                remote: file:#{gem_repo2}/
+                specs:
+                  indirect_platform_specific (1.0)
+                    platform_specific
+                  platform_specific (1.0)
+                  platform_specific (1.0-java)
+
+              PLATFORMS
+                java
+                ruby
+
+              DEPENDENCIES
+                foo!
+                indirect_platform_specific
+
+              BUNDLED WITH
+                 #{Bundler::VERSION}
+            L
+          end
+        end
+      end
+    end
   end
 end
