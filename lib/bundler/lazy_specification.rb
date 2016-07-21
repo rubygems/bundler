@@ -61,7 +61,11 @@ module Bundler
     end
 
     def to_s
-      @__to_s ||= "#{name} (#{version})"
+      @__to_s ||= if platform == Gem::Platform::RUBY || platform.nil?
+        "#{name} (#{version})"
+      else
+        "#{name} (#{version}-#{platform})"
+      end
     end
 
     def identifier
