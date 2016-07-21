@@ -207,8 +207,10 @@ module Bundler
     def parse_spec(line)
       if line =~ NAME_VERSION_4
         name = $1
-        version = Gem::Version.new($2)
-        platform = $3 ? Gem::Platform.new($3) : Gem::Platform::RUBY
+        version = $2
+        platform = $3
+        version = Gem::Version.new(version)
+        platform = platform ? Gem::Platform.new(platform) : Gem::Platform::RUBY
         @current_spec = LazySpecification.new(name, version, platform)
         @current_spec.source = @current_source
 
