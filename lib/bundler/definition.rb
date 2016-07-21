@@ -626,6 +626,9 @@ module Bundler
         locked_dep = locked_deps_hash[dep]
 
         if in_locked_deps?(dep, locked_dep) || satisfies_locked_spec?(dep)
+          if dep.is_a?(Source::Gemspec)
+            dep.platforms.concat(@platforms.map {|p| Dependency::REVERSE_PLATFORM_MAP[p] }.flatten(1)).uniq!
+          end
           deps << dep
         elsif dep.source.is_a?(Source::Path) && dep.current_platform? && (!locked_dep || dep.source != locked_dep.source)
           @locked_specs.each do |s|
