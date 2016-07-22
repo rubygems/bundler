@@ -521,14 +521,14 @@ module Bundler
     # Check if the specs of the given source changed
     # according to the locked source.
     def specs_changed?(source)
-      locked = @locked_sources.find(source)
+      locked = @locked_sources.find {|s| s == source }
 
-      !locked || dependencies_for_source_changed?(source) || specs_for_source_changed?(source)
+      !locked || dependencies_for_source_changed?(source, locked) || specs_for_source_changed?(source)
     end
 
-    def dependencies_for_source_changed?(source)
+    def dependencies_for_source_changed?(source, locked_source = source)
       deps_for_source = @dependencies.select {|s| s.source == source }
-      locked_deps_for_source = @locked_deps.select {|s| s.source == source }
+      locked_deps_for_source = @locked_deps.select {|s| s.source == locked_source }
 
       Set.new(deps_for_source) != Set.new(locked_deps_for_source)
     end
@@ -566,8 +566,21 @@ module Bundler
       end
     end
 
+    def converge_path_source_to_gemspec_source(source)
+      return source unless source.instance_of?(Source::Path)
+      gemspec_source = sources.path_sources.find {|s| s.is_a?(Source::Gemspec) && s.as_path_source == source }
+      gemspec_source || source
+    end
+
     def converge_sources
       changes = false
+
+      @locked_sources.map! do |source|
+        converge_path_source_to_gemspec_source(source)
+      end
+      @locked_specs.each do |spec|
+        spec.source &&= converge_path_source_to_gemspec_source(spec.source)
+      end
 
       # Get the Rubygems sources from the Gemfile.lock
       locked_gem_sources = @locked_sources.select {|s| s.is_a?(Source::Rubygems) }
@@ -613,6 +626,9 @@ module Bundler
         elsif dep.source
           dep.source = sources.get(dep.source)
         end
+        if dep.source.is_a?(Source::Gemspec)
+          dep.platforms.concat(@platforms.map {|p| Dependency::REVERSE_PLATFORM_MAP[p] }.flatten(1)).uniq!
+        end
       end
       Set.new(@dependencies) != Set.new(@locked_deps)
     end
@@ -635,9 +651,6 @@ module Bundler
         locked_dep = locked_deps_hash[dep]
 
         if in_locked_deps?(dep, locked_dep) || satisfies_locked_spec?(dep)
-          if dep.is_a?(Source::Gemspec)
-            dep.platforms.concat(@platforms.map {|p| Dependency::REVERSE_PLATFORM_MAP[p] }.flatten(1)).uniq!
-          end
           deps << dep
         elsif dep.source.is_a?(Source::Path) && dep.current_platform? && (!locked_dep || dep.source != locked_dep.source)
           @locked_specs.each do |s|
@@ -667,7 +680,7 @@ module Bundler
         # then we unlock it.
 
         # Path sources have special logic
-        if s.source.instance_of?(Source::Path)
+        if s.source.instance_of?(Source::Path) || s.source.instance_of?(Source::Gemspec)
           other = s.source.specs[s].first
 
           # If the spec is no longer in the path source, unlock it. This
