@@ -269,12 +269,19 @@ describe "bundle install from an existing gemspec" do
 
     context "bundled for ruby and jruby" do
       let(:platform_specific_type) { :runtime }
+      let(:dependency) { "platform_specific" }
       before do
+        build_repo2 do
+          build_gem "indirect_platform_specific" do |s|
+            s.add_runtime_dependency "platform_specific"
+          end
+        end
+
         build_lib "foo", :path => "." do |s|
           if platform_specific_type == :runtime
-            s.add_runtime_dependency "platform_specific"
+            s.add_runtime_dependency dependency
           elsif platform_specific_type == :development
-            s.add_development_dependency "platform_specific"
+            s.add_development_dependency dependency
           else
             raise "wrong dependency type #{platform_specific_type}, can only be :development or :runtime"
           end
@@ -283,7 +290,7 @@ describe "bundle install from an existing gemspec" do
         %w(ruby jruby).each do |platform|
           simulate_platform(platform) do
             install_gemfile <<-G
-              source "file://#{gem_repo1}"
+              source "file://#{gem_repo2}"
               gemspec
             G
           end
@@ -307,7 +314,7 @@ describe "bundle install from an existing gemspec" do
                     platform_specific
 
               GEM
-                remote: file:#{gem_repo1}/
+                remote: file:#{gem_repo2}/
                 specs:
                   platform_specific (1.0)
                   platform_specific (1.0-java)
@@ -337,7 +344,7 @@ describe "bundle install from an existing gemspec" do
                   foo (1.0)
 
               GEM
-                remote: file:#{gem_repo1}/
+                remote: file:#{gem_repo2}/
                 specs:
                   platform_specific (1.0)
                   platform_specific (1.0-java)
@@ -357,29 +364,8 @@ describe "bundle install from an existing gemspec" do
         end
 
         context "with an indirect platform-specific development dependency" do
-          before do
-            build_repo2 do
-              build_gem "indirect_platform_specific" do |s|
-                s.add_runtime_dependency "platform_specific"
-              end
-            end
-
-            build_lib "foo", :path => "." do |s|
-              s.add_development_dependency "indirect_platform_specific"
-            end
-
-            %w(ruby jruby).each do |platform|
-              simulate_platform(platform) do
-                install_gemfile <<-G
-                  source "file://#{gem_repo2}"
-                  gemspec
-                G
-              end
-            end
-
-            simulate_platform "ruby"
-            bundle :install
-          end
+          let(:platform_specific_type) { :development }
+          let(:dependency) { "indirect_platform_specific" }
 
           it "keeps java dependencies in the lockfile" do
             should_be_installed "foo 1.0", "indirect_platform_specific 1.0", "platform_specific 1.0 RUBY"
