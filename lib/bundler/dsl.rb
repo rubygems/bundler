@@ -74,7 +74,7 @@ module Bundler
 
         group(development_group) do
           spec.development_dependencies.each do |dep|
-            gem dep.name, *(dep.requirement.as_list + [:type => :development, :platforms => gem_platforms])
+            gem dep.name, *(dep.requirement.as_list + [:type => :development])
           end
         end
       when 0
