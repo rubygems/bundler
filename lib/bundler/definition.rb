@@ -7,7 +7,15 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps, :gem_version_promoter, :requires
+    attr_reader(
+      :dependencies,
+      :gem_version_promoter,
+      :locked_deps,
+      :locked_gems,
+      :platforms,
+      :requires,
+      :ruby_version
+    )
 
     # Given a gemfile and lockfile creates a Bundler definition
     #
@@ -60,15 +68,15 @@ module Bundler
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
-        locked = LockfileParser.new(@lockfile_contents)
-        @platforms = locked.platforms
-        @locked_bundler_version = locked.bundler_version
-        @locked_ruby_version = locked.ruby_version
+        @locked_gems = LockfileParser.new(@lockfile_contents)
+        @platforms = @locked_gems.platforms
+        @locked_bundler_version = @locked_gems.bundler_version
+        @locked_ruby_version = @locked_gems.ruby_version
 
         if unlock != true
-          @locked_deps    = locked.dependencies
-          @locked_specs   = SpecSet.new(locked.specs)
-          @locked_sources = locked.sources
+          @locked_deps    = @locked_gems.dependencies
+          @locked_specs   = SpecSet.new(@locked_gems.specs)
+          @locked_sources = @locked_gems.sources
         else
           @unlock         = {}
           @locked_deps    = []
@@ -78,6 +86,7 @@ module Bundler
       else
         @unlock         = {}
         @platforms      = []
+        @locked_gems    = nil
         @locked_deps    = []
         @locked_specs   = SpecSet.new([])
         @locked_sources = []
