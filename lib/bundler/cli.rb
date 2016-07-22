@@ -495,10 +495,12 @@ module Bundler
         else
           args
         end
-      elsif command.nil?
-        abort("Could not find command \"#{args.join(" ")}\".")
-      else
+      elsif help_used
+        args = args.dup
+        args.delete_at(help_used)
         ["help", command || args].flatten.compact
+      else
+        args
       end
     end
 
