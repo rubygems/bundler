@@ -67,7 +67,7 @@ describe "bundle install from an existing gemspec" do
 
   it "should raise if there are too many gemspecs available" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
-      s.write("foo2.gemspec", "")
+      s.write("foo2.gemspec", build_spec("foo", "4.0").first.to_ruby)
     end
 
     error = install_gemfile(<<-G, :expect_err => true)
@@ -196,7 +196,17 @@ describe "bundle install from an existing gemspec" do
       before do
         build_lib("foo", :path => tmp.join("foo")) do |s|
           s.add_dependency "rack", "=1.0.0"
-          s.platform = platform if explicit_platform
+        end
+
+        if explicit_platform
+          create_file(
+            tmp.join("foo", "foo-#{platform}.gemspec"),
+            build_spec("foo", "1.0", platform) do
+              dep "rack", "=1.0.0"
+              @spec.authors = "authors"
+              @spec.summary = "summary"
+            end.first.to_ruby
+          )
         end
 
         gemfile <<-G
