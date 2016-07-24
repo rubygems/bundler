@@ -373,12 +373,14 @@ module Spec
       end
       return unless block_given?
       @_build_path = "#{path}/gems"
+      @_build_repo = File.basename(path)
       yield
       with_gem_path_as Path.base_system_gems do
         Dir.chdir(path) { gem_command :generate_index }
       end
     ensure
       @_build_path = nil
+      @_build_repo = nil
     end
 
     def build_index(&block)
@@ -435,6 +437,7 @@ module Spec
       spec     = nil
 
       options[:path] ||= @_build_path
+      options[:source] ||= @_build_repo
 
       Array(versions).each do |version|
         spec = builder.new(self, name, version)
@@ -584,7 +587,12 @@ module Spec
           @files["#{name}.gemspec"] = @spec.to_ruby
         end
 
-        @files = _default_files.merge(@files) unless options[:no_default]
+        unless options[:no_default]
+          gem_source = options[:source] || "path@#{path}"
+          @files = _default_files.
+                   merge("lib/#{name}/source.rb" => "#{Builders.constantize(name)}_SOURCE = #{gem_source.to_s.dump}").
+                   merge(@files)
+        end
 
         @spec.authors = ["no one"]
 
@@ -609,7 +617,8 @@ module Spec
     class GitBuilder < LibBuilder
       def _build(options)
         path = options[:path] || _default_path
-        super(options.merge(:path => path))
+        source = options[:source] || "git@#{path}"
+        super(options.merge(:path => path, :source => source))
         Dir.chdir(path) do
           `git init`
           `git add *`
