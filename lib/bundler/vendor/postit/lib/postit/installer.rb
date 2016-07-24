@@ -19,6 +19,7 @@ module BundlerVendoredPostIt::PostIt
 
     def install!
       return if installed?
+      puts "Installing locked Bundler version #{@bundler_version}"
       require 'rubygems/dependency_installer'
       installer = Gem::DependencyInstaller.new
       installer.install('bundler', @bundler_version)
