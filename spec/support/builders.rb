@@ -393,6 +393,8 @@ module Spec
           s.name     = name
           s.version  = Gem::Version.new(v)
           s.platform = platform
+          s.authors  = ["no one in particular"]
+          s.summary  = "a gemspec used only for testing"
           DepBuilder.run(s, &block) if block_given?
         end
       end

@@ -241,7 +241,7 @@ describe "bundle install with explicit source paths" do
 
   it "raises if there are multiple gemspecs" do
     build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-      s.write "bar.gemspec"
+      s.write "bar.gemspec", build_spec("bar", "1.0").first.to_ruby
     end
 
     install_gemfile <<-G

@@ -127,7 +127,7 @@ describe "bundle package" do
           source "file://#{gem_repo1}"
           gem 'rack'
           gemspec :name => 'mygem'
-          gemspec :name => 'mygem_client'
+          gemspec :name => 'mygem_test'
         D
 
         bundle! "package --all"
