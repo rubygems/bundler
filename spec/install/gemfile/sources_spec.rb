@@ -35,7 +35,7 @@ describe "bundle install with gems on multiple sources" do
         expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
         expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
         expect(out).to include("Installed from: file:#{gem_repo1}")
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
+        should_be_installed("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
       end
 
       it "errors when disable_multisource is set" do
@@ -65,7 +65,7 @@ describe "bundle install with gems on multiple sources" do
         expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
         expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
         expect(out).to include("Installed from: file:#{gem_repo1}")
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
+        should_be_installed("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
       end
     end
   end
@@ -94,7 +94,8 @@ describe "bundle install with gems on multiple sources" do
       it "installs the gems without any warning" do
         bundle :install
         expect(out).not_to include("Warning")
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
+        should_be_installed("rack-obama 1.0.0")
+        should_be_installed("rack 1.0.0", :source => "remote1")
       end
 
       it "can cache and deploy" do
