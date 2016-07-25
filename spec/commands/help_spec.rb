@@ -83,6 +83,18 @@ describe "bundle help" do
     with_fake_man do
       bundle "instill -h", :expect_err => true
     end
-    expect(err).to include('Could not find command "instill -h --no-color".')
+    expect(out).to include('Could not find command "instill".')
+  end
+
+  it "is called when only using the --help flag" do
+    with_fake_man do
+      bundle "--help"
+    end
+    expect(out).to eq(%(["#{root}/lib/bundler/man/bundle"]))
+
+    with_fake_man do
+      bundle "-h"
+    end
+    expect(out).to eq(%(["#{root}/lib/bundler/man/bundle"]))
   end
 end
