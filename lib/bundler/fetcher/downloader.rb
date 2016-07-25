@@ -14,7 +14,7 @@ module Bundler
         raise HTTPError, "Too many redirects" if counter >= redirect_limit
 
         response = request(uri, options)
-        Bundler.ui.debug("HTTP #{response.code} #{response.message}")
+        Bundler.ui.debug("HTTP #{response.code} #{response.message} #{uri}")
 
         case response
         when Net::HTTPSuccess, Net::HTTPNotModified
