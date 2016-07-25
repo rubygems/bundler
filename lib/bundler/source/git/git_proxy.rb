@@ -80,7 +80,7 @@ module Bundler
         end
 
         def version
-          git("--version").sub("git version", "").strip
+          git("--version").match(/(git version\s*)?((\.?\d+)+).*/)[2]
         end
 
         def checkout

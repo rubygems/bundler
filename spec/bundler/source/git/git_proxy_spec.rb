@@ -32,4 +32,51 @@ describe Bundler::Source::Git::GitProxy do
       subject.checkout
     end
   end
+
+  describe "#version" do
+    context "with a normal version number" do
+      before do
+        expect(subject).to receive(:git).with("--version").
+          and_return("git version 1.2.3")
+      end
+
+      it "returns the git version number" do
+        expect(subject.version).to eq("1.2.3")
+      end
+
+      it "does not raise an error when passed into Gem::Version.create" do
+        expect { Gem::Version.create subject.version }.not_to raise_error
+      end
+    end
+
+    context "with a OSX version number" do
+      before do
+        expect(subject).to receive(:git).with("--version").
+          and_return("git version 1.2.3 (Apple Git-BS)")
+      end
+
+      it "strips out OSX specific additions in the version string" do
+        expect(subject.version).to eq("1.2.3")
+      end
+
+      it "does not raise an error when passed into Gem::Version.create" do
+        expect { Gem::Version.create subject.version }.not_to raise_error
+      end
+    end
+
+    context "with a msysgit version number" do
+      before do
+        expect(subject).to receive(:git).with("--version").
+          and_return("git version 1.2.3.msysgit.0")
+      end
+
+      it "strips out msysgit specific additions in the version string" do
+        expect(subject.version).to eq("1.2.3")
+      end
+
+      it "does not raise an error when passed into Gem::Version.create" do
+        expect { Gem::Version.create subject.version }.not_to raise_error
+      end
+    end
+  end
 end
