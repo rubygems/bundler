@@ -202,8 +202,8 @@ It is a security vulnerability to allow your home directory to be world-writable
 You should probably consider fixing this issue by running `chmod o-w ~` on *nix.
 Please refer to http://ruby-doc.org/stdlib-2.1.2/libdoc/fileutils/rdoc/FileUtils.html#method-c-remove_entry_secure for details.
 EOF
-      Bundler.ui.warn(message) if File.expand_path(path).world_writable?
-      raise
+      File.world_writable?(path) ? Bundler.ui.warn(message) : raise
+      raise PathError, "Please fix the world-writable issue with your #{path} directory"
     end
 
     def settings
