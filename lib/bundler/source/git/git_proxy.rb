@@ -83,6 +83,10 @@ module Bundler
           git("--version").match(/(git version\s*)?((\.?\d+)+).*/)[2]
         end
 
+        def full_version
+          git("--version").sub("git version", "").strip
+        end
+
         def checkout
           if path.exist?
             return if has_revision_cached?

@@ -79,4 +79,39 @@ describe Bundler::Source::Git::GitProxy do
       end
     end
   end
+
+  describe "#full_version" do
+    context "with a normal version number" do
+      before do
+        expect(subject).to receive(:git).with("--version").
+          and_return("git version 1.2.3")
+      end
+
+      it "returns the git version number" do
+        expect(subject.full_version).to eq("1.2.3")
+      end
+    end
+
+    context "with a OSX version number" do
+      before do
+        expect(subject).to receive(:git).with("--version").
+          and_return("git version 1.2.3 (Apple Git-BS)")
+      end
+
+      it "does not strip out OSX specific additions in the version string" do
+        expect(subject.full_version).to eq("1.2.3 (Apple Git-BS)")
+      end
+    end
+
+    context "with a msysgit version number" do
+      before do
+        expect(subject).to receive(:git).with("--version").
+          and_return("git version 1.2.3.msysgit.0")
+      end
+
+      it "does not strip out msysgit specific additions in the version string" do
+        expect(subject.full_version).to eq("1.2.3.msysgit.0")
+      end
+    end
+  end
 end
