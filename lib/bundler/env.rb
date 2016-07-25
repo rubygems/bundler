@@ -75,7 +75,7 @@ module Bundler
     end
 
     def git_version
-      Bundler::Source::Git::GitProxy.new(nil, nil, nil).version
+      Bundler::Source::Git::GitProxy.new(nil, nil, nil).full_version
     rescue Bundler::Source::Git::GitNotInstalledError
       "not installed"
     end
