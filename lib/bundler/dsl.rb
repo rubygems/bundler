@@ -58,7 +58,7 @@ module Bundler
       expanded_path     = gemfile_root.join(path)
 
       gemspecs = Dir[File.join(expanded_path, "{,*}.gemspec")].map {|g| Bundler.load_gemspec(g) }.compact
-      gemspecs.select! {|s| s.name == name } if name
+      gemspecs.reject! {|s| s.name != name } if name
       Index.sort_specs(gemspecs)
       specs_by_name_and_version = gemspecs.group_by {|s| [s.name, s.version] }
 
