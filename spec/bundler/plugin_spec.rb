@@ -274,5 +274,19 @@ describe Bundler::Plugin do
         expect(out).to eq("loaded")
       end
     end
+
+    context "a block is to be passed" do
+      let(:code) { <<-RUBY }
+        Bundler::Plugin::API.hook("#{event}") { |&blk| blk.call }
+      RUBY
+
+      it "is passed to the hook" do
+        out = capture(:stdout) do
+          Plugin.hook("event-1") { puts "win" }
+        end.strip
+
+        expect(out).to eq("win")
+      end
+    end
   end
 end

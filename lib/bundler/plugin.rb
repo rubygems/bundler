@@ -149,13 +149,13 @@ module Bundler
       @hooks_by_event[event.to_s] << block
     end
 
-    def hook(event, *args)
+    def hook(event, *args, &arg_blk)
       plugins = index.hook_plugins(event)
-      return unless plugins
+      return unless plugins.any?
 
       (plugins - @loaded_plugin_names).each {|name| load_plugin(name) }
 
-      @hooks_by_event[event].each {|blk| blk.call(*args) }
+      @hooks_by_event[event].each {|blk| blk.call(*args, &arg_blk) }
     end
 
     # currently only intended for specs
