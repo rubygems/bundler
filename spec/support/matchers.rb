@@ -1,6 +1,54 @@
 # frozen_string_literal: true
+require "forwardable"
 module Spec
   module Matchers
+    extend RSpec::Matchers
+
+    class Precondition
+      include RSpec::Matchers::Composable
+      extend Forwardable
+      def_delegators :failing_matcher,
+        :failure_message,
+        :actual,
+        :description,
+        :diffable?,
+        :does_not_match?,
+        :expected,
+        :failure_message_when_negated
+
+      def initialize(matcher, preconditions)
+        @matcher = with_matchers_cloned(matcher)
+        @preconditions = with_matchers_cloned(preconditions)
+      end
+
+      def matches?(target, &blk)
+        @failure_index = @preconditions.index {|pc| !pc.matches?(target, &blk) }
+        !@failure_index && @matcher.matches?(target, &blk)
+      end
+
+      def expects_call_stack_jump?
+        @matcher.expects_call_stack_jump? || @preconditions.any?(&:expects_call_stack_jump)
+      end
+
+      def supports_block_expectations?
+        @matcher.supports_block_expectations? || @preconditions.any?(&:supports_block_expectations)
+      end
+
+      def failing_matcher
+        @failure_index ? @preconditions[@failure_index] : @matcher
+      end
+    end
+
+    def self.define_compound_matcher(matcher, preconditions, &declarations)
+      raise "Must have preconditions to define a compound matcher" if preconditions.empty?
+      define_method(matcher) do |*expected, &block_arg|
+        Precondition.new(
+          RSpec::Matchers::DSL::Matcher.new(matcher, declarations, self, *expected, &block_arg),
+          preconditions
+        )
+      end
+    end
+
     MAJOR_DEPRECATION = /^\[DEPRECATED FOR 2\.0\]\s*/
 
     RSpec::Matchers.define :lack_errors do
@@ -50,13 +98,11 @@ module Spec
       end
     end
 
-    RSpec::Matchers.define :read_as do |file_contents|
+    define_compound_matcher :read_as, [exist] do |file_contents|
       diffable
       match do |actual|
-        if File.file?(actual)
-          @actual = Bundler.read_file(actual)
-          @actual == file_contents
-        end
+        @actual = Bundler.read_file(actual)
+        values_match?(file_contents, @actual)
       end
     end
 
@@ -110,16 +156,15 @@ module Spec
 
     def plugin_should_be_installed(*names)
       names.each do |name|
+        expect(Bundler::Plugin).to be_installed(name)
         path = Bundler::Plugin.installed?(name)
-        expect(path).to be_truthy
-        expect(Pathname.new(path).join("plugins.rb")).to exist
+        expect(File.join(path, "plugins.rb")).to exist
       end
     end
 
     def plugin_should_not_be_installed(*names)
       names.each do |name|
-        path = Bundler::Plugin.installed?(name)
-        expect(path).to be_falsey
+        expect(Bundler::Plugin).not_to be_installed(name)
       end
     end
 
@@ -128,7 +173,6 @@ module Spec
     end
 
     def lockfile_should_be(expected)
-      should_be_locked
       expect(bundled_app("Gemfile.lock")).to read_as(strip_whitespace(expected))
     end
   end
