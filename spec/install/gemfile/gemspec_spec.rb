@@ -67,7 +67,7 @@ describe "bundle install from an existing gemspec" do
 
   it "should raise if there are too many gemspecs available" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
-      s.write("foo2.gemspec", "")
+      s.write("foo2.gemspec", build_spec("foo", "4.0").first.to_ruby)
     end
 
     error = install_gemfile(<<-G, :expect_err => true)
@@ -196,7 +196,17 @@ describe "bundle install from an existing gemspec" do
       before do
         build_lib("foo", :path => tmp.join("foo")) do |s|
           s.add_dependency "rack", "=1.0.0"
-          s.platform = platform if explicit_platform
+        end
+
+        if explicit_platform
+          create_file(
+            tmp.join("foo", "foo-#{platform}.gemspec"),
+            build_spec("foo", "1.0", platform) do
+              dep "rack", "=1.0.0"
+              @spec.authors = "authors"
+              @spec.summary = "summary"
+            end.first.to_ruby
+          )
         end
 
         gemfile <<-G
@@ -262,6 +272,138 @@ describe "bundle install from an existing gemspec" do
             results = bundle "install", :artifice => "endpoint"
             expect(results).to include("Installing rack 1.0.0")
             should_be_installed "rack 1.0.0"
+          end
+        end
+      end
+    end
+
+    context "bundled for ruby and jruby" do
+      let(:platform_specific_type) { :runtime }
+      let(:dependency) { "platform_specific" }
+      before do
+        build_repo2 do
+          build_gem "indirect_platform_specific" do |s|
+            s.add_runtime_dependency "platform_specific"
+          end
+        end
+
+        build_lib "foo", :path => "." do |s|
+          if platform_specific_type == :runtime
+            s.add_runtime_dependency dependency
+          elsif platform_specific_type == :development
+            s.add_development_dependency dependency
+          else
+            raise "wrong dependency type #{platform_specific_type}, can only be :development or :runtime"
+          end
+        end
+
+        %w(ruby jruby).each do |platform|
+          simulate_platform(platform) do
+            install_gemfile <<-G
+              source "file://#{gem_repo2}"
+              gemspec
+            G
+          end
+        end
+      end
+
+      context "on ruby" do
+        before do
+          simulate_platform("ruby")
+          bundle :install
+        end
+
+        context "as a runtime dependency" do
+          it "keeps java dependencies in the lockfile" do
+            should_be_installed "foo 1.0", "platform_specific 1.0 RUBY"
+            expect(lockfile).to eq strip_whitespace(<<-L)
+              PATH
+                remote: .
+                specs:
+                  foo (1.0)
+                    platform_specific
+
+              GEM
+                remote: file:#{gem_repo2}/
+                specs:
+                  platform_specific (1.0)
+                  platform_specific (1.0-java)
+
+              PLATFORMS
+                java
+                ruby
+
+              DEPENDENCIES
+                foo!
+
+              BUNDLED WITH
+                 #{Bundler::VERSION}
+            L
+          end
+        end
+
+        context "as a development dependency" do
+          let(:platform_specific_type) { :development }
+
+          it "keeps java dependencies in the lockfile" do
+            should_be_installed "foo 1.0", "platform_specific 1.0 RUBY"
+            expect(lockfile).to eq strip_whitespace(<<-L)
+              PATH
+                remote: .
+                specs:
+                  foo (1.0)
+
+              GEM
+                remote: file:#{gem_repo2}/
+                specs:
+                  platform_specific (1.0)
+                  platform_specific (1.0-java)
+
+              PLATFORMS
+                java
+                ruby
+
+              DEPENDENCIES
+                foo!
+                platform_specific
+
+              BUNDLED WITH
+                 #{Bundler::VERSION}
+            L
+          end
+        end
+
+        context "with an indirect platform-specific development dependency" do
+          let(:platform_specific_type) { :development }
+          let(:dependency) { "indirect_platform_specific" }
+
+          it "keeps java dependencies in the lockfile" do
+            should_be_installed "foo 1.0", "indirect_platform_specific 1.0", "platform_specific 1.0 RUBY"
+            expect(lockfile).to eq strip_whitespace(<<-L)
+              PATH
+                remote: .
+                specs:
+                  foo (1.0)
+
+              GEM
+                remote: file:#{gem_repo2}/
+                specs:
+                  indirect_platform_specific (1.0)
+                    platform_specific
+                  platform_specific (1.0)
+                  platform_specific (1.0-java)
+
+              PLATFORMS
+                java
+                ruby
+
+              DEPENDENCIES
+                foo!
+                indirect_platform_specific
+
+              BUNDLED WITH
+                 #{Bundler::VERSION}
+            L
           end
         end
       end

@@ -11,7 +11,7 @@ module Bundler
       DEFAULT_GLOB = "{,*,*/*}.gemspec".freeze
 
       def initialize(options)
-        @options = options
+        @options = options.dup
         @glob = options["glob"] || DEFAULT_GLOB
 
         @allow_cached = false
@@ -60,7 +60,7 @@ module Bundler
       end
 
       def eql?(other)
-        return unless other.class == Path || other.class == Gemspec
+        return unless other.class == self.class
         expanded_path == expand(other.path) &&
           version == other.version
       end

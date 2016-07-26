@@ -7,7 +7,15 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps, :gem_version_promoter, :requires
+    attr_reader(
+      :dependencies,
+      :gem_version_promoter,
+      :locked_deps,
+      :locked_gems,
+      :platforms,
+      :requires,
+      :ruby_version
+    )
 
     # Given a gemfile and lockfile creates a Bundler definition
     #
@@ -60,15 +68,15 @@ module Bundler
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
-        locked = LockfileParser.new(@lockfile_contents)
-        @platforms = locked.platforms
-        @locked_bundler_version = locked.bundler_version
-        @locked_ruby_version = locked.ruby_version
+        @locked_gems = LockfileParser.new(@lockfile_contents)
+        @platforms = @locked_gems.platforms
+        @locked_bundler_version = @locked_gems.bundler_version
+        @locked_ruby_version = @locked_gems.ruby_version
 
         if unlock != true
-          @locked_deps    = locked.dependencies
-          @locked_specs   = SpecSet.new(locked.specs)
-          @locked_sources = locked.sources
+          @locked_deps    = @locked_gems.dependencies
+          @locked_specs   = SpecSet.new(@locked_gems.specs)
+          @locked_sources = @locked_gems.sources
         else
           @unlock         = {}
           @locked_deps    = []
@@ -78,6 +86,7 @@ module Bundler
       else
         @unlock         = {}
         @platforms      = []
+        @locked_gems    = nil
         @locked_deps    = []
         @locked_specs   = SpecSet.new([])
         @locked_sources = []
@@ -512,14 +521,14 @@ module Bundler
     # Check if the specs of the given source changed
     # according to the locked source.
     def specs_changed?(source)
-      locked = @locked_sources.find(source)
+      locked = @locked_sources.find {|s| s == source }
 
-      !locked || dependencies_for_source_changed?(source) || specs_for_source_changed?(source)
+      !locked || dependencies_for_source_changed?(source, locked) || specs_for_source_changed?(source)
     end
 
-    def dependencies_for_source_changed?(source)
+    def dependencies_for_source_changed?(source, locked_source = source)
       deps_for_source = @dependencies.select {|s| s.source == source }
-      locked_deps_for_source = @locked_deps.select {|s| s.source == source }
+      locked_deps_for_source = @locked_deps.select {|s| s.source == locked_source }
 
       Set.new(deps_for_source) != Set.new(locked_deps_for_source)
     end
@@ -557,8 +566,21 @@ module Bundler
       end
     end
 
+    def converge_path_source_to_gemspec_source(source)
+      return source unless source.instance_of?(Source::Path)
+      gemspec_source = sources.path_sources.find {|s| s.is_a?(Source::Gemspec) && s.as_path_source == source }
+      gemspec_source || source
+    end
+
     def converge_sources
       changes = false
+
+      @locked_sources.map! do |source|
+        converge_path_source_to_gemspec_source(source)
+      end
+      @locked_specs.each do |spec|
+        spec.source &&= converge_path_source_to_gemspec_source(spec.source)
+      end
 
       # Get the Rubygems sources from the Gemfile.lock
       locked_gem_sources = @locked_sources.select {|s| s.is_a?(Source::Rubygems) }
@@ -603,6 +625,9 @@ module Bundler
           dep.source = locked_source.source
         elsif dep.source
           dep.source = sources.get(dep.source)
+        end
+        if dep.source.is_a?(Source::Gemspec)
+          dep.platforms.concat(@platforms.map {|p| Dependency::REVERSE_PLATFORM_MAP[p] }.flatten(1)).uniq!
         end
       end
       Set.new(@dependencies) != Set.new(@locked_deps)
@@ -655,7 +680,7 @@ module Bundler
         # then we unlock it.
 
         # Path sources have special logic
-        if s.source.instance_of?(Source::Path)
+        if s.source.instance_of?(Source::Path) || s.source.instance_of?(Source::Gemspec)
           other = s.source.specs[s].first
 
           # If the spec is no longer in the path source, unlock it. This

@@ -50,22 +50,22 @@ module Bundler
     end
 
     def gemspec(opts = nil)
-      path              = opts && opts[:path] || "."
-      glob              = opts && opts[:glob]
-      name              = opts && opts[:name] || "{,*}"
-      development_group = opts && opts[:development_group] || :development
+      opts ||= {}
+      path              = opts[:path] || "."
+      glob              = opts[:glob]
+      name              = opts[:name]
+      development_group = opts[:development_group] || :development
       expanded_path     = gemfile_root.join(path)
 
-      gemspecs = Dir[File.join(expanded_path, "#{name}.gemspec")]
+      gemspecs = Dir[File.join(expanded_path, "{,*}.gemspec")].map {|g| Bundler.load_gemspec(g) }.compact
+      gemspecs.reject! {|s| s.name != name } if name
+      Index.sort_specs(gemspecs)
+      specs_by_name_and_version = gemspecs.group_by {|s| [s.name, s.version] }
 
-      case gemspecs.size
+      case specs_by_name_and_version.size
       when 1
-        spec = Bundler.load_gemspec(gemspecs.first)
-
-        unless spec
-          raise InvalidOption, "There was an error loading the gemspec at " \
-            "#{file}. Make sure you can build the gem, then try again"
-        end
+        specs = specs_by_name_and_version.values.first
+        spec = specs.find {|s| s.match_platform(Gem::Platform.local) } || specs.first
 
         @gemspecs << spec
 
@@ -74,7 +74,7 @@ module Bundler
 
         group(development_group) do
           spec.development_dependencies.each do |dep|
-            gem dep.name, *(dep.requirement.as_list + [:type => :development, :platforms => gem_platforms])
+            gem dep.name, *(dep.requirement.as_list + [:type => :development])
           end
         end
       when 0

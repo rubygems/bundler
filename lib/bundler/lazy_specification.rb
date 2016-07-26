@@ -5,6 +5,8 @@ require "bundler/match_platform"
 
 module Bundler
   class LazySpecification
+    Identifier = Struct.new(:name, :version, :source, :platform, :dependencies)
+
     include MatchPlatform
 
     attr_reader :name, :version, :dependencies, :platform
@@ -61,11 +63,15 @@ module Bundler
     end
 
     def to_s
-      @__to_s ||= "#{name} (#{version})"
+      @__to_s ||= if platform == Gem::Platform::RUBY || platform.nil?
+        "#{name} (#{version})"
+      else
+        "#{name} (#{version}-#{platform})"
+      end
     end
 
     def identifier
-      @__identifier ||= [name, version, source, platform, dependencies].hash
+      @__identifier ||= Identifier.new(name, version, source, platform, dependencies)
     end
 
   private
