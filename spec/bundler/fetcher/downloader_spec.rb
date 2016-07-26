@@ -31,7 +31,7 @@ describe Bundler::Fetcher::Downloader do
       let(:http_response) { Net::HTTPSuccess.new("1.1", 200, "Success") }
 
       it "should log the HTTP response code and message to debug" do
-        expect(Bundler).to receive_message_chain(:ui, :debug).with("HTTP 200 Success")
+        expect(Bundler).to receive_message_chain(:ui, :debug).with("HTTP 200 Success #{uri}")
         subject.fetch(uri, options, counter)
       end
     end
