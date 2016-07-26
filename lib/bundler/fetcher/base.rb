@@ -36,6 +36,16 @@ module Bundler
       def api_fetcher?
         false
       end
+
+    private
+
+      def log_specs(debug_msg)
+        if Bundler.ui.debug?
+          Bundler.ui.debug debug_msg
+        else
+          Bundler.ui.info ".", false
+        end
+      end
     end
   end
 end
