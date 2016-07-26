@@ -16,7 +16,6 @@ module Spec
       Bundler.reset!
       Bundler.ui = nil
       Bundler.ui # force it to initialize
-      Plugin.reset!
     end
 
     def self.bang(method)
