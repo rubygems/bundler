@@ -20,6 +20,7 @@ module Bundler
     # For more information see the #run method on this class.
     def self.install(root, definition, options = {})
       installer = new(root, definition)
+      Plugin.hook("before-install-all", definition.dependencies)
       installer.run(options)
       installer
     end

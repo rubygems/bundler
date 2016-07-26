@@ -405,7 +405,6 @@ EOF
       rubygems.undo_replacements
       rubygems.reset
       @rubygems = nil
-      Plugin.reset!
     end
 
   private

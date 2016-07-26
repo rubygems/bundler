@@ -122,7 +122,7 @@ describe Bundler::Plugin::Index do
       end
 
       it "the hook" do
-        expect(index.hook_plugins("xhoook")).to be_falsy
+        expect(index.hook_plugins("xhoook")).to be_empty
       end
     end
 

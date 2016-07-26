@@ -19,10 +19,10 @@ describe "hook plugins" do
   it "runs after a rubygem is installed" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-      gem "yaml_spec"
       gem "rake"
+      gem "rack"
     G
 
-    expect(out).to include "gems to be installed yaml_spec, rake"
+    expect(out).to include "gems to be installed rake, rack"
   end
 end

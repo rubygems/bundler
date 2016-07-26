@@ -24,7 +24,7 @@ module Bundler
         @plugin_paths = {}
         @commands = {}
         @sources = {}
-        @hooks = {}
+        @hooks = Hash.new {|h, k| h[k] = [] }
         @load_paths = {}
 
         load_index(global_index_file, true)
@@ -51,7 +51,7 @@ module Bundler
         raise SourceConflict.new(name, common) unless common.empty?
         sources.each {|k| @sources[k] = name }
 
-        hooks.each {|e| (@hooks[e] ||= []) << name }
+        hooks.each {|e| @hooks[e] << name }
 
         @plugin_paths[name] = path
         @load_paths[name] = load_paths
@@ -119,14 +119,15 @@ module Bundler
           break unless valid_file
 
           data = index_f.read
+
           require "bundler/yaml_serializer"
           index = YAMLSerializer.load(data)
 
-          @plugin_paths.merge!(index["plugin_paths"])
-          @load_paths.merge!(index["load_paths"])
           @commands.merge!(index["commands"])
-          @sources.merge!(index["sources"]) unless global
           @hooks.merge!(index["hooks"])
+          @load_paths.merge!(index["load_paths"])
+          @plugin_paths.merge!(index["plugin_paths"])
+          @sources.merge!(index["sources"]) unless global
         end
       end
 
@@ -135,11 +136,11 @@ module Bundler
       # to be only String key value pairs)
       def save_index
         index = {
-          "plugin_paths" => @plugin_paths,
-          "load_paths"   => @load_paths,
           "commands"     => @commands,
-          "sources"      => @sources,
           "hooks"        => @hooks,
+          "load_paths"   => @load_paths,
+          "plugin_paths" => @plugin_paths,
+          "sources"      => @sources,
         }
 
         require "bundler/yaml_serializer"

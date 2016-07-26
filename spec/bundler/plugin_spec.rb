@@ -249,7 +249,7 @@ describe Bundler::Plugin do
     let(:event) { "event-1" }
 
     it "executes the hook" do
-      out = capture_output do
+      out = capture(:stdout) do
         Plugin.hook("event-1")
       end.strip
 
@@ -266,7 +266,7 @@ describe Bundler::Plugin do
       let(:event) { /event-1|event-2/ }
 
       it "evals plugins.rb once" do
-        out = capture_output do
+        out = capture(:stdout) do
           Plugin.hook("event-1")
           Plugin.hook("event-2")
         end.strip
