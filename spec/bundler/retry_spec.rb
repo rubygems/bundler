@@ -46,4 +46,37 @@ describe Bundler::Retry do
     end.to raise_error(error)
     expect(attempts).to eq(1)
   end
+
+  context "logging" do
+    let(:error)           { Bundler::GemfileNotFound }
+    let(:failure_message) { "Retrying test due to error (2/2): #{error} #{error}" }
+
+    context "with debugging on" do
+      it "print error message with newline" do
+        allow(Bundler.ui).to receive(:debug?).and_return(true)
+        expect(Bundler.ui).to_not receive(:info)
+        expect(Bundler.ui).to receive(:warn).with(failure_message, true)
+
+        expect do
+          Bundler::Retry.new("test", [], 1).attempt do
+            raise error
+          end
+        end.to raise_error(error)
+      end
+    end
+
+    context "with debugging on" do
+      it "print error message with newlines" do
+        allow(Bundler.ui).to  receive(:debug?).and_return(false)
+        expect(Bundler.ui).to receive(:info).with("")
+        expect(Bundler.ui).to receive(:warn).with(failure_message, false)
+
+        expect do
+          Bundler::Retry.new("test", [], 1).attempt do
+            raise error
+          end
+        end.to raise_error(error)
+      end
+    end
+  end
 end
