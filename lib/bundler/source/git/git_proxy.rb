@@ -80,6 +80,10 @@ module Bundler
         end
 
         def version
+          git("--version").match(/(git version\s*)?((\.?\d+)+).*/)[2]
+        end
+
+        def full_version
           git("--version").sub("git version", "").strip
         end
 

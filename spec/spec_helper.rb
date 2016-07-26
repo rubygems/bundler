@@ -74,9 +74,11 @@ RSpec.configure do |config|
     config.filter_run_excluding :realworld => true
   end
 
+  git_version = Bundler::Source::Git::GitProxy.new(nil, nil, nil).version
+
   config.filter_run_excluding :ruby => LessThanProc.with(RUBY_VERSION)
   config.filter_run_excluding :rubygems => LessThanProc.with(Gem::VERSION)
-  config.filter_run_excluding :git => LessThanProc.with(`git --version`.gsub("git version", "").strip)
+  config.filter_run_excluding :git => LessThanProc.with(git_version)
   config.filter_run_excluding :rubygems_master => (ENV["RGV"] != "master")
 
   config.filter_run :focused => true unless ENV["CI"]
