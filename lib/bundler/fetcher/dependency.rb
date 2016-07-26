@@ -23,7 +23,7 @@ module Bundler
       def specs(gem_names, full_dependency_list = [], last_spec_list = [])
         query_list = gem_names.uniq - full_dependency_list
 
-        log_specs(query_list)
+        log_specs "Query List: #{query_list.inspect}"
 
         return last_spec_list if query_list.empty?
 
@@ -75,17 +75,6 @@ module Bundler
         uri = fetch_uri + "api/v1/dependencies"
         uri.query = "gems=#{CGI.escape(gem_names.join(","))}" if gem_names.any?
         uri
-      end
-
-    private
-
-      def log_specs(query_list)
-        # only display the message on the first run
-        if Bundler.ui.debug?
-          Bundler.ui.debug "Query List: #{query_list.inspect}"
-        else
-          Bundler.ui.info ".", false
-        end
       end
     end
   end
