@@ -50,6 +50,16 @@ module Spec
       end
     end
 
+    RSpec::Matchers.define :read_as do |file_contents|
+      diffable
+      match do |actual|
+        if File.file?(actual)
+          @actual = Bundler.read_file(actual)
+          @actual == file_contents
+        end
+      end
+    end
+
     def should_be_installed(*names)
       opts = names.last.is_a?(Hash) ? names.pop : {}
       source = opts.delete(:source)
@@ -119,9 +129,7 @@ module Spec
 
     def lockfile_should_be(expected)
       should_be_locked
-      spaces = expected[/\A\s+/, 0] || ""
-      expected = expected.gsub(/^#{spaces}/, "")
-      expect(bundled_app("Gemfile.lock").read).to eq(expected)
+      expect(bundled_app("Gemfile.lock")).to read_as(strip_whitespace(expected))
     end
   end
 end
