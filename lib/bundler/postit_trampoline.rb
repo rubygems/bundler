@@ -21,7 +21,7 @@ if ENV["BUNDLE_ENABLE_TRAMPOLINE"]
     begin
       installer = BundlerVendoredPostIt::PostIt::Installer.new(version)
       unless installer.installed?
-        warn "Installing locked Bundler version #{version}" 
+        warn "Installing locked Bundler version #{version}"
         installer.install!
       end
     rescue => e
