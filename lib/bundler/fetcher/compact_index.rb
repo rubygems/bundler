@@ -36,7 +36,7 @@ module Bundler
         remaining_gems = gem_names.dup
 
         until remaining_gems.empty?
-          Bundler.ui.debug "Looking up gems #{remaining_gems.inspect}"
+          log_specs "Looking up gems #{remaining_gems.inspect}"
 
           deps = compact_index_client.dependencies(remaining_gems)
           next_gems = deps.map {|d| d[3].map(&:first).flatten(1) }.flatten(1).uniq
