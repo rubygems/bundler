@@ -4,6 +4,7 @@ require "spec_helper"
 describe "bundler version trampolining" do
   before do
     ENV["BUNDLE_DISABLE_POSTIT"] = nil
+    ENV["BUNDLE_ENABLE_TRAMPOLINE"] = "true"
     FileUtils.rm_rf(system_gem_path)
     FileUtils.cp_r(base_system_gems, system_gem_path)
   end
