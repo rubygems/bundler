@@ -12,7 +12,7 @@ require "spec_helper"
 
       bundle "#{cmd} --all"
       expect(bundled_app("vendor/cache/foo-1.0")).not_to exist
-      should_be_installed "foo 1.0"
+      expect(the_bundle).to have_installed "foo 1.0"
     end
 
     it "copies when the path is outside the bundle " do
@@ -27,7 +27,7 @@ require "spec_helper"
       expect(bundled_app("vendor/cache/foo-1.0/.bundlecache")).to be_file
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      should_be_installed "foo 1.0"
+      expect(the_bundle).to have_installed "foo 1.0"
     end
 
     it "copies when the path is outside the bundle and the paths intersect" do
@@ -45,7 +45,7 @@ require "spec_helper"
       expect(bundled_app("vendor/cache/#{libname}/.bundlecache")).to be_file
 
       FileUtils.rm_rf libpath
-      should_be_installed "#{libname} 1.0"
+      expect(the_bundle).to have_installed "#{libname} 1.0"
     end
 
     it "updates the path on each cache" do

@@ -12,7 +12,7 @@ describe "bundle package" do
       bundle "package --gemfile=NotGemfile"
 
       ENV["BUNDLE_GEMFILE"] = "NotGemfile"
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
   end
 
@@ -151,7 +151,7 @@ describe "bundle package" do
 
       bundle "package --path=#{bundled_app("test")}"
 
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
       expect(bundled_app("test/vendor/cache/")).to exist
     end
   end
@@ -165,7 +165,7 @@ describe "bundle package" do
 
       bundle "package --no-install"
 
-      should_not_be_installed "rack 1.0.0", :expect_err => true
+      expect(the_bundle).not_to have_installed "rack 1.0.0", :expect_err => true
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     end
 
@@ -178,7 +178,7 @@ describe "bundle package" do
       bundle "package --no-install"
       bundle "install"
 
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
   end
 
@@ -236,7 +236,7 @@ describe "bundle install with gem sources" do
       FileUtils.rm_rf gem_repo2
 
       bundle "install --local"
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
 
     it "does not hit the remote at all" do
@@ -251,7 +251,7 @@ describe "bundle install with gem sources" do
       FileUtils.rm_rf gem_repo2
 
       bundle "install --deployment"
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
 
     it "does not reinstall already-installed gems" do
@@ -267,7 +267,7 @@ describe "bundle install with gem sources" do
 
       bundle :install
       expect(err).to lack_errors
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to have_installed "rack 1.0"
     end
 
     it "ignores cached gems for the wrong platform" do

@@ -12,7 +12,7 @@ describe "bundle install" do
 
       bundle :install
       expect(out).to include("Using foo 1.0 from #{lib_path("foo")} (at master@#{revision_for(lib_path("foo"))[0..6]})")
-      should_be_installed "foo 1.0", :source => "git@#{lib_path("foo")}"
+      expect(the_bundle).to have_installed "foo 1.0", :source => "git@#{lib_path("foo")}"
     end
 
     it "should check out git repos that are missing but not being installed" do

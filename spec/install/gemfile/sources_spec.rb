@@ -35,7 +35,7 @@ describe "bundle install with gems on multiple sources" do
         expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
         expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
         expect(out).to include("Installed from: file:#{gem_repo1}")
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
+        expect(the_bundle).to have_installed("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
       end
 
       it "errors when disable_multisource is set" do
@@ -65,7 +65,7 @@ describe "bundle install with gems on multiple sources" do
         expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
         expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
         expect(out).to include("Installed from: file:#{gem_repo1}")
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
+        expect(the_bundle).to have_installed("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
       end
     end
   end
@@ -94,8 +94,8 @@ describe "bundle install with gems on multiple sources" do
       it "installs the gems without any warning" do
         bundle :install
         expect(out).not_to include("Warning")
-        should_be_installed("rack-obama 1.0.0")
-        should_be_installed("rack 1.0.0", :source => "remote1")
+        expect(the_bundle).to have_installed("rack-obama 1.0.0")
+        expect(the_bundle).to have_installed("rack 1.0.0", :source => "remote1")
       end
 
       it "can cache and deploy" do
@@ -107,7 +107,7 @@ describe "bundle install with gems on multiple sources" do
         bundle "install --deployment"
 
         expect(exitstatus).to eq(0) if exitstatus
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
+        expect(the_bundle).to have_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
     end
 
@@ -131,7 +131,7 @@ describe "bundle install with gems on multiple sources" do
       it "installs the gems without any warning" do
         bundle :install
         expect(out).not_to include("Warning")
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
+        expect(the_bundle).to have_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
     end
 
@@ -167,7 +167,7 @@ describe "bundle install with gems on multiple sources" do
           it "installs from the same source without any warning" do
             bundle :install
             expect(out).not_to include("Warning")
-            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+            expect(the_bundle).to have_installed("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
 
@@ -184,7 +184,7 @@ describe "bundle install with gems on multiple sources" do
           it "installs from the same source without any warning" do
             bundle :install
             expect(out).not_to include("Warning")
-            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+            expect(the_bundle).to have_installed("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
       end
@@ -210,7 +210,7 @@ describe "bundle install with gems on multiple sources" do
           it "installs from the other source without any warning" do
             bundle :install
             expect(out).not_to include("Warning")
-            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+            expect(the_bundle).to have_installed("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
 
@@ -231,7 +231,7 @@ describe "bundle install with gems on multiple sources" do
             expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
             expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
             expect(out).to include("Installed from: file:#{gem_repo2}")
-            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+            expect(the_bundle).to have_installed("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
 
@@ -257,7 +257,7 @@ describe "bundle install with gems on multiple sources" do
             bundle :install
 
             expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
-            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+            expect(the_bundle).to have_installed("depends_on_rack 1.0.1", "rack 1.0.0")
 
             # In https://github.com/bundler/bundler/issues/3585 this failed
             # when there is already a lock file, and the gems are missing, so try again
@@ -265,7 +265,7 @@ describe "bundle install with gems on multiple sources" do
             bundle :install
 
             expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
-            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+            expect(the_bundle).to have_installed("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
       end
@@ -317,7 +317,7 @@ describe "bundle install with gems on multiple sources" do
 
       # Reproduction of https://github.com/bundler/bundler/issues/3298
       it "does not unlock the installed gem on exec" do
-        should_be_installed("rack 0.9.1")
+        expect(the_bundle).to have_installed("rack 0.9.1")
       end
     end
 
@@ -355,7 +355,7 @@ describe "bundle install with gems on multiple sources" do
     it "installs the gems without any warning" do
       bundle :install
       expect(out).not_to include("Warning")
-      should_be_installed("rack 1.0.0")
+      expect(the_bundle).to have_installed("rack 1.0.0")
     end
   end
 
@@ -413,8 +413,8 @@ describe "bundle install with gems on multiple sources" do
       G
 
       # 6. Which should update foo to 0.2, but not the (locked) bar 0.1
-      should_be_installed("foo 0.2")
-      should_be_installed("bar 0.1")
+      expect(the_bundle).to have_installed("foo 0.2")
+      expect(the_bundle).to have_installed("bar 0.1")
     end
   end
 

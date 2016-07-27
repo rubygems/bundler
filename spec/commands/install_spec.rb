@@ -83,7 +83,7 @@ describe "bundle install with gem sources" do
       G
 
       expect(default_bundle_path("gems/rack-1.0.0")).to exist
-      should_be_installed("rack 1.0.0")
+      expect(the_bundle).to have_installed("rack 1.0.0")
     end
 
     it "fetches gems when multiple versions are specified" do
@@ -93,7 +93,7 @@ describe "bundle install with gem sources" do
       G
 
       expect(default_bundle_path("gems/rack-0.9.1")).to exist
-      should_be_installed("rack 0.9.1")
+      expect(the_bundle).to have_installed("rack 0.9.1")
     end
 
     it "fetches gems when multiple versions are specified take 2" do
@@ -103,7 +103,7 @@ describe "bundle install with gem sources" do
       G
 
       expect(default_bundle_path("gems/rack-0.9.1")).to exist
-      should_be_installed("rack 0.9.1")
+      expect(the_bundle).to have_installed("rack 0.9.1")
     end
 
     it "raises an appropriate error when gems are specified using symbols" do
@@ -120,7 +120,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+      expect(the_bundle).to have_installed "actionpack 2.3.2", "rails 2.3.2"
     end
 
     it "does the right version" do
@@ -129,7 +129,7 @@ describe "bundle install with gem sources" do
         gem "rack", "0.9.1"
       G
 
-      should_be_installed "rack 0.9.1"
+      expect(the_bundle).to have_installed "rack 0.9.1"
     end
 
     it "does not install the development dependency" do
@@ -138,8 +138,8 @@ describe "bundle install with gem sources" do
         gem "with_development_dependency"
       G
 
-      should_be_installed "with_development_dependency 1.0.0"
-      should_not_be_installed "activesupport 2.3.5"
+      expect(the_bundle).to have_installed("with_development_dependency 1.0.0").
+        and not_have_installed("activesupport 2.3.5")
     end
 
     it "resolves correctly" do
@@ -149,7 +149,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
+      expect(the_bundle).to have_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
     end
 
     it "activates gem correctly according to the resolved gems" do
@@ -164,7 +164,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
+      expect(the_bundle).to have_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
     end
 
     it "does not reinstall any gem that is already available locally" do
@@ -181,7 +181,7 @@ describe "bundle install with gem sources" do
         gem "activerecord", "2.3.2"
       G
 
-      should_be_installed "activesupport 2.3.2"
+      expect(the_bundle).to have_installed "activesupport 2.3.2"
     end
 
     it "works when the gemfile specifies gems that only exist in the system" do
@@ -192,7 +192,7 @@ describe "bundle install with gem sources" do
         gem "foo"
       G
 
-      should_be_installed "rack 1.0.0", "foo 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0", "foo 1.0.0"
     end
 
     it "prioritizes local gems over remote gems" do
@@ -205,7 +205,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+      expect(the_bundle).to have_installed "rack 1.0.0", "activesupport 2.3.5"
     end
 
     describe "with a gem that installs multiple platforms" do
@@ -264,21 +264,21 @@ describe "bundle install with gem sources" do
 
       it "works" do
         bundle "install --path vendor"
-        should_be_installed "rack 1.0"
+        expect(the_bundle).to have_installed "rack 1.0"
       end
 
       it "allows running bundle install --system without deleting foo" do
         bundle "install --path vendor"
         bundle "install --system"
         FileUtils.rm_rf(bundled_app("vendor"))
-        should_be_installed "rack 1.0"
+        expect(the_bundle).to have_installed "rack 1.0"
       end
 
       it "allows running bundle install --system after deleting foo" do
         bundle "install --path vendor"
         FileUtils.rm_rf(bundled_app("vendor"))
         bundle "install --system"
-        should_be_installed "rack 1.0"
+        expect(the_bundle).to have_installed "rack 1.0"
       end
     end
 
@@ -294,7 +294,7 @@ describe "bundle install with gem sources" do
         gem "rack", "1.2"
       G
 
-      should_be_installed "rack 1.2", "activesupport 1.2.3"
+      expect(the_bundle).to have_installed "rack 1.2", "activesupport 1.2.3"
     end
 
     it "gives a useful error if no sources are set" do

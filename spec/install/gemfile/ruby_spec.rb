@@ -24,7 +24,7 @@ describe "ruby requirement" do
     G
 
     expect(exitstatus).to eq(0) if exitstatus
-    should_be_installed "rack-obama 1.0"
+    expect(the_bundle).to have_installed "rack-obama 1.0"
   end
 
   it "allows removing the ruby version requirement" do
@@ -41,7 +41,7 @@ describe "ruby requirement" do
       gem "rack"
     G
 
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
     expect(lockfile).not_to include("RUBY VERSION")
   end
 
@@ -62,7 +62,7 @@ describe "ruby requirement" do
       gem "rack"
     G
 
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
     expect(locked_ruby_version).to eq(Bundler::RubyVersion.system)
   end
 
@@ -83,7 +83,7 @@ describe "ruby requirement" do
       gem "rack"
     G
 
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
     expect(locked_ruby_version.versions).to eq(["5100"])
   end
 end

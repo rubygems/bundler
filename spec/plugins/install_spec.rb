@@ -127,7 +127,7 @@ describe "bundler plugin install" do
 
       expect(out).to include("Bundle complete!")
 
-      should_be_installed("rack 1.0.0")
+      expect(the_bundle).to have_installed("rack 1.0.0")
       plugin_should_be_installed("foo")
     end
 

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "forwardable"
+require "support/the_bundle"
 module Spec
   module Matchers
     extend RSpec::Matchers
@@ -19,6 +20,7 @@ module Spec
       def initialize(matcher, preconditions)
         @matcher = with_matchers_cloned(matcher)
         @preconditions = with_matchers_cloned(preconditions)
+        @failure_index = nil
       end
 
       def matches?(target, &blk)
@@ -100,65 +102,108 @@ module Spec
 
     define_compound_matcher :read_as, [exist] do |file_contents|
       diffable
+      attr_reader :strip_whitespace
+
+      chain :stripping_whitespace do
+        @strip_whitespace = true
+      end
+
       match do |actual|
         @actual = Bundler.read_file(actual)
+        file_contents = strip_whitespace(file_contents) if strip_whitespace
         values_match?(file_contents, @actual)
       end
     end
 
-    def should_be_installed(*names)
-      opts = names.last.is_a?(Hash) ? names.pop : {}
-      source = opts.delete(:source)
-      groups = Array(opts[:groups])
-      groups << opts
-      aggregate_failures "should be installed" do
-        names.each do |name|
-          name, version, platform = name.split(/\s+/)
-          version_const = name == "bundler" ? "Bundler::VERSION" : Spec::Builders.constantize(name)
-          run! "require '#{name}.rb'; puts #{version_const}", *groups
-          expect(out).not_to be_empty, "#{name} is not installed"
-          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
-          actual_version, actual_platform = out.strip.split(/\s+/, 2)
-          expect(Gem::Version.new(actual_version)).to eq(Gem::Version.new(version))
-          expect(actual_platform).to eq(platform)
-          next unless source
-          source_const = "#{Spec::Builders.constantize(name)}_SOURCE"
-          run! "require '#{name}/source'; puts #{source_const}", *groups
-          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
-          expect(out.strip).to eq(source),
-            "Expected #{name} (#{version}) to be installed from `#{source}`, was actually from `#{out}`"
-        end
-      end
+    def indent(string, padding = 4, indent_character = " ")
+      string.to_s.gsub(/^/, indent_character * padding).gsub("\t", "    ")
     end
 
-    alias_method :should_be_available, :should_be_installed
-
-    def should_not_be_installed(*names)
-      opts = names.last.is_a?(Hash) ? names.pop : {}
-      groups = Array(opts[:groups]) || []
-      names.each do |name|
-        name, version = name.split(/\s+/, 2)
-        run <<-R, *(groups + [opts])
+    define_compound_matcher :have_installed, [be_an_instance_of(Spec::TheBundle)] do |*names|
+      match do
+        opts = names.last.is_a?(Hash) ? names.pop : {}
+        source = opts.delete(:source)
+        groups = Array(opts[:groups])
+        groups << opts
+        @errors = names.map do |name|
+          name, version, platform = name.split(/\s+/)
+          version_const = name == "bundler" ? "Bundler::VERSION" : Spec::Builders.constantize(name)
           begin
-            require '#{name}'
-            puts #{Spec::Builders.constantize(name)}
-          rescue LoadError, NameError
-            puts "WIN"
+            run! "require '#{name}.rb'; puts #{version_const}", *groups
+          rescue => e
+            next "#{name} is not installed:\n#{indent(e)}"
           end
-        R
-        if version.nil? || out == "WIN"
-          expect(out).to eq("WIN")
-        else
-          expect(Gem::Version.new(out)).not_to eq(Gem::Version.new(version))
-        end
+          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
+          actual_version, actual_platform = out.strip.split(/\s+/, 2)
+          unless Gem::Version.new(actual_version) == Gem::Version.new(version)
+            next "#{name} was expected to be at version #{version} but was #{actual_version}"
+          end
+          unless actual_platform == platform
+            next "#{name} was expected to be of platform #{platform} but was #{actual_platform}"
+          end
+          next unless source
+          begin
+            source_const = "#{Spec::Builders.constantize(name)}_SOURCE"
+            run! "require '#{name}/source'; puts #{source_const}", *groups
+          rescue
+            next "#{name} does not have a source defined:\n#{indent(e)}"
+          end
+          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
+          unless out.strip == source
+            next "Expected #{name} (#{version}) to be installed from `#{source}`, was actually from `#{out}`"
+          end
+        end.compact
+
+        @errors.empty?
       end
+
+      match_when_negated do
+        opts = names.last.is_a?(Hash) ? names.pop : {}
+        groups = Array(opts[:groups]) || []
+        @errors = names.map do |name|
+          name, version = name.split(/\s+/, 2)
+          begin
+            run <<-R, *(groups + [opts])
+              begin
+                require '#{name}'
+                puts #{Spec::Builders.constantize(name)}
+              rescue LoadError, NameError
+                puts "WIN"
+              end
+            R
+          rescue => e
+            next "checking for #{name} failed:\n#{e}"
+          end
+          next if out == "WIN"
+          if version.nil?
+            next "expected #{name} to not be installed, but it was"
+          elsif Gem::Version.new(out) == Gem::Version.new(version)
+            next "expected #{name} (#{version}) not to be installed, but it was"
+          end
+        end.compact
+
+        @errors.empty?
+      end
+
+      failure_message do
+        super() + " but:\n" + @errors.map {|e| indent(e) }.join("\n")
+      end
+
+      failure_message_when_negated do
+        super() + " but:\n" + @errors.map {|e| indent(e) }.join("\n")
+      end
+    end
+    RSpec::Matchers.define_negated_matcher :not_have_installed, :have_installed
+
+    def have_lockfile(expected)
+      read_as(strip_whitespace(expected))
     end
 
     def plugin_should_be_installed(*names)
       names.each do |name|
         expect(Bundler::Plugin).to be_installed(name)
-        path = Bundler::Plugin.installed?(name)
-        expect(File.join(path, "plugins.rb")).to exist
+        path = Pathname.new(Bundler::Plugin.installed?(name))
+        expect(path + "plugins.rb").to exist
       end
     end
 
@@ -166,10 +211,6 @@ module Spec
       names.each do |name|
         expect(Bundler::Plugin).not_to be_installed(name)
       end
-    end
-
-    def should_be_locked
-      expect(bundled_app("Gemfile.lock")).to exist
     end
 
     def lockfile_should_be(expected)

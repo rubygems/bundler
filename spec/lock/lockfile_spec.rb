@@ -413,7 +413,7 @@ describe "the lockfile format" do
          #{Bundler::VERSION}
     G
 
-    should_be_installed "net-sftp 1.1.1", "net-ssh 1.0.0"
+    expect(the_bundle).to have_installed "net-sftp 1.1.1", "net-ssh 1.0.0"
   end
 
   it "generates a simple lockfile for a single pinned source, gem with a version requirement" do
@@ -480,7 +480,7 @@ describe "the lockfile format" do
     L
 
     bundle "install"
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
   end
 
   it "serializes global git sources" do
@@ -1168,7 +1168,7 @@ describe "the lockfile format" do
     G
 
     bundle "install --path vendor"
-    should_be_installed "omg 1.0"
+    expect(the_bundle).to have_installed "omg 1.0"
 
     # Create a Gemfile.lock that has duplicate GIT sections
     lockfile <<-L
@@ -1202,7 +1202,7 @@ describe "the lockfile format" do
 
     FileUtils.rm_rf(bundled_app("vendor"))
     bundle "install"
-    should_be_installed "omg 1.0"
+    expect(the_bundle).to have_installed "omg 1.0"
 
     # Confirm that duplicate specs do not appear
     expect(File.read(bundled_app("Gemfile.lock"))).to eq(strip_whitespace(<<-L))
@@ -1245,7 +1245,7 @@ describe "the lockfile format" do
 
     it "generates Gemfile.lock with \\n line endings" do
       expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to have_installed "rack 1.0"
     end
 
     context "during updates" do
@@ -1254,7 +1254,7 @@ describe "the lockfile format" do
 
         expect { bundle "update" }.to change { File.mtime(bundled_app("Gemfile.lock")) }
         expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
-        should_be_installed "rack 1.2"
+        expect(the_bundle).to have_installed "rack 1.2"
       end
 
       it "preserves Gemfile.lock \\n\\r line endings" do
@@ -1265,7 +1265,7 @@ describe "the lockfile format" do
 
         expect { bundle "update" }.to change { File.mtime(bundled_app("Gemfile.lock")) }
         expect(File.read(bundled_app("Gemfile.lock"))).to match("\r\n")
-        should_be_installed "rack 1.2"
+        expect(the_bundle).to have_installed "rack 1.2"
       end
     end
 

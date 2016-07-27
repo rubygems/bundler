@@ -5,7 +5,7 @@ shared_examples "bundle install --standalone" do
   shared_examples "common functionality" do
     it "still makes the gems available to normal bundler" do
       args = expected_gems.map {|k, v| "#{k} #{v}" }
-      should_be_installed(*args)
+      expect(the_bundle).to have_installed(*args)
     end
 
     it "generates a bundle/bundler/setup.rb" do

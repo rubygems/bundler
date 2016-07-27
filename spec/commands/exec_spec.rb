@@ -151,7 +151,7 @@ describe "bundle exec" do
     bundle "exec rackup"
 
     expect(out).to eq("0.9.1")
-    should_not_be_installed "rack_middleware 1.0"
+    expect(the_bundle).not_to have_installed "rack_middleware 1.0"
   end
 
   it "does not duplicate already exec'ed RUBYOPT" do
@@ -320,7 +320,7 @@ describe "bundle exec" do
       end
 
       it "works when locked" do
-        should_be_locked
+        expect(the_bundle).to be_locked
         bundle "exec 'cd #{tmp("gems")} && rackup'"
         expect(out).to include("1.0.0")
       end
@@ -343,7 +343,7 @@ describe "bundle exec" do
       end
 
       it "works when locked" do
-        should_be_locked
+        expect(the_bundle).to be_locked
 
         bundle "exec fizz"
         expect(out).to eq("1.0")
@@ -367,7 +367,7 @@ describe "bundle exec" do
       end
 
       it "works when locked" do
-        should_be_locked
+        expect(the_bundle).to be_locked
         bundle "exec fizz_git"
         expect(out).to eq("1.0")
       end
@@ -390,7 +390,7 @@ describe "bundle exec" do
       end
 
       it "works when locked" do
-        should_be_locked
+        expect(the_bundle).to be_locked
         bundle "exec fizz_no_gemspec"
         expect(out).to eq("1.0")
       end

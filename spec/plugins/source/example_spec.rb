@@ -61,7 +61,7 @@ describe "real source plugins" do
 
       expect(out).to include("Bundle complete!")
 
-      should_be_installed("a-path-gem 1.0")
+      expect(the_bundle).to have_installed("a-path-gem 1.0")
     end
 
     it "writes to lock file" do
@@ -124,7 +124,7 @@ describe "real source plugins" do
         expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}/.bundlecache")).to be_file
 
         FileUtils.rm_rf lib_path("a-path-gem-1.0")
-        should_be_installed("a-path-gem 1.0")
+        expect(the_bundle).to have_installed("a-path-gem 1.0")
       end
 
       it "copies repository to vendor cache and uses it even when installed with bundle --path" do
@@ -134,7 +134,7 @@ describe "real source plugins" do
         expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}")).to exist
 
         FileUtils.rm_rf lib_path("a-path-gem-1.0")
-        should_be_installed("a-path-gem 1.0")
+        expect(the_bundle).to have_installed("a-path-gem 1.0")
       end
 
       it "bundler package copies repository to vendor cache" do
@@ -144,7 +144,7 @@ describe "real source plugins" do
         expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}")).to exist
 
         FileUtils.rm_rf lib_path("a-path-gem-1.0")
-        should_be_installed("a-path-gem 1.0")
+        expect(the_bundle).to have_installed("a-path-gem 1.0")
       end
     end
 
@@ -175,7 +175,7 @@ describe "real source plugins" do
       it "installs" do
         bundle "install"
 
-        should_be_installed("a-path-gem 1.0")
+        expect(the_bundle).to have_installed("a-path-gem 1.0")
       end
     end
   end
@@ -324,7 +324,7 @@ describe "real source plugins" do
     it "handles the source option" do
       bundle "install"
       expect(out).to include("Bundle complete!")
-      should_be_installed("ma-gitp-gem 1.0")
+      expect(the_bundle).to have_installed("ma-gitp-gem 1.0")
     end
 
     it "writes to lock file" do
@@ -382,7 +382,7 @@ describe "real source plugins" do
 
       it "installs" do
         bundle "install"
-        should_be_installed("ma-gitp-gem 1.0")
+        expect(the_bundle).to have_installed("ma-gitp-gem 1.0")
       end
 
       it "uses the locked ref" do
@@ -417,7 +417,7 @@ describe "real source plugins" do
         G
         bundle "install"
 
-        should_be_installed("ma-gitp-gem 1.1")
+        expect(the_bundle).to have_installed("ma-gitp-gem 1.1")
       end
     end
 
@@ -439,7 +439,7 @@ describe "real source plugins" do
         expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
 
         FileUtils.rm_rf lib_path("foo-1.0")
-        should_be_installed "foo 1.0"
+        expect(the_bundle).to have_installed "foo 1.0"
       end
     end
   end

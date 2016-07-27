@@ -434,6 +434,7 @@ module Spec
 
     def build_with(builder, name, args, &blk)
       @_build_path ||= nil
+      @_build_repo ||= nil
       options  = args.last.is_a?(Hash) ? args.pop : {}
       versions = args.last || "1.0"
       spec     = nil

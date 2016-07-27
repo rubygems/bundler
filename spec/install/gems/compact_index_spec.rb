@@ -13,7 +13,7 @@ describe "compact index api" do
 
     bundle! :install, :artifice => "compact_index"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
   end
 
   it "should URI encode gem names" do
@@ -34,7 +34,7 @@ describe "compact index api" do
 
     bundle! :install, :artifice => "compact_index"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
-    should_be_installed(
+    expect(the_bundle).to have_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
       "activerecord 2.3.2",
@@ -51,7 +51,7 @@ describe "compact index api" do
     G
 
     bundle! :install, :artifice => "compact_index"
-    should_be_installed "net-sftp 1.1.1"
+    expect(the_bundle).to have_installed "net-sftp 1.1.1"
   end
 
   it "should use the endpoint when using --deployment" do
@@ -63,7 +63,7 @@ describe "compact index api" do
 
     bundle "install --deployment", :artifice => "compact_index"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
   end
 
   it "handles git dependencies that are in rubygems" do
@@ -81,7 +81,7 @@ describe "compact index api" do
 
     bundle! :install, :artifice => "compact_index"
 
-    should_be_installed("rails 2.3.2")
+    expect(the_bundle).to have_installed("rails 2.3.2")
   end
 
   it "handles git dependencies that are in rubygems using --deployment" do
@@ -99,7 +99,7 @@ describe "compact index api" do
 
     bundle "install --deployment", :artifice => "compact_index"
 
-    should_be_installed("rails 2.3.2")
+    expect(the_bundle).to have_installed("rails 2.3.2")
   end
 
   it "doesn't fail if you only have a git gem with no deps when using --deployment" do
@@ -113,7 +113,7 @@ describe "compact index api" do
     bundle "install --deployment", :artifice => "compact_index"
 
     expect(exitstatus).to eq(0) if exitstatus
-    should_be_installed("foo 1.0")
+    expect(the_bundle).to have_installed("foo 1.0")
   end
 
   it "falls back when the API errors out" do
@@ -126,7 +126,7 @@ describe "compact index api" do
 
     bundle! :install, :fakeweb => "windows"
     expect(out).to include("Fetching source index from #{source_uri}")
-    should_be_installed "rcov 1.0.0"
+    expect(the_bundle).to have_installed "rcov 1.0.0"
   end
 
   it "falls back when the API URL returns 403 Forbidden" do
@@ -137,7 +137,7 @@ describe "compact index api" do
 
     bundle! :install, :verbose => true, :artifice => "compact_index_forbidden"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
   end
 
   it "falls back when the versions endpoint has a checksum mismatch" do
@@ -151,7 +151,7 @@ describe "compact index api" do
     expect(out).to include <<-'WARN'
 The checksum of /versions does not match the checksum provided by the server! Something is wrong (local checksum is "\"d41d8cd98f00b204e9800998ecf8427e\"", was expecting "\"123\"").
     WARN
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
   end
 
   it "falls back when the user's home directory does not exist or is not writable" do
@@ -164,7 +164,7 @@ The checksum of /versions does not match the checksum provided by the server! So
 
     bundle! :install, :artifice => "compact_index"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
   end
 
   it "handles host redirects" do
@@ -174,7 +174,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     G
 
     bundle! :install, :artifice => "compact_index_host_redirect"
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
   end
 
   it "handles host redirects without Net::HTTP::Persistent" do
@@ -198,7 +198,7 @@ The checksum of /versions does not match the checksum provided by the server! So
 
     bundle! :install, :artifice => "compact_index_host_redirect", :requires => [lib_path("disable_net_http_persistent.rb")]
     expect(out).to_not match(/Too many redirects/)
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
   end
 
   it "times out when Bundler::Fetcher redirects too much" do
@@ -220,7 +220,7 @@ The checksum of /versions does not match the checksum provided by the server! So
 
       bundle "install --full-index", :artifice => "compact_index"
       expect(out).to include("Fetching source index from #{source_uri}")
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
 
     it "should use the modern index for update" do
@@ -231,7 +231,7 @@ The checksum of /versions does not match the checksum provided by the server! So
 
       bundle "update --full-index", :artifice => "compact_index"
       expect(out).to include("Fetching source index from #{source_uri}")
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
   end
 
@@ -250,7 +250,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     G
 
     bundle! :install, :artifice => "compact_index_extra"
-    should_be_installed "back_deps 1.0"
+    expect(the_bundle).to have_installed "back_deps 1.0"
   end
 
   it "fetches gem versions even when those gems are already installed" do
@@ -259,7 +259,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack", "1.0.0"
     G
     bundle! :install, :artifice => "compact_index_extra_api"
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
 
     build_repo4 do
       build_gem "rack", "1.2" do |s|
@@ -273,7 +273,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack", "1.2"
     G
     bundle! :install, :artifice => "compact_index_extra_api"
-    should_be_installed "rack 1.2"
+    expect(the_bundle).to have_installed "rack 1.2"
   end
 
   it "considers all possible versions of dependencies from all api gem sources" do
@@ -296,8 +296,8 @@ The checksum of /versions does not match the checksum provided by the server! So
 
     bundle! :install, :artifice => "compact_index_extra_api"
 
-    should_be_installed "somegem 1.0.0"
-    should_be_installed "activesupport 1.2.3"
+    expect(the_bundle).to have_installed "somegem 1.0.0"
+    expect(the_bundle).to have_installed "activesupport 1.2.3"
   end
 
   it "prints API output properly with back deps" do
@@ -341,7 +341,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     G
 
     bundle! :install, :artifice => "compact_index_extra_missing"
-    should_be_installed "back_deps 1.0"
+    expect(the_bundle).to have_installed "back_deps 1.0"
   end
 
   it "uses the endpoint if all sources support it" do
@@ -352,7 +352,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     G
 
     bundle! :install, :artifice => "compact_index_api_missing"
-    should_be_installed "foo 1.0"
+    expect(the_bundle).to have_installed "foo 1.0"
   end
 
   it "fetches again when more dependencies are found in subsequent sources using --deployment" do
@@ -372,7 +372,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     bundle! :install, :artifice => "compact_index_extra"
 
     bundle "install --deployment", :artifice => "compact_index_extra"
-    should_be_installed "back_deps 1.0"
+    expect(the_bundle).to have_installed "back_deps 1.0"
   end
 
   it "does not refetch if the only unmet dependency is bundler" do
@@ -395,7 +395,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rails"
     G
     bundle! :install, :artifice => "compact_index"
-    should_be_installed "rails 2.3.2"
+    expect(the_bundle).to have_installed "rails 2.3.2"
   end
 
   it "installs the binstubs" do
@@ -472,7 +472,7 @@ The checksum of /versions does not match the checksum provided by the server! So
 
       bundle! :install, :artifice => "compact_index_basic_authentication"
       expect(out).not_to include("#{user}:#{password}")
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
 
     it "strips http basic authentication creds for modern index" do
@@ -483,7 +483,7 @@ The checksum of /versions does not match the checksum provided by the server! So
 
       bundle! :install, :artifice => "endopint_marshal_fail_basic_authentication"
       expect(out).not_to include("#{user}:#{password}")
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
 
     it "strips http basic auth creds when it can't reach the server" do
@@ -506,7 +506,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       bundle! :install, :artifice => "compact_index_basic_authentication"
       expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
       expect(out).not_to include("#{user}:#{password}")
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
 
     it "does not pass the user / password to different hosts on redirect" do
@@ -516,7 +516,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       G
 
       bundle! :install, :artifice => "compact_index_creds_diff_host"
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to have_installed "rack 1.0.0"
     end
 
     describe "with authentication details in bundle config" do
@@ -533,7 +533,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         bundle! :install, :artifice => "compact_index_strict_basic_authentication"
 
         expect(out).to include("Fetching gem metadata from #{source_uri}")
-        should_be_installed "rack 1.0.0"
+        expect(the_bundle).to have_installed "rack 1.0.0"
       end
 
       it "reads authentication details by full url from bundle config" do
@@ -543,14 +543,14 @@ The checksum of /versions does not match the checksum provided by the server! So
         bundle! :install, :artifice => "compact_index_strict_basic_authentication"
 
         expect(out).to include("Fetching gem metadata from #{source_uri}")
-        should_be_installed "rack 1.0.0"
+        expect(the_bundle).to have_installed "rack 1.0.0"
       end
 
       it "should use the API" do
         bundle "config #{source_hostname} #{user}:#{password}"
         bundle! :install, :artifice => "compact_index_strict_basic_authentication"
         expect(out).to include("Fetching gem metadata from #{source_uri}")
-        should_be_installed "rack 1.0.0"
+        expect(the_bundle).to have_installed "rack 1.0.0"
       end
 
       it "prefers auth supplied in the source uri" do
@@ -562,7 +562,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         bundle "config #{source_hostname} otheruser:wrong"
 
         bundle! :install, :artifice => "compact_index_strict_basic_authentication"
-        should_be_installed "rack 1.0.0"
+        expect(the_bundle).to have_installed "rack 1.0.0"
       end
 
       it "shows instructions if auth is not provided for the source" do
@@ -588,7 +588,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         G
 
         bundle! :install, :artifice => "compact_index_basic_authentication"
-        should_be_installed "rack 1.0.0"
+        expect(the_bundle).to have_installed "rack 1.0.0"
       end
     end
   end
@@ -673,6 +673,6 @@ The checksum of /versions does not match the checksum provided by the server! So
     bundle! :install, :artifice => "compact_index_concurrent_download"
 
     expect(File.read(versions)).to start_with("created_at")
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to have_installed "rack 1.0.0"
   end
 end

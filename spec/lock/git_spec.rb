@@ -11,7 +11,7 @@ describe "bundle lock with git gems" do
   end
 
   it "doesn't break right after running lock" do
-    should_be_installed "foo 1.0.0"
+    expect(the_bundle).to have_installed "foo 1.0.0"
   end
 
   it "locks a git source to the current ref" do

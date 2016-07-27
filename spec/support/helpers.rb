@@ -34,6 +34,10 @@ module Spec
 
     attr_reader :out, :err, :exitstatus
 
+    def the_bundle(*args)
+      TheBundle.new(*args)
+    end
+
     def in_app_root(&blk)
       Dir.chdir(bundled_app, &blk)
     end

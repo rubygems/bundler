@@ -19,7 +19,7 @@ describe "bundle install" do
         gem "rails", "3.0"
       G
 
-      should_be_installed "bundler #{Bundler::VERSION}"
+      expect(the_bundle).to have_installed "bundler #{Bundler::VERSION}"
     end
 
     it "are not added if not already present" do
@@ -27,7 +27,7 @@ describe "bundle install" do
         source "file://#{gem_repo1}"
         gem "rack"
       G
-      should_not_be_installed "bundler #{Bundler::VERSION}"
+      expect(the_bundle).not_to have_installed "bundler #{Bundler::VERSION}"
     end
 
     it "causes a conflict if explicitly requesting a different version" do
@@ -71,7 +71,7 @@ describe "bundle install" do
         gem "rack"
       G
 
-      should_be_installed "multiple_versioned_deps 1.0.0"
+      expect(the_bundle).to have_installed "multiple_versioned_deps 1.0.0"
     end
 
     it "includes bundler in the bundle when it's a child dependency" do

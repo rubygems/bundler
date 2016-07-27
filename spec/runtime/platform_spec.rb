@@ -57,7 +57,7 @@ describe "Bundler.setup with multi platform stuff" do
       gem "nokogiri"
     G
 
-    should_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to have_installed "nokogiri 1.4.2"
   end
 
   it "will add the resolve for the current platform" do
@@ -86,6 +86,6 @@ describe "Bundler.setup with multi platform stuff" do
       gem "platform_specific"
     G
 
-    should_be_installed "nokogiri 1.4.2", "platform_specific 1.0 x86-darwin-100"
+    expect(the_bundle).to have_installed "nokogiri 1.4.2", "platform_specific 1.0 x86-darwin-100"
   end
 end
