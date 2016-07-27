@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "support/helpers"
 require "support/path"
 
@@ -17,7 +18,7 @@ module Spec
     def to_s
       "the bundle"
     end
-    alias inspect to_s
+    alias_method :inspect, :to_s
 
     def locked?
       lockfile.file?

@@ -175,9 +175,8 @@ module Spec
             next "checking for #{name} failed:\n#{e}"
           end
           next if out == "WIN"
-          if version.nil?
-            next "expected #{name} to not be installed, but it was"
-          elsif Gem::Version.new(out) == Gem::Version.new(version)
+          next "expected #{name} to not be installed, but it was" if version.nil?
+          if Gem::Version.new(out) == Gem::Version.new(version)
             next "expected #{name} (#{version}) not to be installed, but it was"
           end
         end.compact
