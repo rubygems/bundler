@@ -81,8 +81,7 @@ RSpec.configure do |config|
   config.filter_run_excluding :git => LessThanProc.with(git_version)
   config.filter_run_excluding :rubygems_master => (ENV["RGV"] != "master")
 
-  config.filter_run :focused => true unless ENV["CI"]
-  config.run_all_when_everything_filtered = true
+  config.filter_run_when_matching :focus unless ENV["CI"]
 
   original_wd  = Dir.pwd
   original_env = ENV.to_hash
