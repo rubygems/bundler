@@ -275,7 +275,7 @@ describe Bundler::Plugin do
       end
     end
 
-    context "a block is to be passed" do
+    context "a block is passed" do
       let(:code) { <<-RUBY }
         Bundler::Plugin::API.hook("#{event}") { |&blk| blk.call }
       RUBY
