@@ -184,11 +184,13 @@ describe "The library itself" do
 
   it "can still be built" do
     Dir.chdir(root) do
-      `gem build bundler.gemspec`
-      expect($?).to eq(0)
-
-      # clean up the .gem generated
-      system("rm bundler-#{Bundler::VERSION}.gem")
+      begin
+        gem_command! :build, "bundler.gemspec"
+        expect(err).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
+      ensure
+        # clean up the .gem generated
+        FileUtils.rm("bundler-#{Bundler::VERSION}.gem")
+      end
     end
   end
 

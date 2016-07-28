@@ -159,6 +159,15 @@ module Spec
       ENV["RUBYOPT"] = old
     end
 
+    def gem_command(command, args = "", options = {})
+      if command == :exec && !options[:no_quote]
+        args = args.gsub(/(?=")/, "\\")
+        args = %("#{args}")
+      end
+      sys_exec("#{Gem.ruby} -rubygems -S gem --backtrace #{command} #{args}", options[:expect_err])
+    end
+    bang :gem_command
+
     def sys_exec(cmd, expect_err = false)
       Open3.popen3(cmd.to_s) do |stdin, stdout, stderr, wait_thr|
         yield stdin, stdout, wait_thr if block_given?
@@ -236,7 +245,7 @@ module Spec
 
         raise "OMG `#{path}` does not exist!" unless File.exist?(path)
 
-        gem_command :install, "--no-rdoc --no-ri --ignore-dependencies #{path}"
+        gem_command! :install, "--no-rdoc --no-ri --ignore-dependencies #{path}"
       end
     end
 

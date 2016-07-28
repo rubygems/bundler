@@ -50,14 +50,5 @@ module Spec
       cmd += " --version '#{version}'" if version
       system(cmd) || raise("Installing gem #{name} for the tests to use failed!")
     end
-
-    def gem_command(command, args = "", options = {})
-      if command == :exec && !options[:no_quote]
-        args = args.gsub(/(?=")/, "\\")
-        args = %("#{args}")
-      end
-      lib = File.join(File.dirname(__FILE__), "..", "..", "lib")
-      `#{Gem.ruby} -I#{lib} -rubygems -S gem --backtrace #{command} #{args}`.strip
-    end
   end
 end
