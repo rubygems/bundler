@@ -44,6 +44,8 @@ module Bundler
           complete_gems.concat(deps.map(&:first)).uniq!
           remaining_gems = next_gems - complete_gems
         end
+        @bundle_worker.stop if @bundle_worker
+        @bundle_worker = nil # reset it.  Not sure if necessary
 
         gem_info
       end
@@ -86,12 +88,22 @@ module Bundler
           end.tap do |client|
             client.in_parallel = lambda do |inputs, &blk|
               func = lambda {|object, _index| blk.call(object) }
-              worker_name = "Compact Index (#{display_uri.host})"
-              worker = Bundler::Worker.new(25, worker_name, func)
+              worker = bundle_worker(func)
               inputs.each {|input| worker.enq(input) }
-              inputs.map { worker.deq }.tap { worker.stop }
+              inputs.map { worker.deq }
             end
           end
+        end
+      end
+
+      def bundle_worker(func = nil)
+        if @bundle_worker
+          @bundle_worker.tap do |worker|
+            worker.instance_variable_set(:@func, func) if func
+          end
+        else
+          worker_name = "Compact Index (#{display_uri.host})"
+          @bundle_worker ||= Bundler::Worker.new(25, worker_name, func)
         end
       end
 
