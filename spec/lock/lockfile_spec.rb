@@ -1125,7 +1125,7 @@ describe "the lockfile format" do
     G
   end
 
-  it "captures the Ruby version in the lockfile", :focus do
+  it "captures the Ruby version in the lockfile" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       ruby '#{RUBY_VERSION}'
