@@ -7,7 +7,7 @@ require "rubygems"
 
 bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
 bundler_spec.dependencies.each do |dep|
-  gem dep.name, dep.requirement.to_s
+  gem dep.name, dep.requirement
 end
 
 gem "rubocop", "= 0.41.2"
