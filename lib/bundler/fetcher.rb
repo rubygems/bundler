@@ -255,6 +255,7 @@ module Bundler
         end
 
         con.read_timeout = Fetcher.api_timeout
+        con.open_timeout = Fetcher.api_timeout
         con.override_headers["User-Agent"] = user_agent
         con.override_headers["X-Gemfile-Source"] = @remote.original_uri.to_s if @remote.original_uri
         con
