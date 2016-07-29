@@ -125,6 +125,7 @@ module Bundler
       return if ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"].nil?
       installed_version = Gem::Version.new(ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"].dup)
       running_version = Gem::Version.new(Bundler::VERSION)
+      return if Gem::Requirement.new(installed_version).satisfied_by?(running_version)
       if Bundler.settings[:warned_version].nil? || running_version > Gem::Version.new(Bundler.settings[:warned_version])
         Bundler.settings[:warned_version] = running_version
         Bundler.ui.warn "You're running Bundler #{installed_version} but this " \

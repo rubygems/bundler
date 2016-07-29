@@ -498,5 +498,12 @@ describe "bundle install with gem sources" do
       bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => "999" }
       expect(out).not_to include("You're running Bundler 999 but this project uses #{Bundler::VERSION}.")
     end
+
+    it "should not print warning if versions match" do
+      bundle :init
+      bundle :install, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => Bundler::VERSION }
+      expect(out).to start_with("Running `bundle install --no-color` with bundler #{Bundler::VERSION}\nThe Gemfile specifies no dependencies")
+      expect(out).not_to include("You're running Bundler #{Bundler::VERSION} but this project uses #{Bundler::VERSION}.")
+    end
   end
 end
