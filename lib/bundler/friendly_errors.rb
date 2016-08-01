@@ -89,8 +89,10 @@ module Bundler
     end
 
     def issues_url(exception)
+      message = exception.message.lines.first.tr(":", " ").chomp
+      message = message.split("-").first if exception.is_a?(Errno)
       "https://github.com/bundler/bundler/search?q=" \
-        "#{CGI.escape(exception.message.lines.first.chomp)}&type=Issues"
+        "#{CGI.escape(message)}&type=Issues"
     end
   end
 
