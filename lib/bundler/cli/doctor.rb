@@ -13,6 +13,14 @@ module Bundler
       @options = options
     end
 
+    def otool_available?
+      system("otool --version 2>&1 >/dev/null")
+    end
+
+    def ldd_available?
+      !system("ldd --help 2>&1 >/dev/null").nil?
+    end
+
     def dylibs_darwin(path)
       output = `/usr/bin/otool -L "#{path}"`.chomp
       dylibs = output.split("\n")[1..-1].map {|l| l.match(DARWIN_REGEX).captures[0] }.uniq
@@ -32,8 +40,10 @@ module Bundler
     def dylibs(path)
       case RbConfig::CONFIG["host_os"]
       when /darwin/
+        return [] unless otool_available?
         dylibs_darwin(path)
       when /(linux|solaris|bsd)/
+        return [] unless ldd_available?
         dylibs_ldd(path)
       else # Windows, etc.
         Bundler.ui.warn("Dynamic library check not supported on this platform.")
