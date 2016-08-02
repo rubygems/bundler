@@ -147,7 +147,7 @@ module Bundler
         end
 
         def git_retry(command)
-          Bundler::Retry.new("git #{command}", GitNotAllowedError).attempts do
+          Bundler::Retry.new("`git #{command}`", GitNotAllowedError).attempts do
             git(command)
           end
         end
