@@ -34,8 +34,7 @@ Dir["#{File.expand_path("../support", __FILE__)}/*.rb"].each do |file|
   require file unless file =~ %r{fakeweb/.*\.rb}
 end
 
-$debug    = false
-$show_err = true
+$debug = false
 
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
@@ -98,10 +97,12 @@ RSpec.configure do |config|
     reset!
     system_gems []
     in_app_root
+    @all_output = String.new
   end
 
   config.after :each do |example|
-    puts @out if defined?(@out) && example.exception
+    @all_output.strip!
+    warn @all_output if example.exception && !@all_output.empty?
 
     Dir.chdir(original_wd)
     ENV.replace(original_env)

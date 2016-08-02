@@ -132,7 +132,7 @@ describe "bundle update" do
         end
 
         Dir.chdir(lib_path("has_submodule-1.0")) do
-          sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0", :expect_err => true
+          sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0"
           `git commit -m "submodulator"`
         end
       end
@@ -147,7 +147,7 @@ describe "bundle update" do
         run "require 'submodule'"
         expect(out).to eq("GEM")
 
-        install_gemfile <<-G, :expect_err => true
+        install_gemfile <<-G
           git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
@@ -158,7 +158,7 @@ describe "bundle update" do
       end
 
       it "unlocks the source when submodules are removed from git source", :git => ">= 2.9.0" do
-        install_gemfile <<-G, :expect_err => true
+        install_gemfile <<-G
           git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
@@ -187,7 +187,7 @@ describe "bundle update" do
 
       lib_path("foo-1.0").join(".git").rmtree
 
-      bundle :update, :expect_err => true
+      bundle :update
       expect(out).to include(lib_path("foo-1.0").to_s)
     end
 

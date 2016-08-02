@@ -124,18 +124,18 @@ end
       end
 
       Dir.chdir(lib_path("has_submodule-1.0")) do
-        sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0", :expect_err => true
+        sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0"
         `git commit -m "submodulator"`
       end
 
-      install_gemfile <<-G, :expect_err => true
+      install_gemfile <<-G
         git "#{lib_path("has_submodule-1.0")}", :submodules => true do
           gem "has_submodule"
         end
       G
 
       ref = git.ref_for("master", 11)
-      bundle "#{cmd} --all", :expect_err => true
+      bundle "#{cmd} --all"
 
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist

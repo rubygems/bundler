@@ -58,7 +58,7 @@ describe "bundle install from an existing gemspec" do
   it "should raise if there are no gemspecs available" do
     build_lib("foo", :path => tmp.join("foo"), :gemspec => false)
 
-    error = install_gemfile(<<-G, :expect_err => true)
+    error = install_gemfile(<<-G)
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}'
     G
@@ -70,7 +70,7 @@ describe "bundle install from an existing gemspec" do
       s.write("foo2.gemspec", build_spec("foo", "4.0").first.to_ruby)
     end
 
-    error = install_gemfile(<<-G, :expect_err => true)
+    error = install_gemfile(<<-G)
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}'
     G
@@ -84,7 +84,7 @@ describe "bundle install from an existing gemspec" do
       s.add_development_dependency "bar-dev", "=1.0.0"
     end
 
-    install_gemfile(<<-G, :expect_err => true)
+    install_gemfile(<<-G)
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
     G
@@ -100,7 +100,7 @@ describe "bundle install from an existing gemspec" do
       s.add_development_dependency "bar-dev", "=1.0.0"
     end
 
-    install_gemfile(<<-G, :expect_err => true)
+    install_gemfile(<<-G)
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}', :name => 'foo', :development_group => :dev
     G
@@ -137,7 +137,7 @@ describe "bundle install from an existing gemspec" do
       s.write "raise 'ahh' unless Dir.pwd == '#{tmp.join("foo")}'"
     end
 
-    install_gemfile <<-G, :expect_err => true
+    install_gemfile <<-G
       gemspec :path => '#{tmp.join("foo")}'
     G
     expect(@err).not_to match(/ahh/)

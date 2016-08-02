@@ -165,7 +165,7 @@ describe "bundle package" do
 
       bundle "package --no-install"
 
-      expect(the_bundle).not_to include_gems "rack 1.0.0", :expect_err => true
+      expect(the_bundle).not_to include_gems "rack 1.0.0"
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     end
 

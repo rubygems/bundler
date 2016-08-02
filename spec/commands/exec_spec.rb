@@ -128,7 +128,7 @@ describe "bundle exec" do
       G
     end
 
-    bundle! "exec rackup", :expect_err => true
+    bundle! "exec rackup"
 
     expect(out).to eq("0.9.1")
 
@@ -425,11 +425,11 @@ describe "bundle exec" do
         G
       end
 
-      install_gemfile <<-G, :expect_err => true
+      install_gemfile <<-G
         gem "foo", :path => "#{lib_path("foo-1.0")}"
       G
 
-      bundle "exec irb", :expect_err => true
+      bundle "exec irb"
 
       expect(err).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
       expect(err).to match('"TODO" is not a summary')
@@ -480,7 +480,7 @@ describe "bundle exec" do
     let(:expected) { [exec, args, rack].join("\n") }
     let(:expected_err) { "" }
 
-    subject { bundle "exec #{path} arg1 arg2", :expect_err => true }
+    subject { bundle "exec #{path} arg1 arg2" }
 
     shared_examples_for "it runs" do
       it "like a normally executed executable" do

@@ -237,7 +237,7 @@ describe Bundler::GemHelper do
           mock_confirm_message "Pushed git commits and tags."
           expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
 
-          Dir.chdir(app_path) { sys_exec("git push -u origin master", true) }
+          Dir.chdir(app_path) { sys_exec("git push -u origin master") }
 
           Rake.application["release"].invoke
         end

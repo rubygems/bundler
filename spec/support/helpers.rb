@@ -52,11 +52,10 @@ module Spec
 
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
-      expect_err = opts.delete(:expect_err)
       env = opts.delete(:env)
       groups = args.map(&:inspect).join(", ")
       setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
-      @out = ruby(setup + cmd, :expect_err => expect_err, :env => env)
+      @out = ruby(setup + cmd, :env => env)
     end
     bang :run
 
@@ -69,7 +68,6 @@ module Spec
         end
       RUBY
       opts = args.last.is_a?(Hash) ? args.pop : {}
-      opts.merge!(:expect_err => true)
       args += [opts]
       run(cmd, *args)
     end
@@ -83,7 +81,6 @@ module Spec
     end
 
     def bundle(cmd, options = {})
-      expect_err = options.delete(:expect_err)
       with_sudo = options.delete(:sudo)
       sudo = with_sudo == :preserve_env ? "sudo -E" : "sudo" if with_sudo
 
@@ -103,7 +100,7 @@ module Spec
       end.join
 
       cmd = "#{env} #{sudo} #{Gem.ruby} -I#{lib}:#{spec} #{requires_str} #{bundle_bin} #{cmd}#{args}"
-      sys_exec(cmd, expect_err) {|i, o, thr| yield i, o, thr if block_given? }
+      sys_exec(cmd) {|i, o, thr| yield i, o, thr if block_given? }
     end
     bang :bundle
 
@@ -113,7 +110,6 @@ module Spec
     end
 
     def bundle_ruby(options = {})
-      expect_err = options.delete(:expect_err)
       options["no-color"] = true unless options.key?("no-color")
 
       bundle_bin = File.expand_path("../../../exe/bundle_ruby", __FILE__)
@@ -126,27 +122,25 @@ module Spec
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin}"
 
-      sys_exec(cmd, expect_err) {|i, o, thr| yield i, o, thr if block_given? }
+      sys_exec(cmd) {|i, o, thr| yield i, o, thr if block_given? }
     end
 
     def ruby(ruby, options = {})
-      expect_err = options.delete(:expect_err)
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
       ruby = ruby.gsub(/["`\$]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib}"
-      sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"), expect_err)
+      sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"))
     end
     bang :ruby
 
     def load_error_ruby(ruby, name, opts = {})
-      cmd = <<-R
+      ruby(<<-R)
         begin
           #{ruby}
         rescue LoadError => e
           $stderr.puts "ZOMG LOAD ERROR"# if e.message.include?("-- #{name}")
         end
       R
-      ruby(cmd, opts.merge(:expect_err => true))
     end
 
     def gembin(cmd)
@@ -168,17 +162,24 @@ module Spec
     end
     bang :gem_command
 
-    def sys_exec(cmd, expect_err = false)
+    def sys_exec(cmd)
       Open3.popen3(cmd.to_s) do |stdin, stdout, stderr, wait_thr|
         yield stdin, stdout, wait_thr if block_given?
         stdin.close
 
+        @exitstatus = wait_thr && wait_thr.value.exitstatus
         @out = Thread.new { stdout.read }.value.strip
         @err = Thread.new { stderr.read }.value.strip
-        @exitstatus = wait_thr && wait_thr.value.exitstatus
       end
 
-      puts @err unless expect_err || @err.empty? || !$show_err
+      @all_output << [
+        "$ #{cmd.to_s.strip}",
+        out,
+        err,
+        @exitstatus ? "# $? => #{@exitstatus}" : "",
+        "\n",
+      ].reject(&:empty?).join("\n")
+
       @out
     end
     bang :sys_exec

@@ -93,7 +93,7 @@ describe "Bundler.setup" do
     end
 
     it "handles multiple non-additive invocations" do
-      ruby <<-RUBY, :expect_err => true
+      ruby <<-RUBY
         require 'bundler'
         Bundler.setup(:default, :test)
         Bundler.setup(:default)
@@ -194,7 +194,7 @@ describe "Bundler.setup" do
       gem "rack"
     G
 
-    ruby <<-R, :expect_err => true
+    ruby <<-R
       require 'rubygems'
       require 'bundler'
 
@@ -218,7 +218,7 @@ describe "Bundler.setup" do
       gem "nosuchgem", "10.0"
     G
 
-    ruby <<-R, :expect_err => true
+    ruby <<-R
       require 'rubygems'
       require 'bundler'
 
@@ -296,7 +296,7 @@ describe "Bundler.setup" do
       end
 
       it "version_requirement is now deprecated in rubygems 1.4.0+ when gem is missing" do
-        run <<-R, :expect_err => true
+        run <<-R
           begin
             gem "activesupport"
             puts "FAIL"
@@ -322,7 +322,7 @@ describe "Bundler.setup" do
       end
 
       it "version_requirement is now deprecated in rubygems 1.4.0+ when the version is wrong" do
-        run <<-R, :expect_err => true
+        run <<-R
           begin
             gem "rack", "1.0.0"
             puts "FAIL"
@@ -388,7 +388,7 @@ describe "Bundler.setup" do
     end
 
     it "provides a useful exception when the git repo is not checked out yet" do
-      run "1", :expect_err => true
+      run "1"
       expect(err).to match(/the git source #{lib_path('rack-1.0.0')} is not yet checked out. Please run `bundle install`/i)
     end
 
@@ -431,7 +431,7 @@ describe "Bundler.setup" do
         end
       R
 
-      run "puts 'FAIL'", :expect_err => true
+      run "puts 'FAIL'"
 
       expect(err).not_to include "This is not the git you are looking for"
     end
@@ -475,7 +475,7 @@ describe "Bundler.setup" do
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
       FileUtils.rm_rf(lib_path("local-rack"))
-      run "require 'rack'", :expect_err => true
+      run "require 'rack'"
       expect(err).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
     end
 
@@ -498,7 +498,7 @@ describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}"
       G
 
-      run "require 'rack'", :expect_err => true
+      run "require 'rack'"
       expect(err).to match(/because :branch is not specified in Gemfile/)
     end
 
@@ -521,7 +521,7 @@ describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "changed"
       G
 
-      run "require 'rack'", :expect_err => true
+      run "require 'rack'"
       expect(err).to match(/is using branch master but Gemfile specifies changed/)
     end
 
@@ -541,7 +541,7 @@ describe "Bundler.setup" do
       G
 
       bundle %(config local.rack #{lib_path("local-rack")})
-      run "require 'rack'", :expect_err => true
+      run "require 'rack'"
       expect(err).to match(/is using branch master but Gemfile specifies nonexistant/)
     end
   end
@@ -635,7 +635,7 @@ describe "Bundler.setup" do
           gem "thin", "1.0"
         G
 
-        ruby <<-R, :expect_err => true
+        ruby <<-R
           require 'rubygems'
           gem "thin"
           require 'bundler'

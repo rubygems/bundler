@@ -16,7 +16,7 @@ describe "major deprecations" do
 
   describe "bundle_ruby" do
     it "prints a deprecation" do
-      bundle_ruby :expect_err => true
+      bundle_ruby
       out.gsub! "\nruby #{RUBY_VERSION}", ""
       expect(warnings).to have_major_deprecation "the bundle_ruby executable has been removed in favor of `bundle platform --ruby`"
     end
@@ -136,7 +136,7 @@ describe "major deprecations" do
 
   context "when `bundler/deployment` is required in a ruby script" do
     it "should print a capistrano deprecation warning" do
-      ruby(<<-RUBY, :expect_err => true)
+      ruby(<<-RUBY)
         require 'bundler/deployment'
       RUBY
 

@@ -186,7 +186,7 @@ describe "bundle flex_install" do
 
     it "does not install gems whose dependencies are not met" do
       bundle :install
-      ruby <<-RUBY, :expect_err => true
+      ruby <<-RUBY
         require 'bundler/setup'
       RUBY
       expect(err).to match(/could not find gem 'rack-obama/i)
