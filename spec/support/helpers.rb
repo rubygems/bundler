@@ -158,7 +158,7 @@ module Spec
         args = args.gsub(/(?=")/, "\\")
         args = %("#{args}")
       end
-      sys_exec("#{Gem.ruby} -rubygems -S gem --backtrace #{command} #{args}", options[:expect_err])
+      sys_exec("#{Gem.ruby} -rubygems -S gem --backtrace #{command} #{args}")
     end
     bang :gem_command
 
@@ -172,7 +172,7 @@ module Spec
         @err = Thread.new { stderr.read }.value.strip
       end
 
-      @all_output << [
+      (@all_output ||= String.new) << [
         "$ #{cmd.to_s.strip}",
         out,
         err,
