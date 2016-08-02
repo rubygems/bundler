@@ -66,9 +66,9 @@ module Bundler
         not_installed = definition.missing_specs
         raise GemNotFound if not_installed.any?
       rescue GemNotFound
-        Bundler.ui.error "This bundle's gems must be installed to run this command."
+        Bundler.ui.warn "This bundle's gems must be installed to run this command."
         Bundler.ui.warn "Install missing gems with `bundle install`."
-        exit 2
+        exit 0
       end
 
       definition.specs.each do |spec|
