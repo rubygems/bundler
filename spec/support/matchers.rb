@@ -13,7 +13,6 @@ module Spec
         :actual,
         :description,
         :diffable?,
-        :does_not_match?,
         :expected,
         :failure_message_when_negated
 
@@ -24,8 +23,17 @@ module Spec
       end
 
       def matches?(target, &blk)
-        @failure_index = @preconditions.index {|pc| !pc.matches?(target, &blk) }
-        !@failure_index && @matcher.matches?(target, &blk)
+        return false if @failure_index = @preconditions.index {|pc| !pc.matches?(target, &blk) }
+        @matcher.matches?(target, &blk)
+      end
+
+      def does_not_match?(target, &blk)
+        return false if @failure_index = @preconditions.index {|pc| !pc.matches?(target, &blk) }
+        if @matcher.respond_to?(:does_not_match?)
+          @matcher.does_not_match?(target, &blk)
+        else
+          !@matcher.matches?(target, &blk)
+        end
       end
 
       def expects_call_stack_jump?
