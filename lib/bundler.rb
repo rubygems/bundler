@@ -26,7 +26,6 @@ module Bundler
   autoload :Dsl,                    "bundler/dsl"
   autoload :EndpointSpecification,  "bundler/endpoint_specification"
   autoload :Env,                    "bundler/env"
-  autoload :Environment,            "bundler/environment"
   autoload :Fetcher,                "bundler/fetcher"
   autoload :GemHelper,              "bundler/gem_helper"
   autoload :GemHelpers,             "bundler/gem_helpers"
@@ -112,7 +111,8 @@ module Bundler
     end
 
     def environment
-      Bundler::Environment.new(root, definition)
+      SharedHelpers.major_deprecation "Bundler.environment has been removed in favor of Bundler.load"
+      load
     end
 
     # Returns an instance of Bundler::Definition for given Gemfile and lockfile

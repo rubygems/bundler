@@ -2,8 +2,13 @@
 require "digest/sha1"
 
 module Bundler
-  class Runtime < Environment
+  class Runtime
     include SharedHelpers
+
+    def initialize(root, definition)
+      @root = root
+      @definition = definition
+    end
 
     def setup(*groups)
       groups.map!(&:to_sym)
@@ -105,6 +110,24 @@ module Bundler
           end
         end
       end
+    end
+
+    def self.definition_method(meth)
+      define_method(meth) do
+        raise ArgumentError, "no definition when calling Runtime##{meth}" unless @definition
+        @definition.send(meth)
+      end
+    end
+    private_class_method :definition_method
+
+    definition_method :requested_specs
+    definition_method :specs
+    definition_method :dependencies
+    definition_method :current_dependencies
+    definition_method :requires
+
+    def lock(opts = {})
+      @definition.lock(Bundler.default_lockfile, opts[:preserve_unknown_sections])
     end
 
     alias_method :gems, :specs
