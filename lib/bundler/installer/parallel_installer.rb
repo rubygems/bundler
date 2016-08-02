@@ -5,12 +5,13 @@ require "bundler/installer/gem_installer"
 module Bundler
   class ParallelInstaller
     class SpecInstallation
-      attr_accessor :spec, :name, :post_install_message, :state
+      attr_accessor :spec, :name, :post_install_message, :state, :error
       def initialize(spec)
         @spec = spec
         @name = spec.name
         @state = :none
         @post_install_message = ""
+        @error = nil
       end
 
       def installed?
@@ -21,9 +22,17 @@ module Bundler
         state == :enqueued
       end
 
+      def failed?
+        state == :failed
+      end
+
+      def installation_attempted?
+        installed? || failed?
+      end
+
       # Only true when spec in neither installed nor already enqueued
       def ready_to_enqueue?
-        !installed? && !enqueued?
+        !enqueued? && !installation_attempted?
       end
 
       def has_post_install_message?
@@ -80,17 +89,24 @@ module Bundler
 
     def call
       enqueue_specs
-      process_specs until @specs.all?(&:installed?)
+      process_specs until @specs.all?(&:installed?) || @specs.any?(&:failed?)
+      raise Bundler::InstallError, @specs.select(&:failed?).map(&:error).map(&:to_s).join("\n\n")
     ensure
       worker_pool && worker_pool.stop
     end
 
     def worker_pool
       @worker_pool ||= Bundler::Worker.new @size, "Parallel Installer", lambda { |spec_install, worker_num|
-        message = Bundler::GemInstaller.new(
+        gem_installer = Bundler::GemInstaller.new(
           spec_install.spec, @installer, @standalone, worker_num, @force
-        ).install_from_spec
-        spec_install.post_install_message = message unless message.nil?
+        )
+        success, message = gem_installer.install_from_spec
+        if success && !message.nil?
+          spec_install.post_install_message = message
+        elsif !success
+          spec_install.state = :failed
+          spec_install.error = message
+        end
         spec_install
       }
     end
@@ -102,8 +118,10 @@ module Bundler
     # dequeue.
     def process_specs
       spec = worker_pool.deq
-      spec.state = :installed
-      collect_post_install_message spec if spec.has_post_install_message?
+      unless spec.failed?
+        spec.state = :installed
+        collect_post_install_message spec if spec.has_post_install_message?
+      end
       enqueue_specs
     end
 
