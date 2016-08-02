@@ -4,6 +4,7 @@ require "uri"
 module Bundler
   class Settings
     BOOL_KEYS = %w(
+      allow_offline_install
       cache_all
       disable_local_branch_check
       disable_shared_gems
