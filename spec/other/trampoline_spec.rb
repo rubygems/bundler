@@ -84,10 +84,25 @@ describe "bundler version trampolining" do
       ENV["BUNDLER_VERSION"] = "9999"
       bundle "--version", :expect_err => true
       expect(err).to start_with(<<-E.strip)
+Installing locked Bundler version 9999...
 Installing the inferred bundler version (= 9999) failed.
 If you'd like to update to the current bundler version (#{Bundler::VERSION}) in this project, run `bundle update --bundler`.
 The error was:
       E
+    end
+
+    it "displays installing message before install is started" do
+      expect(system_gem_path.join("gems", "bundler-1.12.3")).not_to exist
+      bundle! "--version"
+      expect(err).to include("Installing locked Bundler version #{ENV["BUNDLER_VERSION"]}...")
+    end
+
+    it "doesn't display installing message if locked version is installed" do
+      expect(system_gem_path.join("gems", "bundler-1.12.3")).not_to exist
+      bundle! "--version"
+      expect(system_gem_path.join("gems", "bundler-1.12.3")).to exist
+      bundle! "--version"
+      expect(err).not_to include("Installing locked Bundler version = #{ENV["BUNDLER_VERSION"]}...")
     end
   end
 
