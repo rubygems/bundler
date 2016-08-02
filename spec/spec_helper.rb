@@ -102,7 +102,13 @@ RSpec.configure do |config|
 
   config.after :each do |example|
     @all_output.strip!
-    warn @all_output if example.exception && !@all_output.empty?
+    if example.exception && !@all_output.empty?
+      warn @all_output
+      message = example.exception.message + "\n\nCommands:\n#{@all_output}"
+      (class << example.exception; self; end).send(:define_method, :message) do
+        message
+      end
+    end
 
     Dir.chdir(original_wd)
     ENV.replace(original_env)
