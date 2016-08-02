@@ -38,7 +38,7 @@ describe "install with --deployment or --frozen" do
     bundle "install --deployment"
     bundle :install
     expect(exitstatus).to eq(0) if exitstatus
-    expect(the_bundle).to have_installed "rack 1.0"
+    expect(the_bundle).to include_gems "rack 1.0"
   end
 
   it "still works if you are not in the app directory and specify --gemfile" do
@@ -47,7 +47,7 @@ describe "install with --deployment or --frozen" do
     simulate_new_machine
     bundle "install --gemfile #{tmp}/bundled_app/Gemfile --deployment"
     Dir.chdir bundled_app
-    expect(the_bundle).to have_installed "rack 1.0"
+    expect(the_bundle).to include_gems "rack 1.0"
   end
 
   it "works if you exclude a group with a git gem" do
@@ -105,7 +105,7 @@ describe "install with --deployment or --frozen" do
     bundle "install --deployment"
 
     expect(exitstatus).to eq(0) if exitstatus
-    expect(the_bundle).to have_installed "rack 1.0"
+    expect(the_bundle).to include_gems "rack 1.0"
   end
 
   describe "with an existing lockfile" do
@@ -260,7 +260,7 @@ describe "install with --deployment or --frozen" do
         gem "rack-obama"
       G
 
-      expect(the_bundle).to have_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
   end
 
@@ -272,7 +272,7 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle :install
-      expect(the_bundle).to have_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
       bundle "package --all"
       expect(bundled_app("vendor/cache/foo")).to be_directory
 
@@ -288,7 +288,7 @@ describe "install with --deployment or --frozen" do
       expect(out).not_to include("You have deleted from the Gemfile")
       expect(out).to include("Using foo 1.0 from source at")
       expect(out).to include("vendor/cache/foo")
-      expect(the_bundle).to have_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
   end
 end

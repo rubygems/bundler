@@ -151,7 +151,7 @@ describe "bundle exec" do
     bundle "exec rackup"
 
     expect(out).to eq("0.9.1")
-    expect(the_bundle).not_to have_installed "rack_middleware 1.0"
+    expect(the_bundle).not_to include_gems "rack_middleware 1.0"
   end
 
   it "does not duplicate already exec'ed RUBYOPT" do

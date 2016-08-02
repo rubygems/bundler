@@ -19,7 +19,7 @@ describe "bundle update" do
 
       bundle "update"
 
-      expect(the_bundle).to have_installed "foo 1.1"
+      expect(the_bundle).to include_gems "foo 1.1"
     end
 
     it "updates correctly when you have like craziness" do
@@ -34,7 +34,7 @@ describe "bundle update" do
 
       bundle "update rails"
       expect(out).to include("Using activesupport 3.0 from #{lib_path("rails")} (at master@#{revision_for(lib_path("rails"))[0..6]})")
-      expect(the_bundle).to have_installed "rails 3.0", "activesupport 3.0"
+      expect(the_bundle).to include_gems "rails 3.0", "activesupport 3.0"
     end
 
     it "floats on a branch when :branch is used and the source is specified in the update" do
@@ -53,7 +53,7 @@ describe "bundle update" do
 
       bundle "update --source foo"
 
-      expect(the_bundle).to have_installed "foo 1.1"
+      expect(the_bundle).to include_gems "foo 1.1"
     end
 
     it "floats on master when updating all gems that are pinned to the source even if you have child dependencies" do
@@ -73,7 +73,7 @@ describe "bundle update" do
 
       bundle "update foo"
 
-      expect(the_bundle).to have_installed "foo 1.1"
+      expect(the_bundle).to include_gems "foo 1.1"
     end
 
     it "notices when you change the repo url in the Gemfile" do
@@ -268,7 +268,7 @@ describe "bundle update" do
       update_git "foo", "2.0", :path => @git.path
 
       bundle "update --source foo"
-      expect(the_bundle).to have_installed "foo 2.0"
+      expect(the_bundle).to include_gems "foo 2.0"
     end
 
     it "leaves all other gems frozen" do
@@ -276,7 +276,7 @@ describe "bundle update" do
       update_git "foo", :path => @git.path
 
       bundle "update --source foo"
-      expect(the_bundle).to have_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
   end
 

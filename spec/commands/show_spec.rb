@@ -80,7 +80,7 @@ describe "bundle show" do
       install_gemfile <<-G
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
-      expect(the_bundle).to have_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
 
       bundle :show
       expect(out).to include("foo (1.0 #{@git.ref_for("master", 6)}")
@@ -95,7 +95,7 @@ describe "bundle show" do
       install_gemfile <<-G
         gem "foo", :git => "#{lib_path("foo-1.0")}", :branch => "omg"
       G
-      expect(the_bundle).to have_installed "foo 1.0.omg"
+      expect(the_bundle).to include_gems "foo 1.0.omg"
 
       bundle :show
       expect(out).to include("foo (1.0 #{@git.ref_for("omg", 6)}")
@@ -116,7 +116,7 @@ describe "bundle show" do
       install_gemfile <<-G
         gem "foo", "1.0.0-beta.1", :git => "#{lib_path("foo")}"
       G
-      expect(the_bundle).to have_installed "foo 1.0.0.pre.beta.1"
+      expect(the_bundle).to include_gems "foo 1.0.0.pre.beta.1"
 
       bundle! :show
       expect(out).to include("foo (1.0.0.pre.beta.1")

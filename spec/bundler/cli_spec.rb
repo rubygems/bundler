@@ -35,7 +35,7 @@ describe "bundle executable" do
 
       bundle :install, :env => { "BUNDLE_GEMFILE" => "" }
 
-      expect(the_bundle).to have_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
   end
 

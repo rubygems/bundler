@@ -16,7 +16,7 @@ describe "bundle install" do
 
       config "BUNDLE_SYSTEM_BINDIR" => system_gem_path("altbin").to_s
       bundle :install
-      expect(the_bundle).to have_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
       expect(system_gem_path("altbin/rackup")).to exist
     end
   end

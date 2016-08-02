@@ -244,7 +244,7 @@ describe "bundle binstubs <gem>" do
       bundle "config auto_install 1"
       bundle "binstubs rack"
       expect(out).to include("Installing rack 1.0.0")
-      expect(the_bundle).to have_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
 
     it "does nothing when already up to date" do

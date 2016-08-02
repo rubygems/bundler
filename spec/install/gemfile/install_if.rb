@@ -15,9 +15,9 @@ describe "bundle install with install_if conditionals" do
       gem "rack"
     G
 
-    expect(the_bundle).to have_installed("rack 1.0", "activesupport 2.3.5")
-    expect(the_bundle).not_to have_installed("thin")
-    expect(the_bundle).not_to have_installed("foo")
+    expect(the_bundle).to include_gems("rack 1.0", "activesupport 2.3.5")
+    expect(the_bundle).not_to include_gems("thin")
+    expect(the_bundle).not_to include_gems("foo")
 
     lockfile_should_be <<-L
       GEM

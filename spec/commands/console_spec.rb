@@ -102,6 +102,6 @@ describe "bundle console" do
     end
     expect(out).to include("Installing foo 1.0")
     expect(out).to include("hello")
-    expect(the_bundle).to have_installed "foo 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
   end
 end

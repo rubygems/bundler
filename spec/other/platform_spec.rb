@@ -494,7 +494,7 @@ G
       end
 
       bundle "update"
-      expect(the_bundle).to have_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+      expect(the_bundle).to include_gems "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
     it "updates fine with any engine" do
@@ -511,7 +511,7 @@ G
         end
 
         bundle "update"
-        expect(the_bundle).to have_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+        expect(the_bundle).to include_gems "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
       end
     end
 

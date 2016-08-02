@@ -17,7 +17,7 @@ describe "bundle install with git sources" do
     end
 
     it "fetches gems" do
-      expect(the_bundle).to have_installed("foo 1.0")
+      expect(the_bundle).to include_gems("foo 1.0")
 
       run <<-RUBY
         require 'foo'
@@ -126,7 +126,7 @@ describe "bundle install with git sources" do
       FileUtils.mv bundled_app, tmp("bundled_app.bck")
 
       Dir.chdir tmp("bundled_app.bck")
-      expect(the_bundle).to have_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "can still install after moving the application directory" do
@@ -147,7 +147,7 @@ describe "bundle install with git sources" do
 
       bundle "update foo"
 
-      expect(the_bundle).to have_installed "foo 1.1", "rack 1.0"
+      expect(the_bundle).to include_gems "foo 1.1", "rack 1.0"
     end
   end
 
@@ -166,7 +166,7 @@ describe "bundle install with git sources" do
 
     it "does not explode" do
       bundle "install"
-      expect(the_bundle).to have_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
   end
 
@@ -398,7 +398,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}"
       G
 
-      expect(the_bundle).to have_installed "rack 0.8"
+      expect(the_bundle).to include_gems "rack 0.8"
     end
 
     it "installs dependencies from git even if a newer gem is available elsewhere" do
@@ -434,7 +434,7 @@ describe "bundle install with git sources" do
         gem "rack", "1.0.0", :git => "#{lib_path("rack")}"
       G
 
-      expect(the_bundle).to have_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
 
     it "correctly unlocks when changing to a git source without versions" do
@@ -450,7 +450,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack")}"
       G
 
-      expect(the_bundle).to have_installed "rack 1.2"
+      expect(the_bundle).to include_gems "rack 1.2"
     end
   end
 
@@ -466,7 +466,7 @@ describe "bundle install with git sources" do
         end
       G
 
-      expect(the_bundle).to have_installed "omg 1.0", "hi2u 1.0"
+      expect(the_bundle).to include_gems "omg 1.0", "hi2u 1.0"
     end
   end
 
@@ -498,8 +498,8 @@ describe "bundle install with git sources" do
       gem "rails", "2.3.2"
     G
 
-    expect(the_bundle).to have_installed "foo 1.0"
-    expect(the_bundle).to have_installed "rails 2.3.2"
+    expect(the_bundle).to include_gems "foo 1.0"
+    expect(the_bundle).to include_gems "rails 2.3.2"
   end
 
   it "runs the gemspec in the context of its parent directory" do
@@ -528,8 +528,8 @@ describe "bundle install with git sources" do
       gem "rails", "2.3.2"
     G
 
-    expect(the_bundle).to have_installed "bar 1.0"
-    expect(the_bundle).to have_installed "rails 2.3.2"
+    expect(the_bundle).to include_gems "bar 1.0"
+    expect(the_bundle).to include_gems "rails 2.3.2"
   end
 
   it "installs from git even if a rubygems gem is present" do
@@ -543,7 +543,7 @@ describe "bundle install with git sources" do
       gem "foo", "1.0", :git => "#{lib_path("foo-1.0")}"
     G
 
-    expect(the_bundle).to have_installed "foo 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
   end
 
   it "fakes the gem out if there is no gemspec" do
@@ -555,8 +555,8 @@ describe "bundle install with git sources" do
       gem "rails", "2.3.2"
     G
 
-    expect(the_bundle).to have_installed("foo 1.0")
-    expect(the_bundle).to have_installed("rails 2.3.2")
+    expect(the_bundle).to include_gems("foo 1.0")
+    expect(the_bundle).to include_gems("rails 2.3.2")
   end
 
   it "catches git errors and spits out useful output" do
@@ -578,7 +578,7 @@ describe "bundle install with git sources" do
       gem "foo", :git => "#{lib_path("foo space-1.0")}"
     G
 
-    expect(the_bundle).to have_installed "foo 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
   end
 
   it "handles repos that have been force-pushed" do
@@ -589,21 +589,21 @@ describe "bundle install with git sources" do
         gem 'forced'
       end
     G
-    expect(the_bundle).to have_installed "forced 1.0"
+    expect(the_bundle).to include_gems "forced 1.0"
 
     update_git "forced" do |s|
       s.write "lib/forced.rb", "FORCED = '1.1'"
     end
 
     bundle "update"
-    expect(the_bundle).to have_installed "forced 1.1"
+    expect(the_bundle).to include_gems "forced 1.1"
 
     Dir.chdir(lib_path("forced-1.0")) do
       `git reset --hard HEAD^`
     end
 
     bundle "update"
-    expect(the_bundle).to have_installed "forced 1.0"
+    expect(the_bundle).to include_gems "forced 1.0"
   end
 
   it "ignores submodules if :submodule is not passed" do
@@ -623,7 +623,7 @@ describe "bundle install with git sources" do
     G
     expect(out).to match(/could not find gem 'submodule/i)
 
-    expect(the_bundle).not_to have_installed "has_submodule 1.0", :expect_err => true
+    expect(the_bundle).not_to include_gems "has_submodule 1.0", :expect_err => true
   end
 
   it "handles repos with submodules" do
@@ -642,7 +642,7 @@ describe "bundle install with git sources" do
       end
     G
 
-    expect(the_bundle).to have_installed "has_submodule 1.0"
+    expect(the_bundle).to include_gems "has_submodule 1.0"
   end
 
   it "handles implicit updates when modifying the source info" do
@@ -747,7 +747,7 @@ describe "bundle install with git sources" do
         gem "bar", :git => "#{lib_path("bar")}"
       G
 
-      expect(the_bundle).to have_installed "foo 1.0", "bar 1.0"
+      expect(the_bundle).to include_gems "foo 1.0", "bar 1.0"
     end
 
     it "doesn't explode when switching Gem to Git source" do
@@ -1097,7 +1097,7 @@ describe "bundle install with git sources" do
         G
 
         bundle :install
-        expect(the_bundle).to have_installed "foo 1.0"
+        expect(the_bundle).to include_gems "foo 1.0"
       end
     end
   end

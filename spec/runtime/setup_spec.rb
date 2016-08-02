@@ -256,7 +256,7 @@ describe "Bundler.setup" do
     ENV["BUNDLE_GEMFILE"] = bundled_app("4realz").to_s
     bundle :install
 
-    expect(the_bundle).to have_installed "activesupport 2.3.5"
+    expect(the_bundle).to include_gems "activesupport 2.3.5"
   end
 
   it "prioritizes gems in BUNDLE_PATH over gems in GEM_HOME" do
@@ -270,7 +270,7 @@ describe "Bundler.setup" do
       s.write "lib/rack.rb", "RACK = 'FAIL'"
     end
 
-    expect(the_bundle).to have_installed "rack 1.0.0"
+    expect(the_bundle).to include_gems "rack 1.0.0"
   end
 
   describe "integrate with rubygems" do
@@ -439,14 +439,14 @@ describe "Bundler.setup" do
     it "works even when the cache directory has been deleted" do
       bundle "install --path vendor/bundle"
       FileUtils.rm_rf vendored_gems("cache")
-      expect(the_bundle).to have_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
 
     it "does not randomly change the path when specifying --path and the bundle directory becomes read only" do
       bundle "install --path vendor/bundle"
 
       with_read_only("**/*") do
-        expect(the_bundle).to have_installed "rack 1.0.0"
+        expect(the_bundle).to include_gems "rack 1.0.0"
       end
     end
 
@@ -454,7 +454,7 @@ describe "Bundler.setup" do
       bundle "install"
 
       with_read_only("#{Bundler.bundle_path}/**/*") do
-        expect(the_bundle).to have_installed "rack 1.0.0"
+        expect(the_bundle).to include_gems "rack 1.0.0"
       end
     end
   end
@@ -559,7 +559,7 @@ describe "Bundler.setup" do
 
       install_gems "activesupport-2.3.5"
 
-      expect(the_bundle).to have_installed "activesupport 2.3.2", :groups => :default
+      expect(the_bundle).to include_gems "activesupport 2.3.2", :groups => :default
     end
 
     it "remembers --without and does not bail on bare Bundler.setup" do
@@ -574,7 +574,7 @@ describe "Bundler.setup" do
 
       install_gems "activesupport-2.3.5"
 
-      expect(the_bundle).to have_installed "activesupport 2.3.2"
+      expect(the_bundle).to include_gems "activesupport 2.3.2"
     end
 
     it "remembers --without and does not include groups passed to Bundler.setup" do
@@ -591,8 +591,8 @@ describe "Bundler.setup" do
         end
       G
 
-      expect(the_bundle).not_to have_installed "activesupport 2.3.2", :groups => :rack
-      expect(the_bundle).to have_installed "rack 1.0.0", :groups => :rack
+      expect(the_bundle).not_to include_gems "activesupport 2.3.2", :groups => :rack
+      expect(the_bundle).to include_gems "rack 1.0.0", :groups => :rack
     end
   end
 

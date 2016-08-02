@@ -10,7 +10,7 @@ describe "bundle install with explicit source paths" do
       gem 'foo'
     G
 
-    expect(the_bundle).to have_installed("foo 1.0")
+    expect(the_bundle).to include_gems("foo 1.0")
   end
 
   it "supports pinned paths" do
@@ -20,7 +20,7 @@ describe "bundle install with explicit source paths" do
       gem 'foo', :path => "#{lib_path("foo-1.0")}"
     G
 
-    expect(the_bundle).to have_installed("foo 1.0")
+    expect(the_bundle).to include_gems("foo 1.0")
   end
 
   it "supports relative paths" do
@@ -32,7 +32,7 @@ describe "bundle install with explicit source paths" do
       gem 'foo', :path => "#{relative_path}"
     G
 
-    expect(the_bundle).to have_installed("foo 1.0")
+    expect(the_bundle).to include_gems("foo 1.0")
   end
 
   it "expands paths" do
@@ -44,7 +44,7 @@ describe "bundle install with explicit source paths" do
       gem 'foo', :path => "~/#{relative_path}"
     G
 
-    expect(the_bundle).to have_installed("foo 1.0")
+    expect(the_bundle).to include_gems("foo 1.0")
   end
 
   it "expands paths raise error with not existing user's home dir" do
@@ -68,7 +68,7 @@ describe "bundle install with explicit source paths" do
 
     bundled_app("subdir").mkpath
     Dir.chdir(bundled_app("subdir")) do
-      expect(the_bundle).to have_installed("foo 1.0")
+      expect(the_bundle).to include_gems("foo 1.0")
     end
   end
 
@@ -118,7 +118,7 @@ describe "bundle install with explicit source paths" do
       gem "omg", :path => "#{lib_path("omg")}"
     G
 
-    expect(the_bundle).to have_installed "foo 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
   end
 
   it "prefers gemspecs closer to the path root" do
@@ -139,7 +139,7 @@ describe "bundle install with explicit source paths" do
 
     # Installation of the 'gemfiles' gemspec would fail since it will be unable
     # to require 'premailer.rb'
-    expect(the_bundle).to have_installed "premailer 1.0.0"
+    expect(the_bundle).to include_gems "premailer 1.0.0"
   end
 
   it "warns on invalid specs", :rubygems => "1.7" do
@@ -179,8 +179,8 @@ describe "bundle install with explicit source paths" do
 
     Dir.chdir(lib_path("foo")) do
       bundle "install"
-      expect(the_bundle).to have_installed "foo 1.0"
-      expect(the_bundle).to have_installed "rack 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
   end
 
@@ -194,8 +194,8 @@ describe "bundle install with explicit source paths" do
       gemspec :path => "#{lib_path("foo")}"
     G
 
-    expect(the_bundle).to have_installed "foo 1.0"
-    expect(the_bundle).to have_installed "rack 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
+    expect(the_bundle).to include_gems "rack 1.0"
   end
 
   it "doesn't automatically unlock dependencies when using the gemspec syntax" do
@@ -214,8 +214,8 @@ describe "bundle install with explicit source paths" do
 
     bundle "install"
 
-    expect(the_bundle).to have_installed "foo 1.0"
-    expect(the_bundle).to have_installed "rack 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
+    expect(the_bundle).to include_gems "rack 1.0"
   end
 
   it "doesn't automatically unlock dependencies when using the gemspec syntax and the gem has development dependencies" do
@@ -235,8 +235,8 @@ describe "bundle install with explicit source paths" do
 
     bundle "install"
 
-    expect(the_bundle).to have_installed "foo 1.0"
-    expect(the_bundle).to have_installed "rack 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
+    expect(the_bundle).to include_gems "rack 1.0"
   end
 
   it "raises if there are multiple gemspecs" do
@@ -261,7 +261,7 @@ describe "bundle install with explicit source paths" do
       gemspec :path => "#{lib_path("foo")}", :name => "foo"
     G
 
-    expect(the_bundle).to have_installed "foo 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
   end
 
   it "sets up executables" do
@@ -273,7 +273,7 @@ describe "bundle install with explicit source paths" do
       path "#{lib_path("foo-1.0")}"
       gem 'foo'
     G
-    expect(the_bundle).to have_installed "foo 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
 
     bundle "exec foobar"
     expect(out).to eq("1.0")
@@ -312,7 +312,7 @@ describe "bundle install with explicit source paths" do
         end
       G
 
-      expect(the_bundle).to have_installed "omg 1.0", "hi2u 1.0"
+      expect(the_bundle).to include_gems "omg 1.0", "hi2u 1.0"
     end
   end
 
@@ -328,7 +328,7 @@ describe "bundle install with explicit source paths" do
       gem "omg", :path => "#{lib_path("omg")}"
     G
 
-    expect(the_bundle).to have_installed "foo 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
   end
 
   it "works when the path does not have a gemspec" do
@@ -338,9 +338,9 @@ describe "bundle install with explicit source paths" do
       gem "foo", "1.0", :path => "#{lib_path("foo-1.0")}"
     G
 
-    expect(the_bundle).to have_installed "foo 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
 
-    expect(the_bundle).to have_installed "foo 1.0"
+    expect(the_bundle).to include_gems "foo 1.0"
   end
 
   it "works when the path does not have a gemspec but there is a lockfile" do
@@ -371,7 +371,7 @@ describe "bundle install with explicit source paths" do
 
       bundle :check, :env => { "DEBUG" => 1 }
       expect(out).to match(/using resolution from the lockfile/)
-      expect(the_bundle).to have_installed "rack-obama 1.0", "net-ssh 1.0"
+      expect(the_bundle).to include_gems "rack-obama 1.0", "net-ssh 1.0"
     end
 
     it "source path gems w/deps don't re-resolve without changes" do
@@ -391,7 +391,7 @@ describe "bundle install with explicit source paths" do
 
       bundle :check, :env => { "DEBUG" => 1 }
       expect(out).to match(/using resolution from the lockfile/)
-      expect(the_bundle).to have_installed "rack-obama 1.0", "net-ssh 1.0"
+      expect(the_bundle).to include_gems "rack-obama 1.0", "net-ssh 1.0"
     end
   end
 
@@ -427,7 +427,7 @@ describe "bundle install with explicit source paths" do
 
       bundle "install"
 
-      expect(the_bundle).to have_installed "foo 2.0", "bar 1.0"
+      expect(the_bundle).to include_gems "foo 2.0", "bar 1.0"
     end
 
     it "unlocks all gems when a child dependency gem is updated" do
@@ -435,7 +435,7 @@ describe "bundle install with explicit source paths" do
 
       bundle "install"
 
-      expect(the_bundle).to have_installed "foo 1.0", "bar 2.0"
+      expect(the_bundle).to include_gems "foo 1.0", "bar 2.0"
     end
   end
 
@@ -456,7 +456,7 @@ describe "bundle install with explicit source paths" do
 
       bundle "install"
 
-      expect(the_bundle).to have_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
   end
 
@@ -480,7 +480,7 @@ describe "bundle install with explicit source paths" do
         gem "bar", :path => "#{lib_path("bar")}"
       G
 
-      expect(the_bundle).to have_installed "foo 1.0", "bar 1.0"
+      expect(the_bundle).to include_gems "foo 1.0", "bar 1.0"
     end
 
     it "switches the source when the gem existed in rubygems and the path was already being used for another gem" do
@@ -507,7 +507,7 @@ describe "bundle install with explicit source paths" do
         end
       G
 
-      expect(the_bundle).to have_installed "bar 1.0"
+      expect(the_bundle).to include_gems "bar 1.0"
     end
   end
 
@@ -525,8 +525,8 @@ describe "bundle install with explicit source paths" do
         bundle :install, :env => { "DEBUG" => 1 }, :artifice => "endpoint"
         expect(out).to match(%r{^HTTP GET http://localgemserver\.test/api/v1/dependencies\?gems=rack$})
         expect(out).not_to match(/^HTTP GET.*private_lib/)
-        expect(the_bundle).to have_installed "private_lib 2.2"
-        expect(the_bundle).to have_installed "rack 1.0"
+        expect(the_bundle).to include_gems "private_lib 2.2"
+        expect(the_bundle).to include_gems "rack 1.0"
       end
     end
   end

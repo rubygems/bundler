@@ -36,7 +36,7 @@ describe "bundle install with install-time dependencies" do
       gem "actionpack", "2.3.2"
     G
 
-    expect(the_bundle).to have_installed "actionpack 2.3.2", "activesupport 2.3.2"
+    expect(the_bundle).to include_gems "actionpack 2.3.2", "activesupport 2.3.2"
   end
 
   describe "with crazy rubygem plugin stuff" do
@@ -46,7 +46,7 @@ describe "bundle install with install-time dependencies" do
         gem "net_b"
       G
 
-      expect(the_bundle).to have_installed "net_b 1.0"
+      expect(the_bundle).to include_gems "net_b 1.0"
     end
 
     it "installs plugins depended on by other plugins" do
@@ -55,7 +55,7 @@ describe "bundle install with install-time dependencies" do
         gem "net_a"
       G
 
-      expect(the_bundle).to have_installed "net_a 1.0", "net_b 1.0"
+      expect(the_bundle).to include_gems "net_a 1.0", "net_b 1.0"
     end
 
     it "installs multiple levels of dependencies" do
@@ -65,7 +65,7 @@ describe "bundle install with install-time dependencies" do
         gem "net_e"
       G
 
-      expect(the_bundle).to have_installed "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
+      expect(the_bundle).to include_gems "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
     end
 
     context "with ENV['DEBUG_RESOLVER'] set" do
@@ -118,7 +118,7 @@ describe "bundle install with install-time dependencies" do
         G
 
         expect(out).to_not include("rack-9001.0.0 requires ruby version > 9000")
-        expect(the_bundle).to have_installed("rack 1.2")
+        expect(the_bundle).to include_gems("rack 1.2")
       end
     end
 

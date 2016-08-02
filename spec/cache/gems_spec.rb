@@ -24,14 +24,14 @@ describe "bundle cache" do
         gem "omg"
       G
 
-      expect(the_bundle).to have_installed "omg 1.0.0"
+      expect(the_bundle).to include_gems "omg 1.0.0"
     end
 
     it "uses the cache as a source when installing gems with --local" do
       system_gems []
       bundle "install --local"
 
-      expect(the_bundle).to have_installed("rack 1.0.0")
+      expect(the_bundle).to include_gems("rack 1.0.0")
     end
 
     it "does not reinstall gems from the cache if they exist on the system" do
@@ -43,7 +43,7 @@ describe "bundle cache" do
         gem "rack"
       G
 
-      expect(the_bundle).to have_installed("rack 1.0.0")
+      expect(the_bundle).to include_gems("rack 1.0.0")
     end
 
     it "does not reinstall gems from the cache if they exist in the bundle" do
@@ -58,7 +58,7 @@ describe "bundle cache" do
       end
 
       bundle "install --local"
-      expect(the_bundle).to have_installed("rack 1.0.0")
+      expect(the_bundle).to include_gems("rack 1.0.0")
     end
 
     it "creates a lockfile" do
@@ -89,7 +89,7 @@ describe "bundle cache" do
 
     it "uses builtin gems" do
       install_gemfile %(gem 'builtin_gem', '1.0.2')
-      expect(the_bundle).to have_installed("builtin_gem 1.0.2")
+      expect(the_bundle).to include_gems("builtin_gem 1.0.2")
     end
 
     it "caches remote and builtin gems" do
@@ -115,7 +115,7 @@ describe "bundle cache" do
       G
 
       bundle "install --local"
-      expect(the_bundle).to have_installed("builtin_gem_2 1.0.2")
+      expect(the_bundle).to include_gems("builtin_gem_2 1.0.2")
     end
 
     it "errors if the builtin gem isn't available to cache" do
@@ -149,7 +149,7 @@ describe "bundle cache" do
       system_gems []
       bundle "install --local"
 
-      expect(the_bundle).to have_installed("rack 1.0.0", "foo 1.0")
+      expect(the_bundle).to include_gems("rack 1.0.0", "foo 1.0")
     end
 
     it "should not explode if the lockfile is not present" do
@@ -286,7 +286,7 @@ describe "bundle cache" do
         gem "foo-bundler"
       G
 
-      expect(the_bundle).to have_installed "foo-bundler 1.0"
+      expect(the_bundle).to include_gems "foo-bundler 1.0"
     end
   end
 end

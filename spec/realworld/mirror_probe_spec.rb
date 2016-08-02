@@ -35,7 +35,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
 
       expect(out).to include("Installing weakling")
       expect(out).to include("Bundle complete")
-      expect(the_bundle).to have_installed "weakling 0.0.3"
+      expect(the_bundle).to include_gems "weakling 0.0.3"
     end
   end
 
@@ -55,7 +55,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
 
       expect(out).to include("Installing weakling")
       expect(out).to include("Bundle complete")
-      expect(the_bundle).to have_installed "weakling 0.0.3"
+      expect(the_bundle).to include_gems "weakling 0.0.3"
     end
   end
 

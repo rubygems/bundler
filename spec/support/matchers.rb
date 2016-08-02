@@ -119,7 +119,7 @@ module Spec
       string.to_s.gsub(/^/, indent_character * padding).gsub("\t", "    ")
     end
 
-    define_compound_matcher :have_installed, [be_an_instance_of(Spec::TheBundle)] do |*names|
+    define_compound_matcher :include_gems, [be_an_instance_of(Spec::TheBundle)] do |*names|
       match do
         opts = names.last.is_a?(Hash) ? names.pop : {}
         source = opts.delete(:source)
@@ -192,7 +192,8 @@ module Spec
         super() + " but:\n" + @errors.map {|e| indent(e) }.join("\n")
       end
     end
-    RSpec::Matchers.define_negated_matcher :not_have_installed, :have_installed
+    RSpec::Matchers.define_negated_matcher :not_include_gems, :include_gems
+    RSpec::Matchers.alias_matcher :include_gem, :include_gems
 
     def have_lockfile(expected)
       read_as(strip_whitespace(expected))

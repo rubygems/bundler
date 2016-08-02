@@ -26,7 +26,7 @@ describe "fetching dependencies with a mirrored source", :realworld => true, :ru
 
     expect(out).to include("Installing weakling")
     expect(out).to include("Bundle complete")
-    expect(the_bundle).to have_installed "weakling 0.0.3"
+    expect(the_bundle).to include_gems "weakling 0.0.3"
   end
 
   private

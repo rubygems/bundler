@@ -18,8 +18,8 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}'
     G
 
-    expect(the_bundle).to have_installed "bar 1.0.0"
-    expect(the_bundle).to have_installed "bar-dev 1.0.0", :groups => :development
+    expect(the_bundle).to include_gems "bar 1.0.0"
+    expect(the_bundle).to include_gems "bar-dev 1.0.0", :groups => :development
   end
 
   it "that is hidden should install runtime and development dependencies" do
@@ -35,8 +35,8 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}'
     G
 
-    expect(the_bundle).to have_installed "bar 1.0.0"
-    expect(the_bundle).to have_installed "bar-dev 1.0.0", :groups => :development
+    expect(the_bundle).to include_gems "bar 1.0.0"
+    expect(the_bundle).to include_gems "bar-dev 1.0.0", :groups => :development
   end
 
   it "should handle a list of requirements" do
@@ -52,7 +52,7 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}'
     G
 
-    expect(the_bundle).to have_installed "baz 1.0"
+    expect(the_bundle).to include_gems "baz 1.0"
   end
 
   it "should raise if there are no gemspecs available" do
@@ -89,8 +89,8 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
     G
 
-    expect(the_bundle).to have_installed "bar 1.0.0"
-    expect(the_bundle).to have_installed "bar-dev 1.0.0", :groups => :development
+    expect(the_bundle).to include_gems "bar 1.0.0"
+    expect(the_bundle).to include_gems "bar-dev 1.0.0", :groups => :development
   end
 
   it "should use a specific group for development dependencies" do
@@ -105,9 +105,9 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}', :name => 'foo', :development_group => :dev
     G
 
-    expect(the_bundle).to have_installed "bar 1.0.0"
-    expect(the_bundle).not_to have_installed "bar-dev 1.0.0", :groups => :development
-    expect(the_bundle).to have_installed "bar-dev 1.0.0", :groups => :dev
+    expect(the_bundle).to include_gems "bar 1.0.0"
+    expect(the_bundle).not_to include_gems "bar-dev 1.0.0", :groups => :development
+    expect(the_bundle).to include_gems "bar-dev 1.0.0", :groups => :dev
   end
 
   it "should match a lockfile even if the gemspec defines development dependencies" do
@@ -159,7 +159,7 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
     G
 
-    expect(the_bundle).to have_installed "foo 1.0.0"
+    expect(the_bundle).to include_gems "foo 1.0.0"
   end
 
   context "when child gemspecs conflict with a released gemspec" do
@@ -182,7 +182,7 @@ describe "bundle install from an existing gemspec" do
         gemspec
       G
 
-      expect(the_bundle).to have_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
   end
 
@@ -246,7 +246,7 @@ describe "bundle install from an existing gemspec" do
             simulate_platform "java" do
               results = bundle "install", :artifice => "endpoint"
               expect(results).to include("Installing rack 1.0.0")
-              expect(the_bundle).to have_installed "rack 1.0.0"
+              expect(the_bundle).to include_gems "rack 1.0.0"
             end
           end
         end
@@ -260,7 +260,7 @@ describe "bundle install from an existing gemspec" do
             simulate_platform "java" do
               results = bundle "install", :artifice => "endpoint"
               expect(results).to include("Installing rack 1.0.0")
-              expect(the_bundle).to have_installed "rack 1.0.0"
+              expect(the_bundle).to include_gems "rack 1.0.0"
             end
           end
         end
@@ -271,7 +271,7 @@ describe "bundle install from an existing gemspec" do
           simulate_windows do
             results = bundle "install", :artifice => "endpoint"
             expect(results).to include("Installing rack 1.0.0")
-            expect(the_bundle).to have_installed "rack 1.0.0"
+            expect(the_bundle).to include_gems "rack 1.0.0"
           end
         end
       end
@@ -315,7 +315,7 @@ describe "bundle install from an existing gemspec" do
 
         context "as a runtime dependency" do
           it "keeps java dependencies in the lockfile" do
-            expect(the_bundle).to have_installed "foo 1.0", "platform_specific 1.0 RUBY"
+            expect(the_bundle).to include_gems "foo 1.0", "platform_specific 1.0 RUBY"
             expect(lockfile).to eq strip_whitespace(<<-L)
               PATH
                 remote: .
@@ -346,7 +346,7 @@ describe "bundle install from an existing gemspec" do
           let(:platform_specific_type) { :development }
 
           it "keeps java dependencies in the lockfile" do
-            expect(the_bundle).to have_installed "foo 1.0", "platform_specific 1.0 RUBY"
+            expect(the_bundle).to include_gems "foo 1.0", "platform_specific 1.0 RUBY"
             expect(lockfile).to eq strip_whitespace(<<-L)
               PATH
                 remote: .
@@ -378,7 +378,7 @@ describe "bundle install from an existing gemspec" do
           let(:dependency) { "indirect_platform_specific" }
 
           it "keeps java dependencies in the lockfile" do
-            expect(the_bundle).to have_installed "foo 1.0", "indirect_platform_specific 1.0", "platform_specific 1.0 RUBY"
+            expect(the_bundle).to include_gems "foo 1.0", "indirect_platform_specific 1.0", "platform_specific 1.0 RUBY"
             expect(lockfile).to eq strip_whitespace(<<-L)
               PATH
                 remote: .

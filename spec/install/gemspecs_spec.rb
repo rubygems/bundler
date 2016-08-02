@@ -44,7 +44,7 @@ describe "bundle install" do
       f.write spec.to_ruby
     end
     bundle :install, :artifice => "endpoint_marshal_fail" # force gemspec load
-    expect(the_bundle).to have_installed "activesupport 2.3.2"
+    expect(the_bundle).to include_gems "activesupport 2.3.2"
   end
 
   context "when ruby version is specified in gemspec and gemfile" do
@@ -57,7 +57,7 @@ describe "bundle install" do
         ruby '#{RUBY_VERSION}', :engine_version => '#{RUBY_VERSION}', :engine => 'ruby'
         gemspec
       G
-      expect(the_bundle).to have_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "installs when patch level is specified and the version still matches the current version",
@@ -70,7 +70,7 @@ describe "bundle install" do
         ruby '#{RUBY_VERSION}', :engine_version => '#{RUBY_VERSION}', :engine => 'ruby', :patchlevel => '#{RUBY_PATCHLEVEL}'
         gemspec
       G
-      expect(the_bundle).to have_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "fails and complains about patchlevel on patchlevel mismatch",

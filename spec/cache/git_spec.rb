@@ -29,7 +29,7 @@ end
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      expect(the_bundle).to have_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "copies repository to vendor cache and uses it even when installed with bundle --path" do
@@ -47,7 +47,7 @@ end
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      expect(the_bundle).to have_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "runs twice without exploding" do
@@ -62,7 +62,7 @@ end
 
       expect(err).to lack_errors
       FileUtils.rm_rf lib_path("foo-1.0")
-      expect(the_bundle).to have_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "tracks updates" do
@@ -139,7 +139,7 @@ end
 
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist
-      expect(the_bundle).to have_installed "has_submodule 1.0"
+      expect(the_bundle).to include_gems "has_submodule 1.0"
     end
 
     it "displays warning message when detecting git repo in Gemfile" do
