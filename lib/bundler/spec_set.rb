@@ -99,6 +99,20 @@ module Bundler
       SpecSet.new(materialized.compact)
     end
 
+    # Materialize for all the specs in the spec set, regardless of what platform they're for
+    # This is in contrast to how for does platform filtering (and specifically different from how `materialize` calls `for` only for the current platform)
+    # @return [Array<Gem::Specification>]
+    def materialized_for_all_platforms
+      names = @specs.map(&:name).uniq
+      @specs.map do |s|
+        next s unless s.is_a?(LazySpecification)
+        s.source.dependency_names = names if s.source.respond_to?(:dependency_names=)
+        spec = s.__materialize__
+        raise GemNotFound, "Could not find #{s.full_name} in any of the sources" unless spec
+        spec
+      end
+    end
+
     def merge(set)
       arr = sorted.dup
       set.each do |s|

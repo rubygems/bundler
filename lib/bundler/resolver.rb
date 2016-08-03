@@ -66,8 +66,6 @@ module Bundler
       end
     end
 
-    ALL = Bundler::Dependency::PLATFORM_MAP.values.uniq.freeze
-
     class SpecGroup < Array
       include GemHelpers
 
@@ -78,10 +76,9 @@ module Bundler
         @required_by = []
         @activated_platforms = []
         @dependencies = nil
-        @specs        = {}
-
-        ALL.each do |p|
-          @specs[p] = reverse.find {|s| s.match_platform(p) }
+        @specs        = Hash.new do |specs, platform|
+          specs[platform] = select {|spec| spec.match_platform(platform) }.
+                            min_by {|spec| platform_specificity_match(spec.platform, platform) }
         end
       end
 
@@ -92,18 +89,12 @@ module Bundler
       end
 
       def to_specs
-        specs = {}
-
-        @activated_platforms.each do |p|
+        @activated_platforms.map do |p|
           next unless s = @specs[p]
-          platform = generic(Gem::Platform.new(s.platform))
-          next if specs[platform]
-
-          lazy_spec = LazySpecification.new(name, version, platform, source)
+          lazy_spec = LazySpecification.new(name, version, s.platform, source)
           lazy_spec.dependencies.replace s.dependencies
-          specs[platform] = lazy_spec
-        end
-        specs.values
+          lazy_spec
+        end.compact
       end
 
       def activate_platform!(platform)
@@ -148,17 +139,15 @@ module Bundler
     private
 
       def __dependencies
-        @dependencies ||= begin
-          dependencies = {}
-          ALL.each do |p|
-            next unless spec = @specs[p]
-            dependencies[p] = []
+        @dependencies = Hash.new do |dependencies, platform|
+          dependencies[platform] = []
+          if spec = @specs[platform]
             spec.dependencies.each do |dep|
               next if dep.type == :development
-              dependencies[p] << DepProxy.new(dep, p)
+              dependencies[platform] << DepProxy.new(dep, platform)
             end
           end
-          dependencies
+          dependencies[platform]
         end
       end
 
