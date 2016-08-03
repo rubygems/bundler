@@ -61,7 +61,6 @@ module Bundler
     # Finally: TODO add documentation for how the standalone process works.
     def run(options)
       create_bundle_path
-      remove_0_9_environment_rb
 
       if Bundler.settings[:frozen]
         @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
@@ -218,12 +217,6 @@ module Bundler
 
       return if local
       options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
-    end
-
-    def remove_0_9_environment_rb
-      SharedHelpers.filesystem_access(Bundler.app_config_path.join("environment.rb")) do |env_file|
-        env_file.rmtree if env_file.exist?
-      end
     end
 
     def lock(opts = {})
