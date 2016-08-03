@@ -22,7 +22,7 @@ describe "bundle install" do
       bundle :install, :gemfile => bundled_app("NotGemfile")
 
       ENV["BUNDLE_GEMFILE"] = "NotGemfile"
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
   end
 

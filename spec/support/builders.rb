@@ -376,7 +376,7 @@ module Spec
       @_build_repo = File.basename(path)
       yield
       with_gem_path_as Path.base_system_gems do
-        Dir.chdir(path) { gem_command :generate_index }
+        Dir.chdir(path) { gem_command! :generate_index }
       end
     ensure
       @_build_path = nil
@@ -434,6 +434,7 @@ module Spec
 
     def build_with(builder, name, args, &blk)
       @_build_path ||= nil
+      @_build_repo ||= nil
       options  = args.last.is_a?(Hash) ? args.pop : {}
       versions = args.last || "1.0"
       spec     = nil

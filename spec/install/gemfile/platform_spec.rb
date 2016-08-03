@@ -22,7 +22,7 @@ describe "bundle install across platforms" do
       gem "rack"
     G
 
-    should_be_installed "rack 0.9.1"
+    expect(the_bundle).to include_gems "rack 0.9.1"
   end
 
   it "pulls in the correct platform specific gem" do
@@ -48,7 +48,7 @@ describe "bundle install across platforms" do
       gem "platform_specific"
     G
 
-    should_be_installed "platform_specific 1.0 JAVA"
+    expect(the_bundle).to include_gems "platform_specific 1.0 JAVA"
   end
 
   it "works with gems that have different dependencies" do
@@ -59,7 +59,7 @@ describe "bundle install across platforms" do
       gem "nokogiri"
     G
 
-    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
 
     simulate_new_machine
 
@@ -70,8 +70,8 @@ describe "bundle install across platforms" do
       gem "nokogiri"
     G
 
-    should_be_installed "nokogiri 1.4.2"
-    should_not_be_installed "weakling"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2"
+    expect(the_bundle).not_to include_gems "weakling"
   end
 
   it "works the other way with gems that have different dependencies" do
@@ -85,7 +85,7 @@ describe "bundle install across platforms" do
     simulate_platform "java"
     bundle "install"
 
-    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
   end
 
   it "fetches gems again after changing the version of Ruby" do
@@ -115,7 +115,7 @@ describe "bundle install with platform conditionals" do
       end
     G
 
-    should_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2"
   end
 
   it "does not install gems tagged w/ another platforms" do
@@ -127,8 +127,8 @@ describe "bundle install with platform conditionals" do
       end
     G
 
-    should_be_installed "rack 1.0"
-    should_not_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "rack 1.0"
+    expect(the_bundle).not_to include_gems "nokogiri 1.4.2"
   end
 
   it "installs gems tagged w/ the current platforms inline" do
@@ -136,7 +136,7 @@ describe "bundle install with platform conditionals" do
       source "file://#{gem_repo1}"
       gem "nokogiri", :platforms => :#{local_tag}
     G
-    should_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2"
   end
 
   it "does not install gems tagged w/ another platforms inline" do
@@ -145,8 +145,8 @@ describe "bundle install with platform conditionals" do
       gem "rack"
       gem "nokogiri", :platforms => :#{not_local_tag}
     G
-    should_be_installed "rack 1.0"
-    should_not_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "rack 1.0"
+    expect(the_bundle).not_to include_gems "nokogiri 1.4.2"
   end
 
   it "installs gems tagged w/ the current platform inline" do
@@ -154,7 +154,7 @@ describe "bundle install with platform conditionals" do
       source "file://#{gem_repo1}"
       gem "nokogiri", :platform => :#{local_tag}
     G
-    should_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2"
   end
 
   it "doesn't install gems tagged w/ another platform inline" do
@@ -162,7 +162,7 @@ describe "bundle install with platform conditionals" do
       source "file://#{gem_repo1}"
       gem "nokogiri", :platform => :#{not_local_tag}
     G
-    should_not_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).not_to include_gems "nokogiri 1.4.2"
   end
 
   it "does not blow up on sources with all platform-excluded specs" do
@@ -217,6 +217,6 @@ describe "when a gem has no architecture" do
     G
 
     bundle :install, :fakeweb => "windows"
-    should_be_installed "rcov 1.0.0"
+    expect(the_bundle).to include_gems "rcov 1.0.0"
   end
 end

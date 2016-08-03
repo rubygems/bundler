@@ -20,7 +20,7 @@ describe "bundle update" do
 
       bundle "update"
       expect(out).to include("Bundle updated!")
-      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+      expect(the_bundle).to include_gems "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
     it "doesn't delete the Gemfile.lock file if something goes wrong" do
@@ -49,7 +49,7 @@ describe "bundle update" do
       end
 
       bundle "update rack-obama"
-      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 2.3.5"
+      expect(the_bundle).to include_gems "rack 1.2", "rack-obama 1.0", "activesupport 2.3.5"
     end
   end
 
@@ -68,7 +68,7 @@ describe "bundle update" do
     it "should update the child dependency" do
       update_repo2
       bundle "update rack"
-      should_be_installed "rack 1.2"
+      expect(the_bundle).to include_gems "rack 1.2"
     end
   end
 
@@ -92,8 +92,8 @@ describe "bundle update" do
         build_gem "activesupport", "3.0"
       end
       bundle "update --group development"
-      should_be_installed "activesupport 3.0"
-      should_not_be_installed "rack 1.2"
+      expect(the_bundle).to include_gems "activesupport 3.0"
+      expect(the_bundle).not_to include_gems "rack 1.2"
     end
 
     context "when there is a source with the same name as a gem in a group" do
@@ -111,8 +111,8 @@ describe "bundle update" do
         update_git "foo", "2.0", :path => lib_path("activesupport")
 
         bundle "update --group development"
-        should_be_installed "activesupport 3.0"
-        should_not_be_installed "foo 2.0"
+        expect(the_bundle).to include_gems "activesupport 3.0"
+        expect(the_bundle).not_to include_gems "foo 2.0"
       end
     end
   end
@@ -138,7 +138,7 @@ describe "bundle update" do
       update_repo2 { build_gem "activesupport", "3.0" }
 
       bundle "update --source activesupport"
-      should_not_be_installed "activesupport 3.0"
+      expect(the_bundle).not_to include_gems "activesupport 3.0"
     end
 
     it "should update gems not included in the source that happen to have the same name" do
@@ -149,7 +149,7 @@ describe "bundle update" do
       update_repo2 { build_gem "activesupport", "3.0" }
 
       bundle "update --source activesupport"
-      should_be_installed "activesupport 3.0"
+      expect(the_bundle).to include_gems "activesupport 3.0"
     end
   end
 
@@ -178,8 +178,8 @@ describe "bundle update" do
       end
 
       bundle "update --source harry"
-      should_be_installed "harry 2.0"
-      should_be_installed "fred 1.0"
+      expect(the_bundle).to include_gems "harry 2.0"
+      expect(the_bundle).to include_gems "fred 1.0"
     end
   end
 
@@ -211,9 +211,9 @@ describe "bundle update" do
       end
 
       bundle "update --source harry"
-      should_be_installed "harry 2.0"
-      should_be_installed "fred 1.0"
-      should_be_installed "george 1.0"
+      expect(the_bundle).to include_gems "harry 2.0"
+      expect(the_bundle).to include_gems "fred 1.0"
+      expect(the_bundle).to include_gems "george 1.0"
     end
   end
 end
@@ -238,7 +238,7 @@ describe "bundle update in more complicated situations" do
     end
 
     bundle "update thin"
-    should_be_installed "thin 2.0", "rack 1.2", "rack-obama 1.0"
+    expect(the_bundle).to include_gems "thin 2.0", "rack 1.2", "rack-obama 1.0"
   end
 
   it "will update only from pinned source" do
@@ -255,7 +255,7 @@ describe "bundle update in more complicated situations" do
     end
 
     bundle "update"
-    should_be_installed "thin 1.0"
+    expect(the_bundle).to include_gems "thin 1.0"
   end
 end
 
@@ -271,7 +271,7 @@ describe "bundle update without a Gemfile.lock" do
 
     bundle "update"
 
-    should_be_installed "rack 1.0.0"
+    expect(the_bundle).to include_gems "rack 1.0.0"
   end
 end
 
@@ -481,13 +481,13 @@ describe "bundle update conservative" do
     it "single gem updates dependent gem to minor" do
       bundle "update --patch foo"
 
-      should_be_installed "foo 1.4.5", "bar 2.1.1", "qux 1.0.0"
+      expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.0"
     end
 
     it "update all" do
       bundle "update --patch"
 
-      should_be_installed "foo 1.4.5", "bar 2.1.1", "qux 1.0.1"
+      expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.1"
     end
 
     it "warns on minor or major increment elsewhere" ## include in prior test
@@ -497,7 +497,7 @@ describe "bundle update conservative" do
     it "single gem updates dependent gem to major" do
       bundle "update --minor foo"
 
-      should_be_installed "foo 1.5.1", "bar 3.0.0", "qux 1.0.0"
+      expect(the_bundle).to include_gems "foo 1.5.1", "bar 3.0.0", "qux 1.0.0"
     end
 
     it "warns on major increment elsewhere" ## include in prior test
@@ -509,13 +509,13 @@ describe "bundle update conservative" do
     it "patch preferred" do
       bundle "update --patch foo bar --strict"
 
-      should_be_installed "foo 1.4.4", "bar 2.0.5", "qux 1.0.0"
+      expect(the_bundle).to include_gems "foo 1.4.4", "bar 2.0.5", "qux 1.0.0"
     end
 
     it "minor preferred" do
       bundle "update --minor --strict"
 
-      should_be_installed "foo 1.5.0", "bar 2.1.1", "qux 1.1.0"
+      expect(the_bundle).to include_gems "foo 1.5.0", "bar 2.1.1", "qux 1.1.0"
     end
   end
 

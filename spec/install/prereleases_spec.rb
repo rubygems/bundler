@@ -8,7 +8,7 @@ describe "bundle install" do
         source "file://#{gem_repo1}"
         gem "not_released"
       G
-      should_be_installed "not_released 1.0.pre"
+      expect(the_bundle).to include_gems "not_released 1.0.pre"
     end
 
     it "uses regular releases if available" do
@@ -16,7 +16,7 @@ describe "bundle install" do
         source "file://#{gem_repo1}"
         gem "has_prerelease"
       G
-      should_be_installed "has_prerelease 1.0"
+      expect(the_bundle).to include_gems "has_prerelease 1.0"
     end
 
     it "uses prereleases if requested" do
@@ -24,7 +24,7 @@ describe "bundle install" do
         source "file://#{gem_repo1}"
         gem "has_prerelease", "1.1.pre"
       G
-      should_be_installed "has_prerelease 1.1.pre"
+      expect(the_bundle).to include_gems "has_prerelease 1.1.pre"
     end
   end
 
@@ -36,7 +36,7 @@ describe "bundle install" do
         gem "rack"
       G
 
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
   end
 end

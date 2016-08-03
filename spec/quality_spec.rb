@@ -184,11 +184,17 @@ describe "The library itself" do
 
   it "can still be built" do
     Dir.chdir(root) do
-      `gem build bundler.gemspec`
-      expect($?).to eq(0)
-
-      # clean up the .gem generated
-      system("rm bundler-#{Bundler::VERSION}.gem")
+      begin
+        gem_command! :build, "bundler.gemspec"
+        if Bundler.rubygems.provides?(">= 2.4")
+          # older rubygems have weird warnings, and we won't actually be using them
+          # to build the gem for releases anyways
+          expect(err).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
+        end
+      ensure
+        # clean up the .gem generated
+        FileUtils.rm("bundler-#{Bundler::VERSION}.gem")
+      end
     end
   end
 

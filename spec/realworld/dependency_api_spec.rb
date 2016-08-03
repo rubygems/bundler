@@ -41,7 +41,7 @@ describe "gemcutter's dependency API", :realworld => true do
 
       bundle :install
       expect(out).to include("Fetching source index from #{@server_uri}/")
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
   end
 end

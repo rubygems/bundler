@@ -16,7 +16,7 @@ describe "bundle install" do
 
     it "does not use available system gems with bundle --path vendor/bundle" do
       bundle "install --path vendor/bundle"
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
 
     it "handles paths with regex characters in them" do
@@ -48,7 +48,7 @@ describe "bundle install" do
       bundle "install"
 
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
   end
 
@@ -79,7 +79,7 @@ describe "bundle install" do
 
         expect(vendored_gems("gems/rack-1.0.0")).to be_directory
         expect(bundled_app("vendor2")).not_to be_directory
-        should_be_installed "rack 1.0.0"
+        expect(the_bundle).to include_gems "rack 1.0.0"
       end
 
       it "installs gems to BUNDLE_PATH with #{type}" do
@@ -88,7 +88,7 @@ describe "bundle install" do
         bundle :install
 
         expect(bundled_app("vendor/gems/rack-1.0.0")).to be_directory
-        should_be_installed "rack 1.0.0"
+        expect(the_bundle).to include_gems "rack 1.0.0"
       end
 
       it "installs gems to BUNDLE_PATH relative to root when relative" do
@@ -100,7 +100,7 @@ describe "bundle install" do
         end
 
         expect(bundled_app("vendor/gems/rack-1.0.0")).to be_directory
-        should_be_installed "rack 1.0.0"
+        expect(the_bundle).to include_gems "rack 1.0.0"
       end
     end
 
@@ -110,14 +110,14 @@ describe "bundle install" do
       bundle :install
 
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
 
     it "sets BUNDLE_PATH as the first argument to bundle install" do
       bundle "install --path ./vendor/bundle"
 
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
 
     it "disables system gems when passing a path to install" do
@@ -126,7 +126,7 @@ describe "bundle install" do
       bundle "install --path ./vendor/bundle"
 
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
   end
 
