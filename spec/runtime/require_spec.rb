@@ -133,7 +133,7 @@ describe "Bundler.require" do
       gem "faulty"
     G
 
-    run "Bundler.require", :expect_err => true
+    run "Bundler.require"
     expect(err).to match("error while trying to load the gem 'faulty'")
     expect(err).to match("Gem Internal Error Message")
   end
@@ -155,7 +155,7 @@ describe "Bundler.require" do
         $stderr.puts "ZOMG LOAD ERROR: \#{e.message}"
       end
     RUBY
-    run(cmd, :expect_err => true)
+    run(cmd)
 
     expect(err).to eq_err("ZOMG LOAD ERROR: cannot load such file -- load-bar")
   end
@@ -191,7 +191,7 @@ describe "Bundler.require" do
         require 'bundler'
         Bundler.require
       RUBY
-      ruby(cmd, :expect_err => true)
+      ruby(cmd)
 
       expect(err).to lack_errors
     end
@@ -225,7 +225,7 @@ describe "Bundler.require" do
           $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("Could not open library 'libfuuu-1.0'")
         end
       RUBY
-      run(cmd, :expect_err => true)
+      run(cmd)
 
       expect(err).to eq_err("ZOMG LOAD ERROR")
     end
@@ -248,7 +248,7 @@ describe "Bundler.require" do
           $stderr.puts "ZOMG LOAD ERROR: \#{e.message}"
         end
       RUBY
-      run(cmd, :expect_err => true)
+      run(cmd)
 
       expect(err).to eq_err("ZOMG LOAD ERROR: cannot load such file -- load-bar")
     end
@@ -374,7 +374,7 @@ describe "Bundler.require with platform specific dependencies" do
       gem "rack", "1.0.0"
     G
 
-    run "Bundler.require", :expect_err => true
+    run "Bundler.require"
     expect(err).to lack_errors
   end
 
@@ -387,7 +387,7 @@ describe "Bundler.require with platform specific dependencies" do
       end
     G
 
-    run "Bundler.require; puts RACK", :expect_err => true
+    run "Bundler.require; puts RACK"
 
     expect(out).to eq("1.0.0")
     expect(err).to lack_errors

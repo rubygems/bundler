@@ -76,11 +76,9 @@ describe "bundle install with install-time dependencies" do
           gem "net_e"
         G
 
-        resolve_output = capture(:stdout) do
-          bundle :install, :env => { "DEBUG_RESOLVER" => "1" }
-        end
+        bundle :install, :env => { "DEBUG_RESOLVER" => "1" }
 
-        expect(resolve_output).to include("Creating possibility state for net_c")
+        expect(err).to include("Creating possibility state for net_c")
       end
     end
 
@@ -92,12 +90,10 @@ describe "bundle install with install-time dependencies" do
           gem "net_e"
         G
 
-        resolve_output = capture(:stdout) do
-          bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
-        end
+        bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
 
-        expect(resolve_output).to include(" net_b")
-        expect(resolve_output).to include(" net_build_extensions (1.0)")
+        expect(err).to include(" net_b")
+        expect(err).to include(" net_build_extensions (1.0)")
       end
     end
   end

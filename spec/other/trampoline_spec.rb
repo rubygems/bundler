@@ -82,7 +82,7 @@ describe "bundler version trampolining" do
 
     it "fails gracefully when installing the bundler fails" do
       ENV["BUNDLER_VERSION"] = "9999"
-      bundle "--version", :expect_err => true
+      bundle "--version"
       expect(err).to start_with(<<-E.strip)
 Installing locked Bundler version 9999...
 Installing the inferred bundler version (= 9999) failed.
@@ -115,7 +115,7 @@ The error was:
 
     it "updates to the specified version" do
       # HACK: since no released bundler version actually supports this feature!
-      bundle "update --bundler=1.12.0", :expect_err => true
+      bundle "update --bundler=1.12.0"
       expect(out).to include("Unknown switches '--bundler=1.12.0'")
     end
 

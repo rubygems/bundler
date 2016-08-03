@@ -198,7 +198,7 @@ shared_examples "bundle install --standalone" do
       bundle "install --standalone --path path/to/bundle"
 
       Dir.chdir(bundled_app) do
-        ruby <<-RUBY, :no_lib => true, :expect_err => false
+        ruby <<-RUBY, :no_lib => true
           $:.unshift File.expand_path("path/to/bundle")
           require "bundler/setup"
 

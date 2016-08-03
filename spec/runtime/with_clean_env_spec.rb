@@ -38,7 +38,7 @@ describe "Bundler.with_env helpers" do
       RB
       path = `getconf PATH`.strip + File::PATH_SEPARATOR + File.dirname(Gem.ruby)
       with_path_as(path) do
-        bundle!("exec ruby #{bundled_app("exe.rb")} 2", :expect_err => true)
+        bundle!("exec ruby #{bundled_app("exe.rb")} 2")
       end
       expect(err).to eq <<-EOS.strip
 2 false

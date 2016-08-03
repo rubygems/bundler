@@ -1317,7 +1317,7 @@ describe "the lockfile format" do
          #{Bundler::VERSION}
     L
 
-    error = install_gemfile(<<-G, :expect_err => true)
+    error = install_gemfile(<<-G)
       source "file://#{gem_repo1}"
       gem "rack"
     G

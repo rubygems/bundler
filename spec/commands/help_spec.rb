@@ -7,7 +7,7 @@ describe "bundle help" do
   it "complains if older versions of bundler are installed", :if => rubygems_under_14 do
     system_gems "bundler-0.8.1"
 
-    bundle "help", :expect_err => true
+    bundle "help"
     expect(err).to include("older than 0.9")
     expect(err).to include("running `gem cleanup bundler`.")
   end
@@ -28,7 +28,7 @@ describe "bundle help" do
 
   it "simply outputs the txt file when there is no man on the path" do
     with_path_as("") do
-      bundle "help install", :expect_err => true
+      bundle "help install"
     end
     expect(out).to match(/BUNDLE-INSTALL/)
   end
@@ -81,7 +81,7 @@ describe "bundle help" do
 
   it "has helpful output when using --help flag for a non-existent command" do
     with_fake_man do
-      bundle "instill -h", :expect_err => true
+      bundle "instill -h"
     end
     expect(out).to include('Could not find command "instill".')
   end

@@ -381,7 +381,7 @@ describe "bundle install with git sources" do
     #     gem "thingy", :git => "git@notthere.fallingsnow.net:somebody/thingy.git"
     #   G
     #
-    #   bundle :install, :expect_err => true
+    #   bundle :install
     #
     #   # p out
     #   # p err
@@ -564,7 +564,7 @@ describe "bundle install with git sources" do
       gem "foo", "1.0", :git => "omgomg"
     G
 
-    bundle :install, :expect_err => true
+    bundle :install
 
     expect(out).to include("Git error:")
     expect(err).to include("fatal")
@@ -612,18 +612,18 @@ describe "bundle install with git sources" do
       s.add_dependency "submodule"
     end
     Dir.chdir(lib_path("has_submodule-1.0")) do
-      sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0", :expect_err => true
+      sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0"
       `git commit -m "submodulator"`
     end
 
-    install_gemfile <<-G, :expect_err => true
+    install_gemfile <<-G
       git "#{lib_path("has_submodule-1.0")}" do
         gem "has_submodule"
       end
     G
     expect(out).to match(/could not find gem 'submodule/i)
 
-    expect(the_bundle).not_to include_gems "has_submodule 1.0", :expect_err => true
+    expect(the_bundle).not_to include_gems "has_submodule 1.0"
   end
 
   it "handles repos with submodules" do
@@ -632,11 +632,11 @@ describe "bundle install with git sources" do
       s.add_dependency "submodule"
     end
     Dir.chdir(lib_path("has_submodule-1.0")) do
-      sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0", :expect_err => true
+      sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0"
       `git commit -m "submodulator"`
     end
 
-    install_gemfile <<-G, :expect_err => true
+    install_gemfile <<-G
       git "#{lib_path("has_submodule-1.0")}", :submodules => true do
         gem "has_submodule"
       end
@@ -809,10 +809,10 @@ describe "bundle install with git sources" do
       bundle "install"
       expect(out).to_not match(/Revision.*does not exist/)
 
-      install_gemfile <<-G, :expect_err => true
+      install_gemfile <<-G
         gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "deadbeef"
       G
-      bundle "install", :expect_err => true
+      bundle "install"
       expect(out).to include("Revision deadbeef does not exist in the repository")
     end
   end
@@ -849,8 +849,8 @@ describe "bundle install with git sources" do
         H
       end
 
-      bundle :install, :expect_err => true,
-                       :requires => [lib_path("install_hooks.rb")]
+      bundle :install,
+        :requires => [lib_path("install_hooks.rb")]
       expect(err).to eq_err("Ran pre-install hook: foo-1.0")
     end
 
@@ -869,8 +869,8 @@ describe "bundle install with git sources" do
         H
       end
 
-      bundle :install, :expect_err => true,
-                       :requires => [lib_path("install_hooks.rb")]
+      bundle :install,
+        :requires => [lib_path("install_hooks.rb")]
       expect(err).to eq_err("Ran post-install hook: foo-1.0")
     end
 
@@ -889,8 +889,8 @@ describe "bundle install with git sources" do
         H
       end
 
-      bundle :install, :expect_err => true,
-                       :requires => [lib_path("install_hooks.rb")]
+      bundle :install,
+        :requires => [lib_path("install_hooks.rb")]
       expect(out).to include("failed for foo-1.0")
     end
   end
@@ -1107,13 +1107,13 @@ describe "bundle install with git sources" do
       let(:credentials) { "user1:password1" }
 
       it "does not display the password" do
-        install_gemfile <<-G, :expect_err => true
+        install_gemfile <<-G
           git "https://#{credentials}@github.com/company/private-repo" do
             gem "foo"
           end
         G
 
-        bundle :install, :expect_err => true
+        bundle :install
         expect(out).to_not include("password1")
         expect(out).to include("Fetching https://user1@github.com/company/private-repo")
       end
@@ -1123,13 +1123,13 @@ describe "bundle install with git sources" do
       let(:credentials) { "oauth_token" }
 
       it "displays the oauth scheme but not the oauth token" do
-        install_gemfile <<-G, :expect_err => true
+        install_gemfile <<-G
           git "https://#{credentials}:x-oauth-basic@github.com/company/private-repo" do
             gem "foo"
           end
         G
 
-        bundle :install, :expect_err => true
+        bundle :install
         expect(out).to_not include("oauth_token")
         expect(out).to include("Fetching https://x-oauth-basic@github.com/company/private-repo")
       end

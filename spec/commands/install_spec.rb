@@ -13,7 +13,7 @@ describe "bundle install with gem sources" do
     end
 
     it "does not make a lockfile if the install fails" do
-      install_gemfile <<-G, :expect_err => true
+      install_gemfile <<-G
         raise StandardError, "FAIL"
       G
 
@@ -60,7 +60,7 @@ describe "bundle install with gem sources" do
 
       lockfile = File.read(bundled_app("Gemfile.lock"))
 
-      install_gemfile <<-G, :expect_err => true
+      install_gemfile <<-G
         raise StandardError, "FAIL"
       G
 
@@ -302,7 +302,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      bundle :install, :expect_err => true
+      bundle :install
       expect(out).to include("Your Gemfile has no gem server sources")
     end
 
@@ -356,7 +356,7 @@ describe "bundle install with gem sources" do
 
     context "and using an unsupported Ruby version" do
       it "prints an error" do
-        install_gemfile <<-G, :expect_err => true
+        install_gemfile <<-G
           ::RUBY_VERSION = '1.8.7'
           ruby '~> 2.1'
         G
@@ -366,7 +366,7 @@ describe "bundle install with gem sources" do
 
     context "and using a supported Ruby version" do
       before do
-        install_gemfile <<-G, :expect_err => true
+        install_gemfile <<-G
           ::RUBY_VERSION = '2.1.3'
           ::RUBY_PATCHLEVEL = 100
           ruby '~> 2.1.0'
@@ -392,7 +392,7 @@ describe "bundle install with gem sources" do
       end
 
       it "updates Gemfile.lock with updated incompatible ruby version" do
-        install_gemfile <<-G, :expect_err => true
+        install_gemfile <<-G
           ::RUBY_VERSION = '2.2.3'
           ::RUBY_PATCHLEVEL = 100
           ruby '~> 2.2.0'
