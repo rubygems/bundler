@@ -90,7 +90,7 @@ module Bundler
     def call
       enqueue_specs
       process_specs until @specs.all?(&:installed?) || @specs.any?(&:failed?)
-      raise Bundler::InstallError, @specs.select(&:failed?).map(&:error).map(&:to_s).join("\n\n")
+      handle_error if @specs.any?(&:failed?)
     ensure
       worker_pool && worker_pool.stop
     end
@@ -127,6 +127,14 @@ module Bundler
 
     def collect_post_install_message(spec)
       Bundler::Installer.post_install_messages[spec.name] = spec.post_install_message
+    end
+
+    def handle_error
+      errors = @specs.select(&:failed?).map(&:error)
+      if exception = errors.find {|e| e.is_a?(Bundler::Error) }
+        raise exception
+      end
+      raise Bundler::InstallError, errors.map(&:to_s).join("\n\n")
     end
 
     # Keys in the remains hash represent uninstalled gems specs.
