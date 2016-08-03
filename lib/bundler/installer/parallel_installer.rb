@@ -91,6 +91,7 @@ module Bundler
       enqueue_specs
       process_specs until @specs.all?(&:installed?) || @specs.any?(&:failed?)
       handle_error if @specs.any?(&:failed?)
+      @specs
     ensure
       worker_pool && worker_pool.stop
     end
@@ -118,15 +119,8 @@ module Bundler
     # dequeue.
     def process_specs
       spec = worker_pool.deq
-      unless spec.failed?
-        spec.state = :installed
-        collect_post_install_message spec if spec.has_post_install_message?
-      end
+      spec.state = :installed unless spec.failed?
       enqueue_specs
-    end
-
-    def collect_post_install_message(spec)
-      Bundler::Installer.post_install_messages[spec.name] = spec.post_install_message
     end
 
     def handle_error
