@@ -24,7 +24,7 @@ module Bundler
         @plugin_paths = {}
         @commands = {}
         @sources = {}
-        @hooks = Hash.new {|h, k| h[k] = [] }
+        @hooks = {}
         @load_paths = {}
 
         load_index(global_index_file, true)
@@ -51,7 +51,7 @@ module Bundler
         raise SourceConflict.new(name, common) unless common.empty?
         sources.each {|k| @sources[k] = name }
 
-        hooks.each {|e| @hooks[e] << name }
+        hooks.each {|e| (@hooks[e] ||= []) << name }
 
         @plugin_paths[name] = path
         @load_paths[name] = load_paths
@@ -102,7 +102,7 @@ module Bundler
       end
 
       def hook_plugins(event)
-        @hooks[event]
+        @hooks[event] || []
       end
 
     private
