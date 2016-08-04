@@ -82,6 +82,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle clean(1)`:
   Clean up unused gems in your bundler directory
 
+* `bundle doctor(1)`:
+  Display warnings about common potential problems
+
 ## PLUGINS
 
 When running a command that isn't listed in PRIMARY COMMANDS or UTILITIES,
