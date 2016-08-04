@@ -31,6 +31,14 @@ describe "major deprecations" do
       end
     end
 
+    describe ".environment" do
+      it "is deprecated in favor of .load" do
+        source = "Bundler.environment"
+        bundle "exec ruby -e #{source.dump}"
+        expect(warnings).to have_major_deprecation "Bundler.environment has been removed in favor of Bundler.load"
+      end
+    end
+
     shared_examples_for "environmental deprecations" do |trigger|
       describe "ruby version", :ruby => "< 2.0" do
         it "requires a newer ruby version" do

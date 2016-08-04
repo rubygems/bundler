@@ -7,7 +7,7 @@ require "bundler/installer/standalone"
 require "bundler/installer/gem_installer"
 
 module Bundler
-  class Installer < Environment
+  class Installer
     class << self
       attr_accessor :post_install_messages, :ambiguous_gems
 
@@ -21,6 +21,11 @@ module Bundler
       installer = new(root, definition)
       installer.run(options)
       installer
+    end
+
+    def initialize(root, definition)
+      @root = root
+      @definition = definition
     end
 
     # Runs the install procedures for a specific Gemfile.
@@ -61,7 +66,7 @@ module Bundler
         @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
       end
 
-      if dependencies.empty?
+      if @definition.dependencies.empty?
         Bundler.ui.warn "The Gemfile specifies no dependencies"
         lock
         return
@@ -160,7 +165,7 @@ module Bundler
     def ensure_specs_are_compatible!
       system_ruby = Bundler::RubyVersion.system
       rubygems_version = Gem::Version.create(Gem::VERSION)
-      specs.each do |spec|
+      @definition.specs.each do |spec|
         if required_ruby_version = spec.required_ruby_version
           unless required_ruby_version.satisfied_by?(system_ruby.gem_version)
             raise InstallError, "#{spec.full_name} requires ruby version #{required_ruby_version}, " \
@@ -187,7 +192,7 @@ module Bundler
     end
 
     def install_in_parallel(size, standalone, force = false)
-      ParallelInstaller.call(self, specs, size, standalone, force)
+      ParallelInstaller.call(self, @definition.specs, size, standalone, force)
     end
 
     def create_bundle_path
@@ -212,6 +217,10 @@ module Bundler
 
       return if local
       options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
+    end
+
+    def lock(opts = {})
+      @definition.lock(Bundler.default_lockfile, opts[:preserve_unknown_sections])
     end
   end
 end

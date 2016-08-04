@@ -30,15 +30,6 @@ describe ".bundle/config" do
       expect(bundled_app("../foo/config")).to exist
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
-
-    it "removes environment.rb from BUNDLE_APP_CONFIG's path" do
-      FileUtils.mkdir_p(tmp("foo/bar"))
-      ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
-      bundle "install"
-      FileUtils.touch tmp("foo/bar/environment.rb")
-      expect(the_bundle).to include_gems "rack 1.0.0"
-      expect(tmp("foo/bar/environment.rb")).not_to exist
-    end
   end
 
   describe "global" do
