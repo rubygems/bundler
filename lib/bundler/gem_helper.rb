@@ -140,7 +140,7 @@ module Bundler
     end
 
     def tag_version
-      sh "git tag -a -m \"Version #{version}\" #{version_tag}"
+      sh "git tag -m \"Version #{version}\" #{version_tag}"
       Bundler.ui.confirm "Tagged #{version_tag}."
       yield if block_given?
     rescue
