@@ -101,6 +101,7 @@ module Bundler
         @sources[name]
       end
 
+      # Returns the list of plugin names handling the passed event
       def hook_plugins(event)
         @hooks[event] || []
       end

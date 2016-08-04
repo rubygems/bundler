@@ -145,10 +145,18 @@ module Bundler
       src.new(locked_opts.merge("uri" => locked_opts["remote"]))
     end
 
+    # To be called via the API to register a hooks and corresponding block that
+    # will be called to handle the hook
     def add_hook(event, &block)
       @hooks_by_event[event.to_s] << block
     end
 
+    # Runs all the hooks that are registered for the passed event
+    #
+    # It passes the passed arguments and block to the block registered with
+    # the api.
+    #
+    # @param [String] event
     def hook(event, *args, &arg_blk)
       plugins = index.hook_plugins(event)
       return unless plugins.any?
