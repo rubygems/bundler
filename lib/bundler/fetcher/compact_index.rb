@@ -97,13 +97,12 @@ module Bundler
       end
 
       def bundle_worker(func = nil)
-        if @bundle_worker
-          @bundle_worker.tap do |worker|
-            worker.instance_variable_set(:@func, func) if func
-          end
-        else
+        @bundle_worker ||= begin
           worker_name = "Compact Index (#{display_uri.host})"
-          @bundle_worker ||= Bundler::Worker.new(25, worker_name, func)
+          Bundler::Worker.new(25, worker_name, func)
+        end
+        @bundle_worker.tap do |worker|
+          worker.instance_variable_set(:@func, func) if func
         end
       end
 

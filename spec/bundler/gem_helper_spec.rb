@@ -198,6 +198,10 @@ describe Bundler::GemHelper do
           `git config user.name "name"`
           `git config push.default simple`
         end
+
+        # silence messages
+        allow(Bundler.ui).to receive(:confirm)
+        allow(Bundler.ui).to receive(:error)
       end
 
       context "fails" do
@@ -213,10 +217,6 @@ describe Bundler::GemHelper do
         end
 
         it "when there is no git remote" do
-          # silence messages
-          allow(Bundler.ui).to receive(:confirm)
-          allow(Bundler.ui).to receive(:error)
-
           Dir.chdir(app_path) { `git commit -a -m "initial commit"` }
           expect { Rake.application["release"].invoke }.to raise_error(RuntimeError)
         end
