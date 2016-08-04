@@ -125,7 +125,7 @@ module Bundler
 
     def handle_error
       errors = @specs.select(&:failed?).map(&:error)
-      if exception = errors.find {|e| e.is_a?(Bundler::Error) }
+      if exception = errors.find {|e| e.is_a?(Bundler::BundlerError) }
         raise exception
       end
       raise Bundler::InstallError, errors.map(&:to_s).join("\n\n")
