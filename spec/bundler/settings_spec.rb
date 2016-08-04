@@ -207,6 +207,13 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
         URI("http://rubygems-mirror.org/")
       )
     end
+
+    it "accepts keys using host names" do
+      settings["mirror.rubygems.org"] = "http://rubygems-mirror.org"
+      expect(settings.mirror_for("rubygems.org")).to eq(
+        URI("http://rubygems-mirror.org/")
+      )
+    end
   end
 
   describe "BUNDLE_ keys format" do

@@ -43,7 +43,8 @@ module Bundler
     private
 
       def fetch_valid_mirror_for(uri)
-        mirror = (@mirrors[URI(uri.to_s.downcase)] || Mirror.new(uri)).validate!(@prober)
+        host = Settings.normalize_uri(URI(uri.to_s).host)
+        mirror = (@mirrors[URI(uri.to_s.downcase)] || @mirrors[host] || Mirror.new(uri)).validate!(@prober)
         mirror = Mirror.new(uri) unless mirror.valid?
         mirror
       end

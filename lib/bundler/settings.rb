@@ -289,11 +289,7 @@ module Bundler
     def self.normalize_uri(uri)
       uri = uri.to_s
       uri = "#{uri}/" unless uri =~ %r{/\Z}
-      uri = URI(uri)
-      unless uri.absolute?
-        raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
-      end
-      uri
+      URI(uri)
     end
   end
 end
