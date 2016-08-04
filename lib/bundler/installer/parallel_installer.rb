@@ -119,8 +119,8 @@ module Bundler
     def enqueue_specs
       @specs.select(&:ready_to_enqueue?).each do |spec|
         if spec.dependencies_installed? @specs
-          worker_pool.enq spec
           spec.state = :enqueued
+          worker_pool.enq spec
         end
       end
     end
