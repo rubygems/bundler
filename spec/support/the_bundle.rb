@@ -27,5 +27,10 @@ module Spec
     def lockfile
       bundle_dir.join("Gemfile.lock")
     end
+
+    def locked_gems
+      raise "Cannot read lockfile if it doesn't exist" unless locked?
+      Bundler::LockfileParser.new(lockfile.read)
+    end
   end
 end
