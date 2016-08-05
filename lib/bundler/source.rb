@@ -14,7 +14,7 @@ module Bundler
 
     def version_message(spec)
       message = "#{spec.name} #{spec.version}"
-      message += " (#{spec.platform})" if Bundler.ui.debug? && spec.platform != Gem::Platform::RUBY
+      message += " (#{spec.platform})" if spec.platform != Gem::Platform::RUBY
 
       if Bundler.locked_gems
         locked_spec = Bundler.locked_gems.specs.find {|s| s.name == spec.name }
