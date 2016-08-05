@@ -77,8 +77,7 @@ module Bundler
         @activated_platforms = []
         @dependencies = nil
         @specs        = Hash.new do |specs, platform|
-          specs[platform] = select {|spec| spec.match_platform(platform) }.
-                            min_by {|spec| platform_specificity_match(spec.platform, platform) }
+          specs[platform] = select_best_platform_match(self, platform)
         end
       end
 

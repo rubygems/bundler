@@ -24,12 +24,13 @@ module Bundler
         dep = deps.shift
         next if handled[dep] || skip.include?(dep.name)
 
-        spec = lookup[dep.name].find do |s|
-          if match_current_platform
-            Gem::Platform.match(s.platform)
-          else
-            s.match_platform(dep.__platform)
+        spec = if match_current_platform
+          Bundler.rubygems.platforms.reverse_each do |pl|
+            match = GemHelpers.select_best_platform_match(lookup[dep.name], pl)
+            break match if match
           end
+        else
+          GemHelpers.select_best_platform_match(lookup[dep.name], dep.__platform)
         end
 
         handled[dep] = true
@@ -147,10 +148,7 @@ module Bundler
     def lookup
       @lookup ||= begin
         lookup = Hash.new {|h, k| h[k] = [] }
-        specs = @specs.sort_by do |s|
-          s.platform.to_s == "ruby" ? "\0" : s.platform.to_s
-        end
-        specs.reverse_each do |s|
+        Index.sort_specs(@specs).reverse_each do |s|
           lookup[s.name] << s
         end
         lookup
