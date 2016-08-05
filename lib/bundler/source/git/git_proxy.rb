@@ -92,7 +92,7 @@ module Bundler
             return if has_revision_cached?
             Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
             in_path do
-              git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*")
+              git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/*:refs/*")
             end
           else
             Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
