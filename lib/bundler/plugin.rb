@@ -158,6 +158,8 @@ module Bundler
     #
     # @param [String] event
     def hook(event, *args, &arg_blk)
+      return unless Bundler.settings[:plugins]
+
       plugins = index.hook_plugins(event)
       return unless plugins.any?
 
