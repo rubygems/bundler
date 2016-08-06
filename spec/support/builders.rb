@@ -422,8 +422,9 @@ module Spec
     end
 
     def update_git(name, *args, &block)
+      opts = args.last.is_a?(Hash) ? args.last : {}
       spec = build_with(GitUpdater, name, args, &block)
-      GitReader.new lib_path(spec.full_name)
+      GitReader.new(opts[:path] || lib_path(spec.full_name))
     end
 
     def build_plugin(name, *args, &blk)
