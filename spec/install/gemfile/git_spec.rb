@@ -250,6 +250,27 @@ describe "bundle install with git sources" do
       expect(out).to eq("LOCAL")
     end
 
+    it "unlocks the source when the dependencies have changed while switching to the local" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
+
+      update_git "rack", "0.8", :path => lib_path("local-rack") do |s|
+        s.write "rack.gemspec", build_spec("rack", "0.8") { runtime "rspec", "> 0" }.first.to_ruby
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
+      G
+
+      bundle! %(config local.rack #{lib_path("local-rack")})
+      bundle! :install
+      run! "require 'rack'"
+      expect(out).to eq("LOCAL")
+    end
+
     it "updates specs on runtime" do
       system_gems "nokogiri-1.4.2"
 
