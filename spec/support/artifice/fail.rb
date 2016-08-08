@@ -15,7 +15,9 @@ class Fail
   end
 
   def exception(env)
-    Object.const_get(ENV.fetch("BUNDLER_SPEC_EXCEPTION") { "Errno::ENETUNREACH" }).new("host down: Bundler spec artifice fail! #{env["PATH_INFO"]}")
+    name = ENV.fetch("BUNDLER_SPEC_EXCEPTION") { "Errno::ENETUNREACH" }
+    const = name.split("::").reduce(Object) {|mod, sym| mod.const_get(sym) }
+    const.new("host down: Bundler spec artifice fail! #{env["PATH_INFO"]}")
   end
 end
 Artifice.activate_with(Fail.new)
