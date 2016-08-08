@@ -140,7 +140,8 @@ module Bundler
               :bin_dir             => bin_path.to_s,
               :ignore_dependencies => true,
               :wrappers            => true,
-              :env_shebang         => true
+              :env_shebang         => true,
+              :bundler_expected_checksum => spec.respond_to?(:checksum) && spec.checksum
             ).install
           end
           spec.full_gem_path = installed_spec.full_gem_path
