@@ -24,18 +24,9 @@ module Bundler
         dep = deps.shift
         next if handled[dep] || skip.include?(dep.name)
 
-        spec = if match_current_platform
-          Bundler.rubygems.platforms.reverse_each do |pl|
-            match = GemHelpers.select_best_platform_match(lookup[dep.name], pl)
-            break match if match
-          end
-        else
-          GemHelpers.select_best_platform_match(lookup[dep.name], dep.__platform)
-        end
-
         handled[dep] = true
 
-        if spec
+        if spec = spec_for_dependency(dep, match_current_platform)
           specs << spec
 
           spec.dependencies.each do |d|
@@ -157,6 +148,18 @@ module Bundler
 
     def tsort_each_node
       @specs.each {|s| yield s }
+    end
+
+    def spec_for_dependency(dep, match_current_platform)
+      if match_current_platform
+        Bundler.rubygems.platforms.reverse_each do |pl|
+          match = GemHelpers.select_best_platform_match(lookup[dep.name], pl)
+          return match if match
+        end
+        nil
+      else
+        GemHelpers.select_best_platform_match(lookup[dep.name], dep.__platform)
+      end
     end
 
     def tsort_each_child(s)
