@@ -125,6 +125,29 @@ describe Bundler::YAMLSerializer do
 
       expect(serializer.load(yaml)).to eq(hash)
     end
+
+    it "handles windows-style CRLF line endings" do
+      yaml = strip_whitespace(<<-YAML).gsub("\n", "\r\n")
+        ---
+        nested_hash:
+          contains_array:
+          - "Why shouldn't you write with a broken pencil?"
+          - "Because it's pointless!"
+          - oh so silly
+      YAML
+
+      hash = {
+        "nested_hash" => {
+          "contains_array" => [
+            "Why shouldn't you write with a broken pencil?",
+            "Because it's pointless!",
+            "oh so silly",
+          ],
+        },
+      }
+
+      expect(serializer.load(yaml)).to eq(hash)
+    end
   end
 
   describe "against yaml lib" do

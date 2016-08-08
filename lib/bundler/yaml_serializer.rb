@@ -52,7 +52,7 @@ module Bundler
       stack = [res]
       last_hash = nil
       last_empty_key = nil
-      str.split("\n").each do |line|
+      str.split(/\r?\n/).each do |line|
         if match = HASH_REGEX.match(line)
           indent, key, _, val = match.captures
           key = convert_to_backward_compatible_key(key)
