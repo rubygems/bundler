@@ -72,6 +72,120 @@ describe "bundle outdated" do
     end
   end
 
+  describe "with --group option" do
+    def test_group_option(group = nil, gems_list_size = 1)
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "weakling", "~> 0.0.1"
+        gem "terranova", '8'
+        group :development, :test do
+          gem "duradura", '7.0'
+          gem 'activesupport', '2.3.5'
+        end
+      G
+
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        build_gem "terranova", "9"
+        build_gem "duradura", "8.0"
+      end
+
+      bundle "outdated --group #{group}"
+
+      # Gem names are one per-line, between "*" and their parenthesized version.
+      gem_list = out.split("\n").map {|g| g[/\* (.*) \(/, 1] }.compact
+      expect(gem_list).to eq(gem_list.sort)
+      expect(gem_list.size).to eq gems_list_size
+    end
+
+    it "not outdated gems" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "weakling", "~> 0.0.1"
+        gem "terranova", '8'
+        group :development, :test do
+          gem 'activesupport', '2.3.5'
+          gem "duradura", '7.0'
+        end
+      G
+
+      bundle "outdated --group"
+      expect(out).to include("Bundle up to date!")
+    end
+
+    it "returns a sorted list of outdated gems from one group => 'default'" do
+      test_group_option("default")
+
+      expect(out).to include("===== Group default =====")
+      expect(out).to include("terranova (")
+
+      expect(out).not_to include("===== Group development, test =====")
+      expect(out).not_to include("activesupport")
+      expect(out).not_to include("duradura")
+    end
+
+    it "returns a sorted list of outdated gems from one group => 'development'" do
+      test_group_option("development", 2)
+
+      expect(out).not_to include("===== Group default =====")
+      expect(out).not_to include("terranova (")
+
+      expect(out).to include("===== Group development, test =====")
+      expect(out).to include("activesupport")
+      expect(out).to include("duradura")
+    end
+  end
+
+  describe "with --groups option" do
+    it "not outdated gems" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "weakling", "~> 0.0.1"
+        gem "terranova", '8'
+        group :development, :test do
+          gem 'activesupport', '2.3.5'
+          gem "duradura", '7.0'
+        end
+      G
+
+      bundle "outdated --groups"
+      expect(out).to include("Bundle up to date!")
+    end
+
+    it "returns a sorted list of outdated gems by groups" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "weakling", "~> 0.0.1"
+        gem "terranova", '8'
+        group :development, :test do
+          gem 'activesupport', '2.3.5'
+          gem "duradura", '7.0'
+        end
+      G
+
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        build_gem "terranova", "9"
+        build_gem "duradura", "8.0"
+      end
+
+      bundle "outdated --groups"
+      expect(out).to include("===== Group default =====")
+      expect(out).to include("terranova (newest 9, installed 8, requested = 8)")
+      expect(out).to include("===== Group development, test =====")
+      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
+      expect(out).to include("duradura (newest 8.0, installed 7.0, requested = 7.0)")
+
+      expect(out).not_to include("weakling (")
+
+      # TODO: check gems order inside the group
+    end
+  end
+
   describe "with --local option" do
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)
