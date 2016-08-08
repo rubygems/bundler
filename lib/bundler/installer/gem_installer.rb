@@ -15,15 +15,23 @@ module Bundler
       post_install_message = spec_settings ? install_with_settings : install
       Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       generate_executable_stubs
-      post_install_message
-
+      return true, post_install_message
+    rescue Bundler::InstallHookError, Bundler::SecurityError
+      raise
     rescue Errno::ENOSPC
-      raise Bundler::InstallError, out_of_space_message
+      return false, out_of_space_message
     rescue => e
-      handle_exception(e)
+      return false, specific_failure_message(e)
     end
 
   private
+
+    def specific_failure_message(e)
+      message = "#{e.class}: #{e.message}\n"
+      message += "  " + e.backtrace.join("\n  ") + "\n\n" if Bundler.ui.debug?
+      message = message.lines.first + Bundler.ui.add_color(message.lines.drop(1).join, :clear)
+      message + Bundler.ui.add_color(failure_message, :red)
+    end
 
     def failure_message
       return install_error_message if spec.source.options["git"]
@@ -36,16 +44,6 @@ module Bundler
 
     def gem_install_message
       "Make sure that `gem install #{spec.name} -v '#{spec.version}'` succeeds before bundling."
-    end
-
-    def handle_exception(e)
-      # Die if install hook failed or gem signature is bad.
-      raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
-      # other failure, likely a native extension build failure
-      Bundler.ui.info ""
-      Bundler.ui.warn "#{e.class}: #{e.message}"
-      Bundler.ui.debug e.backtrace.join("\n")
-      raise Bundler::InstallError, failure_message
     end
 
     def spec_settings
@@ -63,7 +61,7 @@ module Bundler
     end
 
     def out_of_space_message
-      "Your disk is out of space. Free some space to be able to install your bundle."
+      "#{install_error_message}\nYour disk is out of space. Free some space to be able to install your bundle."
     end
 
     def generate_executable_stubs

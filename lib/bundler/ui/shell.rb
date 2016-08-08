@@ -17,8 +17,8 @@ module Bundler
         @warning_history = []
       end
 
-      def add_color(string, color)
-        @shell.set_color(string, color)
+      def add_color(string, *color)
+        @shell.set_color(string, *color)
       end
 
       def info(msg, newline = nil)

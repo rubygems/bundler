@@ -68,7 +68,7 @@ module Bundler
       definition = Bundler.definition
       definition.validate_ruby!
 
-      Installer.install(Bundler.root, definition, options)
+      installer = Installer.install(Bundler.root, definition, options)
       Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]
 
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
@@ -83,7 +83,7 @@ module Bundler
       end
 
       unless Bundler.settings["ignore_messages"]
-        Installer.post_install_messages.to_a.each do |name, msg|
+        installer.post_install_messages.to_a.each do |name, msg|
           print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
         end
       end
