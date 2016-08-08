@@ -92,7 +92,7 @@ module Bundler
         end
       end
       @sources << @rubygems_aggregate
-      @specs = @specs.values
+      @specs = @specs.values.sort_by(&:identifier)
       warn_for_outdated_bundler_version
     rescue ArgumentError => e
       Bundler.ui.debug(e)

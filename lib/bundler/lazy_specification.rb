@@ -6,6 +6,20 @@ require "bundler/match_platform"
 module Bundler
   class LazySpecification
     Identifier = Struct.new(:name, :version, :source, :platform, :dependencies)
+    class Identifier
+      include Comparable
+      def <=>(other)
+        return unless other.is_a?(Identifier)
+        [name, version, platform_string] <=> [other.name, other.version, other.platform_string]
+      end
+
+    protected
+
+      def platform_string
+        platform_string = platform.to_s
+        platform_string == Index::RUBY ? Index::NULL : platform_string
+      end
+    end
 
     include MatchPlatform
 
