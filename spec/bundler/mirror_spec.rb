@@ -154,9 +154,14 @@ describe Bundler::Settings::Mirrors do
       expect(mirrors.for("http://rubygems.org/").uri).to eq(localhost_uri)
     end
 
-    it "parses a relative mirror key and returns a mirror for the parsed uri" do
+    it "parses a relative mirror key and returns a mirror for the parsed http uri" do
       mirrors.parse("mirror.rubygems.org", localhost_uri)
       expect(mirrors.for("http://rubygems.org/").uri).to eq(localhost_uri)
+    end
+
+    it "parses a relative mirror key and returns a mirror for the parsed https uri" do
+      mirrors.parse("mirror.rubygems.org", localhost_uri)
+      expect(mirrors.for("https://rubygems.org/").uri).to eq(localhost_uri)
     end
 
     context "with a uri parsed already" do
