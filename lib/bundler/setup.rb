@@ -20,9 +20,12 @@ if Bundler::SharedHelpers.in_bundle?
     Bundler.setup
   end
 
-  # Add bundler to the load path after disabling system gems
-  bundler_lib = File.expand_path("../..", __FILE__)
-  $LOAD_PATH.unshift(bundler_lib) unless $LOAD_PATH.include?(bundler_lib)
+  unless ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"]
+    # Add bundler to the load path after disabling system gems
+    # This is guarenteed to be done already if we've trampolined
+    bundler_lib = File.expand_path("../..", __FILE__)
+    $LOAD_PATH.unshift(bundler_lib) unless $LOAD_PATH.include?(bundler_lib)
+  end
 
   Bundler.ui = nil
 end
