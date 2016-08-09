@@ -176,8 +176,8 @@ describe "the lockfile format" do
       G
     end
 
-    warning_message = "Warning: the running version of Bundler is " \
-                           "older than the version that created the lockfile"
+    warning_message = "the running version of Bundler (9999999.0.0) is older " \
+                      "than the version that created the lockfile (9999999.1.0)"
     expect(out.scan(warning_message).size).to eq(1)
 
     lockfile_should_be <<-G

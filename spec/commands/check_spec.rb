@@ -331,7 +331,7 @@ describe "bundle check" do
       it "does not change the lock but warns" do
         lockfile lock_with(Bundler::VERSION.succ)
         bundle :check
-        expect(out).to include("Bundler is older than the version that created the lockfile")
+        expect(out).to include("the running version of Bundler (#{Bundler::VERSION}) is older than the version that created the lockfile (#{Bundler::VERSION.succ})")
         expect(err).to lack_errors
         lockfile_should_be lock_with(Bundler::VERSION.succ)
       end
