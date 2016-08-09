@@ -42,7 +42,7 @@ credentials from being stored in plain text in version control.
 
     bundle config gems.example.com user:password
 
-For some sources, like a company Gemfury account, it may be easier to simply
+For some sources, like a company Gemfury account, it may be easier to
 include the credentials in the Gemfile as part of the source URL.
 
     source "https://user:password@gems.example.com"
