@@ -705,7 +705,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       expect(out).
         to  include("The checksum for the downloaded `rack-1.0.0.gem` did not match the checksum given by the API.").
         and include("This means that the contents of the gem appear to be different from what was uploaded, and could be an indicator of a security issue.").
-        and match(/\(The expected SHA256 checksum was "checksum!", but the checksum for the downloaded gem was "[a-zA-Z0-9]+="\.\)/).
+        and match(/\(The expected SHA256 checksum was "checksum!", but the checksum for the downloaded gem was "[\w\\+=]+"\.\)/).
         and include("Bundler cannot continue installing rack (1.0.0).")
     end
   end
