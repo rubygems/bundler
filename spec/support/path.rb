@@ -81,11 +81,11 @@ module Spec
       Pathname.new(File.expand_path("../../../lib", __FILE__))
     end
 
-    def global_plugin_gems(*args)
+    def global_plugin_gem(*args)
       home ".bundle", "plugin", "gems", *args
     end
 
-    def local_plugin_gems(*args)
+    def local_plugin_gem(*args)
       bundled_app ".bundle", "plugin", "gems", *args
     end
 

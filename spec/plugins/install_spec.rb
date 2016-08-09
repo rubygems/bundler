@@ -78,7 +78,7 @@ describe "bundler plugin install" do
 
       expect(out).to include("plugins.rb was not found")
 
-      expect(global_plugin_gems("charlie-1.0")).not_to be_directory
+      expect(global_plugin_gem("charlie-1.0")).not_to be_directory
 
       plugin_should_not_be_installed("charlie")
     end
@@ -94,7 +94,7 @@ describe "bundler plugin install" do
 
       bundle "plugin install chaplin --source file://#{gem_repo2}"
 
-      expect(global_plugin_gems("chaplin-1.0")).not_to be_directory
+      expect(global_plugin_gem("chaplin-1.0")).not_to be_directory
 
       plugin_should_not_be_installed("chaplin")
     end
@@ -176,7 +176,7 @@ describe "bundler plugin install" do
       RUBY
 
       ruby code
-      expect(local_plugin_gems("foo-1.0", "plugins.rb")).to exist
+      expect(local_plugin_gem("foo-1.0", "plugins.rb")).to exist
     end
   end
 
@@ -186,7 +186,7 @@ describe "bundler plugin install" do
       bundle "plugin install foo --source file://#{gem_repo2}"
 
       plugin_should_be_installed("foo")
-      expect(local_plugin_gems("foo-1.0")).to be_directory
+      expect(local_plugin_gem("foo-1.0")).to be_directory
     end
 
     context "conflict with global plugin" do
