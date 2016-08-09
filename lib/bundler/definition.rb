@@ -62,6 +62,7 @@ module Bundler
       @specs           = nil
       @ruby_version    = ruby_version
 
+      @lockfile               = lockfile
       @lockfile_contents      = String.new
       @locked_bundler_version = nil
       @locked_ruby_version    = nil
@@ -94,11 +95,7 @@ module Bundler
 
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
-      @unlock[:ruby] ||= if @ruby_version && @locked_ruby_version
-        unless locked_ruby_version_object = RubyVersion.from_string(@locked_ruby_version)
-          raise LockfileError, "Failed to create a `RubyVersion` object from " \
-            "`#{@locked_ruby_version}` found in #{lockfile} -- try running `bundle update --ruby`."
-        end
+      @unlock[:ruby] ||= if @ruby_version && locked_ruby_version_object
         @ruby_version.diff(locked_ruby_version_object)
       end
       @unlocking ||= @unlock[:ruby] ||= (!@locked_ruby_version ^ !@ruby_version)
@@ -264,7 +261,7 @@ module Bundler
           dependency_names -= pinned_spec_names(source.specs)
           dependency_names.concat(source.unmet_deps).uniq!
         end
-        idx << Gem::Specification.new("ruby\0", RUBY_VERSION)
+        idx << Gem::Specification.new("ruby\0", RubyVersion.system.gem_version)
         idx << Gem::Specification.new("rubygems\0", Gem::VERSION)
       end
     end
@@ -339,6 +336,17 @@ module Bundler
         Bundler::RubyVersion.system
       else
         @locked_ruby_version
+      end
+    end
+
+    def locked_ruby_version_object
+      return unless @locked_ruby_version
+      @locked_ruby_version_object ||= begin
+        unless version = RubyVersion.from_string(@locked_ruby_version)
+          raise LockfileError, "Failed to create a `RubyVersion` object from " \
+            "`#{@locked_ruby_version}` found in #{@lockfile} -- try running `bundle update --ruby`."
+        end
+        version
       end
     end
 
@@ -734,9 +742,9 @@ module Bundler
     # the metadata dependencies here
     def expanded_dependencies
       @expanded_dependencies ||= begin
-        ruby_versions = [RUBY_VERSION]
-        ruby_versions.concat(@ruby_version.versions) if @ruby_version
-        ruby_versions << @locked_ruby_version if @locked_ruby_version && !@unlock[:ruby]
+        ruby_versions = RubyVersion.system.versions
+        ruby_versions += @ruby_version.versions if @ruby_version
+        ruby_versions += locked_ruby_version_object.versions if locked_ruby_version_object && !@unlock[:ruby]
         metadata_dependencies = [
           Dependency.new("ruby\0", ruby_versions),
           Dependency.new("rubygems\0", Gem::VERSION),
