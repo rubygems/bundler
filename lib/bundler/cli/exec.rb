@@ -63,7 +63,7 @@ module Bundler
       args.pop if args.last.is_a?(Hash)
       ARGV.replace(args)
       $0 = file
-      Process.setproctitle(process_title(file, *args))
+      Process.setproctitle(process_title(file, args)) if Process.respond_to?(:setproctitle)
       ui = Bundler.ui
       Bundler.ui = nil
       require "bundler/setup"
@@ -79,12 +79,8 @@ module Bundler
       abort "#{e.class}: #{e.message}\n  #{backtrace.join("\n  ")}"
     end
 
-    def process_title(file, *args)
-      if args.empty?
-        file
-      else
-        "#{file} #{args.join(" ")}".strip
-      end
+    def process_title(file, args)
+      "#{file} #{args.join(" ")}".strip
     end
 
     def ruby_shebang?(file)
