@@ -555,9 +555,10 @@ module Bundler
         end
       end
 
-      locals.any? do |source, changed|
+      sources_with_changes = locals.select do |source, changed|
         changed || specs_changed?(source)
-      end
+      end.map(&:first)
+      !sources_with_changes.each {|source| @unlock[:sources] << source.name }.empty?
     end
 
     def converge_paths
