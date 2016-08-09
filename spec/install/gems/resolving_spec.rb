@@ -126,23 +126,26 @@ describe "bundle install with install-time dependencies" do
           end
         end
 
-        install_gemfile <<-G
-          source "file://#{gem_repo2}"
+        install_gemfile <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo2 }
+          source "http://localgemserver.test/"
           ruby "#{RUBY_VERSION}"
           gem 'require_ruby'
         G
 
         expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
 
-        nice_error = <<-E.strip.gsub(/^ {8}/, "")
-          Fetching source index from file:#{gem_repo1}/
+        nice_error = strip_whitespace(<<-E).strip
+          Fetching gem metadata from http://localgemserver.test/.
+          Fetching version metadata from http://localgemserver.test/
           Resolving dependencies...
-          Bundler could not find compatible versions for gem "require_ruby":
+          Bundler could not find compatible versions for gem "ruby\0":
             In Gemfile:
-              ruby (= #{RUBY_VERSION})
+              ruby\0 (= 2.3.1)
 
               require_ruby was resolved to 1.0, which depends on
-                ruby (> 9000)
+                ruby\0 (> 9000)
+
+          Could not find gem 'ruby\0 (> 9000)', which is required by gem 'require_ruby', in any of the sources.
         E
         expect(out).to eq(nice_error)
       end

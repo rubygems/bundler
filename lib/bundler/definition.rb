@@ -264,6 +264,8 @@ module Bundler
           dependency_names -= pinned_spec_names(source.specs)
           dependency_names.concat(source.unmet_deps).uniq!
         end
+        idx << Gem::Specification.new("ruby\0", RUBY_VERSION)
+        idx << Gem::Specification.new("rubygems\0", Gem::VERSION)
       end
     end
 
@@ -728,8 +730,19 @@ module Bundler
       @locked_specs.any? {|s| s.satisfies?(dep) && (!dep.source || s.source.include?(dep.source)) }
     end
 
+    # This list of dependencies is only used in #resolve, so it's OK to add
+    # the metadata dependencies here
     def expanded_dependencies
-      @expanded_dependencies ||= expand_dependencies(dependencies, @remote)
+      @expanded_dependencies ||= begin
+        ruby_versions = [RUBY_VERSION]
+        ruby_versions.concat(@ruby_version.versions) if @ruby_version
+        ruby_versions << @locked_ruby_version if @locked_ruby_version && !@unlock[:ruby]
+        metadata_dependencies = [
+          Dependency.new("ruby\0", ruby_versions),
+          Dependency.new("rubygems\0", Gem::VERSION),
+        ]
+        expand_dependencies(dependencies + metadata_dependencies, @remote)
+      end
     end
 
     def expand_dependencies(dependencies, remote = false)

@@ -124,15 +124,7 @@ module Bundler
 
       def for?(platform, ruby_version)
         spec = @specs[platform]
-        return false unless spec
-
-        return true if ruby_version.nil?
-        # Only allow endpoint specifications since they won't hit the network to
-        # fetch the full gemspec when calling required_ruby_version
-        return true if !spec.is_a?(EndpointSpecification) && !spec.is_a?(Gem::Specification)
-        return true if spec.required_ruby_version.nil?
-
-        spec.required_ruby_version.satisfied_by?(ruby_version.to_gem_version_with_patchlevel)
+        !spec.nil?
       end
 
       def to_s
@@ -140,7 +132,9 @@ module Bundler
       end
 
       def dependencies_for_activated_platforms
-        @activated.map {|p| __dependencies[p] }.flatten
+        dependencies = @activated.map {|p| __dependencies[p] }
+        metadata_dependencies = @activated.map {|platform| metadata_dependencies(@specs[platform], platform) }
+        dependencies.concat(metadata_dependencies).flatten
       end
 
       def platforms_for_dependency_named(dependency)
@@ -162,6 +156,21 @@ module Bundler
           end
           dependencies
         end
+      end
+
+      def metadata_dependencies(spec, platform)
+        return [] unless spec
+        # Only allow endpoint specifications since they won't hit the network to
+        # fetch the full gemspec when calling required_ruby_version
+        return [] if !spec.is_a?(EndpointSpecification) && !spec.is_a?(Gem::Specification)
+        dependencies = []
+        if !spec.required_ruby_version.nil? && !spec.required_ruby_version.none?
+          dependencies << DepProxy.new(Gem::Dependency.new("ruby\0", spec.required_ruby_version), platform)
+        end
+        if !spec.required_rubygems_version.nil? && !spec.required_rubygems_version.none?
+          dependencies << DepProxy.new(Gem::Dependency.new("rubygems\0", spec.required_rubygems_version), platform)
+        end
+        dependencies
       end
     end
 
@@ -201,7 +210,9 @@ module Bundler
     def start(requirements)
       verify_gemfile_dependencies_are_found!(requirements)
       dg = @resolver.resolve(requirements, @base_dg)
-      dg.map(&:payload).map(&:to_specs).flatten
+      dg.map(&:payload).
+        reject {|sg| sg.name.end_with?("\0") }.
+        map(&:to_specs).flatten
     rescue Molinillo::VersionConflict => e
       raise VersionConflict.new(e.conflicts.keys.uniq, e.message)
     rescue Molinillo::CircularDependencyError => e
