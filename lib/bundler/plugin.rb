@@ -38,7 +38,7 @@ module Bundler
       save_plugins names, specs
     rescue PluginError => e
       specs.values.map {|spec| Bundler.rm_rf(spec.full_gem_path) } if specs
-      Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n")}"
+      Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n ")}"
     end
 
     # Evaluates the Gemfile with a limited DSL and installs the plugins
