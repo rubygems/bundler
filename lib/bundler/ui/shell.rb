@@ -45,7 +45,7 @@ module Bundler
 
       def debug?
         # needs to be false instead of nil to be newline param to other methods
-        level("debug")
+        level("debug") ? true : false
       end
 
       def quiet?

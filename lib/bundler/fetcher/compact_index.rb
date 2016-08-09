@@ -78,11 +78,7 @@ module Bundler
     private
 
       def compact_index_client
-        @compact_index_client ||= begin
-          compact_fetcher = lambda do |path, headers|
-            downloader.fetch(fetch_uri + path, headers)
-          end
-
+        @compact_index_client ||=
           SharedHelpers.filesystem_access(cache_path) do
             CompactIndexClient.new(cache_path, compact_fetcher)
           end.tap do |client|
@@ -93,7 +89,6 @@ module Bundler
               inputs.map { worker.deq }
             end
           end
-        end
       end
 
       def bundle_worker(func = nil)
@@ -108,6 +103,18 @@ module Bundler
 
       def cache_path
         Bundler.user_cache.join("compact_index", remote.cache_slug)
+      end
+
+      def compact_fetcher
+        lambda do |path, headers|
+          begin
+            downloader.fetch(fetch_uri + path, headers)
+          rescue NetworkDownError => e
+            raise unless Bundler.settings[:allow_offline_install] && headers["If-None-Match"]
+            Bundler.ui.warn "Using the cached data for the new index because of a network error: #{e}"
+            Net::HTTPNotModified.new(nil, nil, nil)
+          end
+        end
       end
     end
   end

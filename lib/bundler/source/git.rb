@@ -152,7 +152,7 @@ module Bundler
         set_local!(app_cache_path) if has_app_cache? && !local?
 
         if requires_checkout? && !@copied
-          git_proxy.checkout
+          fetch
           git_proxy.copy_to(install_path, submodules)
           serialize_gemspecs_in(install_path)
           @copied = true
@@ -287,6 +287,13 @@ module Bundler
 
       def git_proxy
         @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision, self)
+      end
+
+      def fetch
+        git_proxy.checkout
+      rescue GitError
+        raise unless Bundler.settings[:allow_offline_install]
+        Bundler.ui.warn "Using cached git data because of network errors"
       end
     end
   end
