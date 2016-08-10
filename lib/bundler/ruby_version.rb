@@ -128,6 +128,11 @@ module Bundler
       end
     end
 
+    def exact?
+      return @exact if defined?(@exact)
+      @exact = versions.all? {|v| Gem::Requirement.create(v).exact? }
+    end
+
   private
 
     def matches?(requirements, version)

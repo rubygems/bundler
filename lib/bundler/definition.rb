@@ -261,7 +261,7 @@ module Bundler
           dependency_names -= pinned_spec_names(source.specs)
           dependency_names.concat(source.unmet_deps).uniq!
         end
-        idx << Gem::Specification.new("ruby\0", RubyVersion.system.gem_version)
+        idx << Gem::Specification.new("ruby\0", RubyVersion.system.to_gem_version_with_patchlevel)
         idx << Gem::Specification.new("rubygems\0", Gem::VERSION)
       end
     end
@@ -742,9 +742,21 @@ module Bundler
     # the metadata dependencies here
     def expanded_dependencies
       @expanded_dependencies ||= begin
-        ruby_versions = RubyVersion.system.versions
-        ruby_versions += @ruby_version.versions if @ruby_version
-        ruby_versions += locked_ruby_version_object.versions if locked_ruby_version_object && !@unlock[:ruby]
+        ruby_versions = []
+        add_ruby_versions = proc do |ruby_version|
+          break unless ruby_version
+          if ruby_version.patchlevel
+            ruby_versions << ruby_version.to_gem_version_with_patchlevel
+          else
+            ruby_versions += ruby_version.versions.map {|v| "~> #{v}.0" }
+          end
+        end
+        add_ruby_versions.call(@ruby_version)
+        if ruby_versions.empty? || !@ruby_version.exact?
+          add_ruby_versions.call(RubyVersion.system)
+          add_ruby_versions.call(locked_ruby_version_object) unless @unlock[:ruby]
+        end
+
         metadata_dependencies = [
           Dependency.new("ruby\0", ruby_versions),
           Dependency.new("rubygems\0", Gem::VERSION),

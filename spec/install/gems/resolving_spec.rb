@@ -140,7 +140,7 @@ describe "bundle install with install-time dependencies" do
           Resolving dependencies...
           Bundler could not find compatible versions for gem "ruby\0":
             In Gemfile:
-              ruby\0 (= 2.3.1)
+              ruby\0 (~> #{RUBY_VERSION}.0)
 
               require_ruby was resolved to 1.0, which depends on
                 ruby\0 (> 9000)
