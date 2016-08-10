@@ -76,7 +76,7 @@ describe Bundler::Plugin::Index do
   end
 
   describe "hook" do
-    let(:hooks) { ["before-foo", "after-bar"] }
+    let(:hooks) { ["after-bar"] }
 
     it "returns the plugins name on query" do
       expect(index.hook_plugins("after-bar")).to include(plugin_name)
@@ -85,6 +85,23 @@ describe Bundler::Plugin::Index do
     it "is persistent" do
       new_index = Index.new
       expect(new_index.hook_plugins("after-bar")).to eq([plugin_name])
+    end
+
+    context "that are not registered", :focused do
+      let(:file) { double("index-file") }
+
+      before do
+        index.hook_plugins("not-there")
+        allow(File).to receive(:open).and_yield(file)
+      end
+
+      it "should not save it with next registed hook" do
+        expect(file).to receive(:puts) do |content|
+          expect(content).not_to include("not-there")
+        end
+
+        index.register_plugin("aplugin", lib_path("aplugin").to_s, lib_path("aplugin").join("lib").to_s, [], [], [])
+      end
     end
   end
 
