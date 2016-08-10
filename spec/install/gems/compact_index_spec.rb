@@ -44,6 +44,23 @@ describe "compact index api" do
     )
   end
 
+  it "should handle case sensitivity conflicts" do
+    build_repo4 do
+      build_gem "rack", "1.0" do |s|
+        s.add_runtime_dependency("Rack", "0.1")
+      end
+      build_gem "Rack", "0.1"
+    end
+
+    install_gemfile! <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo4 }
+      source "#{source_uri}"
+      gem "rack", "1.0"
+      gem "Rack", "0.1"
+    G
+
+    expect(the_bundle).to include_gems("rack 1.0", "Rack 1.0")
+  end
+
   it "should handle multiple gem dependencies on the same gem" do
     gemfile <<-G
       source "#{source_uri}"
