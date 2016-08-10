@@ -27,7 +27,7 @@ in your local bundler configuration.
 
 ## REMOTE FETCHING
 
-By default, if you simply run [bundle install(1)][bundle-install] after running
+By default, if you run [bundle install(1)][bundle-install] after running
 [bundle package(1)][bundle-package], bundler will still connect to `rubygems.org`
 to check whether a platform-specific gem exists for any of the gems
 in `vendor/cache`.

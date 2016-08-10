@@ -77,10 +77,19 @@ describe "The library itself" do
 
   def check_for_expendable_words(filename)
     failing_line_message = []
-    useless_words = /\b(actually|obviously|just|clearly|basically|really)\b/i
+    useless_words = %w(
+      actually
+      basically
+      clearly
+      just
+      obviously
+      really
+      simply
+    )
+    pattern = /\b#{Regexp.union(useless_words)}\b/i
 
     File.readlines(filename).each_with_index do |line, number|
-      next unless word_found = useless_words.match(line)
+      next unless word_found = pattern.match(line)
       failing_line_message << "#{filename} has '#{word_found}' on line #{number + 1}. Avoid using these kinds of weak modifiers."
     end
 
