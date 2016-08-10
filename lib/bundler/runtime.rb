@@ -270,7 +270,7 @@ module Bundler
 
     def setup_manpath
       # Store original MANPATH for restoration later in with_clean_env()
-      ENV["BUNDLE_ORIG_MANPATH"] = ENV["MANPATH"]
+      ENV["BUNDLER_ORIG_MANPATH"] = ENV["MANPATH"]
 
       # Add man/ subdirectories from activated bundles to MANPATH for man(1)
       manuals = $LOAD_PATH.map do |path|

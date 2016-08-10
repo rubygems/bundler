@@ -6,7 +6,7 @@ module Bundler
     def initialize(env, keys)
       @original = env.to_hash
       @keys = keys
-      @prefix = "BUNDLE_ORIG_"
+      @prefix = "BUNDLER_ORIG_"
     end
 
     # @return [Hash]
