@@ -292,7 +292,7 @@ module Bundler
       uri = "#{uri}/" unless uri =~ %r{/\Z}
       uri = URI(uri)
       unless uri.absolute?
-        raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
+        raise ArgumentError, format("Gem sources must be absolute. You provided '%s'.", uri)
       end
       uri
     end
