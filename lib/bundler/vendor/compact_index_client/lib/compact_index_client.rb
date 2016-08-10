@@ -60,9 +60,8 @@ class Bundler::CompactIndexClient
 private
 
   def update(local_path, remote_path)
-    return if @endpoints.include?(remote_path)
+    return unless @endpoints.add?(remote_path)
     @updater.update(local_path, url(remote_path))
-    @endpoints << remote_path
   end
 
   def update_info(name)
