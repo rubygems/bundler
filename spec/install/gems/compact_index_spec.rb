@@ -702,11 +702,20 @@ The checksum of /versions does not match the checksum provided by the server! So
         source "#{source_uri}"
         gem "rack"
       G
+      expect(exitstatus).to eq(19) if exitstatus
       expect(out).
         to  include("The checksum for the downloaded `rack-1.0.0.gem` did not match the checksum given by the API.").
         and include("This means that the contents of the gem appear to be different from what was uploaded, and could be an indicator of a security issue.").
-        and match(/\(The expected SHA256 checksum was "checksum!", but the checksum for the downloaded gem was "[\w\\+=]+"\.\)/).
+        and match(/\(The expected SHA256 checksum was "checksum!", but the checksum for the downloaded gem was ".+?"\.\)/).
         and include("Bundler cannot continue installing rack (1.0.0).")
+    end
+
+    it "does not raise when disable_checksum_validation is set" do
+      bundle! "config disable_checksum_validation true"
+      install_gemfile! <<-G, :artifice => "compact_index_wrong_gem_checksum"
+        source "#{source_uri}"
+        gem "rack"
+      G
     end
   end
 end

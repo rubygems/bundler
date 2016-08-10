@@ -20,6 +20,7 @@ module Bundler
   private
 
     def validate_bundler_checksum(checksum)
+      return true if Bundler.settings[:disable_checksum_validation]
       return true unless checksum
       return true unless source = @package.instance_variable_get(:@gem)
       return true unless source.respond_to?(:with_read_io)
