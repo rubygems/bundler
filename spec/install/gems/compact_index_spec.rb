@@ -58,7 +58,10 @@ describe "compact index api" do
       gem "Rack", "0.1"
     G
 
-    expect(the_bundle).to include_gems("rack 1.0", "Rack 1.0")
+    # can't use `include_gems` here since the `require` will conflict on a
+    # case-insensitive FS
+    run! "Bundler.require; puts Gem.loaded_specs.values_at('rack', 'Rack').map(&:full_name)"
+    expect(out).to eq("rack-1.0\nRack-0.1")
   end
 
   it "should handle multiple gem dependencies on the same gem" do
