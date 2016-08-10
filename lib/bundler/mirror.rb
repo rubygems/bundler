@@ -121,7 +121,7 @@ module Bundler
         if uri == "all"
           @all = true
         else
-          @uri = /https?:/ =~ uri ? Settings.normalize_uri(uri) : uri
+          @uri = URI(uri).absolute? ? Settings.normalize_uri(uri) : uri
         end
         @value = value
       end
