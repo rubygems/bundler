@@ -33,7 +33,8 @@ RSpec.configure do |config|
     message = proc do |color, text|
       colored = RSpec::Core::Formatters::ConsoleCodes.wrap(text, color)
       notification = RSpec::Core::Notifications::MessageNotification.new(colored)
-      RSpec.configuration.formatters.first.message(notification)
+      formatter = RSpec.configuration.formatters.first
+      formatter.message(notification) if formatter.respond_to?(:message)
     end
 
     retried_examples = RSpec.world.example_groups.map do |g|
