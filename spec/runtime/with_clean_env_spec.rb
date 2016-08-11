@@ -78,7 +78,7 @@ describe "Bundler.with_env helpers" do
     it "should restore the original MANPATH" do
       code = "print Bundler.clean_env['MANPATH']"
       ENV["MANPATH"] = "/foo"
-      ENV["BUNDLE_ORIG_MANPATH"] = "/foo-original"
+      ENV["BUNDLER_ORIG_MANPATH"] = "/foo-original"
       result = bundle("exec ruby -e #{code.inspect}")
       expect(result).to eq("/foo-original")
     end

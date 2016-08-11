@@ -256,7 +256,7 @@ module Spec
       backup = ENV.to_hash
       ENV["GEM_HOME"] = path.to_s
       ENV["GEM_PATH"] = path.to_s
-      ENV["BUNDLE_ORIG_GEM_PATH"] = nil
+      ENV["BUNDLER_ORIG_GEM_PATH"] = nil
       yield
     ensure
       ENV.replace(backup)
@@ -265,7 +265,7 @@ module Spec
     def with_path_as(path)
       backup = ENV.to_hash
       ENV["PATH"] = path.to_s
-      ENV["BUNDLE_ORIG_PATH"] = nil
+      ENV["BUNDLER_ORIG_PATH"] = nil
       yield
     ensure
       ENV.replace(backup)
@@ -305,7 +305,7 @@ module Spec
       env_backup = ENV.to_hash
       ENV["GEM_HOME"] = system_gem_path.to_s
       ENV["GEM_PATH"] = system_gem_path.to_s
-      ENV["BUNDLE_ORIG_GEM_PATH"] = nil
+      ENV["BUNDLER_ORIG_GEM_PATH"] = nil
 
       install_gems(*gems)
       return unless block_given?

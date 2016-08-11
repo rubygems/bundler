@@ -214,8 +214,8 @@ module Bundler
       Bundler::SharedHelpers.major_deprecation("`Bundler.clean_env` has weird edge cases, use `.original_env` instead")
       env = original_env
 
-      if env.key?("BUNDLE_ORIG_MANPATH")
-        env["MANPATH"] = env["BUNDLE_ORIG_MANPATH"]
+      if env.key?("BUNDLER_ORIG_MANPATH")
+        env["MANPATH"] = env["BUNDLER_ORIG_MANPATH"]
       end
 
       env.delete_if {|k, _| k[0, 7] == "BUNDLE_" }
