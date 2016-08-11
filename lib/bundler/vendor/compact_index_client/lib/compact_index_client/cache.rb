@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+require "digest/md5"
 class Bundler::CompactIndexClient
   class Cache
     attr_reader :directory
 
     def initialize(directory)
       @directory = Pathname.new(directory).expand_path
-      FileUtils.mkdir_p info_path(nil)
+      info_roots.each {|dir| FileUtils.mkdir_p(dir) }
     end
 
     def names
@@ -59,7 +60,13 @@ class Bundler::CompactIndexClient
     end
 
     def info_path(name)
-      directory.join("info", name.to_s)
+      name = name.to_s
+      if name =~ /[^a-z0-9_-]/
+        name += "-#{Digest::MD5.hexdigest(name).downcase}"
+        info_roots.last.join(name)
+      else
+        info_roots.first.join(name)
+      end
     end
 
     def specific_dependency(name, version, platform)
@@ -93,6 +100,13 @@ class Bundler::CompactIndexClient
       dependency = string.split(":")
       dependency[-1] = dependency[-1].split("&") if dependency.size > 1
       dependency
+    end
+
+    def info_roots
+      [
+        directory.join("info"),
+        directory.join("info-special-characters"),
+      ]
     end
   end
 end
