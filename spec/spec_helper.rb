@@ -31,6 +31,7 @@ else
 end
 
 Dir["#{File.expand_path("../support", __FILE__)}/*.rb"].each do |file|
+  file = file.split("/")[-2, 2].join("/") if RUBY_VERSION < "2.0"
   require file unless file =~ %r{fakeweb/.*\.rb}
 end
 
