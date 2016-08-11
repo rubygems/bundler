@@ -1,6 +1,9 @@
 language: ruby
 script: rake spec:travis
 before_script:
+  - rm -rf tmp
+  - mkdir -p /var/ramfs/bundler/tmp
+  - ln -s /var/ramfs/bundler/tmp tmp
   - travis_retry rake spec:travis:deps
   - travis_retry rake man:build
   - travis_retry rake spec:rubygems:clone_rubygems_$RGV
