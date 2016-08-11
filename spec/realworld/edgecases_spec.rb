@@ -49,7 +49,7 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
     bundle :lock
-    expect(lockfile).to include("rails (3.2.22.2)")
+    expect(lockfile).to include("rails (3.2.22.4)")
     expect(lockfile).to include("capybara (2.2.1)")
   end
 

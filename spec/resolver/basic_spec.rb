@@ -213,7 +213,6 @@ describe "Resolving" do
 
       it "will not revert to a previous version in strict mode level patch" do
         pending "possible issue with molinillo - needs further research"
-        ENV["DEBUG_RESOLVER"] = "true"
         should_conservative_resolve_and_include [:patch, :strict], [], %w(foo-1.4.3 bar-2.1.1)
       end
 

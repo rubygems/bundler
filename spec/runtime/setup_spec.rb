@@ -926,7 +926,7 @@ describe "Bundler.setup" do
         s.write "bar.gemspec", "require 'foobarbaz'"
       end.ref_for("HEAD")
       bundle :install
-      puts out
+
       expect(out.lines.map(&:chomp)).to include(
         a_string_starting_with("[!] There was an error while loading `bar.gemspec`:"),
         RUBY_VERSION >= "1.9" ? a_string_starting_with("Does it try to require a relative path? That's been removed in Ruby 1.9.") : "",

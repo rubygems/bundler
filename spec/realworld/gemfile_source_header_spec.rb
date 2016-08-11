@@ -43,7 +43,8 @@ describe "fetching dependencies with a mirrored source", :realworld => true, :ru
                          :Host      => "0.0.0.0",
                          :Port      => @port,
                          :server    => "webrick",
-                         :AccessLog => [])
+                         :AccessLog => [],
+                         :Logger    => Spec::SilentLogger.new)
     end.run
 
     wait_for_server("127.0.0.1", @port)
