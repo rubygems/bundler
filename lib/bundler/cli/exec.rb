@@ -63,6 +63,7 @@ module Bundler
       args.pop if args.last.is_a?(Hash)
       ARGV.replace(args)
       $0 = file
+      Process.setproctitle(process_title(file, *args))
       ui = Bundler.ui
       Bundler.ui = nil
       require "bundler/setup"
@@ -76,6 +77,14 @@ module Bundler
       Bundler.ui.error "bundler: failed to load command: #{cmd} (#{file})"
       backtrace = e.backtrace.take_while {|bt| !bt.start_with?(__FILE__) }
       abort "#{e.class}: #{e.message}\n  #{backtrace.join("\n  ")}"
+    end
+
+    def process_title(file, *args)
+      if args.empty?
+        file
+      else
+        "#{file} #{args.join(" ")}".strip
+      end
     end
 
     def ruby_shebang?(file)

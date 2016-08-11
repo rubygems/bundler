@@ -462,6 +462,7 @@ describe "bundle exec" do
       puts "EXEC: \#{caller.grep(/load/).empty? ? 'exec' : 'load'}"
       puts "ARGS: \#{$0} \#{ARGV.join(' ')}"
       puts "RACK: \#{RACK}"
+      puts "PROCESS: \#{`ps --no-headers -oargs -p\#{Process.pid}`.strip}"
     RUBY
 
     before do
@@ -476,8 +477,9 @@ describe "bundle exec" do
     let(:exec) { "EXEC: load" }
     let(:args) { "ARGS: #{path} arg1 arg2" }
     let(:rack) { "RACK: 1.0.0" }
+    let(:process) { "PROCESS: #{path} arg1 arg2" }
     let(:exit_code) { 0 }
-    let(:expected) { [exec, args, rack].join("\n") }
+    let(:expected) { [exec, args, rack, process].join("\n") }
     let(:expected_err) { "" }
 
     subject { bundle "exec #{path} arg1 arg2" }
@@ -511,7 +513,7 @@ describe "bundle exec" do
       let(:exit_code) { 1 }
       let(:expected) { super() << "\nbundler: failed to load command: #{path} (#{path})" }
       let(:expected_err) do
-        "RuntimeError: ERROR\n  #{path}:7" +
+        "RuntimeError: ERROR\n  #{path}:8" +
           (Bundler.current_ruby.ruby_18? ? "" : ":in `<top (required)>'")
       end
       it_behaves_like "it runs"
