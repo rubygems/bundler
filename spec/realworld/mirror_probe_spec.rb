@@ -112,7 +112,8 @@ describe "fetching dependencies with a not available mirror", :realworld => true
                          :Host      => host,
                          :Port      => @server_port,
                          :server    => "webrick",
-                         :AccessLog => [])
+                         :AccessLog => [],
+                         :Logger    => Spec::SilentLogger.new)
     end.run
 
     wait_for_server(host, @server_port)

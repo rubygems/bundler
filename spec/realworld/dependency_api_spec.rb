@@ -16,7 +16,8 @@ describe "gemcutter's dependency API", :realworld => true do
                                     :Host      => "0.0.0.0",
                                     :Port      => port,
                                     :server    => "webrick",
-                                    :AccessLog => [])
+                                    :AccessLog => [],
+                                    :Logger    => Spec::SilentLogger.new)
         server.start
       end
       @t.run
