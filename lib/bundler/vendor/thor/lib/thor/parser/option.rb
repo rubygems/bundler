@@ -86,7 +86,7 @@ class Bundler::Thor
       sample = "[#{sample}]" unless required?
 
       if boolean?
-        sample << ", [#{dasherize("no-" + human_name)}]" unless name == "force"
+        sample << ", [#{dasherize("no-" + human_name)}]" unless name == "force" or name.start_with?("no-")
       end
 
       if aliases.empty?
@@ -108,6 +108,21 @@ class Bundler::Thor
 
     def validate!
       fail ArgumentError, "An option cannot be boolean and required." if boolean? && required?
+      validate_default_type!
+    end
+
+    def validate_default_type!
+      default_type = case @default
+                     when nil
+                       return
+                     when TrueClass, FalseClass
+                       :boolean
+                     when Numeric
+                       :numeric
+                     when Hash, Array, String
+                       @default.class.name.downcase.to_sym
+                     end
+      fail ArgumentError, "An option's default must match its type." unless default_type == @type
     end
 
     def dasherized?

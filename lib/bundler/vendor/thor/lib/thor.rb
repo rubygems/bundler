@@ -156,6 +156,10 @@ class Bundler::Thor # rubocop:disable ClassLength
     end
     alias_method :option, :method_option
 
+    def disable_class_options
+      @disable_class_options = true
+    end
+
     # Prints help information for the given command.
     #
     # ==== Parameters
@@ -170,7 +174,7 @@ class Bundler::Thor # rubocop:disable ClassLength
       shell.say "Usage:"
       shell.say "  #{banner(command)}"
       shell.say
-      class_options_help(shell, nil => command.options.map { |_, o| o })
+      class_options_help(shell, nil => command.options.values)
       if command.long_description
         shell.say "Description:"
         shell.print_wrapped(command.long_description, :indent => 2)
@@ -231,8 +235,11 @@ class Bundler::Thor # rubocop:disable ClassLength
 
       define_method(subcommand) do |*args|
         args, opts = Bundler::Thor::Arguments.split(args)
-        args.unshift("help") if opts.include? "--help" or opts.include? "-h"
-        invoke subcommand_class, args, opts, :invoked_via_subcommand => true, :class_options => options
+        invoke_args = [args, opts, { :invoked_via_subcommand => true, :class_options => options }]
+        if opts.delete('--help') or opts.delete("-h")
+          invoke_args.unshift 'help'
+        end
+        invoke subcommand_class, *invoke_args
       end
     end
     alias_method :subtask, :subcommand
@@ -380,11 +387,12 @@ class Bundler::Thor # rubocop:disable ClassLength
       @usage ||= nil
       @desc ||= nil
       @long_desc ||= nil
+      @disable_class_options ||= nil
 
       if @usage && @desc
         base_class = @hide ? Bundler::Thor::HiddenCommand : Bundler::Thor::Command
-        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
-        @usage, @desc, @long_desc, @method_options, @hide = nil
+        commands[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options, @disable_class_options)
+        @usage, @desc, @long_desc, @method_options, @hide, @disable_class_options = nil
         true
       elsif all_commands[meth] || meth == "method_missing"
         true
@@ -470,6 +478,7 @@ class Bundler::Thor # rubocop:disable ClassLength
   map HELP_MAPPINGS => :help
 
   desc "help [COMMAND]", "Describe available commands or one specific command"
+  disable_class_options
   def help(command = nil, subcommand = false)
     if command
       if self.class.subcommands.include? command

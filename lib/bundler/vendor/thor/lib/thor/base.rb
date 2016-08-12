@@ -42,7 +42,7 @@ class Bundler::Thor
     # config<Hash>:: Configuration for this Bundler::Thor class.
     #
     def initialize(args = [], local_options = {}, config = {}) # rubocop:disable MethodLength
-      parse_options = self.class.class_options
+      parse_options = config[:current_command] && config[:current_command].disable_class_options ? {} : self.class.class_options
 
       # The start method splits inbound arguments at the first argument
       # that looks like an option (starts with - or --). It then calls
@@ -343,7 +343,7 @@ class Bundler::Thor
       #
       def all_commands
         @all_commands ||= from_superclass(:all_commands, Bundler::Thor::CoreExt::OrderedHash.new)
-        @all_commands.merge(commands)
+        @all_commands.merge!(commands)
       end
       alias_method :all_tasks, :all_commands
 
