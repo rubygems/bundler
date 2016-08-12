@@ -119,35 +119,58 @@ describe "bundle install with install-time dependencies" do
     end
 
     context "allows no gems" do
-      it "raises an error during resolution" do
+      before do
         build_repo2 do
           build_gem "require_ruby" do |s|
             s.required_ruby_version = "> 9000"
           end
         end
+      end
 
-        install_gemfile <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo2 }
-          source "http://localgemserver.test/"
-          ruby "#{RUBY_VERSION}"
-          gem 'require_ruby'
-        G
+      let(:ruby_requirement) { %("#{RUBY_VERSION}") }
+      let(:error_message_requirement) { "~> #{RUBY_VERSION}.0" }
 
-        expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
+      shared_examples_for "ruby version conflicts" do
+        it "raises an error during resolution" do
+          install_gemfile <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo2 }
+            source "http://localgemserver.test/"
+            ruby #{ruby_requirement}
+            gem 'require_ruby'
+          G
 
-        nice_error = strip_whitespace(<<-E).strip
-          Fetching gem metadata from http://localgemserver.test/.
-          Fetching version metadata from http://localgemserver.test/
-          Resolving dependencies...
-          Bundler could not find compatible versions for gem "ruby\0":
-            In Gemfile:
-              ruby\0 (~> #{RUBY_VERSION}.0)
+          expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
 
-              require_ruby was resolved to 1.0, which depends on
-                ruby\0 (> 9000)
+          nice_error = strip_whitespace(<<-E).strip
+            Fetching gem metadata from http://localgemserver.test/.
+            Fetching version metadata from http://localgemserver.test/
+            Resolving dependencies...
+            Bundler could not find compatible versions for gem "ruby\0":
+              In Gemfile:
+                ruby\0 (#{error_message_requirement})
 
-          Could not find gem 'ruby\0 (> 9000)', which is required by gem 'require_ruby', in any of the sources.
-        E
-        expect(out).to eq(nice_error)
+                require_ruby was resolved to 1.0, which depends on
+                  ruby\0 (> 9000)
+
+            Could not find gem 'ruby\0 (> 9000)', which is required by gem 'require_ruby', in any of the sources.
+          E
+          expect(out).to eq(nice_error)
+        end
+      end
+
+      it_behaves_like "ruby version conflicts"
+
+      describe "with a < requirement" do
+        let(:ruby_requirement) { %("< 5000") }
+        let(:error_message_requirement) { "< 5000" }
+
+        it_behaves_like "ruby version conflicts"
+      end
+
+      describe "with a compound requirement" do
+        let(:ruby_requirement) { %("< 5000", "> 0.1") }
+        let(:error_message_requirement) { "< 5000, > 0.1" }
+
+        it_behaves_like "ruby version conflicts"
       end
     end
   end

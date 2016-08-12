@@ -742,19 +742,10 @@ module Bundler
     # the metadata dependencies here
     def expanded_dependencies
       @expanded_dependencies ||= begin
-        ruby_versions = []
-        add_ruby_versions = proc do |ruby_version|
-          break unless ruby_version
-          if ruby_version.patchlevel
-            ruby_versions << ruby_version.to_gem_version_with_patchlevel
-          else
-            ruby_versions += ruby_version.versions.map {|v| "~> #{v}.0" }
-          end
-        end
-        add_ruby_versions.call(@ruby_version)
+        ruby_versions = concat_ruby_version_requirements(@ruby_version)
         if ruby_versions.empty? || !@ruby_version.exact?
-          add_ruby_versions.call(RubyVersion.system)
-          add_ruby_versions.call(locked_ruby_version_object) unless @unlock[:ruby]
+          concat_ruby_version_requirements(RubyVersion.system)
+          concat_ruby_version_requirements(locked_ruby_version_object) unless @unlock[:ruby]
         end
 
         metadata_dependencies = [
@@ -762,6 +753,22 @@ module Bundler
           Dependency.new("rubygems\0", Gem::VERSION),
         ]
         expand_dependencies(dependencies + metadata_dependencies, @remote)
+      end
+    end
+
+    def concat_ruby_version_requirements(ruby_version, ruby_versions = [])
+      return ruby_versions unless ruby_version
+      if ruby_version.patchlevel
+        ruby_versions << ruby_version.to_gem_version_with_patchlevel
+      else
+        ruby_versions.concat(ruby_version.versions.map do |version|
+          requirement = Gem::Requirement.new(version)
+          if requirement.exact?
+            "~> #{version}.0"
+          else
+            requirement
+          end
+        end)
       end
     end
 
