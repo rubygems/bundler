@@ -481,6 +481,11 @@ module Bundler
       @platforms |= [platform]
     end
 
+    def remove_platform(platform)
+      return if @platforms.delete(Gem::Platform.new(platform))
+      raise InvalidOption, "Unable to remove the platform `#{platform}` since the only platforms are #{@platforms.join ", "}"
+    end
+
     attr_reader :sources
     private :sources
 

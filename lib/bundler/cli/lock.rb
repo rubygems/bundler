@@ -26,9 +26,21 @@ module Bundler
         definition = Bundler.definition(true)
       end
 
-      options["add-platform"].each do |platform|
-        platform = Gem::Platform.new(platform)
+      options["remove-platform"].each do |platform|
+        definition.remove_platform(platform)
+      end
+
+      options["add-platform"].each do |platform_string|
+        platform = Gem::Platform.new(platform_string)
+        if platform.to_a.compact == %w(unknown)
+          Bundler.ui.warn "The platform `#{platform_string}` is unknown to RubyGems " \
+            "and adding it will likely lead to resolution errors"
+        end
         definition.add_platform(platform)
+      end
+
+      if definition.platforms.empty?
+        raise InvalidOption, "Removing all platforms from the bundle is not allowed"
       end
 
       definition.resolve_remotely! unless options[:local]
