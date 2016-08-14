@@ -277,7 +277,9 @@ module Bundler
     def download_gem(spec, uri, path)
       uri = Bundler.settings.mirror_for(uri)
       fetcher = Gem::RemoteFetcher.new(configuration[:http_proxy])
-      fetcher.download(spec, uri, path)
+      Bundler::Retry.new("download gem #{uri}", Gem::RemoteFetcher::FetchError).attempts do
+        fetcher.download(spec, uri, path)
+      end
     end
 
     def security_policy_keys
