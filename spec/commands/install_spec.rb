@@ -506,4 +506,31 @@ describe "bundle install with gem sources" do
       expect(out).not_to include("You're running Bundler #{Bundler::VERSION} but this project uses #{Bundler::VERSION}.")
     end
   end
+
+  describe "pre-release dependencies" do
+    it "informs user that pre-release dependencies need to be explicitly stated" do
+      build_repo2 do
+        ["2.99.0", "3.5.0.beta1"].each do |version|
+          build_gem "rspec-core", version
+          build_gem "rspec", version do |s|
+            s.add_dependency "rspec-core", "~> #{version}"
+          end
+          build_gem "rspec-rails", version do |s|
+            s.add_dependency "rspec-core", version
+          end
+        end
+        build_gem "guard-rspec", "4.6.0" do |s|
+          s.add_dependency "rspec", "< 4.0", ">= 2.99.0"
+        end
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem 'rspec-rails', '~> 3.5.0.beta1'
+        gem 'guard-rspec', '~> 4.6'
+      G
+
+      expect(out).to include("Pre-release dependencies need to be explicitly listed in the Gemfile.")
+    end
+  end
 end
