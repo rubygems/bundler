@@ -14,6 +14,7 @@ module Bundler
 
       def message
         conflicts.sort.reduce(String.new) do |o, (name, conflict)|
+          has_prerelease_deps = false
           o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
@@ -33,6 +34,9 @@ module Bundler
                 t << %( depends on)
               end
               t << %(\n)
+              if req.prerelease?
+                has_prerelease_deps = true
+              end
               depth += 1
             end
             t
@@ -60,6 +64,9 @@ module Bundler
             else
               o << "Could not find gem '#{conflict.requirement}' in any of the sources\n"
             end
+          end
+          if has_prerelease_deps
+            o << "\nNOTE: Pre-release dependencies need to be explicitly listed in the Gemfile."
           end
           o
         end
