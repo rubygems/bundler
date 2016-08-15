@@ -209,4 +209,23 @@ describe Bundler::Plugin do
       expect(subject.source_from_lock(opts)).to be(s_instance)
     end
   end
+
+  describe "#root" do
+    context "in app dir" do
+      before do
+        gemfile ""
+      end
+
+      it "returns plugin dir in app .bundle path" do
+        expect(subject.root).to eq(bundled_app.join(".bundle/plugin"))
+      end
+    end
+
+    context "outside app dir" do
+      it "returns plugin dir in global bundle path" do
+        Dir.chdir tmp
+        expect(subject.root).to eq(home.join(".bundle/plugin"))
+      end
+    end
+  end
 end

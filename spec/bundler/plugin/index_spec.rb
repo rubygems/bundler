@@ -6,6 +6,10 @@ describe Bundler::Plugin::Index do
 
   subject(:index) { Index.new }
 
+  before do
+    gemfile ""
+  end
+
   describe "#register plugin" do
     before do
       path = lib_path("new-plugin")
@@ -72,6 +76,20 @@ describe Bundler::Plugin::Index do
     it "is persistent" do
       new_index = Index.new
       expect(new_index.source_plugin("new_source")).to eq("splugin")
+    end
+  end
+
+  describe "global index" do
+    before do
+      Dir.chdir(tmp) do
+        path = lib_path("gplugin")
+        index.register_plugin("gplugin", path.to_s, [path.join("lib").to_s], [], ["glb_source"])
+      end
+    end
+
+    it "skips sources" do
+      new_index = Index.new
+      expect(new_index.source_plugin("glb_source")).to be_falsy
     end
   end
 

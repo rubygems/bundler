@@ -59,26 +59,6 @@ describe "bundler source plugin" do
         end
       end
 
-      context "installed though cli" do
-        before do
-          bundle "plugin install another-psource --source file://#{gem_repo2}"
-
-          install_gemfile <<-G
-            source "file://#{gem_repo2}"
-            source "file://#{lib_path("gitp")}", :type => :psource do
-            end
-          G
-        end
-
-        it "completes successfully" do
-          expect(out).to include("Bundle complete!")
-        end
-
-        it "doesn't install the default one" do
-          plugin_should_not_be_installed("bundler-source-psource")
-        end
-      end
-
       context "explicit presence in gemfile" do
         before do
           install_gemfile <<-G

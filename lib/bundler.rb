@@ -398,6 +398,9 @@ EOF
       @locked_gems = nil
       @bundle_path = nil
       @bin_path = nil
+
+      Plugin.reset!
+
       return unless defined?(@rubygems) && @rubygems
       rubygems.undo_replacements
       rubygems.reset

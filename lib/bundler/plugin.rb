@@ -63,9 +63,25 @@ module Bundler
       @index ||= Index.new
     end
 
-    # The directory root to all plugin related data
+    # The directory root for all plugin related data
+    #
+    # Points to root in app_config_path if ran in an app else points to the one
+    # in user_bundle_path
     def root
-      @root ||= Bundler.user_bundle_path.join("plugin")
+      @root ||= if SharedHelpers.in_bundle?
+        local_root
+      else
+        global_root
+      end
+    end
+
+    def local_root
+      Bundler.app_config_path.join("plugin")
+    end
+
+    # The global directory root for all plugin related data
+    def global_root
+      Bundler.user_bundle_path.join("plugin")
     end
 
     # The cache directory for plugin stuffs
@@ -126,6 +142,14 @@ module Bundler
     # @return [String, nil] installed path
     def installed?(plugin)
       Index.new.installed?(plugin)
+    end
+
+    # Used by specs
+    def reset!
+      instance_variables.each {|i| remove_instance_variable(i) }
+
+      @sources = {}
+      @commands = {}
     end
 
     # Post installation processing and registering with index

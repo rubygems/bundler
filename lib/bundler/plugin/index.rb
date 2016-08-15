@@ -26,7 +26,8 @@ module Bundler
         @sources = {}
         @load_paths = {}
 
-        load_index
+        load_index(global_index_file, true)
+        load_index(local_index_file) if SharedHelpers.in_bundle?
       end
 
       # This function is to be called when a new plugin is installed. This
@@ -57,9 +58,19 @@ module Bundler
         raise
       end
 
-      # Path where the index file is stored
+      # Path of default index file
       def index_file
         Plugin.root.join("index")
+      end
+
+      # Path where the global index file is stored
+      def global_index_file
+        Plugin.global_root.join("index")
+      end
+
+      # Path where the local index file is stored
+      def local_index_file
+        Plugin.local_root.join("index")
       end
 
       def plugin_path(name)
@@ -91,17 +102,23 @@ module Bundler
 
       # Reads the index file from the directory and initializes the instance
       # variables.
-      def load_index
+      #
+      # It skips the sources if the second param is true
+      # @param [Pathname] index file path
+      # @param [Boolean] is the index file global index
+      def load_index(index_file, global = false)
         SharedHelpers.filesystem_access(index_file, :read) do |index_f|
           valid_file = index_f && index_f.exist? && !index_f.size.zero?
           break unless valid_file
+
           data = index_f.read
           require "bundler/yaml_serializer"
           index = YAMLSerializer.load(data)
-          @plugin_paths = index["plugin_paths"] || {}
-          @load_paths = index["load_paths"] || {}
-          @commands = index["commands"] || {}
-          @sources = index["sources"] || {}
+
+          @plugin_paths.merge!(index["plugin_paths"])
+          @load_paths.merge!(index["load_paths"])
+          @commands.merge!(index["commands"])
+          @sources.merge!(index["sources"]) unless global
         end
       end
 
