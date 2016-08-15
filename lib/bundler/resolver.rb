@@ -34,9 +34,7 @@ module Bundler
                 t << %( depends on)
               end
               t << %(\n)
-              if req.prerelease?
-                has_prerelease_deps = true
-              end
+              has_prerelease_deps = true if req.prerelease?
               depth += 1
             end
             t

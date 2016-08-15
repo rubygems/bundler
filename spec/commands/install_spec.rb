@@ -530,7 +530,7 @@ describe "bundle install with gem sources" do
         gem 'guard-rspec', '~> 4.6'
       G
 
-      expect(out).to include("Pre-release dependencies need to be explicitly listed in the Gemfile.")
+      expect(out).to include("NOTE: Pre-release dependencies need to be explicitly listed in the Gemfile.")
     end
   end
 end
