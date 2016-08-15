@@ -195,6 +195,14 @@ module Bundler
 
     def rm_rf(path)
       FileUtils.remove_entry_secure(path) if path && File.exist?(path)
+    rescue ArgumentError
+      message = <<EOF
+It is a security vulnerability to allow your home directory to be world-writable, and bundler can not continue.
+You should probably consider fixing this issue by running `chmod o-w ~` on *nix.
+Please refer to http://ruby-doc.org/stdlib-2.1.2/libdoc/fileutils/rdoc/FileUtils.html#method-c-remove_entry_secure for details.
+EOF
+      File.world_writable?(path) ? Bundler.ui.warn(message) : raise
+      raise PathError, "Please fix the world-writable issue with your #{path} directory"
     end
 
     def settings
