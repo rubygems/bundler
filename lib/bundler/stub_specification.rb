@@ -15,6 +15,10 @@ module Bundler
       _remote_specification.to_yaml
     end
 
+    def to_s
+      "#{name} (#{version})"
+    end
+
   private
 
     def _remote_specification

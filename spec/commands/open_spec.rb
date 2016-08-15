@@ -2,11 +2,13 @@
 require "spec_helper"
 
 describe "bundle open" do
-  before :each do
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "rails"
-    G
+  unless example.metadata[:skip_before]
+    before :each do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+    end
   end
 
   it "opens the gem with BUNDLER_EDITOR as highest priority" do
@@ -82,5 +84,14 @@ describe "bundle open" do
   it "opens the editor with a clean env" do
     bundle "open", :env => { "EDITOR" => "sh -c 'env'", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
     expect(out).not_to include("BUNDLE_GEMFILE=")
+  end
+
+  it "throws proper error when trying to open default gem", :skip_before => true do
+    gemfile <<-G
+        gem "json"
+      G
+    bundle "open json", :env => { "EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor" }
+    expect(out).to include("Unable to open json")
+    expect(out).to include("because the directory it would normally be installed to does not exist. This could happen when you try to open a default gem.")
   end
 end
