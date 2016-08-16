@@ -109,8 +109,8 @@ module Bundler
         raise LockfileError, "You must use Bundler #{bundler_version.segments.first} or greater with this lockfile."
       when 0
         if current_version < bundler_version
-          Bundler.ui.warn "Warning: the running version of Bundler is older " \
-               "than the version that created the lockfile. We suggest you " \
+          Bundler.ui.warn "Warning: the running version of Bundler (#{current_version}) is older " \
+               "than the version that created the lockfile (#{bundler_version}). We suggest you " \
                "upgrade to the latest version of Bundler by running `gem " \
                "install bundler#{prerelease_text}`.\n"
         end
