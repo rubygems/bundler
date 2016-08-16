@@ -38,6 +38,17 @@ describe Bundler::Plugin::API do
         UserPluginClass.source "a_source", NewClass
       end
     end
+
+    describe "#hook" do
+      it "accepts a block and passes it to Plugin module" do
+        foo = double("tester")
+        expect(foo).to receive(:called)
+
+        expect(Bundler::Plugin).to receive(:add_hook).with("post-foo").and_yield
+
+        Bundler::Plugin::API.hook("post-foo") { foo.called }
+      end
+    end
   end
 
   context "bundler interfaces provided" do

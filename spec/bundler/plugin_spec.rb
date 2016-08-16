@@ -228,4 +228,65 @@ describe Bundler::Plugin do
       end
     end
   end
+
+  describe "#hook" do
+    before do
+      path = lib_path("foo-plugin")
+      build_lib "foo-plugin", :path => path do |s|
+        s.write "plugins.rb", code
+      end
+
+      allow(index).to receive(:hook_plugins).with(event).
+        and_return(["foo-plugin"])
+      allow(index).to receive(:plugin_path).with("foo-plugin").and_return(path)
+      allow(index).to receive(:load_paths).with("foo-plugin").and_return([])
+    end
+
+    let(:code) { <<-RUBY }
+      Bundler::Plugin::API.hook("event-1") { puts "hook for event 1" }
+    RUBY
+
+    let(:event) { "event-1" }
+
+    it "executes the hook" do
+      out = capture(:stdout) do
+        Plugin.hook("event-1")
+      end.strip
+
+      expect(out).to eq("hook for event 1")
+    end
+
+    context "single plugin declaring more than one hook" do
+      let(:code) { <<-RUBY }
+        Bundler::Plugin::API.hook("event-1") {}
+        Bundler::Plugin::API.hook("event-2") {}
+        puts "loaded"
+      RUBY
+
+      let(:event) { /event-1|event-2/ }
+
+      it "evals plugins.rb once" do
+        out = capture(:stdout) do
+          Plugin.hook("event-1")
+          Plugin.hook("event-2")
+        end.strip
+
+        expect(out).to eq("loaded")
+      end
+    end
+
+    context "a block is passed" do
+      let(:code) { <<-RUBY }
+        Bundler::Plugin::API.hook("#{event}") { |&blk| blk.call }
+      RUBY
+
+      it "is passed to the hook" do
+        out = capture(:stdout) do
+          Plugin.hook("event-1") { puts "win" }
+        end.strip
+
+        expect(out).to eq("win")
+      end
+    end
+  end
 end

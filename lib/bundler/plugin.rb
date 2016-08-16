@@ -16,8 +16,16 @@ module Bundler
 
   module_function
 
-    @commands = {}
-    @sources = {}
+    def reset!
+      instance_variables.each {|i| remove_instance_variable(i) }
+
+      @sources = {}
+      @commands = {}
+      @hooks_by_event = Hash.new {|h, k| h[k] = [] }
+      @loaded_plugin_names = []
+    end
+
+    reset!
 
     # Installs a new plugin by the given name
     #
@@ -30,7 +38,7 @@ module Bundler
       save_plugins names, specs
     rescue PluginError => e
       specs.values.map {|spec| Bundler.rm_rf(spec.full_gem_path) } if specs
-      Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace[0]}"
+      Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n ")}"
     end
 
     # Evaluates the Gemfile with a limited DSL and installs the plugins
@@ -137,19 +145,34 @@ module Bundler
       src.new(locked_opts.merge("uri" => locked_opts["remote"]))
     end
 
+    # To be called via the API to register a hooks and corresponding block that
+    # will be called to handle the hook
+    def add_hook(event, &block)
+      @hooks_by_event[event.to_s] << block
+    end
+
+    # Runs all the hooks that are registered for the passed event
+    #
+    # It passes the passed arguments and block to the block registered with
+    # the api.
+    #
+    # @param [String] event
+    def hook(event, *args, &arg_blk)
+      return unless Bundler.settings[:plugins]
+
+      plugins = index.hook_plugins(event)
+      return unless plugins.any?
+
+      (plugins - @loaded_plugin_names).each {|name| load_plugin(name) }
+
+      @hooks_by_event[event].each {|blk| blk.call(*args, &arg_blk) }
+    end
+
     # currently only intended for specs
     #
     # @return [String, nil] installed path
     def installed?(plugin)
       Index.new.installed?(plugin)
-    end
-
-    # Used by specs
-    def reset!
-      instance_variables.each {|i| remove_instance_variable(i) }
-
-      @sources = {}
-      @commands = {}
     end
 
     # Post installation processing and registering with index
@@ -162,7 +185,7 @@ module Bundler
       plugins.each do |name|
         spec = specs[name]
         validate_plugin! Pathname.new(spec.full_gem_path)
-        installed = register_plugin name, spec, optional_plugins.include?(name)
+        installed = register_plugin(name, spec, optional_plugins.include?(name))
         Bundler.ui.info "Installed plugin #{name}" if installed
       end
     end
@@ -190,9 +213,11 @@ module Bundler
     def register_plugin(name, spec, optional_plugin = false)
       commands = @commands
       sources = @sources
+      hooks = @hooks_by_event
 
       @commands = {}
       @sources = {}
+      @hooks_by_event = Hash.new {|h, k| h[k] = [] }
 
       load_paths = spec.load_paths
       add_to_load_path(load_paths)
@@ -208,12 +233,14 @@ module Bundler
         Bundler.rm_rf(path)
         false
       else
-        index.register_plugin name, path.to_s, load_paths, @commands.keys, @sources.keys
+        index.register_plugin(name, path.to_s, load_paths, @commands.keys,
+          @sources.keys, @hooks_by_event.keys)
         true
       end
     ensure
       @commands = commands
       @sources = sources
+      @hooks_by_event = hooks
     end
 
     # Executes the plugins.rb file
@@ -228,6 +255,8 @@ module Bundler
       add_to_load_path(index.load_paths(name))
 
       load path.join(PLUGIN_FILE_NAME)
+
+      @loaded_plugin_names << name
     rescue => e
       Bundler.ui.error "Failed loading plugin #{name}: #{e.message}"
       raise

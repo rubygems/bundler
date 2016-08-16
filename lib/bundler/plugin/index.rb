@@ -24,6 +24,7 @@ module Bundler
         @plugin_paths = {}
         @commands = {}
         @sources = {}
+        @hooks = {}
         @load_paths = {}
 
         load_index(global_index_file, true)
@@ -39,7 +40,7 @@ module Bundler
       # @param [Array<String>] load_paths for the plugin
       # @param [Array<String>] commands that are handled by the plugin
       # @param [Array<String>] sources that are handled by the plugin
-      def register_plugin(name, path, load_paths, commands, sources)
+      def register_plugin(name, path, load_paths, commands, sources, hooks)
         old_commands = @commands.dup
 
         common = commands & @commands.keys
@@ -49,6 +50,8 @@ module Bundler
         common = sources & @sources.keys
         raise SourceConflict.new(name, common) unless common.empty?
         sources.each {|k| @sources[k] = name }
+
+        hooks.each {|e| (@hooks[e] ||= []) << name }
 
         @plugin_paths[name] = path
         @load_paths[name] = load_paths
@@ -98,6 +101,11 @@ module Bundler
         @sources[name]
       end
 
+      # Returns the list of plugin names handling the passed event
+      def hook_plugins(event)
+        @hooks[event] || []
+      end
+
     private
 
       # Reads the index file from the directory and initializes the instance
@@ -112,12 +120,14 @@ module Bundler
           break unless valid_file
 
           data = index_f.read
+
           require "bundler/yaml_serializer"
           index = YAMLSerializer.load(data)
 
-          @plugin_paths.merge!(index["plugin_paths"])
-          @load_paths.merge!(index["load_paths"])
           @commands.merge!(index["commands"])
+          @hooks.merge!(index["hooks"])
+          @load_paths.merge!(index["load_paths"])
+          @plugin_paths.merge!(index["plugin_paths"])
           @sources.merge!(index["sources"]) unless global
         end
       end
@@ -127,10 +137,11 @@ module Bundler
       # to be only String key value pairs)
       def save_index
         index = {
+          "commands"     => @commands,
+          "hooks"        => @hooks,
+          "load_paths"   => @load_paths,
           "plugin_paths" => @plugin_paths,
-          "load_paths" => @load_paths,
-          "commands" => @commands,
-          "sources" => @sources,
+          "sources"      => @sources,
         }
 
         require "bundler/yaml_serializer"

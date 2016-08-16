@@ -44,6 +44,10 @@ module Bundler
         Plugin.add_source source, cls
       end
 
+      def self.hook(event, &block)
+        Plugin.add_hook(event, &block)
+      end
+
       # The cache dir to be used by the plugins for storage
       #
       # @return [Pathname] path of the cache dir
