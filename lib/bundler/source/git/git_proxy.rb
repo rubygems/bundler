@@ -224,6 +224,11 @@ module Bundler
           raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
         end
 
+        # TODO: Replace this with Open3 when upgrading to bundler 2
+        # Similar to #git_null, as Open3 is not cross-platform,
+        # a temporary way is to use Tempfile to capture the stderr.
+        # When replacing this using Open3, make sure git_null is
+        # also replaced by Open3, so stdout and stderr all got handled properly.
         def capture_and_filter_stderr(uri)
           return_value, captured_err = ""
           backup_stderr = STDERR.dup
