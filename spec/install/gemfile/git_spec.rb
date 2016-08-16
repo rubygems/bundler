@@ -1136,6 +1136,7 @@ describe "bundle install with git sources" do
 
         bundle :install
         expect(out).to_not include("password1")
+        expect(err).to_not include("password1")
         expect(out).to include("Fetching https://user1@github.com/company/private-repo")
       end
     end
@@ -1152,6 +1153,7 @@ describe "bundle install with git sources" do
 
         bundle :install
         expect(out).to_not include("oauth_token")
+        expect(err).to_not include("oauth_token")
         expect(out).to include("Fetching https://x-oauth-basic@github.com/company/private-repo")
       end
     end

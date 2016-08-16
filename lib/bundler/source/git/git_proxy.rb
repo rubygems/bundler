@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "tempfile"
 module Bundler
   class Source
     class Git < Path
@@ -156,7 +157,9 @@ module Bundler
           command_with_no_credentials = URICredentialsFilter.credential_filtered_string(command, uri)
           raise GitNotAllowedError.new(command_with_no_credentials) unless allow?
 
-          out = SharedHelpers.with_clean_git_env { `git #{command}` }
+          out = SharedHelpers.with_clean_git_env do
+            capture_and_filter_stderr(uri) { `git #{command}` }
+          end
 
           stdout_with_no_credentials = URICredentialsFilter.credential_filtered_string(out, uri)
           raise GitCommandError.new(command_with_no_credentials, path, error_msg) if check_errors && !$?.success?
@@ -219,6 +222,23 @@ module Bundler
         def allowed_in_path
           return in_path { yield } if allow?
           raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+        end
+
+        def capture_and_filter_stderr(uri)
+          return_value, captured_err = ""
+          backup_stderr = STDERR.dup
+          begin
+            Tempfile.open("captured_stderr") do |f|
+              STDERR.reopen(f)
+              return_value = yield
+              f.rewind
+              captured_err = f.read
+            end
+          ensure
+            STDERR.reopen backup_stderr
+          end
+          $stderr.puts URICredentialsFilter.credential_filtered_string(captured_err, uri) if uri && !captured_err.empty?
+          return_value
         end
       end
     end
