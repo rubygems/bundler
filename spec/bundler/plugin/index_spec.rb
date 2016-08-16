@@ -110,7 +110,7 @@ describe Bundler::Plugin::Index do
       Dir.chdir(tmp) do
         Bundler::Plugin.reset!
         path = lib_path("gplugin")
-        index.register_plugin("gplugin", path.to_s, [path.join("lib").to_s], [], ["glb_source"])
+        index.register_plugin("gplugin", path.to_s, [path.join("lib").to_s], [], ["glb_source"], [])
       end
     end
 
