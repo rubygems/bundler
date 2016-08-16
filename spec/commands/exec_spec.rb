@@ -555,6 +555,8 @@ describe "bundle exec" do
 
     context "when disable_exec_load is set" do
       let(:exec) { "EXEC: exec" }
+      let(:process) { "PROCESS: ruby #{path} arg1 arg2" }
+
       before do
         bundle "config disable_exec_load true"
       end
