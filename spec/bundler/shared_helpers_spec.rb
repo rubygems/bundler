@@ -412,4 +412,11 @@ describe Bundler::SharedHelpers do
       end
     end
   end
+
+  describe "#check_home_dir_permissions" do
+    it "raises a PathError" do
+      allow(File).to receive(:writable?).with(Dir.home).and_return(false)
+      expect { subject.check_home_dir_permissions }.to raise_error(Bundler::PathError, /There was an error while trying to use your home path/)
+    end
+  end
 end

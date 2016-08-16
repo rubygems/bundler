@@ -14,6 +14,7 @@ module Bundler
       raise e
     ensure
       Bundler::SharedHelpers.print_major_deprecations!
+      Bundler::SharedHelpers.check_home_dir_permissions
     end
 
     def self.dispatch(*)

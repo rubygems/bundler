@@ -136,6 +136,10 @@ module Bundler
       major_deprecation("Bundler will only support rubygems >= 2.0, you are running #{Bundler.rubygems.version}")
     end
 
+    def check_home_dir_permissions
+      raise PathError, "There was an error while trying to use your home path #{Dir.home}" unless File.writable?(Dir.home)
+    end
+
   private
 
     def find_gemfile
