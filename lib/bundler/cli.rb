@@ -454,6 +454,8 @@ module Bundler
       "Fall back to using the single-file index of all gems"
     method_option "add-platform", :type => :array, :default => [], :banner =>
       "add a new platform to the lockfile"
+    method_option "remove-platform", :type => :array, :default => [], :banner =>
+      "remove a platform from the lockfile"
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run

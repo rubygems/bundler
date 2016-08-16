@@ -110,4 +110,26 @@ describe "bundle lock" do
     lockfile = Bundler::LockfileParser.new(read_lockfile)
     expect(lockfile.platforms).to eq([java, local, mingw])
   end
+
+  it "warns when adding an unknown platform" do
+    bundle "lock --add-platform foobarbaz"
+    expect(out).to include("The platform `foobarbaz` is unknown to RubyGems and adding it will likely lead to resolution errors")
+  end
+
+  it "allows removing platforms" do
+    bundle! "lock --add-platform java x86-mingw32"
+
+    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    expect(lockfile.platforms).to eq([java, local, mingw])
+
+    bundle! "lock --remove-platform java"
+
+    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    expect(lockfile.platforms).to eq([local, mingw])
+  end
+
+  it "errors when removing all platforms" do
+    bundle "lock --remove-platform #{local}"
+    expect(out).to include("Removing all platforms from the bundle is not allowed")
+  end
 end
