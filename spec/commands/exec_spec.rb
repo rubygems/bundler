@@ -553,6 +553,17 @@ describe "bundle exec" do
       it_behaves_like "it runs"
     end
 
+    context "when disable_exec_load is set" do
+      let(:exec) { "EXEC: exec" }
+      let(:process) { "PROCESS: ruby #{path} arg1 arg2" }
+
+      before do
+        bundle "config disable_exec_load true"
+      end
+
+      it_behaves_like "it runs"
+    end
+
     context "signals being trapped by bundler" do
       let(:executable) { strip_whitespace <<-RUBY }
         #{shebang}

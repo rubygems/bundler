@@ -23,7 +23,9 @@ module Bundler
       validate_cmd!
       SharedHelpers.set_bundle_environment
       if bin_path = Bundler.which(cmd)
-        return kernel_load(bin_path, *args) if ruby_shebang?(bin_path)
+        if !Bundler.settings[:disable_exec_load] && ruby_shebang?(bin_path)
+          return kernel_load(bin_path, *args)
+        end
         # First, try to exec directly to something in PATH
         if Bundler.current_ruby.jruby_18?
           kernel_exec(bin_path, *args)

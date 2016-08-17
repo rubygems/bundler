@@ -6,6 +6,7 @@ module Bundler
     BOOL_KEYS = %w(
       allow_offline_install
       cache_all
+      disable_exec_load
       disable_local_branch_check
       disable_shared_gems
       frozen
