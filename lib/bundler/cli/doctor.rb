@@ -14,11 +14,11 @@ module Bundler
     end
 
     def otool_available?
-      system("otool --version 2>&1 >#{Bundler::NULL}")
+      system("otool --version 2>#{Bundler::NULL} >#{Bundler::NULL}")
     end
 
     def ldd_available?
-      !system("ldd --help 2>&1 >#{Bundler::NULL}").nil?
+      !system("ldd --help 2>#{Bundler::NULL} >#{Bundler::NULL}").nil?
     end
 
     def dylibs_darwin(path)
