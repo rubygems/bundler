@@ -55,21 +55,17 @@ module Bundler
       Dir.glob("#{spec.full_gem_path}/**/*.bundle")
     end
 
+    def check!
+      require "bundler/cli/check"
+      Bundler::CLI::Check.new({}).run
+    end
+
     def run
       Bundler.ui.level = "error" if options[:quiet]
+      check!
 
+      definition = Bundler.definition
       broken_links = {}
-
-      begin
-        definition = Bundler.definition
-        definition.validate_ruby!
-        not_installed = definition.missing_specs
-        raise GemNotFound if not_installed.any?
-      rescue GemNotFound
-        Bundler.ui.warn "This bundle's gems must be installed to run this command."
-        Bundler.ui.warn "Install missing gems with `bundle install`."
-        exit 0
-      end
 
       definition.specs.each do |spec|
         bundles_for_gem(spec).each do |bundle|
