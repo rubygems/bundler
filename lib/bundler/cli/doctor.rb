@@ -82,13 +82,15 @@ module Bundler
       end
 
       if broken_links.any?
-        Bundler.ui.error "The following gems are missing OS dependencies"
+        message = "The following gems are missing OS dependencies:"
         broken_links.each do |spec, paths|
           paths.uniq.each do |path|
-            Bundler.ui.error " * #{spec.name}: #{path}"
+            message += "\n * #{spec.name}: #{path}"
           end
         end
-        exit 1
+        raise ProductionError, message
+      else
+        Bundler.ui.info "No issues found with the installed bundle"
       end
     end
   end
