@@ -468,6 +468,11 @@ module Bundler
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
     end
 
+    def validate_runtime!
+      validate_ruby!
+      validate_platforms!
+    end
+
     def validate_ruby!
       return unless ruby_version
 
@@ -491,6 +496,22 @@ module Bundler
 
         raise RubyVersionMismatch, msg
       end
+    end
+
+    # TODO: refactor this so that `match_platform` can be called with two platforms
+    DummyPlatform = Struct.new(:platform)
+    class DummyPlatform; include MatchPlatform; end
+    def validate_platforms!
+      return if @platforms.any? do |bundle_platform|
+        bundle_platform = DummyPlatform.new(bundle_platform)
+        Bundler.rubygems.platforms.any? do |local_platform|
+          bundle_platform.match_platform(local_platform)
+        end
+      end
+
+      raise ProductionError, "Your bundle only supports platforms #{@platforms.map(&:to_s)} " \
+        "but your local platforms are #{Bundler.rubygems.platforms.map(&:to_s)}, and " \
+        "there's no compatible match between those two lists."
     end
 
     def add_platform(platform)

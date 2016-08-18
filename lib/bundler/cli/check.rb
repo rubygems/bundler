@@ -15,7 +15,7 @@ module Bundler
 
       begin
         definition = Bundler.definition
-        definition.validate_ruby!
+        definition.validate_runtime!
         not_installed = definition.missing_specs
       rescue GemNotFound, VersionConflict
         Bundler.ui.error "Bundler can't satisfy your Gemfile's dependencies."

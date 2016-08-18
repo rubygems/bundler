@@ -47,7 +47,7 @@ def gemfile(install = false, options = {}, &gemfile)
 
   definition = builder.to_definition(nil, true)
   def definition.lock(*); end
-  definition.validate_ruby!
+  definition.validate_runtime!
 
   missing_specs = proc do
     begin
