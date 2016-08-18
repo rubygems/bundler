@@ -119,6 +119,9 @@ Metrics/AbcSize:
 Metrics/CyclomaticComplexity:
   Enabled: false
 
+Metrics/ParameterLists:
+  Enabled: false
+
 # It will be obvious which code is complex, Rubocop should only lint simple
 # rules for us.
 Metrics/PerceivedComplexity:
