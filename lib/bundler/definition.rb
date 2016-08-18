@@ -51,7 +51,7 @@ module Bundler
     #   to be updated or true if all gems should be updated
     # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
     # @param optional_groups [Array(String)] A list of optional groups
-    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [], explicit_platforms = nil)
       @unlocking = unlock == true || !unlock.empty?
 
       @dependencies    = dependencies
@@ -104,7 +104,12 @@ module Bundler
 
       @gem_version_promoter = create_gem_version_promoter
 
-      add_current_platform unless Bundler.settings[:frozen]
+      if explicit_platforms
+        explicit_platforms.each {|pl| add_platform(pl) }
+        @platforms.-(explicit_platforms).each {|pl| remove_platform(pl) }
+      else
+        add_current_platform unless Bundler.settings[:frozen]
+      end
 
       @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
