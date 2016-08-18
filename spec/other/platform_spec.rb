@@ -118,18 +118,6 @@ G
       expect(out).to eq("ruby 1.9.3")
     end
 
-    it "infers from .ruby-version" do
-      gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "foo"
-      G
-      create_file(".ruby-version", "2.2.3\n")
-
-      bundle "platform --ruby"
-
-      expect(out).to eq("ruby 2.2.3")
-    end
-
     it "handles jruby" do
       gemfile <<-G
         source "file://#{gem_repo1}"
