@@ -37,7 +37,6 @@ module Bundler
       @gemfile = Pathname.new(gemfile)
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
-      infer_ruby_version(gemfile)
     rescue Exception => e
       message = "There was an error " \
         "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \
@@ -416,12 +415,6 @@ module Bundler
         "    git_source(:#{name}) do |repo_name|\n" \
         "      #{repo_string}\n" \
         "    end", true
-    end
-
-    def infer_ruby_version(gemfile)
-      return if @ruby_version
-      ruby_version_path = gemfile.parent + ".ruby-version"
-      ruby(ruby_version_path.read.strip) if ruby_version_path.file?
     end
 
     class DSLError < GemfileError
