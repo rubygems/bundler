@@ -44,7 +44,8 @@ module Bundler
         :test             => options[:test],
         :ext              => options[:ext],
         :exe              => options[:exe],
-        :bundler_version  => bundler_dependency_version
+        :bundler_version  => bundler_dependency_version,
+        :git_user_name    => git_user_name.empty? ? "[USERNAME]" : git_user_name
       }
       ensure_safe_gem_name(name, constant_array)
 

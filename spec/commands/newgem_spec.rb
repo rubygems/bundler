@@ -112,6 +112,35 @@ describe "bundle gem" do
     end
   end
 
+  context "README.md" do
+    let(:gem_name) { "test_gem" }
+    let(:generated_gem) { Bundler::GemHelper.new(bundled_app(gem_name).to_s) }
+
+    context "git config user.name present" do
+      before do
+        execute_bundle_gem(gem_name)
+      end
+
+      it "contribute URL set to git username" do
+        expect(bundled_app("test_gem/README.md").read).not_to include("[USERNAME]")
+      end
+    end
+
+    context "git config user.name is absent" do
+      before do
+        `git config --unset user.name`
+        reset!
+        in_app_root
+        bundle "gem #{gem_name}"
+        remove_push_guard(gem_name)
+      end
+
+      it "contribute URL set to [USERNAME]" do
+        expect(bundled_app("test_gem/README.md").read).to include("[USERNAME]")
+      end
+    end
+  end
+
   it "generates a valid gemspec" do
     system_gems ["rake-10.0.2"]
 
