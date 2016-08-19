@@ -303,7 +303,8 @@ module Bundler
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
-      requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
+      return false unless requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
+      spec.activate_platform!(requirement.__platform) || spec.for?(requirement.__platform, nil)
     end
 
     def sort_dependencies(dependencies, activated, conflicts)
