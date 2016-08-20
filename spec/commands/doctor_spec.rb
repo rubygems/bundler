@@ -55,7 +55,10 @@ describe "bundle doctor" do
     expect(doctor).to receive(:dylibs).exactly(2).times.and_return ["/usr/local/opt/icu4c/lib/libicui18n.57.1.dylib"]
     allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with("/usr/local/opt/icu4c/lib/libicui18n.57.1.dylib").and_return(false)
-    expect { doctor.run }.to raise_error SystemExit
-    expect(@stdout.string).to include("libicui18n.57.1.dylib")
+    expect { doctor.run }.to raise_error Bundler::ProductionError, strip_whitespace(<<-E).strip
+      The following gems are missing OS dependencies:
+       * bundler: /usr/local/opt/icu4c/lib/libicui18n.57.1.dylib
+       * rack: /usr/local/opt/icu4c/lib/libicui18n.57.1.dylib
+    E
   end
 end
