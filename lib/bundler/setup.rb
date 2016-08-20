@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "bundler/postit_trampoline" unless ENV["BUNDLE_DISABLE_POSTIT"]
+require "bundler/postit_trampoline"
 require "bundler/shared_helpers"
 
 if Bundler::SharedHelpers.in_bundle?
