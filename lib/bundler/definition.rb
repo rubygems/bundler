@@ -249,7 +249,7 @@ module Bundler
         else
           # Run a resolve against the locally available gems
           Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version, gem_version_promoter)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version, gem_version_promoter, additional_base_requirements_for_resolve)
         end
       end
     end
@@ -811,6 +811,14 @@ module Bundler
         end
         requires
       end
+    end
+
+    def additional_base_requirements_for_resolve
+      return [] unless @locked_gems && Bundler.settings[:only_update_to_newer_versions]
+      @locked_gems.specs.reduce({}) do |requirements, locked_spec|
+        requirements[locked_spec.name] = Gem::Dependency.new(locked_spec.name, ">= #{locked_spec.version}")
+        requirements
+      end.values
     end
   end
 end

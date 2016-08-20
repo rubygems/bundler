@@ -175,14 +175,14 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil, gem_version_promoter = GemVersionPromoter.new)
+    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil, gem_version_promoter = GemVersionPromoter.new, additional_base_requirements = [])
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base, ruby_version, gem_version_promoter)
+      resolver = new(index, source_requirements, base, ruby_version, gem_version_promoter, additional_base_requirements)
       result = resolver.start(requirements)
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base, ruby_version, gem_version_promoter)
+    def initialize(index, source_requirements, base, ruby_version, gem_version_promoter, additional_base_requirements)
       @index = index
       @source_requirements = source_requirements
       @base = base
@@ -190,6 +190,7 @@ module Bundler
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
       @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
+      additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, d) }
       @ruby_version = ruby_version
       @gem_version_promoter = gem_version_promoter
     end

@@ -16,6 +16,7 @@ module Bundler
       major_deprecations
       no_install
       no_prune
+      only_update_to_newer_versions
       plugins
       silence_root_warning
     ).freeze
