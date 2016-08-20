@@ -33,5 +33,13 @@ module Bundler
     def include?(other)
       other == self
     end
+
+    def a_path?
+      instance_of?(Path)
+    end
+
+    def a_git?
+      instance_of?(Git)
+    end
   end
 end
