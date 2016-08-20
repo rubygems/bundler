@@ -292,7 +292,7 @@ module Bundler
       def fetch
         git_proxy.checkout
       rescue GitError
-        raise unless Bundler.settings[:allow_offline_install]
+        raise unless Bundler.feature_flag.allow_offline_install?
         Bundler.ui.warn "Using cached git data because of network errors"
       end
     end

@@ -27,6 +27,7 @@ module Bundler
   autoload :EndpointSpecification,  "bundler/endpoint_specification"
   autoload :Env,                    "bundler/env"
   autoload :Fetcher,                "bundler/fetcher"
+  autoload :FeatureFlag,            "bundler/feature_flag"
   autoload :GemHelper,              "bundler/gem_helper"
   autoload :GemHelpers,             "bundler/gem_helpers"
   autoload :GemVersionPromoter,     "bundler/gem_version_promoter"
@@ -387,6 +388,10 @@ EOF
     def git_present?
       return @git_present if defined?(@git_present)
       @git_present = Bundler.which("git") || Bundler.which("git.exe")
+    end
+
+    def feature_flag
+      @feature_flag ||= FeatureFlag.new(VERSION)
     end
 
     def reset!

@@ -41,7 +41,7 @@ def gemfile(install = false, options = {}, &gemfile)
   end
   ENV["BUNDLE_GEMFILE"] ||= "Gemfile"
 
-  Bundler::Plugin.gemfile_install(&gemfile) if Bundler.settings[:plugins]
+  Bundler::Plugin.gemfile_install(&gemfile) if Bundler.feature_flag.plugins?
   builder = Bundler::Dsl.new
   builder.instance_eval(&gemfile)
 
