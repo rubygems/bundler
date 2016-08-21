@@ -467,16 +467,6 @@ module Bundler
       Env.new.write($stdout)
     end
 
-    desc "add GEM [VERSION]", "Add the specified gem to the bottom of Gemfile"
-    method_option "group", :type => :array, :aliases => "-g", :desc => "Specify groups to add the gem in"
-    method_option "source", :type => :string, :aliases => "-s", :desc => "Specify the gem's source"
-    method_option "pre", :type => :boolean, :aliases => "-p", :default => false, :desc => "Check for newer pre-release gems"
-    method_option "timestamp", :type => :boolean, :aliases => "-t", :default => false, :desc => "Append timestamp to Gemfile"
-    def add(name, version = nil, *gems)
-      require "bundler/cli/inject"
-      Inject.new(options, name, version, gems).run
-    end
-
     desc "doctor [OPTIONS]", "Checks the bundle for common problems"
     long_desc <<-D
       Doctor scans the OS dependencies of each of the gems requested in the Gemfile. If
