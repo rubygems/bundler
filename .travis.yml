@@ -43,12 +43,16 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.6.4
-  - RGV=v2.4.8
+  - RGV=v2.6.6
 
 matrix:
   include:
-    # Ruby 2.2, Rubygems 2.4.5 and up (included by RGV above)
+    # Ruby 2.3, Rubygems 2.5.1 and up
+    - rvm: 2.2
+      env: RGV=v2.5.2
+    # Ruby 2.2, Rubygems 2.4.5 and up
+    - rvm: 2.2
+      env: RGV=v2.4.8
     # Ruby 2.1, Rubygems 2.2.2 and up
     - rvm: 2.1
       env: RGV=v2.2.5
