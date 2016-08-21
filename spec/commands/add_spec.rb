@@ -3,10 +3,8 @@ require "spec_helper"
 
 describe "bundle add" do
   before :each do
-    build_repo2
-
     gemfile <<-G
-      source "file://#{gem_repo2}"
+      source "file://#{gem_repo1}"
     G
   end
 
