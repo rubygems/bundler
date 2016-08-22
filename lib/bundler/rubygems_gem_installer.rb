@@ -45,7 +45,7 @@ module Bundler
       case checksum.length
       when 64 then :hexdigest!
       when 44 then :base64digest!
-      else raise InstallError, "The given checksum for #{spec.full_name} is not a valid SHA256 hexdigest nor base64digest"
+      else raise InstallError, "The given checksum for #{spec.full_name} (#{checksum.inspect}) is not a valid SHA256 hexdigest nor base64digest"
       end
     end
   end
