@@ -189,8 +189,11 @@ module Bundler
       @resolver = Molinillo::Resolver.new(self, self)
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
-      @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
-      additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, d) }
+      @base.each do |ls|
+        dep = Dependency.new(ls.name, ls.version)
+        @base_dg.add_vertex(ls.name, DepProxy.new(dep, ls.platform), true)
+      end
+      additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, DepProxy.new(d, Gem::Platform::RUBY)) }
       @ruby_version = ruby_version
       @gem_version_promoter = gem_version_promoter
     end
