@@ -193,7 +193,7 @@ module Bundler
         dep = Dependency.new(ls.name, ls.version)
         @base_dg.add_vertex(ls.name, DepProxy.new(dep, ls.platform), true)
       end
-      additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, DepProxy.new(d, Gem::Platform::RUBY)) }
+      additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, d) }
       @ruby_version = ruby_version
       @gem_version_promoter = gem_version_promoter
     end
