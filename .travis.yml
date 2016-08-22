@@ -109,23 +109,4 @@ matrix:
 
   allow_failures:
     - rvm: 1.8.7
-      env: RGV=v2.1.11
-    - rvm: 1.8.7
-      env: RGV=v2.2.5
-    - rvm: 1.8.7
-      env: RGV=v2.0.14
-    - rvm: 1.8.7
-      env: RGV=v1.8.29
-    - rvm: 1.8.7
-      env: RGV=v1.7.2
-    - rvm: 1.8.7
-      env: RGV=v1.6.2
-    - rvm: 1.8.7
-      env: RGV=v1.5.3
-    - rvm: 1.8.7
-      env: RGV=v1.4.2
-    - rvm: 1.8.7
-      env: RGV=v1.3.7
-    - rvm: 1.8.7
-      env: RGV=v1.3.6
     - rvm: ruby-head
