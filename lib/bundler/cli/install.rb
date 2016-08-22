@@ -151,6 +151,7 @@ module Bundler
     def normalize_groups
       options[:with] &&= options[:with].join(":").tr(" ", ":").split(":")
       options[:without] &&= options[:without].join(":").tr(" ", ":").split(":")
+      options[:only] &&= options[:only].join(":").tr(" ", ":").split(":")
 
       check_for_group_conflicts_in_cli_options
 
@@ -165,8 +166,12 @@ module Bundler
       without |= Bundler.settings[:without].map(&:to_s)
       without -= options[:with] if options[:with]
 
+      only = options.fetch("only", [])
+      only |= Bundler.settings.only.map(&:to_s)
+
       options[:with]    = with
       options[:without] = without
+      options[:only] = only
     end
 
     def normalize_settings
@@ -189,12 +194,13 @@ module Bundler
 
       Bundler.settings.set_command_option_if_given :clean, options["clean"]
 
-      unless Bundler.settings[:without] == options[:without] && Bundler.settings[:with] == options[:with]
+      unless Bundler.settings[:without] == options[:without] && Bundler.settings[:with] == options[:with] && Bundler.settings[:only] == options[:only]
         # need to nil them out first to get around validation for backwards compatibility
         Bundler.settings.set_command_option :without, nil
         Bundler.settings.set_command_option :with,    nil
         Bundler.settings.set_command_option :without, options[:without] - options[:with]
         Bundler.settings.set_command_option :with,    options[:with]
+        Bundler.settings.set_command_option :only,    options[:only]
       end
 
       options[:force] = options[:redownload]

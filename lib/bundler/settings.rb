@@ -61,6 +61,7 @@ module Bundler
     ARRAY_KEYS = %w[
       with
       without
+      only
     ].freeze
 
     DEFAULT_CONFIG = {

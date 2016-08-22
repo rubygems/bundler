@@ -70,6 +70,58 @@ RSpec.describe "bundle install with groups" do
     end
   end
 
+  describe "installing --only" do
+    describe "with gems assigned to a single group" do
+      before :each do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "thin"
+          group :emo do
+            gem "activesupport", "2.3.5"
+          end
+          group :debugging, :optional => true do
+            gem "rack"
+          end
+        G
+      end
+
+      it "installs gems from only the given optional group when that group is in only" do
+        bundle :install, :only => "debugging"
+        expect(the_bundle).not_to include_gems "thin"
+        expect(the_bundle).not_to include_gems "activesupport"
+        expect(the_bundle).to include_gems "rack 1.0.0"
+      end
+
+      it "installs gems from only the given groups when those group are in only" do
+        bundle :install, :only => "debugging emo"
+        expect(the_bundle).to include_gems "rack 1.0.0"
+        expect(the_bundle).to include_gems "activesupport 2.3.5"
+        expect(the_bundle).not_to include_gems "thin"
+      end
+
+      it "installs gems from only the given group when that group is in only" do
+        bundle :install, :only => "emo"
+        expect(the_bundle).not_to include_gems "rack"
+        expect(the_bundle).to include_gems "activesupport 2.3.5"
+        expect(the_bundle).not_to include_gems "thin"
+      end
+
+      it "installs gems from only the given optional group overriding with" do
+        bundle :install, :only => "debugging", :with => "emo"
+        expect(the_bundle).to include_gems "rack 1.0.0"
+        expect(the_bundle).not_to include_gems "activesupport"
+        expect(the_bundle).not_to include_gems "thin"
+      end
+
+      it "installs gems from only the given optional group ignoring without" do
+        bundle :install, :only => "debugging", :without => "debugging"
+        expect(the_bundle).to include_gems "rack 1.0.0"
+        expect(the_bundle).not_to include_gems "activesupport"
+        expect(the_bundle).not_to include_gems "thin"
+      end
+    end
+  end
+
   describe "installing --without" do
     describe "with gems assigned to a single group" do
       before :each do

@@ -920,6 +920,7 @@ module Bundler
     end
 
     def requested_groups
+      return Bundler.settings[:only] if Bundler.settings[:only].any?
       groups - Bundler.settings[:without] - @optional_groups + Bundler.settings[:with]
     end
 

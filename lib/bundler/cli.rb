@@ -197,6 +197,8 @@ module Bundler
       "Exclude gems that are part of the specified named group."
     deprecated_option "with", :type => :array, :banner =>
       "Include gems that are part of the specified named group."
+    method_option "only", :type => :array, :banner =>
+      "Include only the gems that are part of the specified named group."
     map "i" => "install"
     def install
       require "bundler/cli/install"
