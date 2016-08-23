@@ -189,7 +189,10 @@ module Bundler
       @resolver = Molinillo::Resolver.new(self, self)
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
-      @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
+      @base.each do |ls|
+        dep = Dependency.new(ls.name, ls.version)
+        @base_dg.add_vertex(ls.name, DepProxy.new(dep, ls.platform), true)
+      end
       additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, d) }
       @ruby_version = ruby_version
       @gem_version_promoter = gem_version_promoter
@@ -303,7 +306,8 @@ module Bundler
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
-      requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
+      return false unless requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
+      spec.activate_platform!(requirement.__platform) || spec.for?(requirement.__platform, nil)
     end
 
     def sort_dependencies(dependencies, activated, conflicts)

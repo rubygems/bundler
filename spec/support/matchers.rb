@@ -110,15 +110,9 @@ module Spec
 
     define_compound_matcher :read_as, [exist] do |file_contents|
       diffable
-      attr_reader :strip_whitespace
-
-      chain :stripping_whitespace do
-        @strip_whitespace = true
-      end
 
       match do |actual|
         @actual = Bundler.read_file(actual)
-        file_contents = strip_whitespace(file_contents) if strip_whitespace
         values_match?(file_contents, @actual)
       end
     end
