@@ -78,7 +78,12 @@ class CompactIndexAPI < Endpoint
               reqs = d.requirement.requirements.map {|r| r.join(" ") }.join(", ")
               CompactIndex::Dependency.new(d.name, reqs)
             end
-            CompactIndex::GemVersion.new(spec.version.version, spec.platform.to_s, nil, nil,
+            checksum = begin
+                         Digest::SHA256.file("#{GEM_REPO}/gems/#{spec.original_name}.gem").base64digest
+                       rescue
+                         nil
+                       end
+            CompactIndex::GemVersion.new(spec.version.version, spec.platform.to_s, checksum, nil,
               deps, spec.required_ruby_version, spec.required_rubygems_version)
           end
           CompactIndex::Gem.new(name, gem_versions)
