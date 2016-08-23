@@ -104,9 +104,7 @@ module Bundler
 
       @gem_version_promoter = create_gem_version_promoter
 
-      current_platform = Bundler.rubygems.platforms.last
-      add_platform(current_platform) if Bundler.settings[:specific_platform]
-      add_platform(generic(current_platform))
+      add_current_platform unless Bundler.settings[:frozen]
 
       @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
@@ -503,6 +501,12 @@ module Bundler
     def remove_platform(platform)
       return if @platforms.delete(Gem::Platform.new(platform))
       raise InvalidOption, "Unable to remove the platform `#{platform}` since the only platforms are #{@platforms.join ", "}"
+    end
+
+    def add_current_platform
+      current_platform = Bundler.rubygems.platforms.last
+      add_platform(current_platform) if Bundler.settings[:specific_platform]
+      add_platform(generic(current_platform))
     end
 
     attr_reader :sources
