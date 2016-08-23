@@ -343,8 +343,9 @@ module Bundler
       return unless @locked_ruby_version
       @locked_ruby_version_object ||= begin
         unless version = RubyVersion.from_string(@locked_ruby_version)
-          raise LockfileError, "Failed to create a `RubyVersion` object from " \
-            "`#{@locked_ruby_version}` found in #{@lockfile} -- try running `bundle update --ruby`."
+          raise LockfileError, "The Ruby version #{@locked_ruby_version} from " \
+            "#{@lockfile} could not be parsed. " \
+            "Try running bundle update --ruby to resolve this."
         end
         version
       end
