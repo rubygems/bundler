@@ -171,4 +171,20 @@ describe Bundler::RemoteSpecification do
       end
     end
   end
+
+  describe "respond to missing?" do
+    context "and is present in Gem::Specification" do
+      let(:remote_spec) { double(:remote_spec) }
+
+      before do
+        allow_any_instance_of(Gem::Specification).to receive(:respond_to?).and_return(false)
+        allow(subject).to receive(:_remote_specification).and_return(remote_spec)
+      end
+
+      it "should send through to Gem::Specification" do
+        expect(remote_spec).to receive(:respond_to?).with(:missing_method_call, false).once
+        subject.respond_to?(:missing_method_call)
+      end
+    end
+  end
 end

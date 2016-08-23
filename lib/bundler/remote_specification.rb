@@ -81,5 +81,9 @@ module Bundler
     def method_missing(method, *args, &blk)
       _remote_specification.send(method, *args, &blk)
     end
+
+    def respond_to_missing?(method, include_all)
+      _remote_specification.respond_to?(method, include_all)
+    end
   end
 end
