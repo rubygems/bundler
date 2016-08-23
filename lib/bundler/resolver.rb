@@ -75,8 +75,8 @@ module Bundler
 
       def initialize(a)
         super
-        @required_by  = []
-        @activated    = []
+        @required_by = []
+        @activated_platforms = []
         @dependencies = nil
         @specs        = {}
 
@@ -88,13 +88,13 @@ module Bundler
       def initialize_copy(o)
         super
         @required_by = o.required_by.dup
-        @activated   = o.activated.dup
+        @activated_platforms = o.activated.dup
       end
 
       def to_specs
         specs = {}
 
-        @activated.each do |p|
+        @activated_platforms.each do |p|
           next unless s = @specs[p]
           platform = generic(Gem::Platform.new(s.platform))
           next if specs[platform]
@@ -107,7 +107,9 @@ module Bundler
       end
 
       def activate_platform!(platform)
-        @activated << platform if !@activated.include?(platform) && for?(platform, nil)
+        return unless for?(platform)
+        return if @activated_platforms.include?(platform)
+        @activated_platforms << platform
       end
 
       def name
@@ -122,7 +124,7 @@ module Bundler
         @source ||= first.source
       end
 
-      def for?(platform, ruby_version)
+      def for?(platform)
         spec = @specs[platform]
         !spec.nil?
       end
@@ -132,8 +134,10 @@ module Bundler
       end
 
       def dependencies_for_activated_platforms
-        dependencies = @activated.map {|p| __dependencies[p] }
-        metadata_dependencies = @activated.map {|platform| metadata_dependencies(@specs[platform], platform) }
+        dependencies = @activated_platforms.map {|p| __dependencies[p] }
+        metadata_dependencies = @activated_platforms.map do |platform|
+          metadata_dependencies(@specs[platform], platform)
+        end
         dependencies.concat(metadata_dependencies).flatten
       end
 
@@ -184,14 +188,14 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil, gem_version_promoter = GemVersionPromoter.new, additional_base_requirements = [])
+    def self.resolve(requirements, index, source_requirements = {}, base = [], gem_version_promoter = GemVersionPromoter.new, additional_base_requirements = [])
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base, ruby_version, gem_version_promoter, additional_base_requirements)
+      resolver = new(index, source_requirements, base, gem_version_promoter, additional_base_requirements)
       result = resolver.start(requirements)
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base, ruby_version, gem_version_promoter, additional_base_requirements)
+    def initialize(index, source_requirements, base, gem_version_promoter, additional_base_requirements)
       @index = index
       @source_requirements = source_requirements
       @base = base
@@ -203,7 +207,6 @@ module Bundler
         @base_dg.add_vertex(ls.name, DepProxy.new(dep, ls.platform), true)
       end
       additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, d) }
-      @ruby_version = ruby_version
       @gem_version_promoter = gem_version_promoter
     end
 
@@ -293,7 +296,7 @@ module Bundler
           @gem_version_promoter.sort_versions(dependency, spec_groups)
         end
       end
-      search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform!(platform) }
+      search.select {|sg| sg.for?(platform) }.each {|sg| sg.activate_platform!(platform) }
     end
 
     def index_for(dependency)
@@ -318,7 +321,7 @@ module Bundler
 
     def requirement_satisfied_by?(requirement, activated, spec)
       return false unless requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
-      spec.activate_platform!(requirement.__platform) || spec.for?(requirement.__platform, nil)
+      spec.activate_platform!(requirement.__platform) || spec.for?(requirement.__platform)
     end
 
     def sort_dependencies(dependencies, activated, conflicts)
