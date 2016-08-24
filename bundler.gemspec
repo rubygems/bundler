@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
   s.summary     = "The best way to manage your application's dependencies"
   s.description = "Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably"
 
-  s.required_ruby_version     = ">= 1.8.7"
-  s.required_rubygems_version = ">= 1.3.6"
+  s.required_ruby_version     = ">= 2.0.0"
+  s.required_rubygems_version = ">= 2.0.0"
 
   s.add_development_dependency "automatiek", "~> 0.1.0"
   s.add_development_dependency "mustache",   "0.99.6"
