@@ -123,7 +123,7 @@ G
         source "file://#{gem_repo1}"
         gem "foo"
       G
-      bundled_app(".ruby-version").write("2.2.3\n")
+      create_file(".ruby-version", "2.2.3\n")
 
       bundle "platform --ruby"
 
