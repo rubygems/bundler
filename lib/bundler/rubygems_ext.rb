@@ -159,6 +159,11 @@ module Gem
     def none?
       @none ||= (to_s == ">= 0")
     end unless allocate.respond_to?(:none?)
+
+    def exact?
+      return false unless @requirements.size == 1
+      @requirements[0][0] == "="
+    end unless allocate.respond_to?(:exact?)
   end
 
   class Platform

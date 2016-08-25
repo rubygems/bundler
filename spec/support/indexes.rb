@@ -62,7 +62,7 @@ module Spec
         s.level = opts.first
         s.strict = opts.include?(:strict)
       end
-      should_resolve_and_include specs, [{}, @base, nil, search]
+      should_resolve_and_include specs, [{}, @base, search]
     end
 
     def an_awesome_index

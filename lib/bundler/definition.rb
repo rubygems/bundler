@@ -62,6 +62,7 @@ module Bundler
       @specs           = nil
       @ruby_version    = ruby_version
 
+      @lockfile               = lockfile
       @lockfile_contents      = String.new
       @locked_bundler_version = nil
       @locked_ruby_version    = nil
@@ -94,11 +95,7 @@ module Bundler
 
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
-      @unlock[:ruby] ||= if @ruby_version && @locked_ruby_version
-        unless locked_ruby_version_object = RubyVersion.from_string(@locked_ruby_version)
-          raise LockfileError, "Failed to create a `RubyVersion` object from " \
-            "`#{@locked_ruby_version}` found in #{lockfile} -- try running `bundle update --ruby`."
-        end
+      @unlock[:ruby] ||= if @ruby_version && locked_ruby_version_object
         @ruby_version.diff(locked_ruby_version_object)
       end
       @unlocking ||= @unlock[:ruby] ||= (!@locked_ruby_version ^ !@ruby_version)
@@ -249,7 +246,7 @@ module Bundler
         else
           # Run a resolve against the locally available gems
           Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version, gem_version_promoter, additional_base_requirements_for_resolve)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, gem_version_promoter, additional_base_requirements_for_resolve)
         end
       end
     end
@@ -264,6 +261,8 @@ module Bundler
           dependency_names -= pinned_spec_names(source.specs)
           dependency_names.concat(source.unmet_deps).uniq!
         end
+        idx << Gem::Specification.new("ruby\0", RubyVersion.system.to_gem_version_with_patchlevel)
+        idx << Gem::Specification.new("rubygems\0", Gem::VERSION)
       end
     end
 
@@ -337,6 +336,18 @@ module Bundler
         Bundler::RubyVersion.system
       else
         @locked_ruby_version
+      end
+    end
+
+    def locked_ruby_version_object
+      return unless @locked_ruby_version
+      @locked_ruby_version_object ||= begin
+        unless version = RubyVersion.from_string(@locked_ruby_version)
+          raise LockfileError, "The Ruby version #{@locked_ruby_version} from " \
+            "#{@lockfile} could not be parsed. " \
+            "Try running bundle update --ruby to resolve this."
+        end
+        version
       end
     end
 
@@ -728,8 +739,38 @@ module Bundler
       @locked_specs.any? {|s| s.satisfies?(dep) && (!dep.source || s.source.include?(dep.source)) }
     end
 
+    # This list of dependencies is only used in #resolve, so it's OK to add
+    # the metadata dependencies here
     def expanded_dependencies
-      @expanded_dependencies ||= expand_dependencies(dependencies, @remote)
+      @expanded_dependencies ||= begin
+        ruby_versions = concat_ruby_version_requirements(@ruby_version)
+        if ruby_versions.empty? || !@ruby_version.exact?
+          concat_ruby_version_requirements(RubyVersion.system)
+          concat_ruby_version_requirements(locked_ruby_version_object) unless @unlock[:ruby]
+        end
+
+        metadata_dependencies = [
+          Dependency.new("ruby\0", ruby_versions),
+          Dependency.new("rubygems\0", Gem::VERSION),
+        ]
+        expand_dependencies(dependencies + metadata_dependencies, @remote)
+      end
+    end
+
+    def concat_ruby_version_requirements(ruby_version, ruby_versions = [])
+      return ruby_versions unless ruby_version
+      if ruby_version.patchlevel
+        ruby_versions << ruby_version.to_gem_version_with_patchlevel
+      else
+        ruby_versions.concat(ruby_version.versions.map do |version|
+          requirement = Gem::Requirement.new(version)
+          if requirement.exact?
+            "~> #{version}.0"
+          else
+            requirement
+          end
+        end)
+      end
     end
 
     def expand_dependencies(dependencies, remote = false)
