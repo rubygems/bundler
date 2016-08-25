@@ -42,11 +42,18 @@ module Bundler
       @local_config    = load_config(local_config_file)
       @global_config   = load_config(global_config_file)
       @cli_flags_given = false
+      @temporary       = {}
     end
 
     def [](name)
       key = key_for(name)
-      value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
+      value = @temporary.fetch(name) do
+              @local_config.fetch(key) do
+              ENV.fetch(key) do
+              @global_config.fetch(key) do
+              DEFAULT_CONFIG.fetch(name) do
+                nil
+              end end end end end
 
       if value.nil?
         nil
@@ -75,6 +82,17 @@ module Bundler
       end
       local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
       set_key(key, value, @local_config, local_config_file)
+    end
+
+    def temporary(update)
+      existing = Hash[update.map {|k, _| [k, @temporary[k]] }]
+      @temporary.update(update)
+      return unless block_given?
+      begin
+        yield
+      ensure
+        existing.each {|k, v| v.nil? ? @temporary.delete(k) : @temporary[k] = v }
+      end
     end
 
     alias_method :set_local, :[]=

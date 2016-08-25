@@ -184,11 +184,9 @@ module Bundler
     map "i" => "install"
     def install
       require "bundler/cli/install"
-      no_install = Bundler.settings[:no_install]
-      Bundler.settings[:no_install] = false if no_install == true
-      Install.new(options.dup).run
-    ensure
-      Bundler.settings[:no_install] = no_install unless no_install.nil?
+      Bundler.settings.temporary(:no_install => false) do
+        Install.new(options.dup).run
+      end
     end
 
     desc "update [OPTIONS]", "update the current environment"
