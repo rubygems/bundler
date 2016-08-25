@@ -91,7 +91,7 @@ module Bundler
       # Return if all groups are already loaded
       return @setup if defined?(@setup) && @setup
 
-      definition.validate_ruby!
+      definition.validate_runtime!
 
       SharedHelpers.print_major_deprecations!
 

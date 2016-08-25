@@ -62,7 +62,9 @@ module Bundler
 
       save_plugins plugins, installed_specs, builder.inferred_plugins
     rescue => e
-      Bundler.ui.error "Failed to install plugin: #{e.message}\n  #{e.backtrace[0]}"
+      unless e.is_a?(GemfileError)
+        Bundler.ui.error "Failed to install plugin: #{e.message}\n  #{e.backtrace[0]}"
+      end
       raise
     end
 

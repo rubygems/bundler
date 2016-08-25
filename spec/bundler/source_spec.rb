@@ -22,7 +22,7 @@ describe Bundler::Source do
   end
 
   describe "#version_message" do
-    let(:spec) { double(:spec, :name => "nokogiri", :version => ">= 1.6") }
+    let(:spec) { double(:spec, :name => "nokogiri", :version => ">= 1.6", :platform => rb) }
 
     shared_examples_for "the lockfile specs are not relevant" do
       it "should return a string with the spec name and version" do

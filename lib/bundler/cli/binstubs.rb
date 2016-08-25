@@ -10,7 +10,7 @@ module Bundler
     end
 
     def run
-      Bundler.definition.validate_ruby!
+      Bundler.definition.validate_runtime!
       Bundler.settings[:bin] = options["path"] if options["path"]
       Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
       installer = Installer.new(Bundler.root, Bundler.definition)

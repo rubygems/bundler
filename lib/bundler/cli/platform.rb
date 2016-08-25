@@ -29,7 +29,7 @@ module Bundler
           output << "Your Gemfile specifies a Ruby version requirement:\n* #{ruby_version}"
 
           begin
-            Bundler.definition.validate_ruby!
+            Bundler.definition.validate_runtime!
             output << "Your current platform satisfies the Ruby version requirement."
           rescue RubyVersionMismatch => e
             output << e.message

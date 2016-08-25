@@ -70,7 +70,8 @@ module Bundler
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
         @locked_gems = LockfileParser.new(@lockfile_contents)
-        @platforms = @locked_gems.platforms
+        @locked_platforms = @locked_gems.platforms
+        @platforms = @locked_platforms.dup
         @locked_bundler_version = @locked_gems.bundler_version
         @locked_ruby_version = @locked_gems.ruby_version
 
@@ -91,6 +92,7 @@ module Bundler
         @locked_deps    = []
         @locked_specs   = SpecSet.new([])
         @locked_sources = []
+        @locked_platforms = []
       end
 
       @unlock[:gems] ||= []
@@ -102,8 +104,7 @@ module Bundler
 
       @gem_version_promoter = create_gem_version_promoter
 
-      current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
-      add_platform(current_platform)
+      add_current_platform unless Bundler.settings[:frozen]
 
       @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
@@ -414,6 +415,11 @@ module Bundler
       deleted = []
       changed = []
 
+      new_platforms = @platforms - @locked_platforms
+      deleted_platforms = @locked_platforms - @platforms
+      added.concat new_platforms.map {|p| "* platform: #{p}" }
+      deleted.concat deleted_platforms.map {|p| "* platform: #{p}" }
+
       gemfile_sources = sources.lock_sources
 
       new_sources = gemfile_sources - @locked_sources
@@ -462,6 +468,11 @@ module Bundler
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
     end
 
+    def validate_runtime!
+      validate_ruby!
+      validate_platforms!
+    end
+
     def validate_ruby!
       return unless ruby_version
 
@@ -487,6 +498,22 @@ module Bundler
       end
     end
 
+    # TODO: refactor this so that `match_platform` can be called with two platforms
+    DummyPlatform = Struct.new(:platform)
+    class DummyPlatform; include MatchPlatform; end
+    def validate_platforms!
+      return if @platforms.any? do |bundle_platform|
+        bundle_platform = DummyPlatform.new(bundle_platform)
+        Bundler.rubygems.platforms.any? do |local_platform|
+          bundle_platform.match_platform(local_platform)
+        end
+      end
+
+      raise ProductionError, "Your bundle only supports platforms #{@platforms.map(&:to_s)} " \
+        "but your local platforms are #{Bundler.rubygems.platforms.map(&:to_s)}, and " \
+        "there's no compatible match between those two lists."
+    end
+
     def add_platform(platform)
       @new_platform ||= !@platforms.include?(platform)
       @platforms |= [platform]
@@ -495,6 +522,12 @@ module Bundler
     def remove_platform(platform)
       return if @platforms.delete(Gem::Platform.new(platform))
       raise InvalidOption, "Unable to remove the platform `#{platform}` since the only platforms are #{@platforms.join ", "}"
+    end
+
+    def add_current_platform
+      current_platform = Bundler.rubygems.platforms.last
+      add_platform(current_platform) if Bundler.settings[:specific_platform]
+      add_platform(generic(current_platform))
     end
 
     attr_reader :sources

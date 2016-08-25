@@ -18,7 +18,7 @@ module Bundler
         Bundler::CLI::Common.select_spec(gem_name)
       end
 
-      Bundler.definition.validate_ruby!
+      Bundler.definition.validate_runtime!
       current_specs = Bundler.ui.silence { Bundler.load.specs }
       current_dependencies = {}
       Bundler.ui.silence { Bundler.load.dependencies.each {|dep| current_dependencies[dep.name] = dep } }
