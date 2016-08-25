@@ -382,20 +382,21 @@ module Bundler
       opts["optional"] ||= false
     end
 
-    def validate_keys(command, opts, valid_keys)
+    def validate_keys(command, opts, valid_keys, raise_on_invalid_keys = false)
       invalid_keys = opts.keys - valid_keys
-      if invalid_keys.any?
-        message = String.new
-        message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
-        message << if invalid_keys.size > 1
-                     "as options for #{command}, but they are invalid."
-                   else
-                     "as an option for #{command}, but it is invalid."
-                   end
+      return true if invalid_keys.empty?
+      message = String.new
+      message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
+      message << if invalid_keys.size > 1
+                   "as options for #{command}, but they are invalid."
+                 else
+                   "as an option for #{command}, but it is invalid."
+                 end
 
-        message << " Valid options are: #{valid_keys.join(", ")}"
-        raise InvalidOption, message
-      end
+      message << " Valid options are: #{valid_keys.join(", ")}"
+      raise InvalidOption, message if raise_on_invalid_keys
+      Bundler.ui.warn(message)
+      false
     end
 
     def normalize_source(source)
