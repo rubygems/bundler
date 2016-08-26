@@ -344,6 +344,7 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
+    method_option "parseable", :aliases => "--porcelain", :type => :boolean, :banner => "Use minimal formatting for more parseable output"
     def config(*args)
       require "bundler/cli/config"
       Config.new(options, args, self).run

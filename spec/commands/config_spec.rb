@@ -187,6 +187,16 @@ describe ".bundle/config" do
     end
   end
 
+  context "with --parseable option" do
+    it "returns value associated with the config" do
+      global_config "BUNDLE_GEM__COC" => "true"
+
+      bundle "config gem.coc", :parseable => true
+
+      expect(out).to eq "true"
+    end
+  end
+
   describe "gem mirrors" do
     before(:each) { bundle :install }
 
