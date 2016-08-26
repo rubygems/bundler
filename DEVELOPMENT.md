@@ -40,6 +40,8 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
      The `BUNDLE_DISABLE_POSTIT` environment variable ensures that the version of Bundler in `/path/to/bundler/lib` will be used. Without that environment setting, Bundler will automatically download, install, and run the version of Bundler listed in `Gemfile.lock`. With that set up, you can test changes you've made to Bundler by running `dbundle`, without interfering with the regular `bundle` command.
 
+To dive into the code with Pry: `RUBYOPT=-rpry dbundle` to require pry and then run commands.
+
 # Submitting Pull Requests
 
 Before you submit a pull request, please remember to do the following:
