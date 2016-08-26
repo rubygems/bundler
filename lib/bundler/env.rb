@@ -34,6 +34,8 @@ module Bundler
         end
       end
 
+      return out unless SharedHelpers.in_bundle?
+
       if print_gemfile
         out << "\n#{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}\n\n"
         out << "    " << read_file(Bundler.default_gemfile).gsub(/\n/, "\n    ") << "\n"
