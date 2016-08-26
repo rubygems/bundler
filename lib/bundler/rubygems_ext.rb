@@ -123,7 +123,7 @@ module Gem
     end
 
     def to_yaml_properties
-      instance_variables.reject {|p| ["@source", "@groups"].include?(p.to_s) }
+      instance_variables.reject {|p| ["@source", "@groups", "@all_sources"].include?(p.to_s) }
     end
 
     def to_lock
