@@ -15,7 +15,7 @@ describe Bundler::SharedHelpers do
     context "Gemfile is present" do
       it "returns the Gemfile path" do
         expected = Pathname.pwd.join("gems.rb")
-        expected.write("")
+        expected.open("w") {}
         expect(subject.default_gemfile).to eq(expected)
       end
     end
