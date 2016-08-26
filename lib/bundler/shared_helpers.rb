@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "pathname"
 require "rubygems"
+require "etc"
 
 require "bundler/constants"
 require "bundler/rubygems_integration"
@@ -137,7 +138,11 @@ module Bundler
     end
 
     def check_home_dir_permissions
-      raise PathError, "There was an error while trying to use your home path #{Dir.home}" unless File.writable?(Dir.home)
+      message = "There was error while trying to use your home path:"
+      home_path = File.expand_path(Dir.home(Etc.getlogin))
+      message += "\n * Your home directory #{home_path} is not writable" unless File.writable?(home_path)
+      message += "\n * Your home directory #{home_path} is not a directory" unless File.directory?(home_path)
+      raise PathError, message unless File.writable?(home_path) && File.directory?(home_path)
     end
 
   private

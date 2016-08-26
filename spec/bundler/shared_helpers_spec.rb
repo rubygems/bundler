@@ -414,9 +414,14 @@ describe Bundler::SharedHelpers do
   end
 
   describe "#check_home_dir_permissions" do
-    it "raises a PathError" do
-      allow(File).to receive(:writable?).with(Dir.home).and_return(false)
-      expect { subject.check_home_dir_permissions }.to raise_error(Bundler::PathError, /There was an error while trying to use your home path/)
+    it "raises a PathError when directory is not writable" do
+      allow(File).to receive(:writable?).with(File.expand_path(Dir.home(Etc.getlogin))).and_return(false)
+      expect { subject.check_home_dir_permissions }.to raise_error(Bundler::PathError, /is not writable/)
+    end
+
+    it "raise a PathError when directory doesn't exists" do
+      allow(File).to receive(:directory?).with(File.expand_path(Dir.home(Etc.getlogin))).and_return(false)
+      expect { subject.check_home_dir_permissions }.to raise_error(Bundler::PathError, /is not a directory/)
     end
   end
 end
