@@ -318,6 +318,7 @@ module Bundler
     end
 
     def sudo(str)
+      return unless settings.allow_sudo?
       SUDO_MUTEX.synchronize do
         prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
         Your user account isn't allowed to install to the system Rubygems.

@@ -178,7 +178,32 @@ module Bundler
     end
 
     def allow_sudo?
-      !@local_config.key?(key_for(:path))
+      is_nopasswd = `sudo -l` =~ /NOPASSWD/
+      allow_user = false || Bundler.settings[:allow_passwordless_sudo]
+      if is_nopasswd && !allow_user
+        resp = Bundler.ui.ask <<-PROMPT
+bundler needs to use sudo in order to install gems to $GEM_HOME,
+and has detected that this user is allowed to use `sudo` without
+any password prompts (`NOPASSWD` in /etc/sudoers).
+
+Do you want bundler to use sudo?
+
+    n - no, quit (default)
+    y - yes, allow bundler to use sudo just for this run
+    A - always, configure bundler to never again ask permission
+
+Enter your choice [nyA]:
+        PROMPT
+        if resp == "y"
+          allow_user = true 
+        elsif resp == "A"
+          allow_user = true 
+          Bundler.settings[:allow_passwordless_sudo] = true
+        else
+          raise BundlerError
+        end
+      end
+      !@local_config.key?(key_for(:path)) && allow_user
     end
 
     def ignore_config?
