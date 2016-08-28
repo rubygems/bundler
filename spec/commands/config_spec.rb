@@ -188,8 +188,32 @@ describe ".bundle/config" do
   end
 
   context "with --parseable option" do
-    it "returns value associated with the config" do
-      global_config "BUNDLE_GEM__COC" => "true"
+    it "returns empty when not set" do
+      bundle "config gem.coc", :parseable => true
+
+      expect(out).to eq ""
+    end
+
+    it "returns true when set" do
+      bundle "config gem.coc true"
+
+      bundle "config gem.coc", :parseable => true
+
+      expect(out).to eq "true"
+    end
+
+    it "returns empty string when unset" do
+      bundle "config gem.coc true"
+      bundle "config --delete gem.coc"
+
+      bundle "config gem.coc", :parseable => true
+
+      expect(out).to eq ""
+    end
+
+    it "returns default if global default presents when unset" do
+      bundle "config --delete gem.coc"
+      bundle "config --global gem.coc true"
 
       bundle "config gem.coc", :parseable => true
 
