@@ -49,6 +49,14 @@ describe Bundler::Env do
       end
     end
 
+    context "when there no Gemfile and print_gemfile is true" do
+      let(:output) { env.report(:print_gemfile => true) }
+
+      it "prints the environment" do
+        expect(output).to start_with("Environment")
+      end
+    end
+
     context "when Gemfile contains a gemspec and print_gemspecs is true" do
       let(:gemspec) do
         <<-GEMSPEC.gsub(/^\s+/, "")
