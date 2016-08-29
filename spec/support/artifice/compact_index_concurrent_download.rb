@@ -22,8 +22,8 @@ class CompactIndexConcurrentDownload < CompactIndexAPI
       file = tmp("versions.list")
       file.delete if file.file?
       file = CompactIndex::VersionsFile.new(file.to_s)
-      file.update_with(gems)
-      CompactIndex.versions(file, nil, {})
+      file.create(gems)
+      file.contents
     end
   end
 end
