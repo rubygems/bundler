@@ -158,32 +158,30 @@ describe Bundler::RemoteSpecification do
 
   describe "method missing" do
     context "and is present in Gem::Specification" do
-      let(:remote_spec) { double(:remote_spec) }
+      let(:remote_spec) { double(:remote_spec, :authors => "abcd") }
 
       before do
-        allow_any_instance_of(Gem::Specification).to receive(:respond_to?).and_return(true)
         allow(subject).to receive(:_remote_specification).and_return(remote_spec)
+        expect(subject.methods.map(&:to_sym)).not_to include(:authors)
       end
 
       it "should send through to Gem::Specification" do
-        expect(remote_spec).to receive(:send).with(:missing_method_call).once
-        subject.missing_method_call
+        expect(subject.authors).to eq("abcd")
       end
     end
   end
 
   describe "respond to missing?" do
     context "and is present in Gem::Specification" do
-      let(:remote_spec) { double(:remote_spec) }
+      let(:remote_spec) { double(:remote_spec, :authors => "abcd") }
 
       before do
-        allow_any_instance_of(Gem::Specification).to receive(:respond_to?).and_return(false)
         allow(subject).to receive(:_remote_specification).and_return(remote_spec)
+        expect(subject.methods.map(&:to_sym)).not_to include(:authors)
       end
 
       it "should send through to Gem::Specification" do
-        expect(remote_spec).to receive(:respond_to?).with(:missing_method_call, false).once
-        subject.respond_to?(:missing_method_call)
+        expect(subject.respond_to?(:authors)).to be_truthy
       end
     end
   end
