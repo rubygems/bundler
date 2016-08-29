@@ -50,7 +50,7 @@ class Bundler::CompactIndexClient
         mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
         local_temp_path.open(mode) {|f| f << content }
 
-        response_etag = response["ETag"]
+        response_etag = response["ETag"].gsub(%r{\AW/}, "")
         if etag_for(local_temp_path) == response_etag
           FileUtils.mv(local_temp_path, local_path)
           return
