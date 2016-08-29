@@ -9,7 +9,8 @@ module Spec
         # rack 2.x requires Ruby version >= 2.2.2.
         # artifice doesn't support rack 2.x now.
         "rack" => "< 2",
-        "fakeweb artifice compact_index" => nil,
+        "fakeweb artifice" => nil,
+        "compact_index" => "~> 0.11.0",
         "sinatra" => "1.2.7",
         # Rake version has to be consistent for tests to pass
         "rake" => "10.0.2",
@@ -36,7 +37,7 @@ module Spec
         FileUtils.rm_rf(Path.base_system_gems)
         FileUtils.mkdir_p(Path.base_system_gems)
         puts "installing gems for the tests to use..."
-        DEPS.sort {|a, _| a[1].nil? ? 1 : -1 }.each {|n, v| install_gem(n, v) }
+        install_gems(DEPS)
         File.open(manifest_path, "w") {|f| f << manifest.join }
       end
 
@@ -45,10 +46,14 @@ module Spec
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
     end
 
-    def self.install_gem(name, version = nil)
-      cmd = "gem install #{name} --no-rdoc --no-ri"
-      cmd += " --version '#{version}'" if version
-      system(cmd) || raise("Installing gem #{name} for the tests to use failed!")
+    def self.install_gems(gems)
+      reqs, no_reqs = gems.partition {|_, req| !req.nil? && !req.split(" ").empty? }
+      no_reqs.map!(&:first)
+      reqs.map! {|name, req| "'#{name}:#{req}'" }
+      deps = reqs.concat(no_reqs).join(" ")
+      cmd = "gem install #{deps} --no-rdoc --no-ri"
+      puts cmd
+      system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
     end
   end
 end
