@@ -205,7 +205,7 @@ module Bundler
     end
 
     def inspect
-      "#<#{self.class}:0x#{object_id} uri=#{uri}>"
+      "#<#{self.class}:0x#{object_id} uri=#{uri} fetchers=#{fetchers.map {|f| f.class.name }}>"
     end
 
   private
