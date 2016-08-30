@@ -227,4 +227,26 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       expect(settings["mirror.https://rubygems.org/"]).to eq("http://rubygems-mirror.org")
     end
   end
+
+  describe "#pretty_values_for" do
+    it "works" do
+      config("BUNDLE_MIRROR__HTTPS://RUBYGEMS__ORG/__FALLBACK_TIMEOUT/" => "true")
+
+      result = Bundler.settings.pretty_values_for(
+        "mirror.https://rubygems.org/.fallback_timeout/"
+      )
+
+      expect(result).to eq ["Set for your local app (/Users/Juan/dev/bundler/tmp/bundled_app/.bundle/config): \"true\""]
+    end
+
+    it "please work" do
+      config("BUNDLE_MIRROR__HTTPS://RUBYGEMS__ORG__FALLBACK_TIMEOUT/" => "true")
+
+      result = Bundler.settings.pretty_values_for(
+        "mirror.https://rubygems.org.fallback_timeout/"
+      )
+
+      expect(result).to eq ["Set for your local app (/Users/Juan/dev/bundler/tmp/bundled_app/.bundle/config): \"true\""]
+    end
+  end
 end
