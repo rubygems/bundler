@@ -66,6 +66,14 @@ module Bundler
       self
     end
 
+    def delete(spec)
+      # TODO: implement? (called from Gem::Specification.remove_spec)
+    end
+
+    def delete_if
+      # TODO: implement? (called from Gem::Specification.remove_spec)
+    end
+
     def to_a
       sorted.dup
     end

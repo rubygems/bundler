@@ -15,6 +15,12 @@ module Bundler
       _remote_specification.to_yaml
     end
 
+    def ==(other)
+      name == other.name &&
+        version.to_s == other.version.to_s &&
+        platform == other.platform
+    end
+
   private
 
     def _remote_specification
