@@ -83,6 +83,7 @@ module Bundler
       local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
       set_key(key, value, @local_config, local_config_file)
     end
+    alias_method :set_local, :[]=
 
     def temporary(update)
       existing = Hash[update.map {|k, _| [k, @temporary[k]] }]
@@ -94,8 +95,6 @@ module Bundler
         existing.each {|k, v| v.nil? ? @temporary.delete(k) : @temporary[k] = v }
       end
     end
-
-    alias_method :set_local, :[]=
 
     def delete(key)
       @local_config.delete(key_for(key))
