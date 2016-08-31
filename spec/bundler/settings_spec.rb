@@ -96,6 +96,18 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
     end
   end
 
+  describe "#temporary" do
+    it "reset after used" do
+      Bundler.settings[:no_install] = true
+
+      Bundler.settings.temporary(:no_install => false) do
+        expect(Bundler.settings[:no_install]).to eq false
+      end
+
+      expect(Bundler.settings[:no_install]).to eq true
+    end
+  end
+
   describe "#set_global" do
     context "when it's not possible to write to the file" do
       it "raises an PermissionError with explanation" do
