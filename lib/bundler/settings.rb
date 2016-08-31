@@ -187,10 +187,10 @@ module Bundler
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     def path
       key  = key_for(:path)
-      path = ENV[key] || @global_config[key]
+      path = ENV[key]
       return path if path && !@local_config.key?(key)
 
-      if path = self[:path]
+      if path = self[:path] || @global_config[key]
         "#{path}/#{Bundler.ruby_scope}"
       else
         Bundler.rubygems.gem_dir
