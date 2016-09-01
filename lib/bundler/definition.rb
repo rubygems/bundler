@@ -230,7 +230,12 @@ module Bundler
             names = :names # do this so we only have to traverse to get dependency_names from the index once
             unmet_dependency_names = proc do
               if names == :names
-                names = dependency_names.+(idx.dependency_names).uniq unless idx.size > Source::Rubygems::API_REQUEST_LIMIT
+                names = if idx.size > Source::Rubygems::API_REQUEST_LIMIT
+                  new_names = idx.dependency_names_if_available
+                  new_names && dependency_names.+(new_names).uniq
+                else
+                  dependency_names.+(idx.dependency_names).uniq
+                end
               else
                 names
               end

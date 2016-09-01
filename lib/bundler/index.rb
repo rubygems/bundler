@@ -114,6 +114,18 @@ module Bundler
       names.uniq
     end
 
+    def dependency_names_if_available
+      reduce([]) do |names, spec|
+        case spec
+        when EndpointSpecification, Gem::Specification, LazySpecification, StubSpecification
+          names.concat(spec.dependencies)
+        else
+          # RemoteSpecification from the full index
+          return nil
+        end
+      end.tap {|n| n && n.map!(&:name) }
+    end
+
     def use(other, override_dupes = false)
       return unless other
       other.each do |s|

@@ -241,9 +241,9 @@ module Bundler
         return unless api_fetchers.any?
 
         unmet_dependency_names = unmet_dependency_names.call
-        Bundler.ui.debug "#{self}: 2x check for #{unmet_dependency_names}"
+        return if !unmet_dependency_names.nil? && unmet_dependency_names.empty?
 
-        return if unmet_dependency_names && unmet_dependency_names.empty?
+        Bundler.ui.debug "Double checking for #{unmet_dependency_names || "all specs (due to the size of the request)"} in #{self}"
 
         fetch_names(api_fetchers, unmet_dependency_names, index, override_dupes)
       end
