@@ -452,13 +452,6 @@ EOF
     end
 
     def configure_gem_home
-      # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
-      begin
-        FileUtils.mkdir_p bundle_path.to_s
-      rescue
-        nil
-      end
-
       ENV["GEM_HOME"] = File.expand_path(bundle_path, root)
       Bundler.rubygems.clear_paths
     end
