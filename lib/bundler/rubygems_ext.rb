@@ -13,7 +13,7 @@ begin
   # Possible use in Gem::Specification#source below and require
   # shouldn't be deferred.
   require "rubygems/source"
-rescue LoadError => e
+rescue LoadError
   # Not available before Rubygems 2.0.0, ignore
   nil
 end
