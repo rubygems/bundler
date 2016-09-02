@@ -8,6 +8,7 @@ end
 
 require "rubygems"
 require "rubygems/specification"
+require "rubygems/source"
 require "bundler/match_platform"
 
 module Gem
