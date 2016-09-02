@@ -13,8 +13,9 @@ begin
   # Possible use in Gem::Specification#source below and require
   # shouldn't be deferred.
   require "rubygems/source"
-rescue LoadError
+rescue LoadError => e
   # Not available before Rubygems 2.0.0, ignore
+  nil
 end
 
 require "bundler/match_platform"
