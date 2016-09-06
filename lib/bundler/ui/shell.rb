@@ -83,6 +83,10 @@ module Bundler
         with_level("silent", &blk)
       end
 
+      def unprinted_warnings
+        []
+      end
+
     private
 
       # valimism

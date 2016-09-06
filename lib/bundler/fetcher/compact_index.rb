@@ -61,7 +61,7 @@ module Bundler
       compact_index_request :fetch_spec
 
       def available?
-        user_home = Pathname.new(Bundler.rubygems.user_home)
+        user_home = Bundler.user_home
         return nil unless user_home.directory? && user_home.writable?
         # Read info file checksums out of /versions, so we can know if gems are up to date
         fetch_uri.scheme != "file" && compact_index_client.update_and_parse_checksums!
