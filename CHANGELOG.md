@@ -1,3 +1,7 @@
+## 1.13.0 (2016-09-05)
+
+This space deliberately left blank.
+
 ## 1.13.0.rc.2 (2016-08-21)
 
 Features:
