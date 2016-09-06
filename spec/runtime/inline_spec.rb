@@ -173,4 +173,24 @@ describe "bundler/inline#gemfile" do
     expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
+
+  it "allows calling gemfile twice" do
+    script <<-RUBY
+      gemfile do
+        path "#{lib_path}" do
+          gem "two"
+        end
+      end
+
+      gemfile do
+        path "#{lib_path}" do
+          gem "four"
+        end
+      end
+    RUBY
+
+    expect(out).to eq("two\nfour")
+    expect(err).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
 end
