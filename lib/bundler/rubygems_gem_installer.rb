@@ -28,7 +28,7 @@ module Bundler
         digest = Digest::SHA256.new
         digest << io.read(16_384) until io.eof?
         io.rewind
-        digest.send(checksum_type(checksum))
+        send(checksum_type(checksum), digest)
       end
       unless digest == checksum
         raise SecurityError,
@@ -46,6 +46,18 @@ module Bundler
       when 64 then :hexdigest!
       when 44 then :base64digest!
       else raise InstallError, "The given checksum for #{spec.full_name} (#{checksum.inspect}) is not a valid SHA256 hexdigest nor base64digest"
+      end
+    end
+
+    def hexdigest!(digest)
+      digest.hexdigest!
+    end
+
+    def base64digest!(digest)
+      if digest.respond_to?(:base64digest!)
+        digest.base64digest!
+      else
+        [digest.digest!].pack("m0")
       end
     end
   end
