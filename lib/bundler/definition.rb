@@ -169,6 +169,7 @@ module Bundler
 
     def missing_dependencies?
       missing = []
+      resolve.materialize(current_dependencies, missing)
       return false if missing.empty?
       Bundler.ui.debug "The definition is missing #{missing.map(&:full_name)}"
       true

@@ -68,7 +68,7 @@ module Bundler
         return
       end
 
-      resolve_if_need(options)
+      resolve_if_needed(options)
       install(options)
 
       lock unless Bundler.settings[:frozen]
@@ -181,7 +181,7 @@ module Bundler
         "because of an invalid symlink. Remove the symlink so the directory can be created."
     end
 
-    def resolve_if_need(options)
+    def resolve_if_needed(options)
       if Bundler.default_lockfile.exist? && !options["update"]
         if @definition.new_platform?
           Bundler.ui.debug "Resolving since there is a new platform in the definition"
