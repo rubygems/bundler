@@ -204,9 +204,14 @@ module Bundler
 
     def set_rubylib
       rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
-      rubylib.unshift File.expand_path("../..", __FILE__)
+      rubylib.unshift bundler_ruby_lib
       ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
     end
+
+    def bundler_ruby_lib
+      File.expand_path("../..", __FILE__)
+    end
+    private :bundler_ruby_lib
 
     def clean_load_path
       # handle 1.9 where system gems are always on the load path

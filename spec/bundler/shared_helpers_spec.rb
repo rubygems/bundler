@@ -234,7 +234,9 @@ describe Bundler::SharedHelpers do
     shared_examples_for "ENV['RUBYLIB'] gets set correctly" do
       let(:ruby_lib_path) { "stubbed_ruby_lib_dir" }
 
-      before { allow(File).to receive(:expand_path).and_return(ruby_lib_path) }
+      before do
+        allow(Bundler::SharedHelpers).to receive(:bundler_ruby_lib).and_return(ruby_lib_path)
+      end
 
       it "ensures bundler's ruby version lib path is in ENV['RUBYLIB']" do
         subject.set_bundle_environment
@@ -324,7 +326,6 @@ describe Bundler::SharedHelpers do
       let(:ruby_lib_path) { "stubbed_ruby_lib_dir" }
 
       before do
-        allow(File).to receive(:expand_path).and_return(ruby_lib_path)
         ENV["RUBYLIB"] = ruby_lib_path
       end
 
