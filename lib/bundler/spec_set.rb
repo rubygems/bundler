@@ -108,6 +108,10 @@ module Bundler
       SpecSet.new(arr)
     end
 
+    def to_s
+      format("<%s:%p @specs=%s>", self.class, object_id, @specs.map(&:full_name))
+    end
+
   private
 
     def sorted
