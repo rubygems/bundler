@@ -3,6 +3,8 @@ require "fileutils"
 require "pathname"
 require "rbconfig"
 require "thread"
+require "tmpdir"
+
 require "bundler/errors"
 require "bundler/environment_preserver"
 require "bundler/gem_remote_fetcher"
