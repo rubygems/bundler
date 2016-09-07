@@ -142,7 +142,7 @@ learn more about their operation in [bundle install(1)][bundle-install].
   and key in PEM format.
 * `cache_path` (`BUNDLE_CACHE_PATH`): The directory that bundler will place
   cached gems in when running <code>bundle package</code>, and that bundler
-  will look in when installing gems.
+  will look in when installing gems. Defaults to `vendor/bundle`.
 * `disable_multisource` (`BUNDLE_DISABLE_MULTISOURCE`): When set, Gemfiles
   containing multiple sources will produce errors instead of warnings. Use
   `bundle config --delete disable_multisource` to unset.
