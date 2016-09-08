@@ -156,7 +156,7 @@ module Bundler
         elsif !File.writable?(home)
           warning += "\n * `#{home}` is not writable"
         else
-          return Pathname.new(home)
+          return @user_home = Pathname.new(home)
         end
 
         login = Etc.getlogin || "unknown"
