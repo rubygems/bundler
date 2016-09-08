@@ -54,6 +54,7 @@ module Bundler
     end
 
     def get(source)
+      return unless source
       source_list_for(source).find {|s| source == s }
     end
 
