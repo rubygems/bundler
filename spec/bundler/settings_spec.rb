@@ -236,7 +236,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
         "mirror.https://rubygems.org/.fallback_timeout/"
       )
 
-      expect(result).to eq ["Set for your local app (/Users/Juan/dev/bundler/tmp/bundled_app/.bundle/config): \"true\""]
+      expect(result).to eq ["Set for your local app (#{bundled_app(".bundle/config")}): \"true\""]
     end
 
     it "please work" do
@@ -246,7 +246,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
         "mirror.https://rubygems.org.fallback_timeout/"
       )
 
-      expect(result).to eq ["Set for your local app (/Users/Juan/dev/bundler/tmp/bundled_app/.bundle/config): \"true\""]
+      expect(result).to eq ["Set for your local app (#{bundled_app(".bundle/config")}): \"true\""]
     end
   end
 end
