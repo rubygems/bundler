@@ -11,7 +11,7 @@ Features:
   - print gem installation errors after other install output (#4834, @segiddins)
   - add `lock --remove-platform` flag to remove platforms from the lock (#4877, @segiddins)
   - add `only_update_to_newer_versions` setting to prevent downgrades during `update` (@segiddins)
-  - expanded expirimental plugin support to include hooks and sources (@asutoshpalai)
+  - expanded experimental plugin support to include hooks and sources (@asutoshpalai)
 
 Bugfixes:
 
