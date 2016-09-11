@@ -30,6 +30,7 @@ module Bundler
       @ruby_version         = nil
       @gemspecs             = []
       @gemfile              = nil
+      @explicit_platforms   = nil
       add_git_sources
     end
 
@@ -197,7 +198,15 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups)
+      Definition.new(
+        lockfile,
+        @dependencies,
+        @sources,
+        unlock,
+        @ruby_version,
+        @optional_groups,
+        @explicit_platforms
+      )
     end
 
     def group(*args, &blk)
@@ -230,6 +239,17 @@ module Bundler
       platforms.each { @platforms.pop }
     end
     alias_method :platform, :platforms
+
+    def only_platforms(*platforms)
+      raise GemfileError, "Can only specify the exact list of platforms once, is already set to #{@explicit_platforms.map(&:to_s)}" if @explicit_platforms
+      @explicit_platforms = platforms.map! do |platform_string|
+        Gem::Platform.new(platform_string).tap do |platform|
+          if platform.to_s == "unknown"
+            raise GemfileEvalError, "The platform `#{platform_string}` is unknown to RubyGems #{Gem::VERSION}"
+          end
+        end
+      end
+    end
 
     def env(name)
       old = @env
