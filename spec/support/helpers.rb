@@ -208,7 +208,11 @@ module Spec
     end
 
     def gemfile(*args)
-      create_file("Gemfile", *args)
+      if args.empty?
+        File.open("Gemfile", "r", &:read)
+      else
+        create_file("Gemfile", *args)
+      end
     end
 
     def lockfile(*args)

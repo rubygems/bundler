@@ -10,9 +10,11 @@ describe "bundle lock" do
     strip_lockfile bundled_app(file).read
   end
 
+  let(:repo) { gem_repo1 }
+
   before :each do
     gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "file://#{repo}"
       gem "rails"
       gem "with_license"
       gem "foo"
@@ -20,7 +22,7 @@ describe "bundle lock" do
 
     @lockfile = strip_lockfile <<-L
       GEM
-        remote: file:#{gem_repo1}/
+        remote: file:#{repo}/
         specs:
           actionmailer (2.3.2)
             activesupport (= 2.3.2)
@@ -77,7 +79,7 @@ describe "bundle lock" do
   it "writes a lockfile when there is an outdated lockfile using --update" do
     lockfile @lockfile.gsub("2.3.2", "2.3.1")
 
-    bundle "lock --update"
+    bundle! "lock --update"
 
     expect(read_lockfile).to eq(@lockfile)
   end
@@ -222,5 +224,29 @@ describe "bundle lock" do
       BUNDLED WITH
          #{Bundler::VERSION}
     G
+  end
+
+  context "when an update is available" do
+    let(:repo) { gem_repo2 }
+
+    before do
+      lockfile(@lockfile)
+      build_repo2 do
+        build_gem "foo", "2.0"
+      end
+    end
+
+    it "does not implicitly update" do
+      bundle! "lock"
+
+      expect(read_lockfile).to eq(@lockfile)
+    end
+
+    it "accounts for changes in the gemfile" do
+      gemfile gemfile.gsub('"foo"', '"foo", "2.0"')
+      bundle! "lock"
+
+      expect(read_lockfile).to eq(@lockfile.sub("foo (1.0)", "foo (2.0)").sub(/foo$/, "foo (= 2.0)"))
+    end
   end
 end
