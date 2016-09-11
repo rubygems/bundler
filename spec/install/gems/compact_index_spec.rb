@@ -696,6 +696,17 @@ The checksum of /versions does not match the checksum provided by the server! So
     expect(the_bundle).to include_gems "rack 1.0.0"
   end
 
+  it "fails gracefully when the source URI has an invalid scheme" do
+    install_gemfile <<-G
+      source "htps://rubygems.org"
+      gem "rack"
+    G
+    expect(exitstatus).to eq(15) if exitstatus
+    expect(out).to end_with(<<-E.strip)
+      The request uri `htps://index.rubygems.org/versions` has an invalid scheme (`htps`). Did you mean `http` or `https`?
+    E
+  end
+
   describe "checksum validation", :rubygems => ">= 2.3.0" do
     it "raises when the checksum does not match" do
       install_gemfile <<-G, :artifice => "compact_index_wrong_gem_checksum"
