@@ -1,6 +1,4 @@
 # frozen_string_literal: true
-require "uri"
-require "digest/sha1"
 
 module Bundler
   module Plugin
@@ -41,6 +39,8 @@ module Bundler
       #     is present to be compatible with `Definition` and is used by
       #     rubygems source.
       module Source
+        require "uri"
+        require "digest/sha1"
         attr_reader :uri, :options, :name
         attr_accessor :dependency_names
 
