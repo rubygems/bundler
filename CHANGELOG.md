@@ -1,3 +1,14 @@
+## 1.13.1 (2016-09-13)
+
+Bugfixes:
+
+  - ensure that `Gem::Source` is available, fixing several exceptions (#4944, @dekellum)
+  - ensure that dependency resolution works when multiple gems have the same dependency (#4961, @segiddins)
+
+## 1.13.0 (2016-09-05)
+
+This space deliberately left blank.
+
 ## 1.13.0.rc.2 (2016-08-21)
 
 Features:
