@@ -137,7 +137,7 @@ describe Bundler::Definition do
   describe "initialize" do
     context "gem version promoter" do
       context "with lockfile" do
-        before :each do
+        before do
           install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "foo"
@@ -156,6 +156,73 @@ describe Bundler::Definition do
         it "should not attempt to parse empty lockfile contents" do
           definition = Bundler::Definition.new(nil, [], mock_source_list, true)
           expect(definition.gem_version_promoter.locked_specs.to_a).to eq []
+        end
+      end
+
+      context "shared dependent gems" do
+        before do
+          build_repo4 do
+            build_gem "isolated_owner", %w(1.0.1 1.0.2) do |s|
+              s.add_dependency "isolated_dep", "~> 2.0"
+            end
+            build_gem "isolated_dep", %w(2.0.1 2.0.2)
+
+            build_gem "shared_owner_a", %w(3.0.1 3.0.2) do |s|
+              s.add_dependency "shared_dep", "~> 5.0"
+            end
+            build_gem "shared_owner_b", %w(4.0.1 4.0.2) do |s|
+              s.add_dependency "shared_dep", "~> 5.0"
+            end
+            build_gem "shared_dep", %w(5.0.1 5.0.2)
+          end
+
+          gemfile <<-G
+            source "file://#{gem_repo4}"
+            gem 'isolated_owner'
+
+            gem 'shared_owner_a'
+            gem 'shared_owner_b'
+          G
+
+          lockfile <<-L
+            GEM
+              remote: file://#{gem_repo4}
+              specs:
+                isolated_dep (2.0.1)
+                isolated_owner (1.0.1)
+                  isolated_dep (~> 2.0)
+                shared_dep (5.0.1)
+                shared_owner_a (3.0.1)
+                  shared_dep (~> 5.0)
+                shared_owner_b (4.0.1)
+                  shared_dep (~> 5.0)
+
+            PLATFORMS
+              ruby
+
+            DEPENDENCIES
+              shared_owner_a
+              shared_owner_b
+              isolated_owner
+
+            BUNDLED WITH
+               1.13.0
+          L
+        end
+
+        it "should unlock isolated and shared dependencies equally" do
+          # setup for these test costs about 3/4 of a second, much faster to just jam them all in here.
+          # the global before :each defeats any ability to have re-usable setup for many examples in a
+          # single context by wiping out the tmp dir and contents.
+
+          unlock_deps_test(%w(isolated_owner), %w(isolated_dep isolated_owner))
+          unlock_deps_test(%w(isolated_owner shared_owner_a), %w(isolated_dep isolated_owner shared_dep shared_owner_a))
+        end
+
+        def unlock_deps_test(passed_unlocked, expected_calculated)
+          definition = Bundler::Definition.new(bundled_app("Gemfile.lock"), [], Bundler::SourceList.new, :gems => passed_unlocked)
+          unlock_gems = definition.gem_version_promoter.unlock_gems
+          expect(unlock_gems.sort).to eq expected_calculated
         end
       end
 
