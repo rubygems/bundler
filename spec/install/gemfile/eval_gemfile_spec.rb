@@ -26,6 +26,24 @@ describe "bundle install with gemfile that uses eval_gemfile" do
     end
   end
 
+  context "eval-ed Gemfile has relative-path gems" do
+    before do
+      build_lib("a", :path => "gems/a")
+      create_file "nested/Gemfile-nested", <<-G
+        gem "a", :path => "../gems/a"
+      G
+
+      gemfile <<-G
+        eval_gemfile "nested/Gemfile-nested"
+      G
+    end
+
+    it "installs the path gem" do
+      bundle! :install
+      expect(the_bundle).to include_gem("a 1.0")
+    end
+  end
+
   context "Gemfile uses gemspec paths after eval-ing a Gemfile" do
     before { create_file "other/Gemfile-other" }
 
