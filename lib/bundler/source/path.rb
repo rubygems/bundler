@@ -130,7 +130,7 @@ module Bundler
       end
 
       def lockfile_path
-        return path if path.absolute?
+        return relative_path if path.absolute?
         expand(path).relative_path_from(Bundler.root)
       end
 
