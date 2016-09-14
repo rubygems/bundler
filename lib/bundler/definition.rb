@@ -105,8 +105,11 @@ module Bundler
       add_current_platform unless Bundler.settings[:frozen]
 
       @path_changes = converge_paths
-      eager_unlock = expand_dependencies(@unlock[:gems])
-      @unlock[:gems] = @locked_specs.for(eager_unlock).map(&:name)
+
+      unless @unlock[:lock_shared_dependencies]
+        eager_unlock = expand_dependencies(@unlock[:gems])
+        @unlock[:gems] = @locked_specs.for(eager_unlock).map(&:name)
+      end
 
       @gem_version_promoter = create_gem_version_promoter
 

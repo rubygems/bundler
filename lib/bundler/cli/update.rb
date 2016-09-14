@@ -37,7 +37,8 @@ module Bundler
           gems.concat(specs.map(&:name))
         end
 
-        Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby])
+        Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby],
+                           :lock_shared_dependencies => options[:conservative])
       end
 
       Bundler::CLI::Common.config_gem_version_promoter(Bundler.definition, options)

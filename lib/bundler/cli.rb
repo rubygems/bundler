@@ -215,14 +215,16 @@ module Bundler
       "Update ruby specified in Gemfile.lock"
     method_option "bundler", :type => :string, :lazy_default => "> 0.a", :banner =>
       "Update the locked version of bundler"
-    method_option "patch", :type => :boolean, :hide => true, :banner =>
+    method_option "patch", :type => :boolean, :banner =>
       "Prefer updating only to next patch version"
-    method_option "minor", :type => :boolean, :hide => true, :banner =>
+    method_option "minor", :type => :boolean, :banner =>
       "Prefer updating only to next minor version"
-    method_option "major", :type => :boolean, :hide => true, :banner =>
+    method_option "major", :type => :boolean, :banner =>
       "Prefer updating to next major version (default)"
-    method_option "strict", :type => :boolean, :hide => true, :banner =>
+    method_option "strict", :type => :boolean, :banner =>
       "Do not allow any gem to be updated past latest --patch/--minor/--major"
+    method_option "conservative", :type => :boolean, :banner =>
+      "Use bundle install conservative update behavior and do not allowed shared dependencies to be updated."
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run
@@ -459,14 +461,16 @@ module Bundler
       "add a new platform to the lockfile"
     method_option "remove-platform", :type => :array, :default => [], :banner =>
       "remove a platform from the lockfile"
-    method_option "patch", :type => :boolean, :hide => true, :banner =>
-      "Prefer updating only to next patch version"
-    method_option "minor", :type => :boolean, :hide => true, :banner =>
-      "Prefer updating only to next minor version"
-    method_option "major", :type => :boolean, :hide => true, :banner =>
-      "Prefer updating to next major version (default)"
-    method_option "strict", :type => :boolean, :hide => true, :banner =>
-      "Do not allow any gem to be updated past latest --patch/--minor/--major"
+    method_option "patch", :type => :boolean, :banner =>
+      "If updating, prefer updating only to next patch version"
+    method_option "minor", :type => :boolean, :banner =>
+      "If updating, prefer updating only to next minor version"
+    method_option "major", :type => :boolean, :banner =>
+      "If updating, prefer updating to next major version (default)"
+    method_option "strict", :type => :boolean, :banner =>
+      "If updating, do not allow any gem to be updated past latest --patch | --minor | --major"
+    method_option "conservative", :type => :boolean, :banner =>
+      "If updating, use bundle install conservative update behavior and do not allowed shared dependencies to be updated."
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run
