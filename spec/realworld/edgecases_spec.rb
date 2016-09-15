@@ -48,8 +48,16 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       gem 'capybara', '~> 2.2.0'
       gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
-    bundle :lock
-    expect(lockfile).to include("rails (3.2.22.4)")
+    bundle! :lock
+    rails_version = ruby(<<-R)
+      require 'rubygems'
+      require 'bundler'
+      fetcher = Bundler::Fetcher.new(Bundler::Source::Rubygems::Remote.new(URI('https://rubygems.org')))
+      index = fetcher.specs(%w(rails), nil)
+      rails = index.search(Gem::Dependency.new("rails", "~> 3.0")).last
+      puts rails.version
+    R
+    expect(lockfile).to include("rails (#{rails_version})")
     expect(lockfile).to include("capybara (2.2.1)")
   end
 
