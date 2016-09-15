@@ -73,7 +73,7 @@ describe "bundle install" do
         simulate_ruby_engine "jruby", "9.1.2.0" do
           install_gemfile! <<-G
             source "https://rubygems.org"
-            ruby "2.3.0", :engine => :jruby, engine_version: "9.1.2.0"
+            ruby "2.3.0", :engine => :jruby, :engine_version => "9.1.2.0"
           G
 
           expect(out).to match(/Bundle complete!/)
@@ -86,7 +86,7 @@ describe "bundle install" do
         simulate_ruby_engine "jruby", "9.1.2.0" do
           install_gemfile! <<-G
             source "file://#{gem_repo1}"
-            ruby "2.3.0", :engine => :jruby, engine_version: "9.1.2.0"
+            ruby "2.3.0", :engine => :jruby, :engine_version => "9.1.2.0"
             gem "rack"
           G
 
