@@ -443,7 +443,10 @@ EOF
     def configure_gem_path(env = ENV, settings = self.settings)
       blank_home = env["GEM_HOME"].nil? || env["GEM_HOME"].empty?
       if settings[:disable_shared_gems]
-        env["GEM_PATH"] = nil
+        # this needs to be empty string to cause
+        # PathSupport.split_gem_path to only load up the
+        # Bundler --path setting as the GEM_PATH.
+        env["GEM_PATH"] = ""
       elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
         paths = possibles.flatten.compact.uniq.reject(&:empty?)
