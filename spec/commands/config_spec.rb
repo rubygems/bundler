@@ -102,6 +102,12 @@ describe ".bundle/config" do
       run "puts Bundler.settings['local.foo']"
       expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
     end
+
+    it "works with parseable option" do
+      bundle "config --global parseable value"
+      run "puts Bundler.settings['parseable']"
+      expect(out).to eq("value")
+    end
   end
 
   describe "local" do
@@ -146,6 +152,12 @@ describe ".bundle/config" do
       bundle "config --local local.foo .."
       run "puts Bundler.settings['local.foo']"
       expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
+    end
+
+    it "works with parseable option" do
+      bundle "config --local parseable value"
+      run "puts Bundler.settings['parseable']"
+      expect(out).to eq("value")
     end
   end
 
