@@ -502,10 +502,11 @@ module Bundler
       @replaced_methods[[method, klass]] = instance_method
       if unbound_method
         klass.send(:define_method, method, unbound_method)
+        klass.send(visibility, method)
       elsif block
         klass.send(:define_method, method, &block)
+        klass.send(visibility, method)
       end
-      klass.send(visibility, method)
     end
 
     def method_visibility(klass, method)
