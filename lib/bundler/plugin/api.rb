@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "bundler/plugin/api/source"
 
 module Bundler
   # This is the interfacing class represents the API that we intend to provide
@@ -23,7 +24,6 @@ module Bundler
   # and hooks).
   module Plugin
     class API
-      autoload :Source, "bundler/plugin/api/source"
       # The plugins should declare that they handle a command through this helper.
       #
       # @param [String] command being handled by them
