@@ -17,14 +17,11 @@ module Bundler
       ui = Bundler.ui
       Bundler.ui = UI::Silent.new if print
 
-      gems = options[:update]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
-      if gems && !gems.empty?
-        definition = Bundler.definition(:gems => gems)
-      else
-        definition = Bundler.definition(true)
-      end
+      update = options[:update]
+      update = { :gems => update } if update.is_a?(Array)
+      definition = Bundler.definition(update)
 
       options["remove-platform"].each do |platform|
         definition.remove_platform(platform)
