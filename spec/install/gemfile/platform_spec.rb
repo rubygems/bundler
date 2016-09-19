@@ -184,7 +184,7 @@ describe "bundle install with platform conditionals" do
 
     gemfile <<-G
       source "file://#{gem_repo1}"
-      gem "some_gem", platform: :rbx
+      gem "some_gem", :platform => :rbx
     G
 
     bundle "install --local"
@@ -203,6 +203,23 @@ describe "bundle install with platform conditionals" do
 
     bundle "install --local"
     expect(out).not_to match(/Could not find gem 'some_gem/)
+  end
+
+  it "prints a helpful warning when a dependency is unused on any platform" do
+    simulate_platform "ruby"
+    simulate_ruby_engine "ruby"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", :platform => :jruby
+    G
+
+    bundle! "install"
+
+    expect(out).to include <<-O.strip
+The dependency rack (>= 0) will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for java. To add those platforms to the bundle, run `bundle lock --add-platform jruby`.
+    O
   end
 end
 

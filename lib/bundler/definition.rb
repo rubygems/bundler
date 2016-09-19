@@ -808,8 +808,16 @@ module Bundler
       deps = []
       dependencies.each do |dep|
         dep = Dependency.new(dep, ">= 0") unless dep.respond_to?(:name)
-        next unless remote || dep.current_platform?
-        dep.gem_platforms(@platforms).each do |p|
+        next if !remote && !dep.current_platform?
+        platforms = dep.gem_platforms(@platforms)
+        if platforms.empty?
+          Bundler.ui.warn \
+            "The dependency #{dep} will be unused by any of the platforms Bundler is installing for. " \
+            "Bundler is installing for #{@platforms.join ", "} but the dependency " \
+            "is only for #{dep.platforms.map {|p| Dependency::PLATFORM_MAP[p] }.join ", "}. " \
+            "To add those platforms to the bundle, run `bundle lock --add-platform #{dep.platforms.join ", "}`."
+        end
+        platforms.each do |p|
           deps << DepProxy.new(dep, p) if remote || p == generic_local_platform
         end
       end
