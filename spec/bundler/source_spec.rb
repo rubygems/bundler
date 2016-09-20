@@ -61,7 +61,7 @@ describe Bundler::Source do
             before { Bundler.ui = Bundler::UI::Shell.new }
 
             it "should return a string with the spec name and version and locked spec version" do
-              expect(subject.version_message(spec)).to eq("nokogiri >= 1.6 (\e[32mwas < 1.5\e[0m)")
+              expect(subject.version_message(spec)).to eq("nokogiri >= 1.6\e[32m (was < 1.5)\e[0m")
             end
           end
 
