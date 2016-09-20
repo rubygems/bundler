@@ -14,17 +14,17 @@ Detailed information about each Bundler command, including help with common prob
 
 Certain operating systems such as MacOS and Ubuntu have versions of Ruby that require evelated privileges to install gems.
 
-	ERROR:  While executing gem ... (Gem::FilePermissionError)
-	    You don't have write permissions for the /Library/Ruby/Gems/2.0.0 directory.
+    ERROR:  While executing gem ... (Gem::FilePermissionError)
+      You don't have write permissions for the /Library/Ruby/Gems/2.0.0 directory.
 
 There are multiple ways to solve this issue. You can install bundler with elevated privilges using `sudo` or `su`.
 
-	sudo gem install bundler
-	
+  sudo gem install bundler
+
 If you cannot elevated your privileges or do not want to globally install Bundler, you can use the `--user-install` option.
 
-	gem install bundler --user-install
-	
+  gem install bundler --user-install
+
 This will install Bundler into your home directory. Note that you will need to append `~/.gem/ruby/<ruby version>/bin` to your `$PATH` variable to use `bundle`.
 
 ### Heroku errors
