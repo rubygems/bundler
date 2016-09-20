@@ -329,16 +329,22 @@ EOF
     def sudo(str)
       SUDO_MUTEX.synchronize do
         prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
-        Your user account isn't allowed to install to the system Rubygems.
+        Your user account isn't allowed to install to the system RubyGems.
         You can cancel this installation and run:
 
             bundle install --path vendor/bundle
 
         to install the gems into ./vendor/bundle/, or you can enter your password
-        and install the bundled gems to Rubygems using sudo.
+        and install the bundled gems to RubyGems using sudo.
 
         Password:
         PROMPT
+
+        unless @prompted_for_sudo ||= system(%(sudo -k -p "#{prompt}" true))
+          raise SudoNotPermittedError,
+            "Bundler requires sudo access to install at the moment. " \
+            "Try installing again, granting Bundler sudo access when prompted, or installing into a different path."
+        end
 
         `sudo -p "#{prompt}" #{str}`
       end
