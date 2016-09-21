@@ -285,13 +285,6 @@ end
 begin
   require "automatiek"
 
-  Automatiek::RakeTask.new("compact_index_client") do |lib|
-    lib.download = { :github => "https://github.com/bundler/compact_index_client" }
-    lib.namespace = "CompactIndexClient"
-    lib.prefix = "Bundler"
-    lib.vendor_lib = "lib/bundler/vendor/compact_index_client"
-  end
-
   Automatiek::RakeTask.new("molinillo") do |lib|
     lib.download = { :github => "https://github.com/CocoaPods/Molinillo" }
     lib.namespace = "Molinillo"
