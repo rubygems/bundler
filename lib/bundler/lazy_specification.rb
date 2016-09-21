@@ -70,7 +70,7 @@ module Bundler
 
     def __materialize__
       search_object = Bundler.settings[:specific_platform] ? self : Dependency.new(name, version)
-      @specification = source.specs.search(search_object).last
+      @specification = select_best_platform_match(source.specs.search(search_object), Gem::Platform.new(platform))
     end
 
     def respond_to?(*args)
