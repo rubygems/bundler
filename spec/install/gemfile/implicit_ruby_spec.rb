@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "ruby requirement" do
+describe "implicit ruby requirement" do
   def locked_ruby_version
     Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(lockfile).ruby_version)
   end
@@ -12,18 +12,18 @@ describe "ruby requirement" do
   it "allows adding gems" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-      ruby "#{RUBY_VERSION}"
       gem "rack"
     G
 
-    install_gemfile <<-G
+    expect(locked_ruby_version).to eq(Bundler::RubyVersion.system)
+
+    install_gemfile! <<-G
       source "file://#{gem_repo1}"
-      ruby "#{RUBY_VERSION}"
       gem "rack"
       gem "rack-obama"
     G
 
-    expect(exitstatus).to eq(0) if exitstatus
+    expect(locked_ruby_version).to eq(Bundler::RubyVersion.system)
     expect(the_bundle).to include_gems "rack-obama 1.0"
   end
 
@@ -48,7 +48,6 @@ describe "ruby requirement" do
   it "allows changing the ruby version requirement to something compatible" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-      ruby ">= 1.0.0"
       gem "rack"
     G
 
@@ -69,7 +68,6 @@ describe "ruby requirement" do
   it "allows changing the ruby version requirement to something incompatible" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-      ruby ">= 1.0.0"
       gem "rack"
     G
 
@@ -85,5 +83,57 @@ describe "ruby requirement" do
 
     expect(the_bundle).to include_gems "rack 1.0.0"
     expect(locked_ruby_version.versions).to eq(["5100"])
+  end
+
+  it "warns when installing in deployment mode with a mis-match" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    expect(locked_ruby_version).to eq(system = Bundler::RubyVersion.system)
+
+    simulate_ruby_version "1.0"
+
+    bundle! "install --deployment"
+    expect(out).to include("Your Ruby version is 1.0, but your bundled is locked to #{RUBY_VERSION}. This may cause issues if there are any gems that were depending on that ruby version.")
+    expect(locked_ruby_version).to eq(system)
+
+    expect(the_bundle).to include_gems "rack 1.0.0"
+  end
+
+  it "warns when installing with a lower version" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    expect(locked_ruby_version).to eq(system = Bundler::RubyVersion.system)
+
+    simulate_ruby_version "1.0"
+
+    bundle! "install"
+    expect(out).to include("Your Ruby version is 1.0, but your bundled is locked to #{RUBY_VERSION}. This may cause issues if there are any gems that were depending on that ruby version.")
+    expect(locked_ruby_version).to eq(system)
+
+    expect(the_bundle).to include_gems "rack 1.0.0"
+  end
+
+  it "does not warn when installing with a higher version" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    expect(locked_ruby_version).to eq(system = Bundler::RubyVersion.system)
+
+    simulate_ruby_version "5100.3.1415926538"
+
+    bundle! "install"
+    expect(out).not_to include("5100.3.1415926538")
+    expect(err).not_to include("5100.3.1415926538")
+    expect(locked_ruby_version).to eq(system)
+
+    expect(the_bundle).to include_gems "rack 1.0.0"
   end
 end

@@ -100,7 +100,7 @@ module Bundler
       @unlock[:ruby] ||= if @ruby_version && locked_ruby_version_object
         @ruby_version.diff(locked_ruby_version_object)
       end
-      @unlocking ||= @unlock[:ruby] ||= (!@locked_ruby_version ^ !@ruby_version)
+      @unlocking ||= @unlock[:ruby]
 
       add_current_platform unless Bundler.settings[:frozen]
 
@@ -330,7 +330,6 @@ module Bundler
     end
 
     def locked_ruby_version
-      return unless ruby_version
       if @unlock[:ruby] || !@locked_ruby_version
         Bundler::RubyVersion.system
       else
@@ -386,10 +385,8 @@ module Bundler
         handled << dep.name
       end
 
-      if locked_ruby_version
-        out << "\nRUBY VERSION\n"
-        out << "   #{locked_ruby_version}\n"
-      end
+      out << "\nRUBY VERSION\n"
+      out << "   #{locked_ruby_version}\n"
 
       # Record the version of Bundler that was used to create the lockfile
       out << "\nBUNDLED WITH\n"
@@ -472,28 +469,34 @@ module Bundler
     end
 
     def validate_ruby!
-      return unless ruby_version
+      return unless ruby_version = self.ruby_version || locked_ruby_version_object
 
-      if diff = ruby_version.diff(Bundler::RubyVersion.system)
-        problem, expected, actual = diff
+      return unless diff = ruby_version.diff(Bundler::RubyVersion.system)
+      problem, expected, actual = diff
 
-        msg = case problem
-              when :engine
-                "Your Ruby engine is #{actual}, but your Gemfile specified #{expected}"
-              when :version
-                "Your Ruby version is #{actual}, but your Gemfile specified #{expected}"
-              when :engine_version
-                "Your #{Bundler::RubyVersion.system.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
-              when :patchlevel
-                if !expected.is_a?(String)
-                  "The Ruby patchlevel in your Gemfile must be a string"
-                else
-                  "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
-                end
-        end
+      implicit_ruby_version = self.ruby_version.nil?
+      specified = implicit_ruby_version ? "bundled is locked to" : "Gemfile specified"
 
-        raise RubyVersionMismatch, msg
+      msg = case problem
+            when :engine
+              "Your Ruby engine is #{actual}, but your #{specified} #{expected}"
+            when :version
+              return if implicit_ruby_version && ruby_version.to_gem_version_with_patchlevel < Bundler::RubyVersion.system.to_gem_version_with_patchlevel
+              "Your Ruby version is #{actual}, but your #{specified} #{expected}"
+            when :engine_version
+              "Your #{Bundler::RubyVersion.system.engine} version is #{actual}, but your #{specified} #{ruby_version.engine} #{expected}"
+            when :patchlevel
+              if !expected.is_a?(String)
+                "The Ruby patchlevel in your Gemfile must be a string"
+              else
+                "Your Ruby patchlevel is #{actual}, but your #{specified} #{expected}"
+              end
       end
+      msg += ". This may cause issues if there are any gems that were depending on that ruby version." if implicit_ruby_version
+
+      raise RubyVersionMismatch, msg if !implicit_ruby_version || Bundler.feature_flag.bundler_2_mode?
+
+      Bundler.ui.warn(msg)
     end
 
     # TODO: refactor this so that `match_platform` can be called with two platforms
