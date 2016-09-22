@@ -14,8 +14,9 @@ module Bundler
 
     (1..10).each {|v| define_method("bundler_#{v}_mode?") { major_version >= v } }
 
-    settings_flag :allow_offline_install
-    settings_flag :plugins
+    settings_flag(:allow_offline_install) { bundler_2_mode? }
+    settings_flag(:only_update_to_newer_versions) { bundler_2_mode? }
+    settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }
 
     def initialize(bundler_version)
       @bundler_version = Gem::Version.create(bundler_version)

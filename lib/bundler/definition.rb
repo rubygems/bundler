@@ -886,7 +886,7 @@ module Bundler
     end
 
     def additional_base_requirements_for_resolve
-      return [] unless @locked_gems && Bundler.settings[:only_update_to_newer_versions]
+      return [] unless @locked_gems && Bundler.feature_flag.only_update_to_newer_versions?
       @locked_gems.specs.reduce({}) do |requirements, locked_spec|
         dep = Gem::Dependency.new(locked_spec.name, ">= #{locked_spec.version}")
         requirements[locked_spec.name] = DepProxy.new(dep, locked_spec.platform)
