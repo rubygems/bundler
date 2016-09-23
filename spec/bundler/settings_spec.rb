@@ -58,9 +58,9 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       subject(:settings) { described_class.new }
 
       it "does not raise" do
-        expect {
-          subject['foo']
-        }.not_to raise_error
+        expect do
+          subject["foo"]
+        end.not_to raise_error
       end
     end
 
