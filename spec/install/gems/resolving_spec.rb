@@ -118,7 +118,7 @@ describe "bundle install with gem sources" do
           gem 'require_ruby'
         G
 
-        expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
+        expect(out).to_not match(/Gem::(InstallError|RuntimeRequirementNotMetError): require_ruby requires Ruby version > 9000/)
       end
     end
   end
