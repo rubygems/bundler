@@ -387,7 +387,7 @@ describe "bundle update --ruby" do
           ::RUBY_PATCHLEVEL = 222
       G
     end
-    it "removes the Ruby from the Gemfile.lock" do
+    it "does not remove the Ruby from the Gemfile.lock" do
       bundle "update --ruby"
 
       lockfile_should_be <<-L
@@ -398,6 +398,9 @@ describe "bundle update --ruby" do
          ruby
 
        DEPENDENCIES
+
+       RUBY VERSION
+          ruby 2.1.4p222
 
        BUNDLED WITH
           #{Bundler::VERSION}

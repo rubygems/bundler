@@ -272,6 +272,9 @@ describe "bundle flex_install" do
       DEPENDENCIES
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
       L

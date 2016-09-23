@@ -65,6 +65,9 @@ describe Bundler::Definition do
         DEPENDENCIES
           foo!
 
+        RUBY VERSION
+           #{Bundler::RubyVersion.system}
+
         BUNDLED WITH
            #{Bundler::VERSION}
       G
@@ -102,6 +105,9 @@ describe Bundler::Definition do
         DEPENDENCIES
           foo!
 
+        RUBY VERSION
+           #{Bundler::RubyVersion.system}
+
         BUNDLED WITH
            #{Bundler::VERSION}
       G
@@ -127,6 +133,9 @@ describe Bundler::Definition do
 
         DEPENDENCIES
           foo
+
+        RUBY VERSION
+           #{Bundler::RubyVersion.system}
 
         BUNDLED WITH
            #{Bundler::VERSION}

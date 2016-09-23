@@ -376,7 +376,7 @@ G
 
       bundle :check
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to eq("Resolving dependencies...\nThe Gemfile's dependencies are satisfied")
+      expect(out).to eq("The Gemfile's dependencies are satisfied")
     end
 
     it "checks fine with any engine" do
@@ -395,7 +395,7 @@ G
 
         bundle :check
         expect(exitstatus).to eq(0) if exitstatus
-        expect(out).to eq("Resolving dependencies...\nThe Gemfile's dependencies are satisfied")
+        expect(out).to eq("The Gemfile's dependencies are satisfied")
       end
     end
 

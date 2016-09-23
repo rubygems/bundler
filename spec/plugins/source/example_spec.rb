@@ -84,6 +84,9 @@ describe "real source plugins" do
         DEPENDENCIES
           a-path-gem!
 
+        RUBY VERSION
+           #{Bundler::RubyVersion.system}
+
         BUNDLED WITH
            #{Bundler::VERSION}
       G
@@ -348,6 +351,9 @@ describe "real source plugins" do
 
         DEPENDENCIES
           ma-gitp-gem!
+
+        RUBY VERSION
+           #{Bundler::RubyVersion.system}
 
         BUNDLED WITH
            #{Bundler::VERSION}

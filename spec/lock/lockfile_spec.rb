@@ -23,6 +23,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -47,6 +50,9 @@ describe "the lockfile format" do
         omg!
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          1.8.2
     L
@@ -69,6 +75,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -86,6 +95,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          1.10.0
@@ -108,6 +120,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          1.10.0
@@ -146,6 +161,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack (> 0)
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -163,6 +181,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          9999999.1.0
@@ -192,6 +213,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          9999999.1.0
     G
@@ -209,6 +233,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          9999999.0.0
@@ -245,6 +272,9 @@ describe "the lockfile format" do
         rails-assets-bootstrap!
         rake
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          9999999.0.0
     L
@@ -275,6 +305,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          1.10.0
     L
@@ -302,6 +335,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          9999999.0.0
     G
@@ -328,6 +364,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack-obama
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -353,6 +392,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama (>= 1.0)
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -384,6 +426,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack-obama (>= 1.0)
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -408,6 +453,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         net-sftp
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -438,6 +486,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -475,6 +526,9 @@ describe "the lockfile format" do
         omg!
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     L
@@ -508,6 +562,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         foo!
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -537,6 +594,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -568,6 +628,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         foo!
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -594,6 +657,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -637,6 +703,9 @@ describe "the lockfile format" do
         foo!
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -671,6 +740,9 @@ describe "the lockfile format" do
         actionpack
         rack-obama
         thin
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -711,6 +783,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rails
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -736,6 +811,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         double_deps
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -763,6 +841,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack-obama (>= 1.0)
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -788,6 +869,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama (>= 1.0)
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -817,6 +901,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         foo
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -844,6 +931,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -873,6 +963,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         foo
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -900,6 +993,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         foo!
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -917,6 +1013,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -942,6 +1041,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -971,6 +1073,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         platform_specific
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -1003,6 +1108,9 @@ describe "the lockfile format" do
         activesupport
         rack
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -1026,6 +1134,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -1051,6 +1162,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         rack (= 1.0)
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     G
@@ -1074,6 +1188,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack (= 1.0)
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -1119,6 +1236,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack (> 0.9, < 1.0)
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -1196,6 +1316,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         omg!
 
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
+
       BUNDLED WITH
          #{Bundler::VERSION}
     L
@@ -1222,6 +1345,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         omg!
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -1312,6 +1438,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      RUBY VERSION
+         #{Bundler::RubyVersion.system}
 
       BUNDLED WITH
          #{Bundler::VERSION}

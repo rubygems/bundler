@@ -325,6 +325,9 @@ describe "bundle update" do
           foo!
           rack
 
+        RUBY VERSION
+           #{Bundler::RubyVersion.system}
+
         BUNDLED WITH
            #{Bundler::VERSION}
       G

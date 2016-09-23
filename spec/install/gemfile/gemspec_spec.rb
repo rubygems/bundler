@@ -336,6 +336,9 @@ describe "bundle install from an existing gemspec" do
               DEPENDENCIES
                 foo!
 
+              RUBY VERSION
+                 #{Bundler::RubyVersion.system}
+
               BUNDLED WITH
                  #{Bundler::VERSION}
             L
@@ -366,6 +369,9 @@ describe "bundle install from an existing gemspec" do
               DEPENDENCIES
                 foo!
                 platform_specific
+
+              RUBY VERSION
+                 #{Bundler::RubyVersion.system}
 
               BUNDLED WITH
                  #{Bundler::VERSION}
@@ -400,6 +406,9 @@ describe "bundle install from an existing gemspec" do
               DEPENDENCIES
                 foo!
                 indirect_platform_specific
+
+              RUBY VERSION
+                 #{Bundler::RubyVersion.system}
 
               BUNDLED WITH
                  #{Bundler::VERSION}
