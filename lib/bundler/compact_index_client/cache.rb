@@ -8,7 +8,11 @@ module Bundler
 
       def initialize(directory)
         @directory = Pathname.new(directory).expand_path
-        info_roots.each {|dir| FileUtils.mkdir_p(dir) }
+        info_roots.each do |dir|
+          SharedHelpers.filesystem_access(dir) do
+            FileUtils.mkdir_p(dir)
+          end
+        end
       end
 
       def names
@@ -84,7 +88,7 @@ module Bundler
 
       def lines(path)
         return [] unless path.file?
-        lines = path.read.split("\n")
+        lines = SharedHelpers.filesystem_access(path, :read, &:read).split("\n")
         header = lines.index("---")
         header ? lines[header + 1..-1] : lines
       end

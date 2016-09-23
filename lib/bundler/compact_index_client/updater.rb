@@ -49,11 +49,15 @@ module Bundler
           end
 
           mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
-          local_temp_path.open(mode) {|f| f << content }
+          SharedHelpers.filesystem_access(local_temp_path) do
+            local_temp_path.open(mode) {|f| f << content }
+          end
 
           response_etag = response["ETag"].gsub(%r{\AW/}, "")
           if etag_for(local_temp_path) == response_etag
-            FileUtils.mv(local_temp_path, local_path)
+            SharedHelpers.filesystem_access(local_path) do
+              FileUtils.mv(local_temp_path, local_path)
+            end
             return nil
           end
 
@@ -75,7 +79,9 @@ module Bundler
         # This must use IO.read instead of Digest.file().hexdigest
         # because we need to preserve \n line endings on windows when calculating
         # the checksum
-        Digest::MD5.hexdigest(IO.read(path))
+        SharedHelpers.filesystem_access(path, :read) do
+          Digest::MD5.hexdigest(IO.read(path))
+        end
       end
     end
   end
