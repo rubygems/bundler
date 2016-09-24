@@ -54,6 +54,16 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
   end
 
   describe "#[]" do
+    context "when the local config file is not found" do
+      subject(:settings) { described_class.new }
+
+      it "does not raise" do
+        expect do
+          subject["foo"]
+        end.not_to raise_error
+      end
+    end
+
     context "when not set" do
       context "when default value present" do
         it "retrieves value" do
