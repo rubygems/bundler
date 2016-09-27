@@ -610,7 +610,10 @@ module Spec
       end
 
       def _default_files
-        @_default_files ||= { "lib/#{name}.rb" => "#{Builders.constantize(name)} = '#{version}'" }
+        @_default_files ||= begin
+          platform_string = " #{@spec.platform}" unless @spec.platform == Gem::Platform::RUBY
+          { "lib/#{name}.rb" => "#{Builders.constantize(name)} = '#{version}#{platform_string}'" }
+        end
       end
 
       def _default_path

@@ -62,6 +62,7 @@ module Bundler
       @specs           = nil
       @ruby_version    = ruby_version
 
+      @lockfile               = lockfile
       @lockfile_contents      = String.new
       @locked_bundler_version = nil
       @locked_ruby_version    = nil
@@ -69,7 +70,8 @@ module Bundler
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
         @locked_gems = LockfileParser.new(@lockfile_contents)
-        @platforms = @locked_gems.platforms
+        @locked_platforms = @locked_gems.platforms
+        @platforms = @locked_platforms.dup
         @locked_bundler_version = @locked_gems.bundler_version
         @locked_ruby_version = @locked_gems.ruby_version
 
@@ -90,27 +92,23 @@ module Bundler
         @locked_deps    = []
         @locked_specs   = SpecSet.new([])
         @locked_sources = []
+        @locked_platforms = []
       end
 
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
-      @unlock[:ruby] ||= if @ruby_version && @locked_ruby_version
-        unless locked_ruby_version_object = RubyVersion.from_string(@locked_ruby_version)
-          raise LockfileError, "Failed to create a `RubyVersion` object from " \
-            "`#{@locked_ruby_version}` found in #{lockfile} -- try running `bundle update --ruby`."
-        end
+      @unlock[:ruby] ||= if @ruby_version && locked_ruby_version_object
         @ruby_version.diff(locked_ruby_version_object)
       end
       @unlocking ||= @unlock[:ruby] ||= (!@locked_ruby_version ^ !@ruby_version)
 
-      @gem_version_promoter = create_gem_version_promoter
-
-      current_platform = Bundler.rubygems.platforms.map {|p| generic(p) }.compact.last
-      add_platform(current_platform)
+      add_current_platform unless Bundler.settings[:frozen]
 
       @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
       @unlock[:gems] = @locked_specs.for(eager_unlock).map(&:name)
+
+      @gem_version_promoter = create_gem_version_promoter
 
       @source_changes = converge_sources
       @dependency_changes = converge_dependencies
@@ -137,17 +135,15 @@ module Bundler
     end
 
     def create_gem_version_promoter
-      locked_specs = begin
+      locked_specs =
         if @unlocking && @locked_specs.empty? && !@lockfile_contents.empty?
           # Definition uses an empty set of locked_specs to indicate all gems
           # are unlocked, but GemVersionPromoter needs the locked_specs
           # for conservative comparison.
-          locked = Bundler::LockfileParser.new(@lockfile_contents)
-          Bundler::SpecSet.new(locked.specs)
+          Bundler::SpecSet.new(@locked_gems.specs)
         else
           @locked_specs
         end
-      end
       GemVersionPromoter.new(locked_specs, @unlock[:gems])
     end
 
@@ -249,7 +245,7 @@ module Bundler
         else
           # Run a resolve against the locally available gems
           Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version, gem_version_promoter)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, gem_version_promoter, additional_base_requirements_for_resolve)
         end
       end
     end
@@ -264,6 +260,8 @@ module Bundler
           dependency_names -= pinned_spec_names(source.specs)
           dependency_names.concat(source.unmet_deps).uniq!
         end
+        idx << Gem::Specification.new("ruby\0", RubyVersion.system.to_gem_version_with_patchlevel)
+        idx << Gem::Specification.new("rubygems\0", Gem::VERSION)
       end
     end
 
@@ -340,6 +338,18 @@ module Bundler
       end
     end
 
+    def locked_ruby_version_object
+      return unless @locked_ruby_version
+      @locked_ruby_version_object ||= begin
+        unless version = RubyVersion.from_string(@locked_ruby_version)
+          raise LockfileError, "The Ruby version #{@locked_ruby_version} from " \
+            "#{@lockfile} could not be parsed. " \
+            "Try running bundle update --ruby to resolve this."
+        end
+        version
+      end
+    end
+
     def to_lock
       out = String.new
 
@@ -403,6 +413,11 @@ module Bundler
       deleted = []
       changed = []
 
+      new_platforms = @platforms - @locked_platforms
+      deleted_platforms = @locked_platforms - @platforms
+      added.concat new_platforms.map {|p| "* platform: #{p}" }
+      deleted.concat deleted_platforms.map {|p| "* platform: #{p}" }
+
       gemfile_sources = sources.lock_sources
 
       new_sources = gemfile_sources - @locked_sources
@@ -451,6 +466,11 @@ module Bundler
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
     end
 
+    def validate_runtime!
+      validate_ruby!
+      validate_platforms!
+    end
+
     def validate_ruby!
       return unless ruby_version
 
@@ -476,6 +496,22 @@ module Bundler
       end
     end
 
+    # TODO: refactor this so that `match_platform` can be called with two platforms
+    DummyPlatform = Struct.new(:platform)
+    class DummyPlatform; include MatchPlatform; end
+    def validate_platforms!
+      return if @platforms.any? do |bundle_platform|
+        bundle_platform = DummyPlatform.new(bundle_platform)
+        Bundler.rubygems.platforms.any? do |local_platform|
+          bundle_platform.match_platform(local_platform)
+        end
+      end
+
+      raise ProductionError, "Your bundle only supports platforms #{@platforms.map(&:to_s)} " \
+        "but your local platforms are #{Bundler.rubygems.platforms.map(&:to_s)}, and " \
+        "there's no compatible match between those two lists."
+    end
+
     def add_platform(platform)
       @new_platform ||= !@platforms.include?(platform)
       @platforms |= [platform]
@@ -484,6 +520,12 @@ module Bundler
     def remove_platform(platform)
       return if @platforms.delete(Gem::Platform.new(platform))
       raise InvalidOption, "Unable to remove the platform `#{platform}` since the only platforms are #{@platforms.join ", "}"
+    end
+
+    def add_current_platform
+      current_platform = Bundler.rubygems.platforms.last
+      add_platform(current_platform) if Bundler.settings[:specific_platform]
+      add_platform(generic(current_platform))
     end
 
     attr_reader :sources
@@ -728,8 +770,38 @@ module Bundler
       @locked_specs.any? {|s| s.satisfies?(dep) && (!dep.source || s.source.include?(dep.source)) }
     end
 
+    # This list of dependencies is only used in #resolve, so it's OK to add
+    # the metadata dependencies here
     def expanded_dependencies
-      @expanded_dependencies ||= expand_dependencies(dependencies, @remote)
+      @expanded_dependencies ||= begin
+        ruby_versions = concat_ruby_version_requirements(@ruby_version)
+        if ruby_versions.empty? || !@ruby_version.exact?
+          concat_ruby_version_requirements(RubyVersion.system)
+          concat_ruby_version_requirements(locked_ruby_version_object) unless @unlock[:ruby]
+        end
+
+        metadata_dependencies = [
+          Dependency.new("ruby\0", ruby_versions),
+          Dependency.new("rubygems\0", Gem::VERSION),
+        ]
+        expand_dependencies(dependencies + metadata_dependencies, @remote)
+      end
+    end
+
+    def concat_ruby_version_requirements(ruby_version, ruby_versions = [])
+      return ruby_versions unless ruby_version
+      if ruby_version.patchlevel
+        ruby_versions << ruby_version.to_gem_version_with_patchlevel
+      else
+        ruby_versions.concat(ruby_version.versions.map do |version|
+          requirement = Gem::Requirement.new(version)
+          if requirement.exact?
+            "~> #{version}.0"
+          else
+            requirement
+          end
+        end)
+      end
     end
 
     def expand_dependencies(dependencies, remote = false)
@@ -811,6 +883,15 @@ module Bundler
         end
         requires
       end
+    end
+
+    def additional_base_requirements_for_resolve
+      return [] unless @locked_gems && Bundler.settings[:only_update_to_newer_versions]
+      @locked_gems.specs.reduce({}) do |requirements, locked_spec|
+        dep = Gem::Dependency.new(locked_spec.name, ">= #{locked_spec.version}")
+        requirements[locked_spec.name] = DepProxy.new(dep, locked_spec.platform)
+        requirements
+      end.values
     end
   end
 end

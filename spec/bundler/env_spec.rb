@@ -15,6 +15,7 @@ describe Bundler::Env do
       expect(out).to include(Gem::VERSION)
       expect(out).to include(env.send(:ruby_version))
       expect(out).to include(env.send(:git_version))
+      expect(out).to include(OpenSSL::OPENSSL_VERSION)
     end
 
     context "when there is a Gemfile and a lockfile and print_gemfile is true" do
@@ -45,6 +46,14 @@ describe Bundler::Env do
       it "prints the lockfile" do
         expect(output).to include("Gemfile.lock")
         expect(output).to include("rack (1.0.0)")
+      end
+    end
+
+    context "when there no Gemfile and print_gemfile is true" do
+      let(:output) { env.report(:print_gemfile => true) }
+
+      it "prints the environment" do
+        expect(output).to start_with("Environment")
       end
     end
 

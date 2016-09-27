@@ -207,7 +207,7 @@ module Bundler
       end unless Bundler.bundle_path.exist?
     rescue Errno::EEXIST
       raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " \
-        "because of an invalid symlink. Remove the symlink so the directory can be created."
+        "because a file already exists at that path. Either remove or rename the file so the directory can be created."
     end
 
     def resolve_if_need(options)

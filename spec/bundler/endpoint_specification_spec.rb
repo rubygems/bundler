@@ -50,4 +50,17 @@ describe Bundler::EndpointSpecification do
       end
     end
   end
+
+  describe "#parse_metadata" do
+    context "when the metadata has malformed requirements" do
+      let(:metadata) { { "rubygems" => ">\n" } }
+      it "raises a helpful error message" do
+        expect { subject }.to raise_error(
+          Bundler::GemspecError,
+          a_string_including("There was an error parsing the metadata for the gem foo (1.0.0)").
+            and(a_string_including('The metadata was {"rubygems"=>">\n"}'))
+        )
+      end
+    end
+  end
 end

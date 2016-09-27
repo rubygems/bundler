@@ -46,7 +46,7 @@ module Bundler
 
       def to_lock
         out = String.new("PATH\n")
-        out << "  remote: #{relative_path}\n"
+        out << "  remote: #{lockfile_path}\n"
         out << "  glob: #{@glob}\n" unless @glob == DEFAULT_GLOB
         out << "  specs:\n"
       end
@@ -127,6 +127,11 @@ module Bundler
         Bundler.ui.debug(e)
         raise PathError, "There was an error while trying to use the path " \
           "`#{somepath}`.\nThe error message was: #{e.message}."
+      end
+
+      def lockfile_path
+        return relative_path if path.absolute?
+        expand(path).relative_path_from(Bundler.root)
       end
 
       def app_cache_path(custom_path = nil)

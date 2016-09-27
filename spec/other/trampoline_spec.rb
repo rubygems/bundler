@@ -59,6 +59,24 @@ describe "bundler version trampolining" do
     end
   end
 
+  context "without BUNDLE_ENABLE_TRAMPOLINE" do
+    before { ENV["BUNDLE_ENABLE_TRAMPOLINE"] = nil }
+
+    context "when the version is >= 2" do
+      let(:version) { "2.7182818285" }
+      before do
+        simulate_bundler_version version do
+          install_gemfile! ""
+        end
+      end
+
+      it "trampolines automatically", :realworld => true do
+        bundle "--version"
+        expect(err).to include("Installing locked Bundler version #{version}...")
+      end
+    end
+  end
+
   context "installing missing bundler versions", :realworld => true do
     before do
       ENV["BUNDLER_VERSION"] = "1.12.3"

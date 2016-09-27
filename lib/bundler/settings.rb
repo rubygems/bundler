@@ -6,6 +6,7 @@ module Bundler
     BOOL_KEYS = %w(
       allow_offline_install
       cache_all
+      disable_checksum_validation
       disable_exec_load
       disable_local_branch_check
       disable_shared_gems
@@ -16,6 +17,7 @@ module Bundler
       major_deprecations
       no_install
       no_prune
+      only_update_to_newer_versions
       plugins
       silence_root_warning
     ).freeze
@@ -40,11 +42,18 @@ module Bundler
       @local_config    = load_config(local_config_file)
       @global_config   = load_config(global_config_file)
       @cli_flags_given = false
+      @temporary       = {}
     end
 
     def [](name)
       key = key_for(name)
-      value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
+      value = @temporary.fetch(name) do
+              @local_config.fetch(key) do
+              ENV.fetch(key) do
+              @global_config.fetch(key) do
+              DEFAULT_CONFIG.fetch(name) do
+                nil
+              end end end end end
 
       if value.nil?
         nil
@@ -74,8 +83,18 @@ module Bundler
       local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
       set_key(key, value, @local_config, local_config_file)
     end
-
     alias_method :set_local, :[]=
+
+    def temporary(update)
+      existing = Hash[update.map {|k, _| [k, @temporary[k]] }]
+      @temporary.update(update)
+      return unless block_given?
+      begin
+        yield
+      ensure
+        existing.each {|k, v| v.nil? ? @temporary.delete(k) : @temporary[k] = v }
+      end
+    end
 
     def delete(key)
       @local_config.delete(key_for(key))
@@ -277,7 +296,7 @@ module Bundler
     }xo
 
     def load_config(config_file)
-      return unless config_file
+      return {} unless config_file
       SharedHelpers.filesystem_access(config_file, :read) do |file|
         valid_file = file.exist? && !file.size.zero?
         return {} if ignore_config? || !valid_file

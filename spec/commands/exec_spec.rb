@@ -564,6 +564,42 @@ describe "bundle exec" do
       it_behaves_like "it runs"
     end
 
+    context "regarding $0 and __FILE__" do
+      let(:executable) { super() + <<-'RUBY' }
+
+        puts "$0: #{$0.inspect}"
+        puts "__FILE__: #{__FILE__.inspect}"
+      RUBY
+
+      let(:expected) { super() + <<-EOS.chomp }
+
+$0: #{path.to_s.inspect}
+__FILE__: #{path.to_s.inspect}
+      EOS
+
+      it_behaves_like "it runs"
+
+      context "when the path is relative" do
+        let(:path) { super().relative_path_from(bundled_app) }
+
+        if LessThanProc.with(RUBY_VERSION).call("1.9")
+          pending "relative paths have ./ __FILE__"
+        else
+          it_behaves_like "it runs"
+        end
+      end
+
+      context "when the path is relative with a leading ./" do
+        let(:path) { Pathname.new("./#{super().relative_path_from(Pathname.pwd)}") }
+
+        if LessThanProc.with(RUBY_VERSION).call("< 1.9")
+          pending "relative paths with ./ have absolute __FILE__"
+        else
+          it_behaves_like "it runs"
+        end
+      end
+    end
+
     context "signals being trapped by bundler" do
       let(:executable) { strip_whitespace <<-RUBY }
         #{shebang}

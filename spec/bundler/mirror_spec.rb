@@ -131,6 +131,16 @@ describe Bundler::Settings::Mirror do
         end
       end
     end
+
+    describe "#==" do
+      it "returns true if uri and fallback timeout are the same" do
+        uri = "https://ruby.taobao.org"
+        mirror = Bundler::Settings::Mirror.new(uri, 1)
+        another_mirror = Bundler::Settings::Mirror.new(uri, 1)
+
+        expect(mirror == another_mirror).to be true
+      end
+    end
   end
 end
 

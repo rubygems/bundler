@@ -393,7 +393,8 @@ module Bundler
                      "as an option for #{command}, but it is invalid."
                    end
 
-        message << " Valid options are: #{valid_keys.join(", ")}"
+        message << " Valid options are: #{valid_keys.join(", ")}."
+        message << " You may be able to resolve this by upgrading Bundler to the newest version."
         raise InvalidOption, message
       end
     end

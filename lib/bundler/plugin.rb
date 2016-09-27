@@ -62,7 +62,9 @@ module Bundler
 
       save_plugins plugins, installed_specs, builder.inferred_plugins
     rescue => e
-      Bundler.ui.error "Failed to install plugin: #{e.message}\n  #{e.backtrace[0]}"
+      unless e.is_a?(GemfileError)
+        Bundler.ui.error "Failed to install plugin: #{e.message}\n  #{e.backtrace[0]}"
+      end
       raise
     end
 
@@ -158,7 +160,7 @@ module Bundler
     #
     # @param [String] event
     def hook(event, *args, &arg_blk)
-      return unless Bundler.settings[:plugins]
+      return unless Bundler.feature_flag.plugins?
 
       plugins = index.hook_plugins(event)
       return unless plugins.any?

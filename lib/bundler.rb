@@ -27,6 +27,7 @@ module Bundler
   autoload :EndpointSpecification,  "bundler/endpoint_specification"
   autoload :Env,                    "bundler/env"
   autoload :Fetcher,                "bundler/fetcher"
+  autoload :FeatureFlag,            "bundler/feature_flag"
   autoload :GemHelper,              "bundler/gem_helper"
   autoload :GemHelpers,             "bundler/gem_helpers"
   autoload :GemVersionPromoter,     "bundler/gem_version_promoter"
@@ -90,7 +91,7 @@ module Bundler
       # Return if all groups are already loaded
       return @setup if defined?(@setup) && @setup
 
-      definition.validate_ruby!
+      definition.validate_runtime!
 
       SharedHelpers.print_major_deprecations!
 
@@ -328,16 +329,22 @@ EOF
     def sudo(str)
       SUDO_MUTEX.synchronize do
         prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
-        Your user account isn't allowed to install to the system Rubygems.
+        Your user account isn't allowed to install to the system RubyGems.
         You can cancel this installation and run:
 
             bundle install --path vendor/bundle
 
         to install the gems into ./vendor/bundle/, or you can enter your password
-        and install the bundled gems to Rubygems using sudo.
+        and install the bundled gems to RubyGems using sudo.
 
         Password:
         PROMPT
+
+        unless @prompted_for_sudo ||= system(%(sudo -k -p "#{prompt}" true))
+          raise SudoNotPermittedError,
+            "Bundler requires sudo access to install at the moment. " \
+            "Try installing again, granting Bundler sudo access when prompted, or installing into a different path."
+        end
 
         `sudo -p "#{prompt}" #{str}`
       end
@@ -387,6 +394,10 @@ EOF
     def git_present?
       return @git_present if defined?(@git_present)
       @git_present = Bundler.which("git") || Bundler.which("git.exe")
+    end
+
+    def feature_flag
+      @feature_flag ||= FeatureFlag.new(VERSION)
     end
 
     def reset!

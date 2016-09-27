@@ -72,6 +72,42 @@ describe "bundle update" do
     end
   end
 
+  describe "when a possible resolve requires an older version of a locked gem" do
+    context "and only_update_to_newer_versions is set" do
+      before do
+        bundle! "config only_update_to_newer_versions true"
+      end
+      it "does not go to an older version" do
+        build_repo4 do
+          build_gem "a" do |s|
+            s.add_dependency "b"
+            s.add_dependency "c"
+          end
+          build_gem "b"
+          build_gem "c"
+          build_gem "c", "2.0"
+        end
+
+        install_gemfile! <<-G
+          source "file:#{gem_repo4}"
+          gem "a"
+        G
+
+        expect(the_bundle).to include_gems("a 1.0", "b 1.0", "c 2.0")
+
+        update_repo4 do
+          build_gem "b", "2.0" do |s|
+            s.add_dependency "c", "< 2"
+          end
+        end
+
+        bundle! "update"
+
+        expect(the_bundle).to include_gems("a 1.0", "b 1.0", "c 2.0")
+      end
+    end
+  end
+
   describe "with --local option" do
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)

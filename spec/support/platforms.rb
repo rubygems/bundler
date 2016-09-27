@@ -11,6 +11,10 @@ module Spec
       Gem::Platform.new("x86-darwin-10")
     end
 
+    def x64_mac
+      Gem::Platform.new("x86_64-darwin-15")
+    end
+
     def java
       Gem::Platform.new([nil, "java", nil])
     end

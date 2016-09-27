@@ -35,6 +35,14 @@ describe "Bundler::RubyVersion and its subclasses" do
         end
       end
 
+      context "with engine in symbol" do
+        let(:engine) { :jruby }
+
+        it "should coerce engine to string" do
+          expect(subject.engine).to eq("jruby")
+        end
+      end
+
       context "is called with multiple requirements" do
         let(:version) { ["<= 2.0.0", "> 1.9.3"] }
         let(:engine_version) { nil }

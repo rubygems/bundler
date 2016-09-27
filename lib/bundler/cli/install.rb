@@ -63,10 +63,10 @@ module Bundler
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
-      Plugin.gemfile_install(Bundler.default_gemfile) if Bundler.settings[:plugins]
+      Plugin.gemfile_install(Bundler.default_gemfile) if Bundler.feature_flag.plugins?
 
       definition = Bundler.definition
-      definition.validate_ruby!
+      definition.validate_runtime!
 
       installer = Installer.install(Bundler.root, definition, options)
       Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]

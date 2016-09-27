@@ -20,6 +20,7 @@ module Bundler
       out << "    GEM_PATH  #{ENV["GEM_PATH"]}\n" unless ENV["GEM_PATH"] == ENV["GEM_HOME"]
       out << "    RVM       #{ENV["rvm_version"]}\n" if ENV["rvm_version"]
       out << "    Git       #{git_version}\n"
+      out << "    OpenSSL   #{OpenSSL::OPENSSL_VERSION}\n" if defined?(OpenSSL::OPENSSL_VERSION)
       %w(rubygems-bundler open_gem).each do |name|
         specs = Bundler.rubygems.find_name(name)
         out << "    #{name} (#{specs.map(&:version).join(",")})\n" unless specs.empty?
@@ -32,6 +33,8 @@ module Bundler
           out << "      " << line << "\n"
         end
       end
+
+      return out unless SharedHelpers.in_bundle?
 
       if print_gemfile
         out << "\n#{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}\n\n"

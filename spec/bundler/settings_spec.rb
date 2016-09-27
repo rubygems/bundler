@@ -54,6 +54,16 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
   end
 
   describe "#[]" do
+    context "when the local config file is not found" do
+      subject(:settings) { described_class.new }
+
+      it "does not raise" do
+        expect do
+          subject["foo"]
+        end.not_to raise_error
+      end
+    end
+
     context "when not set" do
       context "when default value present" do
         it "retrieves value" do
@@ -93,6 +103,18 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
         expect { settings[:frozen] = "1" }.
           to raise_error(Bundler::PermissionError, /config/)
       end
+    end
+  end
+
+  describe "#temporary" do
+    it "reset after used" do
+      Bundler.settings[:no_install] = true
+
+      Bundler.settings.temporary(:no_install => false) do
+        expect(Bundler.settings[:no_install]).to eq false
+      end
+
+      expect(Bundler.settings[:no_install]).to eq true
     end
   end
 

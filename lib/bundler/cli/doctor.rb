@@ -14,11 +14,11 @@ module Bundler
     end
 
     def otool_available?
-      system("otool --version 2>&1 >#{Bundler::NULL}")
+      system("otool --version 2>#{Bundler::NULL} >#{Bundler::NULL}")
     end
 
     def ldd_available?
-      !system("ldd --help 2>&1 >#{Bundler::NULL}").nil?
+      !system("ldd --help 2>#{Bundler::NULL} >#{Bundler::NULL}").nil?
     end
 
     def dylibs_darwin(path)
@@ -55,21 +55,17 @@ module Bundler
       Dir.glob("#{spec.full_gem_path}/**/*.bundle")
     end
 
+    def check!
+      require "bundler/cli/check"
+      Bundler::CLI::Check.new({}).run
+    end
+
     def run
       Bundler.ui.level = "error" if options[:quiet]
+      check!
 
+      definition = Bundler.definition
       broken_links = {}
-
-      begin
-        definition = Bundler.definition
-        definition.validate_ruby!
-        not_installed = definition.missing_specs
-        raise GemNotFound if not_installed.any?
-      rescue GemNotFound
-        Bundler.ui.warn "This bundle's gems must be installed to run this command."
-        Bundler.ui.warn "Install missing gems with `bundle install`."
-        exit 0
-      end
 
       definition.specs.each do |spec|
         bundles_for_gem(spec).each do |bundle|
@@ -82,13 +78,15 @@ module Bundler
       end
 
       if broken_links.any?
-        Bundler.ui.error "The following gems are missing OS dependencies"
-        broken_links.each do |spec, paths|
-          paths.uniq.each do |path|
-            Bundler.ui.error " * #{spec.name}: #{path}"
+        message = "The following gems are missing OS dependencies:"
+        broken_links.map do |spec, paths|
+          paths.uniq.map do |path|
+            "\n * #{spec.name}: #{path}"
           end
-        end
-        exit 1
+        end.flatten.sort.each {|m| message += m }
+        raise ProductionError, message
+      else
+        Bundler.ui.info "No issues found with the installed bundle"
       end
     end
   end

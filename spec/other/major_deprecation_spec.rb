@@ -4,6 +4,22 @@ require "spec_helper"
 describe "major deprecations" do
   let(:warnings) { out } # change to err in 2.0
 
+  context "in a .99 version" do
+    before do
+      simulate_bundler_version "1.99.1"
+      bundle "config --delete major_deprecations"
+    end
+
+    it "prints major deprecations without being configured" do
+      ruby <<-R
+        require "bundler"
+        Bundler::SharedHelpers.major_deprecation(Bundler::VERSION)
+      R
+
+      expect(warnings).to have_major_deprecation("1.99.1")
+    end
+  end
+
   before do
     bundle "config major_deprecations true"
 

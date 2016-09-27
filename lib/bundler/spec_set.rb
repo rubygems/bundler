@@ -24,17 +24,9 @@ module Bundler
         dep = deps.shift
         next if handled[dep] || skip.include?(dep.name)
 
-        spec = lookup[dep.name].find do |s|
-          if match_current_platform
-            Gem::Platform.match(s.platform)
-          else
-            s.match_platform(dep.__platform)
-          end
-        end
-
         handled[dep] = true
 
-        if spec
+        if spec = spec_for_dependency(dep, match_current_platform)
           specs << spec
 
           spec.dependencies.each do |d|
@@ -99,6 +91,20 @@ module Bundler
       SpecSet.new(materialized.compact)
     end
 
+    # Materialize for all the specs in the spec set, regardless of what platform they're for
+    # This is in contrast to how for does platform filtering (and specifically different from how `materialize` calls `for` only for the current platform)
+    # @return [Array<Gem::Specification>]
+    def materialized_for_all_platforms
+      names = @specs.map(&:name).uniq
+      @specs.map do |s|
+        next s unless s.is_a?(LazySpecification)
+        s.source.dependency_names = names if s.source.respond_to?(:dependency_names=)
+        spec = s.__materialize__
+        raise GemNotFound, "Could not find #{s.full_name} in any of the sources" unless spec
+        spec
+      end
+    end
+
     def merge(set)
       arr = sorted.dup
       set.each do |s|
@@ -133,10 +139,7 @@ module Bundler
     def lookup
       @lookup ||= begin
         lookup = Hash.new {|h, k| h[k] = [] }
-        specs = @specs.sort_by do |s|
-          s.platform.to_s == "ruby" ? "\0" : s.platform.to_s
-        end
-        specs.reverse_each do |s|
+        Index.sort_specs(@specs).reverse_each do |s|
           lookup[s.name] << s
         end
         lookup
@@ -145,6 +148,18 @@ module Bundler
 
     def tsort_each_node
       @specs.each {|s| yield s }
+    end
+
+    def spec_for_dependency(dep, match_current_platform)
+      if match_current_platform
+        Bundler.rubygems.platforms.reverse_each do |pl|
+          match = GemHelpers.select_best_platform_match(lookup[dep.name], pl)
+          return match if match
+        end
+        nil
+      else
+        GemHelpers.select_best_platform_match(lookup[dep.name], dep.__platform)
+      end
     end
 
     def tsort_each_child(s)

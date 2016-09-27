@@ -1,3 +1,46 @@
+## 1.13.1 (2016-09-13)
+
+Bugfixes:
+
+  - ensure that `Gem::Source` is available, fixing several exceptions (#4944, @dekellum)
+  - ensure that dependency resolution works when multiple gems have the same dependency (#4961, @segiddins)
+
+## 1.13.0 (2016-09-05)
+
+This space deliberately left blank.
+
+## 1.13.0.rc.2 (2016-08-21)
+
+Features:
+
+  - add setting `exec_disable_load` to force `exec` to spawn a new Ruby process (@segiddins)
+  - add `doctor` command to help with issues like unlinked compiled gems (#4765, @mistydemeo)
+  - rework the `update` command, providing fine-grained control via flags (#4676, @chrismo)
+  - add URI to http response output in debug mode (#4808, @NickLaMuro)
+  - add manpage for `binstubs` command (#4847, @Zorbash)
+  - support `mirror` settings for sources by hostname, not only full URL (@opiethehokie)
+  - print gem installation errors after other install output (#4834, @segiddins)
+  - add `lock --remove-platform` flag to remove platforms from the lock (#4877, @segiddins)
+  - add `only_update_to_newer_versions` setting to prevent downgrades during `update` (@segiddins)
+  - expanded experimental plugin support to include hooks and sources (@asutoshpalai)
+
+Bugfixes:
+
+  - retry gem downloads (#4846, @jkeiser)
+  - improve the CompactIndex to handle capitalized legacy gems (#4867, @segiddins)
+  - re-use persistent HTTP connections for CompactIndex (@NickLaMuro)
+  - respect `required_ruby_version` when Gemfile contains `ruby` version (@indirect)
+  - allow `rake release` to sign git tags (#4743, @eagletmt)
+  - set process titles when using `#load` during `exec` (@yob)
+  - recognize JRuby shebangs for using `#load` during `exec` (@ojab)
+  - handle world-writable home directories (#4726, @allenzhao)
+  - support multi-platform gems via the `gemspec` Gemfile method (#4798, @segiddins)
+  - print dots correctly for CompactIndex fetcher (@NickLaMuro)
+  - set an `open_timeout` when requesting gem data via HTTP (@NickLaMuro)
+  - rename the BUNDLE\_ORIG\_ENV variable so it no longer shows up in `config` (@indirect)
+  - show help only when `-h` or `--help` is passed to Bundler, not to `exec` (#4801, @segiddins)
+  - handle symlinks to binstubs created by `--standalone` (#4782, @terinjokes)
+
 ## 1.13.0.rc.1 (2016-06-27)
 
 Features:
@@ -5,7 +48,7 @@ Features:
   - when `bundle config major_deprecations` or `BUNDLE_MAJOR_DEPRECATIONS` is set, deprecation warnings for bundler 2 will be printed (@segiddins)
   - when running with `--verbose`, bundler will print the reason it is re-resolving a gemfile (@segiddins)
 
-Bug fixes:
+Bugfixes:
 
   - fix support for running RubyGems 1.x on Ruby 2.3 (#4698, @segiddins)
   - fix bundle exec'ing to a ruby file when gems are installed into a path (#4592, @chrismo)

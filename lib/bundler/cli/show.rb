@@ -13,7 +13,7 @@ module Bundler
 
     def run
       Bundler.ui.silence do
-        Bundler.definition.validate_ruby!
+        Bundler.definition.validate_runtime!
         Bundler.load.lock
       end
 

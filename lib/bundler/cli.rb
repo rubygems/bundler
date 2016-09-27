@@ -92,7 +92,7 @@ module Bundler
     end
 
     def self.handle_no_command_error(command, has_namespace = $thor_runner)
-      if Bundler.settings[:plugins] && Bundler::Plugin.command?(command)
+      if Bundler.feature_flag.plugins? && Bundler::Plugin.command?(command)
         return Bundler::Plugin.exec_command(command, ARGV[1..-1])
       end
 
@@ -184,11 +184,9 @@ module Bundler
     map "i" => "install"
     def install
       require "bundler/cli/install"
-      no_install = Bundler.settings[:no_install]
-      Bundler.settings[:no_install] = false if no_install == true
-      Install.new(options.dup).run
-    ensure
-      Bundler.settings[:no_install] = no_install unless no_install.nil?
+      Bundler.settings.temporary(:no_install => false) do
+        Install.new(options.dup).run
+      end
     end
 
     desc "update [OPTIONS]", "update the current environment"
@@ -255,7 +253,7 @@ module Bundler
       "Overwrite existing binstubs if they exist"
     method_option "path", :type => :string, :lazy_default => "bin", :banner =>
       "Binstub destination directory (default bin)"
-    method_option "standalone", :type => :array, :lazy_default => [], :banner =>
+    method_option "standalone", :type => :boolean, :banner =>
       "Make binstubs that can work without the Bundler runtime"
     def binstubs(*gems)
       require "bundler/cli/binstubs"
@@ -437,12 +435,13 @@ module Bundler
 
     desc "inject GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
     def inject(name, version, *gems)
+      SharedHelpers.major_deprecation "The `inject` command has been replaced by the `add` command"
       require "bundler/cli/inject"
       Inject.new(options, name, version, gems).run
     end
 
     desc "lock", "Creates a lockfile without installing"
-    method_option "update", :type => :array, :lazy_default => [], :banner =>
+    method_option "update", :type => :array, :lazy_default => true, :banner =>
       "ignore the existing lockfile, update all gems by default, or update list of given gems"
     method_option "local", :type => :boolean, :default => false, :banner =>
       "do not attempt to fetch remote gemspecs and use the local gem cache only"
@@ -466,16 +465,6 @@ module Bundler
       Env.new.write($stdout)
     end
 
-    desc "add GEM [VERSION]", "Add the specified gem to the bottom of Gemfile"
-    method_option "group", :type => :array, :aliases => "-g", :desc => "Specify groups to add the gem in"
-    method_option "source", :type => :string, :aliases => "-s", :desc => "Specify the gem's source"
-    method_option "pre", :type => :boolean, :aliases => "-p", :default => false, :desc => "Check for newer pre-release gems"
-    method_option "timestamp", :type => :boolean, :aliases => "-t", :default => false, :desc => "Append timestamp to Gemfile"
-    def add(name, version = nil, *gems)
-      require "bundler/cli/inject"
-      Inject.new(options, name, version, gems).run
-    end
-
     desc "doctor [OPTIONS]", "Checks the bundle for common problems"
     long_desc <<-D
       Doctor scans the OS dependencies of each of the gems requested in the Gemfile. If
@@ -491,7 +480,7 @@ module Bundler
       Doctor.new(options).run
     end
 
-    if Bundler.settings[:plugins]
+    if Bundler.feature_flag.plugins?
       require "bundler/cli/plugin"
       desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
       subcommand "plugin", Plugin

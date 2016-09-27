@@ -50,7 +50,7 @@ describe "Resolving platform craziness" do
       # mingw is _not_ hardcoded to add CPU x86 in rubygems
       platforms "x86-mingw32"
       dep "thin"
-      should_resolve_as %w(thin-1.2.7-x86-mingw32)
+      should_resolve_as %w(thin-1.2.7-mingw32)
     end
 
     it "finds x64-mingw gems" do
