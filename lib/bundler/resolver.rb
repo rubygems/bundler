@@ -250,7 +250,6 @@ module Bundler
     end
 
     def search_for(dependency)
-      puts "Searching for #{dependency}"
       platform = dependency.__platform
       dependency = dependency.dep unless dependency.is_a? Gem::Dependency
       search = @search_for[dependency] ||= begin
