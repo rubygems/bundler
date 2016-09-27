@@ -55,7 +55,11 @@ module Bundler
     end
 
     def __materialize__
-      @specification = source.specs.search(Gem::Dependency.new(name, version)).last
+      @specification = if source.is_a?(Source::Gemspec) && source.gemspec.name == name
+        source.gemspec.tap {|s| s.source = source }
+      else
+        source.specs.search(Gem::Dependency.new(name, version)).last
+      end
     end
 
     def respond_to?(*args)
