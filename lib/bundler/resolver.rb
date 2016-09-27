@@ -250,6 +250,7 @@ module Bundler
     end
 
     def search_for(dependency)
+      puts "Searching for #{dependency}"
       platform = dependency.__platform
       dependency = dependency.dep unless dependency.is_a? Gem::Dependency
       search = @search_for[dependency] ||= begin
@@ -365,7 +366,11 @@ module Bundler
                        "Source does not contain any versions of '#{requirement}'"
                      end
         else
-          cache_message = Bundler.app_cache.exist? ? " or in gems cached in vendor/cache" : ""
+          cache_message = begin
+                            " or in gems cached in #{Bundler.settings.app_cache_path}" if Bundler.app_cache.exist?
+                          rescue GemfileNotFound
+                            nil
+                          end
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
             "listed in your Gemfile#{cache_message}."
         end
