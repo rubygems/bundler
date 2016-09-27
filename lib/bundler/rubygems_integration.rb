@@ -397,6 +397,17 @@ module Bundler
         spec
       end
 
+      redefine_method(gem_class, :activate_bin_path) do |name, *args|
+        exec_name = args.first
+        return ENV["BUNDLE_BIN_PATH"] if exec_name == "bundle"
+
+        # Copy of Rubygems activate_bin_path impl
+        requirement = args.last
+        spec = find_spec_for_exe name, exec_name, [requirement]
+        Gem::LOADED_SPECS_MUTEX.synchronize { spec.activate }
+        spec.bin_file exec_name
+      end
+
       redefine_method(gem_class, :bin_path) do |name, *args|
         exec_name = args.first
         return ENV["BUNDLE_BIN_PATH"] if exec_name == "bundle"

@@ -2,8 +2,9 @@
 require "spec_helper"
 
 describe "bundle exec" do
+  let(:system_gems_to_install) { %w(rack-1.0.0 rack-0.9.1) }
   before :each do
-    system_gems "rack-1.0.0", "rack-0.9.1"
+    system_gems(system_gems_to_install)
   end
 
   it "activates the correct gem" do
@@ -625,6 +626,28 @@ __FILE__: #{path.to_s.inspect}
 
         expect(out).to eq("foo")
       end
+    end
+  end
+
+  context "nested bundle exec" do
+    let(:system_gems_to_install) { super() << :bundler }
+    before do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      bundle :install, :system_bundler => true, :path => "vendor/bundler"
+    end
+
+    it "overrides disable_shared_gems so bundler can be found" do
+      file = bundled_app("file_that_bundle_execs.rb")
+      create_file(file, <<-RB)
+        #!#{Gem.ruby}
+        puts `bundle exec echo foo`
+      RB
+      file.chmod(0o777)
+      bundle! "exec #{file}", :system_bundler => true
+      expect(out).to eq("foo")
     end
   end
 end

@@ -143,12 +143,12 @@ describe Bundler do
 
   describe "configuration" do
     context "disable_shared_gems" do
-      it "should unset GEM_PATH with nil" do
+      it "should unset GEM_PATH with empty string" do
         env = {}
         settings = { :disable_shared_gems => true }
         Bundler.send(:configure_gem_path, env, settings)
         expect(env.keys).to include("GEM_PATH")
-        expect(env["GEM_PATH"]).to be_nil
+        expect(env["GEM_PATH"]).to eq ""
       end
     end
   end
