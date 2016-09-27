@@ -12,7 +12,7 @@ If you have any questions after reading this page, please feel free to contact e
 
 ## How you can help
 
-We track [small bugs and features](https://github.com/bundler/bundler/issues?labels=small) so that anyone who wants to help can start with something that's not too overwhelming. We also keep a [list of things anyone can help with, any time](https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md#contributing). If nothing on those lists looks good, talk to us, and we'll figure out what you can help with. We can absolutely use your help, no matter what level of programming skill you have at the moment.
+We track [small bugs and features](https://github.com/bundler/bundler/labels/contribution%3A%20small) so that anyone who wants to help can start with something that's not too overwhelming. We also keep a [list of things anyone can help with, any time](https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md#contributing). If nothing on those lists looks good, talk to us, and we'll figure out what you can help with. We can absolutely use your help, no matter what level of programming skill you have at the moment.
 
 # Development setup
 
