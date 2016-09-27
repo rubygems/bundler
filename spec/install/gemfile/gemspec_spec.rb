@@ -409,4 +409,37 @@ describe "bundle install from an existing gemspec" do
       end
     end
   end
+
+  context "with multiple platforms" do
+    before do
+      build_lib("foo", :path => tmp.join("foo")) do |s|
+        s.version = "1.0.0"
+        s.add_development_dependency "rack"
+        s.write "foo-universal-java.gemspec", build_spec("foo", "1.0.0", "universal-java") {|sj| sj.runtime "rack", "1.0.0" }.first.to_ruby
+      end
+    end
+
+    it "installs the ruby platform gemspec" do
+      simulate_platform "ruby"
+
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
+      G
+
+      expect(the_bundle).to include_gems "foo 1.0.0", "rack 1.0.0"
+    end
+
+    it "installs the ruby platform gemspec and skips dev deps with --without development" do
+      simulate_platform "ruby"
+
+      install_gemfile! <<-G, :without => "development"
+        source "file://#{gem_repo1}"
+        gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
+      G
+
+      expect(the_bundle).to include_gem "foo 1.0.0"
+      expect(the_bundle).not_to include_gem "rack"
+    end
+  end
 end
