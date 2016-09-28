@@ -19,6 +19,8 @@ bundle install
 bundle exec rspec
 ```
 
+For help with installation issues, see [ISSUES](https://github.com/bundler/bundler/blob/master/ISSUES.md)
+
 See [bundler.io](http://bundler.io) for the full documentation.
 
 ### Troubleshooting
