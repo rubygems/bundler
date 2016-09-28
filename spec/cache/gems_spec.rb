@@ -238,7 +238,7 @@ describe "bundle cache" do
         gem "platform_specific"
       G
 
-      expect(cached_gem("platform_specific-1.0-#{Gem::Platform.local}")).to exist
+      expect(cached_gem("platform_specific-1.0-#{Bundler.local_platform}")).to exist
       expect(cached_gem("platform_specific-1.0-java")).to exist
     end
 

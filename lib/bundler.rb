@@ -258,6 +258,11 @@ EOF
       with_clean_env { Kernel.exec(*args) }
     end
 
+    def local_platform
+      return Gem::Platform::RUBY if settings[:only_ruby_platform]
+      Gem::Platform.local
+    end
+
     def default_gemfile
       SharedHelpers.default_gemfile
     end

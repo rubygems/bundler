@@ -25,7 +25,7 @@ module Bundler
     module_function :generic
 
     def generic_local_platform
-      generic(Gem::Platform.local)
+      generic(Bundler.local_platform)
     end
     module_function :generic_local_platform
 
