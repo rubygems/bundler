@@ -80,6 +80,7 @@ module Bundler
     end
 
     def platforms
+      return [Gem::Platform::RUBY] if Bundler.settings[:only_ruby_platform]
       Gem.platforms
     end
 
