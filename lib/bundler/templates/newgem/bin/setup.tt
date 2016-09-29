@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd -
+cd -P -- "$(dirname -- "$0")"
 IFS=$'\n\t'
 set -vx
 
