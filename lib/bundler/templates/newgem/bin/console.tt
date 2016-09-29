@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+# help script to find ../lib/ if a shell executes it with another directory
+# set as active (like Mac OS Finder does)
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
 require "bundler/setup"
 require "<%= config[:namespaced_path] %>"
 
