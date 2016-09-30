@@ -17,7 +17,6 @@ Lint/Eval:
 Lint/HandleExceptions:
   Exclude:
     - 'lib/bundler/installer.rb'
-    - 'lib/bundler/psyched_yaml.rb'
     - 'lib/bundler/vendored_persistent.rb'
 
 # Offense count: 1
@@ -122,7 +121,6 @@ Style/ConditionalAssignment:
     - 'lib/bundler/cli/platform.rb'
     - 'lib/bundler/dsl.rb'
     - 'lib/bundler/lazy_specification.rb'
-    - 'lib/bundler/psyched_yaml.rb'
     - 'lib/bundler/rubygems_integration.rb'
     - 'lib/bundler/source/git.rb'
     - 'lib/bundler/source/rubygems.rb'
