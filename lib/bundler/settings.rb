@@ -5,6 +5,7 @@ module Bundler
   class Settings
     BOOL_KEYS = %w(
       allow_offline_install
+      auto_install
       cache_all
       disable_checksum_validation
       disable_exec_load
