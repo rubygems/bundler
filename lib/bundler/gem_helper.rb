@@ -98,7 +98,7 @@ module Bundler
         allowed_push_host = @gemspec.metadata["allowed_push_host"]
         gem_command += " --host #{allowed_push_host}" if allowed_push_host
       end
-      unless allowed_push_host || Pathname.new("~/.gem/credentials").expand_path.file?
+      unless allowed_push_host || Bundler.user_home.join(".gem/credentials").file?
         raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
       end
       sh(gem_command)

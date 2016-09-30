@@ -36,8 +36,10 @@ module Bundler
     ensure
       self.options ||= {}
       Bundler.settings.cli_flags_given = !options.empty?
+      unprinted_warnings = Bundler.ui.unprinted_warnings
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
+      unprinted_warnings.each {|w| Bundler.ui.warn(w) }
 
       if ENV["RUBYGEMS_GEMDEPS"] && !ENV["RUBYGEMS_GEMDEPS"].empty?
         Bundler.ui.warn(

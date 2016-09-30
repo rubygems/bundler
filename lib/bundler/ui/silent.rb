@@ -2,6 +2,10 @@
 module Bundler
   module UI
     class Silent
+      def initialize
+        @warnings = []
+      end
+
       def add_color(string, color)
         string
       end
@@ -13,6 +17,7 @@ module Bundler
       end
 
       def warn(message, newline = nil)
+        @warnings |= [message]
       end
 
       def error(message, newline = nil)
@@ -43,6 +48,10 @@ module Bundler
 
       def silence
         yield
+      end
+
+      def unprinted_warnings
+        @warnings
       end
     end
   end

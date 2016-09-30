@@ -3,6 +3,8 @@ require "fileutils"
 require "pathname"
 require "rbconfig"
 require "thread"
+require "tmpdir"
+
 require "bundler/errors"
 require "bundler/environment_preserver"
 require "bundler/gem_remote_fetcher"
@@ -143,8 +145,41 @@ module Bundler
       "#{Bundler.rubygems.ruby_engine}/#{Bundler.rubygems.config_map[:ruby_version]}"
     end
 
+    def user_home
+      @user_home ||= begin
+        home = Bundler.rubygems.user_home
+        warning = "Your home directory is not set properly:"
+        if home.nil?
+          warning += "\n * It is not set at all"
+        elsif !File.directory?(home)
+          warning += "\n * `#{home}` is not a directory"
+        elsif !File.writable?(home)
+          warning += "\n * `#{home}` is not writable"
+        else
+          return @user_home = Pathname.new(home)
+        end
+
+        login = Etc.getlogin || "unknown"
+
+        tmp_home = Pathname.new(Dir.tmpdir).join("bundler", "home", login)
+        begin
+          SharedHelpers.filesystem_access(tmp_home, :write) do |p|
+            FileUtils.mkdir_p(p)
+          end
+        rescue => e
+          warning += "\n\nBundler also failed to create a temporary home directory at `#{tmp_home}`:\n#{e}"
+          raise warning
+        end
+
+        warning += "\n\nBundler will use `#{tmp_home}` as your home directory temporarily"
+
+        Bundler.ui.warn(warning)
+        tmp_home
+      end
+    end
+
     def user_bundle_path
-      Pathname.new(Bundler.rubygems.user_home).join(".bundle")
+      Pathname.new(user_home).join(".bundle")
     end
 
     def home
@@ -409,6 +444,7 @@ EOF
       @locked_gems = nil
       @bundle_path = nil
       @bin_path = nil
+      @user_home = nil
 
       Plugin.reset!
 
