@@ -5,7 +5,7 @@ require "bundler/worker"
 module Bundler
   class Fetcher
     class CompactIndex < Base
-      require "bundler/vendor/compact_index_client/lib/compact_index_client"
+      require "bundler/compact_index_client"
 
       def self.compact_index_request(method_name)
         method = instance_method(method_name)
