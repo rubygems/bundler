@@ -37,6 +37,11 @@ module Bundler
       when Gem::InvalidSpecificationException
         Bundler.ui.error error.message, :wrap => true
       when SystemExit
+      when *[defined?(Java::JavaLang::OutOfMemoryError) && Java::JavaLang::OutOfMemoryError].compact
+        Bundler.ui.error "\nYour JVM has run out of memory, and Bundler cannot continue. " \
+          "You can decrease the amount of memory Bundler needs by removing gems from your Gemfile, " \
+          "especially large gems. (Gems can be as large as hundreds of megabytes, and Bundler has to read those files!). " \
+          "Alternatively, you can increase the amount of memory the JVM is able to use by running Bundler with jruby -J-Xmx1024m -S bundle (JRuby defaults to 500MB)."
       else request_issue_report_for(error)
       end
     end
