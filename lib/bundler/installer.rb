@@ -170,18 +170,31 @@ module Bundler
       system_ruby = Bundler::RubyVersion.system
       rubygems_version = Gem::Version.create(Gem::VERSION)
       @definition.specs.each do |spec|
-        if required_ruby_version = spec.required_ruby_version
-          unless required_ruby_version.satisfied_by?(system_ruby.gem_version)
-            raise InstallError, "#{spec.full_name} requires ruby version #{required_ruby_version}, " \
-              "which is incompatible with the current version, #{system_ruby}"
-          end
-        end
-        next unless required_rubygems_version = spec.required_rubygems_version
-        unless required_rubygems_version.satisfied_by?(rubygems_version)
-          raise InstallError, "#{spec.full_name} requires rubygems version #{required_rubygems_version}, " \
-            "which is incompatible with the current version, #{rubygems_version}"
-        end
+        validate_required_ruby_version!(spec, system_ruby)
+        validate_required_rubygems_version!(spec, rubygems_version)
+        validate_path_spec!(spec)
       end
+    end
+
+    def validate_required_ruby_version!(spec, system_ruby)
+      return unless required_ruby_version = spec.required_ruby_version
+      unless required_ruby_version.satisfied_by?(system_ruby.gem_version)
+        raise InstallError, "#{spec.full_name} requires ruby version #{required_ruby_version}, " \
+          "which is incompatible with the current version, #{system_ruby}"
+      end
+    end
+
+    def validate_required_rubygems_version!(spec, rubygems_version)
+      return unless required_rubygems_version = spec.required_rubygems_version
+      unless required_rubygems_version.satisfied_by?(rubygems_version)
+        raise InstallError, "#{spec.full_name} requires rubygems version #{required_rubygems_version}, " \
+          "which is incompatible with the current version, #{rubygems_version}"
+      end
+    end
+
+    def validate_path_spec!(spec)
+      return unless spec.source.is_a?(Source::Path)
+      Bundler.rubygems.validate(spec)
     end
 
     def can_install_in_parallel?

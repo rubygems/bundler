@@ -152,8 +152,7 @@ module Bundler
             spec.source = self
             Bundler.rubygems.set_installed_by_version(spec)
             # Validation causes extension_dir to be calculated, which depends
-            # on #source, so we validate here instead of load_gemspec
-            Bundler.rubygems.validate(spec)
+            # on #source, so we validate in the installer instead of when loading
             index << spec
           end
 
