@@ -32,11 +32,11 @@ module Bundler
 
         def suppressing_configured_credentials
           @suppressing_configured_credentials ||= begin
-            remote_nouser = dup.tap {|uri| uri.user = uri.password = nil }.to_s
-            if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
+            remote_nouser = uri.dup.tap {|uri| uri.user = uri.password = nil }.to_s
+            if uri.userinfo && uri.userinfo == Bundler.settings[remote_nouser]
               remote_nouser
             else
-              remote
+              uri
             end
           end
         end

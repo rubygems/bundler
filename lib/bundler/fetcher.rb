@@ -77,6 +77,8 @@ module Bundler
     self.api_timeout    = Bundler.settings[:timeout] # How long to wait for each API call
     self.max_retries    = Bundler.settings[:retry] # How many retries for the API call
 
+    attr_reader :remote
+
     def initialize(remote)
       @remote = remote
 
