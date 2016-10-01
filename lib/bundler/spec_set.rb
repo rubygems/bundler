@@ -23,7 +23,7 @@ module Bundler
 
       until deps.empty?
         dep = deps.shift
-        next if handled.add?(dep) || skip.include?(dep.name)
+        next if !handled.add?(dep) || skip.include?(dep.name)
 
         if spec = spec_for_dependency(dep, match_current_platform)
           specs << spec
