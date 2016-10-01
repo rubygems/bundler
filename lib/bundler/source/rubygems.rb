@@ -64,7 +64,7 @@ module Bundler
       def to_lock
         out = String.new("GEM\n")
         remotes.reverse_each do |remote|
-          out << "  remote: #{suppress_configured_credentials remote}\n"
+          out << "  remote: #{remote.suppressing_configured_credentials}\n"
         end
         out << "  specs:\n"
       end
@@ -239,7 +239,7 @@ module Bundler
     protected
 
       def credless_remotes
-        remotes.map(&method(:suppress_configured_credentials))
+        remotes.map(&:suppressing_configured_credentials)
       end
 
       def remotes_for_spec(spec)
@@ -273,15 +273,6 @@ module Bundler
         raise ArgumentError, "The source must be an absolute URI. For example:\n" \
           "source 'https://rubygems.org'" if !uri.absolute? || (uri.is_a?(URI::HTTP) && uri.host.nil?)
         uri
-      end
-
-      def suppress_configured_credentials(remote)
-        remote_nouser = remote.dup.tap {|uri| uri.user = uri.password = nil }.to_s
-        if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
-          remote_nouser
-        else
-          remote
-        end
       end
 
       def installed_specs
