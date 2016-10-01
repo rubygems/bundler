@@ -115,6 +115,12 @@ module Bundler
         instance_of?(Path)
       end
 
+      def has_spec_files?
+        !specs.nil?
+      rescue PathError, GitError
+        false
+      end
+
     private
 
       def expanded_path

@@ -581,6 +581,7 @@ module Bundler
     end
 
     def specs_for_source_changed?(source)
+      return false if source.is_a?(Source::Path) && !source.has_spec_files? && Bundler.settings[:frozen]
       locked_index = Index.new
       locked_index.use(@locked_specs.select {|s| source.can_lock?(s) })
 
@@ -728,7 +729,7 @@ module Bundler
         # then we unlock it.
 
         # Path sources have special logic
-        if s.source.instance_of?(Source::Path) || s.source.instance_of?(Source::Gemspec)
+        if (s.source.instance_of?(Source::Path) || s.source.instance_of?(Source::Gemspec)) && (s.source.has_spec_files? || !Bundler.settings[:frozen])
           other = s.source.specs[s].first
 
           # If the spec is no longer in the path source, unlock it. This
