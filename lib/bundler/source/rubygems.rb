@@ -63,8 +63,8 @@ module Bundler
 
       def to_lock
         out = String.new("GEM\n")
-        remotes.reverse_each do |remote|
-          out << "  remote: #{remote.suppressing_configured_credentials}\n"
+        fetchers.reverse_each do |fetcher|
+          out << "  remote: #{fetcher.remote.suppressing_configured_credentials}\n"
         end
         out << "  specs:\n"
       end
@@ -239,7 +239,7 @@ module Bundler
     protected
 
       def credless_remotes
-        remotes.map(&:suppressing_configured_credentials)
+        fetchers.map {|f| f.remote.suppressing_configured_credentials }
       end
 
       def remotes_for_spec(spec)
