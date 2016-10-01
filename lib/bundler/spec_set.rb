@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "tsort"
 require "forwardable"
+require "set"
 
 module Bundler
   class SpecSet
@@ -15,16 +16,14 @@ module Bundler
     end
 
     def for(dependencies, skip = [], check = false, match_current_platform = false)
-      handled = {}
+      handled = Set.new
       deps = dependencies.dup
       specs = []
       skip += ["bundler"]
 
       until deps.empty?
         dep = deps.shift
-        next if handled[dep] || skip.include?(dep.name)
-
-        handled[dep] = true
+        next if handled.add?(dep) || skip.include?(dep.name)
 
         if spec = spec_for_dependency(dep, match_current_platform)
           specs << spec
