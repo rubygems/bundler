@@ -1,8 +1,8 @@
 # frozen_string_literal: true
+require "bundler/plugin/api"
 
 module Bundler
   module Plugin
-    autoload :API,        "bundler/plugin/api"
     autoload :DSL,        "bundler/plugin/dsl"
     autoload :Index,      "bundler/plugin/index"
     autoload :Installer,  "bundler/plugin/installer"
