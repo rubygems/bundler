@@ -159,6 +159,7 @@ module Bundler
     # that said, it's a rare situation (other than rake), and parallel
     # installation is SO MUCH FASTER. so we let people opt in.
     def install(options)
+      Bundler.rubygems.load_plugins
       force = options["force"]
       jobs = 1
       jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?

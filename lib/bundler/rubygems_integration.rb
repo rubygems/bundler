@@ -194,6 +194,10 @@ module Bundler
       end
     end
 
+    def load_plugins
+      Gem.load_plugins
+    end
+
     def ui=(obj)
       Gem::DefaultUserInteraction.ui = obj
     end
