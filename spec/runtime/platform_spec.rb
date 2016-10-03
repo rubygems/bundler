@@ -98,7 +98,7 @@ describe "Bundler.setup with multi platform stuff" do
       gem "platform_specific"
     G
 
-    bundle! "config only_ruby_platform true"
+    bundle! "config force_ruby_platform true"
 
     bundle! "install"
 

@@ -17,7 +17,7 @@ module Bundler
       major_deprecations
       no_install
       no_prune
-      only_ruby_platform
+      force_ruby_platform
       only_update_to_newer_versions
       plugins
       silence_root_warning
