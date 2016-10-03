@@ -65,7 +65,7 @@ module Bundler
       case specs_by_name_and_version.size
       when 1
         specs = specs_by_name_and_version.values.first
-        spec = specs.find {|s| s.match_platform(Gem::Platform.local) } || specs.first
+        spec = specs.find {|s| s.match_platform(Bundler.local_platform) } || specs.first
 
         @gemspecs << spec
 
