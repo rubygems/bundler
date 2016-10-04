@@ -695,4 +695,12 @@ The checksum of /versions does not match the checksum provided by the server! So
     expect(File.read(versions)).to start_with("created_at")
     expect(the_bundle).to include_gems "rack 1.0.0"
   end
+
+  it "works when cache dir is world-writable" do
+    install_gemfile! <<-G, :artifice => "compact_index"
+      File.umask(0000)
+      source "#{source_uri}"
+      gem "rack"
+    G
+  end
 end

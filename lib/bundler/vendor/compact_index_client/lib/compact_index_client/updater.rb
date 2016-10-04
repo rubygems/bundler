@@ -26,7 +26,7 @@ class Bundler::CompactIndexClient
     def update(local_path, remote_path, retrying = nil)
       headers = {}
 
-      Dir.mktmpdir(local_path.basename.to_s, local_path.dirname) do |local_temp_dir|
+      Dir.mktmpdir("bundler-compact-index-") do |local_temp_dir|
         local_temp_path = Pathname.new(local_temp_dir).join(local_path.basename)
 
         # first try to fetch any new bytes on the existing file
