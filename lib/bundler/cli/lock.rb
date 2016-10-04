@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require "bundler/cli/common"
+
 module Bundler
   class CLI::Lock
     attr_reader :options
@@ -22,6 +24,8 @@ module Bundler
       update = options[:update]
       update = { :gems => update } if update.is_a?(Array)
       definition = Bundler.definition(update)
+
+      Bundler::CLI::Common.config_gem_version_promoter(Bundler.definition, options) if options[:update]
 
       options["remove-platform"].each do |platform|
         definition.remove_platform(platform)

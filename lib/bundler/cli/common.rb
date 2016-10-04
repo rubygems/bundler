@@ -52,5 +52,14 @@ module Bundler
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
     end
+
+    def self.config_gem_version_promoter(definition, opts)
+      patch_level = [:major, :minor, :patch].select {|v| opts.keys.include?(v.to_s) }
+      raise InvalidOption, "Provide only one of the following options: #{patch_level.join(", ")}" unless patch_level.length <= 1
+      definition.gem_version_promoter.tap do |gvp|
+        gvp.level = patch_level.first || :major
+        gvp.strict = opts[:strict]
+      end
+    end
   end
 end

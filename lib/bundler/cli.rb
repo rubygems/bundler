@@ -457,6 +457,14 @@ module Bundler
       "add a new platform to the lockfile"
     method_option "remove-platform", :type => :array, :default => [], :banner =>
       "remove a platform from the lockfile"
+    method_option "patch", :type => :boolean, :hide => true, :banner =>
+      "Prefer updating only to next patch version"
+    method_option "minor", :type => :boolean, :hide => true, :banner =>
+      "Prefer updating only to next minor version"
+    method_option "major", :type => :boolean, :hide => true, :banner =>
+      "Prefer updating to next major version (default)"
+    method_option "strict", :type => :boolean, :hide => true, :banner =>
+      "Do not allow any gem to be updated past latest --patch/--minor/--major"
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run
