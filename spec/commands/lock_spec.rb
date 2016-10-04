@@ -106,6 +106,54 @@ describe "bundle lock" do
     expect(read_lockfile).to eq(@lockfile)
   end
 
+  # see update_spec for more coverage on same options. logic is shared so it's not necessary
+  # to repeat coverage here.
+  context "conservative updates" do
+    before do
+      build_repo4 do
+        build_gem "foo", %w(1.4.3 1.4.4) do |s|
+          s.add_dependency "bar", "~> 2.0"
+        end
+        build_gem "foo", %w(1.4.5 1.5.0) do |s|
+          s.add_dependency "bar", "~> 2.1"
+        end
+        build_gem "foo", %w(1.5.1) do |s|
+          s.add_dependency "bar", "~> 3.0"
+        end
+        build_gem "bar", %w(2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0)
+        build_gem "qux", %w(1.0.0 1.0.1 1.1.0 2.0.0)
+      end
+
+      # establish a lockfile set to 1.4.3
+      install_gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo', '1.4.3'
+        gem 'bar', '2.0.3'
+        gem 'qux', '1.0.0'
+      G
+
+      # remove 1.4.3 requirement and bar altogether
+      # to setup update specs below
+      gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo'
+        gem 'qux'
+      G
+    end
+
+    it "single gem updates dependent gem to minor" do
+      bundle "lock --update foo --patch"
+
+      expect(the_bundle.locked_gems.specs.map(&:full_name)).to eq(%w(foo-1.4.5 bar-2.1.1 qux-1.0.0).sort)
+    end
+
+    it "minor preferred with strict" do
+      bundle "lock --update --minor --strict"
+
+      expect(the_bundle.locked_gems.specs.map(&:full_name)).to eq(%w(foo-1.5.0 bar-2.1.1 qux-1.1.0).sort)
+    end
+  end
+
   it "supports adding new platforms" do
     bundle! "lock --add-platform java x86-mingw32"
 
