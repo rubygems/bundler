@@ -73,7 +73,7 @@ module Bundler
 
       def dependency_api_uri(gem_names = [])
         uri = fetch_uri + "api/v1/dependencies"
-        uri.query = "gems=#{CGI.escape(gem_names.join(","))}" if gem_names.any?
+        uri.query = "gems=#{CGI.escape(gem_names.sort.join(","))}" if gem_names.any?
         uri
       end
     end
