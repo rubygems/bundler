@@ -567,7 +567,7 @@ describe "bundle clean" do
     expect(exitstatus).to eq(0) if exitstatus
   end
 
-  it "doesn't remove gems in dry-run mode" do
+  it "doesn't remove gems in dry-run mode with path set" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -584,6 +584,36 @@ describe "bundle clean" do
     G
 
     bundle :install
+
+    bundle "clean --dry-run"
+
+    expect(out).not_to include("Removing foo (1.0)")
+    expect(out).to include("Would have removed foo (1.0)")
+
+    should_have_gems "thin-1.0", "rack-1.0.0", "foo-1.0"
+
+    expect(vendored_gems("bin/rackup")).to exist
+  end
+
+  it "doesn't remove gems in dry-run mode with no path set" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "foo"
+    G
+
+    bundle "install --path vendor/bundle --no-clean"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+    G
+
+    bundle :install
+
+    bundle "configuration --delete path"
 
     bundle "clean --dry-run"
 
