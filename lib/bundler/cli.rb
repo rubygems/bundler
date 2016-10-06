@@ -269,6 +269,8 @@ module Bundler
       versions of the given gems. Prerelease gems are ignored by default. If your gems
       are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
     D
+    method_option "group", :aliases => "--group", :type => :string, :banner => "List gems from a specific group"
+    method_option "groups", :aliases => "--groups", :type => :boolean, :banner => "List gems organized by groups"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
