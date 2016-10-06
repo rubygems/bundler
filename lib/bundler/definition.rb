@@ -243,6 +243,11 @@ module Bundler
           Bundler.ui.debug("Found no changes, using resolution from the lockfile")
           last_resolve
         else
+          (sources.path_sources + sources.git_sources).each do |path_source|
+            path_source.specs.each do |path_spec|
+              Bundler.rubygems.validate(path_spec)
+            end
+          end
           # Run a resolve against the locally available gems
           Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
           last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, gem_version_promoter, additional_base_requirements_for_resolve)
