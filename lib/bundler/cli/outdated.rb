@@ -31,6 +31,10 @@ module Bundler
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
+      Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options)
+      # the patch level options don't work without strict also being true
+      strict = options[:strict] || Bundler::CLI::Common.patch_level_options(options).any?
+
       definition_resolution = proc { options[:local] ? definition.resolve_with_cache! : definition.resolve_remotely! }
       if options[:parseable]
         Bundler.ui.silence(&definition_resolution)
@@ -49,7 +53,7 @@ module Bundler
 
         dependency = current_dependencies[current_spec.name]
 
-        if options[:strict]
+        if strict
           active_spec = definition.specs.detect {|spec| spec.name == current_spec.name && spec.platform == current_spec.platform }
         else
           active_specs = definition.index[current_spec.name].select {|spec| spec.platform == current_spec.platform }.sort_by(&:version)
@@ -57,11 +61,11 @@ module Bundler
             active_spec = active_specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
           end
           active_spec = active_specs.last
+        end
 
-          if options[:major] || options[:minor] || options[:patch]
-            update_present = update_present_via_semver_portions(current_spec, active_spec, options)
-            active_spec = nil unless update_present
-          end
+        if options["filter-major"] || options["filter-minor"] || options["filter-patch"]
+          update_present = update_present_via_semver_portions(current_spec, active_spec, options)
+          active_spec = nil unless update_present
         end
 
         next if active_spec.nil?
@@ -167,15 +171,15 @@ module Bundler
       active_major = active_spec.version.segments.first
 
       update_present = false
-      update_present = active_major > current_major if options[:major]
+      update_present = active_major > current_major if options["filter-major"]
 
-      if !update_present && (options[:minor] || options[:patch]) && current_major == active_major
+      if !update_present && (options["filter-minor"] || options["filter-patch"]) && current_major == active_major
         current_minor = get_version_semver_portion_value(current_spec, 1)
         active_minor = get_version_semver_portion_value(active_spec, 1)
 
-        update_present = active_minor > current_minor if options[:minor]
+        update_present = active_minor > current_minor if options["filter-minor"]
 
-        if !update_present && options[:patch] && current_minor == active_minor
+        if !update_present && options["filter-patch"] && current_minor == active_minor
           current_patch = get_version_semver_portion_value(current_spec, 2)
           active_patch = get_version_semver_portion_value(active_spec, 2)
 

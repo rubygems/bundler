@@ -53,13 +53,17 @@ module Bundler
       message
     end
 
-    def self.config_gem_version_promoter(definition, opts)
-      patch_level = [:major, :minor, :patch].select {|v| opts.keys.include?(v.to_s) }
+    def self.configure_gem_version_promoter(definition, options)
+      patch_level = patch_level_options(options)
       raise InvalidOption, "Provide only one of the following options: #{patch_level.join(", ")}" unless patch_level.length <= 1
       definition.gem_version_promoter.tap do |gvp|
         gvp.level = patch_level.first || :major
-        gvp.strict = opts[:strict]
+        gvp.strict = options[:strict] || options["update-strict"]
       end
+    end
+
+    def self.patch_level_options(options)
+      [:major, :minor, :patch].select {|v| options.keys.include?(v.to_s) }
     end
   end
 end
