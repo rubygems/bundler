@@ -481,8 +481,7 @@ describe "bundle install with gem sources" do
     it "should display a helpful messag explaining how to fix it" do
       bundle :install, :env => { "BUNDLE_RUBYGEMS__ORG" => "user:pass{word" }
       expect(exitstatus).to eq(17) if exitstatus
-      expect(out).to eq("Please CGI escape your usernames and passwords before " \
-                        "setting them for authentication.")
+      expect(out).to match(/Please CGI escape your usernames and passwords/)
     end
   end
 
