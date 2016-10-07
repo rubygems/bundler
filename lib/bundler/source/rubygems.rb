@@ -209,7 +209,9 @@ module Bundler
 
       def add_remote(source)
         uri = normalize_uri(source)
-        @remotes.unshift(uri) unless @remotes.include?(uri)
+        return if @remotes.include?(uri)
+        @credless_remotes = nil
+        @remotes.unshift(uri)
       end
 
       def replace_remotes(other_remotes)
@@ -239,7 +241,7 @@ module Bundler
     protected
 
       def credless_remotes
-        fetchers.map {|f| f.remote.suppressing_configured_credentials }
+        @credless_remotes ||= fetchers.map {|f| f.remote.suppressing_configured_credentials }
       end
 
       def remotes_for_spec(spec)
