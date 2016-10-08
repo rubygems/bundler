@@ -78,7 +78,7 @@ module Bundler
     private
 
       def compact_index_client
-        @compact_index_client ||=
+        @compact_index_client ||= begin
           SharedHelpers.filesystem_access(cache_path) do
             CompactIndexClient.new(cache_path, compact_fetcher)
           end.tap do |client|
@@ -89,6 +89,7 @@ module Bundler
               inputs.map { worker.deq }
             end
           end
+        end
       end
 
       def bundle_worker(func = nil)
