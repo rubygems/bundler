@@ -66,7 +66,7 @@ module Bundler
         # Read info file checksums out of /versions, so we can know if gems are up to date
         fetch_uri.scheme != "file" && compact_index_client.update_and_parse_checksums!
       rescue CompactIndexClient::Updater::MisMatchedChecksumError => e
-        Bundler.ui.warn(e.message)
+        Bundler.ui.debug(e.message)
         nil
       end
       compact_index_request :available?
@@ -78,9 +78,9 @@ module Bundler
     private
 
       def compact_index_client
-        @compact_index_client ||=
+        @compact_index_client ||= begin
           SharedHelpers.filesystem_access(cache_path) do
-            CompactIndexClient.new(cache_path, compact_fetcher)
+            CompactIndexClient.new(cache_path, client_fetcher)
           end.tap do |client|
             client.in_parallel = lambda do |inputs, &blk|
               func = lambda {|object, _index| blk.call(object) }
@@ -89,6 +89,7 @@ module Bundler
               inputs.map { worker.deq }
             end
           end
+        end
       end
 
       def bundle_worker(func = nil)
@@ -105,15 +106,17 @@ module Bundler
         Bundler.user_cache.join("compact_index", remote.cache_slug)
       end
 
-      def compact_fetcher
-        lambda do |path, headers|
-          begin
-            downloader.fetch(fetch_uri + path, headers)
-          rescue NetworkDownError => e
-            raise unless Bundler.settings[:allow_offline_install] && headers["If-None-Match"]
-            Bundler.ui.warn "Using the cached data for the new index because of a network error: #{e}"
-            Net::HTTPNotModified.new(nil, nil, nil)
-          end
+      def client_fetcher
+        ClientFetcher.new(self, Bundler.ui)
+      end
+
+      ClientFetcher = Struct.new(:fetcher, :ui) do
+        def call(path, headers)
+          fetcher.downloader.fetch(fetcher.fetch_uri + path, headers)
+        rescue NetworkDownError => e
+          raise unless Bundler.feature_flag.allow_offline_install? && headers["If-None-Match"]
+          ui.warn "Using the cached data for the new index because of a network error: #{e}"
+          Net::HTTPNotModified.new(nil, nil, nil)
         end
       end
     end
