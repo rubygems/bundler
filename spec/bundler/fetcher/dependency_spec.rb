@@ -262,13 +262,13 @@ describe Bundler::Fetcher::Dependency do
     let(:uri) { URI("http://gem-api.com") }
 
     context "with gem names" do
-      let(:gem_names) { [%w(foo bar), %w(bundler rubocop)] }
+      let(:gem_names) { %w(foo bar bundler rubocop) }
 
       before { allow(subject).to receive(:fetch_uri).and_return(uri) }
 
       it "should return an api calling uri with the gems in the query" do
         expect(subject.dependency_api_uri(gem_names).to_s).to eq(
-          "http://gem-api.com/api/v1/dependencies?gems=foo%2Cbar%2Cbundler%2Crubocop"
+          "http://gem-api.com/api/v1/dependencies?gems=bar%2Cbundler%2Cfoo%2Crubocop"
         )
       end
     end
