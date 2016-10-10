@@ -1,3 +1,8 @@
+## 1.12.6 (2016-10-10)
+
+Bugfixes:
+  - add support for weak etags to the new index (@segiddins)
+
 ## 1.12.5 (2016-05-25)
 
 Bugfixes:
