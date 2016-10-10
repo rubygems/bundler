@@ -751,6 +751,14 @@ module Bundler
           end.map(&:to_spec)
         end
       end
+
+      def use_gemdeps(gemfile)
+        ENV["BUNDLE_GEMFILE"] ||= File.expand_path(gemfile)
+        runtime = Bundler.setup
+        Bundler.ui = nil
+        activated_spec_names = runtime.requested_specs.map(&:to_spec).sort_by(&:name)
+        [Gemdeps.new(runtime), activated_spec_names]
+      end
     end
   end
 
