@@ -116,6 +116,11 @@ Bugfixes:
   - allow running `bundle install --deployment` after `bundle package --all` with path gems (#2175, @allenzhao)
   - add support for patchlevels in ruby versions in the gemfile and gemspecs (#4593, @chalkos)
 
+## 1.12.6 (2016-10-10)
+
+Bugfixes:
+  - add support for weak etags to the new index (@segiddins)
+
 ## 1.12.5 (2016-05-25)
 
 Bugfixes:

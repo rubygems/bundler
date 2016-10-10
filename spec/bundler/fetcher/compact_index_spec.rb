@@ -15,7 +15,7 @@ describe Bundler::Fetcher::CompactIndex do
     it "has only one thread open at the end of the run" do
       compact_index.specs_for_names(["lskdjf"])
 
-      thread_count = Thread.list.select {|thread| thread.status == "run" }.count
+      thread_count = Thread.list.count {|thread| thread.status == "run" }
       expect(thread_count).to eq 1
     end
 
