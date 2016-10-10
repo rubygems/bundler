@@ -30,6 +30,17 @@ module Bundler
           end
         end
 
+        def suppressing_configured_credentials
+          @suppressing_configured_credentials ||= begin
+            remote_nouser = uri.dup.tap {|uri| uri.user = uri.password = nil }.to_s
+            if uri.userinfo && uri.userinfo == Bundler.settings[remote_nouser]
+              remote_nouser
+            else
+              uri
+            end
+          end
+        end
+
       private
 
         def apply_auth(uri, auth)

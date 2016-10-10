@@ -147,7 +147,7 @@ module Gem
 
     def to_lock
       out = String.new("  #{name}")
-      unless requirement == Gem::Requirement.default
+      unless requirement.none?
         reqs = requirement.requirements.map {|o, v| "#{o} #{v}" }.sort.reverse
         out << " (#{reqs.join(", ")})"
       end
@@ -167,7 +167,11 @@ module Gem
   class Requirement
     # Backport of performance enhancement added to Rubygems 1.4
     def none?
-      @none ||= (to_s == ">= 0")
+      if @requirements.size == 1
+        @requirements[0] == DefaultRequirement
+      else
+        false
+      end
     end unless allocate.respond_to?(:none?)
 
     def exact?

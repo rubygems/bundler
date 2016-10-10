@@ -243,6 +243,11 @@ module Bundler
           Bundler.ui.debug("Found no changes, using resolution from the lockfile")
           last_resolve
         else
+          (sources.path_sources + sources.git_sources).each do |path_source|
+            path_source.specs.each do |path_spec|
+              Bundler.rubygems.validate(path_spec)
+            end
+          end
           # Run a resolve against the locally available gems
           Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
           last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, gem_version_promoter, additional_base_requirements_for_resolve)
@@ -581,6 +586,7 @@ module Bundler
     end
 
     def specs_for_source_changed?(source)
+      return false if source.is_a?(Source::Path) && !source.has_spec_files? && Bundler.settings[:frozen]
       locked_index = Index.new
       locked_index.use(@locked_specs.select {|s| source.can_lock?(s) })
 
@@ -664,11 +670,12 @@ module Bundler
     end
 
     def converge_dependencies
+      frozen_bundle = Bundler.settings[:frozen]
       (@dependencies + @locked_deps).each do |dep|
-        locked_source = @locked_deps.select {|d| d.name == dep.name }.last
+        locked_source = @locked_deps.find {|d| d.name == dep.name }
         # This is to make sure that if bundler is installing in deployment mode and
         # after locked_source and sources don't match, we still use locked_source.
-        if Bundler.settings[:frozen] && !locked_source.nil? &&
+        if frozen_bundle && !locked_source.nil? &&
             locked_source.respond_to?(:source) && locked_source.source.instance_of?(Source::Path) && locked_source.source.path.exist?
           dep.source = locked_source.source
         elsif dep.source
@@ -728,7 +735,7 @@ module Bundler
         # then we unlock it.
 
         # Path sources have special logic
-        if s.source.instance_of?(Source::Path) || s.source.instance_of?(Source::Gemspec)
+        if (s.source.instance_of?(Source::Path) || s.source.instance_of?(Source::Gemspec)) && (s.source.has_spec_files? || !Bundler.settings[:frozen])
           other = s.source.specs[s].first
 
           # If the spec is no longer in the path source, unlock it. This
