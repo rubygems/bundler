@@ -1,3 +1,12 @@
+## 1.13.4 (2016-10-11)
+
+Bugfixes:
+
+ - stop printing warning when compact index versions file is rewritten (#5064, @indirect)
+ - fix `parent directory is world writable but not sticky` error on install (#5043, @indirect)
+ - fix for `uninitialized constant Bundler::Plugin::API::Source` error (#5010, @hsbt, @aycabta)
+ - make `update` options for major, minor, and patch updates consistent (#5043, @chrismo)
+
 ## 1.13.3 (2016-10-10)
 
 Bugfixes:
