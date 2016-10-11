@@ -20,18 +20,19 @@ a number of methods used to describe the gem requirements.
 At the top of the `Gemfile`, add a line for the `Rubygems` source that contains
 the gems listed in the `Gemfile`.
 
-    source "https://rubygems.org"
+Global source lines are a security risk and should not be used as they can lead
+to gems being installed from unintended sources. If alternate sources are
+specified in the file, they will override the default global source even if
+they are only specified for a block or for a single gem. To avoid this use a
+source block that points to rubygems.org:
 
-It is possible, but not recommended as of Bundler 1.7, to add multiple global
-`source` lines. Each of these `source`s `MUST` be a valid Rubygems repository.
+    source 'https://rubygems.org' do
+      # Gems here
+    end
 
-Sources are checked for gems following the heuristics described in
-[SOURCE PRIORITY][]. If a gem is found in more than one global source, Bundler
-will print a warning after installing the gem indicating which source was used,
-and listing the other sources where the gem is available. A specific source can
-be selected for gems that need to use a non-standard repository, suppressing
-this warning, by using the [`:source` option](#SOURCE-source-) or a
-[`source` block](#BLOCK-FORM-OF-SOURCE-GIT-PATH-GROUP-and-PLATFORMS).
+The only way to properly map gems to a source is to use source blocks instead of
+global sources. Use of single line `source` specifications will open all gems in
+your Gemfile to a second source.
 
 ### CREDENTIALS
 

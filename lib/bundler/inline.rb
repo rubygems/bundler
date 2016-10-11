@@ -20,10 +20,11 @@
 #          require 'bundler/inline'
 #
 #          gemfile do
-#            source 'https://rubygems.org'
-#            gem 'json', require: false
-#            gem 'nap', require: 'rest'
-#            gem 'cocoapods', '~> 0.34.1'
+#            source 'https://rubygems.org' do
+#              gem 'json', require: false
+#              gem 'nap', require: 'rest'
+#              gem 'cocoapods', '~> 0.34.1'
+#            end
 #          end
 #
 #          puts Pod::VERSION # => "0.34.4"

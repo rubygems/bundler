@@ -246,12 +246,12 @@ third-party code being used in different environments.`
 
 For a simple illustration, consider the following Gemfile(5):
 
-    source 'https://rubygems.org'
+    source 'https://rubygems.org' do
+      gem 'sinatra'
 
-    gem 'sinatra'
-
-    group :production do
-      gem 'rack-perftools-profiler'
+      group :production do
+        gem 'rack-perftools-profiler'
+      end
     end
 
 In this case, `sinatra` depends on any version of Rack (`>= 1.0`), while
@@ -307,10 +307,10 @@ same versions of all dependencies as it used before the update.
 
 Let's take a look at an example. Here's your original Gemfile(5):
 
-    source 'https://rubygems.org'
-
-    gem 'actionpack', '2.3.8'
-    gem 'activemerchant'
+    source 'https://rubygems.org' do
+      gem 'actionpack', '2.3.8'
+      gem 'activemerchant'
+    end
 
 In this case, both `actionpack` and `activemerchant` depend on
 `activesupport`. The `actionpack` gem depends on `activesupport 2.3.8`
@@ -323,10 +323,10 @@ gems in your Gemfile(5).
 
 Next, you modify your Gemfile(5) to:
 
-    source 'https://rubygems.org'
-
-    gem 'actionpack', '3.0.0.rc'
-    gem 'activemerchant'
+    source 'https://rubygems.org' do
+      gem 'actionpack', '3.0.0.rc'
+      gem 'activemerchant'
+    end
 
 The `actionpack 3.0.0.rc` gem has a number of new dependencies,
 and updates the `activesupport` dependency to `= 3.0.0.rc` and

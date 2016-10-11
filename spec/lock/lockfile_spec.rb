@@ -250,8 +250,9 @@ describe "the lockfile format" do
     L
 
     install_gemfile <<-G
-      source 'https://rubygems.org'
-      gem 'rake'
+      source 'https://rubygems.org' do
+        gem 'rake'
+      end
 
       source 'https://rails-assets.org' do
         gem 'rails-assets-bootstrap'

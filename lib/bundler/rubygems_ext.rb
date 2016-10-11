@@ -98,12 +98,13 @@ module Gem
     end
 
     def to_gemfile(path = nil)
-      gemfile = String.new("source 'https://rubygems.org'\n")
+      gemfile = String.new("source 'https://rubygems.org' do\n")
       gemfile << dependencies_to_gemfile(nondevelopment_dependencies)
       unless development_dependencies.empty?
         gemfile << "\n"
         gemfile << dependencies_to_gemfile(development_dependencies, :development)
       end
+      gemfile << "\nend"
       gemfile
     end
 
@@ -116,15 +117,15 @@ module Gem
     def dependencies_to_gemfile(dependencies, group = nil)
       gemfile = String.new
       if dependencies.any?
-        gemfile << "group :#{group} do\n" if group
+        gemfile << "  group :#{group} do\n" if group
         dependencies.each do |dependency|
-          gemfile << "  " if group
+          gemfile << group ? "    " : "  "
           gemfile << %(gem "#{dependency.name}")
           req = dependency.requirements_list.first
           gemfile << %(, "#{req}") if req
           gemfile << "\n"
         end
-        gemfile << "end\n" if group
+        gemfile << "  end\n" if group
       end
       gemfile
     end

@@ -100,7 +100,9 @@ module Bundler
         Bundler.ui.warn <<-WARN, :wrap => true
           Your Gemfile has no gem server sources. If you need gems that are \
           not already on your machine, add a line like this to your Gemfile:
-          source 'https://rubygems.org'
+          source 'https://rubygems.org' do
+            # Gems here
+          end
         WARN
       end
       raise e
