@@ -2,6 +2,14 @@
 require "spec_helper"
 
 describe "real world edgecases", :realworld => true, :sometimes => true do
+  def rubygems_version(name, requirement)
+    source = Bundler::Source::Rubygems::Remote.new(URI('https://rubygems.org'))
+    fetcher = Bundler::Fetcher.new(source)
+    index = fetcher.specs([name], nil)
+    rubygem = index.search(Gem::Dependency.new(name, requirement)).last
+    "#{name} (#{rubygem.version})"
+  end
+
   # there is no rbx-relative-require gem that will install on 1.9
   it "ignores extra gems with bad platforms", :ruby => "~> 1.8.7" do
     gemfile <<-G
@@ -84,8 +92,8 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       gem "builder", "~> 2.1.2"
     G
     bundle :lock
-    expect(lockfile).to include("i18n (0.6.11)")
-    expect(lockfile).to include("activesupport (3.0.5)")
+    expect(lockfile).to include(rubygems_version("i18n", "~> 0.6.0"))
+    expect(lockfile).to include(rubygems_version("activesupport", "~> 3.0"))
   end
 
   # https://github.com/bundler/bundler/issues/1500
