@@ -40,8 +40,8 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       source "https://rubygems.org"
 
       gem 'i18n', '~> 0.6.0'
-      gem 'activesupport', '~> 3.0'
-      gem 'activerecord', '~> 3.0'
+      gem 'activesupport', '~> 3.0.5'
+      gem 'activerecord', '~> 3.0.5'
       gem 'builder', '~> 2.1.2'
     G
     bundle :lock
