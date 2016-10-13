@@ -3,10 +3,16 @@ require "spec_helper"
 
 describe "real world edgecases", :realworld => true, :sometimes => true do
   def rubygems_version(name, requirement)
+    require "bundler/source/rubygems/remote"
+    require "bundler/fetcher"
     source = Bundler::Source::Rubygems::Remote.new(URI("https://rubygems.org"))
     fetcher = Bundler::Fetcher.new(source)
     index = fetcher.specs([name], nil)
     rubygem = index.search(Gem::Dependency.new(name, requirement)).last
+    if rubygem.nil?
+      raise "Could not find #{name} (#{requirement}) on rubygems.org!\n" \
+        "Found specs:\n#{index.send(:specs).inspect}"
+    end
     "#{name} (#{rubygem.version})"
   end
 
