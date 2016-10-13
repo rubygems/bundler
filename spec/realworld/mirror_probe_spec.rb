@@ -15,6 +15,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
   end
 
   after do
+    Artifice.deactivate
     @server_thread.kill
     @server_thread.join
   end
