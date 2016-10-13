@@ -94,7 +94,7 @@ module Bundler
       end
 
       if outdated_gems_list.empty?
-        Bundler.ui.info "Bundle up to date!\n" unless options[:parseable]
+        display_nothing_outdated_message
       else
         unless options[:parseable]
           if options[:pre]
@@ -140,6 +140,18 @@ module Bundler
     end
 
   private
+
+    def display_nothing_outdated_message
+      unless options[:parseable]
+        filter_options = options.keys & %w(filter-major filter-minor filter-patch)
+        if filter_options.any?
+          display = filter_options.map {|o| o.sub("filter-", "") }.join(" or ")
+          Bundler.ui.info "No #{display} updates to display.\n"
+        else
+          Bundler.ui.info "Bundle up to date!\n"
+        end
+      end
+    end
 
     def print_gem(current_spec, active_spec, dependency, groups, options_include_groups)
       spec_version = "#{active_spec.version}#{active_spec.git_version}"

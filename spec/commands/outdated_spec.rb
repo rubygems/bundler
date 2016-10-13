@@ -326,7 +326,7 @@ describe "bundle outdated" do
         bundle "outdated --strict --filter-patch"
 
         expect(out).to_not include("activesupport (newest")
-        expect(out).to include("(newest 0.0.5, installed 0.0.3)")
+        expect(out).to include("(newest 0.0.5, installed 0.0.3")
       end
 
       it "only reports gems that match requirement and minor filter level" do
@@ -344,7 +344,7 @@ describe "bundle outdated" do
         bundle "outdated --strict --filter-minor"
 
         expect(out).to_not include("activesupport (newest")
-        expect(out).to include("(newest 0.1.5, installed 0.0.3)")
+        expect(out).to include("(newest 0.1.5, installed 0.0.3")
       end
 
       it "only reports gems that match requirement and major filter level" do
@@ -362,7 +362,7 @@ describe "bundle outdated" do
         bundle "outdated --strict --filter-major"
 
         expect(out).to_not include("activesupport (newest")
-        expect(out).to include("(newest 1.1.5, installed 0.0.3)")
+        expect(out).to include("(newest 1.1.5, installed 0.0.3")
       end
     end
   end
@@ -472,7 +472,7 @@ describe "bundle outdated" do
   shared_examples_for "no version updates are detected" do
     it "does not detect any version updates" do
       subject
-      expect(out).to include("Bundle up to date!")
+      expect(out).to include("updates to display.")
       expect(out).to_not include("ERROR REPORT TEMPLATE")
       expect(out).to_not include("activesupport (newest")
       expect(out).to_not include("weakling (newest")
@@ -598,7 +598,7 @@ describe "bundle outdated" do
       it "shows nothing when patching and filtering to minor" do
         bundle "outdated --patch --filter-minor"
 
-        expect(out).to include("Bundle up to date!") # it shouldn't say this, but will get back to this with: #5076
+        expect(out).to include("No minor updates to display.")
         expect(out).not_to include("patch (newest")
         expect(out).not_to include("minor (newest")
         expect(out).not_to include("major (newest")
