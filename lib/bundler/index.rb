@@ -179,7 +179,8 @@ module Bundler
         end
 
         wants_prerelease = dependency.requirement.prerelease?
-        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
+        wants_prerelease ||= base && base.any? {|base_spec| base_spec.version.prerelease? }
+        only_prerelease = specs.all? {|spec| spec.version.prerelease? }
 
         unless wants_prerelease || only_prerelease
           found.reject! {|spec| spec.version.prerelease? }

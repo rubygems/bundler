@@ -24,7 +24,11 @@ class Endpoint < Sinatra::Base
       require "rubygems"
       require "bundler"
       Bundler::Deprecate.skip_during do
-        Marshal.load(File.open(gem_repo.join("specs.4.8")).read).map do |name, version, platform|
+        all_specs = %w(specs.4.8 prerelease_specs.4.8).map do |filename|
+          Marshal.load(File.open(gem_repo.join(filename)).read)
+        end.inject(:+)
+
+        all_specs.map do |name, version, platform|
           spec = load_spec(name, version, platform, gem_repo)
           next unless gem_names.include?(spec.name)
           {
