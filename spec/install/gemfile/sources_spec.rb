@@ -470,12 +470,11 @@ describe "bundle install with gems on multiple sources" do
 
         # When this gemfile is installed...
         gemfile <<-G
-          # frozen_string_literal: true
           source "#{source_uri}"
 
           source "#{second_uri}" do
             gem "rack", "2.0.1.1.forked"
-            gem "thor", "0.19.1.1.forked"
+            gem "thor"
           end
           gem "rack-obama"
         G
@@ -498,14 +497,10 @@ describe "bundle install with gems on multiple sources" do
             rack (= 2.0.1.1.forked)!
             rack-obama
             thor!
-
-          BUNDLED WITH
-             1.13.3
         L
 
         # Then we change the Gemfile by adding a version to thor
         gemfile <<-G
-          # frozen_string_literal: true
           source "#{source_uri}"
 
           source "#{second_uri}" do
