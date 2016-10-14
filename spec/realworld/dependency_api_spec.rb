@@ -26,6 +26,7 @@ describe "gemcutter's dependency API", :realworld => true do
     end
 
     after do
+      Artifice.deactivate
       @t.kill
       @t.join
     end
