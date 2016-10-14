@@ -22,6 +22,12 @@ describe "bundle inject" do
       bundle "install"
     end
 
+    it "should add gem with default version" do
+      expect(bundled_app("Gemfile").read).not_to match(/rack-obama/)
+      bundle "inject 'rack-obama'"
+      expect(bundled_app("Gemfile").read).to match(/rack-obama/)
+    end
+
     it "adds the injected gems to the Gemfile" do
       expect(bundled_app("Gemfile").read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
