@@ -8,7 +8,7 @@ module Bundler
     end
 
     def run
-      require_path_or_force
+      require_path_or_force unless options[:"dry-run"]
       Bundler.load.clean(options[:"dry-run"])
     end
 
