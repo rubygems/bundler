@@ -2,6 +2,20 @@
 require "spec_helper"
 
 describe "real world edgecases", :realworld => true, :sometimes => true do
+  def rubygems_version(name, requirement)
+    require "bundler/source/rubygems/remote"
+    require "bundler/fetcher"
+    source = Bundler::Source::Rubygems::Remote.new(URI("https://rubygems.org"))
+    fetcher = Bundler::Fetcher.new(source)
+    index = fetcher.specs([name], nil)
+    rubygem = index.search(Gem::Dependency.new(name, requirement)).last
+    if rubygem.nil?
+      raise "Could not find #{name} (#{requirement}) on rubygems.org!\n" \
+        "Found specs:\n#{index.send(:specs).inspect}"
+    end
+    "#{name} (#{rubygem.version})"
+  end
+
   # there is no rbx-relative-require gem that will install on 1.9
   it "ignores extra gems with bad platforms", :ruby => "~> 1.8.7" do
     gemfile <<-G
@@ -15,7 +29,7 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
 
   # https://github.com/bundler/bundler/issues/1202
   it "bundle cache works with rubygems 1.3.7 and pre gems",
-    :ruby => "~> 1.8.7", "https://rubygems.org" => "~> 1.3.7" do
+    :ruby => "~> 1.8.7", :rubygems => "~> 1.3.7" do
     install_gemfile <<-G
       source "https://rubygems.org"
       gem "rack",          "1.3.0.beta2"
@@ -32,8 +46,8 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       source "https://rubygems.org"
 
       gem 'i18n', '~> 0.6.0'
-      gem 'activesupport', '~> 3.0'
-      gem 'activerecord', '~> 3.0'
+      gem 'activesupport', '~> 3.0.5'
+      gem 'activerecord', '~> 3.0.5'
       gem 'builder', '~> 2.1.2'
     G
     bundle :lock
@@ -49,15 +63,7 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
     bundle! :lock
-    rails_version = ruby(<<-R)
-      require 'rubygems'
-      require 'bundler'
-      fetcher = Bundler::Fetcher.new(Bundler::Source::Rubygems::Remote.new(URI('https://rubygems.org')))
-      index = fetcher.specs(%w(rails), nil)
-      rails = index.search(Gem::Dependency.new("rails", "~> 3.0")).last
-      puts rails.version
-    R
-    expect(lockfile).to include("rails (#{rails_version})")
+    expect(lockfile).to include(rubygems_version("rails", "~> 3.0"))
     expect(lockfile).to include("capybara (2.2.1)")
   end
 
@@ -84,8 +90,8 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       gem "builder", "~> 2.1.2"
     G
     bundle :lock
-    expect(lockfile).to include("i18n (0.6.11)")
-    expect(lockfile).to include("activesupport (3.0.5)")
+    expect(lockfile).to include(rubygems_version("i18n", "~> 0.6.0"))
+    expect(lockfile).to include(rubygems_version("activesupport", "~> 3.0"))
   end
 
   # https://github.com/bundler/bundler/issues/1500

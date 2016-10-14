@@ -15,7 +15,7 @@ module Bundler
       else
         context_name = "vlad"
         role_default = "[:app]"
-        error_type = ::Vlad::CommandFailedError
+        error_type = ::Rake::CommandFailedError
       end
 
       roles = context.fetch(:bundle_roles, false)

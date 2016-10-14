@@ -12,6 +12,7 @@ describe "fetching dependencies with a mirrored source", :realworld => true, :ru
   end
 
   after do
+    Artifice.deactivate
     @t.kill
     @t.join
   end
