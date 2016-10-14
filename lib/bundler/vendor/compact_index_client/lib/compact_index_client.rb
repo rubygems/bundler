@@ -22,7 +22,7 @@ class Bundler::CompactIndexClient
     @cache = Cache.new(@directory)
     @endpoints = Set.new
     @info_checksums_by_name = {}
-    @parsed_checksums = nil
+    @parsed_checksums = false
     @in_parallel = lambda do |inputs, &blk|
       inputs.map(&blk)
     end
