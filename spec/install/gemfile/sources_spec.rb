@@ -449,4 +449,75 @@ describe "bundle install with gems on multiple sources" do
       end
     end
   end
+
+  context "when a gem is installed to system gems" do
+    before do
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    context "and the gemfile changes" do
+      it "is still able to find that gem from remote sources" do
+        source_uri = "file://#{gem_repo1}"
+        second_uri = "file://#{gem_repo4}"
+
+        build_repo4 do
+          build_gem "rack", "2.0.1.1.forked"
+          build_gem "thor", "0.19.1.1.forked"
+        end
+
+        # When this gemfile is installed...
+        gemfile <<-G
+          # frozen_string_literal: true
+          source "#{source_uri}"
+
+          source "#{second_uri}" do
+            gem "rack", "2.0.1.1.forked"
+            gem "thor", "0.19.1.1.forked"
+          end
+          gem "rack-obama"
+        G
+
+        # It creates this lockfile.
+        lockfile <<-L
+          GEM
+            remote: #{source_uri}/
+            remote: #{second_uri}/
+            specs:
+              rack (2.0.1.1.forked)
+              rack-obama (1.0)
+                rack
+              thor (0.19.1.1.forked)
+
+          PLATFORMS
+            ruby
+
+          DEPENDENCIES
+            rack (= 2.0.1.1.forked)!
+            rack-obama
+            thor!
+
+          BUNDLED WITH
+             1.13.3
+        L
+
+        # Then we change the Gemfile by adding a version to thor
+        gemfile <<-G
+          # frozen_string_literal: true
+          source "#{source_uri}"
+
+          source "#{second_uri}" do
+            gem "rack", "2.0.1.1.forked"
+            gem "thor", "0.19.1.1.forked"
+          end
+          gem "rack-obama"
+        G
+
+        # But we should still be able to find rack 2.0.1.1.forked and install it
+        bundle! :install
+      end
+    end
+  end
 end
