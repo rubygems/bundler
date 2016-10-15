@@ -32,6 +32,11 @@ describe "bunlde info" do
 
       expect(bundled_app("Gemfile.lock")).to exist
     end
+  
+    it "should show error message if gem not found" do
+      bundle "info anything"
 
+      expect(out).to eql("Could not find gem 'anything'.")
+    end
   end
 end

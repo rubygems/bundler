@@ -3,11 +3,10 @@ require "bundler/cli/common"
 
 module Bundler
   class CLI::Info
-    attr_reader :gem_name, :options, :latest_specs
+    attr_reader :gem_name, :options 
     def initialize(options, gem_name)
       @options = options
       @gem_name = gem_name
-      @latest_specs = fetch_latest_specs if not options[:path]
     end
 
     def run
@@ -35,7 +34,7 @@ module Bundler
 
     def print_gem_info spec
       desc = "  * #{spec.name} (#{spec.version}#{spec.git_version})"
-      latest = latest_specs.find {|l| l.name == spec.name }
+      latest = fetch_latest_specs().find {|l| l.name == spec.name }
       Bundler.ui.info <<-END.gsub(/^ +/, "")
         #{desc}
         \tSummary:  #{spec.summary || "No description available."}
