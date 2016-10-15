@@ -247,8 +247,8 @@ module Bundler
 
     desc "info GEM [OPTIONS]", "Shows gem information"
     method_option "path", :type => :boolean,
-                   :default => false,
-                   :banner => "Show gem path"
+                          :default => false,
+                          :banner => "Show gem path"
     def info(gem_name)
       require "bundler/cli/info"
       Info.new(options, gem_name).run

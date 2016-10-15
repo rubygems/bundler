@@ -2,7 +2,6 @@
 require "spec_helper"
 
 describe "bunlde info" do
-
   context "info from specific gem in gemfile" do
     before :each do
       install_gemfile <<-G
@@ -32,7 +31,7 @@ describe "bunlde info" do
 
       expect(bundled_app("Gemfile.lock")).to exist
     end
-  
+
     it "should show error message if gem not found" do
       bundle "info anything"
 

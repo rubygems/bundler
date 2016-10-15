@@ -3,7 +3,7 @@ require "bundler/cli/common"
 
 module Bundler
   class CLI::Info
-    attr_reader :gem_name, :options 
+    attr_reader :gem_name, :options
     def initialize(options, gem_name)
       @options = options
       @gem_name = gem_name
@@ -19,22 +19,20 @@ module Bundler
       return unless spec
 
       path = spec.full_gem_path
-      if options[:path]
-        return Bundler.ui.info(path)
-      end
+      return Bundler.ui.info(path) if options[:path]
 
       unless File.directory?(path)
         Bundler.ui.warn("The gem #{gem_name} has been deleted. It was installed at:")
       end
 
-      return print_gem_info spec
+      print_gem_info spec
     end
 
-    private
+  private
 
-    def print_gem_info spec
+    def print_gem_info(spec)
       desc = "  * #{spec.name} (#{spec.version}#{spec.git_version})"
-      latest = fetch_latest_specs().find {|l| l.name == spec.name }
+      latest = fetch_latest_specs.find {|l| l.name == spec.name }
       Bundler.ui.info <<-END.gsub(/^ +/, "")
         #{desc}
         \tSummary:  #{spec.summary || "No description available."}
@@ -53,6 +51,5 @@ module Bundler
       return false unless latest
       Gem::Version.new(current.version) < Gem::Version.new(latest.version)
     end
-
   end
 end
