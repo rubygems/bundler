@@ -1,3 +1,9 @@
+## 1.13.5 (2016-10-15)
+
+Bugfixes:
+
+  - Ensure a locked pre-release spec can always be re-resolved (#5089, @segiddins)
+
 ## 1.13.4 (2016-10-11)
 
 Bugfixes:
