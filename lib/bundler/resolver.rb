@@ -14,7 +14,7 @@ module Bundler
 
       def message
         conflicts.sort.reduce(String.new) do |o, (name, conflict)|
-          o << %(Bundler could not find compatible versions for gem "#{name}":\n)
+          o << %(\nBundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
             o << %(    #{printable_dep(conflict.locked_requirement)}\n)
@@ -62,7 +62,7 @@ module Bundler
             end
           end
           o
-        end
+        end.strip
       end
     end
 
@@ -315,6 +315,7 @@ module Bundler
       dependencies.sort_by do |dependency|
         name = name_for(dependency)
         [
+          @base_dg.vertex_named(name) ? 0 : 1,
           activated.vertex_named(name).payload ? 0 : 1,
           amount_constrained(dependency),
           conflicts[name] ? 0 : 1,
