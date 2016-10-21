@@ -41,7 +41,7 @@ module Bundler
                            :lock_shared_dependencies => options[:conservative])
       end
 
-      Bundler::CLI::Common.config_gem_version_promoter(Bundler.definition, options)
+      Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options)
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
