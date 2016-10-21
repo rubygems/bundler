@@ -1094,4 +1094,19 @@ describe "Bundler.setup" do
       expect(post_bundler).to match(/\d+\.\d+\.\d+/)
     end
   end
+
+  describe "after setup" do
+    it "allows calling #gem on random objects" do
+      install_gemfile <<-G
+        source "file:#{gem_repo1}"
+        gem "rack"
+      G
+      ruby! <<-RUBY
+        require "bundler/setup"
+        Object.new.gem "rack"
+        puts Gem.loaded_specs["rack"].full_name
+      RUBY
+      expect(out).to eq("rack-1.0.0")
+    end
+  end
 end
