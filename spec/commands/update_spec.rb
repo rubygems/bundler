@@ -481,81 +481,171 @@ end
 
 # these specs are slow and focus on integration and therefore are not exhaustive. unit specs elsewhere handle that.
 describe "bundle update conservative" do
-  before do
-    build_repo4 do
-      build_gem "foo", %w(1.4.3 1.4.4) do |s|
-        s.add_dependency "bar", "~> 2.0"
+  context "patch and minor options" do
+    before do
+      build_repo4 do
+        build_gem "foo", %w(1.4.3 1.4.4) do |s|
+          s.add_dependency "bar", "~> 2.0"
+        end
+        build_gem "foo", %w(1.4.5 1.5.0) do |s|
+          s.add_dependency "bar", "~> 2.1"
+        end
+        build_gem "foo", %w(1.5.1) do |s|
+          s.add_dependency "bar", "~> 3.0"
+        end
+        build_gem "bar", %w(2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0)
+        build_gem "qux", %w(1.0.0 1.0.1 1.1.0 2.0.0)
       end
-      build_gem "foo", %w(1.4.5 1.5.0) do |s|
-        s.add_dependency "bar", "~> 2.1"
-      end
-      build_gem "foo", %w(1.5.1) do |s|
-        s.add_dependency "bar", "~> 3.0"
-      end
-      build_gem "bar", %w(2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0)
-      build_gem "qux", %w(1.0.0 1.0.1 1.1.0 2.0.0)
+
+      # establish a lockfile set to 1.4.3
+      install_gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo', '1.4.3'
+        gem 'bar', '2.0.3'
+        gem 'qux', '1.0.0'
+      G
+
+      # remove 1.4.3 requirement and bar altogether
+      # to setup update specs below
+      gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo'
+        gem 'qux'
+      G
     end
 
-    # establish a lockfile set to 1.4.3
-    install_gemfile <<-G
-      source "file://#{gem_repo4}"
-      gem 'foo', '1.4.3'
-      gem 'bar', '2.0.3'
-      gem 'qux', '1.0.0'
-    G
+    context "patch preferred" do
+      it "single gem updates dependent gem to minor" do
+        bundle "update --patch foo"
 
-    # remove 1.4.3 requirement and bar altogether
-    # to setup update specs below
-    gemfile <<-G
-      source "file://#{gem_repo4}"
-      gem 'foo'
-      gem 'qux'
-    G
+        expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.0"
+      end
+
+      it "update all" do
+        bundle "update --patch"
+
+        expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.1"
+      end
+
+      it "warns on minor or major increment elsewhere" ## include in prior test
+    end
+
+    context "minor preferred" do
+      it "single gem updates dependent gem to major" do
+        bundle "update --minor foo"
+
+        expect(the_bundle).to include_gems "foo 1.5.1", "bar 3.0.0", "qux 1.0.0"
+      end
+
+      it "warns on major increment elsewhere" ## include in prior test
+
+      it "warns when something unlocked doesn't update at all"
+    end
+
+    context "strict" do
+      it "patch preferred" do
+        bundle "update --patch foo bar --strict"
+
+        expect(the_bundle).to include_gems "foo 1.4.4", "bar 2.0.5", "qux 1.0.0"
+      end
+
+      it "minor preferred" do
+        bundle "update --minor --strict"
+
+        expect(the_bundle).to include_gems "foo 1.5.0", "bar 2.1.1", "qux 1.1.0"
+      end
+    end
   end
 
-  context "patch preferred" do
-    it "single gem updates dependent gem to minor" do
-      bundle "update --patch foo"
+  context "eager unlocking" do
+    before do
+      build_repo4 do
+        build_gem "isolated_owner", %w(1.0.1 1.0.2) do |s|
+          s.add_dependency "isolated_dep", "~> 2.0"
+        end
+        build_gem "isolated_dep", %w(2.0.1 2.0.2)
 
-      expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.0"
+        build_gem "shared_owner_a", %w(3.0.1 3.0.2) do |s|
+          s.add_dependency "shared_dep", "~> 5.0"
+        end
+        build_gem "shared_owner_b", %w(4.0.1 4.0.2) do |s|
+          s.add_dependency "shared_dep", "~> 5.0"
+        end
+        build_gem "shared_dep", %w(5.0.1 5.0.2)
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'isolated_owner'
+
+        gem 'shared_owner_a'
+        gem 'shared_owner_b'
+      G
+
+      lockfile <<-L
+        GEM
+          remote: file://#{gem_repo4}
+          specs:
+            isolated_dep (2.0.1)
+            isolated_owner (1.0.1)
+              isolated_dep (~> 2.0)
+            shared_dep (5.0.1)
+            shared_owner_a (3.0.1)
+              shared_dep (~> 5.0)
+            shared_owner_b (4.0.1)
+              shared_dep (~> 5.0)
+
+        PLATFORMS
+          ruby
+
+        DEPENDENCIES
+          shared_owner_a
+          shared_owner_b
+          isolated_owner
+
+        BUNDLED WITH
+           1.13.0
+      L
     end
 
-    it "update all" do
-      bundle "update --patch"
+    it "should eagerly unlock isolated dependency" do
+      bundle "update isolated_owner"
 
-      expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.1"
+      expect(the_bundle).to include_gems "isolated_owner 1.0.2", "isolated_dep 2.0.2", "shared_dep 5.0.1", "shared_owner_a 3.0.1", "shared_owner_b 4.0.1"
     end
 
-    it "warns on minor or major increment elsewhere" ## include in prior test
-  end
+    it "should eagerly unlock shared dependency" do
+      bundle "update shared_owner_a"
 
-  context "minor preferred" do
-    it "single gem updates dependent gem to major" do
-      bundle "update --minor foo"
-
-      expect(the_bundle).to include_gems "foo 1.5.1", "bar 3.0.0", "qux 1.0.0"
+      expect(the_bundle).to include_gems "isolated_owner 1.0.1", "isolated_dep 2.0.1", "shared_dep 5.0.2", "shared_owner_a 3.0.2", "shared_owner_b 4.0.1"
     end
 
-    it "warns on major increment elsewhere" ## include in prior test
+    it "should not eagerly unlock with --conservative" do
+      bundle "update --conservative shared_owner_a isolated_owner"
 
-    it "warns when something unlocked doesn't update at all"
-  end
-
-  context "strict" do
-    it "patch preferred" do
-      bundle "update --patch foo bar --strict"
-
-      expect(the_bundle).to include_gems "foo 1.4.4", "bar 2.0.5", "qux 1.0.0"
+      expect(the_bundle).to include_gems "isolated_owner 1.0.2", "isolated_dep 2.0.2", "shared_dep 5.0.1", "shared_owner_a 3.0.2", "shared_owner_b 4.0.1"
     end
 
-    it "minor preferred" do
-      bundle "update --minor --strict"
+    it "should match bundle install conservative update behavior when not eagerly unlocking" do
+      gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'isolated_owner', '1.0.2'
 
-      expect(the_bundle).to include_gems "foo 1.5.0", "bar 2.1.1", "qux 1.1.0"
+        gem 'shared_owner_a', '3.0.2'
+        gem 'shared_owner_b'
+      G
+
+      bundle "install"
+
+      expect(the_bundle).to include_gems "isolated_owner 1.0.2", "isolated_dep 2.0.2", "shared_dep 5.0.1", "shared_owner_a 3.0.2", "shared_owner_b 4.0.1"
     end
   end
 
   context "error handling" do
+    before do
+      gemfile ""
+    end
+
     it "raises if too many flags are provided" do
       bundle "update --patch --minor"
 

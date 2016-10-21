@@ -22,7 +22,7 @@ module Bundler
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
       update = options[:update]
-      update = { :gems => update } if update.is_a?(Array)
+      update = { :gems => update, :lock_shared_dependencies => options[:conservative] } if update.is_a?(Array)
       definition = Bundler.definition(update)
 
       Bundler::CLI::Common.config_gem_version_promoter(Bundler.definition, options) if options[:update]

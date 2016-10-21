@@ -159,23 +159,8 @@ describe Bundler::Definition do
         end
       end
 
-      context "shared dependent gems" do
+      context "eager unlock" do
         before do
-          build_repo4 do
-            build_gem "isolated_owner", %w(1.0.1 1.0.2) do |s|
-              s.add_dependency "isolated_dep", "~> 2.0"
-            end
-            build_gem "isolated_dep", %w(2.0.1 2.0.2)
-
-            build_gem "shared_owner_a", %w(3.0.1 3.0.2) do |s|
-              s.add_dependency "shared_dep", "~> 5.0"
-            end
-            build_gem "shared_owner_b", %w(4.0.1 4.0.2) do |s|
-              s.add_dependency "shared_dep", "~> 5.0"
-            end
-            build_gem "shared_dep", %w(5.0.1 5.0.2)
-          end
-
           gemfile <<-G
             source "file://#{gem_repo4}"
             gem 'isolated_owner'
@@ -210,19 +195,34 @@ describe Bundler::Definition do
           L
         end
 
-        it "should unlock isolated and shared dependencies equally" do
-          # setup for these test costs about 3/4 of a second, much faster to just jam them all in here.
-          # the global before :each defeats any ability to have re-usable setup for many examples in a
-          # single context by wiping out the tmp dir and contents.
-
-          unlock_deps_test(%w(isolated_owner), %w(isolated_dep isolated_owner))
-          unlock_deps_test(%w(isolated_owner shared_owner_a), %w(isolated_dep isolated_owner shared_dep shared_owner_a))
+        it "should not eagerly unlock shared dependency with bundle install conservative updating behavior" do
+          updated_deps_in_gemfile = [Bundler::Dependency.new("isolated_owner", ">= 0"),
+                                     Bundler::Dependency.new("shared_owner_a", "3.0.2"),
+                                     Bundler::Dependency.new("shared_owner_b", ">= 0")]
+          unlock_hash_for_bundle_install = {}
+          definition = Bundler::Definition.new(
+            bundled_app("Gemfile.lock"),
+            updated_deps_in_gemfile,
+            Bundler::SourceList.new,
+            unlock_hash_for_bundle_install
+          )
+          locked = definition.send(:converge_locked_specs).map(&:name)
+          expect(locked.include?("shared_dep")).to be_truthy
         end
 
-        def unlock_deps_test(passed_unlocked, expected_calculated)
-          definition = Bundler::Definition.new(bundled_app("Gemfile.lock"), [], Bundler::SourceList.new, :gems => passed_unlocked)
-          unlock_gems = definition.gem_version_promoter.unlock_gems
-          expect(unlock_gems.sort).to eq expected_calculated
+        it "should not eagerly unlock shared dependency with bundle update conservative updating behavior" do
+          updated_deps_in_gemfile = [Bundler::Dependency.new("isolated_owner", ">= 0"),
+                                     Bundler::Dependency.new("shared_owner_a", ">= 0"),
+                                     Bundler::Dependency.new("shared_owner_b", ">= 0")]
+          definition = Bundler::Definition.new(
+            bundled_app("Gemfile.lock"),
+            updated_deps_in_gemfile,
+            Bundler::SourceList.new,
+            :gems => ["shared_owner_a"], :lock_shared_dependencies => true
+          )
+          locked = definition.send(:converge_locked_specs).map(&:name)
+          expect(locked).to eq %w(isolated_dep isolated_owner shared_dep shared_owner_b)
+          expect(locked.include?("shared_dep")).to be_truthy
         end
       end
 
