@@ -492,7 +492,11 @@ module Bundler
                 "Your Ruby patchlevel is #{actual}, but your #{specified} #{expected}"
               end
       end
-      msg += ". This may cause issues if there are any gems that were depending on that ruby version." if implicit_ruby_version
+      if implicit_ruby_version
+        msg += ". This may cause issues if there are any gems that were depending on that ruby version." \
+               "\nTo update the locked ruby version, run `bundle update --ruby`." \
+               "If that fails, run `bundle update` followed by `bundle update --ruby`."
+      end
 
       raise RubyVersionMismatch, msg if !implicit_ruby_version || Bundler.feature_flag.bundler_2_mode?
 
