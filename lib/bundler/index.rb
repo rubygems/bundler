@@ -59,16 +59,31 @@ module Bundler
     # about, returning all of the results.
     def search(query, base = nil)
       results = local_search(query, base)
-      seen = results.map(&:full_name).to_set
+      results = results.group_by(&:full_name)
 
       @sources.each do |source|
-        source.search(query, base).each do |spec|
-          results << spec if seen.add?(spec.full_name)
+        source.search_without_sorting(query, base).each do |spec|
+          results[spec.full_name] ||= [spec]
         end
       end
 
-      sort_specs(results)
+      filter_dependency(base, query, base).each do |locked_spec|
+        results[locked_spec.full_name] ||= [locked_spec]
+      end if base
+
+      sort_specs(results.values.flatten) # .tap {|s| warn "search(#{query}, #{base && base.map(&:full_name)}) => #{s.map(&:full_name)}"}
     end
+
+    def search_without_sorting(query, base, target = [])
+      target.concat local_search(query, base)
+
+      @sources.each do |source|
+        target.concat source.search_without_sorting(query, base, target)
+      end
+
+      target
+    end
+    protected :search_without_sorting
 
     def self.sort_specs(specs)
       specs.sort_by do |s|
@@ -85,10 +100,9 @@ module Bundler
       case query
       when Gem::Specification, RemoteSpecification, LazySpecification, EndpointSpecification then search_by_spec(query)
       when String then specs_by_name(query)
-      when Gem::Dependency then search_by_dependency(query, base)
-      when DepProxy then search_by_dependency(query.dep, base)
+      when Gem::Dependency, DepProxy then search_by_dependency(query, base)
       else
-        raise "You can't search for a #{query.inspect}."
+        raise ArgumentError, "You can't search for a #{query.inspect}."
       end
     end
 
@@ -164,30 +178,40 @@ module Bundler
       @specs[name].values
     end
 
-    def search_by_dependency(dependency, base = nil)
-      @cache[base || false] ||= {}
-      @cache[base || false][dependency] ||= begin
-        specs = specs_by_name(dependency.name)
-        specs += base if base
-        found = specs.select do |spec|
-          next true if spec.source.is_a?(Source::Gemspec)
-          if base # allow all platforms when searching from a lockfile
-            dependency.matches_spec?(spec)
-          else
-            dependency.matches_spec?(spec) && Gem::Platform.match(spec.platform)
-          end
-        end
-
-        wants_prerelease = dependency.requirement.prerelease?
-        wants_prerelease ||= base && base.any? {|base_spec| base_spec.version.prerelease? }
-        only_prerelease = specs.all? {|spec| spec.version.prerelease? }
-
-        unless wants_prerelease || only_prerelease
-          found.reject! {|spec| spec.version.prerelease? }
-        end
-
-        found
+    def search_by_dependency(dependency, base)
+      @cache ||= {}
+      @cache[dependency] ||= begin
+        filter_dependency(specs_by_name(dependency.name), dependency, base)
       end
+    end
+
+    def filter_dependency(specs, dependency, base)
+      case dependency
+      when Gem::Dependency
+      when DepProxy
+        dependency = dependency.dep
+      else
+        return []
+      end
+
+      found = specs.select do |spec|
+        next true if spec.source.is_a?(Source::Gemspec)
+        if base # allow all platforms when searching from a lockfile
+          dependency.matches_spec?(spec)
+        else
+          dependency.matches_spec?(spec) && Gem::Platform.match(spec.platform)
+        end
+      end
+
+      allow_prerelease_versions = dependency.requirement.prerelease?
+      allow_prerelease_versions ||= base && base.any? {|base_spec| base_spec.version.prerelease? }
+      allow_prerelease_versions ||= specs.all? {|spec| spec.version.prerelease? }
+
+      unless allow_prerelease_versions
+        found.reject! {|spec| spec.version.prerelease? }
+      end
+
+      found
     end
 
     EMPTY_SEARCH = [].freeze
