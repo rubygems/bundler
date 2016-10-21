@@ -348,6 +348,10 @@ module Bundler
 
           true
         end
+
+        # TODO: delete this in 2.0, it's a backwards compatibility shim
+        # see https://github.com/bundler/bundler/issues/5102
+        kernel_class.send(:public, :gem)
       end
     end
 
