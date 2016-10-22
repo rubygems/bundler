@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require "spec_helper"
-
+  <?php
 describe "bundle update" do
   before :each do
     build_repo2
