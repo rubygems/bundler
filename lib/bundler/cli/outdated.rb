@@ -72,18 +72,19 @@ module Bundler
         end
 
         active_spec = Bundler.definition.gem_version_promoter.sort_versions(dependency, spec_groups).last
-        gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
-
         if filter_options_patch.any?
           update_present = update_present_via_semver_portions(current_spec, active_spec, options)
-          next unless update_present
+          active_spec = nil unless update_present
         end
+
+        next if active_spec.nil?
 
         git_outdated = false
         if active_spec.respond_to?(:git_version)
           git_outdated = current_spec.git_version != active_spec.git_version
         end
 
+        gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
         if gem_outdated || git_outdated
           groups = nil
           if dependency && !options[:parseable]
