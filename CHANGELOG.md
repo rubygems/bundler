@@ -1,3 +1,9 @@
+## 1.13.6 (2016-10-22)
+
+Bugfixes:
+
+  - make the `gem` method public again, fixing a regression in 1.13.4 (#5102, @segiddins)
+
 ## 1.13.5 (2016-10-15)
 
 Bugfixes:
