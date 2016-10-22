@@ -222,9 +222,9 @@ module Bundler
     method_option "major", :type => :boolean, :banner =>
       "Prefer updating to next major version (default)"
     method_option "strict", :type => :boolean, :banner =>
-      "Do not allow any gem to be updated past latest --patch/--minor/--major"
+      "Do not allow any gem to be updated past latest --patch | --minor | --major"
     method_option "conservative", :type => :boolean, :banner =>
-      "Use bundle install conservative update behavior and do not allowed shared dependencies to be updated."
+      "Use bundle install conservative update behavior and do not allow shared dependencies to be updated."
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run
@@ -478,7 +478,7 @@ module Bundler
     method_option "strict", :type => :boolean, :banner =>
       "If updating, do not allow any gem to be updated past latest --patch | --minor | --major"
     method_option "conservative", :type => :boolean, :banner =>
-      "If updating, use bundle install conservative update behavior and do not allowed shared dependencies to be updated."
+      "If updating, use bundle install conservative update behavior and do not allow shared dependencies to be updated."
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run
