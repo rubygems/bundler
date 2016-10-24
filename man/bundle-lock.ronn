@@ -7,6 +7,14 @@ bundle-lock(1) -- Creates / Updates a lockfile without installing
               [--local]
               [--print]
               [--lockfile=PATH]
+              [--full-index]
+              [--add-platform]
+              [--remove-platform]
+              [--patch]
+              [--minor]
+              [--major]
+              [--strict]
+              [--conservative]
 
 ## DESCRIPTION
 
@@ -30,6 +38,30 @@ Lock the gems specified in Gemfile.
 * `--lockfile=<path>`:
   The path where the lockfile should be written to.
 
+* `--full-index`:
+  Fall back to using the single-file index of all gems.
+
+* `--add-platform`:
+  Add a new platform to the lockfile.
+
+* `--remove-platform`:
+  Remove a platform from the lockfile.
+
+* `--patch`:
+  If updating, prefer updating only to next patch version.
+
+* `--minor`:
+  If updating, prefer updating only to next minor version.
+
+* `--major`:
+  If updating, prefer updating to next major version (default).
+
+* `--strict`:
+  If updating, do not allow any gem to be updated past latest --patch | --minor | --major.
+
+* `--conservative`:
+  If updating, use bundle install conservative update behavior and do not allow shared dependencies to be updated.
+
 ## UPDATING ALL GEMS
 
 If you run `bundle lock` with `--update` option without list of gems, bundler will
@@ -45,3 +77,7 @@ For instance, you only want to update `nokogiri`, run `bundle lock --update noko
 
 Bundler will update `nokogiri` and any of its dependencies, but leave the rest of the
 gems that you specified locked to the versions in the `Gemfile.lock`.
+
+## PATCH LEVEL OPTIONS
+
+See [bundle update(1)][bundle-update] for details.
