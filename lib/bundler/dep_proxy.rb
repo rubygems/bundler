@@ -13,6 +13,7 @@ module Bundler
     end
 
     def ==(other)
+      return unless other
       dep == other.dep && __platform == other.__platform
     end
 
