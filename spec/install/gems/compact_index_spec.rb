@@ -716,7 +716,7 @@ The checksum of /versions does not match the checksum provided by the server! So
 
       expect(exitstatus).to eq(19) if exitstatus
       expect(out).
-        to  include("Bundler cannot continue installing rack (1.0.0).\n").
+        to  include("Bundler cannot continue installing rack (1.0.0).").
         and include("The checksum for the downloaded `rack-1.0.0.gem` does not match the checksum given by the server.").
         and include("This means the contents of the downloaded gem is different from what was uploaded to the server, and could be a potential security issue.").
         and include("To resolve this issue:").
