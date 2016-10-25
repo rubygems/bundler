@@ -271,8 +271,8 @@ module Bundler
       versions of the given gems. Prerelease gems are ignored by default. If your gems
       are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
 
-      For more information on conservative resolution options (--major, --minor,
-      --patch, --strict) see documentation on the same options on the update command.
+      For more information on patch level options (--major, --minor, --patch,
+      --update-strict) see documentation on the same options on the update command.
     D
     method_option "group", :aliases => "--group", :type => :string, :banner => "List gems from a specific group"
     method_option "groups", :aliases => "--groups", :type => :boolean, :banner => "List gems organized by groups"
@@ -283,7 +283,7 @@ module Bundler
     method_option "strict", :type => :boolean, :banner =>
       "Only list newer versions allowed by your Gemfile requirements"
     method_option "update-strict", :type => :boolean, :banner =>
-      "Strict conservative resolution, do not allow any gem to be updated past latest --patch/--minor/--major"
+      "Strict conservative resolution, do not allow any gem to be updated past latest --patch | --minor | --major"
     method_option "minor", :type => :boolean, :banner => "Prefer updating only to next minor version"
     method_option "major", :type => :boolean, :banner => "Prefer updating to next major version (default)"
     method_option "patch", :type => :boolean, :banner => "Prefer updating only to next patch version"
