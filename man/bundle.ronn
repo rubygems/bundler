@@ -27,20 +27,20 @@ We divide `bundle` subcommands into primary commands and utilities.
 
 ## PRIMARY COMMANDS
 
-* [bundle install(1)][bundle-install]:
+* [`bundle install(1)`][bundle-install]:
   Install the gems specified by the `Gemfile` or `Gemfile.lock`
 
-* [bundle update(1)][bundle-update]:
+* [`bundle update(1)`][bundle-update]:
   Update dependencies to their latest versions
 
-* [bundle package(1)][bundle-package]:
+* [`bundle package(1)`][bundle-package]:
   Package the .gem files required by your application into the
   `vendor/cache` directory
 
-* [bundle exec(1)][bundle-exec]:
+* [`bundle exec(1)`][bundle-exec]:
   Execute a script in the context of the current bundle
 
-* [bundle config(1)][bundle-config]:
+* [`bundle config(1)`][bundle-config]:
   Specify and read configuration options for bundler
 
 * `bundle help(1)`:
