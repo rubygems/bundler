@@ -7,7 +7,7 @@ require "bundler/version"
 Gem::Specification.new do |s|
   s.name        = "bundler"
   s.version     = Bundler::VERSION
-  s.licenses    = ["MIT"]
+  s.license     = "MIT"
   s.authors     = ["André Arko", "Samuel Giddins"]
   s.email       = ["team@bundler.io"]
   s.homepage    = "http://bundler.io"
