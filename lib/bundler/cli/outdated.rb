@@ -111,6 +111,21 @@ module Bundler
 
             print_gems(gems)
           end
+        elsif options[:pretty]
+          header = ["Gem Name", "Installed", "New", "Requested", "Groups"]
+          header << "Load Path" if options[:verbose]
+
+          outdated_gems_list.map! do |gem|
+            current_version = "#{gem[:current_spec].version}#{gem[:current_spec].git_version}"
+            spec_version = "#{gem[:active_spec].version}#{gem[:active_spec].git_version}"
+            dependency = gem[:dependency].requirement if gem[:dependency] && gem[:dependency].specific?
+
+            ret_val = [gem[:active_spec].name, current_version, spec_version, dependency.to_s, gem[:groups].to_s]
+            ret_val << gem[:active_spec].loaded_from if options[:verbose]
+            ret_val
+          end
+
+          print_indented header, *outdated_gems_list
         else
           print_gems(outdated_gems_list)
         end
@@ -252,6 +267,24 @@ module Bundler
     def get_version_semver_portion_value(spec, version_portion_index)
       version_section = spec.version.segments[version_portion_index, 1]
       version_section.to_a[0].to_i
+    end
+
+    def print_indented(*data)
+      columns = data.first.size
+
+      column_sizes = Array.new(columns) do |index|
+        data.max_by {|row| row[index].to_s.length }[index].length
+      end
+
+      data.sort_by! {|row| row[0] }
+
+      data.each do |row|
+        row = row.each_with_index.map do |element, index|
+          element.to_s.ljust(column_sizes[index])
+        end
+
+        Bundler.ui.info row.join(" ") + "\n"
+      end
     end
   end
 end
