@@ -91,6 +91,12 @@ module Bundler
         "#!/usr/bin/env jruby\n",
         "#!#{Gem.ruby}\n",
       ]
+
+      if File.zero?(file)
+        Bundler.ui.warn "#{file} is empty"
+        return false
+      end
+
       first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }
       possibilities.any? {|shebang| first_line.start_with?(shebang) }
     end
