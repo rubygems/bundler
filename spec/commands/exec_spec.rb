@@ -514,6 +514,21 @@ describe "bundle exec" do
       end
     end
 
+    context "the executable is empty" do
+      let(:executable) { "" }
+
+      let(:exit_code) { 0 }
+      let(:expected) { "#{path} is empty" }
+      let(:expected_err) { "" }
+      if LessThanProc.with(RUBY_VERSION).call("1.9")
+        # Kernel#exec in ruby < 1.9 will raise Errno::ENOEXEC if the command content is empty,
+        # even if the command is set as an executable.
+        pending "Kernel#exec is different"
+      else
+        it_behaves_like "it runs"
+      end
+    end
+
     context "the executable raises" do
       let(:executable) { super() << "\nraise 'ERROR'" }
       let(:exit_code) { 1 }
