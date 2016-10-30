@@ -11,6 +11,8 @@
 
 # output from ronn
 /lib/bundler/man/
+man/*
+!man/*.ronn
 
 # rspec failure tracking
 .rspec_status

@@ -238,14 +238,15 @@ begin
   require "ronn"
 
   namespace :man do
-    directory "lib/bundler/man"
+    directory "man"
 
     sources = Dir["man/*.ronn"].map {|f| File.basename(f, ".ronn") }
     sources.map do |basename|
       ronn = "man/#{basename}.ronn"
-      roff = "lib/bundler/man/#{basename}"
+      manual_section = ".1" unless basename =~ /.*(\d+)\Z/
+      roff = "man/#{basename}#{manual_section}"
 
-      file roff => ["lib/bundler/man", ronn] do
+      file roff => ["man", ronn] do
         sh "#{Gem.ruby} -S ronn --roff --pipe #{ronn} > #{roff}"
       end
 
@@ -257,9 +258,8 @@ begin
     end
 
     task :clean do
-      leftovers = Dir["lib/bundler/man/*"].reject do |f|
-        basename = File.basename(f).sub(/\.(txt|ronn)/, "")
-        sources.include?(basename)
+      leftovers = Dir["man/*"].reject do |f|
+        File.extname(f) == ".ronn" || f == "man/index.txt"
       end
       rm leftovers if leftovers.any?
     end

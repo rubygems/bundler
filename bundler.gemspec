@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   s.files = `git ls-files -z`.split("\x0").reject {|f| f.match(%r{^(test|spec|features)/}) }
   # we don't check in man pages, but we need to ship them because
   # we use them to generate the long-form help for each command.
-  s.files += Dir.glob("lib/bundler/man/**/*")
+  s.files += Dir.glob("man/**/*")
 
   s.bindir        = "exe"
   s.executables   = %w(bundle bundler)
