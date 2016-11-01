@@ -222,9 +222,9 @@ module Bundler
     method_option "major", :type => :boolean, :banner =>
       "Prefer updating to next major version (default)"
     method_option "strict", :type => :boolean, :banner =>
-      "Do not allow any gem to be updated past latest --patch/--minor/--major"
+      "Do not allow any gem to be updated past latest --patch | --minor | --major"
     method_option "conservative", :type => :boolean, :banner =>
-      "Use bundle install conservative update behavior and do not allowed shared dependencies to be updated."
+      "Use bundle install conservative update behavior and do not allow shared dependencies to be updated."
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run
@@ -271,8 +271,8 @@ module Bundler
       versions of the given gems. Prerelease gems are ignored by default. If your gems
       are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
 
-      For more information on conservative resolution options (--major, --minor,
-      --patch, --strict) see documentation on the same options on the update command.
+      For more information on patch level options (--major, --minor, --patch,
+      --update-strict) see documentation on the same options on the update command.
     D
     method_option "group", :aliases => "--group", :type => :string, :banner => "List gems from a specific group"
     method_option "groups", :aliases => "--groups", :type => :boolean, :banner => "List gems organized by groups"
@@ -283,7 +283,7 @@ module Bundler
     method_option "strict", :type => :boolean, :banner =>
       "Only list newer versions allowed by your Gemfile requirements"
     method_option "update-strict", :type => :boolean, :banner =>
-      "Strict conservative resolution, do not allow any gem to be updated past latest --patch/--minor/--major"
+      "Strict conservative resolution, do not allow any gem to be updated past latest --patch | --minor | --major"
     method_option "minor", :type => :boolean, :banner => "Prefer updating only to next minor version"
     method_option "major", :type => :boolean, :banner => "Prefer updating to next major version (default)"
     method_option "patch", :type => :boolean, :banner => "Prefer updating only to next patch version"
@@ -466,9 +466,9 @@ module Bundler
     method_option "full-index", :type => :boolean, :default => false, :banner =>
       "Fall back to using the single-file index of all gems"
     method_option "add-platform", :type => :array, :default => [], :banner =>
-      "add a new platform to the lockfile"
+      "Add a new platform to the lockfile"
     method_option "remove-platform", :type => :array, :default => [], :banner =>
-      "remove a platform from the lockfile"
+      "Remove a platform from the lockfile"
     method_option "patch", :type => :boolean, :banner =>
       "If updating, prefer updating only to next patch version"
     method_option "minor", :type => :boolean, :banner =>
@@ -478,7 +478,7 @@ module Bundler
     method_option "strict", :type => :boolean, :banner =>
       "If updating, do not allow any gem to be updated past latest --patch | --minor | --major"
     method_option "conservative", :type => :boolean, :banner =>
-      "If updating, use bundle install conservative update behavior and do not allowed shared dependencies to be updated."
+      "If updating, use bundle install conservative update behavior and do not allow shared dependencies to be updated"
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run

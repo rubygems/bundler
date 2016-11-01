@@ -526,8 +526,6 @@ describe "bundle update conservative" do
 
         expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.1"
       end
-
-      it "warns on minor or major increment elsewhere" ## include in prior test
     end
 
     context "minor preferred" do
@@ -536,10 +534,6 @@ describe "bundle update conservative" do
 
         expect(the_bundle).to include_gems "foo 1.5.1", "bar 3.0.0", "qux 1.0.0"
       end
-
-      it "warns on major increment elsewhere" ## include in prior test
-
-      it "warns when something unlocked doesn't update at all"
     end
 
     context "strict" do
@@ -651,11 +645,5 @@ describe "bundle update conservative" do
 
       expect(out).to eq "Provide only one of the following options: minor, patch"
     end
-  end
-
-  context "other commands" do
-    it "Installer could support --dry-run flag for install and update"
-
-    it "outdated should conform its flags to the resolver flags"
   end
 end

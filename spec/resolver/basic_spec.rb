@@ -214,18 +214,22 @@ describe "Resolving" do
         should_conservative_resolve_and_include :patch, [], %w(foo-1.4.4 bar-2.1.1)
       end
 
-      it "will not revert to a previous version in strict mode level patch" do
-        pending "possible issue with molinillo - needs further research"
-        should_conservative_resolve_and_include [:patch, :strict], [], %w(foo-1.4.3 bar-2.1.1)
+      it "cannot revert to a previous version in strict mode level patch" do
+        # the strict option removes the version required to match, so a version conflict results
+        expect do
+          should_conservative_resolve_and_include [:patch, :strict], [], %w(foo-1.4.3 bar-2.1.1)
+        end.to raise_error Bundler::VersionConflict, /#{Regexp.escape("Could not find gem 'bar (~> 2.1.0)'")}/
       end
 
       it "could revert to a previous version level minor" do
         should_conservative_resolve_and_include :minor, [], %w(foo-1.5.0 bar-2.0.5)
       end
 
-      it "will not revert to a previous version in strict mode level minor" do
-        pending "possible issue with molinillo - needs further research"
-        should_conservative_resolve_and_include [:minor, :strict], [], %w(foo-1.4.3 bar-2.1.1)
+      it "cannot revert to a previous version in strict mode level minor" do
+        # the strict option removes the version required to match, so a version conflict results
+        expect do
+          should_conservative_resolve_and_include [:minor, :strict], [], %w(foo-1.4.3 bar-2.1.1)
+        end.to raise_error Bundler::VersionConflict, /#{Regexp.escape("Could not find gem 'bar (~> 2.0.0)'")}/
       end
     end
   end
