@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "strscan"
 
 # Some versions of the Bundler 1.1 RC series introduced corrupted
 # lockfiles. There were two major problems:
