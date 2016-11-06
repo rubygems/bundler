@@ -61,30 +61,21 @@ module Bundler
 
     def help(cli = nil)
       case cli
-      when "gemfile" then command = "gemfile.5"
+      when "gemfile" then command = "gemfile"
       when nil       then command = "bundle"
       else command = "bundle-#{cli}"
       end
 
-      manpages = %w(
-        bundle
-        bundle-config
-        bundle-exec
-        bundle-gem
-        bundle-install
-        bundle-package
-        bundle-update
-        bundle-platform
-        gemfile.5
-      )
+      man_path  = File.expand_path("../../../man", __FILE__)
+      man_pages = Hash[Dir.glob(File.join(man_path, "*")).grep(/.*\.\d*\Z/).collect do |f|
+        [File.basename(f, ".*"), f]
+      end]
 
-      if manpages.include?(command)
-        root = File.expand_path("../man", __FILE__)
-
-        if Bundler.which("man") && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          Kernel.exec "man #{root}/#{command}"
+      if man_pages.include?(command)
+        if Bundler.which("man") && man_path !~ %r{^file:/.+!/META-INF/jruby.home/.+}
+          Kernel.exec "man #{man_pages[command]}"
         else
-          puts File.read("#{root}/#{command}.txt")
+          puts File.read("#{man_path}/#{File.basename(man_pages[command])}.txt")
         end
       elsif command_path = Bundler.which("bundler-#{cli}")
         Kernel.exec(command_path, "--help")
