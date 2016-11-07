@@ -27,6 +27,11 @@ See [bundler.io](http://bundler.io) for the full documentation.
 
 For help with common problems, see [ISSUES](https://github.com/bundler/bundler/blob/master/ISSUES.md).
 
+### Supporting
+
+<a href="https://rubytogether.org/"><img src="https://rubytogether.org/images/rubies.svg" width=200></a><br/>
+Bundler is maintained by <a href="https://rubytogether.org/">Ruby Together</a>, a grassroots initiative committed to supporting the critical Ruby infrastructure you rely on. Contribute today <a href="https://rubytogether.org/developers">as an individual</a> or even better, <a href="https://rubytogether.org/companies">as a company</a>, and ensure that Bundler, RubyGems, and other shared tooling is around for years to come.
+
 ### Other questions
 
 To see what has changed in recent versions of Bundler, see the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md).
