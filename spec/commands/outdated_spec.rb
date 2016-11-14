@@ -607,17 +607,17 @@ describe "bundle outdated" do
       it "shows all gems when patching and filtering to patch" do
         bundle "outdated --patch --filter-patch"
 
-        expect(out).to include("patch (newest")
-        expect(out).to include("minor (newest")
-        expect(out).to include("major (newest")
+        expect(out).to include("patch (newest 1.0.1")
+        expect(out).to include("minor (newest 1.0.1")
+        expect(out).to include("major (newest 1.0.1")
       end
 
       it "shows minor and major when updating to minor and filtering to patch and minor" do
         bundle "outdated --minor --filter-minor"
 
         expect(out).not_to include("patch (newest")
-        expect(out).to include("minor (newest")
-        expect(out).to include("major (newest")
+        expect(out).to include("minor (newest 1.1.0")
+        expect(out).to include("major (newest 1.1.0")
       end
 
       it "shows minor when updating to major and filtering to minor with parseable" do

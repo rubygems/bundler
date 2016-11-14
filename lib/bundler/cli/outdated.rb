@@ -32,7 +32,7 @@ module Bundler
       end
 
       Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options)
-      # the patch level options don't work without strict also being true
+      # the patch level options imply strict is also true. It wouldn't make sense otherwise.
       strict = options[:strict] || Bundler::CLI::Common.patch_level_options(options).any?
 
       definition_resolution = proc { options[:local] ? definition.resolve_with_cache! : definition.resolve_remotely! }
@@ -54,11 +54,11 @@ module Bundler
         dependency = current_dependencies[current_spec.name]
 
         if strict
-          active_spec = definition.specs.detect {|spec| spec.name == current_spec.name && spec.match_platform(current_spec.platform) }
+          active_spec = definition.find_resolved_spec(current_spec)
         else
-          active_specs = definition.index[current_spec.name].select {|spec| spec.match_platform(current_spec.platform) }.sort_by(&:version)
+          active_specs = definition.find_indexed_specs(current_spec)
           if !current_spec.version.prerelease? && !options[:pre] && active_specs.size > 1
-            active_spec = active_specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
+            active_specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
           end
           active_spec = active_specs.last
         end
