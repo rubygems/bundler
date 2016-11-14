@@ -531,6 +531,14 @@ module Bundler
       add_platform(generic(current_platform))
     end
 
+    def find_resolved_spec(current_spec)
+      specs.find_by_name_and_platform(current_spec.name, current_spec.platform)
+    end
+
+    def find_indexed_specs(current_spec)
+      index[current_spec.name].select {|spec| spec.match_platform(current_spec.platform) }.sort_by(&:version)
+    end
+
     attr_reader :sources
     private :sources
 
