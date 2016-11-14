@@ -57,7 +57,7 @@ module Bundler
 
       if options["binstubs"]
         Bundler::SharedHelpers.major_deprecation \
-          "the --binstubs option will be removed in favor of `bundle binstubs`"
+          "The --binstubs option will be removed in favor of `bundle binstubs`"
       end
 
       Plugin.gemfile_install(Bundler.default_gemfile) if Bundler.feature_flag.plugins?
