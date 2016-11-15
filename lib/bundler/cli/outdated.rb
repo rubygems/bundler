@@ -54,9 +54,9 @@ module Bundler
         dependency = current_dependencies[current_spec.name]
 
         if strict
-          active_spec = definition.specs.detect {|spec| spec.name == current_spec.name && spec.platform == current_spec.platform }
+          active_spec = definition.specs.detect {|spec| spec.name == current_spec.name && spec.match_platform(current_spec.platform) }
         else
-          active_specs = definition.index[current_spec.name].select {|spec| spec.platform == current_spec.platform }.sort_by(&:version)
+          active_specs = definition.index[current_spec.name].select {|spec| spec.match_platform(current_spec.platform) }.sort_by(&:version)
           if !current_spec.version.prerelease? && !options[:pre] && active_specs.size > 1
             active_spec = active_specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
           end
