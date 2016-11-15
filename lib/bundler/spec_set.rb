@@ -114,6 +114,10 @@ module Bundler
       SpecSet.new(arr)
     end
 
+    def find_by_name_and_platform(name, platform)
+      @specs.detect {|spec| spec.name == name && spec.match_platform(platform) }
+    end
+
   private
 
     def sorted
