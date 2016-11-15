@@ -38,7 +38,7 @@ describe "bundle install" do
 
     it "disallows --path vendor/bundle --system" do
       bundle "install --path vendor/bundle --system"
-      expect(out).to include("Please choose.")
+      expect(out).to include("Please choose only one option.")
       expect(exitstatus).to eq(15) if exitstatus
     end
 

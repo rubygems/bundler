@@ -22,15 +22,15 @@ describe "install with --deployment or --frozen" do
   it "disallows --deployment --system" do
     bundle "install --deployment --system"
     expect(out).to include("You have specified both --deployment")
-    expect(out).to include("Please choose.")
+    expect(out).to include("Please choose only one option")
     expect(exitstatus).to eq(15) if exitstatus
   end
 
   it "disallows --deployment --path --system" do
     bundle "install --deployment --path . --system"
-    expect(out).to include("You have specified both a path to install your gems to")
-    expect(out).to include("You have specified both --deployment")
-    expect(out).to include("Please choose.")
+    expect(out).to include("You have specified both --path")
+    expect(out).to include("as well as --system")
+    expect(out).to include("Please choose only one option")
     expect(exitstatus).to eq(15) if exitstatus
   end
 
