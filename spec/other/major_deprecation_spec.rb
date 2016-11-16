@@ -97,7 +97,7 @@ describe "major deprecations" do
         G
 
         bundle :install, :binstubs => true
-        expect(warnings).to have_major_deprecation a_string_including("the --binstubs option will be removed")
+        expect(warnings).to have_major_deprecation a_string_including("The --binstubs option will be removed")
       end
     end
   end
