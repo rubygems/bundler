@@ -235,7 +235,7 @@ There are a number of `Gemfile` platforms:
     _x64_mingw_ `AND` version 2.2
   * `x64_mingw_23`:
     _x64_mingw_ `AND` version 2.3
-  * `x65_mingw_23`:
+  * `x64_mingw_24`:
     _x64_mingw_ `AND` version 2.4
 
 As with groups, you can specify one or more platforms:
