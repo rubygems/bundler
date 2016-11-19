@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bunlde info" do
+describe "bundle info" do
   context "info from specific gem in gemfile" do
     before :each do
       install_gemfile <<-G
