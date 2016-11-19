@@ -39,7 +39,7 @@ namespace :spec do
     deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
-    deps["rubocop"] ||= "= 0.41.2" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
+    deps["rubocop"] ||= "= 0.45.0" if RUBY_VERSION >= "2.0.0" # can't go in the gemspec because of the ruby version requirement
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
@@ -91,9 +91,9 @@ begin
   RSpec::Core::RakeTask.new
   task :spec => "man:build"
 
-  if RUBY_VERSION >= "1.9.3"
+  if RUBY_VERSION >= "2.0.0"
     # can't go in the gemspec because of the ruby version requirement
-    gem "rubocop", "= 0.41.2"
+    gem "rubocop", "= 0.45.0"
     require "rubocop/rake_task"
     RuboCop::RakeTask.new
   end
@@ -190,7 +190,7 @@ begin
     task :travis do
       rg = ENV["RGV"] || raise("Rubygems version is required on Travis!")
 
-      if RUBY_VERSION > "1.9.3"
+      if RUBY_VERSION >= "2.0.0"
         puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
         Rake::Task["rubocop"].invoke
       end
