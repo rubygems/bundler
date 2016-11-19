@@ -17,7 +17,7 @@ describe "bundle gem" do
   end
 
   def execute_bundle_gem(gem_name, flag = "", to_remove_push_guard = true)
-    bundle "gem #{gem_name} #{flag}"
+    bundle! "gem #{gem_name} #{flag}"
     remove_push_guard(gem_name) if to_remove_push_guard
     # reset gemspec cache for each test because of commit 3d4163a
     Bundler.clear_gemspec_cache
