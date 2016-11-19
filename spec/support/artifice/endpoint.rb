@@ -3,7 +3,7 @@ require File.expand_path("../../path.rb", __FILE__)
 require File.expand_path("../../../../lib/bundler/deprecate", __FILE__)
 include Spec::Path
 
-# Set up pretend http gem server with FakeWeb
+# Set up pretend http gem server with Artifice
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/artifice*/lib")].first}"
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].first}"
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].last}"

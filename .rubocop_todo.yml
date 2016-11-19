@@ -245,4 +245,3 @@ Style/UnneededInterpolation:
     - 'spec/commands/exec_spec.rb'
     - 'spec/support/artifice/endpoint.rb'
     - 'spec/support/artifice/endpoint_500.rb'
-    - 'spec/support/fakeweb/windows.rb'
