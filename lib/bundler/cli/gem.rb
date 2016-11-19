@@ -202,10 +202,23 @@ module Bundler
       if name =~ /^\d/
         Bundler.ui.error "Invalid gem name #{name} Please give a name which does not start with numbers."
         exit 1
-      elsif constant_array.inject(Object) {|c, s| (c.const_defined?(s) && c.const_get(s)) || break }
-        Bundler.ui.error "Invalid gem name #{name} constant #{constant_array.join("::")} is already in use. Please choose another gem name."
-        exit 1
       end
+
+      constant_name = constant_array.join("::")
+
+      existing_constant = constant_array.inject(Object) do |c, s|
+        defined = begin
+          c.const_defined?(s)
+        rescue NameError
+          Bundler.ui.error "Invalid gem name #{name} -- `#{constant_name}` is an invalid constant name"
+          exit 1
+        end
+        (defined && c.const_get(s)) || break
+      end
+
+      return unless existing_constant
+      Bundler.ui.error "Invalid gem name #{name} constant #{constant_name} is already in use. Please choose another gem name."
+      exit 1
     end
 
     def open_editor(editor, file)

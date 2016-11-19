@@ -733,6 +733,21 @@ describe "bundle gem" do
 
       expect(bundled_app("a--a/a--a.gemspec")).to exist
     end
+
+    it "fails gracefully with a ." do
+      bundle "gem foo.gemspec"
+      expect(out).to end_with("Invalid gem name foo.gemspec -- `Foo.gemspec` is an invalid constant name")
+    end
+
+    it "fails gracefully with a ^" do
+      bundle "gem ^"
+      expect(out).to end_with("Invalid gem name ^ -- `^` is an invalid constant name")
+    end
+
+    it "fails gracefully with a space" do
+      bundle "gem 'foo bar'"
+      expect(out).to end_with("Invalid gem name foo bar -- `Foo bar` is an invalid constant name")
+    end
   end
 
   describe "#ensure_safe_gem_name" do
