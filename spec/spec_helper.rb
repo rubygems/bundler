@@ -35,7 +35,7 @@ else
 end
 
 Dir["#{File.expand_path("../support", __FILE__)}/*.rb"].each do |file|
-  require file unless file =~ %r{fakeweb/.*\.rb}
+  require file unless file.end_with?("hax.rb")
 end
 
 $debug = false
