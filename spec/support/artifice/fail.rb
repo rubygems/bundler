@@ -3,10 +3,7 @@
 require File.expand_path("../../path.rb", __FILE__)
 
 # Set up pretend http gem server with Artifice
-$LOAD_PATH.unshift Dir[Spec::Path.base_system_gems.join("gems/artifice*/lib")].first.to_s
-$LOAD_PATH.unshift Dir[Spec::Path.base_system_gems.join("gems/rack-*/lib")].first.to_s
-$LOAD_PATH.unshift Dir[Spec::Path.base_system_gems.join("gems/rack-*/lib")].last.to_s
-$LOAD_PATH.unshift Dir[Spec::Path.base_system_gems.join("gems/tilt*/lib")].first.to_s
+$LOAD_PATH.unshift(*Dir[Spec::Path.base_system_gems.join("gems/{artifice,rack,tilt}-*/lib")].map(&:to_s))
 require "artifice"
 
 class Fail
