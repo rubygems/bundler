@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rdiscount",  "~> 2.2"
   s.add_development_dependency "ronn",       "~> 0.7.3"
   s.add_development_dependency "rspec",      "~> 3.5"
+  s.add_development_dependency "parallel",   "~> 1.9.0"
 
   s.files = `git ls-files -z`.split("\x0").reject {|f| f.match(%r{^(test|spec|features)/}) }
   # we don't check in man pages, but we need to ship them because
