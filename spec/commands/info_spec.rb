@@ -17,11 +17,7 @@ describe "bundle info" do
       expect(out).to include("\tSummary:")
       expect(out).to include("\tHomepage:")
       expect(out).to include("\tStatus:")
-    end
-
-    it "should print gem path" do
-      bundle "info rails --path"
-      expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
+      expect(out).to include("\tPath:")
     end
 
     it "should create a Gemfile.lock if not existing" do

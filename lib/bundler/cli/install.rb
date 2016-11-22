@@ -76,7 +76,7 @@ module Bundler
         relative_path = absolute_path.sub(File.expand_path(".") + File::SEPARATOR, "." + File::SEPARATOR)
         Bundler.ui.confirm "Bundled gems are installed into #{relative_path}."
       else
-        Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
+        Bundler.ui.confirm "Use `bundle info [gemname]` to see where a bundled gem is installed."
       end
 
       unless Bundler.settings["ignore_messages"]
