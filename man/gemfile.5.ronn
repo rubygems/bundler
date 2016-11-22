@@ -64,6 +64,18 @@ the Ruby version that the engine is compatible with.
 
     ruby "1.9.3"
 
+If your application is a library which needs to be tested on more than one
+Ruby version, you can tell Bundler to use the current Ruby version as the
+required one:
+
+    ruby RUBY_VERSION
+
+This will add the Ruby version to the requirements list. Sub-dependencies
+will also be subject to this version requirement.
+
+(NB: The Bundler team is actively working on making Bundler able to handle
+ruby versions without having to put `ruby` in the Gemfile.)
+
 ### ENGINE
 
 Each application _may_ specify a Ruby engine. If an engine is specified, an
