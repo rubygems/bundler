@@ -219,11 +219,12 @@ describe "bundler/inline#gemfile" do
     script <<-RUBY
       gemfile do
         source "https://rubygems.org"
-        gem "whirly"
+        gem "json", "~> 2.0.2"
       end
+      puts JSON::VERSION
     RUBY
 
     expect(err).to be_empty
-    expet(existstatus).to be_zero if existstatus
+    expet(exitstatus).to be_zero if exitstatus
   end
 end
