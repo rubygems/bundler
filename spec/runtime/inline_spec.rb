@@ -219,7 +219,7 @@ describe "bundler/inline#gemfile" do
     script <<-RUBY
       gemfile do
         source "https://rubygems.org"
-        gem "json", "~> 2.0.2"
+        gem "json", "~> 1.8.3"
       end
       puts JSON::VERSION
     RUBY
