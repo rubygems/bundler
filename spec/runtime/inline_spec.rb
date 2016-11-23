@@ -200,7 +200,7 @@ describe "bundler/inline#gemfile" do
       gem "rake"
     G
 
-    gemfile <<-G
+    lockfile <<-G
       GEM
         remote: https://rubygems.org/
         specs:
@@ -225,6 +225,6 @@ describe "bundler/inline#gemfile" do
     RUBY
 
     expect(err).to be_empty
-    expet(exitstatus).to be_zero if exitstatus
+    expect(exitstatus).to be_zero if exitstatus
   end
 end
