@@ -216,13 +216,16 @@ describe "bundler/inline#gemfile" do
          1.13.6
     G
 
-    script <<-RUBY
-      gemfile do
-        source "https://rubygems.org"
-        gem "json", "~> 1.8.3"
-      end
-      puts JSON::VERSION
-    RUBY
+    in_app_root do
+      script <<-RUBY
+        gemfile do
+          source "file://#{gem_repo1}"
+          gem "rack"
+        end
+
+        puts RACK
+      RUBY
+    end
 
     expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus
