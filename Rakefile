@@ -47,10 +47,10 @@ namespace :spec do
       deps.delete("rdiscount")
     end
 
-    deps.sort_by {|name, _| name }.each do |name, version|
-      sh %(#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || ) +
-        %(#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc)
-    end
+    gem_install_command = "install --no-ri --no-rdoc --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
+      "'#{name}:#{version}'"
+    end.join(" ")
+    sh %(#{Gem.ruby} -S gem #{gem_install_command})
 
     # Download and install gems used inside tests
     $LOAD_PATH.unshift("./spec")
