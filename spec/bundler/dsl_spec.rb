@@ -98,10 +98,24 @@ describe Bundler::Dsl do
       it "allows #{platform} as a valid platform" do
         subject.gem("foo", :platform => platform)
       end
+      it "allows #{platform} as a valid except platform" do
+        subject.gem("foo", :except_platform => platform)
+      end
+    end
+
+    it "rejects specifying platform and except_platform simultaneously" do
+      inc = [:platform, :platforms]
+      exc = [:except_platform, :except_platforms]
+      inc.product(exc).each do |i, e|
+        expect { subject.gem("foo", i => :ruby, e => :ruby) }.
+          to raise_error(Bundler::GemfileError, /Cannot specify both/)
+      end
     end
 
     it "rejects invalid platforms" do
       expect { subject.gem("foo", :platform => :bogus) }.
+        to raise_error(Bundler::GemfileError, /is not a valid platform/)
+      expect { subject.gem("foo", :except_platform => :bogus) }.
         to raise_error(Bundler::GemfileError, /is not a valid platform/)
     end
 

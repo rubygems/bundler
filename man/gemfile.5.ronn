@@ -244,6 +244,11 @@ As with groups, you can specify one or more platforms:
     gem "ruby-debug", :platforms => :mri_18
     gem "nokogiri",   :platforms => [:mri_18, :jruby]
 
+Or, instead of specify platforms, you can exclude one or more platforms:
+
+    gem "ruby-prof",   :except_platforms => :jruby
+    gem "ruby-llvm",   :except_platforms => [:jruby, :rbx, :mswin]
+
 All operations involving groups (`bundle install`, `Bundler.setup`,
 `Bundler.require`) behave exactly the same as if any groups not
 matching the current platform were explicitly excluded.
@@ -288,7 +293,7 @@ protocols are unauthenticated, so a man-in-the-middle attacker can deliver
 malicious code and compromise your system. HTTPS and SSH are strongly
 preferred.
 
-The `group`, `platforms`, and `require` options are available and behave
+The `group`, `platforms`, `except_platforms`, and `require` options are available and behave
 exactly the same as they would for a normal gem.
 
 A git repository `SHOULD` have at least one file, at the root of the
@@ -428,7 +433,7 @@ If you would like to use multiple local gems directly from the filesystem, you c
 
 ## BLOCK FORM OF SOURCE, GIT, PATH, GROUP and PLATFORMS
 
-The `:source`, `:git`, `:path`, `:group`, and `:platforms` options may be
+The `:source`, `:git`, `:path`, `:group`, `:platforms` and `:except_platforms` options may be
 applied to a group of gems by using block form.
 
     source "https://gems.example.com" do
@@ -444,6 +449,11 @@ applied to a group of gems by using block form.
     platforms :ruby do
       gem "ruby-debug"
       gem "sqlite3"
+    end
+
+    except_platforms :jruby do
+      gem "ruby-prof"
+      gem "unicorn"
     end
 
     group :development, :optional => true do

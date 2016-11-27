@@ -231,6 +231,11 @@ module Bundler
     end
     alias_method :platform, :platforms
 
+    def except_platforms(*except_platforms, &block)
+      platforms(VALID_PLATFORMS - except_platforms, &block)
+    end
+    alias_method :except_platform, :except_platforms
+
     def env(name)
       old = @env
       @env = name
@@ -308,7 +313,25 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source install_if)
+      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms except_platform except_platforms type source install_if)
+    end
+
+    def normalize_platforms(ps)
+      ps.map!(&:to_sym)
+      ps.each do |p|
+        next if VALID_PLATFORMS.include?(p)
+        raise GemfileError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
+      end
+    end
+
+    def mutex_opts(opts, *mk)
+      o = opts.keys & mk
+      raise GemfileError, "Cannot specify both :#{mk[0]} and :#{mk[1]} simultaneously" if o.size > 1
+      o.map do |k|
+        r = Array(opts.delete(k))
+        raise GemfileError, "Cannot specify empty :#{k}" if r.empty?
+        return r
+      end
     end
 
     def normalize_options(name, version, opts)
@@ -336,13 +359,16 @@ module Bundler
       end
 
       platforms = @platforms.dup
-      opts["platforms"] = opts["platform"] || opts["platforms"]
-      platforms.concat Array(opts.delete("platforms"))
-      platforms.map!(&:to_sym)
-      platforms.each do |p|
-        next if VALID_PLATFORMS.include?(p)
-        raise GemfileError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
+      platforms.concat mutex_opts(opts, "platform", "platforms")
+      except_platforms = mutex_opts(opts, "except_platform", "except_platforms")
+      if except_platforms.empty?
+        unless platforms.empty?
+          raise GemfileError, "Cannot specify both :platform(s) and :except_platform(s) simultaneously"
+        end
+        normalize_platforms except_platforms
+        platforms.concat(VALID_PLATFORMS - except_platforms)
       end
+      normalize_platforms platforms
 
       # Save sources passed in a key
       if opts.key?("source")
