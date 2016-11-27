@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Bundler
-  class CLI::ReportMetrics
+  class CLI::GemAnalyticsReporter
     attr_reader :options
       def initialize(options)
         @options = options
