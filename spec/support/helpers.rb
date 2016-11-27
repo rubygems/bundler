@@ -119,18 +119,8 @@ module Spec
     end
 
     def bundle_ruby(options = {})
-      options["no-color"] = true unless options.key?("no-color")
-
-      bundle_bin = File.expand_path("../../../exe/bundle_ruby", __FILE__)
-
-      requires = options.delete(:requires) || []
-      requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
-      requires_str = requires.map {|r| "-r#{r}" }.join(" ")
-
-      env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin}"
-
-      sys_exec(cmd) {|i, o, thr| yield i, o, thr if block_given? }
+      options["bundle_bin"] = File.expand_path("../../../exe/bundle_ruby", __FILE__)
+      bundle("", options)
     end
 
     def ruby(ruby, options = {})
