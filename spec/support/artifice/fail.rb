@@ -1,20 +1,27 @@
 # frozen_string_literal: true
 
-require File.expand_path("../../path.rb", __FILE__)
+require "net/http"
 
-# Set up pretend http gem server with Artifice
-$LOAD_PATH.unshift(*Dir[Spec::Path.base_system_gems.join("gems/{artifice,rack,tilt}-*/lib")].map(&:to_s))
-require "artifice"
+# We can't use artifice here because it uses rack
 
-class Fail
-  def call(env)
-    raise(exception(env))
+class Fail < Net::HTTP
+  def request(req, body = nil, &block)
+    raise(exception(req))
   end
 
-  def exception(env)
+  # Ensure we don't start a connect here
+  def connect
+  end
+
+  def exception(req)
     name = ENV.fetch("BUNDLER_SPEC_EXCEPTION") { "Errno::ENETUNREACH" }
     const = name.split("::").reduce(Object) {|mod, sym| mod.const_get(sym) }
-    const.new("host down: Bundler spec artifice fail! #{env["PATH_INFO"]}")
+    const.new("host down: Bundler spec artifice fail! #{req["PATH_INFO"]}")
   end
 end
-Artifice.activate_with(Fail.new)
+
+# Replace Net::HTTP with our failing subclass
+::Net.class_eval do
+  remove_const(:HTTP)
+  const_set(:HTTP, Fail)
+end
