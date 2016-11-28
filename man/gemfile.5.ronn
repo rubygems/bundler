@@ -71,10 +71,12 @@ required one:
     ruby RUBY_VERSION
 
 This will add the Ruby version to the requirements list. Sub-dependencies
-will also be subject to this version requirement.
+will also be subject to this version requirement. NB: This will overwrite your
+`Gemfile.lock` at every usage. People who use this technique ignore their
+`Gemfile.lock` from source control.
 
-(NB: The Bundler team is actively working on making Bundler able to handle
-ruby versions without having to put `ruby` in the Gemfile.)
+(NB: Upcoming versions of Bundler will be able to discover the Ruby version
+without needing a `ruby` annotation in the Gemfile.)
 
 ### ENGINE
 
