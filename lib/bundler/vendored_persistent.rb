@@ -6,7 +6,12 @@ begin
 rescue LoadError
   # some Ruby builds don't have OpenSSL
 end
-
-vendor = File.expand_path("../vendor", __FILE__)
-$:.unshift(vendor) unless $:.include?(vendor)
-require "net/http/persistent"
+module Bundler
+  module Persistent
+    module Net
+      module HTTP
+      end
+    end
+  end
+end
+require "bundler/vendor/net-http-persistent/lib/net/http/persistent"
