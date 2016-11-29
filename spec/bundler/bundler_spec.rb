@@ -156,7 +156,7 @@ describe Bundler do
   describe "#rm_rf" do
     context "the directory is world writable" do
       let(:bundler_ui) { Bundler.ui }
-      it "should show a fridenly error" do
+      it "should raise a friendly error" do
         allow(File).to receive(:exist?).and_return(true)
         allow(FileUtils).to receive(:remove_entry_secure).and_raise(ArgumentError)
         allow(File).to receive(:world_writable?).and_return(true)
