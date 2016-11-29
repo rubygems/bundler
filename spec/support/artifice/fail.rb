@@ -1,10 +1,20 @@
 # frozen_string_literal: true
 
 require "net/http"
+begin
+  require "net/https"
+rescue LoadError
+  nil # net/https or openssl
+end
 
 # We can't use artifice here because it uses rack
 
 class Fail < Net::HTTP
+  # Net::HTTP uses a @newimpl instance variable to decide whether
+  # to use a legacy implementation. Since we are subclassing
+  # Net::HTTP, we must set it
+  @newimpl = true
+
   def request(req, body = nil, &block)
     raise(exception(req))
   end
@@ -23,5 +33,5 @@ end
 # Replace Net::HTTP with our failing subclass
 ::Net.class_eval do
   remove_const(:HTTP)
-  const_set(:HTTP, Fail)
+  const_set(:HTTP, ::Fail)
 end
