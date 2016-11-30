@@ -38,7 +38,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.6.6
+  - RGV=v2.6.8
 
 matrix:
   include:
