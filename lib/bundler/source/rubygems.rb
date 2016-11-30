@@ -292,7 +292,7 @@ module Bundler
             next if spec.name == "bundler" && spec.version.to_s != VERSION
             have_bundler = true if spec.name == "bundler"
             spec.source = self
-            if spec.missing_extensions?
+            if Bundler.rubygems.spec_missing_extensions?(spec, false)
               Bundler.ui.debug "Source #{self} is ignoring #{spec} because it is missing extensions"
               next
             end
@@ -326,7 +326,7 @@ module Bundler
             next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
             s ||= Bundler.rubygems.spec_from_gem(gemfile)
             s.source = self
-            if s.missing_extensions?
+            if Bundler.rubygems.spec_missing_extensions?(s, false)
               Bundler.ui.debug "Source #{self} is ignoring #{s} because it is missing extensions"
               next
             end
