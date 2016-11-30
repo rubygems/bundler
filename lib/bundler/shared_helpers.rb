@@ -115,6 +115,8 @@ module Bundler
       raise NoSpaceOnDeviceError.new(path, action)
     rescue *[const_get_safely(:ENOTSUP, Errno)].compact
       raise OperationNotSupportedError.new(path, action)
+    rescue Errno::EEXIST, Errno::ENOENT
+      raise
     rescue SystemCallError => e
       raise GenericSystemCallError.new(e, "There was an error accessing `#{path}`.")
     end
