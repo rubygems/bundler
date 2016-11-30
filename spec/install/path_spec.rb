@@ -128,6 +128,34 @@ describe "bundle install" do
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
+
+    it "re-installs gems whose extensions have been deleted" do
+      build_lib "very_simple_binary", "1.0.0", :to_system => true do |s|
+        s.write "lib/very_simple_binary.rb", "raise 'FAIL'"
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "very_simple_binary"
+      G
+
+      bundle "install --path ./vendor/bundle"
+
+      expect(vendored_gems("gems/very_simple_binary-1.0")).to be_directory
+      expect(vendored_gems("extensions")).to be_directory
+      expect(the_bundle).to include_gems "very_simple_binary 1.0", :source => "remote1"
+
+      vendored_gems("extensions").rmtree
+
+      run "require 'very_simple_binary_c'"
+      expect(err).to include("Bundler::GemNotFound")
+
+      bundle "install --path ./vendor/bundle"
+
+      expect(vendored_gems("gems/very_simple_binary-1.0")).to be_directory
+      expect(vendored_gems("extensions")).to be_directory
+      expect(the_bundle).to include_gems "very_simple_binary 1.0", :source => "remote1"
+    end
   end
 
   describe "to a file" do
