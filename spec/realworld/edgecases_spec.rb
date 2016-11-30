@@ -2,17 +2,22 @@
 
 RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
   def rubygems_version(name, requirement)
-    require "bundler/source/rubygems/remote"
-    require "bundler/fetcher"
-    source = Bundler::Source::Rubygems::Remote.new(URI("https://rubygems.org"))
-    fetcher = Bundler::Fetcher.new(source)
-    index = fetcher.specs([name], nil)
-    rubygem = index.search(Gem::Dependency.new(name, requirement)).last
-    if rubygem.nil?
-      raise "Could not find #{name} (#{requirement}) on rubygems.org!\n" \
-        "Found specs:\n#{index.send(:specs).inspect}"
-    end
-    "#{name} (#{rubygem.version})"
+    ruby! <<-RUBY
+      ENV["BUNDLER_SPEC_VCR_CASSETTE_NAME"] = #{RSpec.current_example.full_description.dump}
+      require #{File.expand_path("../../support/artifice/vcr.rb", __FILE__).dump}
+      require "bundler"
+      require "bundler/source/rubygems/remote"
+      require "bundler/fetcher"
+      source = Bundler::Source::Rubygems::Remote.new(URI("https://rubygems.org"))
+      fetcher = Bundler::Fetcher.new(source)
+      index = fetcher.specs([#{name.dump}], nil)
+      rubygem = index.search(Gem::Dependency.new(#{name.dump}, #{requirement.dump})).last
+      if rubygem.nil?
+        raise "Could not find #{name} (#{requirement}) on rubygems.org!\n" \
+          "Found specs:\n\#{index.send(:specs).inspect}"
+      end
+      "#{name} (\#{rubygem.version})"
+    RUBY
   end
 
   # there is no rbx-relative-require gem that will install on 1.9
