@@ -111,8 +111,12 @@ module Bundler
       raise TemporaryResourceError.new(path, action)
     rescue Errno::EPROTO
       raise VirtualProtocolError.new
+    rescue Errno::ENOSPC
+      raise NoSpaceOnDeviceError.new(path, action)
     rescue *[const_get_safely(:ENOTSUP, Errno)].compact
       raise OperationNotSupportedError.new(path, action)
+    rescue SystemCallError => e
+      raise GenericSystemCallError.new(e, "There was an error accessing `#{path}`.")
     end
 
     def const_get_safely(constant_name, namespace)

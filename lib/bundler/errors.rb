@@ -132,4 +132,24 @@ module Bundler
 
     status_code(28)
   end
+
+  class NoSpaceOnDeviceError < PermissionError
+    def message
+      "There was an error while trying to #{action} `#{@path}`. " \
+      "There was insufficent space remaining on the device."
+    end
+
+    status_code(31)
+  end
+
+  class GenericSystemCallError < BundlerError
+    attr_reader :underlying_error
+
+    def initialize(underlying_error, message)
+      @underlying_error = underlying_error
+      super("#{message}\nThe underlying system error is #{@underlying_error.class}: #{@underlying_error}")
+    end
+
+    status_code(32)
+  end
 end
