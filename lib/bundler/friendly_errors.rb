@@ -71,12 +71,14 @@ module Bundler
           Instead, what happened was...
 
 
-        Error details
+        ## Backtrace
 
-            #{e.class}: #{e.message}
-              #{e.backtrace && e.backtrace.join("\n              ")}
+        ```
+        #{e.class}: #{e.message}
+          #{e.backtrace && e.backtrace.join("\n          ").chomp}
+        ```
 
-        #{Bundler::Env.new.report(:print_gemfile => false, :print_gemspecs => false).gsub(/\n/, "\n      ").strip}
+        #{Bundler::Env.new.report(:print_gemfile => false, :print_gemspecs => false)}
         --- TEMPLATE END ----------------------------------------------------------------
 
       EOS

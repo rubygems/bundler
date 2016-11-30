@@ -41,7 +41,7 @@ module Bundler
       return out unless SharedHelpers.in_bundle?
 
       if print_gemfile
-        out << "## Gemfile\n"
+        out << "\n## Gemfile\n"
         out << "\n### `#{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}`\n\n"
         out << "```ruby\n" << read_file(Bundler.default_gemfile).chomp << "\n```\n"
 
