@@ -58,18 +58,32 @@ module Bundler
     def request_issue_report_for(e)
       Bundler.ui.info <<-EOS.gsub(/^ {8}/, "")
         --- ERROR REPORT TEMPLATE -------------------------------------------------------
-        - What did you do?
+        # Error Report
+
+        ## Questions
+
+        Please fill out answers to these questions, it'll help us figure out
+        why things are going wrong.
+
+        - **What did you do?**
 
           I ran the command `#{$PROGRAM_NAME} #{ARGV.join(" ")}`
 
-        - What did you expect to happen?
+        - **What did you expect to happen?**
 
           I expected Bundler to...
 
-        - What happened instead?
+        - **What happened instead?**
 
           Instead, what happened was...
 
+        - **Have you tried any solutions posted on similar issues in our issue tracker, stack overflow, or google?**
+
+          I tried...
+
+        - **Have you read our issues document, https://github.com/bundler/bundler/blob/master/ISSUES.md?**
+
+          ...
 
         ## Backtrace
 

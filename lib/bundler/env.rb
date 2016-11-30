@@ -42,10 +42,10 @@ module Bundler
 
       if print_gemfile
         out << "\n## Gemfile\n"
-        out << "\n### `#{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}`\n\n"
+        out << "\n### #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}\n\n"
         out << "```ruby\n" << read_file(Bundler.default_gemfile).chomp << "\n```\n"
 
-        out << "\n### `#{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}`\n\n"
+        out << "\n### #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}\n\n"
         out << "```\n" << read_file(Bundler.default_lockfile).chomp << "\n```\n"
       end
 
@@ -53,7 +53,7 @@ module Bundler
         dsl = Dsl.new.tap {|d| d.eval_gemfile(Bundler.default_gemfile) }
         out << "\n## Gemspecs\n" unless dsl.gemspecs.empty?
         dsl.gemspecs.each do |gs|
-          out << "\n### `#{File.basename(gs.loaded_from)}`"
+          out << "\n### #{File.basename(gs.loaded_from)}"
           out << "\n\n```ruby\n" << read_file(gs.loaded_from).chomp << "\n```\n"
         end
       end
