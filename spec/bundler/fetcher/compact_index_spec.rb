@@ -25,6 +25,22 @@ describe Bundler::Fetcher::CompactIndex do
       compact_index.specs_for_names(["lskdjf"])
     end
 
+    describe "#available?" do
+      context "when OpenSSL is in FIPS mode" do
+        before { stub_const("OpenSSL::OPENSSL_FIPS", true) }
+
+        it "returns false" do
+          expect(compact_index).to_not be_available
+        end
+
+        it "never requires digest/md5" do
+          expect(Kernel).to receive(:require).with("digest/md5").never
+
+          compact_index.available?
+        end
+      end
+    end
+
     context "logging" do
       before { allow(compact_index).to receive(:log_specs).and_call_original }
 
