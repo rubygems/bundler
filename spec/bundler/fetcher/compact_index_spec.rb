@@ -26,7 +26,7 @@ describe Bundler::Fetcher::CompactIndex do
     end
 
     describe "#available?" do
-      context "when OpenSSL is in FIPS mode" do
+      context "when OpenSSL is in FIPS mode", :ruby => ">= 2.0.0" do
         before { stub_const("OpenSSL::OPENSSL_FIPS", true) }
 
         it "returns false" do
