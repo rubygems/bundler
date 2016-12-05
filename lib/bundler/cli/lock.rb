@@ -33,7 +33,7 @@ module Bundler
 
       options["add-platform"].each do |platform_string|
         platform = Gem::Platform.new(platform_string)
-        if platform.to_a.compact == %w(unknown)
+        if platform.to_s == "unknown"
           Bundler.ui.warn "The platform `#{platform_string}` is unknown to RubyGems " \
             "and adding it will likely lead to resolution errors"
         end
