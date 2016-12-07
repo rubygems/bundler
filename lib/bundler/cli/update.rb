@@ -61,15 +61,7 @@ module Bundler
       end
 
       Bundler.ui.confirm "Bundle updated!"
-      without_groups_messages
-    end
-
-  private
-
-    def without_groups_messages
-      return unless Bundler.settings.without.any?
-      require "bundler/cli/common"
-      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
+      Bundler::CLI::Common.output_without_groups_message
     end
   end
 end

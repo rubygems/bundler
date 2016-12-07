@@ -1,6 +1,23 @@
 # frozen_string_literal: true
 module Bundler
   module CLI::Common
+    def self.output_post_install_messages(messages)
+      return if Bundler.settings["ignore_messages"]
+      messages.to_a.each do |name, msg|
+        print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
+      end
+    end
+
+    def self.print_post_install_message(name, msg)
+      Bundler.ui.confirm "Post-install message from #{name}:"
+      Bundler.ui.info msg
+    end
+
+    def self.output_without_groups_message
+      return unless Bundler.settings.without.any?
+      Bundler.ui.confirm without_groups_message
+    end
+
     def self.without_groups_message
       groups = Bundler.settings.without
       group_list = [groups[0...-1].join(", "), groups[-1..-1]].
