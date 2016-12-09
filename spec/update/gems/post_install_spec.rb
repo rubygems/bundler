@@ -11,9 +11,9 @@ describe "bundle update" do
       gem 'thin'
     G
 
-    bundle "config #{config}" if config
+    bundle! "config #{config}" if config
 
-    bundle :install
+    bundle! :install
   end
 
   shared_examples "a config observer" do
@@ -53,7 +53,7 @@ describe "bundle update" do
         gem 'thin'
       G
 
-      bundle :update
+      bundle! :update
     end
 
     it_behaves_like "a post-install message outputter"
@@ -68,7 +68,7 @@ describe "bundle update" do
         gem 'thin'
       G
 
-      bundle :update
+      bundle! :update
     end
 
     it_behaves_like "a post-install message outputter"
