@@ -95,7 +95,6 @@ Retrying fetcher due to error (2/4): Bundler::HTTPError Could not fetch specs fr
 Retrying fetcher due to error (3/4): Bundler::HTTPError Could not fetch specs from #{mirror}/
 Retrying fetcher due to error (4/4): Bundler::HTTPError Could not fetch specs from #{mirror}/
 Could not fetch specs from #{mirror}/"
-      R
     end
   end
 
