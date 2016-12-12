@@ -18,8 +18,6 @@ end
 
 module Bundler
   module SharedHelpers
-    attr_accessor :gem_loaded
-
     def default_gemfile
       gemfile = find_gemfile
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
