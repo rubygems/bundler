@@ -8,6 +8,7 @@ require "bundler/current_ruby"
 
 module Gem
   class Dependency
+    # This is only needed for RubyGems < 1.4
     unless method_defined? :requirement
       def requirement
         version_requirements
