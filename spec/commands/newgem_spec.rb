@@ -445,6 +445,63 @@ describe "bundle gem" do
       end
     end
 
+    context "--test parameter set to test-unit" do
+      before do
+        reset!
+        in_app_root
+        bundle "gem #{gem_name} --test=test-unit"
+      end
+
+      it "depends on a specific version of test-unit", :rubygems => ">= 1.8.1" do
+        remove_push_guard(gem_name)
+        rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "test-unit" }
+        expect(rspec_dep).to be_specific
+      end
+
+      it "builds spec skeleton" do
+        expect(bundled_app("test_gem/test/test_test_gem.rb")).to exist
+        expect(bundled_app("test_gem/test/helper.rb")).to exist
+      end
+
+      it "requires 'test-gem'" do
+        expect(bundled_app("test_gem/test/helper.rb").read).to include("require \"test_gem\"")
+      end
+
+      it "requires 'helper'" do
+        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to include("require \"helper\"")
+      end
+
+      it "creates a default test which fails" do
+        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to include("assert false")
+      end
+    end
+
+    context "gem.test setting set to test-unit" do
+      before do
+        reset!
+        in_app_root
+        bundle "config gem.test test-unit"
+        bundle "gem #{gem_name}"
+      end
+
+      it "creates a default rake task to run the test suite" do
+        rakefile = strip_whitespace <<-RAKEFILE
+          require "bundler/gem_tasks"
+          require "rake/testtask"
+
+          Rake::TestTask.new(:test) do |t|
+            t.libs << "test"
+            t.libs << "lib"
+            t.test_files = FileList['test/**/test_*.rb']
+          end
+
+          task :default => :test
+        RAKEFILE
+
+        expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
+      end
+    end
+
     context "--test with no arguments" do
       before do
         reset!
