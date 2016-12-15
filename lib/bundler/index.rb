@@ -116,7 +116,9 @@ module Bundler
 
     def dependency_names
       names = []
-      each {|s| names.concat(s.dependencies.map(&:name)) }
+      each do |s|
+        names.concat(s.dependencies.select {|d| d.type != :development }.map(&:name))
+      end
       names.uniq
     end
 
