@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require "bundler/cli/common"
+
 module Bundler
   class CLI::Install
     attr_reader :options
@@ -69,7 +71,7 @@ module Bundler
       Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]
 
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
-      confirm_without_groups
+      Bundler::CLI::Common.output_without_groups_message
 
       if Bundler.settings[:path]
         absolute_path = File.expand_path(Bundler.settings[:path])
@@ -79,11 +81,7 @@ module Bundler
         Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
 
-      unless Bundler.settings["ignore_messages"]
-        installer.post_install_messages.to_a.each do |name, msg|
-          print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
-        end
-      end
+      Bundler::CLI::Common.output_post_install_messages installer.post_install_messages
 
       warn_ambiguous_gems
 
@@ -132,12 +130,6 @@ module Bundler
       end
     end
 
-    def confirm_without_groups
-      return unless Bundler.settings.without.any?
-      require "bundler/cli/common"
-      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
-    end
-
     def dependencies_count_for(definition)
       count = definition.dependencies.count
       "#{count} Gemfile #{count == 1 ? "dependency" : "dependencies"}"
@@ -146,11 +138,6 @@ module Bundler
     def gems_installed_for(definition)
       count = definition.specs.count
       "#{count} #{count == 1 ? "gem" : "gems"} now installed"
-    end
-
-    def print_post_install_message(name, msg)
-      Bundler.ui.confirm "Post-install message from #{name}:"
-      Bundler.ui.info msg
     end
 
     def check_for_group_conflicts

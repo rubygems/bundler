@@ -52,7 +52,7 @@ module Bundler
       Bundler.settings[:jobs] = opts["jobs"] if opts["jobs"]
 
       Bundler.definition.validate_runtime!
-      Installer.install Bundler.root, Bundler.definition, opts
+      installer = Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.app_cache.exist?
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
@@ -61,15 +61,8 @@ module Bundler
       end
 
       Bundler.ui.confirm "Bundle updated!"
-      without_groups_messages
-    end
-
-  private
-
-    def without_groups_messages
-      return unless Bundler.settings.without.any?
-      require "bundler/cli/common"
-      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
+      Bundler::CLI::Common.output_without_groups_message
+      Bundler::CLI::Common.output_post_install_messages installer.post_install_messages
     end
   end
 end
