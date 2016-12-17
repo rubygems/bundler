@@ -81,7 +81,6 @@ describe "fetching dependencies with a not available mirror", :realworld => true
     end
 
     it "prints each error and warning on a new line" do
-
       gemfile <<-G
         source "#{original}"
         gem 'weakling'
