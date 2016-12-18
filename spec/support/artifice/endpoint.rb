@@ -3,12 +3,7 @@ require File.expand_path("../../path.rb", __FILE__)
 require File.expand_path("../../../../lib/bundler/deprecate", __FILE__)
 include Spec::Path
 
-# Set up pretend http gem server with FakeWeb
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/artifice*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].last}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/tilt*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/sinatra*/lib")].first}"
+$LOAD_PATH.unshift(*Dir[Spec::Path.base_system_gems.join("gems/{artifice,rack,tilt,sinatra}-*/lib")].map(&:to_s))
 require "artifice"
 require "sinatra/base"
 

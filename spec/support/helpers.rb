@@ -93,7 +93,6 @@ module Spec
       end
 
       requires = options.delete(:requires) || []
-      requires << File.expand_path("../fakeweb/" + options.delete(:fakeweb) + ".rb", __FILE__) if options.key?(:fakeweb)
       requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
       requires << "support/hax"
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
@@ -125,7 +124,6 @@ module Spec
       bundle_bin = File.expand_path("../../../exe/bundle_ruby", __FILE__)
 
       requires = options.delete(:requires) || []
-      requires << File.expand_path("../fakeweb/" + options.delete(:fakeweb) + ".rb", __FILE__) if options.key?(:fakeweb)
       requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
 

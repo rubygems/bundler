@@ -193,4 +193,41 @@ describe "bundler/inline#gemfile" do
     expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
+
+  it "installs inline gems when a Gemfile.lock is present" do
+    gemfile <<-G
+      source "https://rubygems.org"
+      gem "rake"
+    G
+
+    lockfile <<-G
+      GEM
+        remote: https://rubygems.org/
+        specs:
+          rake (11.3.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rake
+
+      BUNDLED WITH
+         1.13.6
+    G
+
+    in_app_root do
+      script <<-RUBY
+        gemfile do
+          source "file://#{gem_repo1}"
+          gem "rack"
+        end
+
+        puts RACK
+      RUBY
+    end
+
+    expect(err).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
 end

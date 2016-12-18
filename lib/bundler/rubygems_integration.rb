@@ -71,8 +71,13 @@ module Bundler
       spec.installed_by_version = Gem::Version.create(installed_by_version)
     end
 
-    def spec_missing_extensions?(spec)
-      !spec.respond_to?(:missing_extensions?) || spec.missing_extensions?
+    def spec_missing_extensions?(spec, default = true)
+      return spec.missing_extensions? if spec.respond_to?(:missing_extensions?)
+
+      return false if spec.respond_to?(:default_gem?) && spec.default_gem?
+      return false if spec.extensions.empty?
+
+      default
     end
 
     def path(obj)

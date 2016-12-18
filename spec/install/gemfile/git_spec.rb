@@ -1022,20 +1022,20 @@ describe "bundle install with git sources" do
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      run <<-R
+      run! <<-R
         require 'foo'
         puts FOO
       R
 
       installed_time = out
-      expect(installed_time).to match(/\d+\.\d+/)
+      expect(installed_time).to match(/\A\d+\.\d+\z/)
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      run <<-R
+      run! <<-R
         require 'foo'
         puts FOO
       R

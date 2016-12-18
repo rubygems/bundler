@@ -233,7 +233,7 @@ describe "when a gem has no architecture" do
       gem "rcov"
     G
 
-    bundle :install, :fakeweb => "windows"
+    bundle :install, :artifice => "windows"
     expect(the_bundle).to include_gems "rcov 1.0.0"
   end
 end

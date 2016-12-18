@@ -7,7 +7,7 @@
 # This class is an implementation detail and is subject to change or removal
 # at any time.
 
-class Net::HTTP::Persistent::SSLReuse < Net::HTTP
+class Bundler::Persistent::Net::HTTP::Persistent::SSLReuse < Net::HTTP
 
   @is_proxy_class = false
   @proxy_addr = nil
@@ -126,3 +126,4 @@ class Net::HTTP::Persistent::SSLReuse < Net::HTTP
   private :connect
 
 end
+

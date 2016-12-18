@@ -17,7 +17,7 @@ describe "bundle gem" do
   end
 
   def execute_bundle_gem(gem_name, flag = "", to_remove_push_guard = true)
-    bundle "gem #{gem_name} #{flag}"
+    bundle! "gem #{gem_name} #{flag}"
     remove_push_guard(gem_name) if to_remove_push_guard
     # reset gemspec cache for each test because of commit 3d4163a
     Bundler.clear_gemspec_cache
@@ -732,6 +732,21 @@ describe "bundle gem" do
       Bundler.clear_gemspec_cache
 
       expect(bundled_app("a--a/a--a.gemspec")).to exist
+    end
+
+    it "fails gracefully with a ." do
+      bundle "gem foo.gemspec"
+      expect(out).to end_with("Invalid gem name foo.gemspec -- `Foo.gemspec` is an invalid constant name")
+    end
+
+    it "fails gracefully with a ^" do
+      bundle "gem ^"
+      expect(out).to end_with("Invalid gem name ^ -- `^` is an invalid constant name")
+    end
+
+    it "fails gracefully with a space" do
+      bundle "gem 'foo bar'"
+      expect(out).to end_with("Invalid gem name foo bar -- `Foo bar` is an invalid constant name")
     end
   end
 

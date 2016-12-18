@@ -9,9 +9,9 @@ module Spec
         # rack 2.x requires Ruby version >= 2.2.2.
         # artifice doesn't support rack 2.x now.
         "rack" => "< 2",
-        "fakeweb artifice" => nil,
+        "artifice" => "~> 0.6.0",
         "compact_index" => "~> 0.11.0",
-        "sinatra" => "1.2.7",
+        "sinatra" => "~> 1.4.7",
         # Rake version has to be consistent for tests to pass
         "rake" => "10.0.2",
         # 3.0.0 breaks 1.9.2 specs

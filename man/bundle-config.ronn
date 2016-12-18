@@ -65,7 +65,7 @@ The options that can be configured are:
   The location to install the specified gems to. This defaults to Rubygems'
   setting. Bundler shares this location with Rubygems, `gem install ...` will
   have gem installed there, too. Therefore, gems installed without a
-  `--path ...` setting will show up by calling `gem list`. Accodingly, gems
+  `--path ...` setting will show up by calling `gem list`. Accordingly, gems
   installed to other locations will not get listed.
 
 * `without`:
@@ -223,3 +223,17 @@ For example, to save the credentials of user `claudette` for the gem source at
 Or you can set the credentials as an environment variable like this:
 
     export BUNDLE_GEMS__LONGEROUS__COM="claudette:s00pers3krit"
+
+For gems with a git source with HTTP(S) URL you can specify credentials like so:
+
+    bundle config https://github.com/bundler/bundler.git username:password
+
+Or you can set the credentials as an environment variable like so:
+
+    export BUNDLE_GITHUB__COM=username:password
+
+This is especially useful for private repositories on hosts such as Github,
+where you can use personal OAuth tokens:
+
+    export BUNDLE_GITHUB__COM=abcd0123generatedtoken:x-oauth-basic
+

@@ -194,18 +194,20 @@ module Bundler::Molinillo
       def state_index_for_unwind
         current_requirement = requirement
         existing_requirement = requirement_for_existing_name(name)
-        until current_requirement.nil?
-          current_state = find_state_for(current_requirement)
-          return states.index(current_state) if state_any?(current_state)
-          current_requirement = parent_of(current_requirement)
+        index = -1
+        [current_requirement, existing_requirement].each do |r|
+          until r.nil?
+            current_state = find_state_for(r)
+            if state_any?(current_state)
+              current_index = states.index(current_state)
+              index = current_index if current_index > index
+              break
+            end
+            r = parent_of(r)
+          end
         end
 
-        until existing_requirement.nil?
-          existing_state = find_state_for(existing_requirement)
-          return states.index(existing_state) if state_any?(existing_state)
-          existing_requirement = parent_of(existing_requirement)
-        end
-        -1
+        index
       end
 
       # @return [Object] the requirement that led to `requirement` being added

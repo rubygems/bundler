@@ -144,7 +144,7 @@ describe "compact index api" do
       gem "rcov"
     G
 
-    bundle! :install, :fakeweb => "windows"
+    bundle! :install, :artifice => "windows"
     expect(out).to include("Fetching source index from #{source_uri}")
     expect(the_bundle).to include_gems "rcov 1.0.0"
   end
@@ -713,12 +713,19 @@ The checksum of /versions does not match the checksum provided by the server! So
         source "#{source_uri}"
         gem "rack"
       G
+
       expect(exitstatus).to eq(19) if exitstatus
       expect(out).
-        to  include("The checksum for the downloaded `rack-1.0.0.gem` did not match the checksum given by the API.").
-        and include("This means that the contents of the gem appear to be different from what was uploaded, and could be an indicator of a security issue.").
-        and match(/\(The expected SHA256 checksum was "#{"ab" * 22}", but the checksum for the downloaded gem was ".+?"\.\)/).
-        and include("Bundler cannot continue installing rack (1.0.0).")
+        to  include("Bundler cannot continue installing rack (1.0.0).").
+        and include("The checksum for the downloaded `rack-1.0.0.gem` does not match the checksum given by the server.").
+        and include("This means the contents of the downloaded gem is different from what was uploaded to the server, and could be a potential security issue.").
+        and include("To resolve this issue:").
+        and include("1. delete the downloaded gem located at: `#{system_gem_path}/gems/rack-1.0.0/rack-1.0.0.gem`").
+        and include("2. run `bundle install`").
+        and include("If you wish to continue installing the downloaded gem, and are certain it does not pose a security issue despite the mismatching checksum, do the following:").
+        and include("1. run `bundle config disable.checksum_validation true` to turn off checksum verification").
+        and include("2. run `bundle install`").
+        and match(/\(More info: The expected SHA256 checksum was "#{"ab" * 22}", but the checksum for the downloaded gem was ".+?"\.\)/)
     end
 
     it "raises when the checksum is the wrong length" do

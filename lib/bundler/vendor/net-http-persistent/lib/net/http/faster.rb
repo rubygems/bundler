@@ -24,3 +24,4 @@ class Net::BufferedIO #:nodoc:
     end
   end
 end if RUBY_VERSION < '1.9'
+

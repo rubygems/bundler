@@ -22,7 +22,11 @@ module Bundler
       Bundler.definition.validate_runtime!
       current_specs = Bundler.ui.silence { Bundler.load.specs }
       current_dependencies = {}
-      Bundler.ui.silence { Bundler.load.dependencies.each {|dep| current_dependencies[dep.name] = dep } }
+      Bundler.ui.silence do
+        Bundler.load.dependencies.each do |dep|
+          current_dependencies[dep.name] = dep
+        end
+      end
 
       definition = if gems.empty? && sources.empty?
         # We're doing a full update
@@ -31,11 +35,24 @@ module Bundler
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
-      Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options)
-      # the patch level options don't work without strict also being true
-      strict = options[:strict] || Bundler::CLI::Common.patch_level_options(options).any?
+      Bundler::CLI::Common.configure_gem_version_promoter(
+        Bundler.definition,
+        options
+      )
 
-      definition_resolution = proc { options[:local] ? definition.resolve_with_cache! : definition.resolve_remotely! }
+      # the patch level options imply strict is also true. It wouldn't make
+      # sense otherwise.
+      strict = options[:strict] ||
+        Bundler::CLI::Common.patch_level_options(options).any?
+
+      filter_options_patch = options.keys &
+        %w(filter-major filter-minor filter-patch)
+
+      definition_resolution = proc do
+        return definition.resolve_with_cache! if options[:local]
+        definition.resolve_remotely!
+      end
+
       if options[:parseable]
         Bundler.ui.silence(&definition_resolution)
       else
@@ -47,32 +64,24 @@ module Bundler
       outdated_gems_list = []
 
       # Loop through the current specs
-      gemfile_specs, dependency_specs = current_specs.partition {|spec| current_dependencies.key? spec.name }
-      [gemfile_specs.sort_by(&:name), dependency_specs.sort_by(&:name)].flatten.each do |current_spec|
+      gemfile_specs, dependency_specs = current_specs.partition do |spec|
+        current_dependencies.key? spec.name
+      end
+
+      (gemfile_specs + dependency_specs).sort_by(&:name).each do |current_spec|
         next if !gems.empty? && !gems.include?(current_spec.name)
 
         dependency = current_dependencies[current_spec.name]
-
-        if strict
-          active_spec = definition.specs.detect {|spec| spec.name == current_spec.name && spec.platform == current_spec.platform }
-        else
-          active_specs = definition.index[current_spec.name].select {|spec| spec.platform == current_spec.platform }.sort_by(&:version)
-          if !current_spec.version.prerelease? && !options[:pre] && active_specs.size > 1
-            active_spec = active_specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
-          end
-          active_spec = active_specs.last
-        end
-
-        if options["filter-major"] || options["filter-minor"] || options["filter-patch"]
-          update_present = update_present_via_semver_portions(current_spec, active_spec, options)
-          active_spec = nil unless update_present
-        end
+        active_spec = retrieve_active_spec(strict, definition, current_spec)
 
         next if active_spec.nil?
+        if filter_options_patch.any?
+          update_present = update_present_via_semver_portions(current_spec, active_spec, options)
+          next unless update_present
+        end
 
         gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
-        git_outdated = current_spec.git_version != active_spec.git_version
-        if gem_outdated || git_outdated
+        if gem_outdated || (current_spec.git_version != active_spec.git_version)
           groups = nil
           if dependency && !options[:parseable]
             groups = dependency.groups.join(", ")
@@ -94,17 +103,21 @@ module Bundler
       end
 
       if outdated_gems_list.empty?
-        display_nothing_outdated_message
+        display_nothing_outdated_message(filter_options_patch)
       else
         unless options[:parseable]
           if options[:pre]
-            Bundler.ui.info "Outdated gems included in the bundle (including pre-releases):"
+            Bundler.ui.info "Outdated gems included in the bundle (including " \
+              "pre-releases):"
           else
             Bundler.ui.info "Outdated gems included in the bundle:"
           end
         end
 
-        options_include_groups = [:group, :groups].select {|v| options.keys.include?(v.to_s) }
+        options_include_groups = [:group, :groups].select do |v|
+          options.keys.include?(v.to_s)
+        end
+
         if options_include_groups.any?
           ordered_groups = outdated_gems_by_groups.keys.compact.sort
           [nil, ordered_groups].flatten.each do |groups|
@@ -126,12 +139,24 @@ module Bundler
             end
 
             gems.each do |gem|
-              print_gem(gem[:current_spec], gem[:active_spec], gem[:dependency], groups, options_include_groups.any?)
+              print_gem(
+                gem[:current_spec],
+                gem[:active_spec],
+                gem[:dependency],
+                groups,
+                options_include_groups.any?
+              )
             end
           end
         else
           outdated_gems_list.each do |gem|
-            print_gem(gem[:current_spec], gem[:active_spec], gem[:dependency], gem[:groups], options_include_groups.any?)
+            print_gem(
+              gem[:current_spec],
+              gem[:active_spec],
+              gem[:dependency],
+              gem[:groups],
+              options_include_groups.any?
+            )
           end
         end
 
@@ -141,11 +166,27 @@ module Bundler
 
   private
 
-    def display_nothing_outdated_message
+    def retrieve_active_spec(strict, definition, current_spec)
+      if strict
+        active_spec = definition.find_resolved_spec(current_spec)
+      else
+        active_specs = definition.find_indexed_specs(current_spec)
+        if !current_spec.version.prerelease? && !options[:pre] && active_specs.size > 1
+          active_specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
+        end
+        active_spec = active_specs.last
+      end
+
+      active_spec
+    end
+
+    def display_nothing_outdated_message(filter_options_patch)
       unless options[:parseable]
-        filter_options = options.keys & %w(filter-major filter-minor filter-patch)
-        if filter_options.any?
-          display = filter_options.map {|o| o.sub("filter-", "") }.join(" or ")
+        if filter_options_patch.any?
+          display = filter_options_patch.map do |o|
+            o.sub("filter-", "")
+          end.join(" or ")
+
           Bundler.ui.info "No #{display} updates to display.\n"
         else
           Bundler.ui.info "Bundle up to date!\n"
@@ -156,25 +197,32 @@ module Bundler
     def print_gem(current_spec, active_spec, dependency, groups, options_include_groups)
       spec_version = "#{active_spec.version}#{active_spec.git_version}"
       current_version = "#{current_spec.version}#{current_spec.git_version}"
-      dependency_version = %(, requested #{dependency.requirement}) if dependency && dependency.specific?
 
-      spec_outdated_info = "#{active_spec.name} (newest #{spec_version}, installed #{current_version}#{dependency_version})"
-      if options[:parseable]
-        Bundler.ui.info spec_outdated_info.to_s.rstrip
-      elsif options_include_groups || !groups
-        Bundler.ui.info "  * #{spec_outdated_info}".rstrip
-      else
-        Bundler.ui.info "  * #{spec_outdated_info} in groups \"#{groups}\"".rstrip
+      if dependency && dependency.specific?
+        dependency_version = %(, requested #{dependency.requirement})
       end
+
+      spec_outdated_info = "#{active_spec.name} (newest #{spec_version}, " \
+        "installed #{current_version}#{dependency_version})"
+
+      output_message = if options[:parseable]
+        spec_outdated_info.to_s
+      elsif options_include_groups || !groups
+        "  * #{spec_outdated_info}"
+      else
+        "  * #{spec_outdated_info} in groups \"#{groups}\""
+      end
+
+      Bundler.ui.info output_message.rstrip
     end
 
     def check_for_deployment_mode
       if Bundler.settings[:frozen]
-        error_message = "You are trying to check outdated gems in deployment mode. " \
-              "Run `bundle outdated` elsewhere.\n" \
-              "\nIf this is a development machine, remove the #{Bundler.default_gemfile} freeze" \
-              "\nby running `bundle install --no-deployment`."
-        raise ProductionError, error_message
+        raise ProductionError, "You are trying to check outdated gems in " \
+          "deployment mode. Run `bundle outdated` elsewhere.\n" \
+          "\nIf this is a development machine, remove the " \
+          "#{Bundler.default_gemfile} freeze" \
+          "\nby running `bundle install --no-deployment`."
       end
     end
 

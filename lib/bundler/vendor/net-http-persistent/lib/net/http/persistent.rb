@@ -4,7 +4,7 @@ begin
 rescue LoadError
   # net/https or openssl
 end if RUBY_VERSION < '1.9' # but only for 1.8
-require 'net/http/faster'
+require 'bundler/vendor/net-http-persistent/lib/net/http/faster'
 require 'uri'
 require 'cgi' # for escaping
 
@@ -18,27 +18,27 @@ autoload :OpenSSL, 'openssl'
 ##
 # Persistent connections for Net::HTTP
 #
-# Net::HTTP::Persistent maintains persistent connections across all the
+# Bundler::Persistent::Net::HTTP::Persistent maintains persistent connections across all the
 # servers you wish to talk to.  For each host:port you communicate with a
 # single persistent connection is created.
 #
-# Multiple Net::HTTP::Persistent objects will share the same set of
+# Multiple Bundler::Persistent::Net::HTTP::Persistent objects will share the same set of
 # connections.
 #
 # For each thread you start a new connection will be created.  A
-# Net::HTTP::Persistent connection will not be shared across threads.
+# Bundler::Persistent::Net::HTTP::Persistent connection will not be shared across threads.
 #
 # You can shut down the HTTP connections when done by calling #shutdown.  You
-# should name your Net::HTTP::Persistent object if you intend to call this
+# should name your Bundler::Persistent::Net::HTTP::Persistent object if you intend to call this
 # method.
 #
 # Example:
 #
-#   require 'net/http/persistent'
+#   require 'bundler/vendor/net-http-persistent/lib/net/http/persistent'
 #
 #   uri = URI 'http://example.com/awesome/web/service'
 #
-#   http = Net::HTTP::Persistent.new 'my_app_name'
+#   http = Bundler::Persistent::Net::HTTP::Persistent.new 'my_app_name'
 #
 #   # perform a GET
 #   response = http.request uri
@@ -149,19 +149,19 @@ autoload :OpenSSL, 'openssl'
 #
 # The recommended way to handle non-idempotent requests is the following:
 #
-#   require 'net/http/persistent'
+#   require 'bundler/vendor/net-http-persistent/lib/net/http/persistent'
 #
 #   uri = URI 'http://example.com/awesome/web/service'
 #   post_uri = uri + 'create'
 #
-#   http = Net::HTTP::Persistent.new 'my_app_name'
+#   http = Bundler::Persistent::Net::HTTP::Persistent.new 'my_app_name'
 #
 #   post = Net::HTTP::Post.new post_uri.path
 #   # ... fill in POST request
 #
 #   begin
 #     response = http.request post_uri, post
-#   rescue Net::HTTP::Persistent::Error
+#   rescue Bundler::Persistent::Net::HTTP::Persistent::Error
 #
 #     # POST failed, make a new request to verify the server did not process
 #     # the request
@@ -178,7 +178,7 @@ autoload :OpenSSL, 'openssl'
 #
 # === Connection Termination
 #
-# If you are done using the Net::HTTP::Persistent instance you may shut down
+# If you are done using the Bundler::Persistent::Net::HTTP::Persistent instance you may shut down
 # all the connections in the current thread with #shutdown.  This is not
 # recommended for normal use, it should only be used when it will be several
 # minutes before you make another HTTP request.
@@ -188,7 +188,7 @@ autoload :OpenSSL, 'openssl'
 # Ruby will automatically garbage collect and shutdown your HTTP connections
 # when the thread terminates.
 
-class Net::HTTP::Persistent
+class Bundler::Persistent::Net::HTTP::Persistent
 
   ##
   # The beginning of Time
@@ -201,9 +201,9 @@ class Net::HTTP::Persistent
   HAVE_OPENSSL = defined? OpenSSL::SSL # :nodoc:
 
   ##
-  # The version of Net::HTTP::Persistent you are using
+  # The version of Bundler::Persistent::Net::HTTP::Persistent you are using
 
-  VERSION = '2.9.3'
+  VERSION = '2.9.4'
 
   ##
   # Exceptions rescued for automatic retry on ruby 2.0.0.  This overlaps with
@@ -221,7 +221,7 @@ class Net::HTTP::Persistent
   ].compact
 
   ##
-  # Error class for errors raised by Net::HTTP::Persistent.  Various
+  # Error class for errors raised by Bundler::Persistent::Net::HTTP::Persistent.  Various
   # SystemCallErrors are re-raised with a human-readable message under this
   # class.
 
@@ -241,7 +241,7 @@ class Net::HTTP::Persistent
   # NOTE:  This may not work on ruby > 1.9.
 
   def self.detect_idle_timeout uri, max = 10
-    uri = URI uri unless uri.is_a?(URI::Generic)
+    uri = URI uri unless URI::Generic === uri
     uri += '/'
 
     req = Net::HTTP::Head.new uri.request_uri
@@ -257,7 +257,7 @@ class Net::HTTP::Persistent
 
       $stderr.puts "HEAD #{uri} => #{response.code}" if $DEBUG
 
-      unless response.is_a?(Net::HTTPOK) then
+      unless Net::HTTPOK === response then
         raise Error, "bad response code #{response.code} detecting idle timeout"
       end
 
@@ -463,7 +463,7 @@ class Net::HTTP::Persistent
   attr_accessor :retry_change_requests
 
   ##
-  # Creates a new Net::HTTP::Persistent.
+  # Creates a new Bundler::Persistent::Net::HTTP::Persistent.
   #
   # Set +name+ to keep your connections apart from everybody else's.  Not
   # required currently, but highly recommended.  Your library name should be
@@ -594,7 +594,7 @@ class Net::HTTP::Persistent
     use_ssl = uri.scheme.downcase == 'https'
 
     if use_ssl then
-      raise Net::HTTP::Persistent::Error, 'OpenSSL is not available' unless
+      raise Bundler::Persistent::Net::HTTP::Persistent::Error, 'OpenSSL is not available' unless
         HAVE_OPENSSL
 
       ssl_generation = @ssl_generation
@@ -728,7 +728,7 @@ class Net::HTTP::Persistent
           } or not @reuse_ssl_sessions then
         Net::HTTP
     else
-      Net::HTTP::Persistent::SSLReuse
+      Bundler::Persistent::Net::HTTP::Persistent::SSLReuse
     end
   end
 
@@ -1065,7 +1065,7 @@ class Net::HTTP::Persistent
   # Returns the request.
 
   def request_setup req_or_uri # :nodoc:
-    req = if req_or_uri.is_a?(URI) then
+    req = if URI === req_or_uri then
             Net::HTTP::Get.new req_or_uri.request_uri
           else
             req_or_uri
@@ -1092,7 +1092,7 @@ class Net::HTTP::Persistent
   #
   # Uses the current thread by default.
   #
-  # If you've used Net::HTTP::Persistent across multiple threads you should
+  # If you've used Bundler::Persistent::Net::HTTP::Persistent across multiple threads you should
   # call this in each thread when you're done making HTTP requests.
   #
   # *NOTE*: Calling shutdown for another thread can be dangerous!
@@ -1227,4 +1227,5 @@ application:
 
 end
 
-require 'net/http/persistent/ssl_reuse'
+require 'bundler/vendor/net-http-persistent/lib/net/http/persistent/ssl_reuse'
+

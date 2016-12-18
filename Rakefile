@@ -39,7 +39,7 @@ namespace :spec do
     deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
-    deps["rubocop"] ||= "= 0.41.2" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
+    deps["rubocop"] ||= "= 0.45.0" if RUBY_VERSION >= "2.0.0" # can't go in the gemspec because of the ruby version requirement
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
@@ -47,10 +47,10 @@ namespace :spec do
       deps.delete("rdiscount")
     end
 
-    deps.sort_by {|name, _| name }.each do |name, version|
-      sh %(#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || ) +
-        %(#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc)
-    end
+    gem_install_command = "install --no-ri --no-rdoc --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
+      "'#{name}:#{version}'"
+    end.join(" ")
+    sh %(#{Gem.ruby} -S gem #{gem_install_command})
 
     # Download and install gems used inside tests
     $LOAD_PATH.unshift("./spec")
@@ -74,7 +74,7 @@ namespace :spec do
 
       $LOAD_PATH.unshift("./spec")
       require "support/rubygems_ext"
-      Spec::Rubygems::DEPS["codeclimate-test-reporter"] = nil if RUBY_VERSION >= "2.2.0"
+      Spec::Rubygems::DEPS["codeclimate-test-reporter"] = "~> 0.6.0" if RUBY_VERSION >= "2.2.0"
 
       # Install the other gem deps, etc
       Rake::Task["spec:deps"].invoke
@@ -91,9 +91,9 @@ begin
   RSpec::Core::RakeTask.new
   task :spec => "man:build"
 
-  if RUBY_VERSION >= "1.9.3"
+  if RUBY_VERSION >= "2.0.0"
     # can't go in the gemspec because of the ruby version requirement
-    gem "rubocop", "= 0.41.2"
+    gem "rubocop", "= 0.45.0"
     require "rubocop/rake_task"
     RuboCop::RakeTask.new
   end
@@ -127,7 +127,7 @@ begin
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
       branches = %w(master)
-      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.2 v2.6.6)
+      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.2 v2.6.8)
       (branches + releases).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
@@ -190,7 +190,7 @@ begin
     task :travis do
       rg = ENV["RGV"] || raise("Rubygems version is required on Travis!")
 
-      if RUBY_VERSION > "1.9.3"
+      if RUBY_VERSION >= "2.0.0"
         puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
         Rake::Task["rubocop"].invoke
       end
@@ -305,11 +305,29 @@ begin
     lib.prefix = "BundlerVendoredPostIt"
     lib.vendor_lib = "lib/bundler/vendor/postit"
   end
+
+  Automatiek::RakeTask.new("net-http-persistent") do |lib|
+    lib.download = { :github => "https://github.com/drbrain/net-http-persistent" }
+    lib.namespace = "Net::HTTP::Persistent"
+    lib.prefix = "Bundler::Persistent"
+    lib.vendor_lib = "lib/bundler/vendor/net-http-persistent"
+
+    mixin = Module.new do
+      def namespace_files
+        super
+        require_target = vendor_lib.sub(%r{^(.+?/)?lib/}, "") << "/lib"
+        relative_files = files.map {|f| Pathname.new(f).relative_path_from(Pathname.new(vendor_lib) / "lib").sub_ext("").to_s }
+        process_files(/require (['"])(#{Regexp.union(relative_files)})/, "require \\1#{require_target}/\\2")
+      end
+    end
+    lib.send(:extend, mixin)
+  end
 rescue LoadError
   namespace :vendor do
     task(:molinillo) { abort "Install the automatiek gem to be able to vendor gems." }
     task(:thor) { abort "Install the automatiek gem to be able to vendor gems." }
     task(:postit) { abort "Install the automatiek gem to be able to vendor gems." }
+    task("net-http-persistent") { abort "Install the automatiek gem to be able to vendor gems." }
   end
 end
 
