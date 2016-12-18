@@ -85,7 +85,7 @@ describe "bundler/inline#gemfile" do
 
     script <<-RUBY, :artifice => "endpoint"
       gemfile(true) do
-        source "https://rubygems.org"
+        source "https://notaserver.com"
         gem "activesupport", :require => true
       end
     RUBY
@@ -104,7 +104,7 @@ describe "bundler/inline#gemfile" do
         end
       end
       gemfile(true, :ui => MyBundlerUI.new) do
-        source "https://rubygems.org"
+        source "https://notaserver.com"
         gem "activesupport", :require => true
       end
     RUBY
@@ -196,7 +196,7 @@ describe "bundler/inline#gemfile" do
 
   it "installs inline gems when a Gemfile.lock is present" do
     gemfile <<-G
-      source "https://rubygems.org"
+      source "https://notaserver.com"
       gem "rake"
     G
 
