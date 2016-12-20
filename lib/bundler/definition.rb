@@ -104,7 +104,7 @@ module Bundler
 
       add_current_platform unless Bundler.settings[:frozen]
 
-      converge_gemspec_sources
+      converge_path_sources_to_gemspec_sources
       @path_changes = converge_paths
       @source_changes = converge_sources
 
@@ -462,12 +462,13 @@ module Bundler
         changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
       end
 
+      msg << "\n\n#{change_reason.split(", ").join("\n")}\n"
       msg << "\n\nYou have added to the Gemfile:\n" << added.join("\n") if added.any?
       msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
       msg << "\n\nYou have changed in the Gemfile:\n" << changed.join("\n") if changed.any?
       msg << "\n"
 
-      raise ProductionError, msg if added.any? || deleted.any? || changed.any?
+      raise ProductionError, msg if added.any? || deleted.any? || changed.any? || !nothing_changed?
     end
 
     def validate_runtime!
@@ -628,7 +629,7 @@ module Bundler
       gemspec_source || source
     end
 
-    def converge_gemspec_sources
+    def converge_path_sources_to_gemspec_sources
       @locked_sources.map! do |source|
         converge_path_source_to_gemspec_source(source)
       end
