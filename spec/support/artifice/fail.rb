@@ -9,6 +9,8 @@ end
 
 # We can't use artifice here because it uses rack
 
+module Artifice; end # for < 2.0, Net::HTTP::Persistent::SSLReuse
+
 class Fail < Net::HTTP
   # Net::HTTP uses a @newimpl instance variable to decide whether
   # to use a legacy implementation. Since we are subclassing
