@@ -47,21 +47,24 @@ module Bundler
       # sure needed dependencies have been installed.
       def dependencies_installed?(all_specs)
         installed_specs = all_specs.select(&:installed?).map(&:name)
-        dependencies(all_specs.map(&:name)).all? {|d| installed_specs.include? d.name }
+        dependencies.all? {|d| installed_specs.include? d.name }
       end
 
       # Represents only the non-development dependencies, the ones that are
       # itself and are in the total list.
-      def dependencies(all_spec_names)
+      def dependencies
         @dependencies ||= begin
-          deps = all_dependencies.reject {|dep| ignorable_dependency? dep }
-          missing = deps.reject {|dep| all_spec_names.include? dep.name }
-          unless missing.empty?
-            raise Bundler::LockfileError, "Your Gemfile.lock is corrupt. The following #{missing.size > 1 ? "gems are" : "gem is"} missing " \
-                                "from the DEPENDENCIES section: '#{missing.map(&:name).join('\' \'')}'"
-          end
-          deps
+          all_dependencies.reject {|dep| ignorable_dependency? dep }
         end
+      end
+
+      def corrupt_lockfile?(all_spec_names)
+        deps = all_dependencies.reject {|dep| ignorable_dependency? dep }
+        missing = deps.reject {|dep| all_spec_names.include? dep.name }
+        return false if missing.empty?
+        Bundler.ui.warn "Your Gemfile.lock is corrupt. The following #{missing.size > 1 ? "gems are" : "gem is"} missing " \
+                            "from the DEPENDENCIES section for #{@spec.full_name}: '#{missing.map(&:name).join("', '")}'"
+        true
       end
 
       # Represents all dependencies
@@ -92,6 +95,7 @@ module Bundler
       # TODO:  remove in bundler 2.0
       require "bundler/gem_remote_fetcher" if RUBY_VERSION < "1.9"
 
+      check_for_corrupt_lockfile
       enqueue_specs
       process_specs until @specs.all?(&:installed?) || @specs.any?(&:failed?)
       handle_error if @specs.any?(&:failed?)
@@ -133,6 +137,12 @@ module Bundler
         raise exception
       end
       raise Bundler::InstallError, errors.map(&:to_s).join("\n\n")
+    end
+
+    def check_for_corrupt_lockfile
+      return unless @specs.any? {|s| s.corrupt_lockfile?(@specs) }
+      Bundler.ui.warn "Using 1 thread to install specs instead of #{@size} due to lockfile corruption" unless @size == 1
+      @size = 1
     end
 
     # Keys in the remains hash represent uninstalled gems specs.
