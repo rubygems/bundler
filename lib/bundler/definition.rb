@@ -751,8 +751,9 @@ module Bundler
           next unless other
 
           deps2 = other.dependencies.select {|d| d.type != :development }
+          runtime_dependencies = s.dependencies.select {|d| d.type != :development }
           # If the dependencies of the path source have changed, unlock it
-          next unless s.dependencies.sort == deps2.sort
+          next unless runtime_dependencies.sort == deps2.sort
         end
 
         converged << s
