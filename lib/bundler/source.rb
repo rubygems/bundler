@@ -34,5 +34,9 @@ module Bundler
     def include?(other)
       other == self
     end
+
+    def inspect
+      "#<#{self.class}:0x#{object_id} #{self}>"
+    end
   end
 end

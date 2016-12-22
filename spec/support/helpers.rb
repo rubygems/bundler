@@ -84,7 +84,7 @@ module Spec
       with_sudo = options.delete(:sudo)
       sudo = with_sudo == :preserve_env ? "sudo -E" : "sudo" if with_sudo
 
-      options["no-color"] = true unless options.key?("no-color") || cmd.to_s.start_with?("exec", "exe", "ex", "e", "conf")
+      options["no-color"] = true unless options.key?("no-color") || cmd.to_s =~ /\A(e|ex|exe|exec|conf|confi|config)(\s|\z)/
 
       bundle_bin = options.delete("bundle_bin") || File.expand_path("../../../exe/bundle", __FILE__)
 
@@ -93,7 +93,9 @@ module Spec
       end
 
       requires = options.delete(:requires) || []
-      requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
+      if artifice = options.delete(:artifice) { "fail" unless RSpec.current_example.metadata[:realworld] }
+        requires << File.expand_path("../artifice/#{artifice}.rb", __FILE__)
+      end
       requires << "support/hax"
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
 
@@ -119,18 +121,8 @@ module Spec
     end
 
     def bundle_ruby(options = {})
-      options["no-color"] = true unless options.key?("no-color")
-
-      bundle_bin = File.expand_path("../../../exe/bundle_ruby", __FILE__)
-
-      requires = options.delete(:requires) || []
-      requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
-      requires_str = requires.map {|r| "-r#{r}" }.join(" ")
-
-      env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin}"
-
-      sys_exec(cmd) {|i, o, thr| yield i, o, thr if block_given? }
+      options["bundle_bin"] = File.expand_path("../../../exe/bundle_ruby", __FILE__)
+      bundle("", options)
     end
 
     def ruby(ruby, options = {})
