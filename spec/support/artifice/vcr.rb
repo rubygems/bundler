@@ -26,7 +26,7 @@ VCR.configure do |config|
 end
 
 VCR.insert_cassette \
-  ENV.fetch("BUNDLER_SPEC_VCR_CASSETTE_NAME"),
+  ENV.fetch("BUNDLER_SPEC_VCR_CASSETTE_NAME") { "realworld" },
   :record => :new_episodes,
   :match_requests_on => [:method, :uri, :query]
 

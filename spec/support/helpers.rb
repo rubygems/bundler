@@ -105,7 +105,6 @@ module Spec
         end
       end
       if artifice
-        env["BUNDLER_SPEC_VCR_CASSETTE_NAME"] = RSpec.current_example.full_description
         requires << File.expand_path("../artifice/#{artifice}", __FILE__)
       end
 

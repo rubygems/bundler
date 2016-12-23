@@ -3,7 +3,6 @@
 RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
   def rubygems_version(name, requirement)
     ruby! <<-RUBY
-      ENV["BUNDLER_SPEC_VCR_CASSETTE_NAME"] = #{RSpec.current_example.full_description.dump}
       require #{File.expand_path("../../support/artifice/vcr.rb", __FILE__).dump}
       require "bundler"
       require "bundler/source/rubygems/remote"
