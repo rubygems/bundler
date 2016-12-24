@@ -1,13 +1,4 @@
 # frozen_string_literal: true
-require File.expand_path("../../path.rb", __FILE__)
-include Spec::Path
-
-$LOAD_PATH.unshift(*Dir[Spec::Path.base_system_gems.join("gems/{vcr}-*/lib")].map(&:to_s))
-
-require "vcr"
-require "vcr/request_handler"
-require "vcr/extensions/net_http_response"
-
 require "net/http"
 if RUBY_VERSION < "1.9"
   begin
@@ -17,163 +8,123 @@ if RUBY_VERSION < "1.9"
   end
 end # but only for 1.8
 
-VCR.configure do |config|
-  config.cassette_library_dir = File.expand_path("../vcr_cassettes", __FILE__)
-  config.preserve_exact_body_bytes do |_response|
-    true
-  end
-  # config.debug_logger = File.open(File.expand_path("../vcr.log", __FILE__), "w")
-end
-
-VCR.insert_cassette \
-  ENV.fetch("BUNDLER_SPEC_VCR_CASSETTE_NAME") { "realworld" },
-  :record => :new_episodes,
-  :match_requests_on => [:method, :uri, :query]
-
-at_exit { VCR.eject_cassette }
+CASSETTE_PATH = File.expand_path("../vcr_cassettes", __FILE__)
+CASSETTE_NAME = ENV.fetch("BUNDLER_SPEC_VCR_CASSETTE_NAME") { "realworld" }
 
 class BundlerVCRHTTP < Net::HTTP
-  # @private
-  class RequestHandler < ::VCR::RequestHandler
-    attr_reader :net_http, :request, :request_body, :response_block
-    def initialize(net_http, request, request_body = nil, &response_block)
-      @net_http = net_http
+  class RequestHandler
+    attr_reader :http, :request, :body, :response_block
+    def initialize(http, request, body = nil, &response_block)
+      @http = http
       @request = request
-      @request_body = request_body
+      @body = body
       @response_block = response_block
-      @stubbed_response = nil
-      @vcr_response = nil
-      @recursing = false
     end
 
-    def handle
-      super
-    ensure
-      invoke_after_request_hook(@vcr_response) unless @recursing
+    def handle_request
+      handler = self
+      request.instance_eval do
+        @__vcr_request_handler = handler
+      end
+
+      if recorded_response?
+        recorded_response
+      else
+        record_response
+      end
     end
 
-  private
-
-    def on_recordable_request
-      perform_request(net_http.started?, :record_interaction)
+    def recorded_response?
+      return true if ENV["BUNDLER_SPEC_RECORDING"]
+      request_pair_paths.all? {|f| File.exist?(f) }
     end
 
-    def on_stubbed_by_vcr_request
-      status = stubbed_response.status
-      headers = stubbed_response.headers
-      body = stubbed_response.body
+    def recorded_response
+      File.open(request_pair_paths.last, "rb:ASCII-8BIT") do |response_file|
+        response_io = ::Net::BufferedIO.new(response_file)
+        ::Net::HTTPResponse.read_new(response_io).tap do |response|
+          response.decode_content = request.decode_content
+          response.uri = request.uri
+
+          response.reading_body(response_io, request.response_body_permitted?) do
+            response_block.call(response) if response_block
+          end
+        end
+      end
+    end
+
+    def record_response
+      request_path, response_path = *request_pair_paths
+
+      @recording = true
+
+      response = http.request_without_vcr(request, body, &response_block)
+      @recording = false
+      unless @recording
+        FileUtils.mkdir_p(File.dirname(request_path))
+        File.binwrite(request_path, request_to_string(request))
+        File.binwrite(response_path, response_to_string(response))
+      end
+      response
+    end
+
+    def key
+      [request.uri, request["host"] || http.address, request.path, request.method].compact
+    end
+
+    def file_name_for_key(key)
+      key.join("/")
+    end
+
+    def request_pair_paths
+      %w(request response).map do |kind|
+        File.join(CASSETTE_PATH, CASSETTE_NAME, file_name_for_key(key + [kind]))
+      end
+    end
+
+    def read_stored_request(path)
+      contents = File.read(path)
+      headers = {}
+      method = nil
+      path = nil
+      contents.lines.grep(/^> /).each do |line|
+        if line =~ /^> (GET|HEAD|POST|PATCH|PUT|DELETE) (.*)/
+          method = $1
+          path = $2.strip
+        elsif line =~ /^> (.*?): (.*)/
+          headers[$1] = $2
+        end
+      end
+      body = contents =~ /^([^>].*)/m && $1
+      Net::HTTP.const_get(method.capitalize).new(path, headers).tap {|r| r.body = body if body }
+    end
+
+    def request_to_string(request)
+      request_string = []
+      request_string << "> #{request.method.upcase} #{request.path}"
+      request.to_hash.each do |key, value|
+        request_string << "> #{key}: #{Array(value).first}"
+      end
+      request << "" << request.body if request.body
+      request_string.join("\n")
+    end
+
+    def response_to_string(response)
+      headers = response.to_hash
+      body = response.body
 
       response_string = []
-      response_string << "HTTP/1.1 #{status.code} #{status.message}"
+      response_string << "HTTP/1.1 #{response.code} #{response.message}"
+
+      headers["content-length"] = [body.bytesize.to_s] if body
 
       headers.each do |header, value|
-        response_string << "#{header}: #{value}"
+        response_string << "#{header}: #{value.join(", ")}"
       end
 
       response_string << "" << body
 
-      response_io = ::Net::BufferedIO.new(StringIO.new(response_string.join("\n")))
-      res = ::Net::HTTPResponse.read_new(response_io)
-
-      res.reading_body(response_io, true) do
-        yield res if block_given?
-      end
-
-      res
-    end
-
-    def on_ignored_request
-      raise "no ignored requests allowed"
-    end
-
-    def perform_request(started, record_interaction = false)
-      # Net::HTTP calls #request recursively in certain circumstances.
-      # We only want to record the request when the request is started, as
-      # that is the final time through #request.
-      unless started
-        @recursing = true
-        request.instance_variable_set(:@__vcr_request_handler, recursive_request_handler)
-        return net_http.request_without_vcr(request, request_body, &response_block)
-      end
-
-      net_http.request_without_vcr(request, request_body) do |response|
-        @vcr_response = vcr_response_from(response)
-
-        if record_interaction
-          VCR.record_http_interaction VCR::HTTPInteraction.new(vcr_request, @vcr_response)
-        end
-
-        response.extend ::VCR::Net::HTTPResponse # "unwind" the response
-        response_block.call(response) if response_block
-      end
-    end
-
-    def uri
-      @uri ||= begin
-        protocol = net_http.use_ssl? ? "https" : "http"
-
-        path = request.path
-        path = URI.parse(request.path).request_uri if request.path =~ /^http/
-
-        "#{protocol}://#{net_http.address}#{path}"
-      end
-    end
-
-    def response_hash(response)
-      (response.headers || {}).merge(
-        :body   => response.body,
-        :status => [response.status.code.to_s, response.status.message]
-      )
-    end
-
-    def request_method
-      request.method.downcase.to_sym
-    end
-
-    def vcr_request
-      @vcr_request ||= VCR::Request.new \
-        request_method,
-        uri,
-        (request_body || request.body),
-        request.to_hash
-    end
-
-    def vcr_response_from(response)
-      VCR::Response.new \
-        VCR::ResponseStatus.new(response.code.to_i, response.message),
-        response.to_hash,
-        response.body,
-        response.http_version
-    end
-
-    def recursive_request_handler
-      @recursive_request_handler ||= RecursiveRequestHandler.new(
-        @after_hook_typed_request.type, @stubbed_response, @vcr_request,
-        @net_http, @request, @request_body, &@response_block
-      )
-    end
-  end
-
-  # @private
-  class RecursiveRequestHandler < RequestHandler
-    attr_reader :stubbed_response
-
-    def initialize(request_type, stubbed_response, vcr_request, *args, &response_block)
-      @request_type = request_type
-      @stubbed_response = stubbed_response
-      @vcr_request = vcr_request
-      super(*args)
-    end
-
-    def handle
-      set_typed_request_for_after_hook(@request_type)
-      send "on_#{@request_type}_request"
-    ensure
-      invoke_after_request_hook(@vcr_response)
-    end
-
-    def request_type(*args)
-      @request_type
+      response_string.join("\n").force_encoding("ASCII-8BIT")
     end
   end
 
@@ -182,7 +133,7 @@ class BundlerVCRHTTP < Net::HTTP
       remove_instance_variable(:@__vcr_request_handler) if defined?(@__vcr_request_handler)
     end || RequestHandler.new(self, request, *args, &block)
 
-    handler.handle
+    handler.handle_request
   end
 
   alias_method :request_without_vcr, :request
