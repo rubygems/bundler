@@ -93,7 +93,7 @@ module Bundler
         # It should be called in `install` after the plugin is done placing the
         # gem at correct install location.
         #
-        # It also runs Gem hooks `post_install`, `post_build` and `post_install`
+        # It also runs Gem hooks `pre_install`, `post_build` and `post_install`
         #
         # Note: Do not override if you don't know what you are doing.
         def post_install(spec, disable_exts = false)
