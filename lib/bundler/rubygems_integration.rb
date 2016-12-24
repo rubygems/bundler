@@ -253,6 +253,10 @@ module Bundler
       end
     end
 
+    def install_with_build_args(args)
+      with_build_args(args) { yield }
+    end
+
     def gem_from_path(path, policy = nil)
       require "rubygems/format"
       Gem::Format.from_file_by_path(path, policy)
@@ -719,6 +723,10 @@ module Bundler
 
       def repository_subdirectories
         Gem::REPOSITORY_SUBDIRECTORIES
+      end
+
+      def install_with_build_args(args)
+        yield
       end
     end
 

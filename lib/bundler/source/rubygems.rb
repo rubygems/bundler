@@ -141,6 +141,7 @@ module Bundler
               :ignore_dependencies => true,
               :wrappers            => true,
               :env_shebang         => true,
+              :build_args          => opts[:build_args],
               :bundler_expected_checksum => spec.respond_to?(:checksum) && spec.checksum
             ).install
           end
