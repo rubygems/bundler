@@ -42,7 +42,8 @@ Lock the gems specified in Gemfile.
   Fall back to using the single-file index of all gems.
 
 * `--add-platform`:
-  Add a new platform to the lockfile.
+  Add a new platform to the lockfile, re-resolving for the addition of that
+  platform.
 
 * `--remove-platform`:
   Remove a platform from the lockfile.
@@ -77,6 +78,14 @@ For instance, you only want to update `nokogiri`, run `bundle lock --update noko
 
 Bundler will update `nokogiri` and any of its dependencies, but leave the rest of the
 gems that you specified locked to the versions in the `Gemfile.lock`.
+
+## SUPPORTING OTHER PLATFORMS
+
+If you want your bundle to support platforms other than the one you're running
+locally, you can run `bundle lock --add-platform PLATFORM` to add PLATFORM to
+the lockfile, force bundler to re-resolve and consider the new platform when
+picking gems, all without needing to have a machine that matches PLATFORM handy
+to install those platform-specific gems on.
 
 ## PATCH LEVEL OPTIONS
 
