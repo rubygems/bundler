@@ -208,7 +208,6 @@ describe "The library itself" do
       no_prune
       shebang
       silence_root_warning
-      specific_platform
       ssl_verify_mode
       system_bindir
       user_agent

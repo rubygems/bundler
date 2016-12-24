@@ -158,6 +158,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `force_ruby_platform` (`BUNDLE_FORCE_RUBY_PLATFORM`):
    Force bundler to install the `ruby` platform version of gems, instead of
    platform-specific gems.
+* `specific_platform` (`BUNDLE_SPECIFIC_PLATFORM`):
+   Allow bundler to resolve for the specific running platform and store it in
+   the lockfile, instead of only using a generic platform.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
