@@ -198,7 +198,6 @@ describe "The library itself" do
       cache_all_platforms
       clean
       console
-      disable_checksum_validation
       disable_exec_load
       disable_local_branch_check
       disable_shared_gems

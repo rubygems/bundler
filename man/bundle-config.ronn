@@ -161,6 +161,8 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `specific_platform` (`BUNDLE_SPECIFIC_PLATFORM`):
    Allow bundler to resolve for the specific running platform and store it in
    the lockfile, instead of only using a generic platform.
+* `disable_checksum_validation` (`BUNDLE_DISABLE_CHECKSUM_VALIDATION`):
+   Ignore the checksums of downloaded gems returned by rubygems sources.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
