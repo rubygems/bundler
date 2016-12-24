@@ -240,7 +240,12 @@ module Bundler
     end
 
     def to_bool(value)
-      !(value.nil? || value == "" || value =~ /^(false|f|no|n|0)$/i || value == false)
+      case value
+      when nil, /\A(false|f|no|n|0|)\z/i, false
+        false
+      else
+        true
+      end
     end
 
     def is_num(value)
