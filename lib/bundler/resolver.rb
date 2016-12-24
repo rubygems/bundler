@@ -365,8 +365,13 @@ module Bundler
                        "Source does not contain any versions of '#{requirement}'"
                      end
         else
+          cache_message = begin
+                            " or in gems cached in #{Bundler.settings.app_cache_path}" if Bundler.app_cache.exist?
+                          rescue GemfileNotFound
+                            nil
+                          end
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
-            "listed in your Gemfile or available on this machine."
+            "listed in your Gemfile#{cache_message}."
         end
         raise GemNotFound, message
       end
