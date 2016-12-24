@@ -155,6 +155,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
    The number of redirects allowed for network requests. Defaults to `5`.
 * `timeout` (`BUNDLE_TIMEOUT`):
    The seconds allowed before timing out for network requests. Defaults to `10`.
+* `force_ruby_platform` (`BUNDLE_FORCE_RUBY_PLATFORM`):
+   Force bundler to install the `ruby` platform version of gems, instead of
+   platform-specific gems.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
@@ -236,4 +239,3 @@ This is especially useful for private repositories on hosts such as Github,
 where you can use personal OAuth tokens:
 
     export BUNDLE_GITHUB__COM=abcd0123generatedtoken:x-oauth-basic
-
