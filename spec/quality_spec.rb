@@ -223,7 +223,7 @@ describe "The library itself" do
           line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| (all_settings[s] ||= []) << "referenced at `lib/#{filename}:#{number}`" }
         end
       end
-      documented_settings = File.read("../man/bundle-config.ronn").scan(/^* `#{key_pattern}`/).flatten
+      documented_settings = File.read("../man/bundle-config.ronn").scan(/^\* `#{key_pattern}`/).flatten
     end
 
     documented_settings.each {|s| all_settings.delete(s) }
