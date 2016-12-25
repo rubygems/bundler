@@ -58,7 +58,7 @@ module Bundler
       :x64_mingw_21 => Gem::Platform::X64_MINGW,
       :x64_mingw_22 => Gem::Platform::X64_MINGW,
       :x64_mingw_23 => Gem::Platform::X64_MINGW,
-      :x64_mingw_24 => Gem::Platform::X64_MINGW
+      :x64_mingw_24 => Gem::Platform::X64_MINGW,
     }.freeze
 
     REVERSE_PLATFORM_MAP = {}.tap do |reverse_platform_map|

@@ -1,3 +1,9 @@
+## 1.13.7 (2016-12-25)
+
+Features:
+
+  - add support for the `ruby_24` gemfile filter (#5281, @amatsuda)
+
 ## 1.13.6 (2016-10-22)
 
 Bugfixes:
