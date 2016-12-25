@@ -4,13 +4,6 @@ require "spec_helper"
 describe "Bundler.load" do
   before :each do
     system_gems "rack-1.0.0"
-    # clear memoized method results
-    # TODO: Don't reset internal ivars
-    Bundler.instance_eval do
-      @load = nil
-      @runtime = nil
-      @definition = nil
-    end
   end
 
   describe "with a gemfile" do
