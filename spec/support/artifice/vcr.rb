@@ -43,8 +43,8 @@ class BundlerVCRHTTP < Net::HTTP
       File.open(request_pair_paths.last, "rb:ASCII-8BIT") do |response_file|
         response_io = ::Net::BufferedIO.new(response_file)
         ::Net::HTTPResponse.read_new(response_io).tap do |response|
-          response.decode_content = request.decode_content
-          response.uri = request.uri
+          response.decode_content = request.decode_content if request.respond_to?(:decode_content)
+          response.uri = request.uri if request.respond_to?(:uri)
 
           response.reading_body(response_io, request.response_body_permitted?) do
             response_block.call(response) if response_block
@@ -62,14 +62,14 @@ class BundlerVCRHTTP < Net::HTTP
       @recording = false
       unless @recording
         FileUtils.mkdir_p(File.dirname(request_path))
-        File.binwrite(request_path, request_to_string(request))
-        File.binwrite(response_path, response_to_string(response))
+        binwrite(request_path, request_to_string(request))
+        binwrite(response_path, response_to_string(response))
       end
       response
     end
 
     def key
-      [request.uri, request["host"] || http.address, request.path, request.method].compact
+      [request["host"] || http.address, request.path, request.method].compact
     end
 
     def file_name_for_key(key)
@@ -124,7 +124,16 @@ class BundlerVCRHTTP < Net::HTTP
 
       response_string << "" << body
 
-      response_string.join("\n").force_encoding("ASCII-8BIT")
+      response_string = response_string.join("\n")
+      if response_string.respond_to?(:force_encoding)
+        response_string.force_encoding("ASCII-8BIT")
+      else
+        response_string
+      end
+    end
+
+    def binwrite(path, contents)
+      File.open(path, "wb:ASCII-8BIT") {|f| f.write(contents) }
     end
   end
 
