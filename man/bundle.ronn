@@ -55,7 +55,7 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle show(1)`:
   Show the source location of a particular gem in the bundle
 
-* `bundle outdated(1)`:
+* [`bundle outdated(1)`][bundle-outdated]:
   Show all of the outdated gems in the current bundle
 
 * `bundle console(1)`:
@@ -64,7 +64,7 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle open(1)`:
   Open an installed gem in the editor
 
-* `bundle lock(1)`:
+* [`bundle lock(1)`][bundle-lock]:
   Generate a lockfile for your dependencies
 
 * `bundle viz(1)`:
