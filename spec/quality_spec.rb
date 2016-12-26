@@ -193,6 +193,7 @@ describe "The library itself" do
 
   it "documents all used settings" do
     exemptions = %w(
+      allow_offline_install
       auto_install
       cache_all
       cache_all_platforms
@@ -201,10 +202,14 @@ describe "The library itself" do
       disable_exec_load
       disable_local_branch_check
       disable_shared_gems
+      gem.coc
+      gem.mit
       jobs
       major_deprecations
       no_install
       no_prune
+      only_update_to_newer_versions
+      plugins
       shebang
       silence_root_warning
       ssl_verify_mode
@@ -213,14 +218,17 @@ describe "The library itself" do
       warned_version
     )
 
-    all_settings = {}
+    all_settings = Hash.new {|h, k| h[k] = [] }
     documented_settings = exemptions
+
+    Bundler::Settings::BOOL_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::BOOL_KEYS" }
+    Bundler::Settings::NUMBER_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::NUMBER_KEYS" }
 
     Dir.chdir(File.expand_path("../../lib", __FILE__)) do
       key_pattern = /([a-z\._-]+)/i
       `git ls-files -z`.split("\x0").each do |filename|
         File.readlines(filename).each_with_index do |line, number|
-          line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| (all_settings[s] ||= []) << "referenced at `lib/#{filename}:#{number}`" }
+          line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `lib/#{filename}:#{number}`" }
         end
       end
       documented_settings = File.read("../man/bundle-config.ronn").scan(/^\* `#{key_pattern}`/).flatten
