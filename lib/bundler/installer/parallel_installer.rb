@@ -78,6 +78,8 @@ module Bundler
       [Bundler.settings[:jobs].to_i - 1, 1].max
     end
 
+    attr_reader :size
+
     def initialize(installer, all_specs, size, standalone, force)
       @installer = installer
       @size = size
