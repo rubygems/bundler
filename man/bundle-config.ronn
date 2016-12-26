@@ -156,13 +156,19 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `timeout` (`BUNDLE_TIMEOUT`):
    The seconds allowed before timing out for network requests. Defaults to `10`.
 * `force_ruby_platform` (`BUNDLE_FORCE_RUBY_PLATFORM`):
-   Force bundler to install the `ruby` platform version of gems, instead of
-   platform-specific gems.
+   Ignore the current machine's platform and install only `ruby` platform gems.
+   As a result, gems with native extensions will be compiled from source.
 * `specific_platform` (`BUNDLE_SPECIFIC_PLATFORM`):
    Allow bundler to resolve for the specific running platform and store it in
    the lockfile, instead of only using a generic platform.
+   A specific platform is the exact platform triple reported by
+   `Gem::Platform.local`, such as `x86_64-darwin-16` or `universal-java-1.8`.
+   On the other hand, generic platforms are those such as `ruby`, `mswin`, or
+   `java`. In this example, `x86_64-darwin-16` would map to `ruby` and
+   `universal-java-1.8` to `java`.
 * `disable_checksum_validation` (`BUNDLE_DISABLE_CHECKSUM_VALIDATION`):
-   Ignore the checksums of downloaded gems returned by rubygems sources.
+   Allow installing gems even if they do not match the checksum provided by
+   RubyGems.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.

@@ -87,6 +87,8 @@ the lockfile, force bundler to re-resolve and consider the new platform when
 picking gems, all without needing to have a machine that matches PLATFORM handy
 to install those platform-specific gems on.
 
+For a full explanation of gem platforms, see `gem help platform`.
+
 ## PATCH LEVEL OPTIONS
 
 See [bundle update(1)][bundle-update] for details.
