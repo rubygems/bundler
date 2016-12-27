@@ -16,6 +16,7 @@ module Bundler
       2.2
       2.3
       2.4
+      2.5
     ).freeze
 
     KNOWN_MAJOR_VERSIONS = KNOWN_MINOR_VERSIONS.map {|v| v.split(".", 2).first }.uniq.freeze
