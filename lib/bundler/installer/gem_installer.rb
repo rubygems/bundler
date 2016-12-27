@@ -52,12 +52,12 @@ module Bundler
     end
 
     def install
-      spec.source.install(spec, :force => force, :ensure_builtin_gems_cached => standalone)
+      spec.source.install(spec, :force => force, :ensure_builtin_gems_cached => standalone, :build_args => [spec_settings])
     end
 
     def install_with_settings
       # Build arguments are global, so this is mutexed
-      Bundler.rubygems.with_build_args([spec_settings]) { install }
+      Bundler.rubygems.install_with_build_args([spec_settings]) { install }
     end
 
     def out_of_space_message
