@@ -499,14 +499,10 @@ module Bundler
       end
     end
 
-    # TODO: refactor this so that `match_platform` can be called with two platforms
-    DummyPlatform = Struct.new(:platform)
-    class DummyPlatform; include MatchPlatform; end
     def validate_platforms!
       return if @platforms.any? do |bundle_platform|
-        bundle_platform = DummyPlatform.new(bundle_platform)
         Bundler.rubygems.platforms.any? do |local_platform|
-          bundle_platform.match_platform(local_platform)
+          MatchPlatform.platforms_match?(bundle_platform, local_platform)
         end
       end
 
