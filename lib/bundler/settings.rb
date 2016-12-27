@@ -240,7 +240,12 @@ module Bundler
     end
 
     def to_bool(value)
-      !(value.nil? || value == "" || value =~ /^(false|f|no|n|0)$/i || value == false)
+      case value
+      when nil, /\A(false|f|no|n|0|)\z/i, false
+        false
+      else
+        true
+      end
     end
 
     def is_num(value)
@@ -298,10 +303,10 @@ module Bundler
     }xo
 
     def load_config(config_file)
-      return {} unless config_file
+      return {} if !config_file || ignore_config?
       SharedHelpers.filesystem_access(config_file, :read) do |file|
         valid_file = file.exist? && !file.size.zero?
-        return {} if ignore_config? || !valid_file
+        return {} unless valid_file
         require "bundler/yaml_serializer"
         YAMLSerializer.load file.read
       end

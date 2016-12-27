@@ -51,6 +51,15 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       end]
       expect(loaded).to eq(expected)
     end
+
+    context "when BUNDLE_IGNORE_CONFIG is set" do
+      before { ENV["BUNDLE_IGNORE_CONFIG"] = "TRUE" }
+
+      it "ignores the config" do
+        loaded = settings.send(:load_config, bundled_app("config"))
+        expect(loaded).to eq({})
+      end
+    end
   end
 
   describe "#[]" do

@@ -8,11 +8,11 @@ environment = BundlerVendoredPostIt::PostIt::Environment.new([])
 version = Gem::Requirement.new(environment.bundler_version)
 if version.requirements.size == 1 && version.requirements.first.first == "=" # version.exact?
   if version.requirements.first.last.segments.first >= 2
-    ENV["BUNDLE_ENABLE_TRAMPOLINE"] = "true"
+    ENV["BUNDLE_TRAMPOLINE_FORCE"] = "true"
   end
 end
 
-if ENV["BUNDLE_ENABLE_TRAMPOLINE"] && !ENV["BUNDLE_DISABLE_POSTIT"]
+if ENV["BUNDLE_TRAMPOLINE_FORCE"] && !ENV["BUNDLE_TRAMPOLINE_DISABLE"]
   installed_version =
     if defined?(Bundler::VERSION)
       Bundler::VERSION
@@ -70,4 +70,4 @@ You're running Bundler #{installed_version} but this project uses #{running_vers
     abort "The running bundler (#{running_version}) does not match the required `#{version}`"
   end
 
-end # if ENV["BUNDLE_ENABLE_TRAMPOLINE"] && !ENV["BUNDLE_DISABLE_POSTIT"]
+end # if ENV["BUNDLE_TRAMPOLINE_FORCE"] && !ENV["BUNDLE_TRAMPOLINE_DISABLE"]

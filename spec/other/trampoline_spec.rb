@@ -3,8 +3,8 @@ require "spec_helper"
 
 describe "bundler version trampolining" do
   before do
-    ENV["BUNDLE_DISABLE_POSTIT"] = nil
-    ENV["BUNDLE_ENABLE_TRAMPOLINE"] = "true"
+    ENV["BUNDLE_TRAMPOLINE_DISABLE"] = nil
+    ENV["BUNDLE_TRAMPOLINE_FORCE"] = "true"
     FileUtils.rm_rf(system_gem_path)
     FileUtils.cp_r(base_system_gems, system_gem_path)
   end
@@ -59,8 +59,8 @@ describe "bundler version trampolining" do
     end
   end
 
-  context "without BUNDLE_ENABLE_TRAMPOLINE" do
-    before { ENV["BUNDLE_ENABLE_TRAMPOLINE"] = nil }
+  context "without BUNDLE_TRAMPOLINE_FORCE" do
+    before { ENV["BUNDLE_TRAMPOLINE_FORCE"] = nil }
 
     context "when the version is >= 2" do
       let(:version) { "2.7182818285" }
