@@ -105,8 +105,8 @@ However, if the `BUNDLER_VERSION` environment variable is set, that version will
 override the lockfile inference and can be used in directories without a
 lockfile.
 
-Until the target version is Bundler 2 or later, `BUNDLE_ENABLE_TRAMPOLINE` must
-be set for the trampoline to be used. Additionally, `BUNDLE_DISABLE_POSTIT` can
+Until the target version is Bundler 2 or later, `BUNDLE_TRAMPOLINE_FORCE` must
+be set for the trampoline to be used. Additionally, `BUNDLE_TRAMPOLINE_DISABLE` can
 be set to completely disable the trampoline.
 
 ## OBSOLETE

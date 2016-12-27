@@ -12,7 +12,7 @@ module Spec
       end
       FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)
-      ENV["BUNDLE_DISABLE_POSTIT"] = "1"
+      ENV["BUNDLE_TRAMPOLINE_DISABLE"] = "1"
       Bundler.reset!
       Bundler.ui = nil
       Bundler.ui # force it to initialize
