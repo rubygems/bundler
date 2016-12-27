@@ -505,6 +505,10 @@ module Spec
         @spec.add_runtime_dependency(name, requirements)
       end
 
+      def development(name, requirements)
+        @spec.add_development_dependency(name, requirements)
+      end
+
       def required_ruby_version=(*reqs)
         @spec.required_ruby_version = *reqs
       end

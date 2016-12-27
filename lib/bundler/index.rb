@@ -109,14 +109,19 @@ module Bundler
 
     # returns a list of the dependencies
     def unmet_dependency_names
-      names = dependency_names
-      names.delete_if {|n| n == "bundler" }
-      names.select {|n| search(n).empty? }
+      dependency_names.select do |name|
+        name != "bundler" && search(name).empty?
+      end
     end
 
     def dependency_names
       names = []
-      each {|s| names.concat(s.dependencies.map(&:name)) }
+      each do |spec|
+        spec.dependencies.each do |dep|
+          next if dep.type == :development
+          names << dep.name
+        end
+      end
       names.uniq
     end
 

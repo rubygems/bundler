@@ -26,4 +26,12 @@ describe Bundler::Index do
       end
     end
   end
+
+  context "with specs that include development dependencies" do
+    let(:specs) { [*build_spec("a", "1.0.0") {|s| s.development("b", "~> 1.0") }] }
+
+    it "does not include b in #dependency_names" do
+      expect(subject.dependency_names).not_to include("b")
+    end
+  end
 end
