@@ -201,7 +201,7 @@ module Bundler
     end
 
     def load_plugins
-      Gem.load_plugins
+      Gem.load_plugins if Gem.respond_to?(:load_plugins)
     end
 
     def ui=(obj)
