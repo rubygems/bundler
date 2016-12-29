@@ -131,6 +131,7 @@ module Bundler
       clean? && committed? || raise("There are files that need to be committed first.")
     end
 
+    # Runs shell command and returns true if the program exits with no differences.
     def clean?
       sh_with_code("git diff --exit-code")[1] == 0
     end
