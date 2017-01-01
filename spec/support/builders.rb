@@ -665,13 +665,13 @@ module Spec
           if branch = options[:branch]
             raise "You can't specify `master` as the branch" if branch == "master"
 
-            if `git branch | grep #{branch}`.empty?
-              silently("git branch #{branch}")
+            if `git branch | grep '#{branch}'`.empty?
+              silently("git branch '#{branch}'")
             end
 
-            silently("git checkout #{branch}")
+            silently("git checkout '#{branch}'")
           elsif tag = options[:tag]
-            `git tag #{tag}`
+            `git tag '#{tag}'`
           elsif options[:remote]
             silently("git remote add origin file://#{options[:remote]}")
           elsif options[:push]

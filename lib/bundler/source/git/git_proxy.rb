@@ -180,7 +180,7 @@ module Bundler
 
         def find_local_revision
           allowed_in_path do
-            git("rev-parse --verify #{ref}", true).strip
+            git("rev-parse --verify '#{ref}'", true).strip
           end
         end
 
