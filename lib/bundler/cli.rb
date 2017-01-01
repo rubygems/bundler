@@ -401,6 +401,8 @@ module Bundler
       Viz.new(options.dup).run
     end
 
+    old_gem = instance_method(:gem)
+
     desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
     method_option :exe, :type => :boolean, :default => false, :aliases => ["--bin", "-b"], :desc => "Generate a binary executable for your library."
     method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
@@ -412,9 +414,18 @@ module Bundler
     method_option :test, :type => :string, :lazy_default => "rspec", :aliases => "-t", :banner => "rspec",
                          :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config gem.test rspec`."
     def gem(name)
-      require "bundler/cli/gem"
-      Gem.new(options, name, self).run
     end
+
+    commands["gem"].tap do |gem_command|
+      def gem_command.run(instance, args = [])
+        require "bundler/cli/gem"
+        Gem.new(instance.options, *args, instance).run
+      end
+    end
+
+    undef_method(:gem)
+    define_method(:gem, old_gem)
+    private :gem
 
     def self.source_root
       File.expand_path(File.join(File.dirname(__FILE__), "templates"))
