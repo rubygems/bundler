@@ -418,8 +418,19 @@ module Bundler
 
     commands["gem"].tap do |gem_command|
       def gem_command.run(instance, args = [])
+        arity = 1 # name
+
         require "bundler/cli/gem"
-        Gem.new(instance.options, *args, instance).run
+        cmd_args = args + [instance]
+        cmd_args.unshift(instance.options)
+
+        cmd = begin
+          Gem.new(*cmd_args)
+        rescue ArgumentError => e
+          instance.class.handle_argument_error(self, e, args, arity)
+        end
+
+        cmd.run
       end
     end
 
