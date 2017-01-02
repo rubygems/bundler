@@ -67,6 +67,13 @@ describe "bundle open" do
     expect(out).to match(/bundler_editor #{default_bundle_path('gems', 'activerecord-2.3.2')}\z/)
   end
 
+  it "allows selecting exit from many match gems" do
+    env = { "EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor" }
+    bundle! "open active", :env => env do |input, _, _|
+      input.puts "0"
+    end
+  end
+
   it "performs an automatic bundle install" do
     gemfile <<-G
       source "file://#{gem_repo1}"
