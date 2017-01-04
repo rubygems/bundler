@@ -748,6 +748,14 @@ describe "bundle gem" do
       bundle "gem 'foo bar'"
       expect(out).to end_with("Invalid gem name foo bar -- `Foo bar` is an invalid constant name")
     end
+
+    it "fails gracefully when multiple names are passed" do
+      bundle "gem foo bar baz"
+      expect(out).to eq(<<-E.strip)
+ERROR: "bundle gem" was called with arguments ["foo", "bar", "baz"]
+Usage: "bundle gem GEM [OPTIONS]"
+      E
+    end
   end
 
   describe "#ensure_safe_gem_name" do
