@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "shellwords"
 require "tempfile"
 module Bundler
   class Source
@@ -180,7 +181,7 @@ module Bundler
 
         def find_local_revision
           allowed_in_path do
-            git("rev-parse --verify '#{ref}'", true).strip
+            git("rev-parse --verify #{Shellwords.shellescape(ref)}", true).strip
           end
         end
 
