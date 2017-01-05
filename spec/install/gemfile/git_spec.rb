@@ -209,6 +209,94 @@ describe "bundle install with git sources" do
     end
   end
 
+  describe "when specifying a branch" do
+    let(:branch) { "branch" }
+    let(:repo) { build_git("foo").path }
+    before(:each) do
+      update_git("foo", :path => repo, :branch => branch)
+    end
+
+    it "works" do
+      install_gemfile <<-G
+        git "#{repo}", :branch => #{branch.dump} do
+          gem "foo"
+        end
+      G
+
+      expect(the_bundle).to include_gems("foo 1.0")
+    end
+
+    context "when the branch starts with a `#`" do
+      let(:branch) { "#149/redirect-url-fragment" }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :branch => #{branch.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+
+    context "when the branch includes quotes" do
+      let(:branch) { %('") }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :branch => #{branch.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+  end
+
+  describe "when specifying a tag" do
+    let(:tag) { "tag" }
+    let(:repo) { build_git("foo").path }
+    before(:each) do
+      update_git("foo", :path => repo, :tag => tag)
+    end
+
+    it "works" do
+      install_gemfile <<-G
+        git "#{repo}", :tag => #{tag.dump} do
+          gem "foo"
+        end
+      G
+
+      expect(the_bundle).to include_gems("foo 1.0")
+    end
+
+    context "when the tag starts with a `#`" do
+      let(:tag) { "#149/redirect-url-fragment" }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :tag => #{tag.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+
+    context "when the tag includes quotes" do
+      let(:tag) { %('") }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :tag => #{tag.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+  end
+
   describe "when specifying local override" do
     it "uses the local repository instead of checking a new one out" do
       # We don't generate it because we actually don't need it
