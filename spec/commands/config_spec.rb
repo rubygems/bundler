@@ -103,9 +103,9 @@ describe ".bundle/config" do
       expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
     end
 
-    it "works with parseable option" do
-      bundle "config --global parseable value"
-      run "puts Bundler.settings['parseable']"
+    it "saves with parseable option" do
+      bundle "config --global --parseable foo value"
+      run "puts Bundler.settings['foo']"
       expect(out).to eq("value")
     end
   end
@@ -154,10 +154,11 @@ describe ".bundle/config" do
       expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
     end
 
-    it "works with parseable option" do
-      bundle "config --local parseable value"
-      run "puts Bundler.settings['parseable']"
-      expect(out).to eq("value")
+    it "can be deleted with parseable option" do
+      bundle "config --local foo value"
+      bundle "config --delete --parseable foo"
+      run "puts Bundler.settings['foo'] == nil"
+      expect(out).to eq("true")
     end
   end
 
@@ -199,37 +200,33 @@ describe ".bundle/config" do
     end
   end
 
-  context "with --parseable option" do
-    it "returns empty when not set" do
-      bundle "config gem.coc", :parseable => true
+  describe "parseable option" do
+    it "prints an empty string" do
+      bundle "config foo --parseable"
 
       expect(out).to eq ""
     end
 
-    it "returns true when set" do
-      bundle "config gem.coc true"
+    it "only prints the value of the config" do
+      bundle "config foo local"
+      bundle "config foo --parseable"
 
-      bundle "config gem.coc", :parseable => true
-
-      expect(out).to eq "true"
+      expect(out).to eq "local"
     end
 
-    it "returns empty string when unset" do
-      bundle "config gem.coc true"
-      bundle "config --delete gem.coc"
+    it "can print global config" do
+      bundle "config --global bar value"
+      bundle "config bar --parseable"
 
-      bundle "config gem.coc", :parseable => true
-
-      expect(out).to eq ""
+      expect(out).to eq "value"
     end
 
-    it "returns default if global default presents when unset" do
-      bundle "config --delete gem.coc"
-      bundle "config --global gem.coc true"
+    it "preferes local config over global" do
+      bundle "config --local bar value2"
+      bundle "config --global bar value"
+      bundle "config bar --parseable"
 
-      bundle "config gem.coc", :parseable => true
-
-      expect(out).to eq "true"
+      expect(out).to eq "value2"
     end
   end
 
