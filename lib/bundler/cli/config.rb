@@ -21,8 +21,6 @@ module Bundler
         return
       end
 
-      return Bundler.ui.info(Bundler.settings[name]) if options[:parseable]
-
       unless valid_scope?(scope)
         Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
         exit 1
@@ -33,6 +31,8 @@ module Bundler
         Bundler.settings.set_global(name, nil)
         return
       end
+
+      return Bundler.ui.info(Bundler.settings[name]) if options[:parseable] && args.empty?
 
       if args.empty?
         confirm(name)
