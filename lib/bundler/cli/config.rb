@@ -32,9 +32,10 @@ module Bundler
         return
       end
 
-      return Bundler.ui.info(Bundler.settings[name]) if options[:parseable] && args.empty?
 
       if args.empty?
+        return Bundler.ui.info(Bundler.settings[name]) if options[:parseable]
+
         confirm(name)
         return
       end
