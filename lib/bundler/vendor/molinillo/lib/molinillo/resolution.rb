@@ -366,13 +366,12 @@ module Bundler::Molinillo
           if matching_deps.empty? && !succ.root? && succ.predecessors.to_a == [vertex]
             debug(depth) { "Removing orphaned spec #{succ.name} after swapping #{name}" }
             succ.requirements.each { |r| @parent_of.delete(r) }
-            activated.detach_vertex_named(succ.name)
 
-            all_successor_names = succ.recursive_successors.map(&:name)
-
-            requirements.delete_if do |requirement|
-              requirement_name = name_for(requirement)
-              (requirement_name == succ.name) || all_successor_names.include?(requirement_name)
+            removed_names = activated.detach_vertex_named(succ.name).map(&:name)
+            requirements.delete_if do |r|
+              # the only removed vertices are those with no other requirements,
+              # so it's safe to delete only based upon name here
+              removed_names.include?(name_for(r))
             end
           elsif !matching_deps.include?(outgoing_edge.requirement)
             activated.delete_edge(outgoing_edge)
