@@ -33,5 +33,10 @@ Gem::Specification.new do |s|
   s.executables   = %w(bundle bundler)
   s.require_paths = ["lib"]
 
-  s.post_install_message = "Bundler and RubyGems.org are free for anyone to use, but maintaining them costs more than $20,000 USD every month. If you make a profit using Ruby, help us cover those costs so that we can keep the gem ecosystem free for everyone: https://rubytogether.org/join"
+  s.post_install_message = <<-END.lines.map(&:strip).join(" ")
+    Bundler and RubyGems.org are free for anyone to use, but maintaining them
+    costs more than $20,000 USD every month. If you make a profit using Ruby,
+    help us cover those costs so that we can keep the gem ecosystem free for
+    everyone: https://rubytogether.org/join
+  END
 end
