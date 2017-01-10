@@ -35,8 +35,8 @@ Gem::Specification.new do |s|
 
   s.post_install_message = <<-END.lines.map(&:strip).join(" ")
     Bundler and RubyGems.org are free for anyone to use, but maintaining them
-    costs more than $20,000 USD every month. If you make a profit using Ruby,
-    help us cover those costs so that we can keep the gem ecosystem free for
-    everyone: https://rubytogether.org/join
+    costs more than $25,000 USD every month. Help us cover those costs so that
+    we can keep the gem ecosystem free for everyone:
+    https://ruby.to/support-bundler
   END
 end
