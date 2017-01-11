@@ -1,4 +1,13 @@
-## 1.14.0.pre.1
+## 1.14.0.pre.2 (2016-01-11)
+
+Bugfixes:
+
+  - allow not selecting a gem when running `bundle open` (#5301, @segiddins)
+  - support installing gems from git branches that contain shell metacharacters (#5295, @segiddins)
+  - fix a resolver error that could leave dependencies unresolved (#5294, @segiddins)
+  - fix a stack overflow error when invoking commands (#5296, @segiddins)
+
+## 1.14.0.pre.1 (2016-12-xx)
 
 Features:
 
