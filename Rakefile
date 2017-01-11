@@ -342,3 +342,5 @@ task :build => ["man:build"]
 task :release => ["man:require", "man:build"]
 
 task :default => :spec
+
+Dir["task/*.{rb,rake}"].each(&method(:load))
