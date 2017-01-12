@@ -7,6 +7,7 @@
 /pkg/
 /spec/reports/
 /tmp/
+*.gem
 <%- if config[:ext] -%>
 *.bundle
 *.so
