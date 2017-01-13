@@ -1,4 +1,4 @@
-## 1.14.0.pre.2 (2016-01-11)
+## 1.14.0.pre.2 (2017-01-11)
 
 Bugfixes:
 
@@ -7,7 +7,7 @@ Bugfixes:
   - fix a resolver error that could leave dependencies unresolved (#5294, @segiddins)
   - fix a stack overflow error when invoking commands (#5296, @segiddins)
 
-## 1.14.0.pre.1 (2016-12-xx)
+## 1.14.0.pre.1 (2016-12-29)
 
 Features:
 
