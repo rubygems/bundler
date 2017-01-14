@@ -21,7 +21,7 @@ module Bundler
     rescue StandardError => e
       raise unless e.message =~ /GraphViz not installed or dot not in PATH/
       Bundler.ui.error e.message
-      Bundler.ui.warn "Please install GraphViz. On a Mac with homebrew, you can run `brew install graphviz`."
+      Bundler.ui.warn "Please install GraphViz. On a Mac with Homebrew, you can run `brew install graphviz`."
     end
   end
 end
