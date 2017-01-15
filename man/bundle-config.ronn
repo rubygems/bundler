@@ -169,6 +169,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `disable_checksum_validation` (`BUNDLE_DISABLE_CHECKSUM_VALIDATION`):
    Allow installing gems even if they do not match the checksum provided by
    RubyGems.
+* `disable_version_check` (`BUNDLE_DISABLE_VERSION_CHECK`):
+   Stop Bundler from checking if a newer Bundler version is available on
+   rubygems.org.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.

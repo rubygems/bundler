@@ -61,6 +61,69 @@ describe "bundle executable" do
       expect(out).to start_with("Running `bundle config --verbose` with bundler #{Bundler::VERSION}")
     end
   end
+
+  describe "printing the outdated warning" do
+    shared_examples_for "no warning" do
+      it "prints no warning" do
+        bundle "fail"
+        expect(err + out).to eq("Could not find command \"fail\".")
+      end
+    end
+
+    let(:bundler_version) { "1.1" }
+    let(:latest_version) { nil }
+    before do
+      simulate_bundler_version(bundler_version)
+      if latest_version
+        info_path = home(".bundle/cache/compact_index/rubygems.org.443.29b0360b937aa4d161703e6160654e47/info/bundler")
+        info_path.parent.mkpath
+        info_path.open("w") {|f| f.write "#{latest_version}\n" }
+      end
+    end
+
+    context "when there is no latest version" do
+      include_examples "no warning"
+    end
+
+    context "when the latest version is equal to the current version" do
+      let(:latest_version) { bundler_version }
+      include_examples "no warning"
+    end
+
+    context "when the latest version is less than the current version" do
+      let(:latest_version) { "0.9" }
+      include_examples "no warning"
+    end
+
+    context "when the latest version is greater than the current version" do
+      let(:latest_version) { "2.0" }
+      it "prints the version warning" do
+        bundle "fail"
+        expect(err + out).to eq(<<-EOS.strip)
+The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
+To update, run `gem install bundler`
+Could not find command "fail".
+        EOS
+      end
+
+      context "and disable_version_check is set" do
+        before { bundle! "config disable_version_check true" }
+        include_examples "no warning"
+      end
+
+      context "and is a pre-release" do
+        let(:latest_version) { "2.0.0.pre.4" }
+        it "prints the version warning" do
+          bundle "fail"
+          expect(err + out).to eq(<<-EOS.strip)
+The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
+To update, run `gem install bundler --pre`
+Could not find command "fail".
+          EOS
+        end
+      end
+    end
+  end
 end
 
 describe "bundler executable" do
