@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle update" do
+RSpec.describe "bundle update" do
   before :each do
     build_repo2
 
@@ -254,7 +254,7 @@ describe "bundle update" do
   end
 end
 
-describe "bundle update in more complicated situations" do
+RSpec.describe "bundle update in more complicated situations" do
   before :each do
     build_repo2
   end
@@ -295,7 +295,7 @@ describe "bundle update in more complicated situations" do
   end
 end
 
-describe "bundle update without a Gemfile.lock" do
+RSpec.describe "bundle update without a Gemfile.lock" do
   it "should not explode" do
     build_repo2
 
@@ -311,7 +311,7 @@ describe "bundle update without a Gemfile.lock" do
   end
 end
 
-describe "bundle update when a gem depends on a newer version of bundler" do
+RSpec.describe "bundle update when a gem depends on a newer version of bundler" do
   before(:each) do
     build_repo2 do
       build_gem "rails", "3.0.1" do |s|
@@ -338,7 +338,7 @@ describe "bundle update when a gem depends on a newer version of bundler" do
   end
 end
 
-describe "bundle update" do
+RSpec.describe "bundle update" do
   it "shows the previous version of the gem when updated from rubygems source" do
     build_repo2
 
@@ -370,7 +370,7 @@ describe "bundle update" do
   end
 end
 
-describe "bundle update --ruby" do
+RSpec.describe "bundle update --ruby" do
   before do
     install_gemfile <<-G
         ::RUBY_VERSION = '2.1.3'
@@ -480,7 +480,7 @@ describe "bundle update --ruby" do
 end
 
 # these specs are slow and focus on integration and therefore are not exhaustive. unit specs elsewhere handle that.
-describe "bundle update conservative" do
+RSpec.describe "bundle update conservative" do
   context "patch and minor options" do
     before do
       build_repo4 do

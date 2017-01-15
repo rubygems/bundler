@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "Bundler.setup with multi platform stuff" do
+RSpec.describe "Bundler.setup with multi platform stuff" do
   it "raises a friendly error when gems are missing locally" do
     gemfile <<-G
       source "file://#{gem_repo1}"

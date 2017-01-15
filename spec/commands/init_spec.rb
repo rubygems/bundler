@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle init" do
+RSpec.describe "bundle init" do
   it "generates a Gemfile" do
     bundle :init
     expect(bundled_app("Gemfile")).to exist

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "install with --deployment or --frozen" do
+RSpec.describe "install with --deployment or --frozen" do
   before do
     gemfile <<-G
       source "file://#{gem_repo1}"

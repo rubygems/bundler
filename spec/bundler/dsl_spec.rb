@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Dsl do
+RSpec.describe Bundler::Dsl do
   before do
     @rubygems = double("rubygems")
     allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }

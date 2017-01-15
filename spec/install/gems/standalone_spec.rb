@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-shared_examples "bundle install --standalone" do
+RSpec.shared_examples "bundle install --standalone" do
   shared_examples "common functionality" do
     it "still makes the gems available to normal bundler" do
       args = expected_gems.map {|k, v| "#{k} #{v}" }
@@ -303,11 +303,11 @@ shared_examples "bundle install --standalone" do
   end
 end
 
-describe "bundle install --standalone" do
+RSpec.describe "bundle install --standalone" do
   include_examples("bundle install --standalone")
 end
 
-describe "bundle install --standalone run in a subdirectory" do
+RSpec.describe "bundle install --standalone run in a subdirectory" do
   before do
     subdir = bundled_app("bob")
     FileUtils.mkdir_p(subdir)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install" do
+RSpec.describe "bundle install" do
   describe "with bundler dependencies" do
     before(:each) do
       build_repo2 do

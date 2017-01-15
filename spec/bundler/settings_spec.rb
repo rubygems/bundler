@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/settings"
 
-describe Bundler::Settings do
+RSpec.describe Bundler::Settings do
   subject(:settings) { described_class.new(bundled_app) }
 
   describe "#set_local" do

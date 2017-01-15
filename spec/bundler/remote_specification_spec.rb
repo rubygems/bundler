@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::RemoteSpecification do
+RSpec.describe Bundler::RemoteSpecification do
   let(:name)         { "foo" }
   let(:version)      { Gem::Version.new("1.0.0") }
   let(:platform)     { Gem::Platform::RUBY }

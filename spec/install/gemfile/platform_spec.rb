@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install across platforms" do
+RSpec.describe "bundle install across platforms" do
   it "maintains the same lockfile if all gems are compatible across platforms" do
     lockfile <<-G
       GEM
@@ -105,7 +105,7 @@ describe "bundle install across platforms" do
   end
 end
 
-describe "bundle install with platform conditionals" do
+RSpec.describe "bundle install with platform conditionals" do
   it "installs gems tagged w/ the current platforms" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -223,7 +223,7 @@ The dependency #{Gem::Dependency.new("rack", ">= 0")} will be unused by any of t
   end
 end
 
-describe "when a gem has no architecture" do
+RSpec.describe "when a gem has no architecture" do
   it "still installs correctly" do
     simulate_platform mswin
 

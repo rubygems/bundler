@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "Bundler.with_env helpers" do
+RSpec.describe "Bundler.with_env helpers" do
   describe "Bundler.original_env" do
     before do
       gemfile ""

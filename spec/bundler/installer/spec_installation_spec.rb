@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/installer/parallel_installer"
 
-describe Bundler::ParallelInstaller::SpecInstallation do
+RSpec.describe Bundler::ParallelInstaller::SpecInstallation do
   let!(:dep) do
     a_spec = Object.new
     def a_spec.name

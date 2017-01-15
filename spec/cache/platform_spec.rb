@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle cache with multiple platforms" do
+RSpec.describe "bundle cache with multiple platforms" do
   before :each do
     gemfile <<-G
       source "file://#{gem_repo1}"

@@ -3,7 +3,7 @@ require "spec_helper"
 require "rake"
 require "bundler/gem_helper"
 
-describe Bundler::GemHelper do
+RSpec.describe Bundler::GemHelper do
   let(:app_name) { "lorem__ipsum" }
   let(:app_path) { bundled_app app_name }
   let(:app_gemspec_path) { app_path.join("#{app_name}.gemspec") }

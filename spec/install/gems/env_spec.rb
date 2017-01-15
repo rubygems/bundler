@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with ENV conditionals" do
+RSpec.describe "bundle install with ENV conditionals" do
   describe "when just setting an ENV key as a string" do
     before :each do
       gemfile <<-G

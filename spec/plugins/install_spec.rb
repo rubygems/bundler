@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundler plugin install" do
+RSpec.describe "bundler plugin install" do
   before do
     build_repo2 do
       build_plugin "foo"

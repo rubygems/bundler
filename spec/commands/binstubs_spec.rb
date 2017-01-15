@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle binstubs <gem>" do
+RSpec.describe "bundle binstubs <gem>" do
   context "when the gem exists in the lockfile" do
     it "sets up the binstub" do
       install_gemfile <<-G

@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/ssl_certs/certificate_manager"
 
-describe Bundler::SSLCerts::CertificateManager do
+RSpec.describe Bundler::SSLCerts::CertificateManager do
   let(:rubygems_path)      { root }
   let(:stub_cert)          { File.join(root.to_s, "lib", "rubygems", "ssl_certs", "rubygems.org", "ssl-cert.pem") }
   let(:rubygems_certs_dir) { File.join(root.to_s, "lib", "rubygems", "ssl_certs", "rubygems.org") }

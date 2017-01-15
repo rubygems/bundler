@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "ruby requirement" do
+RSpec.describe "ruby requirement" do
   def locked_ruby_version
     Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(lockfile).ruby_version)
   end

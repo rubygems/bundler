@@ -3,7 +3,7 @@
 require "spec_helper"
 require "bundler"
 
-describe Bundler do
+RSpec.describe Bundler do
   describe "#load_gemspec_uncached" do
     let(:app_gemspec_path) { tmp("test.gemspec") }
     subject { Bundler.load_gemspec_uncached(app_gemspec_path) }

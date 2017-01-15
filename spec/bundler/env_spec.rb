@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/settings"
 
-describe Bundler::Env do
+RSpec.describe Bundler::Env do
   let(:env)            { described_class.new }
   let(:git_proxy_stub) { Bundler::Source::Git::GitProxy.new(nil, nil, nil) }
 

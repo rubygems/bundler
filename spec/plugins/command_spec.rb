@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "command plugins" do
+RSpec.describe "command plugins" do
   before do
     build_repo2 do
       build_plugin "command-mah" do |s|

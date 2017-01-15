@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/cli"
 
-describe "bundle executable" do
+RSpec.describe "bundle executable" do
   it "returns non-zero exit status when passed unrecognized options" do
     bundle "--invalid_argument"
     expect(exitstatus).to_not be_zero if exitstatus
@@ -63,7 +63,7 @@ describe "bundle executable" do
   end
 end
 
-describe "bundler executable" do
+RSpec.describe "bundler executable" do
   it "shows the bundler version just as the `bundle` executable does" do
     bundler "--version"
     expect(out).to eq("Bundler version #{Bundler::VERSION}")

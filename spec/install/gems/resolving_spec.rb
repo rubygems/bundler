@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with install-time dependencies" do
+RSpec.describe "bundle install with install-time dependencies" do
   it "installs gems with implicit rake dependencies" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"

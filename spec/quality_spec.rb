@@ -6,7 +6,7 @@ if defined?(Encoding) && Encoding.default_external.name != "UTF-8"
   Encoding.default_external = Encoding.find("UTF-8")
 end
 
-describe "The library itself" do
+RSpec.describe "The library itself" do
   def check_for_spec_defs_with_single_quotes(filename)
     failing_lines = []
 

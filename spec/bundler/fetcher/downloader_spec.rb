@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Fetcher::Downloader do
+RSpec.describe Bundler::Fetcher::Downloader do
   let(:connection)     { double(:connection) }
   let(:redirect_limit) { 5 }
   let(:uri)            { URI("http://www.uri-to-fetch.com/api/v2/endpoint") }

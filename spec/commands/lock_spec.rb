@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle lock" do
+RSpec.describe "bundle lock" do
   def strip_lockfile(lockfile)
     strip_whitespace(lockfile).sub(/\n\Z/, "")
   end

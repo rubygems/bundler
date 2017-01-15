@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with specific_platform enabled" do
+RSpec.describe "bundle install with specific_platform enabled" do
   before do
     bundle "config specific_platform true"
 

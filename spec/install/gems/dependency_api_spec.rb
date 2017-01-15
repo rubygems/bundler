@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "gemcutter's dependency API" do
+RSpec.describe "gemcutter's dependency API" do
   let(:source_hostname) { "localgemserver.test" }
   let(:source_uri) { "http://#{source_hostname}" }
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Fetcher::Dependency do
+RSpec.describe Bundler::Fetcher::Dependency do
   let(:downloader)  { double(:downloader) }
   let(:remote)      { double(:remote, :uri => URI("http://localhost:5000")) }
   let(:display_uri) { "http://sample_uri.com" }

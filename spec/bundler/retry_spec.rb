@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Retry do
+RSpec.describe Bundler::Retry do
   it "return successful result if no errors" do
     attempts = 0
     result = Bundler::Retry.new(nil, nil, 3).attempt do
