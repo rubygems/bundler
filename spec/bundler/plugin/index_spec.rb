@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Plugin::Index do
+RSpec.describe Bundler::Plugin::Index do
   Index = Bundler::Plugin::Index
 
   before do

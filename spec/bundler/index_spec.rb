@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Index do
+RSpec.describe Bundler::Index do
   let(:specs) { [] }
   subject { described_class.build {|i| i.use(specs) } }
 

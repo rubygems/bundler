@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with gems on multiple sources" do
+RSpec.describe "bundle install with gems on multiple sources" do
   # repo1 is built automatically before all of the specs run
   # it contains rack-obama 1.0.0 and rack 0.9.1 & 1.0.0 amongst other gems
 

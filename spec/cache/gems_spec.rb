@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle cache" do
+RSpec.describe "bundle cache" do
   describe "when there are only gemsources" do
     before :each do
       gemfile <<-G

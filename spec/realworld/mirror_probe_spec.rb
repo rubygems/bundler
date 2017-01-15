@@ -2,7 +2,7 @@
 require "spec_helper"
 require "thread"
 
-describe "fetching dependencies with a not available mirror", :realworld => true do
+RSpec.describe "fetching dependencies with a not available mirror", :realworld => true do
   let(:mirror) { @mirror_uri }
   let(:original) { @server_uri }
   let(:server_port) { @server_port }

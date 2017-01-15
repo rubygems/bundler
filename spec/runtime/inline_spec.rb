@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundler/inline#gemfile" do
+RSpec.describe "bundler/inline#gemfile" do
   def script(code, options = {})
     requires = ["bundler/inline"]
     requires.unshift File.expand_path("../../support/artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)

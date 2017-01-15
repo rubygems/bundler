@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "path sources" do
+RSpec.describe "path sources" do
   describe "bundle update --source" do
     it "shows the previous version of the gem when updated from path source" do
       build_lib "activesupport", "2.3.5", :path => lib_path("rails/activesupport")

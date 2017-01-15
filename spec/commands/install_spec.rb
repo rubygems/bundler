@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with gem sources" do
+RSpec.describe "bundle install with gem sources" do
   describe "the simple case" do
     it "prints output and returns if no dependencies are specified" do
       gemfile <<-G

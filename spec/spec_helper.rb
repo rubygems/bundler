@@ -65,6 +65,14 @@ RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"
 
+  config.disable_monkey_patching!
+
+  # Since failures cause us to keep a bunch of long strings in memory, stop
+  # once we have a large number of failures (indicative of core pieces of
+  # bundler being broken) so that running the full test suite doesn't take
+  # forever due to memory constraints
+  config.fail_fast ||= 25
+
   if ENV["BUNDLER_SUDO_TESTS"] && Spec::Sudo.present?
     config.filter_run :sudo => true
   else

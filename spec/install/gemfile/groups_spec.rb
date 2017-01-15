@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with groups" do
+RSpec.describe "bundle install with groups" do
   describe "installing with no options" do
     before :each do
       install_gemfile <<-G

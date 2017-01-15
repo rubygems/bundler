@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install" do
+RSpec.describe "bundle install" do
   context "with duplicated gems" do
     it "will display a warning" do
       install_gemfile <<-G

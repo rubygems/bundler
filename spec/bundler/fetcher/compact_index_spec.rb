@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Fetcher::CompactIndex do
+RSpec.describe Bundler::Fetcher::CompactIndex do
   let(:downloader)  { double(:downloader) }
   let(:remote)      { double(:remote, :cache_slug => "lsjdf") }
   let(:display_uri) { URI("http://sampleuri.com") }

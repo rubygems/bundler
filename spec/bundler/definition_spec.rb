@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/definition"
 
-describe Bundler::Definition do
+RSpec.describe Bundler::Definition do
   describe "#lock" do
     before do
       allow(Bundler).to receive(:settings) { Bundler::Settings.new(".") }

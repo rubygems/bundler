@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Source do
+RSpec.describe Bundler::Source do
   class ExampleSource < Bundler::Source
   end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::EndpointSpecification do
+RSpec.describe Bundler::EndpointSpecification do
   let(:name)         { "foo" }
   let(:version)      { "1.0.0" }
   let(:platform)     { Gem::Platform::RUBY }

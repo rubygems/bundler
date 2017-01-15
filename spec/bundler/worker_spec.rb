@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/worker"
 
-describe Bundler::Worker do
+RSpec.describe Bundler::Worker do
   let(:size) { 5 }
   let(:name) { "Spec Worker" }
   let(:function) { proc {|object, worker_number| [object, worker_number] } }

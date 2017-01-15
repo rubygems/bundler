@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install from an existing gemspec" do
+RSpec.describe "bundle install from an existing gemspec" do
   before(:each) do
     build_gem "bar", :to_system => true
     build_gem "bar-dev", :to_system => true

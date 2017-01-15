@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Plugin::SourceList do
+RSpec.describe Bundler::Plugin::SourceList do
   SourceList = Bundler::Plugin::SourceList
 
   before do

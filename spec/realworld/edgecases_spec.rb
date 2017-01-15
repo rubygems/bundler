@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "real world edgecases", :realworld => true, :sometimes => true do
+RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
   def rubygems_version(name, requirement)
     require "bundler/source/rubygems/remote"
     require "bundler/fetcher"

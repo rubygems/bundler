@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "Bundler.setup" do
+RSpec.describe "Bundler.setup" do
   describe "with no arguments" do
     it "makes all groups available" do
       install_gemfile <<-G

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install" do
+RSpec.describe "bundle install" do
   describe "when prerelease gems are available" do
     it "finds prereleases" do
       install_gemfile <<-G

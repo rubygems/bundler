@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle inject" do
+RSpec.describe "bundle inject" do
   before :each do
     gemfile <<-G
       source "file://#{gem_repo1}"

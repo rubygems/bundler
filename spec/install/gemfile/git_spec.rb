@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with git sources" do
+RSpec.describe "bundle install with git sources" do
   describe "when floating on master" do
     before :each do
       build_git "foo" do |s|

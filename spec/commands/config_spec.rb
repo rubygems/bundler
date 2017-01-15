@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe ".bundle/config" do
+RSpec.describe ".bundle/config" do
   before :each do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -276,7 +276,7 @@ E
   end
 end
 
-describe "setting gemfile via config" do
+RSpec.describe "setting gemfile via config" do
   context "when only the non-default Gemfile exists" do
     it "persists the gemfile location to .bundle/config" do
       File.open(bundled_app("NotGemfile"), "w") do |f|

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle package" do
+RSpec.describe "bundle package" do
   before do
     gemfile <<-G
       source "file://#{gem_repo1}"

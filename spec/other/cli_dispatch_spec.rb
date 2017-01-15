@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle command names" do
+RSpec.describe "bundle command names" do
   it "work when given fully" do
     bundle "install"
     expect(err).to lack_errors

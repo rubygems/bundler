@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundler version trampolining" do
+RSpec.describe "bundler version trampolining" do
   before do
     ENV["BUNDLE_TRAMPOLINE_DISABLE"] = nil
     ENV["BUNDLE_TRAMPOLINE_FORCE"] = "true"

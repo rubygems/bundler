@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install" do
+RSpec.describe "bundle install" do
   context "git sources" do
     it "displays the revision hash of the gem repository" do
       build_git "foo", "1.0", :path => lib_path("foo")

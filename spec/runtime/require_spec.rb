@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "Bundler.require" do
+RSpec.describe "Bundler.require" do
   before :each do
     build_lib "one", "1.0.0" do |s|
       s.write "lib/baz.rb", "puts 'baz'"
@@ -362,7 +362,7 @@ describe "Bundler.require" do
   end
 end
 
-describe "Bundler.require with platform specific dependencies" do
+RSpec.describe "Bundler.require with platform specific dependencies" do
   it "does not require the gems that are pinned to other platforms" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install" do
+RSpec.describe "bundle install" do
   context "with gem sources" do
     context "when gems include post install messages" do
       it "should display the post-install messages after installing" do

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "the lockfile format" do
+RSpec.describe "the lockfile format" do
   include Bundler::GemHelpers
 
   it "generates a simple lockfile for a single source, gem" do

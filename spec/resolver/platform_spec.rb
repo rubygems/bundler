@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "Resolving platform craziness" do
+RSpec.describe "Resolving platform craziness" do
   describe "with cross-platform gems" do
     before :each do
       @index = an_awesome_index

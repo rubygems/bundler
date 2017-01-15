@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::SpecSet do
+RSpec.describe Bundler::SpecSet do
   let(:specs) do
     [
       build_spec("a", "1.0"),

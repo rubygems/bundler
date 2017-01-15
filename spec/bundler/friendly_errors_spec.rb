@@ -4,7 +4,7 @@ require "bundler"
 require "bundler/friendly_errors"
 require "cgi"
 
-describe Bundler, "friendly errors" do
+RSpec.describe Bundler, "friendly errors" do
   context "with invalid YAML in .gemrc" do
     before do
       File.open(Gem.configuration.config_file_name, "w") do |f|

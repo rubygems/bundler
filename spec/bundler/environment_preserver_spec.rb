@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::EnvironmentPreserver do
+RSpec.describe Bundler::EnvironmentPreserver do
   let(:preserver) { described_class.new(env, ["foo"]) }
 
   describe "#backup" do

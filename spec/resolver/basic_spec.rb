@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "Resolving" do
+RSpec.describe "Resolving" do
   before :each do
     @index = an_awesome_index
   end
