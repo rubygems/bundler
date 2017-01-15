@@ -3,6 +3,9 @@ require "uri"
 
 module Bundler
   class Settings
+    autoload :Mirror,  "bundler/mirror"
+    autoload :Mirrors, "bundler/mirror"
+
     BOOL_KEYS = %w(
       allow_offline_install
       auto_install
