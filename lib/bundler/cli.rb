@@ -13,6 +13,7 @@ module Bundler
       Bundler.ui = UI::Shell.new
       raise e
     ensure
+      warn_on_outdated_bundler
       Bundler::SharedHelpers.print_major_deprecations!
     end
 
@@ -579,5 +580,26 @@ module Bundler
       command.reject!(&:empty?)
       Bundler.ui.info "Running `#{command * " "}` with bundler #{Bundler::VERSION}"
     end
+
+    def self.warn_on_outdated_bundler
+      return if Bundler.settings[:disable_version_check]
+
+      latest = Fetcher::CompactIndex.
+               new(nil, Source::Rubygems::Remote.new(URI("https://rubygems.org")), nil).
+               send(:compact_index_client).
+               instance_variable_get(:@cache).
+               dependencies("bundler").
+               map {|d| Gem::Version.new(d.first) }.
+               max
+      return unless latest
+
+      current = Gem::Version.new(VERSION)
+      return if current >= latest
+
+      Bundler.ui.warn "The latest bundler is #{latest}, but you are currently running #{current}.\nTo update, run `gem install bundler#{" --pre" if latest.prerelease?}`"
+    rescue
+      nil
+    end
+    private_class_method :warn_on_outdated_bundler
   end
 end

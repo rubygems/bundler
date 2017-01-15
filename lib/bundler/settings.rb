@@ -11,6 +11,8 @@ module Bundler
       disable_exec_load
       disable_local_branch_check
       disable_shared_gems
+      disable_version_check
+      force_ruby_platform
       frozen
       gem.coc
       gem.mit
@@ -18,7 +20,6 @@ module Bundler
       major_deprecations
       no_install
       no_prune
-      force_ruby_platform
       only_update_to_newer_versions
       plugins
       silence_root_warning
