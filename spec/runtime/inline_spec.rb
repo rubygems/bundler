@@ -232,4 +232,22 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
+
+  it "installs inline gems when BUNDLE_GEMFILE is set to an empty string" do
+    ENV["BUNDLE_GEMFILE"] = ""
+
+    in_app_root do
+      script <<-RUBY
+        gemfile do
+          source "file://#{gem_repo1}"
+          gem "rack"
+        end
+
+        puts RACK
+      RUBY
+    end
+
+    expect(err).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
 end

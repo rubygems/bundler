@@ -135,7 +135,7 @@ module Bundler
       @locked_gems ||=
         if defined?(@definition) && @definition
           definition.locked_gems
-        elsif Bundler.default_lockfile.exist?
+        elsif Bundler.default_lockfile.file?
           lock = Bundler.read_file(Bundler.default_lockfile)
           LockfileParser.new(lock)
         end
