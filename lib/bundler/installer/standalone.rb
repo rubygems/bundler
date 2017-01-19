@@ -14,6 +14,11 @@ module Bundler
         file.puts "# ruby 1.8.7 doesn't define RUBY_ENGINE"
         file.puts "ruby_engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby'"
         file.puts "ruby_version = RbConfig::CONFIG[\"ruby_version\"]"
+        file.puts %(install_ruby_version = "#{RbConfig::CONFIG["ruby_version"]}")
+        file.puts "if ruby_version != install_ruby_version"
+        file.puts %(  puts "WARNING: \#{__FILE__} was generated with ruby \#{install_ruby_version} and you are using \#{ruby_version}")
+        file.puts %(  puts "WARNING: Some gems may not load properly.")
+        file.puts "end"
         file.puts "path = File.expand_path('..', __FILE__)"
         paths.each do |path|
           file.puts %($:.unshift "\#{path}/#{path}")
