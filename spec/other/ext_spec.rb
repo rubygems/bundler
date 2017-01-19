@@ -48,8 +48,6 @@ RSpec.describe "Bundler::GemHelpers#generic" do
 end
 
 RSpec.describe "Gem::SourceIndex#refresh!" do
-  rubygems_1_7 = Gem::Version.new(Gem::VERSION) >= Gem::Version.new("1.7.0")
-
   before do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -57,12 +55,12 @@ RSpec.describe "Gem::SourceIndex#refresh!" do
     G
   end
 
-  it "does not explode when called", :if => rubygems_1_7 do
+  it "does not explode when called", :rubygems => "1.7" do
     run "Gem.source_index.refresh!"
     run "Gem::SourceIndex.new([]).refresh!"
   end
 
-  it "does not explode when called", :unless => rubygems_1_7 do
+  it "does not explode when called", :rubygems => "< 1.7" do
     run "Gem.source_index.refresh!"
     run "Gem::SourceIndex.from_gems_in([]).refresh!"
   end
