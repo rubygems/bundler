@@ -1,3 +1,11 @@
+## 1.14.0 (2017-01-20)
+
+Bugfixes:
+
+  - ensure `Settings::Mirror` is autoloaded under the `Settings` namespace
+    (#5238, @segiddins)
+  - fix `bundler/inline` when `BUNDLE_GEMFILE=""` (#5079, @segiddins)
+
 ## 1.14.0.pre.2 (2017-01-11)
 
 Bugfixes:
