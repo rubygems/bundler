@@ -1,3 +1,9 @@
+## 1.14.1 (2017-01-21)
+
+Bugfixes:
+
+  - work around a ruby 2.2.2 bug that caused a stack consistency error during installation (#5342, @segiddins)
+
 ## 1.14.0 (2017-01-20)
 
 Bugfixes:
