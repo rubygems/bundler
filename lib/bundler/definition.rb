@@ -636,6 +636,9 @@ module Bundler
       @locked_specs.each do |spec|
         spec.source &&= converge_path_source_to_gemspec_source(spec.source)
       end
+      @locked_deps.each do |dep|
+        dep.source &&= converge_path_source_to_gemspec_source(dep.source)
+      end
 
       # Get the Rubygems sources from the Gemfile.lock
       locked_gem_sources = @locked_sources.select {|s| s.is_a?(Source::Rubygems) }
