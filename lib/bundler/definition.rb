@@ -104,8 +104,9 @@ module Bundler
 
       add_current_platform unless Bundler.settings[:frozen]
 
-      @source_changes = converge_sources
+      converge_gemspec_sources
       @path_changes = converge_paths
+      @source_changes = converge_sources
 
       unless @unlock[:lock_shared_dependencies]
         eager_unlock = expand_dependencies(@unlock[:gems])
@@ -627,9 +628,7 @@ module Bundler
       gemspec_source || source
     end
 
-    def converge_sources
-      changes = false
-
+    def converge_gemspec_sources
       @locked_sources.map! do |source|
         converge_path_source_to_gemspec_source(source)
       end
@@ -639,6 +638,10 @@ module Bundler
       @locked_deps.each do |dep|
         dep.source &&= converge_path_source_to_gemspec_source(dep.source)
       end
+    end
+
+    def converge_sources
+      changes = false
 
       # Get the Rubygems sources from the Gemfile.lock
       locked_gem_sources = @locked_sources.select {|s| s.is_a?(Source::Rubygems) }
