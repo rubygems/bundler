@@ -119,7 +119,7 @@ module Bundler
     end
 
     def what_required(spec)
-      unless req = find {|s| s.dependencies.any? {|d| d.runtime? && d.name == spec.name } }
+      unless req = find {|s| s.dependencies.any? {|d| d.type == :runtime && d.name == spec.name } }
         return [spec]
       end
       what_required(req) << spec
