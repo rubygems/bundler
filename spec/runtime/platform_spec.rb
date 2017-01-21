@@ -104,4 +104,20 @@ RSpec.describe "Bundler.setup with multi platform stuff" do
 
     expect(the_bundle).to include_gems "nokogiri 1.4.2", "platform_specific 1.0 RUBY"
   end
+
+  it "allows specifying only-ruby-platform on windows with dependency platforms" do
+    simulate_windows do
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gem "nokogiri", :platforms => [:mingw, :mswin, :x64_mingw, :jruby]
+        gem "platform_specific"
+      G
+
+      bundle! "config force_ruby_platform true"
+
+      bundle! "install"
+
+      expect(the_bundle).to include_gems "platform_specific 1.0 RUBY"
+    end
+  end
 end
