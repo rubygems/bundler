@@ -102,8 +102,10 @@ module Bundler
     #   end
     #
     # @see {Bundler::PermissionError}
-    def filesystem_access(path, action = :write)
-      yield path.dup.untaint
+    def filesystem_access(path, action = :write, &block)
+      # Use block.call instead of yield because of a bug in Ruby 2.2.2
+      # See https://github.com/bundler/bundler/issues/5341 for details
+      block.call(path.dup.untaint)
     rescue Errno::EACCES
       raise PermissionError.new(path, action)
     rescue Errno::EAGAIN
