@@ -169,6 +169,56 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `disable_checksum_validation` (`BUNDLE_DISABLE_CHECKSUM_VALIDATION`):
    Allow installing gems even if they do not match the checksum provided by
    RubyGems.
+* `disable_version_check` (`BUNDLE_DISABLE_VERSION_CHECK`):
+   Stop Bundler from checking if a newer Bundler version is available on
+   rubygems.org.
+* `allow_offline_install` (`BUNDLE_ALLOW_OFFLINE_INSTALL`):
+   Allow Bundler to use cached data when installing without network access.
+* `auto_install` (`BUNDLE_AUTO_INSTALL`):
+   Automatically run `bundle install` when gems are missing.
+* `cache_all_platforms` (`BUNDLE_CACHE_ALL_PLATFORMS`):
+   Cache gems for all platforms.
+* `cache_all` (`BUNDLE_CACHE_ALL`):
+   Cache all gems, including path and git gems.
+* `clean` (`BUNDLE_CLEAN`):
+   Whether Bundler should run `bundle clean` automatically after
+   `bundle install`.
+* `console` (`BUNDLE_CONSOLE`):
+   The console that `bundle console` starts. Defaults to `irb`.
+* `disable_exec_load` (`BUNDLE_DISABLE_EXEC_LOAD`):
+   Stop Bundler from using `load` to launch an executable in-process in
+   `bundle exec`.
+* `disable_local_branch_check` (`BUNDLE_DISABLE_LOCAL_BRANCH_CHECK`):
+   Allow Bundler to use a local git override without a branch specified in the
+   Gemfile.
+* `disable_shared_gems` (`BUNDLE_DISABLE_SHARED_GEMS`):
+   Stop Bundler from accessing gems installed to RubyGems' normal location.
+* `jobs` (`BUNDLE_JOBS`):
+   The number of gems Bundler can install in parallel. Defaults to 1.
+* `major_deprecations` (`BUNDLE_MAJOR_DEPRECATIONS`):
+   Whether Bundler should print deprecation warnings for behavior that will
+   be changed in the next major version.
+* `no_install` (`BUNDLE_NO_INSTALL`):
+   Whether `bundle package` should skip installing gems.
+* `no_prune` (`BUNDLE_NO_PRUNE`):
+   Whether Bundler should leave outdated gems unpruned when caching.
+* `only_update_to_newer_versions` (`BUNDLE_ONLY_UPDATE_TO_NEWER_VERSIONS`):
+   During `bundle update`, only resolve to newer versions of the gems in the
+   lockfile.
+* `plugins` (`BUNDLE_PLUGINS`):
+   Enable Bundler's experimental plugin system.
+* `shebang` (`BUNDLE_SHEBANG`):
+   The program name that should be invoked for generated binstubs. Defaults to
+   the ruby install name used to generate the binstub.
+* `silence_root_warning` (`BUNDLE_SILENCE_ROOT_WARNING`):
+   Silence the warning Bundler prints when installing gems as root.
+* `ssl_verify_mode` (`BUNDLE_SSL_VERIFY_MODE`):
+   The SSL verification mode Bundler uses when making HTTPS requests.
+   Defaults to verify peer.
+* `system_bindir` (`BUNDLE_SYSTEM_BINDIR`):
+   The location where RubyGems installs binstubs. Defaults to `Gem.bindir`.
+* `user_agent` (`BUNDLE_USER_AGENT`):
+   The custom user agent fragment Bundler includes in API requests.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
