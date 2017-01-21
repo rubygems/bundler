@@ -104,6 +104,7 @@ module Bundler
 
       add_current_platform unless Bundler.settings[:frozen]
 
+      @source_changes = converge_sources
       @path_changes = converge_paths
 
       unless @unlock[:lock_shared_dependencies]
@@ -113,7 +114,6 @@ module Bundler
 
       @gem_version_promoter = create_gem_version_promoter
 
-      @source_changes = converge_sources
       @dependency_changes = converge_dependencies
       @local_changes = converge_locals
 
