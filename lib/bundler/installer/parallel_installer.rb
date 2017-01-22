@@ -67,6 +67,10 @@ module Bundler
       def all_dependencies
         @spec.dependencies
       end
+
+      def to_s
+        "#<#{self.class} #{@spec.full_name} (#{state})>"
+      end
     end
 
     def self.call(*args)
