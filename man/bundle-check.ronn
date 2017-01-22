@@ -3,7 +3,9 @@ bundle-check(1) -- Verifies if dependencies are satisfied by installed gems
 
 ## SYNOPSIS
 
-`bundle check` [--dry-run] [--gemfile=FILE] [--path=PATH]
+`bundle check` [--dry-run]
+               [--gemfile=FILE]
+               [--path=PATH]
 
 ## DESCRIPTION
 

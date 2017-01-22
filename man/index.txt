@@ -8,3 +8,8 @@ bundle-platform    bundle-platform.1
 bundle-gem         bundle-gem.1
 bundle-clean       bundle-clean.1
 bundle-check       bundle-check.1
+bundle-init        bundle-init.1
+bundle-inject      bundle-inject.1
+bundle-open        bundle-open.1
+bundle-show        bundle-show.1
+bundle-viz         bundle-viz.1
