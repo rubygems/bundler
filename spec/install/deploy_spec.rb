@@ -267,22 +267,21 @@ describe "install with --deployment or --frozen" do
   context "with path in Gemfile and packed" do
     it "works fine after bundle package and bundle install --local" do
       build_lib "foo", :path => lib_path("foo")
-      install_gemfile <<-G
-      gem "foo", :path => "#{lib_path("foo")}"
+      install_gemfile! <<-G
+        gem "foo", :path => "#{lib_path("foo")}"
       G
 
-      bundle :install
+      bundle! :install
       expect(the_bundle).to include_gems "foo 1.0"
-      bundle "package --all"
+      bundle! "package --all"
       expect(bundled_app("vendor/cache/foo")).to be_directory
 
-      bundle "install --local"
+      bundle! "install --local"
       expect(out).to include("Using foo 1.0 from source at")
       expect(out).to include("vendor/cache/foo")
-      expect(exitstatus).to eq(0) if exitstatus
 
       simulate_new_machine
-      bundle "install --deployment"
+      bundle! "install --deployment --verbose"
       expect(out).not_to include("You are trying to install in deployment mode after changing your Gemfile")
       expect(out).not_to include("You have added to the Gemfile")
       expect(out).not_to include("You have deleted from the Gemfile")
