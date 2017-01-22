@@ -6,3 +6,5 @@ bundle-exec        bundle-exec.1
 bundle-config      bundle-config.1
 bundle-platform    bundle-platform.1
 bundle-gem         bundle-gem.1
+bundle-clean       bundle-clean.1
+bundle-check       bundle-check.1
