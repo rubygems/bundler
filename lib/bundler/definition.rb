@@ -691,7 +691,8 @@ module Bundler
           dep.platforms.concat(@platforms.map {|p| Dependency::REVERSE_PLATFORM_MAP[p] }.flatten(1)).uniq!
         end
       end
-      Set.new(@dependencies) != Set.new(@locked_deps)
+      dependency_without_type = proc {|d| Gem::Dependency.new(d.name, *d.requirement.as_list) }
+      Set.new(@dependencies.map(&dependency_without_type)) != Set.new(@locked_deps.map(&dependency_without_type))
     end
 
     # Remove elements from the locked specs that are expired. This will most
