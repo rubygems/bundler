@@ -52,6 +52,30 @@ RSpec.describe Bundler, "friendly errors" do
     end.to raise_error(SystemExit)
   end
 
+  describe "#exit_status" do
+    it "calls status_code for BundlerError" do
+      exception = Bundler::BundlerError.new
+      expect(exception).to receive(:status_code).and_return("sample_status_code")
+      expect(Bundler::FriendlyErrors.exit_status(exception)).to eq("sample_status_code")
+    end
+
+    it "returns 15 for Thor::Error" do
+      exception = Bundler::Thor::Error.new
+      expect(Bundler::FriendlyErrors.exit_status(exception)).to eq(15)
+    end
+
+    it "calls status for SystemExit" do
+      exception = SystemExit.new
+      expect(exception).to receive(:status).and_return("sample_status")
+      expect(Bundler::FriendlyErrors.exit_status(exception)).to eq("sample_status")
+    end
+
+    it "returns 1 in other cases" do
+      exception = StandardError.new
+      expect(Bundler::FriendlyErrors.exit_status(exception)).to eq(1)
+    end
+  end
+
   describe "#issues_url" do
     it "generates a search URL for the exception message" do
       exception = Exception.new("Exception message")
