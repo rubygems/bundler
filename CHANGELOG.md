@@ -1,3 +1,10 @@
+## 1.14.2 (2017-01-22)
+
+Bugfixes:
+
+  - fix using `force_ruby_platform` on windows (#5344, @segiddins)
+  - fix an incorrect version conflict error when using `gemspec` on multiple platforms (#5340, @segiddins)
+
 ## 1.14.1 (2017-01-21)
 
 Bugfixes:
