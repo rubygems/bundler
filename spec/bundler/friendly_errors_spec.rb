@@ -73,6 +73,23 @@ RSpec.describe Bundler, "friendly errors" do
     it "returns 1 in other cases" do
       exception = StandardError.new
       expect(Bundler::FriendlyErrors.exit_status(exception)).to eq(1)
+
+  describe "#request_issue_report_for" do
+    it "calls relevant methods for Bundler.ui" do
+      expect(Bundler.ui).to receive(:info)
+      expect(Bundler.ui).to receive(:error)
+      expect(Bundler.ui).to receive(:warn)
+      Bundler::FriendlyErrors.request_issue_report_for(StandardError.new)
+    end
+
+    it "includes error class, message and backlog" do
+      error = StandardError.new
+      allow(Bundler::FriendlyErrors).to receive(:issues_url).and_return("")
+
+      expect(error).to receive(:class).at_least(:once)
+      expect(error).to receive(:message).at_least(:once)
+      expect(error).to receive(:backtrace).at_least(:once)
+      Bundler::FriendlyErrors.request_issue_report_for(error)
     end
   end
 
