@@ -145,6 +145,23 @@ describe "bundle install from an existing gemspec" do
     expect(out).to include("Found no changes, using resolution from the lockfile")
   end
 
+  it "should match a lockfile without needing to re-resolve with development dependencies" do
+    simulate_platform java
+
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.add_dependency "rack"
+      s.add_development_dependency "thin"
+    end
+
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gemspec :path => '#{tmp.join("foo")}'
+    G
+
+    bundle! "install", :verbose => true
+    expect(out).to include("Found no changes, using resolution from the lockfile")
+  end
+
   it "should evaluate the gemspec in its directory" do
     build_lib("foo", :path => tmp.join("foo"))
     File.open(tmp.join("foo/foo.gemspec"), "w") do |s|
