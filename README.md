@@ -11,21 +11,28 @@ It does this by managing the gems that the application depends on. Given a list 
 
 ### Installation and usage
 
+To install:
+
 ```
 gem install bundler
+```
+
+Bundler is most commonly used to manage your application's dependencies. To use it for this:
+
+```
 bundle init
 echo 'gem "rspec"' >> Gemfile
 bundle install
 bundle exec rspec
 ```
 
-For help with installation issues, see [ISSUES](https://github.com/bundler/bundler/blob/master/ISSUES.md)
-
 See [bundler.io](http://bundler.io) for the full documentation.
 
 ### Troubleshooting
 
-For help with common problems, see [ISSUES](https://github.com/bundler/bundler/blob/master/ISSUES.md).
+For help with common problems, see [TROUBLESHOOTING](doc/TROUBLESHOOTING.md).
+
+Still stuck? Try [filing an issue](doc/contributing/ISSUES.md).
 
 ### Supporting
 
@@ -34,13 +41,13 @@ Bundler is maintained by <a href="https://rubytogether.org/">Ruby Together</a>, 
 
 ### Other questions
 
-To see what has changed in recent versions of Bundler, see the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md).
+To see what has changed in recent versions of Bundler, see the [CHANGELOG](CHANGELOG.md).
 
-Feel free to chat with the Bundler core team (and many other users) on IRC in the  [#bundler](irc://irc.freenode.net/bundler) channel on Freenode, or via email on the [Bundler mailing list](http://groups.google.com/group/ruby-bundler).
+To get in touch with the Bundler core team and other Bundler users, please see [getting help](doc/contributing/GETTING_HELP.md).
 
 ### Contributing
 
-If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [DEVELOPMENT](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md).
+If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [our documentation section](doc/README.md).
 
 ### Code of Conduct
 
