@@ -1,3 +1,10 @@
+## 1.14.3 (2017-01-24)
+
+Bugfixes:
+
+  - fix the resolver attemting to activate ruby-platform gems when the bundle is only for other platforms (#5349, #5356, @segiddins)
+  - avoid re-resolving a locked gemfile that uses `gemspec` and includes development dependencies (#5349, @segiddins)
+
 ## 1.14.2 (2017-01-22)
 
 Bugfixes:
