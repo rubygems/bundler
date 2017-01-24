@@ -33,8 +33,8 @@ RSpec.describe "bundle help" do
   end
 
   it "still outputs the old help for commands that do not have man pages yet" do
-    bundle "help check"
-    expect(out).to include("Check searches the local machine")
+    bundle "help version"
+    expect(out).to include("Prints the bundler's version information")
   end
 
   it "looks for a binary and executes it with --help option if it's named bundler-<task>" do
