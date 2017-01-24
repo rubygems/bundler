@@ -175,14 +175,15 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [], gem_version_promoter = GemVersionPromoter.new, additional_base_requirements = [])
+    def self.resolve(requirements, index, source_requirements = {}, base = [], gem_version_promoter = GemVersionPromoter.new, additional_base_requirements = [], platforms = nil)
+      platforms = Set.new(platforms) if platforms
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base, gem_version_promoter, additional_base_requirements)
+      resolver = new(index, source_requirements, base, gem_version_promoter, additional_base_requirements, platforms)
       result = resolver.start(requirements)
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base, gem_version_promoter, additional_base_requirements)
+    def initialize(index, source_requirements, base, gem_version_promoter, additional_base_requirements, platforms)
       @index = index
       @source_requirements = source_requirements
       @base = base
@@ -194,6 +195,7 @@ module Bundler
         @base_dg.add_vertex(ls.name, DepProxy.new(dep, ls.platform), true)
       end
       additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, d) }
+      @platforms = platforms
       @gem_version_promoter = gem_version_promoter
     end
 
@@ -308,7 +310,8 @@ module Bundler
 
     def requirement_satisfied_by?(requirement, activated, spec)
       return false unless requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
-      spec.activate_platform!(requirement.__platform) || spec.for?(requirement.__platform)
+      spec.activate_platform!(requirement.__platform) if !@platforms || @platforms.include?(requirement.__platform)
+      true
     end
 
     def sort_dependencies(dependencies, activated, conflicts)
