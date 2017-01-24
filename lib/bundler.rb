@@ -146,34 +146,37 @@ module Bundler
     def user_home
       @user_home ||= begin
         home = Bundler.rubygems.user_home
-        warning = "Your home directory is not set properly:"
-        if home.nil?
-          warning += "\n * It is not set at all"
+
+        warning = if home.nil?
+          "Your home directory is not set."
         elsif !File.directory?(home)
-          warning += "\n * `#{home}` is not a directory"
+          "`#{home}` is not a directory."
         elsif !File.writable?(home)
-          warning += "\n * `#{home}` is not writable"
+          "`#{home}` is not writable."
+        end
+
+        if warning
+          user_home = tmp_home_path(Etc.getlogin, warning)
+          Bundler.ui.warn "#{warning}\nBundler will use `#{user_home}' as your home directory temporarily.\n"
+          user_home
         else
-          return @user_home = Pathname.new(home)
+          Pathname.new(home)
         end
-
-        login = Etc.getlogin || "unknown"
-
-        tmp_home = Pathname.new(Dir.tmpdir).join("bundler", "home", login)
-        begin
-          SharedHelpers.filesystem_access(tmp_home, :write) do |p|
-            FileUtils.mkdir_p(p)
-          end
-        rescue => e
-          warning += "\n\nBundler also failed to create a temporary home directory at `#{tmp_home}`:\n#{e}"
-          raise warning
-        end
-
-        warning += "\n\nBundler will use `#{tmp_home}` as your home directory temporarily"
-
-        Bundler.ui.warn(warning)
-        tmp_home
       end
+    end
+
+    def tmp_home_path(login, warning)
+      login ||= "unknown"
+      path = Pathname.new(Dir.tmpdir).join("bundler", "home")
+      SharedHelpers.filesystem_access(path) do |tmp_home_path|
+        unless tmp_home_path.exist?
+          tmp_home_path.mkpath
+          tmp_home_path.chmod(0o777)
+        end
+        tmp_home_path.join(login).tap(&:mkpath)
+      end
+    rescue => e
+      raise "#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}"
     end
 
     def user_bundle_path
