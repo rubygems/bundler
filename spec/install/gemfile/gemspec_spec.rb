@@ -162,6 +162,24 @@ RSpec.describe "bundle install from an existing gemspec" do
     expect(out).to include("Found no changes, using resolution from the lockfile")
   end
 
+  it "should match a lockfile on non-ruby platforms with a transitive platform dependency" do
+    simulate_platform java
+    simulate_ruby_engine "jruby"
+
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.add_dependency "platform_specific"
+    end
+
+    install_gem "platform_specific-1.0-java"
+
+    install_gemfile! <<-G
+      gemspec :path => '#{tmp.join("foo")}'
+    G
+
+    bundle! "update --bundler", :verbose => true
+    expect(the_bundle).to include_gems "foo 1.0", "platform_specific 1.0 JAVA"
+  end
+
   it "should evaluate the gemspec in its directory" do
     build_lib("foo", :path => tmp.join("foo"))
     File.open(tmp.join("foo/foo.gemspec"), "w") do |s|
