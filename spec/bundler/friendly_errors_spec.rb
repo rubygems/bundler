@@ -44,12 +44,143 @@ RSpec.describe Bundler, "friendly errors" do
     end
   end
 
-  it "rescues Thor::AmbiguousTaskError and raises SystemExit" do
+  it "calls log_error in case of exception" do
+    exception = Exception.new
+    expect(Bundler::FriendlyErrors).to receive(:exit_status).with(exception).and_return(1)
     expect do
       Bundler.with_friendly_errors do
-        raise Thor::AmbiguousTaskError.new("")
+        raise exception
       end
     end.to raise_error(SystemExit)
+  end
+
+  it "calls exit_status on exception" do
+    exception = Exception.new
+    expect(Bundler::FriendlyErrors).to receive(:log_error).with(exception)
+    expect do
+      Bundler.with_friendly_errors do
+        raise exception
+      end
+    end.to raise_error(SystemExit)
+  end
+
+  describe "#log_error" do
+    shared_examples "Bundler.ui receive error" do |error, message = nil|
+      it "" do
+        expect(Bundler.ui).to receive(:error).with(message || error.message)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+    end
+
+    shared_examples "Bundler.ui receive trace" do |error|
+      it "" do
+        expect(Bundler.ui).to receive(:trace).with(error)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+    end
+
+    context "YamlSyntaxError" do
+      it_behaves_like "Bundler.ui receive error", Bundler::YamlSyntaxError.new(StandardError.new, "sample_message")
+
+      it "Bundler.ui receive trace" do
+        std_error = StandardError.new
+        exception = Bundler::YamlSyntaxError.new(std_error, "sample_message")
+        expect(Bundler.ui).to receive(:trace).with(std_error)
+        Bundler::FriendlyErrors.log_error(exception)
+      end
+    end
+
+    context "Dsl::DSLError, GemspecError" do
+      it_behaves_like "Bundler.ui receive error", Bundler::Dsl::DSLError.new("description", "dsl_path", "backtrace")
+      it_behaves_like "Bundler.ui receive error", Bundler::GemspecError.new
+    end
+
+    context "GemRequireError" do
+      let(:orig_error) { StandardError.new }
+      let(:error) { Bundler::GemRequireError.new(orig_error, "sample_message") }
+
+      before do
+        allow(orig_error).to receive(:backtrace).and_return([])
+      end
+
+      it "Bundler.ui receive error" do
+        expect(Bundler.ui).to receive(:error).with(error.message)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+
+      it "writes to Bundler.ui.trace" do
+        expect(Bundler.ui).to receive(:trace).with(orig_error, nil, true)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+    end
+
+    context "BundlerError" do
+      it "Bundler.ui receive error" do
+        error = Bundler::BundlerError.new
+        expect(Bundler.ui).to receive(:error).with(error.message, :wrap => true)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+      it_behaves_like "Bundler.ui receive trace", Bundler::BundlerError.new
+    end
+
+    context "Thor::Error" do
+      it_behaves_like "Bundler.ui receive error", Bundler::Thor::Error.new
+    end
+
+    context "LoadError" do
+      it_behaves_like "Bundler.ui receive error", LoadError.new("cannot load such file -- openssl"), "\nCould not load OpenSSL."
+
+      it "Bundler.ui receive warn" do
+        error = LoadError.new("cannot load such file -- openssl")
+        expect(Bundler.ui).to receive(:warn).with(any_args, :wrap => true)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+
+      it "Bundler.ui receive trace" do
+        error = LoadError.new("cannot load such file -- openssl")
+        expect(Bundler.ui).to receive(:trace).with(error)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+    end
+
+    context "Interrupt" do
+      it_behaves_like "Bundler.ui receive error", Interrupt.new, "\nQuitting..."
+      it_behaves_like "Bundler.ui receive trace", Interrupt.new
+    end
+
+    context "Gem::InvalidSpecificationException" do
+      it "Bundler.ui receive error" do
+        error = Gem::InvalidSpecificationException.new
+        expect(Bundler.ui).to receive(:error).with(error.message, :wrap => true)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+    end
+
+    context "SystemExit" do
+      # Does nothing
+    end
+
+    context "Java::JavaLang::OutOfMemoryError" do
+      module Java
+        module JavaLang
+          class OutOfMemoryError < StandardError; end
+        end
+      end
+
+      it "Bundler.ui receive error" do
+        error = Java::JavaLang::OutOfMemoryError.new
+        expect(Bundler.ui).to receive(:error).with(/JVM has run out of memory/)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+    end
+
+    context "unexpected error" do
+      it "calls request_issue_report_for with error" do
+        error = StandardError.new
+        expect(Bundler::FriendlyErrors).to receive(:request_issue_report_for).with(error)
+        Bundler::FriendlyErrors.log_error(error)
+      end
+    end
   end
 
   describe "#exit_status" do
