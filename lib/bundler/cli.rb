@@ -245,7 +245,8 @@ module Bundler
     # TODO: 2.0 remove `bundle list`
     map %w(list) => "show"
 
-    desc "info GEM [OPTIONS]", "Shows gem information"
+    desc "info GEM [OPTIONS]", "Show information for the given gem"
+    method_option "path", :type => :boolean, :banner => "Print full path to gem"
     def info(gem_name)
       require "bundler/cli/info"
       Info.new(options, gem_name).run

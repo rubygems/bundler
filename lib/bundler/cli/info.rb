@@ -10,38 +10,24 @@ module Bundler
     end
 
     def run
-      Bundler.ui.silence do
-        Bundler.definition.validate_runtime!
-        Bundler.load.lock
-      end
-
       spec = Bundler::CLI::Common.select_spec(gem_name, :regex_match)
-      return print_gem_info(spec) if spec
+      return print_gem_path(spec) if @options[:path]
+      print_gem_info(spec)
     end
 
-  private
+    private
+
+    def print_gem_path(spec)
+      Bundler.ui.info spec.full_gem_path
+    end
 
     def print_gem_info(spec)
-      desc = "  * #{spec.name} (#{spec.version}#{spec.git_version})"
-      latest = fetch_latest_specs.find {|l| l.name == spec.name }
-      Bundler.ui.info <<-END.gsub(/^ +/, "")
-        #{desc}
-        \tSummary:  #{spec.summary || "No description available."}
-        \tHomepage: #{spec.homepage || "No website available."}
-        \tStatus:   #{outdated?(spec, latest) ? "Outdated - #{spec.version} < #{latest.version}" : "Up to date"}
-        \tPath:     #{spec.full_gem_path}
-      END
-    end
-
-    def fetch_latest_specs
-      definition = Bundler.definition(true)
-      definition.resolve_remotely!
-      definition.specs
-    end
-
-    def outdated?(current, latest)
-      return false unless latest
-      Gem::Version.new(current.version) < Gem::Version.new(latest.version)
+      gem_info = String.new
+      gem_info << "  * #{spec.name} (#{spec.version}#{spec.git_version})\n"
+      gem_info << "\tSummary: #{spec.summary}\n" if spec.summary
+      gem_info << "\tHomepage: #{spec.homepage}\n" if spec.homepage
+      gem_info << "\tPath: #{spec.full_gem_path}\n"
+      Bundler.ui.info gem_info
     end
   end
 end

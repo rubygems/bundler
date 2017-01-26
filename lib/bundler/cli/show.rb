@@ -18,7 +18,7 @@ module Bundler
       end
 
       if options[:outdated]
-        Bundler.ui.warn("Deprecated: use `bundle info GEM` or `bundle outdated` instead of `bundle show --outdated`")
+        SharedHelpers.major_deprecation("Deprecated: use `bundle info GEM` or `bundle outdated` instead of `bundle show --outdated`")
       end
 
       if gem_name
