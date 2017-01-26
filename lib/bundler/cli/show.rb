@@ -17,10 +17,6 @@ module Bundler
         Bundler.load.lock
       end
 
-      if options[:outdated]
-        SharedHelpers.major_deprecation("Deprecated: use `bundle info GEM` or `bundle outdated` instead of `bundle show --outdated`")
-      end
-
       if gem_name
         if gem_name == "bundler"
           path = File.expand_path("../../../..", __FILE__)
