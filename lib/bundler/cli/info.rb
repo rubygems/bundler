@@ -15,7 +15,7 @@ module Bundler
       print_gem_info(spec)
     end
 
-    private
+  private
 
     def print_gem_path(spec)
       Bundler.ui.info spec.full_gem_path
