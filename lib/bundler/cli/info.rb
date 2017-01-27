@@ -14,6 +14,7 @@ module Bundler
         gem = Gem::Specification.find_by_name(gem_name)
         spec = gem if gem.default_gem?
       rescue Gem::MissingSpecError
+        nil
       end
 
       spec ||= Bundler::CLI::Common.select_spec(gem_name, :regex_match)
