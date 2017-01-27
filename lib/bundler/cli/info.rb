@@ -10,7 +10,14 @@ module Bundler
     end
 
     def run
-      spec = Bundler::CLI::Common.select_spec(gem_name, :regex_match)
+      begin
+        gem = Gem::Specification.find_by_name(gem_name)
+        spec = gem if gem.default_gem?
+      rescue Gem::MissingSpecError
+      end
+
+      spec ||= Bundler::CLI::Common.select_spec(gem_name, :regex_match)
+      return unless spec
       return print_gem_path(spec) if @options[:path]
       print_gem_info(spec)
     end

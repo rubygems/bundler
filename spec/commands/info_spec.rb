@@ -25,6 +25,14 @@ describe "bundle info" do
       end
     end
 
+    context "given a default gem shippped in ruby" do
+      it "prints information about the default gem" do
+        bundle "info rdoc"
+        expect(out).to include("* rdoc (5.0.0)")
+        expect(out).to match(%r{gems\/rdoc\-5\.0\.0})
+      end
+    end
+
     context "when gem does not have homepage" do
       before do
         build_repo1 do
