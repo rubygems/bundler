@@ -174,8 +174,6 @@ RSpec.describe "bundle show" do
         gem "rails"
       G
 
-      bundle "install"
-
       update_repo2 do
         build_gem "rails", '3.0.0' do |s|
           s.executables = "rails"
