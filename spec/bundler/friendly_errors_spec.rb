@@ -65,7 +65,7 @@ RSpec.describe Bundler, "friendly errors" do
   end
 
   describe "#log_error" do
-    shared_examples "Bundler.ui receive error" do |error, message = nil|
+    shared_examples "Bundler.ui receive error" do |error, message|
       it "" do
         expect(Bundler.ui).to receive(:error).with(message || error.message)
         Bundler::FriendlyErrors.log_error(error)
@@ -128,23 +128,29 @@ RSpec.describe Bundler, "friendly errors" do
     end
 
     context "LoadError" do
-      it_behaves_like "Bundler.ui receive error", LoadError.new("cannot load such file -- openssl"), "\nCould not load OpenSSL."
+      let(:error) { LoadError.new("cannot load such file -- openssl") }
+
+      it "Bundler.ui receive error" do
+        expect(Bundler.ui).to receive(:error).with("\nCould not load OpenSSL.")
+        Bundler::FriendlyErrors.log_error(error)
+      end
 
       it "Bundler.ui receive warn" do
-        error = LoadError.new("cannot load such file -- openssl")
         expect(Bundler.ui).to receive(:warn).with(any_args, :wrap => true)
         Bundler::FriendlyErrors.log_error(error)
       end
 
       it "Bundler.ui receive trace" do
-        error = LoadError.new("cannot load such file -- openssl")
         expect(Bundler.ui).to receive(:trace).with(error)
         Bundler::FriendlyErrors.log_error(error)
       end
     end
 
     context "Interrupt" do
-      it_behaves_like "Bundler.ui receive error", Interrupt.new, "\nQuitting..."
+      it "Bundler.ui receive error" do
+        expect(Bundler.ui).to receive(:error).with("\nQuitting...")
+        Bundler::FriendlyErrors.log_error(Interrupt.new)
+      end
       it_behaves_like "Bundler.ui receive trace", Interrupt.new
     end
 
