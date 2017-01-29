@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+# Should not use `autoload :Source, "bundler/plugin/api/source"` as this breaks sdoc, fastlane with this error:
+# 
+require "bundler/plugin/api/source"
 
 module Bundler
   # This is the interfacing class represents the API that we intend to provide
@@ -23,7 +26,6 @@ module Bundler
   # and hooks).
   module Plugin
     class API
-      autoload :Source, "bundler/plugin/api/source"
 
       # The plugins should declare that they handle a command through this helper.
       #
