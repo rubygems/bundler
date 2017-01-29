@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-# Should not use `autoload :Source, "bundler/plugin/api/source"` as this breaks sdoc, fastlane with this error:
-# 
+# Note for others: should not use `autoload :Source, "bundler/plugin/api/source"` as this breaks sdoc, fastlane with this error:
+# gems/bundler-1.14.3/lib/bundler/rubygems_ext.rb:45:in `full_gem_path': uninitialized constant Bundler::Plugin::API::Source (NameError)
 require "bundler/plugin/api/source"
 
 module Bundler
