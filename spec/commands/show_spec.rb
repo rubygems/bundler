@@ -169,10 +169,12 @@ RSpec.describe "bundle show" do
     end
 
     it "doesn't update gems to newer versions" do
-      install_gemfile <<-G
+      install_gemfile! <<-G
         source "file://#{gem_repo2}"
         gem "rails"
       G
+
+      expect(the_bundle).to include_gem("rails 2.3.2")
 
       update_repo2 do
         build_gem "rails", '3.0.0' do |s|
@@ -180,10 +182,10 @@ RSpec.describe "bundle show" do
         end
       end
 
-      bundle "show --outdated"
+      bundle! "show --outdated"
 
-      bundle "install"
-      expect(the_bundle).to include_gems("rails 2.3.2")
+      bundle! "install"
+      expect(the_bundle).to include_gem("rails 2.3.2")
     end
   end
 end
