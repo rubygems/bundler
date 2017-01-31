@@ -19,6 +19,7 @@ rescue LoadError
 end
 
 require "bundler/match_platform"
+require "bundler/plugin/api/source"
 
 module Gem
   @loaded_stacks = Hash.new {|h, k| h[k] = [] }
