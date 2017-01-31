@@ -789,10 +789,10 @@ module Bundler
     def expanded_dependencies
       @expanded_dependencies ||= begin
         ruby_versions = concat_ruby_version_requirements(@ruby_version)
-        if ruby_versions.empty? || !@ruby_version.exact?
-          concat_ruby_version_requirements(RubyVersion.system)
-          concat_ruby_version_requirements(locked_ruby_version_object) unless @unlock[:ruby]
-        end
+        # if ruby_versions.empty? || !@ruby_version.exact?
+        #   concat_ruby_version_requirements(RubyVersion.system)
+        #   concat_ruby_version_requirements(locked_ruby_version_object) unless @unlock[:ruby]
+        # end
 
         metadata_dependencies = [
           Dependency.new("ruby\0", ruby_versions),
