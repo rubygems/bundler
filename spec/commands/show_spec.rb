@@ -177,7 +177,7 @@ RSpec.describe "bundle show" do
       expect(the_bundle).to include_gem("rails 2.3.2")
 
       update_repo2 do
-        build_gem "rails", '3.0.0' do |s|
+        build_gem "rails", "3.0.0" do |s|
           s.executables = "rails"
         end
       end
