@@ -2,13 +2,13 @@
 module Bundler
   class CLI::Inject
     attr_reader :options, :name, :version, :group, :source, :gems
-    def initialize(options, name, version, gems)
+    def initialize(options, name, version)
       @options = options
       @name = name
       @version = version || last_version_number
       @group = options[:group]
       @source = options[:source]
-      @gems = gems
+      @gems = []
     end
 
     def run
@@ -18,6 +18,7 @@ module Bundler
 
       # Build an array of Dependency objects out of the arguments
       deps = []
+      # when `inject` will support addition of multiple gem, then this loop will help.
       gems.each_slice(4) do |gem_name, gem_version, gem_group, gem_source|
         ops = Gem::Requirement::OPS.map {|key, _val| key }
         has_op = ops.any? {|op| gem_version.start_with? op }
