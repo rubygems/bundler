@@ -461,7 +461,7 @@ module Bundler
       Platform.new(options).run
     end
 
-    desc "inject GEM VERSION" "Add the named gem, with version requirements, to the resolved Gemfile"
+    desc "inject GEM VERSION", "Add the named gem, with version requirements, to the resolved Gemfile"
     def inject(name, version)
       SharedHelpers.major_deprecation "The `inject` command has been replaced by the `add` command"
       require "bundler/cli/inject"

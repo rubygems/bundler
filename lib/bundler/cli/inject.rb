@@ -18,7 +18,8 @@ module Bundler
 
       # Build an array of Dependency objects out of the arguments
       deps = []
-      # when `inject` will support addition of multiple gem, then this loop will help.
+      # when `inject` support addition of more than one gem, then this loop will
+      # help. Currently this loop is running once.
       gems.each_slice(4) do |gem_name, gem_version, gem_group, gem_source|
         ops = Gem::Requirement::OPS.map {|key, _val| key }
         has_op = ops.any? {|op| gem_version.start_with? op }
