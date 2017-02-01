@@ -161,4 +161,31 @@ RSpec.describe "bundle show" do
       expect(out).to include("Could not find gem '#{invalid_regexp}'.")
     end
   end
+
+  context "--outdated option" do
+    # Regression test for https://github.com/bundler/bundler/issues/5375
+    before do
+      build_repo2
+    end
+
+    it "doesn't update gems to newer versions" do
+      install_gemfile! <<-G
+        source "file://#{gem_repo2}"
+        gem "rails"
+      G
+
+      expect(the_bundle).to include_gem("rails 2.3.2")
+
+      update_repo2 do
+        build_gem "rails", "3.0.0" do |s|
+          s.executables = "rails"
+        end
+      end
+
+      bundle! "show --outdated"
+
+      bundle! "install"
+      expect(the_bundle).to include_gem("rails 2.3.2")
+    end
+  end
 end
