@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require "uri"
 require "rubygems/user_interaction"
-require "rubygems/spec_fetcher"
 
 module Bundler
   class Source

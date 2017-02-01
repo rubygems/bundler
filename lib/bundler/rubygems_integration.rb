@@ -213,6 +213,7 @@ module Bundler
     end
 
     def fetch_specs(all, pre, &blk)
+      require "rubygems/spec_fetcher"
       specs = Gem::SpecFetcher.new.list(all, pre)
       specs.each { yield } if block_given?
       specs

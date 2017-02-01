@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require "uri"
-require "rubygems/spec_fetcher"
 
 module Bundler
   # Represents a lazily loaded gem specification, where the full specification
