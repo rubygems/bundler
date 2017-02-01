@@ -81,7 +81,7 @@ module Bundler
 
           I tried...
 
-        - **Have you read our issues document, https://github.com/bundler/bundler/blob/master/ISSUES.md?**
+        - **Have you read our issues document, https://github.com/bundler/bundler/blob/master/doc/contributing/ISSUES.md?**
 
           ...
 
