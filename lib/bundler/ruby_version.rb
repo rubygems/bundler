@@ -21,7 +21,7 @@ module Bundler
       #   must not be specified, or the engine version
       #   specified must match the version.
 
-      @versions           = Array(versions)
+      @versions           = Array(versions).map {|v| Gem::Requirement.parse(v).last }
       @gem_version        = Gem::Requirement.create(@versions.first).requirements.first.last
       @input_engine       = engine && engine.to_s
       @engine             = engine && engine.to_s || "ruby"
