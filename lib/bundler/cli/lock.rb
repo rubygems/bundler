@@ -27,11 +27,11 @@ module Bundler
 
       Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options) if options[:update]
 
-      options["remove-platform"].each do |platform|
+      Array(options["remove-platform"]).each do |platform|
         definition.remove_platform(platform)
       end
 
-      options["add-platform"].each do |platform_string|
+      Array(options["add-platform"]).each do |platform_string|
         platform = Gem::Platform.new(platform_string)
         if platform.to_s == "unknown"
           Bundler.ui.warn "The platform `#{platform_string}` is unknown to RubyGems " \

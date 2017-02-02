@@ -479,9 +479,9 @@ module Bundler
       "the path the lockfile should be written to"
     method_option "full-index", :type => :boolean, :default => false, :banner =>
       "Fall back to using the single-file index of all gems"
-    method_option "add-platform", :type => :array, :default => [], :banner =>
+    method_option "add-platform", :type => :array, :lazy_default => [Gem::Platform.local], :banner =>
       "Add a new platform to the lockfile"
-    method_option "remove-platform", :type => :array, :default => [], :banner =>
+    method_option "remove-platform", :type => :array, :lazy_default => [Gem::Platform.local], :banner =>
       "Remove a platform from the lockfile"
     method_option "patch", :type => :boolean, :banner =>
       "If updating, prefer updating only to next patch version"
