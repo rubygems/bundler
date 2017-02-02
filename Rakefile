@@ -10,6 +10,8 @@ else
   File.expand_path("tmp/rubygems")
 end
 
+CONCURRENT_TESTS = 2
+
 BUNDLER_SPEC = Gem::Specification.load("bundler.gemspec")
 
 def safe_task(&block)
@@ -130,9 +132,21 @@ begin
       releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.2 v2.6.8)
       (branches + releases).each do |rg|
         desc "Run specs with Rubygems #{rg}"
-        RSpec::Core::RakeTask.new(rg) do |t|
-          t.rspec_opts = %w(--format progress --color)
-          t.ruby_opts  = %w(-w)
+        task rg do
+          require "parallel"
+          spec_search = File.join("spec", "**", "*_spec.rb")
+          specs = Dir.glob(spec_search)
+          spec_groups = specs.each_slice((specs.size / 2).round).to_a
+          Parallel.each(spec_groups, :in_processes => CONCURRENT_TESTS) do |proccess_specs|
+            cmd = "bin/rspec #{proccess_specs.join(" ")} --format progress --color"
+            open("|#{cmd}", "r") do |output|
+              loop do
+                read = output.readpartial(4096)
+                $stdout.print read
+                $stdout.flush
+              end
+            end
+          end
         end
 
         # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
