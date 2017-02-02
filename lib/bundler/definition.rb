@@ -825,12 +825,13 @@ module Bundler
         next if !remote && !dep.current_platform?
         platforms = dep.gem_platforms(@platforms)
         if platforms.empty?
+          mapped_platforms = dep.platforms.map {|p| Dependency::PLATFORM_MAP[p] }
           Bundler.ui.warn \
             "The dependency #{dep} will be unused by any of the platforms Bundler is installing for. " \
             "Bundler is installing for #{@platforms.join ", "} but the dependency " \
-            "is only for #{dep.platforms.map {|p| Dependency::PLATFORM_MAP[p] }.join ", "}. " \
+            "is only for #{mapped_platforms.join ", "}. " \
             "To add those platforms to the bundle, " \
-            "run `bundle lock --add-platform #{dep.platforms.map {|p| Dependency::PLATFORM_MAP[p] }.join " "}`."
+            "run `bundle lock --add-platform #{mapped_platforms.join " "}`."
         end
         platforms.each do |p|
           deps << DepProxy.new(dep, p) if remote || p == generic_local_platform
