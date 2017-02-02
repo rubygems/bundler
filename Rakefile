@@ -202,6 +202,13 @@ begin
       # disallow making network requests on CI
       ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
 
+      puts "Installing RubyGems #{rg} from #{RUBYGEMS_REPO} globally"
+      Rake::Task["spec:rubygems:clone_rubygems_#{rg}"].invoke
+      Dir.chdir(RUBYGEMS_REPO) do
+        sh(Gem.ruby, "setup.rb")
+        ENV.delete("RUBYOPT")
+      end
+
       if RUBY_VERSION >= "2.0.0"
         puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
         Rake::Task["rubocop"].invoke
