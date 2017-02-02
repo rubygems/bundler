@@ -15,11 +15,17 @@ class RubygemsVersionManager
   def switch
     return if use_system?
 
-    unrequire_rubygems_if_needed
-
     switch_local_copy_if_needed
 
-    prepare_environment
+    if ENV["CI"]
+      install_local_copy
+
+      unrequire_rubygems_if_defined
+    else
+      unrequire_rubygems_if_not_matching
+
+      prepare_environment
+    end
   end
 
 private
@@ -28,9 +34,25 @@ private
     @env_version.nil?
   end
 
-  def unrequire_rubygems_if_needed
-    return unless rubygems_unrequire_needed?
+  def install_local_copy
+    Dir.chdir(local_copy_path) do
+      sys_exec!("ruby setup.rb")
+    end
+  end
 
+  def unrequire_rubygems_if_not_matching
+    return unless rubygems_mismatch?
+
+    unrequire_rubygems
+  end
+
+  def unrequire_rubygems_if_defined
+    return unless rubygems_required?
+
+    unrequire_rubygems
+  end
+
+  def unrequire_rubygems
     require "rbconfig"
 
     ruby = File.join(RbConfig::CONFIG["bindir"], RbConfig::CONFIG["ruby_install_name"])
@@ -55,8 +77,12 @@ private
     $:.unshift File.expand_path("lib", local_copy_path)
   end
 
-  def rubygems_unrequire_needed?
-    defined?(Gem) && Gem::VERSION != target_gem_version
+  def rubygems_mismatch?
+    rubygems_required? && Gem::VERSION != target_gem_version
+  end
+
+  def rubygems_required?
+    defined?(Gem)
   end
 
   def local_copy_switch_needed?
