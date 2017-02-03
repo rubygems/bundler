@@ -1,6 +1,6 @@
 class Bundler::Thor
   class Arguments #:nodoc: # rubocop:disable ClassLength
-    NUMERIC = /(\d*\.\d+|\d+)/
+    NUMERIC = /[-+]?(\d*\.\d+|\d+)/
 
     # Receives an array of args and returns two arrays, one with arguments
     # and one with switches.
@@ -99,6 +99,7 @@ class Bundler::Thor
 
       while current_is_value? && peek.include?(":")
         key, value = shift.split(":", 2)
+        fail MalformattedArgumentError, "You can't specify '#{key}' more than once in option '#{name}'; got #{key}:#{hash[key]} and #{key}:#{value}" if hash.include? key
         hash[key] = value
       end
       hash
