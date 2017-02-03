@@ -724,10 +724,6 @@ module Bundler
       def repository_subdirectories
         Gem::REPOSITORY_SUBDIRECTORIES
       end
-
-      def install_with_build_args(args)
-        yield
-      end
     end
 
     # RubyGems 2.1.0
