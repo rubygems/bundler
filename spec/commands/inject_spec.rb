@@ -42,6 +42,16 @@ describe "bundle inject" do
     end
   end
 
+  context "incorrect arguments" do
+    it "fails when more than 2 arguments are passed" do
+      bundle "inject gem_name 1 v"
+      expect(out).to eq(<<-E.strip)
+ERROR: "bundle inject" was called with arguments ["gem_name", "1", "v"]
+Usage: "bundle inject GEM VERSION"
+      E
+    end
+  end
+
   context "when frozen" do
     before do
       bundle "install"
