@@ -81,7 +81,7 @@ module Bundler
         when false, "false"
           @fallback_timeout = 0
         else
-          @fallback_timeout = timeout.to_i
+          @fallback_timeout = timeout.to_f
         end
         @valid = nil
       end

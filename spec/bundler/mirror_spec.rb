@@ -34,6 +34,11 @@ RSpec.describe Bundler::Settings::Mirror do
     expect(mirror.fallback_timeout).to eq(0)
   end
 
+  it "takes a float number as a fallback_timeout" do
+    mirror.fallback_timeout = 0.5
+    expect(mirror.fallback_timeout).to eq(0.5)
+  end
+
   it "takes a string for the uri but returns an uri object" do
     mirror.uri = "http://localhost:9292"
     expect(mirror.uri).to eq(URI("http://localhost:9292"))
