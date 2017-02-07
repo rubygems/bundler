@@ -212,13 +212,13 @@ describe "bundle install with platform conditionals" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
-      gem "rack", :platform => :jruby
+      gem "rack", :platform => [:mingw, :mswin, :x64_mingw, :jruby]
     G
 
     bundle! "install"
 
     expect(out).to include <<-O.strip
-The dependency #{Gem::Dependency.new("rack", ">= 0")} will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for java. To add those platforms to the bundle, run `bundle lock --add-platform jruby`.
+The dependency #{Gem::Dependency.new("rack", ">= 0")} will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.
     O
   end
 end
