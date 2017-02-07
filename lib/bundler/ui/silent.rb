@@ -2,6 +2,8 @@
 module Bundler
   module UI
     class Silent
+      attr_writer :shell
+
       def initialize
         @warnings = []
       end
@@ -35,6 +37,14 @@ module Bundler
       end
 
       def ask(message)
+      end
+
+      def yes?(msg)
+        raise "Cannot ask yes? with a silent shell"
+      end
+
+      def no?
+        raise "Cannot ask no? with a silent shell"
       end
 
       def level=(name)
