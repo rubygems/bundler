@@ -43,7 +43,7 @@ module Bundler
       def level(name = nil)
       end
 
-      def trace(message, newline = nil)
+      def trace(message, newline = nil, force = false)
       end
 
       def silence
