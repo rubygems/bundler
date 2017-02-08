@@ -356,13 +356,20 @@ module Bundler::Molinillo
       # Ensures there are no orphaned successors to the given {vertex}.
       # @param [DependencyGraph::Vertex] vertex the vertex to fix up.
       # @return [void]
-      def fixup_swapped_children(vertex)
+      def fixup_swapped_children(vertex) # rubocop:disable Metrics/CyclomaticComplexity
         payload = vertex.payload
         deps = dependencies_for(payload).group_by(&method(:name_for))
         vertex.outgoing_edges.each do |outgoing_edge|
-          @parent_of[outgoing_edge.requirement] = states.size - 1
+          requirement = outgoing_edge.requirement
+          parent_index = @parent_of[requirement]
           succ = outgoing_edge.destination
           matching_deps = Array(deps[succ.name])
+          dep_matched = matching_deps.include?(requirement)
+
+          # only reset the parent index when it was originally required by the
+          # same named spec
+          @parent_of[requirement] = states.size - 1 if parent_index && states[parent_index].name == name
+
           if matching_deps.empty? && !succ.root? && succ.predecessors.to_a == [vertex]
             debug(depth) { "Removing orphaned spec #{succ.name} after swapping #{name}" }
             succ.requirements.each { |r| @parent_of.delete(r) }
@@ -373,9 +380,13 @@ module Bundler::Molinillo
               # so it's safe to delete only based upon name here
               removed_names.include?(name_for(r))
             end
-          elsif !matching_deps.include?(outgoing_edge.requirement)
+          elsif !dep_matched
+            # also reset if we're removing the edge, but only if its parent has
+            # already been fixed up
+            @parent_of[requirement] = states.size - 1 if @parent_of[requirement].nil?
+
             activated.delete_edge(outgoing_edge)
-            requirements.delete(outgoing_edge.requirement)
+            requirements.delete(requirement)
           end
         end
       end
