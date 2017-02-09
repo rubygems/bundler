@@ -95,6 +95,14 @@ RSpec.configure do |config|
 
   config.before :all do
     build_repo1
+    # HACK: necessary until rspec-mocks > 3.5.0 is used
+    # see https://github.com/bundler/bundler/pull/5363#issuecomment-278089256
+    if RUBY_VERSION < "1.9"
+      FileUtils.module_eval do
+        alias_method :mkpath, :mkdir_p
+        module_function :mkpath
+      end
+    end
   end
 
   config.before :each do
