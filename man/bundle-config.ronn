@@ -272,6 +272,18 @@ For example, to use a mirror of rubygems.org hosted at
 
     bundle config mirror.http://rubygems.org http://rubygems-mirror.org
 
+Bundler allows to set fallback timeout. When it pass Bundler will use original
+source instead of configured mirror.
+
+    bundle config mirror.SOURCE_URL.fallback_timeout TIMEOUT
+
+For example, to fallback mirror to original rubygems.org after 3 seconds
+
+    bundle config mirror.https://rubygems.org.fallback_timeout 3
+
+Default fallback timeout is 0.1 second. Bundler accepts only whole seconds as
+valid timeout values (1, 2, 3 ...).
+
 ## CREDENTIALS FOR GEM SOURCES
 
 Bundler allows you to configure credentials for any gem source, which allows
