@@ -10,10 +10,18 @@ namespace :release do
     abort
   end
 
-  desc "Make a patch release with the specified PRs from master"
+  def gh_api_request(opts)
+    require "net/http"
+    require "json"
+    host = opts.fetch(:host) { "https://api.github.com/" }
+    path = opts.fetch(:path)
+    response = Net::HTTP.get(URI.join(host, path))
+    JSON.parse(response)
+  end
+
+  desc "Make a patch release with the PRs from master in the patch milestone"
   task :patch, :version do |_t, args|
     version = args.version
-    prs = args.extras
 
     version ||= begin
       version = BUNDLER_SPEC.version
@@ -27,6 +35,18 @@ namespace :release do
     end
 
     confirm "You are about to release #{version}, currently #{BUNDLER_SPEC.version}"
+
+    milestones = gh_api_request(:path => "repos/bundler/bundler/milestones?state=open")
+    unless patch_milestone = milestones.find {|m| m["title"] == version }
+      abort "failed to find #{version} milestone on GitHub"
+    end
+    prs = gh_api_request(:path => "repos/bundler/bundler/pulls?milestone=#{patch_milestone["number"]}")
+    prs.map! do |pr|
+      unless pr["merged_at"]
+        abort "https://github.com/bundler/bundler/pull/#{pr["number"]} hasn't been merged yet!"
+      end
+      pr["number"]
+    end
 
     version_file = "lib/bundler/version.rb"
     version_contents = File.read(version_file)
