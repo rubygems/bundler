@@ -122,7 +122,10 @@ module Bundler
       end
 
       templates.each do |src, dst|
-        thor.template("newgem/#{src}", target.join(dst), config)
+        destination = target.join(dst)
+        SharedHelpers.filesystem_access(destination) do
+          thor.template("newgem/#{src}", destination, config)
+        end
       end
 
       executables.each do |file|
@@ -139,6 +142,8 @@ module Bundler
 
       # Open gemspec in editor
       open_editor(options["edit"], target.join("#{name}.gemspec")) if options[:edit]
+    rescue Errno::EEXIST => e
+      raise GenericSystemCallError.new(e, "There was a conflict while creating the new gem.")
     end
 
   private
