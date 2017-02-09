@@ -161,7 +161,9 @@ module Bundler
         local_specs
       end
 
-      def install(spec, force = false)
+      def install(spec, options = {})
+        force = options[:force]
+
         Bundler.ui.info "Using #{version_message(spec)} from #{self}"
 
         if requires_checkout? && !@copied && !force
@@ -170,7 +172,8 @@ module Bundler
           serialize_gemspecs_in(install_path)
           @copied = true
         end
-        generate_bin(spec, !Bundler.rubygems.spec_missing_extensions?(spec))
+        generate_bin_options = { :disable_extensions => !Bundler.rubygems.spec_missing_extensions?(spec), :build_args => options[:build_args] }
+        generate_bin(spec, generate_bin_options)
 
         requires_checkout? ? spec.post_install_message : nil
       end
