@@ -15,8 +15,21 @@ namespace :release do
     require "json"
     host = opts.fetch(:host) { "https://api.github.com/" }
     path = opts.fetch(:path)
-    response = Net::HTTP.get(URI.join(host, path))
-    JSON.parse(response)
+    response = Net::HTTP.get_response(URI.join(host, path))
+
+    links = Hash[*(response["Link"] || "").split(", ").map do |link|
+      href, name = link.match(/<(.*?)>; rel="(\w+)"/).captures
+
+      [name.to_sym, href]
+    end.flatten]
+
+    parsed_response = JSON.parse(response.body)
+
+    if n = links[:next]
+      parsed_response.concat gh_api_request(:host => host, :path => n)
+    end
+
+    parsed_response
   end
 
   desc "Make a patch release with the PRs from master in the patch milestone"
@@ -40,13 +53,12 @@ namespace :release do
     unless patch_milestone = milestones.find {|m| m["title"] == version }
       abort "failed to find #{version} milestone on GitHub"
     end
-    prs = gh_api_request(:path => "repos/bundler/bundler/pulls?milestone=#{patch_milestone["number"]}")
+    prs = gh_api_request(:path => "repos/bundler/bundler/issues?milestone=#{patch_milestone["number"]}&state=all")
     prs.map! do |pr|
-      unless pr["merged_at"]
-        abort "https://github.com/bundler/bundler/pull/#{pr["number"]} hasn't been merged yet!"
-      end
+      abort "#{pr["html_url"]} hasn't been closed yet!" unless pr["state"] == "closed"
+      next unless pr["pull_request"]
       pr["number"]
-    end
+    end.compact
 
     version_file = "lib/bundler/version.rb"
     version_contents = File.read(version_file)
@@ -62,6 +74,8 @@ namespace :release do
 
     commits = `git log --oneline origin/master --`.split("\n").map {|l| l.split(/\s/, 2) }.reverse
     commits.select! {|_sha, message| message =~ /(Auto merge of|Merge pull request) ##{Regexp.union(*prs)}/ }
+
+    abort "Could not find commits for all PRs" unless commits.size == prs.size
 
     unless system("git", "cherry-pick", "-x", "-m", "1", *commits.map(&:first))
       abort unless system("zsh")
