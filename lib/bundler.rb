@@ -166,7 +166,6 @@ module Bundler
           end
         rescue => e
           warning += "\n\nBundler also failed to create a temporary home directory at `#{tmp_home}`:\n#{e}"
-          raise warning
         end
 
         warning += "\n\nBundler will use `#{tmp_home}` as your home directory temporarily"
