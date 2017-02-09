@@ -71,9 +71,9 @@ module Bundler
         File.basename(expanded_path.to_s)
       end
 
-      def install(spec, force = false)
+      def install(spec, options = {})
         Bundler.ui.info "Using #{version_message(spec)} from #{self}"
-        generate_bin(spec, :disable_extensions)
+        generate_bin(spec, :disable_extensions => true)
         nil # no post-install message
       end
 
@@ -193,7 +193,7 @@ module Bundler
         path
       end
 
-      def generate_bin(spec, disable_extensions = false)
+      def generate_bin(spec, options = {})
         gem_dir = Pathname.new(spec.full_gem_path)
 
         # Some gem authors put absolute paths in their gemspec
@@ -208,7 +208,12 @@ module Bundler
           end
         end.compact
 
-        installer = Path::Installer.new(spec, :env_shebang => false, :disable_extensions => disable_extensions)
+        installer = Path::Installer.new(
+          spec,
+          :env_shebang => false,
+          :disable_extensions => options[:disable_extensions],
+          :build_args => options[:build_args]
+        )
         installer.post_install
       rescue Gem::InvalidSpecificationException => e
         Bundler.ui.warn "\n#{spec.name} at #{spec.full_gem_path} did not have a valid gemspec.\n" \
