@@ -835,4 +835,26 @@ Usage: "bundle gem GEM [OPTIONS]"
       expect(bundled_app("foobar/CODE_OF_CONDUCT.md")).to exist
     end
   end
+
+  context "on conflicts with a previously created file" do
+    it "should fail gracefully" do
+      in_app_root do
+        FileUtils.touch("conflict-foobar")
+      end
+      output = bundle "gem conflict-foobar"
+      expect(output).to include("Errno::EEXIST")
+      expect(exitstatus).to eql(32) if exitstatus
+    end
+  end
+
+  context "on conflicts with a previously created directory" do
+    it "should fail gracefully" do
+      in_app_root do
+        FileUtils.mkdir_p("conflict-foobar/Gemfile")
+      end
+      output = bundle "gem conflict-foobar"
+      expect(output).to include("Errno::EISDIR")
+      expect(exitstatus).to eql(32) if exitstatus
+    end
+  end
 end
