@@ -3,15 +3,15 @@ module Spec
   module Helpers
     def reset!
       Dir["#{tmp}/{gems/*,*}"].each do |dir|
-        next if %(base remote1 gems rubygems).include?(File.basename(dir))
+        next if %w(base remote1 gems rubygems).include?(File.basename(dir))
         if ENV["BUNDLER_SUDO_TESTS"]
           `sudo rm -rf #{dir}`
         else
           FileUtils.rm_rf(dir)
         end
       end
-      FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)
+      FileUtils.mkdir_p(tmpdir)
       ENV["BUNDLE_TRAMPOLINE_DISABLE"] = "1"
       Bundler.reset!
       Bundler.ui = nil
