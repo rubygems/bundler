@@ -593,7 +593,8 @@ module Bundler
       locked_index = Index.new
       locked_index.use(@locked_specs.select {|s| source.can_lock?(s) })
 
-      source.specs != locked_index
+      # order here matters, since Index#== is checking source.specs.include?(locked_index)
+      locked_index != source.specs
     end
 
     # Get all locals and override their matching sources.

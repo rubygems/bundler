@@ -77,10 +77,8 @@ RSpec.describe "install with --deployment or --frozen" do
       gem "bar", :path => "#{lib_path("nested")}"
     G
 
-    bundle :install
-    bundle "install --deployment"
-
-    expect(exitstatus).to eq(0) if exitstatus
+    bundle! :install
+    bundle! "install --deployment"
   end
 
   it "works when there are credentials in the source URL" do
