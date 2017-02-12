@@ -211,6 +211,31 @@ describe "bundle install from an existing gemspec" do
     expect(the_bundle).to include_gems "foo 1.0.0"
   end
 
+  context "in deployment mode" do
+    context "when the lockfile was not updated after a change to the gemspec's dependencies" do
+      it "reports that installation failed" do
+        build_lib "cocoapods", :path => bundled_app do |s|
+          s.add_dependency "activesupport", ">= 1"
+        end
+
+        install_gemfile! <<-G
+          source "file://#{gem_repo1}"
+          gemspec
+        G
+
+        expect(the_bundle).to include_gems("cocoapods 1.0", "activesupport 2.3.5")
+
+        build_lib "cocoapods", :path => bundled_app do |s|
+          s.add_dependency "activesupport", ">= 1.0.1"
+        end
+
+        bundle "install --deployment"
+
+        expect(out).to include("changed")
+      end
+    end
+  end
+
   context "when child gemspecs conflict with a released gemspec" do
     before do
       # build the "parent" gem that depends on another gem in the same repo

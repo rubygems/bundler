@@ -600,6 +600,36 @@ describe "the lockfile format" do
     G
   end
 
+  it "serializes pinned path sources to the lockfile even when packaging" do
+    build_lib "foo"
+
+    install_gemfile! <<-G
+      gem "foo", :path => "#{lib_path("foo-1.0")}"
+    G
+
+    bundle! "package --all"
+    bundle! "install --local"
+
+    lockfile_should_be <<-G
+      PATH
+        remote: #{lib_path("foo-1.0")}
+        specs:
+          foo (1.0)
+
+      GEM
+        specs:
+
+      PLATFORMS
+        #{generic_local_platform}
+
+      DEPENDENCIES
+        foo!
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    G
+  end
+
   it "sorts serialized sources by type" do
     build_lib "foo"
     bar = build_git "bar"

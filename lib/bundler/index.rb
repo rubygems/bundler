@@ -144,6 +144,8 @@ module Bundler
       end
     end
 
+    # Whether all the specs in self are in other
+    # TODO: rename to #include?
     def ==(other)
       all? do |spec|
         other_spec = other[spec].first
