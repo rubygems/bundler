@@ -4,9 +4,11 @@ module Bundler
     class Path < Source
       autoload :Installer, "bundler/source/path/installer"
 
-      attr_reader :path, :options, :root_path
+      attr_reader :path, :options, :root_path, :original_path
       attr_writer :name
       attr_accessor :version
+
+      protected :original_path
 
       DEFAULT_GLOB = "{,*,*/*}.gemspec".freeze
 
@@ -61,7 +63,7 @@ module Bundler
 
       def eql?(other)
         return unless other.class == self.class
-        expanded_path == expand(other.path) &&
+        expand(@original_path) == expand(other.original_path) &&
           version == other.version
       end
 
@@ -130,8 +132,8 @@ module Bundler
       end
 
       def lockfile_path
-        return relative_path if path.absolute?
-        expand(path).relative_path_from(Bundler.root)
+        return relative_path(original_path) if original_path.absolute?
+        expand(original_path).relative_path_from(Bundler.root)
       end
 
       def app_cache_path(custom_path = nil)
@@ -186,7 +188,7 @@ module Bundler
         index
       end
 
-      def relative_path
+      def relative_path(path = self.path)
         if path.to_s.start_with?(root_path.to_s)
           return path.relative_path_from(root_path)
         end
