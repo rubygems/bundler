@@ -1,3 +1,16 @@
+## 1.14.4 (2017-02-12)
+
+Bugfixes:
+
+  - fail gracefully when attempting to overwrite an existing directory with `bundle gem` (#5358, @nodo)
+  - fix a resolver bug that would cause bundler to report conflicts that it could resolve (#5359, #5362, @segiddins)
+  - set native extension build arguments for git gems (#5401, @segiddins)
+  - fix the suggested `bundle lock` command printed when a dependency is unused on any platform (@5t111111)
+  - ensure the version passed to `ruby` in the Gemfile is valid during Gemfile parsing (#5380, @segiddins)
+  - show `bundle inject` usage when too many arguments are passed (#5384, @Shekharrajak)
+  - stop `bundle show --outdated` from implicitly running `bundle update` (#5375, @colby-swandale)
+  - allow the temporary home directory fallback to work for multiple users (@svoop)
+
 ## 1.14.3 (2017-01-24)
 
 Bugfixes:
