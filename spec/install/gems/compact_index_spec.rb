@@ -755,11 +755,11 @@ The checksum of /versions does not match the checksum provided by the server! So
   end
 
   it "doesn't explode when the API dependencies are wrong" do
-    install_gemfile <<-G, :artifice => "compact_index_wrong_dependencies"
+    install_gemfile <<-G, :artifice => "compact_index_wrong_dependencies", :env => { "DEBUG" => "true" }
       source "#{source_uri}"
       gem "rails"
     G
-    expect(out).to end_with(<<-E.strip)
+    expect(out).to include(<<-E.strip).and include("rails-2.3.2 from rubygems remote at #{source_uri}/ has corrupted API dependencies")
 Downloading rails-2.3.2 revealed dependencies not in the API (rake (= 10.0.2), actionpack (= 2.3.2), activerecord (= 2.3.2), actionmailer (= 2.3.2), activeresource (= 2.3.2)).
 Installing with `--full-index` should fix the problem.
     E

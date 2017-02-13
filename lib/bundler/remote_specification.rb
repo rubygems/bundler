@@ -52,6 +52,7 @@ module Bundler
     def __swap__(spec)
       without_type = proc {|d| Gem::Dependency.new(d.name, d.requirements_list) }
       if (extra_deps = spec.runtime_dependencies.map(&without_type).-(dependencies.map(&without_type))) && extra_deps.any?
+        Bundler.ui.debug "#{full_name} from #{remote} has corrupted API dependencies"
         raise APIResponseMismatchError,
           "Downloading #{full_name} revealed dependencies not in the API (#{extra_deps.map(&:to_s).join(", ")})." \
           "\nInstalling with `--full-index` should fix the problem."
