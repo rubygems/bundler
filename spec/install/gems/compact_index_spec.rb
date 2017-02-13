@@ -759,8 +759,13 @@ The checksum of /versions does not match the checksum provided by the server! So
       source "#{source_uri}"
       gem "rails"
     G
+    deps = [Gem::Dependency.new("rake", "= 10.0.2"),
+            Gem::Dependency.new("actionpack", "= 2.3.2"),
+            Gem::Dependency.new("activerecord", "= 2.3.2"),
+            Gem::Dependency.new("actionmailer", "= 2.3.2"),
+            Gem::Dependency.new("activeresource", "= 2.3.2")]
     expect(out).to include(<<-E.strip).and include("rails-2.3.2 from rubygems remote at #{source_uri}/ has corrupted API dependencies")
-Downloading rails-2.3.2 revealed dependencies not in the API (rake (= 10.0.2), actionpack (= 2.3.2), activerecord (= 2.3.2), actionmailer (= 2.3.2), activeresource (= 2.3.2)).
+Downloading rails-2.3.2 revealed dependencies not in the API (#{deps.join(", ")}).
 Installing with `--full-index` should fix the problem.
     E
   end
