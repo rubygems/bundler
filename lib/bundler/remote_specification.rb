@@ -50,6 +50,11 @@ module Bundler
     # once the remote gem is downloaded, the backend specification will
     # be swapped out.
     def __swap__(spec)
+      if (extra_deps = spec.runtime_dependencies.-(dependencies)) && extra_deps.any?
+        raise APIResponseMismatchError,
+          "Downloading #{full_name} revealed dependencies not in the API (#{extra_deps.map(&:to_s).join(", ")})." \
+          "\nInstalling with `--full-index` should fix the problem."
+      end
       @_remote_specification = spec
     end
 

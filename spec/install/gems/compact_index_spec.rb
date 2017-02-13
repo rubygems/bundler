@@ -753,4 +753,15 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack"
     G
   end
+
+  it "doesn't explode when the API dependencies are wrong" do
+    install_gemfile <<-G, :artifice => "compact_index_wrong_dependencies"
+      source "#{source_uri}"
+      gem "rails"
+    G
+    expect(out).to end_with(<<-E.strip)
+Downloading rails-2.3.2 revealed dependencies not in the API (rake (= 10.0.2), actionpack (= 2.3.2), activerecord (= 2.3.2), actionmailer (= 2.3.2), activeresource (= 2.3.2)).
+Installing with `--full-index` should fix the problem.
+    E
+  end
 end
