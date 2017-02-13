@@ -208,5 +208,10 @@ EOF
       expect(File).to receive(:chmod).with(0o777, "/TMP/bundler/home")
       expect(Bundler.tmp_home_path("USER", "")).to eq(Pathname("/TMP/bundler/home/USER"))
     end
+
+    it "should warn on r/o filesystem" do
+      allow(SharedHelpers).to receive(:filesystem_access).and_raise(PermissionError.new('/tmp'))
+      expect(Bundler.ui).to receive(:warn).with("AAA\nBundler also failed to create a temporary home directory at `AAA':\nAAA")
+    end
   end
 end
