@@ -183,7 +183,7 @@ module Bundler
     end
 
     def gem_key
-      ENV["gem_key"].to_s.downcase if ENV["gem_key"]
+      ENV["GEM_KEY"].to_s.downcase if ENV["GEM_KEY"]
     end
 
     def gem_push?
