@@ -10,8 +10,8 @@ module Spec
           FileUtils.rm_rf(dir)
         end
       end
-      FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)
+      FileUtils.mkdir_p(tmpdir)
       ENV["BUNDLE_TRAMPOLINE_DISABLE"] = "1"
       Bundler.reset!
       Bundler.ui = nil

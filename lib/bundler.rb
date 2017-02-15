@@ -176,7 +176,7 @@ module Bundler
         tmp_home_path.join(login).tap(&:mkpath)
       end
     rescue => e
-      raise "#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}"
+      raise e.exception("#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}")
     end
 
     def user_bundle_path
