@@ -284,7 +284,11 @@ module Bundler
       if ENV["BUNDLE_CONFIG"] && !ENV["BUNDLE_CONFIG"].empty?
         Pathname.new(ENV["BUNDLE_CONFIG"])
       else
-        Bundler.user_bundle_path.join("config")
+        begin
+          Bundler.user_bundle_path.join("config")
+        rescue PermissionError, GenericSystemCallError
+          nil
+        end
       end
     end
 

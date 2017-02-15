@@ -42,6 +42,7 @@ module Spec
       end
 
       ENV["HOME"] = Path.home.to_s
+      ENV["TMPDIR"] = Path.tmpdir.to_s
 
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
     end
