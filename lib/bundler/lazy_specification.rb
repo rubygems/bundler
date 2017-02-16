@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require "uri"
-require "rubygems/spec_fetcher"
 require "bundler/match_platform"
 
 module Bundler
