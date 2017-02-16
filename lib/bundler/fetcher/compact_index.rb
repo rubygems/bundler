@@ -122,14 +122,24 @@ module Bundler
       end
 
       def md5_available?
+        return true unless fips_enabled? && Process.respond_to?(:fork)
+        pid = fork do
+          $stderr.reopen(File.new("/dev/null", "w"))
+          require "digest/md5"
+          Digest::MD5.new
+          exit
+        end
+        Process.wait pid
+        $?.success?
+      end
+
+      def fips_enabled?
         begin
           require "openssl"
-          return false if defined?(OpenSSL::OPENSSL_FIPS) && OpenSSL::OPENSSL_FIPS
         rescue LoadError
           nil
         end
-
-        true
+        defined?(OpenSSL::OPENSSL_FIPS) && OpenSSL::OPENSSL_FIPS
       end
     end
   end
