@@ -329,6 +329,12 @@ module Bundler
 
   private
 
+    # returns an integer \in (-\infty, 0]
+    # a number closer to 0 means the dependency is less constraining
+    #
+    # dependencies w/ 0 or 1 possibilities (ignoring version requirements)
+    # are given very negative values, so they _always_ sort first,
+    # before dependencies that are unconstrained
     def amount_constrained(dependency)
       @amount_constrained ||= {}
       @amount_constrained[dependency.name] ||= begin
@@ -336,8 +342,9 @@ module Bundler
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
           all = index_for(dependency).search(dependency.name).size
+
           if all <= 1
-            all
+            all - 1_000_000
           else
             search = search_for(dependency).size
             search - all
