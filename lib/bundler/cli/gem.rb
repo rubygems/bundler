@@ -29,7 +29,8 @@ module Bundler
       constant_name = name.gsub(/-[_-]*(?![_-]|$)/) { "::" }.gsub(/([_-]+|(::)|^)(.|$)/) { $2.to_s + $3.upcase }
       constant_array = constant_name.split("::")
 
-      git_user_name = `git config user.name`.chomp
+      git_author_name = `git config user.name`.chomp
+      github_username = `git config github.user`.chomp
       git_user_email = `git config user.email`.chomp
 
       config = {
@@ -39,13 +40,13 @@ module Bundler
         :makefile_path    => "#{underscored_name}/#{underscored_name}",
         :constant_name    => constant_name,
         :constant_array   => constant_array,
-        :author           => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
+        :author           => git_author_name.empty? ? "TODO: Write your name" : git_author_name,
         :email            => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
         :test             => options[:test],
         :ext              => options[:ext],
         :exe              => options[:exe],
         :bundler_version  => bundler_dependency_version,
-        :git_user_name    => git_user_name.empty? ? "[USERNAME]" : git_user_name
+        :github_username  => github_username.empty? ? "[USERNAME]" : github_username
       }
       ensure_safe_gem_name(name, constant_array)
 
