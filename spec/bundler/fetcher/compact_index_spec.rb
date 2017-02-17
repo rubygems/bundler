@@ -35,9 +35,14 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
         expect(compact_index).to be_available
       end
 
-      it "does not fork" do
-        expect(compact_index).to receive(:fork).never
-        compact_index.available?
+      context "when OpenSSL is not available" do
+        before do
+          allow(compact_index).to receive(:require).with("openssl").and_raise(LoadError)
+        end
+
+        it "returns true" do
+          expect(compact_index).to be_available
+        end
       end
 
       context "when OpenSSL is FIPS-enabled", :ruby => ">= 2.0.0" do
@@ -45,6 +50,8 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
 
         context "when FIPS-mode is active" do
           before do
+            allow(OpenSSL::Digest::MD5).to receive(:digest).
+              and_raise(OpenSSL::Digest::DigestError)
             allow(Digest::MD5).to receive(:new) do
               # OpenSSL writes to STDERR and kills the current process with SIGABRT
               # when FIPS mode prevents MD5 from being used.
@@ -56,19 +63,10 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
           it "returns false" do
             expect(compact_index).to_not be_available
           end
-
-          it "outputs nothing to stderr" do
-            expect { compact_index.available? }.to_not output.to_stderr_from_any_process
-          end
         end
 
         it "returns true" do
           expect(compact_index).to be_available
-        end
-
-        it "does fork" do
-          expect(compact_index).to receive(:fork).and_call_original
-          compact_index.available?
         end
       end
     end
