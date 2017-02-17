@@ -52,12 +52,6 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
           before do
             allow(OpenSSL::Digest::MD5).to receive(:digest).
               and_raise(OpenSSL::Digest::DigestError)
-            allow(Digest::MD5).to receive(:new) do
-              # OpenSSL writes to STDERR and kills the current process with SIGABRT
-              # when FIPS mode prevents MD5 from being used.
-              $stderr.write "Digest MD5 forbidden in FIPS mode!"
-              Process.kill("ABRT", Process.pid)
-            end
           end
 
           it "returns false" do
