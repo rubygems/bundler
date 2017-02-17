@@ -25,6 +25,7 @@ describe "bundle gem" do
 
   def gem_skeleton_assertions(gem_name)
     expect(bundled_app("#{gem_name}/#{gem_name}.gemspec")).to exist
+    expect(bundled_app("#{gem_name}/README.md")).to exist
     expect(bundled_app("#{gem_name}/Gemfile")).to exist
     expect(bundled_app("#{gem_name}/Rakefile")).to exist
     expect(bundled_app("#{gem_name}/lib/test/gem.rb")).to exist
@@ -36,6 +37,8 @@ describe "bundle gem" do
     [user]
       name = "Bundler User"
       email = user@example.com
+    [github]
+      user = bundleuser
     EOF
     @git_config_location = ENV["GIT_CONFIG"]
     path = "#{File.expand_path("../../tmp", File.dirname(__FILE__))}/test_git_config.txt"
@@ -116,19 +119,20 @@ describe "bundle gem" do
     let(:gem_name) { "test_gem" }
     let(:generated_gem) { Bundler::GemHelper.new(bundled_app(gem_name).to_s) }
 
-    context "git config user.name present" do
+    context "git config github.user present" do
       before do
         execute_bundle_gem(gem_name)
       end
 
       it "contribute URL set to git username" do
         expect(bundled_app("test_gem/README.md").read).not_to include("[USERNAME]")
+        expect(bundled_app("test_gem/README.md").read).to include("github.com/bundleuser")
       end
     end
 
-    context "git config user.name is absent" do
+    context "git config github.user is absent" do
       before do
-        `git config --unset user.name`
+        sys_exec("git config --unset github.user")
         reset!
         in_app_root
         bundle "gem #{gem_name}"
@@ -137,6 +141,7 @@ describe "bundle gem" do
 
       it "contribute URL set to [USERNAME]" do
         expect(bundled_app("test_gem/README.md").read).to include("[USERNAME]")
+        expect(bundled_app("test_gem/README.md").read).not_to include("github.com/bundleuser")
       end
     end
   end
