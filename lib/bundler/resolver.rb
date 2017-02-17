@@ -230,11 +230,11 @@ module Bundler
 
     def debug?
       return @debug_mode if defined?(@debug_mode)
-      @debug_mode = ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"]
+      @debug_mode = ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"] || false
     end
 
     def before_resolution
-      Bundler.ui.info "Resolving dependencies...", false
+      Bundler.ui.info "Resolving dependencies...", debug?
     end
 
     def after_resolution
@@ -242,7 +242,7 @@ module Bundler
     end
 
     def indicate_progress
-      Bundler.ui.info ".", false
+      Bundler.ui.info ".", false unless debug?
     end
 
     include Molinillo::SpecificationProvider
