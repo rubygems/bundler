@@ -3,8 +3,8 @@ require "spec_helper"
 
 RSpec.describe Bundler::Fetcher::CompactIndex do
   let(:downloader)  { double(:downloader) }
-  let(:remote)      { double(:remote, :cache_slug => "lsjdf") }
   let(:display_uri) { URI("http://sampleuri.com") }
+  let(:remote)      { double(:remote, :cache_slug => "lsjdf", :uri => display_uri) }
   let(:compact_index) { described_class.new(downloader, remote, display_uri) }
 
   before do
@@ -26,17 +26,41 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
     end
 
     describe "#available?" do
-      context "when OpenSSL is in FIPS mode", :ruby => ">= 2.0.0" do
-        before { stub_const("OpenSSL::OPENSSL_FIPS", true) }
+      before do
+        allow(compact_index).to receive(:compact_index_client).
+          and_return(double(:compact_index_client, :update_and_parse_checksums! => true))
+      end
 
-        it "returns false" do
-          expect(compact_index).to_not be_available
+      it "returns true" do
+        expect(compact_index).to be_available
+      end
+
+      context "when OpenSSL is not available" do
+        before do
+          allow(compact_index).to receive(:require).with("openssl").and_raise(LoadError)
         end
 
-        it "never requires digest/md5" do
-          expect(Kernel).to receive(:require).with("digest/md5").never
+        it "returns true" do
+          expect(compact_index).to be_available
+        end
+      end
 
-          compact_index.available?
+      context "when OpenSSL is FIPS-enabled", :ruby => ">= 2.0.0" do
+        before { stub_const("OpenSSL::OPENSSL_FIPS", true) }
+
+        context "when FIPS-mode is active" do
+          before do
+            allow(OpenSSL::Digest::MD5).to receive(:digest).
+              and_raise(OpenSSL::Digest::DigestError)
+          end
+
+          it "returns false" do
+            expect(compact_index).to_not be_available
+          end
+        end
+
+        it "returns true" do
+          expect(compact_index).to be_available
         end
       end
     end
