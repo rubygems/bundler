@@ -128,8 +128,8 @@ RSpec.describe Bundler::RemoteSpecification do
   end
 
   describe "#__swap__" do
-    let(:spec) { double(:spec) }
-    let(:new_spec) { double(:new_spec) }
+    let(:spec) { double(:spec, :dependencies => []) }
+    let(:new_spec) { double(:new_spec, :runtime_dependencies => []) }
 
     before { subject.instance_variable_set(:@_remote_specification, spec) }
 

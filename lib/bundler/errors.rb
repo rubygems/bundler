@@ -54,6 +54,7 @@ module Bundler
   class PluginError < BundlerError; status_code(29); end
   class SudoNotPermittedError < BundlerError; status_code(30); end
   class ThreadCreationError < BundlerError; status_code(33); end
+  class APIResponseMismatchError < BundlerError; status_code(34); end
   class GemfileEvalError < GemfileError; end
   class MarshalError < StandardError; end
 

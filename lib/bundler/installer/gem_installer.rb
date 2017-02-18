@@ -16,7 +16,7 @@ module Bundler
       Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       generate_executable_stubs
       return true, post_install_message
-    rescue Bundler::InstallHookError, Bundler::SecurityError
+    rescue Bundler::InstallHookError, Bundler::SecurityError, APIResponseMismatchError
       raise
     rescue Errno::ENOSPC
       return false, out_of_space_message
