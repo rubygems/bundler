@@ -230,11 +230,11 @@ module Bundler
 
     def debug?
       return @debug_mode if defined?(@debug_mode)
-      @debug_mode = ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"]
+      @debug_mode = ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"] || false
     end
 
     def before_resolution
-      Bundler.ui.info "Resolving dependencies...", false
+      Bundler.ui.info "Resolving dependencies...", debug?
     end
 
     def after_resolution
@@ -242,7 +242,7 @@ module Bundler
     end
 
     def indicate_progress
-      Bundler.ui.info ".", false
+      Bundler.ui.info ".", false unless debug?
     end
 
     include Molinillo::SpecificationProvider
@@ -328,6 +328,12 @@ module Bundler
 
   private
 
+    # returns an integer \in (-\infty, 0]
+    # a number closer to 0 means the dependency is less constraining
+    #
+    # dependencies w/ 0 or 1 possibilities (ignoring version requirements)
+    # are given very negative values, so they _always_ sort first,
+    # before dependencies that are unconstrained
     def amount_constrained(dependency)
       @amount_constrained ||= {}
       @amount_constrained[dependency.name] ||= begin
@@ -335,8 +341,9 @@ module Bundler
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
           all = index_for(dependency).search(dependency.name).size
+
           if all <= 1
-            all
+            all - 1_000_000
           else
             search = search_for(dependency).size
             search - all

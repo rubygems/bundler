@@ -44,17 +44,14 @@ describe "bundle install" do
           In Gemfile:
             bundler (= 0.9.2)
 
-            rails (= 3.0) was resolved to 3.0, which depends on
-              bundler (>= 0.9.0.pre)
-
           Current Bundler version:
             bundler (#{Bundler::VERSION})
         This Gemfile requires a different version of Bundler.
         Perhaps you need to update Bundler by running `gem install bundler`?
 
-        Could not find gem 'bundler (= 0.9.2)', which is required by gem 'rails (= 3.0)', in any of the sources.
+        Could not find gem 'bundler (= 0.9.2)' in any of the sources
         E
-      expect(out).to include(nice_error)
+      expect(out).to eq(nice_error)
     end
 
     it "works for gems with multiple versions in its dependencies" do
