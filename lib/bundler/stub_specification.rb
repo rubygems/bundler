@@ -15,6 +15,13 @@ module Bundler
       _remote_specification.to_yaml
     end
 
+    if Bundler.rubygems.provides?(">= 2.3")
+      # This is defined directly to avoid having to load every installed spec
+      def missing_extensions?
+        stub.missing_extensions?
+      end
+    end
+
   private
 
     def _remote_specification
