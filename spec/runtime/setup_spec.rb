@@ -673,6 +673,34 @@ describe "Bundler.setup" do
     expect(out).to be_empty
   end
 
+  it "does not load all gemspecs", :rubygems => ">= 2.3" do
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    run! <<-R
+      File.open(File.join(Gem.dir, "specifications", "broken.gemspec"), "w") do |f|
+        f.write <<-RUBY
+# -*- encoding: utf-8 -*-
+# stub: broken 1.0.0 ruby lib
+
+Gem::Specification.new do |s|
+  s.name = "broken"
+  s.version = "1.0.0"
+  raise "BROKEN GEMSPEC"
+end
+        RUBY
+      end
+    R
+
+    run! <<-R
+      puts "WIN"
+    R
+
+    expect(out).to eq("WIN")
+  end
+
   it "ignores empty gem paths" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
