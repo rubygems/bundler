@@ -1,4 +1,4 @@
-bundle-show(1) -- Show information for the given gem in your bundle
+bundle-info(1) -- Show information for the given gem in your bundle
 =========================================================================
 
 ## SYNOPSIS
