@@ -26,7 +26,7 @@ Everyone is welcome and encouraged to fix any open bug, improve an error message
 
   1. Discuss the fix on the existing issue. Coordinating with everyone else saves duplicate work and serves as a great way to get suggestions and ideas if you need any.
   2. Base your commits on the correct branch. Bugfixes for 1.x versions of Bundler should be based on the matching 1-x-stable branch.
-  3. Review the [pull request guide](../contributing/PULL_REQUESTS.md).
+  3. Review the [pull request guide](../development/PULL_REQUESTS.md).
   4. Commit the code with at least one test covering your changes to a named branch in your fork.
   5. Put a line in the [CHANGELOG](../../CHANGELOG.md) summarizing your changes under the next release under the “Bugfixes” heading.
   6. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your bugfix branch.
