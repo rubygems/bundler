@@ -26,10 +26,10 @@ RSpec.describe "bundle info" do
     end
 
     context "given a default gem shippped in ruby" do
-      it "prints information about the default gem" do
+      it "prints information about the default gem", :if => (RUBY_VERSION >= "1.9") do
         bundle "info rdoc"
         expect(out).to include("* rdoc")
-        expect(out).to match(%r{gems\/rdoc\-})
+        expect(out).to include("Default Gem: yes")
       end
     end
 
