@@ -20,8 +20,8 @@ module Bundler
   private
 
     def spec_for_gem(gem_name)
-      spec = Bundler.definition.specs.find { |s| s.name == gem_name }
-      spec ||= default_gem_spec(gem_name)
+      spec = Bundler.definition.specs.find {|s| s.name == gem_name }
+      spec || default_gem_spec(gem_name)
     end
 
     def default_gem_spec(gem_name)
