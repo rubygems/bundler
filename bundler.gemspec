@@ -8,7 +8,11 @@ Gem::Specification.new do |s|
   s.name        = "bundler"
   s.version     = Bundler::VERSION
   s.license     = "MIT"
-  s.authors     = ["André Arko", "Samuel Giddins"]
+  s.authors     = [
+    "André Arko", "Samuel Giddins", "Chris Morris", "James Wen", "Tim Moore",
+    "André Medeiros", "Jessica Lynn Suttles", "Terence Lee", "Carl Lerche",
+    "Yehuda Katz"
+  ]
   s.email       = ["team@bundler.io"]
   s.homepage    = "http://bundler.io"
   s.summary     = "The best way to manage your application's dependencies"
