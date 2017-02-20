@@ -465,10 +465,14 @@ module Bundler
     end
 
     desc "inject GEM VERSION", "Add the named gem, with version requirements, to the resolved Gemfile"
+    method_option "source", :type => :string, :banner =>
+     "Use the specific source for the gem"
+    method_option "group", :type => :string, :banner =>
+     "Put the gem into specific group"
     def inject(name, version)
       SharedHelpers.major_deprecation "The `inject` command has been replaced by the `add` command"
       require "bundler/cli/inject"
-      Inject.new(options, name, version).run
+      Inject.new(options.dup, name, version).run
     end
 
     desc "lock", "Creates a lockfile without installing"
