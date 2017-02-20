@@ -1,0 +1,7 @@
+require "helper"
+
+class <%= config[:constant_name] %>Test %> < Test::Unit::TestCase
+  def test_it_is_useful
+    assert false
+  end
+end
