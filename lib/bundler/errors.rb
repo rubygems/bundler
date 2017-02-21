@@ -138,7 +138,7 @@ module Bundler
   class NoSpaceOnDeviceError < PermissionError
     def message
       "There was an error while trying to #{action} `#{@path}`. " \
-      "There was insufficent space remaining on the device."
+      "There was insufficient space remaining on the device."
     end
 
     status_code(31)

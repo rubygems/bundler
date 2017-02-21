@@ -15,7 +15,7 @@ Bugfixes:
 
 Bugfixes:
 
-  - fix the resolver attemting to activate ruby-platform gems when the bundle is only for other platforms (#5349, #5356, @segiddins)
+  - fix the resolver attempting to activate ruby-platform gems when the bundle is only for other platforms (#5349, #5356, @segiddins)
   - avoid re-resolving a locked gemfile that uses `gemspec` and includes development dependencies (#5349, @segiddins)
 
 ## 1.14.2 (2017-01-22)
@@ -144,7 +144,7 @@ Bugfixes:
 
   - allow `Settings` to be initialized without a root directory (@m1k3)
   - allow specifying ruby engines in the gemfile as a symbol (#4919, @JuanitoFatas)
-  - avoid an execption when using `bundler/deployment` with Vlad (@srbaker)
+  - avoid an exception when using `bundler/deployment` with Vlad (@srbaker)
   - ensure redefined methods have the same visibility as the one they're replacing, fixing `Kernel.require` failing on JRuby (#4975, @segiddins)
   - ensure that Bundler won't complain about a corrupt lockfile when no lockfile exists when using `gemspec` in the Gemfile (#5006, @segiddins)
   - fail gracefully when parsing the metadata for a gemspec from the compact index fails (@segiddins)
@@ -1380,13 +1380,13 @@ Bugfixes:
 
 Features:
 
-  - compatibile with Ruby 2.0.0-preview2
-  - compatibile with Rubygems 2.0.0.preview2 (@drbrain, @evanphx)
+  - compatible with Ruby 2.0.0-preview2
+  - compatible with Rubygems 2.0.0.preview2 (@drbrain, @evanphx)
   - ruby 2.0 added to the `:ruby19` ABI-compatible platform
   - lazy load YAML, allowing Psych to be specified in the Gemfile
   - significant performance improvements (@cheald, #2181)
   - `inject` command for scripted Gemfile additions (Engine Yard)
-  - :github option uses slashless arguements as repo owner (@rking)
+  - :github option uses slashless arguments as repo owner (@rking)
   - `open` suggests gem names for typos (@jdelStrother)
   - `update` reports non-existent gems (@jdelStrother)
   - `gem` option --test can generate rspec stubs (@MafcoCinco)
@@ -1810,7 +1810,7 @@ Features:
   - Add bundle clean. Removes unused gems from --path directory
   - Initial Gemcutter Endpoint API work, BAI Fetching source index
   - Added bundle install --standalone
-  - Ignore Gemfile.lock when buliding new gems
+  - Ignore Gemfile.lock when building new gems
   - Make it possible to override a .gemspec dependency's source in the
     Gemfile
 
@@ -1861,7 +1861,7 @@ Bugfixes:
 
 Features:
 
-  - Compatability with Rubygems 1.8.10 installer changes
+  - Compatibility with Rubygems 1.8.10 installer changes
   - Report gem installation failures clearly (@rwilcox, #1380)
   - Useful error for cap and vlad on first deploy (@nexmat, @kirs)
 
@@ -2611,7 +2611,7 @@ Bugfixes:
   - make the tests platform agnostic so we can confirm that they're green on JRuby
   - fixes for Ruby 1.9
 
-## 0.9.5 (Feburary 12, 2010)
+## 0.9.5 (February 12, 2010)
 
 Features:
 
