@@ -31,8 +31,7 @@ module Bundler
 
       if added.any?
         Bundler.ui.confirm "Added to Gemfile:"
-        Bundler.ui.confirm added.map {|g| "  #{g}, group => #{g.groups.inspect},
-         :source => '#{g.source}'" }.join("\n")
+        Bundler.ui.confirm added.map {|g| "  #{g}, group => #{g.groups.inspect}, :source => '#{g.source}'" }.join("\n")
       else
         Bundler.ui.confirm "All gems were already present in the Gemfile"
       end
