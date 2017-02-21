@@ -1132,6 +1132,49 @@ end
       RUBY
       expect(out).to eq("undefined\nconstant")
     end
+
+    describe "default gem activation" do
+      let(:code) { strip_whitespace(<<-RUBY) }
+        require "rubygems"
+        Gem::Specification.send(:alias_method, :bundler_spec_activate, :activate)
+        Gem::Specification.send(:define_method, :activate) do
+          warn '-' * 80
+          warn "activating \#{full_name}"
+          warn *caller
+          warn '*' * 80
+          bundler_spec_activate
+        end
+        require "bundler/setup"
+        require "pp"
+        loaded_specs = Gem.loaded_specs.dup
+        loaded_specs.delete("bundler")
+        pp loaded_specs
+      RUBY
+
+      it "activates no gems with -rbundler/setup" do
+        install_gemfile! ""
+        ruby!(code)
+        expect(err).to eq("")
+        expect(out).to eq("{}")
+      end
+
+      it "activates no gems with bundle exec" do
+        install_gemfile! ""
+        create_file("script.rb", code)
+        bundle! "exec ruby ./script.rb"
+        expect(err).to eq("")
+        expect(out).to eq("{}")
+      end
+
+      it "activates no gems with bundle exec that is loaded" do
+        install_gemfile! ""
+        create_file("script.rb", "#!/usr/bin/env ruby\n\n#{code}")
+        FileUtils.chmod(0o777, bundled_app("script.rb"))
+        bundle! "exec ./script.rb"
+        expect(err).to eq("")
+        expect(out).to eq("{}")
+      end
+    end
   end
 
   describe "after setup" do
