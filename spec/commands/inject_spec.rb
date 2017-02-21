@@ -52,26 +52,21 @@ Usage: "bundle inject GEM VERSION"
     end
   end
 
-  context "use source and group options" do
-    it "add gem with source in gemfile" do
-      bundle "inject 'bootstrap' '>0' --source=https://rubygems.org"
+  context "with source option" do
+    it "add gem with source option in gemfile" do
+      bundle "inject 'bootstrap' '>0' --source=https://ruby.taobao.org/"
       gemfile = bundled_app("Gemfile").read
-      str = "gem 'bootstrap', '> 0', :source => 'https://rubygems.org'"
-      expect(gemfile).to match(/str/)
+      str = "gem 'bootstrap', '> 0', :source => 'https://ruby.taobao.org/'"
+      expect(gemfile).to include str
     end
+  end
 
-    it "add gem with group in gemfile" do
+  context "with group option" do
+    it "add gem with group option in gemfile" do
       bundle "inject 'rack-obama' '>0' --group=development"
       gemfile = bundled_app("Gemfile").read
       str = "gem 'rack-obama', '> 0', :group => [:development]"
-      expect(gemfile).to match(/str/)
-    end
-
-    it "add gem with source and group in gemfile" do
-      bundle "inject 'rails' '>0' --source=https://rubygems.org --group=development"
-      gemfile = bundled_app("Gemfile").read
-      str = "gem 'rails', '> 0', :group => [:development], :source => 'https://rubygems.org'"
-      expect(gemfile).to match(/str/)
+      expect(gemfile).to include str
     end
   end
 
