@@ -76,6 +76,7 @@ module Bundler
 
     def abort_threads
       return unless @threads
+      Bundler.ui.debug("\n#{caller.join("\n")}")
       @threads.each(&:exit)
       exit 1
     end
