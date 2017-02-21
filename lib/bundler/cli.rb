@@ -242,6 +242,13 @@ module Bundler
     # TODO: 2.0 remove `bundle list`
     map %w(list) => "show"
 
+    desc "info GEM [OPTIONS]", "Show information for the given gem"
+    method_option "path", :type => :boolean, :banner => "Print full path to gem"
+    def info(gem_name)
+      require "bundler/cli/info"
+      Info.new(options, gem_name).run
+    end
+
     desc "binstubs GEM [OPTIONS]", "Install the binstubs of the listed gem"
     long_desc <<-D
       Generate binstubs for executables in [GEM]. Binstubs are put into bin,

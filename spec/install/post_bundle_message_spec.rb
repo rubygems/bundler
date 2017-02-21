@@ -14,7 +14,7 @@ RSpec.describe "post bundle message" do
     G
   end
 
-  let(:bundle_show_message)       { "Use `bundle show [gemname]` to see where a bundled gem is installed." }
+  let(:bundle_show_message)       { "Use `bundle info [gemname]` to see where a bundled gem is installed." }
   let(:bundle_deployment_message) { "Bundled gems are installed into ./vendor" }
   let(:bundle_complete_message)   { "Bundle complete!" }
   let(:bundle_updated_message)    { "Bundle updated!" }
