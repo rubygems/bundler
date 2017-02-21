@@ -287,6 +287,12 @@ module Bundler
         def root
           Bundler.root
         end
+
+        # @private
+        # Returns true
+        def bundler_plugin_api_source?
+          true
+        end
       end
     end
   end

@@ -192,6 +192,26 @@ RSpec.describe "bundle install from an existing gemspec" do
     expect(@err).not_to match(/ahh/)
   end
 
+  it "allows the gemspec to activate other gems" do
+    # see https://github.com/bundler/bundler/issues/5409
+    #
+    # issue was caused by rubygems having an unresolved gem during a require,
+    # so emulate that
+    system_gems %w(rack-1.0.0 rack-0.9.1 rack-obama-1.0)
+
+    build_lib("foo", :path => bundled_app)
+    gemspec = bundled_app("foo.gemspec").read
+    bundled_app("foo.gemspec").open("w") do |f|
+      f.write "#{gemspec.strip}.tap { gem 'rack-obama'; require 'rack-obama' }"
+    end
+
+    install_gemfile! <<-G
+      gemspec
+    G
+
+    expect(the_bundle).to include_gem "foo 1.0"
+  end
+
   it "allows conflicts" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.version = "1.0.0"
