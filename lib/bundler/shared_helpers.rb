@@ -246,7 +246,7 @@ module Bundler
     def deprecate_gemfile(gemfile)
       return unless gemfile && File.basename(gemfile) == "Gemfile"
       Bundler::SharedHelpers.major_deprecation \
-        "gems.rb and gems.locked will be prefered to Gemfile and Gemfile.lock."
+        "gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock."
     end
 
     extend self

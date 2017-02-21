@@ -49,7 +49,7 @@ module Bundler
     # Bundler returns a warning message stating so and this method returns.
     #
     # Fourthly, Bundler checks if the default lockfile (Gemfile.lock) exists, and if so
-    # then proceeds to set up a defintion based on the default gemfile (Gemfile) and the
+    # then proceeds to set up a definition based on the default gemfile (Gemfile) and the
     # default lock file (Gemfile.lock). However, this is not the case if the platform is different
     # to that which is specified in Gemfile.lock, or if there are any missing specs for the gems.
     #

@@ -120,7 +120,7 @@ RSpec.describe "major deprecations" do
         gem "rack"
       G
 
-      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be prefered to Gemfile and Gemfile.lock.")
+      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
     end
 
     context "with flags" do
@@ -154,7 +154,7 @@ RSpec.describe "major deprecations" do
         Bundler.setup
       RUBY
 
-      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be prefered to Gemfile and Gemfile.lock.")
+      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
     end
   end
 
