@@ -54,9 +54,9 @@ Usage: "bundle inject GEM VERSION"
 
   context "with source option" do
     it "add gem with source option in gemfile" do
-      bundle "inject 'bootstrap' '>0' --source=https://ruby.taobao.org/"
+      bundle "inject 'foo' '>0' --source file://#{gem_repo1}"
       gemfile = bundled_app("Gemfile").read
-      str = "gem 'bootstrap', '> 0', :source => 'https://ruby.taobao.org/'"
+      str = "gem 'foo', '> 0', :source => 'file://#{gem_repo1}'"
       expect(gemfile).to include str
     end
   end
