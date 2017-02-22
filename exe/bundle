@@ -2,7 +2,10 @@
 # frozen_string_literal: true
 
 # Exit cleanly from an early interrupt
-Signal.trap("INT") { exit 1 }
+Signal.trap("INT") do
+  Bundler.ui.debug("\n#{caller.join("\n")}") if defined?(Bundler)
+  exit 1
+end
 
 update = "update".start_with?(ARGV.first || " ") && ARGV.find {|a| a.start_with?("--bundler") }
 update &&= update =~ /--bundler(?:=(.+))?/ && $1 || "> 0.a"
