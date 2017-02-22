@@ -29,9 +29,11 @@ module Bundler
       constant_name = name.gsub(/-[_-]*(?![_-]|$)/) { "::" }.gsub(/([_-]+|(::)|^)(.|$)/) { $2.to_s + $3.upcase }
       constant_array = constant_name.split("::")
 
-      git_author_name = `git config user.name`.chomp
-      github_username = `git config github.user`.chomp
-      git_user_email = `git config user.email`.chomp
+      git_installed = Bundler.git_present?
+
+      git_author_name = git_installed ? `git config user.name`.chomp : ""
+      github_username = git_installed ? `git config github.user`.chomp : ""
+      git_user_email = git_installed ? `git config user.email`.chomp : ""
 
       config = {
         :name             => name,
