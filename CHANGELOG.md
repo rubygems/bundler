@@ -1,3 +1,18 @@
+## 1.14.5 (2017-02-22)
+
+Bugfixes:
+
+  - avoid loading all unused gemspecs during `bundle exec` on RubyGems 2.3+ (@segiddins)
+  - improve resolver performance when dependencies have zero or one total possibilities ignoring requirements (#5444, #5457, @segiddins)
+  - enable compact index when OpenSSL FIPS mode is enabled but not active (#5433, @wjordan)
+  - use github username instead of git name for the github url in `bundle gem` (#5438, @danielpclark)
+  - avoid a TypeError on RubyGems 2.6.8 when no build settings are set for native extensions (@okkez)
+  - fail gracefully when the dependency api is missing runtime dependencies for a gem (@segiddins)
+  - handle when a platform-specific gem has more dependencies than the ruby platform version (#5339, #5426, @segiddins)
+  - allow running bundler on a machine with no home directory where the temporary directory is not writable (#5371, @segiddins)
+  - avoid gem version conflicts on openssl using Ruby 2.5 (#5235, @rhenium)
+  - fail when installing in frozen mode and the dependencies for `gemspec` gems have changed without the lockfile being updated (#5264, @segiddins)
+
 ## 1.14.4 (2017-02-12)
 
 Bugfixes:
