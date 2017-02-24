@@ -645,13 +645,13 @@ RSpec.describe "bundle update conservative" do
     it 'updates gems using the given source' do
       gemfile <<-G
         source "file://#{gem_repo1}"
-        gem 'rack'
+        gem 'rack', '>= 0'
       G
 
       bundle "install"
 
-      bundle "update --source file://#{gem_repo2}"
-      expect(out).to include "Fetching source index from file:#{gem_repo2}/"
+      bundle "update rack --source file://#{gem_repo2}"
+      expect(the_bundle).to include_gem("rack 2.0")
     end
   end
 
