@@ -65,6 +65,14 @@ RSpec.describe Bundler::Dsl do
     end
   end
 
+  describe '#to_definition' do
+    before { allow(@rubygems).to receive(:remotes).and_return(nil) }
+    it 'sets given remote soruces for definition' do
+      expect(@rubygems).to receive(:add_remote).with('http://mygemserver.com')
+      subject.to_definition('', :sources => ['http://mygemserver.com'])
+    end
+  end
+
   describe "#method_missing" do
     it "raises an error for unknown DSL methods" do
       expect(Bundler).to receive(:read_file).with("Gemfile").

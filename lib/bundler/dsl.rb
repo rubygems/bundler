@@ -197,6 +197,7 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
+      unlock[:sources].each { |s| @sources.add_rubygems_remote(s) } if unlock.is_a?(Hash) && unlock[:sources]
       Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups)
     end
 

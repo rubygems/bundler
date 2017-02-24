@@ -635,6 +635,26 @@ RSpec.describe "bundle update conservative" do
     end
   end
 
+  context 'with --source option' do
+    before do
+      build_repo2 do
+        build_gem "rack", "2.0"
+      end
+    end
+
+    it 'updates gems using the given source' do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+
+      bundle "install"
+
+      bundle "update --source file://#{gem_repo2}"
+      expect(out).to include "Fetching source index from file:#{gem_repo2}/"
+    end
+  end
+
   context "error handling" do
     before do
       gemfile ""
