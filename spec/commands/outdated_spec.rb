@@ -595,15 +595,14 @@ RSpec.describe "bundle outdated" do
     it_behaves_like "patch version updates are detected"
   end
 
-
-  context 'with --soruce option' do
+  context "with --soruce option" do
     before do
       build_repo2 do
         build_gem "rack", "2.0"
       end
     end
 
-    it 'uses given remote to check for outdated gems' do
+    it "uses given remote to check for outdated gems" do
       install_gemfile <<-G
         source 'file://#{gem_repo1}'
         gem 'rack', '~> 1.0'

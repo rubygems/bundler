@@ -65,11 +65,11 @@ RSpec.describe Bundler::Dsl do
     end
   end
 
-  describe '#to_definition' do
+  describe "#to_definition" do
     before { allow(@rubygems).to receive(:remotes).and_return(nil) }
-    it 'sets given remote soruces for definition' do
-      expect(@rubygems).to receive(:add_remote).with('http://mygemserver.com')
-      subject.to_definition('', :sources => ['http://mygemserver.com'])
+    it "sets given remote soruces for definition" do
+      expect(@rubygems).to receive(:add_remote).with("http://mygemserver.com")
+      subject.to_definition("", :sources => ["http://mygemserver.com"])
     end
   end
 
