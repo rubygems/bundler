@@ -226,6 +226,36 @@ RSpec.describe Bundler::Definition do
         end
       end
     end
+
+    context "sources" do
+      before do
+        gemfile <<-G
+          source "file://#{gem_repo4}"
+          gem 'testgem'
+        G
+
+        lockfile <<-L
+          GEM
+            remote: file://#{gem_repo4}
+            specs:
+              testgem (1.0.1)
+
+          PLATFORMS
+            ruby
+
+          DEPENDENCIES
+            testgem
+
+          BUNDLED WITH
+             1.13.0
+        L
+      end
+
+      it "merges user specified rubygems source with gemfile sources" do
+        definition = Bundler::Definition.new(bundled_app("Gemfile.lock"), [], Bundler::SourceList.new, :sources => ["http://mygemserver.com"])
+        expect(definition.sources.rubygems_remotes).to include URI("http://mygemserver.com")
+      end
+    end
   end
 
   describe "find_resolved_spec" do

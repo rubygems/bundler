@@ -14,7 +14,8 @@ module Bundler
       :locked_gems,
       :platforms,
       :requires,
-      :ruby_version
+      :ruby_version,
+      :sources
     )
 
     # Given a gemfile and lockfile creates a Bundler definition
@@ -111,6 +112,10 @@ module Bundler
       unless @unlock[:lock_shared_dependencies]
         eager_unlock = expand_dependencies(@unlock[:gems])
         @unlock[:gems] = @locked_specs.for(eager_unlock).map(&:name)
+      end
+
+      if @unlock[:sources]
+        @unlock[:sources].each {|s| @sources.add_rubygems_remote(s) } if @unlock.is_a?(Hash) && @unlock[:sources]
       end
 
       @gem_version_promoter = create_gem_version_promoter
@@ -536,9 +541,6 @@ module Bundler
     def find_indexed_specs(current_spec)
       index[current_spec.name].select {|spec| spec.match_platform(current_spec.platform) }.sort_by(&:version)
     end
-
-    attr_reader :sources
-    private :sources
 
   private
 
