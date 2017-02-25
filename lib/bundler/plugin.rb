@@ -49,7 +49,7 @@ module Bundler
         begin
           uninstalled = index.remove_plugin(name)
           Bundler.ui.info "Uninstalled plugin #{name}" if uninstalled
-        rescue PluginError => e
+        rescue => e
           Bundler.ui.error "Failed to uninstall plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n ")}"
         end
       end
