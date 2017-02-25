@@ -41,6 +41,20 @@ module Bundler
       Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n ")}"
     end
 
+    # Uninstalls the given plugins
+    #
+    # @param [Array<String>] names the name of plugin to be uninstalled
+    def uninstall(names)
+      names.each do |name|
+        begin
+          uninstalled = index.remove_plugin(name)
+          Bundler.ui.info "Uninstalled plugin #{name}" if uninstalled
+        rescue PluginError => e
+          Bundler.ui.error "Failed to uninstall plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n ")}"
+        end
+      end
+    end
+
     # Evaluates the Gemfile with a limited DSL and installs the plugins
     # specified by plugin method
     #

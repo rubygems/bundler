@@ -19,5 +19,10 @@ module Bundler
     def install(*plugins)
       Bundler::Plugin.install(plugins, options)
     end
+
+    desc "uninstall PLUGINS", "Uninstall the plugins"
+    def uninstall(*plugins)
+      Bundler::Plugin.uninstall(plugins)
+    end
   end
 end

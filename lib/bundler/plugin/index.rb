@@ -106,6 +106,18 @@ module Bundler
         @hooks[event] || []
       end
 
+      def remove_plugin(name)
+        @commands.delete_if{|_,v| v == name}
+        _plugin_path = plugin_path(name)
+        Bundler.rm_rf(_plugin_path)
+        @plugin_paths.delete_if{|k,_| k == name}
+        @load_paths.delete_if{|k,_| k == name}
+        @sources.delete_if{|_,v| v == name}
+        @hooks.delete_if{|_,v| v == name}
+        save_index
+        true
+      end
+
     private
 
       # Reads the index file from the directory and initializes the instance
