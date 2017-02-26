@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 module Bundler
   # Manages which plugins are installed and their sources. This also is supposed to map
   # which plugin does what (currently the features are not implemented so this class is
@@ -26,6 +25,7 @@ module Bundler
         @sources = {}
         @hooks = {}
         @load_paths = {}
+        @installed_plugins = []
 
         load_index(global_index_file, true)
         load_index(local_index_file) if SharedHelpers.in_bundle?
@@ -55,6 +55,7 @@ module Bundler
 
         @plugin_paths[name] = path
         @load_paths[name] = load_paths
+        @installed_plugins << name
         save_index
       rescue
         @commands = old_commands
@@ -106,8 +107,16 @@ module Bundler
         @hooks[event] || []
       end
 
+      def all_plugins
+        @installed_plugins
+      end
+
       def get_commands_of(name)
         @commands.select {|_, v| v == name }
+      end
+
+      def remove_installed_plugin(name)
+        @installed_plugins.delete(name)
       end
 
       def remove_plugin_paths(name)
@@ -137,6 +146,7 @@ module Bundler
         remove_commands(name)
         remove_sources(name)
         remove_hooks(name)
+        remove_installed_plugin(name)
         save_index
         true
       end
@@ -159,6 +169,7 @@ module Bundler
           require "bundler/yaml_serializer"
           index = YAMLSerializer.load(data)
 
+          @installed_plugins = @installed_plugins.push(*index["installed_plugins"]).reject(&:empty?)
           @commands.merge!(index["commands"])
           @hooks.merge!(index["hooks"])
           @load_paths.merge!(index["load_paths"])
@@ -172,6 +183,7 @@ module Bundler
       # to be only String key value pairs)
       def save_index
         index = {
+          "installed_plugins" => @installed_plugins,
           "commands"     => @commands,
           "hooks"        => @hooks,
           "load_paths"   => @load_paths,

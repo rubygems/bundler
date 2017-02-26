@@ -86,13 +86,13 @@ RSpec.describe Bundler::Plugin do
         { "new-plugin" => spec }
       end
     end
-
+    let(:opts) { {} }
     it "remove plugin" do
       allow(index).to receive(:remove_plugin).
         with("new-plugin").once
       allow(index).to receive(:installed?).
         with("new-plugin").once
-      subject.uninstall ["new-plugin"]
+      subject.uninstall ["new-plugin"], opts
     end
 
     context "multiple plugins" do
@@ -107,7 +107,7 @@ RSpec.describe Bundler::Plugin do
 
         allow(index).to receive(:remove_plugin).twice
         allow(index).to receive(:installed?).twice
-        subject.uninstall ["new-plugin", "another-plugin"]
+        subject.uninstall ["new-plugin", "another-plugin"], opts
       end
     end
   end

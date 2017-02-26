@@ -22,10 +22,12 @@ module Bundler
 
     desc "uninstall PLUGINS", "Uninstall the plugins"
     long_desc <<-D
-      Uninstall given list of plugins.
+      Uninstalls given list of plugins. To uninstall all the plugins, use -all option.
    D
+    method_option "all", :type => :string, :default => nil, :banner =>
+      "Uninstalls all the  installed plugins. If no plugin is installed then it does nothing."
     def uninstall(*plugins)
-      Bundler::Plugin.uninstall(plugins)
+      Bundler::Plugin.uninstall(plugins, options)
     end
   end
 end

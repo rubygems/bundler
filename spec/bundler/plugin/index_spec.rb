@@ -111,7 +111,7 @@ RSpec.describe Bundler::Plugin::Index do
       index.remove_plugin_paths("new-plugin")
     end
 
-    context "remove plugin path" do
+    context "remove plugin related things" do
       it "delete the plugin gem folder" do
         expect(File).not_to exist(plugin_path)
       end
@@ -130,6 +130,10 @@ RSpec.describe Bundler::Plugin::Index do
 
       it "remove the plugin source from the index file" do
         expect(index.source_plugin("new_source")).to be_nil
+      end
+
+      it "remove the plugin from the installed_plugins array" do
+        expect(index.all_plugins).not_to include(["new-plugin"])
       end
     end
   end

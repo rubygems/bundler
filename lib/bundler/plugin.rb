@@ -44,7 +44,14 @@ module Bundler
     # Uninstalls the given plugins
     #
     # @param [Array<String>] names: the names of plugins to be uninstalled
-    def uninstall(names)
+    def uninstall(names, options)
+      if options[:all]
+        names = index.all_plugins
+      elsif names.empty?
+        Bundler.ui.error "No plugin to uninstall. Specify at least 1 plugin to uninstall.\n"\
+          "Use --all option to uninstall all the installed plugins."
+        exit 1
+      end
       names.each do |name|
         begin
           if index.installed?(name)
