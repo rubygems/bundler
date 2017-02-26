@@ -43,13 +43,18 @@ module Bundler
 
     # Uninstalls the given plugins
     #
-    # @param [Array<String>] names the name of plugin to be uninstalled
+    # @param [Array<String>] names: the names of plugins to be uninstalled
     def uninstall(names)
       names.each do |name|
         begin
-          uninstalled = index.remove_plugin(name)
-          Bundler.ui.info "Uninstalled plugin #{name}" if uninstalled
-        rescue => e
+          if index.installed?(name)
+            uninstalled = index.remove_plugin(name)
+            Bundler.ui.info "Uninstalled plugin #{name}" if uninstalled
+          else
+            Bundler.ui.error "plugin path of `#{name}` is not found. \n" \
+            "Plugin `#{name}` is not installed. \n"
+          end
+        rescue PluginError => e
           Bundler.ui.error "Failed to uninstall plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n ")}"
         end
       end

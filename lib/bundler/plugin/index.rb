@@ -106,22 +106,36 @@ module Bundler
         @hooks[event] || []
       end
 
-      def remove_plugin(name)
-        begin
-          _plugin_path = plugin_path(name)
-        rescue TypeError => e
-          Bundler.ui.error "plugin path of `#{name}` not found. \n" \
-          "It seems plugin `#{name}` is not installed. \n"\
-          "Error msg :#{e.message}"
-          exit 1
-        end
+      def remove_plugin_paths(name)
+        Bundler.rm_rf(plugin_path(name))
+        @plugin_paths.delete_if {|k, _| k == name }
+      end
 
-        Bundler.rm_rf(_plugin_path)
-        @plugin_paths.delete_if{|k,_| k == name}
-        @load_paths.delete_if{|k,_| k == name}
-        @commands.delete_if{|_,v| v == name}
-        @sources.delete_if{|_,v| v == name}
-        @hooks.delete_if{|_,v| v == name}
+      def remove_load_paths(name)
+        @load_paths.delete_if {|k, _| k == name }
+      end
+
+
+      def remove_commands(name)
+        @commands.delete_if {|_, v| v == name }
+      end
+
+
+      def remove_sources(name)
+        @sources.delete_if {|_, v| v == name }
+      end
+
+
+      def remove_hooks(name)
+        @hooks.delete_if {|_, v| v == name }
+      end
+
+      def remove_plugin(name)
+        remove_plugin_paths(name)
+        remove_load_paths(name)
+        remove_commands(name)
+        remove_sources(name)
+        remove_hooks(name)
         save_index
         true
       end

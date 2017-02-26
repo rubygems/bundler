@@ -21,6 +21,9 @@ module Bundler
     end
 
     desc "uninstall PLUGINS", "Uninstall the plugins"
+    long_desc <<-D
+      Uninstall given list of plugins.
+   D
     def uninstall(*plugins)
       Bundler::Plugin.uninstall(plugins)
     end
