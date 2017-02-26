@@ -105,6 +105,35 @@ RSpec.describe Bundler::Plugin::Index do
     end
   end
 
+  describe "remove plugin" do
+    let(:plugin_path) { lib_path("new-plugin").to_s }
+    before do
+      index.remove_plugin_paths("new-plugin")
+    end
+
+    context "remove plugin path" do
+      it "delete the plugin gem folder" do
+        expect(File).not_to exist(plugin_path)
+      end
+
+      it "remove the plugin load path from the index file" do
+        expect(index.load_paths("new_source")).to be_nil
+      end
+
+      it "remove the plugin path from index file" do
+        expect(index.installed?("new_source")).to be_nil
+      end
+
+      it "remove the plugin commands from the index file" do
+        expect(index.get_commands_of("new_source")).to be_empty
+      end
+
+      it "remove the plugin source from the index file" do
+        expect(index.source_plugin("new_source")).to be_nil
+      end
+    end
+  end
+
   describe "global index" do
     before do
       Dir.chdir(tmp) do

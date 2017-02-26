@@ -80,6 +80,38 @@ RSpec.describe Bundler::Plugin do
     end
   end
 
+  describe "uninstall command" do
+    before do
+      allow(installer).to receive(:uninstall).with(["new-plugin"]) do
+        { "new-plugin" => spec }
+      end
+    end
+
+    it "remove plugin" do
+      allow(index).to receive(:remove_plugin).
+        with("new-plugin").once
+      allow(index).to receive(:installed?).
+        with("new-plugin").once
+      subject.uninstall ["new-plugin"]
+    end
+
+    context "multiple plugins" do
+      it do
+        allow(installer).to receive(:uninstall).
+          with(["new-plugin", "another-plugin"]) do
+          {
+            "new-plugin" => spec,
+            "another-plugin" => spec2,
+          }
+        end.once
+
+        allow(index).to receive(:remove_plugin).twice
+        allow(index).to receive(:installed?).twice
+        subject.uninstall ["new-plugin", "another-plugin"]
+      end
+    end
+  end
+
   describe "evaluate gemfile for plugins" do
     let(:definition) { double("definition") }
     let(:builder) { double("builder") }

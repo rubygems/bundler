@@ -106,6 +106,10 @@ module Bundler
         @hooks[event] || []
       end
 
+      def get_commands_of(name)
+        @commands.select {|_, v| v == name }
+      end
+
       def remove_plugin_paths(name)
         Bundler.rm_rf(plugin_path(name))
         @plugin_paths.delete_if {|k, _| k == name }
@@ -115,16 +119,13 @@ module Bundler
         @load_paths.delete_if {|k, _| k == name }
       end
 
-
       def remove_commands(name)
         @commands.delete_if {|_, v| v == name }
       end
 
-
       def remove_sources(name)
-        @sources.delete_if {|_, v| v == name }
+        @sources.delete_if {|k, _| k == name }
       end
-
 
       def remove_hooks(name)
         @hooks.delete_if {|_, v| v == name }
