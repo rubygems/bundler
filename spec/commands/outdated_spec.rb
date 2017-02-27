@@ -595,7 +595,7 @@ RSpec.describe "bundle outdated" do
     it_behaves_like "patch version updates are detected"
   end
 
-  context "with --soruce option" do
+  context "with --source option" do
     before do
       build_repo2 do
         build_gem "rack", "2.0"

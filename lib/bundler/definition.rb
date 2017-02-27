@@ -114,8 +114,8 @@ module Bundler
         @unlock[:gems] = @locked_specs.for(eager_unlock).map(&:name)
       end
 
-      if @unlock[:sources]
-        @unlock[:sources].each {|s| @sources.add_rubygems_remote(s) } if @unlock.is_a?(Hash) && @unlock[:sources]
+      if @unlock.is_a?(Hash) && @unlock[:sources]
+        @unlock[:sources].each {|s| @sources.add_rubygems_remote(s) }
       end
 
       @gem_version_promoter = create_gem_version_promoter
