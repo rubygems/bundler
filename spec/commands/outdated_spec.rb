@@ -187,6 +187,21 @@ RSpec.describe "bundle outdated" do
   end
 
   describe "with --local option" do
+    it "uses local cache to return a list of outdated gems" do
+      update_repo2 do
+        build_gem "activesupport", "2.3.4"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", "2.3.4"
+      G
+
+      bundle "outdated --local"
+
+      expect(out).to include("activesupport (newest 2.3.5, installed 2.3.4, requested = 2.3.4)")
+    end
+
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)
 
