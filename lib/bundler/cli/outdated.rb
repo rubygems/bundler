@@ -49,8 +49,7 @@ module Bundler
         %w(filter-major filter-minor filter-patch)
 
       definition_resolution = proc do
-        return definition.resolve_with_cache! if options[:local]
-        definition.resolve_remotely!
+        options[:local] ? definition.resolve_with_cache! : definition.resolve_remotely!
       end
 
       if options[:parseable]
