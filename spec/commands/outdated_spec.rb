@@ -189,7 +189,7 @@ RSpec.describe "bundle outdated" do
   describe "with --local option" do
     it "uses local cache to return a list of outdated gems" do
       update_repo2 do
-        build_gem 'activesupport', '2.3.4'
+        build_gem "activesupport", "2.3.4"
       end
 
       install_gemfile <<-G
