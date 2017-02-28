@@ -1,0 +1,62 @@
+# frozen_string_literal: true
+require "spec_helper"
+
+RSpec.describe "bundle add" do
+  before :each do
+    build_repo2 do
+      build_gem "foo", "1.1"
+      build_gem "foo", "2.0"
+      build_gem "baz", "1.2.3"
+      build_gem "bar", "0.12.3"
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "weakling", "~> 0.0.1"
+    G
+  end
+
+  describe "without version specified" do
+    it "version requirement becomes ~> major.minor.patch when resolved version is < 1.0" do
+      bundle "add 'bar'"
+      expect(bundled_app("Gemfile").read).to match(/gem 'bar', '~> 0.12.3'/)
+      expect(the_bundle).to include_gems "bar 0.12.3"
+    end
+
+    it "version requirement becomes ~> major.minor when resolved version is > 1.0" do
+      bundle "add 'baz'"
+      expect(bundled_app("Gemfile").read).to match(/gem 'baz', '~> 1.2'/)
+      expect(the_bundle).to include_gems "baz 1.2.3"
+    end
+  end
+
+  describe "with --version" do
+    it "adds dependency of specified version and runs install" do
+      bundle "add 'foo' --version='~> 1.0'"
+      expect(bundled_app("Gemfile").read).to match(/gem 'foo', '~> 1.0'/)
+      expect(the_bundle).to include_gems "foo 1.1"
+    end
+  end
+
+  describe "with --group" do
+    it "adds dependency for the specified group" do
+      bundle "add 'foo' --group='development'"
+      expect(bundled_app("Gemfile").read).to match(/gem 'foo', '~> 2.0', :group => \[:development\]/)
+      expect(the_bundle).to include_gems "foo 2.0"
+    end
+
+    it "adds dependency to more than one group" do
+      bundle "add 'foo' --group='development, test'"
+      expect(bundled_app("Gemfile").read).to match(/gem 'foo', '~> 2.0', :group => \[:development, :test\]/)
+      expect(the_bundle).to include_gems "foo 2.0"
+    end
+  end
+
+  describe "with --source" do
+    it "adds dependency with specified source" do
+      bundle "add 'foo' --source='file://#{gem_repo2}'"
+      expect(bundled_app("Gemfile").read).to match(%r{gem 'foo', '~> 2.0', :source => 'file:\/\/#{gem_repo2}'})
+      expect(the_bundle).to include_gems "foo 2.0"
+    end
+  end
+end

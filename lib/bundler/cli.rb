@@ -268,6 +268,20 @@ module Bundler
       Binstubs.new(options, gems).run
     end
 
+    desc "add GEM VERSION", "Add gem to Gemfile and run bundle install"
+    long_desc <<-D
+      Adds the specified gem to Gemfile (if valid) and run 'bundle install' in one step.
+    D
+    method_option "version", :aliases => "-v", :type => :string
+    method_option "group", :aliases => "-g", :type => :string
+    method_option "source", :aliases => "-s", :type => :string
+
+    map "a" => "add"
+    def add(gem_name)
+      require "bundler/cli/add"
+      Add.new(options.dup, gem_name).run
+    end
+
     desc "outdated GEM [OPTIONS]", "list installed gems with newer versions available"
     long_desc <<-D
       Outdated lists the names and versions of gems that have a newer version available

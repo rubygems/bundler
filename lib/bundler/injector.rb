@@ -27,17 +27,18 @@ module Bundler
       @new_deps -= builder.dependencies
 
       # add new deps to the end of the in-memory Gemfile
-      builder.eval_gemfile("injected gems", new_gem_lines) if @new_deps.any?
+      # Set conservative versioining to false because we want to let the resolver resolve the version first
+      builder.eval_gemfile("injected gems", build_gem_lines(false)) if @new_deps.any?
 
       # resolve to see if the new deps broke anything
-      definition = builder.to_definition(lockfile_path, {})
-      definition.resolve_remotely!
+      @definition = builder.to_definition(lockfile_path, {})
+      @definition.resolve_remotely!
 
       # since nothing broke, we can add those gems to the gemfile
-      append_to(gemfile_path) if @new_deps.any?
+      append_to(gemfile_path, build_gem_lines(@options[:conservative_versioning])) if @new_deps.any?
 
       # since we resolved successfully, write out the lockfile
-      definition.lock(Bundler.default_lockfile)
+      @definition.lock(Bundler.default_lockfile)
 
       # return an array of the deps that we added
       return @new_deps
@@ -47,24 +48,39 @@ module Bundler
 
   private
 
-    def new_gem_lines
+    def conservative_version(version)
+      return ">= 0" if version.nil?
+      segments = version.segments
+      seg_end_index = version >= Gem::Version.new("1.0") ? 1 : 2
+      "~> #{segments[0..seg_end_index].join(".")}"
+    end
+
+    def build_gem_lines(conservative_versioning)
       @new_deps.map do |d|
         name = "'#{d.name}'"
-        requirement = ", '#{d.requirement}'"
+
+        if conservative_versioning
+          version = @definition.specs[d.name][0].version
+          requirement = ", '#{conservative_version(version)}'"
+        else
+          requirement = ", '#{d.requirement}'"
+        end
+
         if d.groups != Array(:default)
           group =
-            if d.groups.size == 1
-              ", :group => #{d.groups.inspect}"
-            else
-              ", :groups => #{d.groups.inspect}"
-            end
+              if d.groups.size == 1
+                ", :group => #{d.groups.inspect}"
+              else
+                ", :groups => #{d.groups.inspect}"
+              end
         end
+        
         source = ", :source => '#{d.source}'" unless d.source.nil?
         %(gem #{name}#{requirement}#{group}#{source})
       end.join("\n")
     end
 
-    def append_to(gemfile_path)
+    def append_to(gemfile_path, new_gem_lines)
       gemfile_path.open("a") do |f|
         f.puts
         if @options["timestamp"] || @options["timestamp"].nil?
