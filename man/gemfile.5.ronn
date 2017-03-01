@@ -30,7 +30,7 @@ Sources are checked for gems following the heuristics described in
 will print a warning after installing the gem indicating which source was used,
 and listing the other sources where the gem is available. A specific source can
 be selected for gems that need to use a non-standard repository, suppressing
-this warning, by using the [`:source` option](#SOURCE-source-) or a
+this warning, by using the [`:source` option](#SOURCE) or a
 [`source` block](#BLOCK-FORM-OF-SOURCE-GIT-PATH-GROUP-and-PLATFORMS).
 
 ### CREDENTIALS
@@ -233,7 +233,7 @@ back on global sources using the ordering described in [SOURCE PRIORITY][].
 
 Selecting a specific source repository this way also suppresses the ambiguous
 gem warning described above in
-[GLOBAL SOURCES (#source)](#GLOBAL-SOURCES-source-).
+[GLOBAL SOURCES (#source)](#GLOBAL-SOURCES).
 
 ### GIT
 
