@@ -80,7 +80,7 @@ module Bundler
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
-        @locked_gems = LockfileParser.new(@lockfile_contents)
+        @locked_gems = LockfileParser.new(@lockfile_contents, lockfile.dirname)
         @locked_platforms = @locked_gems.platforms
         @platforms = @locked_platforms.dup
         @locked_bundler_version = @locked_gems.bundler_version

@@ -2,7 +2,7 @@
 
 RSpec.describe "ruby requirement" do
   def locked_ruby_version
-    Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(lockfile).ruby_version)
+    Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(lockfile, nil).ruby_version)
   end
 
   # As discovered by https://github.com/bundler/bundler/issues/4147, there is

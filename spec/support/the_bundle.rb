@@ -31,7 +31,7 @@ module Spec
 
     def locked_gems
       raise "Cannot read lockfile if it doesn't exist" unless locked?
-      Bundler::LockfileParser.new(lockfile.read)
+      Bundler::LockfileParser.new(lockfile.read, lockfile.dirname)
     end
   end
 end

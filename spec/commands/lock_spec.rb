@@ -165,13 +165,13 @@ RSpec.describe "bundle lock" do
   it "supports adding new platforms" do
     bundle! "lock --add-platform java x86-mingw32"
 
-    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    lockfile = Bundler::LockfileParser.new(read_lockfile, nil)
     expect(lockfile.platforms).to match_array(local_platforms.unshift(java, mingw).uniq)
   end
 
   it "supports adding the `ruby` platform" do
     bundle! "lock --add-platform ruby"
-    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    lockfile = Bundler::LockfileParser.new(read_lockfile, nil)
     expect(lockfile.platforms).to match_array(local_platforms.unshift("ruby").uniq)
   end
 
@@ -183,12 +183,12 @@ RSpec.describe "bundle lock" do
   it "allows removing platforms" do
     bundle! "lock --add-platform java x86-mingw32"
 
-    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    lockfile = Bundler::LockfileParser.new(read_lockfile, nil)
     expect(lockfile.platforms).to match_array(local_platforms.unshift(java, mingw).uniq)
 
     bundle! "lock --remove-platform java"
 
-    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    lockfile = Bundler::LockfileParser.new(read_lockfile, nil)
     expect(lockfile.platforms).to match_array(local_platforms.unshift(mingw).uniq)
   end
 

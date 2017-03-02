@@ -94,7 +94,7 @@ RSpec.describe Bundler::LockfileParser do
 
   describe "#initialize" do
     before { allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app("gems.rb")) }
-    subject { described_class.new(lockfile_contents) }
+    subject { described_class.new(lockfile_contents, nil) }
 
     let(:sources) do
       [Bundler::Source::Git.new("uri" => "https://github.com/alloy/peiji-san.git", "revision" => "eca485d8dc95f12aaec1a434b49d295c7e91844b"),

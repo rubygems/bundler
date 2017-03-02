@@ -58,7 +58,8 @@ module Bundler
       attributes
     end
 
-    def initialize(lockfile)
+    def initialize(lockfile, root_path)
+      @root_path = root_path
       @platforms    = []
       @sources      = []
       @dependencies = {}
@@ -170,7 +171,7 @@ module Bundler
         end
       when *SOURCE
         @current_source = nil
-        @opts = {}
+        @opts = { "root_path" => @root_path }
         @type = line
       else
         parse_spec(line)

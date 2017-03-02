@@ -148,7 +148,7 @@ module Bundler
           definition.locked_gems
         elsif Bundler.default_lockfile.file?
           lock = Bundler.read_file(Bundler.default_lockfile)
-          LockfileParser.new(lock)
+          LockfileParser.new(lock, Bundler.default_lockfile.dirname)
         end
     end
 
