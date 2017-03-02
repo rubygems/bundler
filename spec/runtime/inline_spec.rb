@@ -111,7 +111,7 @@ RSpec.describe "bundler/inline#gemfile" do
       end
     RUBY
 
-    expect(out).to eq("CONFIRMED!")
+    expect(out).to eq("CONFIRMED!\nCONFIRMED!")
     expect(exitstatus).to be_zero if exitstatus
   end
 
