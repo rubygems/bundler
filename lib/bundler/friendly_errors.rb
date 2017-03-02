@@ -92,7 +92,7 @@ module Bundler
           #{e.backtrace && e.backtrace.join("\n          ").chomp}
         ```
 
-        #{Bundler::Env.new.report(:print_gemfile => false, :print_gemspecs => false)}
+        #{Bundler::Env.new.report}
         --- TEMPLATE END ----------------------------------------------------------------
 
       EOS
