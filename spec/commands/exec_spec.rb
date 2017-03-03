@@ -218,6 +218,18 @@ RSpec.describe "bundle exec" do
     expect(out).to include("bundler: exec needs a command to run")
   end
 
+  it "raises a helpful error when exec'ing to something outside of the bundle" do
+    install_gemfile! <<-G
+      gem "rack"
+    G
+    [true, false].each do |l|
+      bundle! "config disable_exec_load #{l}"
+      bundle "exec rake"
+      expect(err).to include "can't find executable rake for gem rake. rake is not currently included in the bundle, perhaps you meant to add it to your Gemfile?"
+    end
+    expect(out).to include "bundler: failed to load command: rake"
+  end
+
   describe "with help flags" do
     each_prefix = proc do |string, &blk|
       1.upto(string.length) {|l| blk.call(string[0, l]) }

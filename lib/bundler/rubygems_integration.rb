@@ -405,8 +405,17 @@ module Bundler
         else
           specs.find {|s| s.name == gem_name }
         end
-        raise(Gem::Exception, "can't find executable #{exec_name}") unless spec
+
+        unless spec
+          message = "can't find executable #{exec_name} for gem #{gem_name}"
+          if !exec_name || specs.find {|s| s.name == gem_name }.nil?
+            message += ". #{gem_name} is not currently included in the bundle, perhaps you meant to add it to your #{Bundler.default_gemfile.basename}?"
+          end
+          raise Gem::Exception, message
+        end
+
         raise Gem::Exception, "no default executable for #{spec.full_name}" unless exec_name ||= spec.default_executable
+
         unless spec.name == name
           Bundler::SharedHelpers.major_deprecation \
             "Bundler is using a binstub that was created for a different gem.\n" \
