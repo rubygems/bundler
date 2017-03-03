@@ -48,22 +48,24 @@ module Bundler
 
   private
 
-    def conservative_version(version)
+    def conservative_version(spec)
+      version = spec.version
       return ">= 0" if version.nil?
       segments = version.segments
       seg_end_index = version >= Gem::Version.new("1.0") ? 1 : 2
-      "~> #{segments[0..seg_end_index].join(".")}"
+
+      prerelease_suffix = version.to_s.gsub(version.release.to_s, "") if version.prerelease?
+      "~> #{segments[0..seg_end_index].join(".")}#{prerelease_suffix}"
     end
 
     def build_gem_lines(conservative_versioning)
       @new_deps.map do |d|
         name = "'#{d.name}'"
 
-        if conservative_versioning
-          version = @definition.specs[d.name][0].version
-          requirement = ", '#{conservative_version(version)}'"
+        requirement = if conservative_versioning
+          ", '#{conservative_version(@definition.specs[d.name][0])}'"
         else
-          requirement = ", #{d.requirement.as_list.map{|k| "'#{k}'"}.join(", ")}"
+          ", #{d.requirement.as_list.map {|k| "'#{k}'" }.join(", ")}"
         end
 
         if d.groups != Array(:default)

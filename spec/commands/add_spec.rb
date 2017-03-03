@@ -8,6 +8,8 @@ RSpec.describe "bundle add" do
       build_gem "foo", "2.0"
       build_gem "baz", "1.2.3"
       build_gem "bar", "0.12.3"
+      build_gem "cat", "0.12.3.pre"
+      build_gem "dog", "1.1.3.pre"
     end
 
     install_gemfile <<-G
@@ -27,6 +29,18 @@ RSpec.describe "bundle add" do
       bundle "add 'baz'"
       expect(bundled_app("Gemfile").read).to match(/gem 'baz', '~> 1.2'/)
       expect(the_bundle).to include_gems "baz 1.2.3"
+    end
+
+    it "version requirement becomes ~> major.minor.patch.pre when resolved version is < 1.0" do
+      bundle "add 'cat'"
+      expect(bundled_app("Gemfile").read).to match(/gem 'cat', '~> 0.12.3.pre'/)
+      expect(the_bundle).to include_gems "cat 0.12.3.pre"
+    end
+
+    it "version requirement becomes ~> major.minor.pre when resolved version is > 1.0.pre" do
+      bundle "add 'dog'"
+      expect(bundled_app("Gemfile").read).to match(/gem 'dog', '~> 1.1.pre'/)
+      expect(the_bundle).to include_gems "dog 1.1.3.pre"
     end
   end
 
