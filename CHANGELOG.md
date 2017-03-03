@@ -1,3 +1,13 @@
+## 1.14.6 (2017-03-03)
+
+Bugfixes:
+
+  - avoid undefined constant `Bundler::Plugin::API::Source` exception (#5409, @segiddins)
+  - avoid incorrect warnings about needing to enable `specific_platform` (@segiddins)
+  - fail gracefully when the compact index does not send an ETag (#5463, @olleolleolle)
+  - ensure `bundle outdated --local` shows all outdated gems (#5430, @denniss)
+  - fix a case where ruby version requirements could lead to incorrect resolver conflicts (#5425, @segiddins)
+
 ## 1.14.5 (2017-02-22)
 
 Bugfixes:
