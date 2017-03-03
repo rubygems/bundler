@@ -10,9 +10,8 @@ module Bundler
     end
 
     def run
-      dependency = Bundler::Dependency.new(@gem_name, nil, @options)
-      dependency.instance_variable_set(:@requirement, Gem::Requirement.new(@options[:version].split(",").map(&:strip))) unless @options[:version].nil?
-
+      version = @options[:version].nil? ? nil : @options[:version].split(",").map(&:strip)
+      dependency = Bundler::Dependency.new(@gem_name, version, @options)
       Injector.inject([dependency], :conservative_versioning => @options[:version].nil?) # Perform conservative versioning only when version is not specified
       Installer.install(Bundler.root, Bundler.definition)
     end
