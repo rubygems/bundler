@@ -132,7 +132,8 @@ module Bundler::Molinillo
       vertices.each do |name, vertex|
         other_vertex = other.vertex_named(name)
         return false unless other_vertex
-        return false unless other_vertex.successors.map(&:name).to_set == vertex.successors.map(&:name).to_set
+        return false unless vertex.payload == other_vertex.payload
+        return false unless other_vertex.successors.to_set == vertex.successors.to_set
       end
     end
 
