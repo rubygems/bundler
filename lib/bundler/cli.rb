@@ -276,7 +276,6 @@ module Bundler
     method_option "group", :aliases => "-g", :type => :string
     method_option "source", :aliases => "-s", :type => :string
 
-    map "a" => "add"
     def add(gem_name)
       require "bundler/cli/add"
       Add.new(options.dup, gem_name).run

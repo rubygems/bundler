@@ -63,7 +63,7 @@ module Bundler
           version = @definition.specs[d.name][0].version
           requirement = ", '#{conservative_version(version)}'"
         else
-          requirement = ", '#{d.requirement}'"
+          requirement = ", #{d.requirement.as_list.map{|k| "'#{k}'"}.join(", ")}"
         end
 
         if d.groups != Array(:default)
