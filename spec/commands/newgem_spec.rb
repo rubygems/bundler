@@ -412,11 +412,11 @@ RSpec.describe "bundle gem" do
       end
 
       it "requires 'test-gem'" do
-        expect(bundled_app("test_gem/test/test_helper.rb").read).to include("require 'test_gem'")
+        expect(bundled_app("test_gem/test/test_helper.rb").read).to include(%(require "test_gem"))
       end
 
       it "requires 'minitest_helper'" do
-        expect(bundled_app("test_gem/test/test_gem_test.rb").read).to include("require 'test_helper'")
+        expect(bundled_app("test_gem/test/test_gem_test.rb").read).to include(%(require "test_helper"))
       end
 
       it "creates a default test which fails" do
@@ -440,7 +440,7 @@ RSpec.describe "bundle gem" do
           Rake::TestTask.new(:test) do |t|
             t.libs << "test"
             t.libs << "lib"
-            t.test_files = FileList['test/**/*_test.rb']
+            t.test_files = FileList["test/**/*_test.rb"]
           end
 
           task :default => :test
@@ -653,11 +653,11 @@ RSpec.describe "bundle gem" do
       end
 
       it "requires 'test/gem'" do
-        expect(bundled_app("test-gem/test/test_helper.rb").read).to match(%r{require 'test/gem'})
+        expect(bundled_app("test-gem/test/test_helper.rb").read).to match(%r{require "test/gem"})
       end
 
       it "requires 'test_helper'" do
-        expect(bundled_app("test-gem/test/test/gem_test.rb").read).to match(/require 'test_helper'/)
+        expect(bundled_app("test-gem/test/test/gem_test.rb").read).to match(/require "test_helper"/)
       end
 
       it "creates a default test which fails" do
@@ -672,7 +672,7 @@ RSpec.describe "bundle gem" do
           Rake::TestTask.new(:test) do |t|
             t.libs << "test"
             t.libs << "lib"
-            t.test_files = FileList['test/**/*_test.rb']
+            t.test_files = FileList["test/**/*_test.rb"]
           end
 
           task :default => :test
