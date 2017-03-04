@@ -1,5 +1,5 @@
 require "bundler/gem_tasks"
-<% if config[:test] == 'minitest' -%>
+<% if config[:test] == "minitest" -%>
 require "rake/testtask"
 
 Rake::TestTask.new(:test) do |t|
@@ -8,7 +8,7 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList["test/**/*_test.rb"]
 end
 
-<% elsif config[:test] == 'rspec' -%>
+<% elsif config[:test] == "rspec" -%>
 require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new(:spec)
