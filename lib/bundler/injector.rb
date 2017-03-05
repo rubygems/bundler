@@ -60,12 +60,12 @@ module Bundler
 
     def build_gem_lines(conservative_versioning)
       @new_deps.map do |d|
-        name = "'#{d.name}'"
+        name = "\"#{d.name}\""
 
         requirement = if conservative_versioning
-          ", '#{conservative_version(@definition.specs[d.name][0])}'"
+          ", \"#{conservative_version(@definition.specs[d.name][0])}\""
         else
-          ", #{d.requirement.as_list.map {|k| "'#{k}'" }.join(", ")}"
+          ", #{d.requirement.as_list.map(&:dump).join(", ")}"
         end
 
         if d.groups != Array(:default)

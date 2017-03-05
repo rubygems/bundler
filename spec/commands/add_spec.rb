@@ -21,25 +21,25 @@ RSpec.describe "bundle add" do
   describe "without version specified" do
     it "version requirement becomes ~> major.minor.patch when resolved version is < 1.0" do
       bundle "add 'bar'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'bar', '~> 0.12.3'/)
+      expect(bundled_app("Gemfile").read).to match(/gem "bar", "~> 0.12.3"/)
       expect(the_bundle).to include_gems "bar 0.12.3"
     end
 
     it "version requirement becomes ~> major.minor when resolved version is > 1.0" do
       bundle "add 'baz'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'baz', '~> 1.2'/)
+      expect(bundled_app("Gemfile").read).to match(/gem "baz", "~> 1.2"/)
       expect(the_bundle).to include_gems "baz 1.2.3"
     end
 
     it "version requirement becomes ~> major.minor.patch.pre when resolved version is < 1.0" do
       bundle "add 'cat'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'cat', '~> 0.12.3.pre'/)
+      expect(bundled_app("Gemfile").read).to match(/gem "cat", "~> 0.12.3.pre"/)
       expect(the_bundle).to include_gems "cat 0.12.3.pre"
     end
 
     it "version requirement becomes ~> major.minor.pre when resolved version is > 1.0.pre" do
       bundle "add 'dog'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'dog', '~> 1.1.pre'/)
+      expect(bundled_app("Gemfile").read).to match(/gem "dog", "~> 1.1.pre"/)
       expect(the_bundle).to include_gems "dog 1.1.3.pre"
     end
   end
@@ -47,13 +47,13 @@ RSpec.describe "bundle add" do
   describe "with --version" do
     it "adds dependency of specified version and runs install" do
       bundle "add 'foo' --version='~> 1.0'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'foo', '~> 1.0'/)
+      expect(bundled_app("Gemfile").read).to match(/gem "foo", "~> 1.0"/)
       expect(the_bundle).to include_gems "foo 1.1"
     end
 
     it "adds multiple version constraints when specified" do
       bundle "add 'foo' --version='< 3.0, > 1.1'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'foo', '< 3.0', '> 1.1'/)
+      expect(bundled_app("Gemfile").read).to match(/gem "foo", "< 3.0", "> 1.1"/)
       expect(the_bundle).to include_gems "foo 2.0"
     end
   end
@@ -61,13 +61,13 @@ RSpec.describe "bundle add" do
   describe "with --group" do
     it "adds dependency for the specified group" do
       bundle "add 'foo' --group='development'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'foo', '~> 2.0', :group => \[:development\]/)
+      expect(bundled_app("Gemfile").read).to match(/gem "foo", "~> 2.0", :group => \[:development\]/)
       expect(the_bundle).to include_gems "foo 2.0"
     end
 
     it "adds dependency to more than one group" do
       bundle "add 'foo' --group='development, test'"
-      expect(bundled_app("Gemfile").read).to match(/gem 'foo', '~> 2.0', :group => \[:development, :test\]/)
+      expect(bundled_app("Gemfile").read).to match(/gem "foo", "~> 2.0", :group => \[:development, :test\]/)
       expect(the_bundle).to include_gems "foo 2.0"
     end
   end
@@ -75,7 +75,7 @@ RSpec.describe "bundle add" do
   describe "with --source" do
     it "adds dependency with specified source" do
       bundle "add 'foo' --source='file://#{gem_repo2}'"
-      expect(bundled_app("Gemfile").read).to match(%r{gem 'foo', '~> 2.0', :source => 'file:\/\/#{gem_repo2}'})
+      expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "~> 2.0", :source => 'file:\/\/#{gem_repo2}'})
       expect(the_bundle).to include_gems "foo 2.0"
     end
   end
