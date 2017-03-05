@@ -298,7 +298,7 @@ RSpec.shared_examples "bundle install --standalone" do
 
     it "creates stubs with the correct load path" do
       extension_line = File.read(bundled_app("bin/rails")).each_line.find {|line| line.include? "$:.unshift" }.strip
-      expect(extension_line).to eq "$:.unshift File.expand_path '../../bundle', path.realpath"
+      expect(extension_line).to eq %($:.unshift File.expand_path "../../bundle", path.realpath)
     end
   end
 end
