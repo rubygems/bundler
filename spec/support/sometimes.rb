@@ -20,6 +20,8 @@ module Sometimes
   end
 end
 
+RSpec::Support.require_rspec_core "formatters/console_codes"
+
 RSpec.configure do |config|
   config.include Sometimes
   config.alias_example_to :sometimes, :sometimes => true
