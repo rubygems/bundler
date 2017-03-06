@@ -157,7 +157,7 @@ RSpec.describe "bundle binstubs <gem>" do
     it "includes the standalone path" do
       bundle "binstubs rack --standalone"
       standalone_line = File.read(bundled_app("bin/rackup")).each_line.find {|line| line.include? "$:.unshift" }.strip
-      expect(standalone_line).to eq "$:.unshift File.expand_path '../../bundle', path.realpath"
+      expect(standalone_line).to eq %($:.unshift File.expand_path "../../bundle", path.realpath)
     end
   end
 
