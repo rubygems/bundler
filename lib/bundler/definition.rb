@@ -409,8 +409,10 @@ module Bundler
              "updated #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} to version control."
 
       unless explicit_flag
+
+        suggested_command = Bundler.settings.locations("frozen")[:global] == "1" ? "bundle config --delete frozen" : "bundle install --no-deployment"
         msg << "\n\nIf this is a development machine, remove the #{Bundler.default_gemfile} " \
-               "freeze \nby running `bundle install --no-deployment`."
+               "freeze \nby running `#{suggested_command}`."
       end
 
       added =   []

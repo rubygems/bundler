@@ -159,7 +159,15 @@ RSpec.describe "bundle update" do
       bundle "update"
 
       expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
+      expect(out).to match(/freeze \nby running `bundle install --no-deployment`./m)
       expect(exitstatus).not_to eq(0) if exitstatus
+    end
+
+    it "should suggest different command when frozen is set globally" do
+      bundler "config --global frozen 1"
+      bundle "update"
+      expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
+      expect(out).to match(/freeze \nby running `bundle config --delete frozen`./m)
     end
   end
 
