@@ -147,7 +147,7 @@ RSpec.describe "bundle gem" do
 
     context "git is not installed in the system" do
       before do
-        `rm "#{ENV["GIT_CONFIG"]}"` if File.exist?(ENV["GIT_CONFIG"])
+        FileUtils.rm ENV["GIT_CONFIG"].to_s if File.exist?(ENV["GIT_CONFIG"])
         reset!
         in_app_root
         bundle "gem #{gem_name}"
