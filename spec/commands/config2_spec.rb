@@ -32,6 +32,33 @@ RSpec.describe ".bundle/config2" do
     end
   end
 
+  describe "global" do
+    before(:each) { bundle :install }
+
+    it "is the default" do
+      bundle "config2 set foo global"
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("global")
+    end
+
+    it "can also be set explicitly" do
+      bundle! "config2 --global set foo global"
+      run! "puts Bundler.settings[:foo]"
+      expect(out).to eq("global")
+    end
+
+    it "has lower precedence than local" do
+      bundle "config2 --local set foo local"
+
+      bundle "config2 --global set foo global"
+      expect(out).to match(/Your application has set foo to "local"/)
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("local")
+    end
+
+  end
+
   context "no option" do
     describe "set"
     describe "unset"
@@ -49,5 +76,5 @@ RSpec.describe ".bundle/config2" do
     describe "unset"
     describe "no command"
   end
-  
+
 end

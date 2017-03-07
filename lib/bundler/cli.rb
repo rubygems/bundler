@@ -381,6 +381,7 @@ module Bundler
 
     desc "config2 COMMAND NAME [VALUE]", "Retrieve or set a configuration value"
     method_option "global", :type => :boolean, :banner => "Modifies global configuration."
+    method_option "local", :type => :boolean, :banner => "Modifies local configuration."
 
     def config2(*args)
       require "bundler/cli/config2"
