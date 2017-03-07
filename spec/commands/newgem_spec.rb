@@ -144,6 +144,23 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test_gem/README.md").read).not_to include("github.com/bundleuser")
       end
     end
+
+    context "git is not installed in the system" do
+      before do
+        FileUtils.rm ENV["GIT_CONFIG"].to_s if File.exist?(ENV["GIT_CONFIG"])
+        reset!
+        in_app_root
+        bundle "gem #{gem_name}"
+        remove_push_guard(gem_name)
+      end
+
+      it "contribute URL set to [USERNAME]" do
+        expect(bundled_app("test_gem/README.md").read).to include("[USERNAME]")
+        expect(bundled_app("test_gem/README.md").read).not_to include("github.com/bundleuser")
+      end
+
+      it_should_behave_like "git config is absent"
+    end
   end
 
   it "generates a valid gemspec" do
