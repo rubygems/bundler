@@ -442,6 +442,12 @@ EOF
     end
 
     def reset!
+      reset_paths!
+      Plugin.reset!
+      reset_rubygems!
+    end
+
+    def reset_paths!
       @root = nil
       @settings = nil
       @definition = nil
@@ -451,9 +457,9 @@ EOF
       @bundle_path = nil
       @bin_path = nil
       @user_home = nil
+    end
 
-      Plugin.reset!
-
+    def reset_rubygems!
       return unless defined?(@rubygems) && @rubygems
       rubygems.undo_replacements
       rubygems.reset
