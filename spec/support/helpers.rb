@@ -2,8 +2,8 @@
 module Spec
   module Helpers
     def reset!
-      Dir["#{tmp}/{gems/*,*}"].each do |dir|
-        next if %w(base remote1 gems rubygems).include?(File.basename(dir))
+      Dir.glob("#{tmp}/{gems/*,*}", File::FNM_DOTMATCH).each do |dir|
+        next if %w(base remote1 gems rubygems . ..).include?(File.basename(dir))
         if ENV["BUNDLER_SUDO_TESTS"]
           `sudo rm -rf "#{dir}"`
         else
