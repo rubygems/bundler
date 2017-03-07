@@ -23,7 +23,6 @@ module Bundler
 
     def initialize(*args)
       super
-      Bundler.reset!
 
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
       ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile) if custom_gemfile && !custom_gemfile.empty?
