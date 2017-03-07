@@ -379,6 +379,14 @@ module Bundler
       Config.new(options, args, self).run
     end
 
+    desc "config2 COMMAND NAME [VALUE]", "Retrieve or set a configuration value"
+    method_option "global", :type => :boolean, :banner => "Modifies global configuration."
+
+    def config2(*args)
+      require "bundler/cli/config2"
+      Config2.new(options, args, self).run
+    end
+
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
       require "bundler/cli/open"
