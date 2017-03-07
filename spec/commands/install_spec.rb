@@ -534,4 +534,25 @@ RSpec.describe "bundle install with gem sources" do
                         "setting them for authentication.")
     end
   end
+
+  describe "when sharing gemfile with path sources across different directories" do
+    it do
+      build_lib("foo", :path => "foo")
+      create_file("app/Gemfile")
+      create_file("app/.bundle/config", <<-YAML)
+        ---
+        BUNDLE_GEMFILE: "../Gemfile"
+      YAML
+      gemfile <<-RUBY
+        gem 'foo', :path => 'foo'
+      RUBY
+
+      bundle "install"
+      expect(out).to include("Bundle complete!")
+      in_app_root_custom "app" do
+        bundle "install"
+        expect(out).to include("Bundle complete!")
+      end
+    end
+  end
 end
