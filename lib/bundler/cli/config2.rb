@@ -8,8 +8,12 @@ module Bundler
     # bundle config unset name
     def initialize(options, args, thor)
       @options = options
-      @args = args
+      @args = args.select { |arg| !arg.start_with?("--") }
       @thor = thor
+    end
+
+    def scope_specified?
+      !options[:global].nil? || !options[:local].nil?
     end
 
     def run
@@ -20,10 +24,6 @@ module Bundler
         return
       end
 
-      while arg0.start_with?("--")
-        arg0 = args.shift
-      end
-
       if arg0 == "set" || arg0 == "unset"
         @command = arg0.to_sym
         @name = args.shift
@@ -32,15 +32,15 @@ module Bundler
         @name = arg0
       end
 
-      @scope = options["global"] ? :global : :local
+      @scope = options[:global] ? "global" : "local"
 
       return set if command == :set
       return unset if command == :unset
 
       # Invariant: name must be set
       raise "Name is not set" if name.nil?
-
-      confirm(name)
+      return confirm(name) if !scope_specified?
+      Bundler.ui.info(Bundler.settings.send("get_#{@scope}", name))
     end
 
     def set
@@ -49,12 +49,13 @@ module Bundler
     end
 
     def unset
-      scope == :global ? Bundler.settings.set_global(name, nil) : Bundler.settings.set_local(name, nil)
+      scope == "global" ? Bundler.settings.set_global(name, nil) : Bundler.settings.set_local(name, nil)
     end
 
     def message
       locations = Bundler.settings.locations(name)
-      if scope == :global
+
+      if scope == "global"
         if locations[:local]
           "Your application has set #{name} to #{locations[:local].inspect}. " \
             "This will override the global value you are currently setting"

@@ -57,24 +57,39 @@ RSpec.describe ".bundle/config2" do
       expect(out).to eq("local")
     end
 
-  end
+    it "can be unset" do
+      bundle "config2 unset --global foo global"
+      bundle "config2 unset foo"
 
-  context "no option" do
-    describe "set"
-    describe "unset"
-    describe "no command"
-  end
+      run "puts Bundler.settings[:foo] == nil"
+      expect(out).to eq("true")
+    end
 
-  context "--global" do
-    describe "set"
-    describe "unset"
-    describe "no command"
-  end
+    it "warns when overriding" do
+      bundle "config2 set --global foo previous"
+      bundle "config2 set --global foo global"
+      expect(out).to match(/You are replacing the current global value of foo/)
 
-  context "--local" do
-    describe "set"
-    describe "unset"
-    describe "no command"
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("global")
+    end
+
+    it "does not warn when using the same value twice" do
+      bundle "config2 set --global foo value"
+      bundle "config2 set --global foo value"
+      expect(out).not_to match(/You are replacing the current global value of foo/)
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("value")
+    end
+
+
+    it "expands the path at time of setting" do
+      bundle "config --global local.foo .."
+      run "puts Bundler.settings['local.foo']"
+      expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
+    end
+
   end
 
 end
