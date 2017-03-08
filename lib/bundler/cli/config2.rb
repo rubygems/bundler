@@ -28,6 +28,10 @@ module Bundler
         @command = arg0.to_sym
         @name = args.shift
         @value = args.shift
+
+        pathname = Pathname(@value)
+        @value = pathname.expand_path.to_s if @name.start_with?("local.") && pathname.directory?
+
       else
         @name = arg0
       end
@@ -62,11 +66,11 @@ module Bundler
         elsif locations[:env]
           "You have a bundler environment variable for #{name} set to " \
             "#{locations[:env].inspect}. This will take precedence over the global value you are setting"
-        elsif locations[:global] && locations[:global] != args.join(" ")
+        elsif locations[:global] && locations[:global] != @value
           "You are replacing the current global value of #{name}, which is currently " \
             "#{locations[:global].inspect}"
         end
-      elsif scope == "local" && locations[:local] != args.join(" ")
+      elsif scope == "local" && locations[:local] != @value
         "You are replacing the current local value of #{name}, which is currently " \
           "#{locations[:local].inspect}"
       end
