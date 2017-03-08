@@ -538,7 +538,6 @@ RSpec.describe "bundle install with gem sources" do
   describe "when sharing gemfile with path sources across different directories" do
     it do
       build_lib("foo", :path => "foo")
-      create_file("app/Gemfile")
       create_file("app/.bundle/config", <<-YAML)
         ---
         BUNDLE_GEMFILE: "../Gemfile"
@@ -552,6 +551,7 @@ RSpec.describe "bundle install with gem sources" do
       in_app_root_custom "app" do
         bundle "install"
         expect(out).to include("Bundle complete!")
+        expect(the_bundle).to include_gem("foo 1.0")
       end
     end
   end
