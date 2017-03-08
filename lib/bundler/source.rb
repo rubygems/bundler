@@ -30,7 +30,7 @@ module Bundler
     def earlier_version?(spec_version, locked_spec_version)
       begin
         Gem::Version.new(spec_version) < Gem::Version.new(locked_spec_version)
-      rescue
+      rescue ArgumentError
         false
       end
     end
