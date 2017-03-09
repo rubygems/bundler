@@ -32,14 +32,65 @@ RSpec.describe ".bundle/config2" do
     end
   end
 
-  describe "global" do
+  describe "local" do
     before(:each) { bundle :install }
 
     it "is the default" do
-      bundle "config2 set foo global"
+      bundle "config2 set foo local"
       run "puts Bundler.settings[:foo]"
-      expect(out).to eq("global")
+      expect(out).to eq("local")
     end
+
+    it "can also be set explicitly" do
+      bundle "config2 --local set foo local"
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("local")
+    end
+
+    it "has higher precedence than env" do
+      begin
+        ENV["BUNDLE_FOO"] = "env"
+
+        run "puts Bundler.settings[:foo]"
+        expect(out).to eq("env")
+
+        bundle "config2 set --local foo local"
+        run "puts Bundler.settings[:foo]"
+
+        expect(out).to eq("local")
+      ensure
+        ENV.delete("BUNDLE_FOO")
+      end
+    end
+
+    it "can be deleted" do
+      bundle "config2 set --local foo local"
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("local")
+
+      bundle "config2 unset foo"
+      run "puts Bundler.settings[:foo] == nil"
+      expect(out).to eq("true")
+    end
+
+    it "warns when overriding" do
+      bundle "config2 set --local foo previous"
+      bundle "config2 set --local foo local"
+      expect(out).to match(/You are replacing the current local value of foo/)
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("local")
+    end
+
+    it "expands the path at time of setting" do
+      bundle "config2 set --local local.foo .."
+      run "puts Bundler.settings['local.foo']"
+      expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
+    end
+  end
+
+  describe "global" do
+    before(:each) { bundle :install }
 
     it "can also be set explicitly" do
       bundle! "config2 --global set foo global"
@@ -84,52 +135,7 @@ RSpec.describe ".bundle/config2" do
     end
 
     it "expands the path at time of setting" do
-      bundle "config --global local.foo .."
-      run "puts Bundler.settings['local.foo']"
-      expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
-    end
-  end
-
-  describe "local" do
-    before(:each) { bundle :install }
-
-    it "can also be set explicitly" do
-      bundle "config2 --local set foo local"
-      run "puts Bundler.settings[:foo]"
-      expect(out).to eq("local")
-    end
-
-    it "has higher precedence than env" do
-      begin
-        ENV["BUNDLE_FOO"] = "env"
-        bundle "config2 set --local foo local"
-
-        run "puts Bundler.settings[:foo]"
-        expect(out).to eq("local")
-      ensure
-        ENV.delete("BUNDLE_FOO")
-      end
-    end
-
-    it "can be deleted" do
-      bundle "config set --local foo local"
-      bundle "config unset foo"
-
-      run "puts Bundler.settings[:foo] == nil"
-      expect(out).to eq("true")
-    end
-
-    it "warns when overriding" do
-      bundle "config2 set --local foo previous"
-      bundle "config2 set --local foo local"
-      expect(out).to match(/You are replacing the current local value of foo/)
-
-      run "puts Bundler.settings[:foo]"
-      expect(out).to eq("local")
-    end
-
-    it "expands the path at time of setting" do
-      bundle "config2 set --local local.foo .."
+      bundle "config2 --global set local.foo .."
       run "puts Bundler.settings['local.foo']"
       expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
     end

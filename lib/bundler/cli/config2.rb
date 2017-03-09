@@ -4,16 +4,10 @@ module Bundler
     attr_reader :options, :scope, :thor, :command, :name, :value
     attr_accessor :args
 
-    # bundle config set name value
-    # bundle config unset name
     def initialize(options, args, thor)
       @options = options
       @args = args.reject { |arg| is_option?(arg) }
       @thor = thor
-    end
-
-    def scope_specified?
-      !options[:global].nil? || !options[:local].nil?
     end
 
     def run
@@ -29,9 +23,10 @@ module Bundler
         @name = args.shift
         @value = args.shift
 
-        pathname = Pathname(@value)
-        @value = pathname.expand_path.to_s if @name.start_with?("local.") && pathname.directory?
-
+        if arg0 == "set" #Try to expand path
+          pathname = Pathname(@value)
+          @value = pathname.expand_path.to_s if @name.start_with?("local.") && pathname.directory?
+        end
       else
         @name = arg0
       end
@@ -58,6 +53,10 @@ module Bundler
 
     def is_option?(arg)
       arg == "--global" || arg == "--local"
+    end
+
+    def scope_specified?
+      !options[:global].nil? || !options[:local].nil?
     end
 
     def message
