@@ -8,7 +8,7 @@ module Bundler
     # bundle config unset name
     def initialize(options, args, thor)
       @options = options
-      @args = args.select { |arg| !arg.start_with?("--") }
+      @args = args.reject { |arg| is_option?(arg) }
       @thor = thor
     end
 
@@ -54,6 +54,10 @@ module Bundler
 
     def unset
       scope == "global" ? Bundler.settings.set_global(name, nil) : Bundler.settings.set_local(name, nil)
+    end
+
+    def is_option?(arg)
+      arg == "--global" || arg == "--local"
     end
 
     def message

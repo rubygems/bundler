@@ -202,7 +202,7 @@ end
 
     it "doesn't return quotes around values", :ruby => "1.9" do
       bundle "config2 set foo '1'"
-      run "puts Bundler.settings.send(:global_config_file).read"
+      run "puts Bundler.settings.send(:local_config_file).read"
       expect(out).to include('"1"')
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("1")
@@ -232,6 +232,49 @@ end
 
       run "puts Bundler.settings[:foo]"
       expect(out).to eq(long_string)
+    end
+  end
+
+  describe "very long lines" do
+    before(:each) { bundle :install }
+
+    let(:long_string) do
+      "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib " \
+      "--with-xslt-dir=/usr/pkg"
+    end
+
+    let(:long_string_without_special_characters) do
+      "here is quite a long string that will wrap to a second line but will not be " \
+      "surrounded by quotes"
+    end
+
+    it "doesn't wrap values" do
+      bundle "config2 set foo '#{long_string}'"
+      run "puts Bundler.settings[:foo]"
+      expect(out).to match(long_string)
+    end
+
+    it "can read wrapped unquoted values" do
+      bundle "config2 set foo '#{long_string_without_special_characters}'"
+      run "puts Bundler.settings[:foo]"
+      expect(out).to match(long_string_without_special_characters)
+    end
+  end
+
+  describe "when only the non-default Gemfile exists" do
+    it "persists the gemfile location to .bundle/config" do
+      File.open(bundled_app("NotGemfile"), "w") do |f|
+        f.write <<-G
+          source "file://#{gem_repo1}"
+          gem 'rack'
+        G
+      end
+
+      bundle "config2 set --local gemfile #{bundled_app("NotGemfile")}"
+      expect(File.exist?(".bundle/config")).to eq(true)
+
+      bundle "config2"
+      expect(out).to include("NotGemfile")
     end
   end
 end
