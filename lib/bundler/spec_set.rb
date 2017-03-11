@@ -118,6 +118,13 @@ module Bundler
       @specs.detect {|spec| spec.name == name && spec.match_platform(platform) }
     end
 
+    def what_required(spec)
+      unless req = find {|s| s.dependencies.any? {|d| d.type == :runtime && d.name == spec.name } }
+        return [spec]
+      end
+      what_required(req) << spec
+    end
+
   private
 
     def sorted

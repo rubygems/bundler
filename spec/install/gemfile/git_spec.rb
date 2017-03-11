@@ -1085,7 +1085,12 @@ RSpec.describe "bundle install with git sources" do
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      expect(out).to include("An error occurred while installing foo (1.0)")
+      expect(out).to end_with(<<-M.strip)
+An error occurred while installing foo (1.0), and Bundler cannot continue.
+
+In Gemfile:
+  foo
+      M
       expect(out).not_to include("gem install foo")
     end
 
