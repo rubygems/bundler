@@ -103,6 +103,13 @@ RSpec.describe "bundle gem" do
       gem_skeleton_assertions(gem_name)
       expect(bundled_app("test-gem/CODE_OF_CONDUCT.md")).to exist
     end
+
+    describe "README additions" do
+      it "generates the README with a section for the Code of Conduct" do
+        expect(bundled_app("test-gem/README.md").read).to include("## Code of Conduct")
+        expect(bundled_app("test-gem/README.md").read).to include("https://github.com/bundleuser/#{gem_name}/blob/master/CODE_OF_CONDUCT.md")
+      end
+    end
   end
 
   shared_examples_for "--no-coc flag" do
@@ -112,6 +119,13 @@ RSpec.describe "bundle gem" do
     it "generates a gem skeleton without Code of Conduct" do
       gem_skeleton_assertions(gem_name)
       expect(bundled_app("test-gem/CODE_OF_CONDUCT.md")).to_not exist
+    end
+
+    describe "README additions" do
+      it "generates the README without a section for the Code of Conduct" do
+        expect(bundled_app("test-gem/README.md").read).not_to include("## Code of Conduct")
+        expect(bundled_app("test-gem/README.md").read).not_to include("https://github.com/bundleuser/#{gem_name}/blob/master/CODE_OF_CONDUCT.md")
+      end
     end
   end
 
