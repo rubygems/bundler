@@ -227,7 +227,6 @@ RSpec.describe "bundle exec" do
       bundle "exec rake"
       expect(err).to include "can't find executable rake for gem rake. rake is not currently included in the bundle, perhaps you meant to add it to your Gemfile?"
     end
-    expect(out).to include "bundler: failed to load command: rake"
   end
 
   describe "with help flags" do
