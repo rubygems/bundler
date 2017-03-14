@@ -1258,6 +1258,35 @@ RSpec.describe "the lockfile format" do
     L
   end
 
+  it "does not deadlock when the lockfile is missing dependencies entirely" do
+    lockfile <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          thin (1.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        thin
+    L
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "thin"
+    G
+
+    expect(out).to end_with(<<-S.strip)
+Your lockfile was created by an old Bundler that left some things out.
+You can fix this by adding the missing gems to your Gemfile, running bundle install, and then removing the gems from your Gemfile.
+The missing gems are:
+* rack depended upon by thin
+
+Bundler is unable to continue installing without rack in the lockfile.
+    S
+  end
+
   describe "a line ending" do
     def set_lockfile_mtime_to_known_value
       time = Time.local(2000, 1, 1, 0, 0, 0)
