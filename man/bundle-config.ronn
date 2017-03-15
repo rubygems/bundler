@@ -219,6 +219,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
    The location where RubyGems installs binstubs. Defaults to `Gem.bindir`.
 * `user_agent` (`BUNDLE_USER_AGENT`):
    The custom user agent fragment Bundler includes in API requests.
+* `gem.push_key` (`BUNDLE_GEM__PUSH_KEY`):
+   Sets the `--key` paramter for `gem push` when using the `rake release`
+   command with a private gemstash server.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
@@ -300,10 +303,3 @@ This is especially useful for private repositories on hosts such as Github,
 where you can use personal OAuth tokens:
 
     export BUNDLE_GITHUB__COM=abcd0123generatedtoken:x-oauth-basic
-
-## RELEASING A GEM TO A PRIVATE SERVER
-
-In order to use the `rake release` command with a private gemstash server,
-you can configure the key for the `--key` parameter via:
-
-    bundle config gem.push_key GEMSTASH_KEY
