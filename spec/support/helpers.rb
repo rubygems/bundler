@@ -2,8 +2,8 @@
 module Spec
   module Helpers
     def reset!
-      Dir["#{tmp}/{gems/*,*}"].each do |dir|
-        next if %w(base remote1 gems rubygems).include?(File.basename(dir))
+      Dir.glob("#{tmp}/{gems/*,*}", File::FNM_DOTMATCH).each do |dir|
+        next if %w(base remote1 gems rubygems . ..).include?(File.basename(dir))
         if ENV["BUNDLER_SUDO_TESTS"]
           `sudo rm -rf "#{dir}"`
         else
@@ -245,12 +245,14 @@ module Spec
     end
 
     def install_gems(*gems)
+      options = gems.last.is_a?(Hash) ? gems.pop : {}
+      gem_repo = options.fetch(:gem_repo) { gem_repo1 }
       gems.each do |g|
         path = if g == :bundler
           Dir.chdir(root) { gem_command! :build, "#{root}/bundler.gemspec" }
           bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
         else
-          "#{gem_repo1}/gems/#{g}.gem"
+          "#{gem_repo}/gems/#{g}.gem"
         end
 
         raise "OMG `#{path}` does not exist!" unless File.exist?(path)
