@@ -23,23 +23,26 @@ RSpec.describe "bundle pristine" do
   context "when sourced from Rubygems" do
     it "reverts using cached .gem file" do
       spec = Bundler.definition.specs["weakling"].first
-      changes_txt = "#{spec.full_gem_path}/lib/changes.txt"
+      changes_txt = Pathname.new(spec.full_gem_path).join("lib/changes.txt")
 
       FileUtils.touch(changes_txt)
-      expect(File.exist?(changes_txt)).to be_truthy
+      expect(changes_txt).to be_file
 
       bundle "pristine"
-      expect(File.exist?(changes_txt)).to be_falsey
+      expect(changes_txt).to_not be_file
     end
   end
 
   context "when sourced from git repo" do
     it "reverts by resetting to current revision`" do
       spec = Bundler.definition.specs["foo"].first
-      changed_file = "#{spec.full_gem_path}/lib/foo.rb"
+      changed_file = Pathname.new(spec.full_gem_path).join("lib/foo.rb")
       diff = "#Pristine spec changes"
 
-      `echo '#Pristine spec changes' >> #{changed_file}`
+      File.open(changed_file, 'a') do |f|
+        f.puts '#Pristine spec changes'
+      end
+
       expect(File.read(changed_file)).to include(diff)
 
       bundle "pristine"
@@ -50,12 +53,12 @@ RSpec.describe "bundle pristine" do
   context "when sourced from path" do
     it "displays warning and ignores changes sourced from local path" do
       spec = Bundler.definition.specs["bar"].first
-      changes_txt = "#{spec.full_gem_path}/lib/changes.txt"
+      changes_txt = Pathname.new(spec.full_gem_path).join("lib/changes.txt")
       FileUtils.touch(changes_txt)
-      expect(File.exist?(changes_txt)).to be_truthy
+      expect(changes_txt).to be_file
       bundle "pristine"
       expect(out).to include("Cannot pristine #{spec.name} (#{spec.version}#{spec.git_version}). Gem is sourced from local path.")
-      expect(File.exist?(changes_txt)).to be_truthy
+      expect(changes_txt).to be_file
     end
   end
 end
