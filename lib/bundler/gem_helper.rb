@@ -183,7 +183,7 @@ module Bundler
     end
 
     def gem_key
-      Bundler.settings['gem.push_key'].to_s.downcase if Bundler.settings['gem.push_key']
+      Bundler.settings["gem.push_key"].to_s.downcase if Bundler.settings["gem.push_key"]
     end
 
     def gem_push?

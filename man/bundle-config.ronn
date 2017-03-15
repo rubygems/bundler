@@ -300,3 +300,10 @@ This is especially useful for private repositories on hosts such as Github,
 where you can use personal OAuth tokens:
 
     export BUNDLE_GITHUB__COM=abcd0123generatedtoken:x-oauth-basic
+
+## RELEASING A GEM TO A PRIVATE SERVER
+
+In order to use the `rake release` command with a private gemstash server,
+you can configure the key for the `--key` parameter via:
+
+    bundle config gem.push_key GEMSTASH_KEY
