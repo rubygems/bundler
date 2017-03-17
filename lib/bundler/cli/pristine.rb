@@ -7,6 +7,10 @@ module Bundler
       ::Bundler.load.specs.each do |spec|
         gem_name = "#{spec.name} (#{spec.version}#{spec.git_version})"
 
+        if spec.platform != Gem::Platform::RUBY
+          gem_name += " (#{spec.platform.nil? ? "No platform" : spec.platform})"
+        end
+
         case spec.source
           when Source::Rubygems
             cached_gem = spec.cache_file
