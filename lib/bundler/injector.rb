@@ -60,7 +60,7 @@ module Bundler
 
     def build_gem_lines(conservative_versioning)
       @new_deps.map do |d|
-        name = "\"#{d.name}\""
+        name = "#{d.name.dump}"
 
         requirement = if conservative_versioning
           ", \"#{conservative_version(@definition.specs[d.name][0])}\""
