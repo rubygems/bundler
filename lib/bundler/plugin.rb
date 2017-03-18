@@ -38,7 +38,7 @@ module Bundler
       save_plugins names, specs
     rescue PluginError => e
       if specs
-        specs_to_delete = specs.select {|k, _v| names.include?(k) && !index.commands.values.include?(k) }
+        specs_to_delete = Hash[specs.select {|k, _v| names.include?(k) && !index.commands.values.include?(k) }]
         specs_to_delete.values.each {|spec| Bundler.rm_rf(spec.full_gem_path) }
       end
 
