@@ -160,6 +160,33 @@ RSpec.describe "bundle gem" do
     end
   end
 
+  it "creates a new git repository" do
+    in_app_root
+    bundle "gem test_gem"
+    expect(bundled_app("test_gem/.git")).to exist
+  end
+
+  context "when git is not avaiable" do
+    let(:gem_name) { "test_gem" }
+
+    before do
+      allow(Bundler).to receive(:git_present?).and_return(false)
+      bundle "gem #{gem_name}"
+    end
+
+    it "creates the gem without the need for git" do
+      expect(bundled_app("#{gem_name}/README.md")).to exist
+    end
+
+    it "doesn't create a git repo" do
+      expect(bundled_app("#{gem_name}/.git")).to_not exist
+    end
+
+    it "doesn't create a .gitignore file" do
+      expect(bundled_app("#{gem_name}/.gitignore")).to_not exist
+    end
+  end
+
   it "generates a valid gemspec" do
     system_gems ["rake-10.0.2"]
 
