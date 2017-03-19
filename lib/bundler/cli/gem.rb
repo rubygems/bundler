@@ -137,10 +137,12 @@ module Bundler
         path.chmod(executable)
       end
 
-      Bundler.ui.info "Initializing git repo in #{target}"
-      Dir.chdir(target) do
-        `git init`
-        `git add .`
+      if Bundler.git_present?
+        Bundler.ui.info "Initializing git repo in #{target}"
+        Dir.chdir(target) do
+          `git init`
+          `git add .`
+        end
       end
 
       # Open gemspec in editor
