@@ -54,7 +54,6 @@ module Bundler
 
       templates = {
         "Gemfile.tt" => "Gemfile",
-        "gitignore.tt" => ".gitignore",
         "lib/newgem.rb.tt" => "lib/#{namespaced_path}.rb",
         "lib/newgem/version.rb.tt" => "lib/#{namespaced_path}/version.rb",
         "newgem.gemspec.tt" => "#{name}.gemspec",
@@ -68,6 +67,8 @@ module Bundler
         bin/console
         bin/setup
       )
+
+      templates.merge!("gitignore.tt" => ".gitignore") if Bundler.git_present?
 
       if test_framework = ask_and_set_test_framework
         config[:test] = test_framework
