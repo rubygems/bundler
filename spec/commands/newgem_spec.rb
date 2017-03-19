@@ -169,9 +169,13 @@ RSpec.describe "bundle gem" do
   context "when git is not avaiable" do
     let(:gem_name) { "test_gem" }
 
+    # This spec cannot have `git` avaiable in the test env
     before do
-      allow(Bundler).to receive(:git_present?).and_return(false)
-      bundle "gem #{gem_name}"
+      bundle_bin = File.expand_path("../../../exe/bundle", __FILE__)
+      load_paths = [lib, spec]
+      load_path_str = "-I#{load_paths.join(File::PATH_SEPARATOR)}"
+
+      sys_exec "PATH= #{Gem.ruby} #{load_path_str} #{bundle_bin} gem #{gem_name}"
     end
 
     it "creates the gem without the need for git" do
