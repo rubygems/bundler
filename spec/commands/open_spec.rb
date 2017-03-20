@@ -90,4 +90,9 @@ RSpec.describe "bundle open" do
     bundle "open", :env => { "EDITOR" => "sh -c 'env'", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
     expect(out).not_to include("BUNDLE_GEMFILE=")
   end
+
+  it "opens default gems", :if => (RUBY_VERSION >= "2.0") do
+    bundle "open rdoc", :env => { "EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
+    expect(out).to include("editor #{default_gem_path("rdoc")}")
+  end
 end
