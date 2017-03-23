@@ -42,13 +42,17 @@ module Bundler
   private
 
     def version_color(spec_version, locked_spec_version)
-      earlier_version?(spec_version, locked_spec_version) ? :yellow : :green
+      if Gem::Version.correct?(spec_version) && Gem::Version.correct?(locked_spec_version)
+        # display yellow if there appears to be a regression
+        earlier_version?(spec_version, locked_spec_version) ? :yellow : :green
+      else
+        # default to green if the versions cannot be directly compared
+        :green
+      end
     end
 
     def earlier_version?(spec_version, locked_spec_version)
       Gem::Version.new(spec_version) < Gem::Version.new(locked_spec_version)
-    rescue ArgumentError
-      false
     end
   end
 end
