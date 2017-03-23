@@ -6,7 +6,7 @@ module Bundler
 
     def initialize(options, args, thor)
       @options = options
-      @args = args.reject { |arg| is_option?(arg) }
+      @args = args.reject {|arg| option?(arg) }
       @thor = thor
     end
 
@@ -23,7 +23,7 @@ module Bundler
         @name = args.shift
         @value = args.shift
 
-        if arg0 == "set" #Try to expand path
+        if arg0 == "set" # Try to expand path
           pathname = Pathname(@value)
           @value = pathname.expand_path.to_s if @name.start_with?("local.") && pathname.directory?
         end
@@ -38,7 +38,7 @@ module Bundler
 
       # Invariant: name must be set
       raise "Name is not set" if name.nil?
-      return confirm(name) if !scope_specified?
+      return confirm(name) unless scope_specified?
       Bundler.ui.info(Bundler.settings.send("get_#{@scope}", name))
     end
 
@@ -51,7 +51,7 @@ module Bundler
       scope == "global" ? Bundler.settings.set_global(name, nil) : Bundler.settings.set_local(name, nil)
     end
 
-    def is_option?(arg)
+    def option?(arg)
       arg == "--global" || arg == "--local"
     end
 
@@ -82,7 +82,7 @@ module Bundler
     def confirm_all
       Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
       Bundler.settings.all.each do |setting|
-        Bundler.ui.confirm "#{setting}"
+        Bundler.ui.confirm setting.to_s
         show_pretty_values_for(setting)
         Bundler.ui.confirm ""
       end
