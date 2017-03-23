@@ -158,22 +158,36 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test_gem/README.md").read).not_to include("github.com/bundleuser")
       end
     end
+  end
 
-    context "git is not installed in the system" do
-      before do
-        FileUtils.rm ENV["GIT_CONFIG"].to_s if File.exist?(ENV["GIT_CONFIG"])
-        reset!
-        in_app_root
-        bundle "gem #{gem_name}"
-        remove_push_guard(gem_name)
-      end
+  it "creates a new git repository" do
+    in_app_root
+    bundle "gem test_gem"
+    expect(bundled_app("test_gem/.git")).to exist
+  end
 
-      it "contribute URL set to [USERNAME]" do
-        expect(bundled_app("test_gem/README.md").read).to include("[USERNAME]")
-        expect(bundled_app("test_gem/README.md").read).not_to include("github.com/bundleuser")
-      end
+  context "when git is not avaiable" do
+    let(:gem_name) { "test_gem" }
 
-      it_should_behave_like "git config is absent"
+    # This spec cannot have `git` avaiable in the test env
+    before do
+      bundle_bin = File.expand_path("../../../exe/bundle", __FILE__)
+      load_paths = [lib, spec]
+      load_path_str = "-I#{load_paths.join(File::PATH_SEPARATOR)}"
+
+      sys_exec "PATH=\"\" #{Gem.ruby} #{load_path_str} #{bundle_bin} gem #{gem_name}"
+    end
+
+    it "creates the gem without the need for git" do
+      expect(bundled_app("#{gem_name}/README.md")).to exist
+    end
+
+    it "doesn't create a git repo" do
+      expect(bundled_app("#{gem_name}/.git")).to_not exist
+    end
+
+    it "doesn't create a .gitignore file" do
+      expect(bundled_app("#{gem_name}/.gitignore")).to_not exist
     end
   end
 
