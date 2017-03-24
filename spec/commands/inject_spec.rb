@@ -68,6 +68,13 @@ Usage: "bundle inject GEM VERSION"
       str = "gem 'rack-obama', '> 0', :group => [:development]"
       expect(gemfile).to include str
     end
+
+    it "add gem with multiple group in gemfile" do
+      bundle "inject 'rack-obama' '>0' --group=development,test"
+      gemfile = bundled_app("Gemfile").read
+      str = "gem 'rack-obama', '> 0', :group => [:development, :test]"
+      expect(gemfile).to include str
+    end
   end
 
   context "when frozen" do
