@@ -53,6 +53,28 @@ RSpec.describe "Resolving" do
     end.to raise_error(Bundler::VersionConflict)
   end
 
+  it "raises an exception with the minimal set of conflicting dependencies" do
+    @index = build_index do
+      %w(0.9 1.0 2.0).each {|v| gem("a", v) }
+      gem("b", "1.0") { dep "a", ">= 2" }
+      gem("c", "1.0") { dep "a", "< 1" }
+    end
+    dep "a"
+    dep "b"
+    dep "c"
+    expect do
+      resolve
+    end.to raise_error(Bundler::VersionConflict, <<-E.strip)
+Bundler could not find compatible versions for gem "a":
+  In Gemfile:
+    b was resolved to 1.0, which depends on
+      a (>= 2)
+
+    c was resolved to 1.0, which depends on
+      a (< 1)
+    E
+  end
+
   it "should throw error in case of circular dependencies" do
     @index = a_circular_index
     dep "circular_app"
