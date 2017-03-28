@@ -61,7 +61,7 @@ module Bundler
     def initialize(lockfile)
       @platforms    = []
       @sources      = []
-      @dependencies = []
+      @dependencies = {}
       @state        = nil
       @specs        = {}
 
@@ -199,7 +199,7 @@ module Bundler
           end
         end
 
-        @dependencies << dep
+        @dependencies[dep.name] = dep
       end
     end
 

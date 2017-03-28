@@ -81,7 +81,7 @@ module Bundler
           @locked_sources = @locked_gems.sources
         else
           @unlock         = {}
-          @locked_deps    = []
+          @locked_deps    = {}
           @locked_specs   = SpecSet.new([])
           @locked_sources = []
         end
@@ -89,7 +89,7 @@ module Bundler
         @unlock         = {}
         @platforms      = []
         @locked_gems    = nil
-        @locked_deps    = []
+        @locked_deps    = {}
         @locked_specs   = SpecSet.new([])
         @locked_sources = []
         @locked_platforms = []
@@ -132,7 +132,7 @@ module Bundler
       # with a mismatch on #type.
       # Test coverage to catch a regression on this is in gemspec_spec.rb
       @dependencies.each do |d|
-        if ld = @locked_deps.find {|l| l.name == d.name }
+        if ld = @locked_deps[d.name]
           ld.instance_variable_set(:@type, d.type)
         end
       end
@@ -429,8 +429,8 @@ module Bundler
       new_sources = gemfile_sources - @locked_sources
       deleted_sources = @locked_sources - gemfile_sources
 
-      new_deps = @dependencies - @locked_deps
-      deleted_deps = @locked_deps - @dependencies
+      new_deps = @dependencies - @locked_deps.values
+      deleted_deps = @locked_deps.values - @dependencies
 
       # Check if it is possible that the source is only changed thing
       if (new_deps.empty? && deleted_deps.empty?) && (!new_sources.empty? && !deleted_sources.empty?)
@@ -455,7 +455,7 @@ module Bundler
 
       both_sources = Hash.new {|h, k| h[k] = [] }
       @dependencies.each {|d| both_sources[d.name][0] = d }
-      @locked_deps.each  {|d| both_sources[d.name][1] = d.source }
+      @locked_deps.each  {|name, d| both_sources[name][1] = d.source }
 
       both_sources.each do |name, (dep, lock_source)|
         next unless (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
@@ -586,7 +586,7 @@ module Bundler
 
     def dependencies_for_source_changed?(source, locked_source = source)
       deps_for_source = @dependencies.select {|s| s.source == source }
-      locked_deps_for_source = @locked_deps.select {|s| s.source == locked_source }
+      locked_deps_for_source = @locked_deps.values.select {|dep| dep.source == locked_source }
 
       Set.new(deps_for_source) != Set.new(locked_deps_for_source)
     end
@@ -639,7 +639,7 @@ module Bundler
       @locked_specs.each do |spec|
         spec.source &&= converge_path_source_to_gemspec_source(spec.source)
       end
-      @locked_deps.each do |dep|
+      @locked_deps.each do |_, dep|
         dep.source &&= converge_path_source_to_gemspec_source(dep.source)
       end
     end
@@ -681,8 +681,8 @@ module Bundler
     end
 
     def converge_dependencies
-      (@dependencies + @locked_deps).each do |dep|
-        locked_source = @locked_deps.select {|d| d.name == dep.name }.last
+      (@dependencies + @locked_deps.values).each do |dep|
+        locked_source = @locked_deps[dep.name]
         # This is to make sure that if bundler is installing in deployment mode and
         # after locked_source and sources don't match, we still use locked_source.
         if Bundler.settings[:frozen] && !locked_source.nil? &&
@@ -696,7 +696,7 @@ module Bundler
         end
       end
       dependency_without_type = proc {|d| Gem::Dependency.new(d.name, *d.requirement.as_list) }
-      Set.new(@dependencies.map(&dependency_without_type)) != Set.new(@locked_deps.map(&dependency_without_type))
+      Set.new(@dependencies.map(&dependency_without_type)) != Set.new(@locked_deps.values.map(&dependency_without_type))
     end
 
     # Remove elements from the locked specs that are expired. This will most
@@ -709,12 +709,11 @@ module Bundler
       # and Gemfile.lock. If the Gemfile modified a dependency, but
       # the gem in the Gemfile.lock still satisfies it, this is fine
       # too.
-      locked_deps_hash = @locked_deps.inject({}) do |hsh, dep|
-        hsh[dep] = dep
-        hsh
-      end
       @dependencies.each do |dep|
-        locked_dep = locked_deps_hash[dep]
+        locked_dep = @locked_deps[dep.name]
+
+        # If the locked_dep doesn't match the dependency we're looking for then we ignore the locked_dep
+        locked_dep = nil unless locked_dep == dep
 
         if in_locked_deps?(dep, locked_dep) || satisfies_locked_spec?(dep)
           deps << dep
