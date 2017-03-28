@@ -26,6 +26,12 @@ module Bundler
       def empty?
         left.version == right.version && !(left.inclusive && right.inclusive)
       end
+
+      def single?
+        left.version == right.version
+      end
+
+      UNIVERSAL = ReqR.new(ReqR::Endpoint.new(Gem::Version.new("0.a"), true), ReqR::Endpoint.new(ReqR::INFINITY, false)).freeze
     end
 
     def self.for_many(requirements)
@@ -46,17 +52,18 @@ module Bundler
         when "<" then ReqR.new(ReqR::Endpoint.new(ReqR::ZERO, true), ReqR::Endpoint.new(v, false))
         when "<=" then ReqR.new(ReqR::Endpoint.new(ReqR::ZERO, true), ReqR::Endpoint.new(v, true))
         when "~>" then ReqR.new(ReqR::Endpoint.new(v, true), ReqR::Endpoint.new(v.bump, false))
+        else raise "unknown version op #{op} in requirement #{requirement}"
         end
       end.uniq
       ranges, neqs = ranges.partition {|r| !r.is_a?(NEq) }
-      ranges << ReqR.new(ReqR::Endpoint.new(Gem::Version.new("0.a"), true), ReqR::Endpoint.new(ReqR::INFINITY, false)) if ranges.empty?
 
-      [ranges.sort_by {|range| [range.left.version, range.left.inclusive ? 0 : 1] }, neqs]
+      [ranges.sort_by {|range| [range.left.version, range.left.inclusive ? 0 : 1] }, neqs.map(&:version)]
     end
 
     def self.empty?(ranges, neqs)
-      !ranges.reduce do |last_range, curr_range|
+      !ranges.reduce(ReqR::UNIVERSAL) do |last_range, curr_range|
         next false unless last_range
+        next false if curr_range.single? && neqs.include?(curr_range.left.version)
         next curr_range if last_range.right.version == ReqR::INFINITY
         case last_range.right.version <=> curr_range.left.version
         when 1 then next curr_range
