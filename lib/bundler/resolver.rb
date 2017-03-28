@@ -28,7 +28,7 @@ module Bundler
           end.select do |deps|
             Bundler::VersionRanges.empty?(*Bundler::VersionRanges.for_many(deps.map(&:requirement)))
           end.min_by(&:size)
-          trees.select! {|t| maximal.include?(t.last) }
+          trees.select! {|t| maximal.include?(t.last) } if maximal
 
           o << trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
             t = String.new
