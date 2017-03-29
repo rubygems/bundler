@@ -51,8 +51,11 @@ gem.
 * `--full-index`:
   Fall back to using the single-file index of all gems.
 
-* `--jobs`:
-  Specify the number of jobs to run in parallel.
+* `--jobs=[<number>]`:
+  Specify the number of jobs to run in parallel. The default is `1`.
+
+* `--retry=[<number>]`:
+Retry failed network or git requests for <number> times.
 
 * `--quiet`:
   Only output warnings and errors.
