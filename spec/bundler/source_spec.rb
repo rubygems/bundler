@@ -71,6 +71,32 @@ RSpec.describe Bundler::Source do
             end
           end
         end
+
+        context "with a more recent version" do
+          let(:spec) { double(:spec, :name => "nokogiri", :version => "1.6.1", :platform => rb) }
+          let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "1.7.0") }
+
+          context "with color" do
+            before { Bundler.ui = Bundler::UI::Shell.new }
+
+            it "should return a string with the locked spec version in yellow" do
+              expect(subject.version_message(spec)).to eq("nokogiri 1.6.1\e[33m (was 1.7.0)\e[0m")
+            end
+          end
+        end
+
+        context "with an older version" do
+          let(:spec) { double(:spec, :name => "nokogiri", :version => "1.7.1", :platform => rb) }
+          let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "1.7.0") }
+
+          context "with color" do
+            before { Bundler.ui = Bundler::UI::Shell.new }
+
+            it "should return a string with the locked spec version in green" do
+              expect(subject.version_message(spec)).to eq("nokogiri 1.7.1\e[32m (was 1.7.0)\e[0m")
+            end
+          end
+        end
       end
 
       context "that do not contain the relevant gem spec" do
