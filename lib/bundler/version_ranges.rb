@@ -35,10 +35,9 @@ module Bundler
     end
 
     def self.for_many(requirements)
-      requirement = requirements.reduce(Gem::Requirement.new(">= 0.a")) do |acc, elem|
-        acc.concat(elem.requirements.map {|r| r.join(" ") })
-        acc
-      end
+      requirements = requirements.map(&:requirements).flatten(1).map {|r| r.join(" ") }
+      requirements << ">= 0.a" if requirements.empty?
+      requirement = Gem::Requirement.new(requirements)
       self.for(requirement)
     end
 
