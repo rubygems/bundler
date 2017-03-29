@@ -320,7 +320,7 @@ module Bundler
       end
     end
 
-    def replace_gem(specs)
+    def replace_gem(specs, specs_by_name)
       reverse_rubygems_kernel_mixin
 
       executables = specs.map(&:executables).flatten
@@ -337,31 +337,26 @@ module Bundler
             dep = Gem::Dependency.new(dep, reqs)
           end
 
-          spec = specs.find {|s| s.name == dep.name }
-
-          if spec.nil?
-
-            e = Gem::LoadError.new "#{dep.name} is not part of the bundle. Add it to Gemfile."
-            e.name = dep.name
-            if e.respond_to?(:requirement=)
-              e.requirement = dep.requirement
-            else
-              e.version_requirement = dep.requirement
-            end
-            raise e
-          elsif dep !~ spec
-            e = Gem::LoadError.new "can't activate #{dep}, already activated #{spec.full_name}. " \
-                                   "Make sure all dependencies are added to Gemfile."
-            e.name = dep.name
-            if e.respond_to?(:requirement=)
-              e.requirement = dep.requirement
-            else
-              e.version_requirement = dep.requirement
-            end
-            raise e
+          if spec = specs_by_name[dep.name]
+            return true if dep.matches_spec?(spec)
           end
 
-          true
+          message = if spec.nil?
+            "#{dep.name} is not part of the bundle." \
+            " Add it to your #{Bundler.default_gemfile.basename}."
+          else
+            "can't activate #{dep}, already activated #{spec.full_name}. " \
+            "Make sure all dependencies are added to Gemfile."
+          end
+
+          e = Gem::LoadError.new(message)
+          e.name = dep.name
+          if e.respond_to?(:requirement=)
+            e.requirement = dep.requirement
+          elsif e.respond_to?(:version_requirement=)
+            e.version_requirement = dep.requirement
+          end
+          raise e
         end
 
         # TODO: delete this in 2.0, it's a backwards compatibility shim
@@ -393,23 +388,28 @@ module Bundler
     # Used to make bin stubs that are not created by bundler work
     # under bundler. The new Gem.bin_path only considers gems in
     # +specs+
-    def replace_bin_path(specs)
+    def replace_bin_path(specs, specs_by_name)
       gem_class = (class << Gem; self; end)
 
       redefine_method(gem_class, :find_spec_for_exe) do |gem_name, *args|
         exec_name = args.first
 
+        spec_with_name = specs_by_name[gem_name]
         spec = if exec_name
-          specs.find {|s| s.name == gem_name && s.executables.include?(exec_name) } ||
+          if spec_with_name && spec_with_name.executables.include?(exec_name)
+            spec_with_name
+          else
             specs.find {|s| s.executables.include?(exec_name) }
+          end
         else
-          specs.find {|s| s.name == gem_name }
+          spec_with_name
         end
 
         unless spec
           message = "can't find executable #{exec_name} for gem #{gem_name}"
-          if !exec_name || specs.find {|s| s.name == gem_name }.nil?
-            message += ". #{gem_name} is not currently included in the bundle, perhaps you meant to add it to your #{Bundler.default_gemfile.basename}?"
+          if !exec_name || spec_with_name.nil?
+            message += ". #{gem_name} is not currently included in the bundle, " \
+                       "perhaps you meant to add it to your #{Bundler.default_gemfile.basename}?"
           end
           raise Gem::Exception, message
         end
@@ -459,11 +459,14 @@ module Bundler
     # Replace or hook into Rubygems to provide a bundlerized view
     # of the world.
     def replace_entrypoints(specs)
-      replace_gem(specs)
+      specs_by_name = specs.reduce({}) do |h, s|
+        h[s.name] = s
+        h
+      end
 
+      replace_gem(specs, specs_by_name)
       stub_rubygems(specs)
-
-      replace_bin_path(specs)
+      replace_bin_path(specs, specs_by_name)
       replace_refresh
 
       Gem.clear_paths
