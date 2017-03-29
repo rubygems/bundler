@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with git sources" do
+RSpec.describe "bundle install with git sources" do
   describe "when floating on master" do
     before :each do
       build_git "foo" do |s|
@@ -206,6 +206,94 @@ describe "bundle install with git sources" do
       RUBY
 
       expect(out).to eq("WIN")
+    end
+  end
+
+  describe "when specifying a branch" do
+    let(:branch) { "branch" }
+    let(:repo) { build_git("foo").path }
+    before(:each) do
+      update_git("foo", :path => repo, :branch => branch)
+    end
+
+    it "works" do
+      install_gemfile <<-G
+        git "#{repo}", :branch => #{branch.dump} do
+          gem "foo"
+        end
+      G
+
+      expect(the_bundle).to include_gems("foo 1.0")
+    end
+
+    context "when the branch starts with a `#`" do
+      let(:branch) { "#149/redirect-url-fragment" }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :branch => #{branch.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+
+    context "when the branch includes quotes" do
+      let(:branch) { %('") }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :branch => #{branch.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+  end
+
+  describe "when specifying a tag" do
+    let(:tag) { "tag" }
+    let(:repo) { build_git("foo").path }
+    before(:each) do
+      update_git("foo", :path => repo, :tag => tag)
+    end
+
+    it "works" do
+      install_gemfile <<-G
+        git "#{repo}", :tag => #{tag.dump} do
+          gem "foo"
+        end
+      G
+
+      expect(the_bundle).to include_gems("foo 1.0")
+    end
+
+    context "when the tag starts with a `#`" do
+      let(:tag) { "#149/redirect-url-fragment" }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :tag => #{tag.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+
+    context "when the tag includes quotes" do
+      let(:tag) { %('") }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :tag => #{tag.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
     end
   end
 
@@ -997,7 +1085,12 @@ describe "bundle install with git sources" do
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      expect(out).to include("An error occurred while installing foo (1.0)")
+      expect(out).to end_with(<<-M.strip)
+An error occurred while installing foo (1.0), and Bundler cannot continue.
+
+In Gemfile:
+  foo
+      M
       expect(out).not_to include("gem install foo")
     end
 
@@ -1022,20 +1115,20 @@ describe "bundle install with git sources" do
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      run <<-R
+      run! <<-R
         require 'foo'
         puts FOO
       R
 
       installed_time = out
-      expect(installed_time).to match(/\d+\.\d+/)
+      expect(installed_time).to match(/\A\d+\.\d+\z/)
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      run <<-R
+      run! <<-R
         require 'foo'
         puts FOO
       R

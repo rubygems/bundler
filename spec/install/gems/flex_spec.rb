@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle flex_install" do
+RSpec.describe "bundle flex_install" do
   it "installs the gems as expected" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"

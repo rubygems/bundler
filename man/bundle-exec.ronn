@@ -63,6 +63,15 @@ It also modifies Rubygems:
   making system executables work
 * Add all gems in the bundle into Gem.loaded_specs
 
+### Loading
+
+By default, when attempting to `bundle exec` to a file with a ruby shebang,
+Bundler will `Kernel.load` that file instead of using `Kernel.exec`. For the
+vast majority of cases, this is a performance improvement. In a rare few cases,
+this could cause some subtle side-effects (such as dependence on the exact
+contents of `$0` or `__FILE__`) and the optimization can be disabled by enabling
+the `disable_exec_load` setting.
+
 ### Shelling out
 
 Any Ruby code that opens a subshell (like `system`, backticks, or `%x{}`) will

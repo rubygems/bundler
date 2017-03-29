@@ -2,7 +2,7 @@
 require "spec_helper"
 require "thread"
 
-describe "fetching dependencies with a mirrored source", :realworld => true, :rubygems => ">= 2.0" do
+RSpec.describe "fetching dependencies with a mirrored source", :realworld => true, :rubygems => ">= 2.0" do
   let(:mirror) { "https://server.example.org" }
   let(:original) { "http://127.0.0.1:#{@port}" }
 
@@ -12,6 +12,7 @@ describe "fetching dependencies with a mirrored source", :realworld => true, :ru
   end
 
   after do
+    Artifice.deactivate
     @t.kill
     @t.join
   end

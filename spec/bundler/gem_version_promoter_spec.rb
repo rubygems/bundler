@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::GemVersionPromoter do
+RSpec.describe Bundler::GemVersionPromoter do
   context "conservative resolver" do
     def versions(result)
       result.flatten.map(&:version).map(&:to_s)

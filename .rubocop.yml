@@ -15,7 +15,7 @@ Lint/AssignmentInCondition:
   Enabled: false
 
 Lint/EndAlignment:
-  AlignWith: variable
+  EnforcedStyleAlignWith: variable
   AutoCorrect: true
 
 Lint/UnusedMethodArgument:

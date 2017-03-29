@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install from an existing gemspec" do
+RSpec.describe "bundle install from an existing gemspec" do
   before(:each) do
     build_gem "bar", :to_system => true
     build_gem "bar-dev", :to_system => true
@@ -131,6 +131,55 @@ describe "bundle install from an existing gemspec" do
     end
   end
 
+  it "should match a lockfile without needing to re-resolve" do
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.add_dependency "rack"
+    end
+
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gemspec :path => '#{tmp.join("foo")}'
+    G
+
+    bundle! "install", :verbose => true
+    expect(out).to include("Found no changes, using resolution from the lockfile")
+  end
+
+  it "should match a lockfile without needing to re-resolve with development dependencies" do
+    simulate_platform java
+
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.add_dependency "rack"
+      s.add_development_dependency "thin"
+    end
+
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gemspec :path => '#{tmp.join("foo")}'
+    G
+
+    bundle! "install", :verbose => true
+    expect(out).to include("Found no changes, using resolution from the lockfile")
+  end
+
+  it "should match a lockfile on non-ruby platforms with a transitive platform dependency" do
+    simulate_platform java
+    simulate_ruby_engine "jruby"
+
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.add_dependency "platform_specific"
+    end
+
+    install_gem "platform_specific-1.0-java"
+
+    install_gemfile! <<-G
+      gemspec :path => '#{tmp.join("foo")}'
+    G
+
+    bundle! "update --bundler", :verbose => true
+    expect(the_bundle).to include_gems "foo 1.0", "platform_specific 1.0 JAVA"
+  end
+
   it "should evaluate the gemspec in its directory" do
     build_lib("foo", :path => tmp.join("foo"))
     File.open(tmp.join("foo/foo.gemspec"), "w") do |s|
@@ -141,6 +190,26 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}'
     G
     expect(@err).not_to match(/ahh/)
+  end
+
+  it "allows the gemspec to activate other gems" do
+    # see https://github.com/bundler/bundler/issues/5409
+    #
+    # issue was caused by rubygems having an unresolved gem during a require,
+    # so emulate that
+    system_gems %w(rack-1.0.0 rack-0.9.1 rack-obama-1.0)
+
+    build_lib("foo", :path => bundled_app)
+    gemspec = bundled_app("foo.gemspec").read
+    bundled_app("foo.gemspec").open("w") do |f|
+      f.write "#{gemspec.strip}.tap { gem 'rack-obama'; require 'rack-obama' }"
+    end
+
+    install_gemfile! <<-G
+      gemspec
+    G
+
+    expect(the_bundle).to include_gem "foo 1.0"
   end
 
   it "allows conflicts" do
@@ -160,6 +229,31 @@ describe "bundle install from an existing gemspec" do
     G
 
     expect(the_bundle).to include_gems "foo 1.0.0"
+  end
+
+  context "in deployment mode" do
+    context "when the lockfile was not updated after a change to the gemspec's dependencies" do
+      it "reports that installation failed" do
+        build_lib "cocoapods", :path => bundled_app do |s|
+          s.add_dependency "activesupport", ">= 1"
+        end
+
+        install_gemfile! <<-G
+          source "file://#{gem_repo1}"
+          gemspec
+        G
+
+        expect(the_bundle).to include_gems("cocoapods 1.0", "activesupport 2.3.5")
+
+        build_lib "cocoapods", :path => bundled_app do |s|
+          s.add_dependency "activesupport", ">= 1.0.1"
+        end
+
+        bundle "install --deployment"
+
+        expect(out).to include("changed")
+      end
+    end
   end
 
   context "when child gemspecs conflict with a released gemspec" do
@@ -407,6 +501,39 @@ describe "bundle install from an existing gemspec" do
           end
         end
       end
+    end
+  end
+
+  context "with multiple platforms" do
+    before do
+      build_lib("foo", :path => tmp.join("foo")) do |s|
+        s.version = "1.0.0"
+        s.add_development_dependency "rack"
+        s.write "foo-universal-java.gemspec", build_spec("foo", "1.0.0", "universal-java") {|sj| sj.runtime "rack", "1.0.0" }.first.to_ruby
+      end
+    end
+
+    it "installs the ruby platform gemspec" do
+      simulate_platform "ruby"
+
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
+      G
+
+      expect(the_bundle).to include_gems "foo 1.0.0", "rack 1.0.0"
+    end
+
+    it "installs the ruby platform gemspec and skips dev deps with --without development" do
+      simulate_platform "ruby"
+
+      install_gemfile! <<-G, :without => "development"
+        source "file://#{gem_repo1}"
+        gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
+      G
+
+      expect(the_bundle).to include_gem "foo 1.0.0"
+      expect(the_bundle).not_to include_gem "rack"
     end
   end
 end

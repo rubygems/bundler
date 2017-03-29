@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle binstubs <gem>" do
+RSpec.describe "bundle binstubs <gem>" do
   context "when the gem exists in the lockfile" do
     it "sets up the binstub" do
       install_gemfile <<-G
@@ -157,7 +157,7 @@ describe "bundle binstubs <gem>" do
     it "includes the standalone path" do
       bundle "binstubs rack --standalone"
       standalone_line = File.read(bundled_app("bin/rackup")).each_line.find {|line| line.include? "$:.unshift" }.strip
-      expect(standalone_line).to eq "$:.unshift File.expand_path '../../bundle', path.realpath"
+      expect(standalone_line).to eq %($:.unshift File.expand_path "../../bundle", path.realpath)
     end
   end
 

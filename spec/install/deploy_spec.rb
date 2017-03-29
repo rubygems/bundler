@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "install with --deployment or --frozen" do
+RSpec.describe "install with --deployment or --frozen" do
   before do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -22,15 +22,15 @@ describe "install with --deployment or --frozen" do
   it "disallows --deployment --system" do
     bundle "install --deployment --system"
     expect(out).to include("You have specified both --deployment")
-    expect(out).to include("Please choose.")
+    expect(out).to include("Please choose only one option")
     expect(exitstatus).to eq(15) if exitstatus
   end
 
   it "disallows --deployment --path --system" do
     bundle "install --deployment --path . --system"
-    expect(out).to include("You have specified both a path to install your gems to")
-    expect(out).to include("You have specified both --deployment")
-    expect(out).to include("Please choose.")
+    expect(out).to include("You have specified both --path")
+    expect(out).to include("as well as --system")
+    expect(out).to include("Please choose only one option")
     expect(exitstatus).to eq(15) if exitstatus
   end
 
@@ -77,10 +77,8 @@ describe "install with --deployment or --frozen" do
       gem "bar", :path => "#{lib_path("nested")}"
     G
 
-    bundle :install
-    bundle "install --deployment"
-
-    expect(exitstatus).to eq(0) if exitstatus
+    bundle! :install
+    bundle! "install --deployment"
   end
 
   it "works when there are credentials in the source URL" do
@@ -267,22 +265,21 @@ describe "install with --deployment or --frozen" do
   context "with path in Gemfile and packed" do
     it "works fine after bundle package and bundle install --local" do
       build_lib "foo", :path => lib_path("foo")
-      install_gemfile <<-G
-      gem "foo", :path => "#{lib_path("foo")}"
+      install_gemfile! <<-G
+        gem "foo", :path => "#{lib_path("foo")}"
       G
 
-      bundle :install
+      bundle! :install
       expect(the_bundle).to include_gems "foo 1.0"
-      bundle "package --all"
+      bundle! "package --all"
       expect(bundled_app("vendor/cache/foo")).to be_directory
 
-      bundle "install --local"
+      bundle! "install --local"
       expect(out).to include("Using foo 1.0 from source at")
       expect(out).to include("vendor/cache/foo")
-      expect(exitstatus).to eq(0) if exitstatus
 
       simulate_new_machine
-      bundle "install --deployment"
+      bundle! "install --deployment --verbose"
       expect(out).not_to include("You are trying to install in deployment mode after changing your Gemfile")
       expect(out).not_to include("You have added to the Gemfile")
       expect(out).not_to include("You have deleted from the Gemfile")

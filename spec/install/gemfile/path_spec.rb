@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with explicit source paths" do
+RSpec.describe "bundle install with explicit source paths" do
   it "fetches gems" do
     build_lib "foo"
 

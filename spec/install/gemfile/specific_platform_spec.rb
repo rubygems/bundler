@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with specific_platform enabled" do
+RSpec.describe "bundle install with specific_platform enabled" do
   before do
     bundle "config specific_platform true"
 
@@ -39,6 +39,13 @@ describe "bundle install with specific_platform enabled" do
       build_gem("google-protobuf", "3.0.0.alpha.2.0")
       build_gem("google-protobuf", "3.0.0.alpha.1.1")
       build_gem("google-protobuf", "3.0.0.alpha.1.0")
+
+      build_gem("facter", "2.4.6")
+      build_gem("facter", "2.4.6") do |s|
+        s.platform = "universal-darwin"
+        s.add_runtime_dependency "CFPropertyList"
+      end
+      build_gem("CFPropertyList")
     end
   end
 
@@ -65,6 +72,19 @@ describe "bundle install with specific_platform enabled" do
       bundle! "package --all-platforms"
       expect([cached_gem("google-protobuf-3.0.0.alpha.5.0.5.1"), cached_gem("google-protobuf-3.0.0.alpha.5.0.5.1-universal-darwin")]).
         to all(exist)
+    end
+
+    it "uses the platform-specific gem with extra dependencies" do
+      install_gemfile! <<-G
+        source "file:#{gem_repo2}"
+        gem "facter"
+      G
+
+      expect(the_bundle.locked_gems.platforms).to eq([pl("ruby"), pl("x86_64-darwin-15")])
+      expect(the_bundle).to include_gems("facter 2.4.6 universal-darwin", "CFPropertyList 1.0")
+      expect(the_bundle.locked_gems.specs.map(&:full_name)).to eq(["CFPropertyList-1.0",
+                                                                   "facter-2.4.6",
+                                                                   "facter-2.4.6-universal-darwin"])
     end
 
     context "when adding a platform via lock --add_platform" do

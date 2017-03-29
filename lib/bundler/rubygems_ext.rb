@@ -8,6 +8,16 @@ end
 
 require "rubygems"
 require "rubygems/specification"
+
+begin
+  # Possible use in Gem::Specification#source below and require
+  # shouldn't be deferred.
+  require "rubygems/source"
+rescue LoadError
+  # Not available before Rubygems 2.0.0, ignore
+  nil
+end
+
 require "bundler/match_platform"
 
 module Gem
@@ -32,7 +42,11 @@ module Gem
     attr_writer :full_gem_path unless instance_methods.include?(:full_gem_path=)
 
     def full_gem_path
-      if source.respond_to?(:path) || source.is_a?(Bundler::Plugin::API::Source)
+      # this cannot check source.is_a?(Bundler::Plugin::API::Source)
+      # because that _could_ trip the autoload, and if there are unresolved
+      # gems at that time, this method could be called inside another require,
+      # thus raising with that constant being undefined. Better to check a method
+      if source.respond_to?(:path) || (source.respond_to?(:bundler_plugin_api_source?) && source.bundler_plugin_api_source?)
         Pathname.new(loaded_from).dirname.expand_path(source.root).to_s.untaint
       else
         rg_full_gem_path

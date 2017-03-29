@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "the lockfile format" do
+RSpec.describe "the lockfile format" do
   include Bundler::GemHelpers
 
   it "generates a simple lockfile for a single source, gem" do
@@ -579,6 +579,36 @@ describe "the lockfile format" do
     install_gemfile <<-G
       gem "foo", :path => "#{lib_path("foo-1.0")}"
     G
+
+    lockfile_should_be <<-G
+      PATH
+        remote: #{lib_path("foo-1.0")}
+        specs:
+          foo (1.0)
+
+      GEM
+        specs:
+
+      PLATFORMS
+        #{generic_local_platform}
+
+      DEPENDENCIES
+        foo!
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    G
+  end
+
+  it "serializes pinned path sources to the lockfile even when packaging" do
+    build_lib "foo"
+
+    install_gemfile! <<-G
+      gem "foo", :path => "#{lib_path("foo-1.0")}"
+    G
+
+    bundle! "package --all"
+    bundle! "install --local"
 
     lockfile_should_be <<-G
       PATH

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Fetcher::CompactIndex do
+RSpec.describe Bundler::Fetcher::CompactIndex do
   let(:downloader)  { double(:downloader) }
-  let(:remote)      { double(:remote, :cache_slug => "lsjdf") }
   let(:display_uri) { URI("http://sampleuri.com") }
+  let(:remote)      { double(:remote, :cache_slug => "lsjdf", :uri => display_uri) }
   let(:compact_index) { described_class.new(downloader, remote, display_uri) }
 
   before do
@@ -15,7 +15,7 @@ describe Bundler::Fetcher::CompactIndex do
     it "has only one thread open at the end of the run" do
       compact_index.specs_for_names(["lskdjf"])
 
-      thread_count = Thread.list.select {|thread| thread.status == "run" }.count
+      thread_count = Thread.list.count {|thread| thread.status == "run" }
       expect(thread_count).to eq 1
     end
 
@@ -23,6 +23,46 @@ describe Bundler::Fetcher::CompactIndex do
       expect_any_instance_of(Bundler::Worker).to receive(:stop).at_least(:once)
 
       compact_index.specs_for_names(["lskdjf"])
+    end
+
+    describe "#available?" do
+      before do
+        allow(compact_index).to receive(:compact_index_client).
+          and_return(double(:compact_index_client, :update_and_parse_checksums! => true))
+      end
+
+      it "returns true" do
+        expect(compact_index).to be_available
+      end
+
+      context "when OpenSSL is not available" do
+        before do
+          allow(compact_index).to receive(:require).with("openssl").and_raise(LoadError)
+        end
+
+        it "returns true" do
+          expect(compact_index).to be_available
+        end
+      end
+
+      context "when OpenSSL is FIPS-enabled", :ruby => ">= 2.0.0" do
+        before { stub_const("OpenSSL::OPENSSL_FIPS", true) }
+
+        context "when FIPS-mode is active" do
+          before do
+            allow(OpenSSL::Digest::MD5).to receive(:digest).
+              and_raise(OpenSSL::Digest::DigestError)
+          end
+
+          it "returns false" do
+            expect(compact_index).to_not be_available
+          end
+        end
+
+        it "returns true" do
+          expect(compact_index).to be_available
+        end
+      end
     end
 
     context "logging" do

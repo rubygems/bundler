@@ -3,12 +3,7 @@ require File.expand_path("../../path.rb", __FILE__)
 require File.expand_path("../../../../lib/bundler/deprecate", __FILE__)
 include Spec::Path
 
-# Set up pretend http gem server with FakeWeb
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/artifice*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].last}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/tilt*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/sinatra*/lib")].first}"
+$LOAD_PATH.unshift(*Dir[Spec::Path.base_system_gems.join("gems/{artifice,rack,tilt,sinatra}-*/lib")].map(&:to_s))
 require "artifice"
 require "sinatra/base"
 
@@ -24,7 +19,11 @@ class Endpoint < Sinatra::Base
       require "rubygems"
       require "bundler"
       Bundler::Deprecate.skip_during do
-        Marshal.load(File.open(gem_repo.join("specs.4.8")).read).map do |name, version, platform|
+        all_specs = %w(specs.4.8 prerelease_specs.4.8).map do |filename|
+          Marshal.load(File.open(gem_repo.join(filename)).read)
+        end.inject(:+)
+
+        all_specs.map do |name, version, platform|
           spec = load_spec(name, version, platform, gem_repo)
           next unless gem_names.include?(spec.name)
           {

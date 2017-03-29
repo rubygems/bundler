@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require "bundler/cli/common"
+
 module Bundler
   class CLI::Update
     attr_reader :options, :gems
@@ -27,7 +29,6 @@ module Bundler
         names = Bundler.locked_gems.specs.map(&:name)
         gems.each do |g|
           next if names.include?(g)
-          require "bundler/cli/common"
           raise GemNotFound, Bundler::CLI::Common.gem_not_found_message(g, names)
         end
 
@@ -36,15 +37,11 @@ module Bundler
           gems.concat(specs.map(&:name))
         end
 
-        Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby])
+        Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby],
+                           :lock_shared_dependencies => options[:conservative])
       end
 
-      patch_level = [:major, :minor, :patch].select {|v| options.keys.include?(v.to_s) }
-      raise InvalidOption, "Provide only one of the following options: #{patch_level.join(", ")}" unless patch_level.length <= 1
-      Bundler.definition.gem_version_promoter.tap do |gvp|
-        gvp.level = patch_level.first || :major
-        gvp.strict = options[:strict]
-      end
+      Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options)
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
@@ -54,11 +51,8 @@ module Bundler
 
       Bundler.settings[:jobs] = opts["jobs"] if opts["jobs"]
 
-      # rubygems plugins sometimes hook into the gem install process
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
-
       Bundler.definition.validate_runtime!
-      Installer.install Bundler.root, Bundler.definition, opts
+      installer = Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.app_cache.exist?
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
@@ -67,15 +61,8 @@ module Bundler
       end
 
       Bundler.ui.confirm "Bundle updated!"
-      without_groups_messages
-    end
-
-  private
-
-    def without_groups_messages
-      return unless Bundler.settings.without.any?
-      require "bundler/cli/common"
-      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
+      Bundler::CLI::Common.output_without_groups_message
+      Bundler::CLI::Common.output_post_install_messages installer.post_install_messages
     end
   end
 end

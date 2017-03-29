@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundler plugin install" do
+RSpec.describe "bundler plugin install" do
   before do
     build_repo2 do
       build_plugin "foo"
@@ -70,6 +70,17 @@ describe "bundler plugin install" do
 
   context "malformatted plugin" do
     it "fails when plugins.rb is missing" do
+      update_repo2 do
+        build_plugin "foo", "1.1"
+        build_plugin "kung-foo", "1.1"
+      end
+
+      bundle "plugin install foo kung-foo --version '1.0' --source file://#{gem_repo2}"
+
+      expect(out).to include("Installing foo 1.0")
+      expect(out).to include("Installing kung-foo 1.0")
+      plugin_should_be_installed("foo", "kung-foo")
+
       build_repo2 do
         build_gem "charlie"
       end
@@ -80,6 +91,7 @@ describe "bundler plugin install" do
 
       expect(global_plugin_gem("charlie-1.0")).not_to be_directory
 
+      plugin_should_be_installed("foo", "kung-foo")
       plugin_should_not_be_installed("charlie")
     end
 

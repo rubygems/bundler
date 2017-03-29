@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "ruby requirement" do
+RSpec.describe "ruby requirement" do
   def locked_ruby_version
     Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(lockfile).ruby_version)
   end
@@ -85,5 +85,25 @@ describe "ruby requirement" do
 
     expect(the_bundle).to include_gems "rack 1.0.0"
     expect(locked_ruby_version.versions).to eq(["5100"])
+  end
+
+  it "allows requirements with trailing whitespace" do
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      ruby "#{RUBY_VERSION}\\n \t\\n"
+      gem "rack"
+    G
+
+    expect(the_bundle).to include_gems "rack 1.0.0"
+  end
+
+  it "fails gracefully with malformed requirements" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      ruby ">= 0", "-.\\0"
+      gem "rack"
+    G
+
+    expect(out).to include("There was an error parsing") # i.e. DSL error, not error template
   end
 end

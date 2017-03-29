@@ -109,14 +109,19 @@ module Bundler
 
     # returns a list of the dependencies
     def unmet_dependency_names
-      names = dependency_names
-      names.delete_if {|n| n == "bundler" }
-      names.select {|n| search(n).empty? }
+      dependency_names.select do |name|
+        name != "bundler" && search(name).empty?
+      end
     end
 
     def dependency_names
       names = []
-      each {|s| names.concat(s.dependencies.map(&:name)) }
+      each do |spec|
+        spec.dependencies.each do |dep|
+          next if dep.type == :development
+          names << dep.name
+        end
+      end
       names.uniq
     end
 
@@ -139,6 +144,8 @@ module Bundler
       end
     end
 
+    # Whether all the specs in self are in other
+    # TODO: rename to #include?
     def ==(other)
       all? do |spec|
         other_spec = other[spec].first
@@ -179,7 +186,8 @@ module Bundler
         end
 
         wants_prerelease = dependency.requirement.prerelease?
-        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
+        wants_prerelease ||= base && base.any? {|base_spec| base_spec.version.prerelease? }
+        only_prerelease = specs.all? {|spec| spec.version.prerelease? }
 
         unless wants_prerelease || only_prerelease
           found.reject! {|spec| spec.version.prerelease? }

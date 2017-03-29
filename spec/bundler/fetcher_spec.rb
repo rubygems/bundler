@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/fetcher"
 
-describe Bundler::Fetcher do
+RSpec.describe Bundler::Fetcher do
   let(:uri) { URI("https://example.com") }
   let(:remote) { double("remote", :uri => uri, :original_uri => nil) }
 

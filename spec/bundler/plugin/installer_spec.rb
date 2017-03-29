@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Plugin::Installer do
+RSpec.describe Bundler::Plugin::Installer do
   subject(:installer) { Bundler::Plugin::Installer.new }
 
   describe "cli install" do

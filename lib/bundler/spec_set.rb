@@ -20,8 +20,8 @@ module Bundler
       specs = []
       skip += ["bundler"]
 
-      until deps.empty?
-        dep = deps.shift
+      loop do
+        break unless dep = deps.shift
         next if handled[dep] || skip.include?(dep.name)
 
         handled[dep] = true
@@ -114,6 +114,17 @@ module Bundler
       SpecSet.new(arr)
     end
 
+    def find_by_name_and_platform(name, platform)
+      @specs.detect {|spec| spec.name == name && spec.match_platform(platform) }
+    end
+
+    def what_required(spec)
+      unless req = find {|s| s.dependencies.any? {|d| d.type == :runtime && d.name == spec.name } }
+        return [spec]
+      end
+      what_required(req) << spec
+    end
+
   private
 
     def sorted
@@ -151,14 +162,15 @@ module Bundler
     end
 
     def spec_for_dependency(dep, match_current_platform)
+      specs_for_platforms = lookup[dep.name]
       if match_current_platform
         Bundler.rubygems.platforms.reverse_each do |pl|
-          match = GemHelpers.select_best_platform_match(lookup[dep.name], pl)
+          match = GemHelpers.select_best_platform_match(specs_for_platforms, pl)
           return match if match
         end
         nil
       else
-        GemHelpers.select_best_platform_match(lookup[dep.name], dep.__platform)
+        GemHelpers.select_best_platform_match(specs_for_platforms, dep.__platform)
       end
     end
 

@@ -16,6 +16,7 @@ module Bundler
       2.2
       2.3
       2.4
+      2.5
     ).freeze
 
     KNOWN_MAJOR_VERSIONS = KNOWN_MINOR_VERSIONS.map {|v| v.split(".", 2).first }.uniq.freeze
@@ -57,15 +58,15 @@ module Bundler
     end
 
     def mswin64?
-      Bundler::WINDOWS && Gem::Platform.local.os == "mswin64" && Gem::Platform.local.cpu == "x64"
+      Bundler::WINDOWS && Bundler.local_platform != Gem::Platform::RUBY && Bundler.local_platform.os == "mswin64" && Bundler.local_platform.cpu == "x64"
     end
 
     def mingw?
-      Bundler::WINDOWS && Gem::Platform.local.os == "mingw32" && Gem::Platform.local.cpu != "x64"
+      Bundler::WINDOWS && Bundler.local_platform != Gem::Platform::RUBY && Bundler.local_platform.os == "mingw32" && Bundler.local_platform.cpu != "x64"
     end
 
     def x64_mingw?
-      Bundler::WINDOWS && Gem::Platform.local.os == "mingw32" && Gem::Platform.local.cpu == "x64"
+      Bundler::WINDOWS && Bundler.local_platform != Gem::Platform::RUBY && Bundler.local_platform.os == "mingw32" && Bundler.local_platform.cpu == "x64"
     end
 
     (KNOWN_MINOR_VERSIONS + KNOWN_MAJOR_VERSIONS).each do |version|

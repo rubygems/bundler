@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Plugin::Index do
+RSpec.describe Bundler::Plugin::Index do
   Index = Bundler::Plugin::Index
 
   before do
@@ -31,7 +31,7 @@ describe Bundler::Plugin::Index do
       expect(new_index.plugin_path(plugin_name)).to eq(lib_path(plugin_name))
     end
 
-    it "load_paths are persistant" do
+    it "load_paths are persistent" do
       new_index = Index.new
       expect(new_index.load_paths(plugin_name)).to eq([lib_path(plugin_name).join("lib").to_s])
     end
@@ -95,7 +95,7 @@ describe Bundler::Plugin::Index do
         allow(File).to receive(:open).and_yield(file)
       end
 
-      it "should not save it with next registed hook" do
+      it "should not save it with next registered hook" do
         expect(file).to receive(:puts) do |content|
           expect(content).not_to include("not-there")
         end

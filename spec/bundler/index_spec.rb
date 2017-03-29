@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Index do
+RSpec.describe Bundler::Index do
   let(:specs) { [] }
   subject { described_class.build {|i| i.use(specs) } }
 
@@ -24,6 +24,14 @@ describe Bundler::Index do
         query = spec.dup.tap {|s| s.platform = "ruby" }
         expect(subject.search(query)).to eq([spec])
       end
+    end
+  end
+
+  context "with specs that include development dependencies" do
+    let(:specs) { [*build_spec("a", "1.0.0") {|s| s.development("b", "~> 1.0") }] }
+
+    it "does not include b in #dependency_names" do
+      expect(subject.dependency_names).not_to include("b")
     end
   end
 end

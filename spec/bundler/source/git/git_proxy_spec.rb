@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Source::Git::GitProxy do
+RSpec.describe Bundler::Source::Git::GitProxy do
   let(:uri) { "https://github.com/bundler/bundler.git" }
   subject { described_class.new(Pathname("path"), uri, "HEAD") }
 

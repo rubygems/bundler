@@ -5,7 +5,7 @@ require "rubygems/security"
 # unfortunately, testing signed gems with a provided CA is extremely difficult
 # as 'gem cert' is currently the only way to add CAs to the system.
 
-describe "policies with unsigned gems" do
+RSpec.describe "policies with unsigned gems" do
   before do
     build_security_repo
     gemfile <<-G
@@ -44,7 +44,7 @@ describe "policies with unsigned gems" do
   end
 end
 
-describe "policies with signed gems and no CA" do
+RSpec.describe "policies with signed gems and no CA" do
   before do
     build_security_repo
     gemfile <<-G

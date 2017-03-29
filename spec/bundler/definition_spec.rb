@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/definition"
 
-describe Bundler::Definition do
+RSpec.describe Bundler::Definition do
   describe "#lock" do
     before do
       allow(Bundler).to receive(:settings) { Bundler::Settings.new(".") }
@@ -137,7 +137,7 @@ describe Bundler::Definition do
   describe "initialize" do
     context "gem version promoter" do
       context "with lockfile" do
-        before :each do
+        before do
           install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "foo"
@@ -159,25 +159,119 @@ describe Bundler::Definition do
         end
       end
 
-      def mock_source_list
-        Class.new do
-          def all_sources
-            []
-          end
+      context "eager unlock" do
+        before do
+          gemfile <<-G
+            source "file://#{gem_repo4}"
+            gem 'isolated_owner'
 
-          def path_sources
-            []
-          end
+            gem 'shared_owner_a'
+            gem 'shared_owner_b'
+          G
 
-          def rubygems_remotes
-            []
-          end
+          lockfile <<-L
+            GEM
+              remote: file://#{gem_repo4}
+              specs:
+                isolated_dep (2.0.1)
+                isolated_owner (1.0.1)
+                  isolated_dep (~> 2.0)
+                shared_dep (5.0.1)
+                shared_owner_a (3.0.1)
+                  shared_dep (~> 5.0)
+                shared_owner_b (4.0.1)
+                  shared_dep (~> 5.0)
 
-          def replace_sources!(arg)
-            nil
-          end
-        end.new
+            PLATFORMS
+              ruby
+
+            DEPENDENCIES
+              shared_owner_a
+              shared_owner_b
+              isolated_owner
+
+            BUNDLED WITH
+               1.13.0
+          L
+        end
+
+        it "should not eagerly unlock shared dependency with bundle install conservative updating behavior" do
+          updated_deps_in_gemfile = [Bundler::Dependency.new("isolated_owner", ">= 0"),
+                                     Bundler::Dependency.new("shared_owner_a", "3.0.2"),
+                                     Bundler::Dependency.new("shared_owner_b", ">= 0")]
+          unlock_hash_for_bundle_install = {}
+          definition = Bundler::Definition.new(
+            bundled_app("Gemfile.lock"),
+            updated_deps_in_gemfile,
+            Bundler::SourceList.new,
+            unlock_hash_for_bundle_install
+          )
+          locked = definition.send(:converge_locked_specs).map(&:name)
+          expect(locked.include?("shared_dep")).to be_truthy
+        end
+
+        it "should not eagerly unlock shared dependency with bundle update conservative updating behavior" do
+          updated_deps_in_gemfile = [Bundler::Dependency.new("isolated_owner", ">= 0"),
+                                     Bundler::Dependency.new("shared_owner_a", ">= 0"),
+                                     Bundler::Dependency.new("shared_owner_b", ">= 0")]
+          definition = Bundler::Definition.new(
+            bundled_app("Gemfile.lock"),
+            updated_deps_in_gemfile,
+            Bundler::SourceList.new,
+            :gems => ["shared_owner_a"], :lock_shared_dependencies => true
+          )
+          locked = definition.send(:converge_locked_specs).map(&:name)
+          expect(locked).to eq %w(isolated_dep isolated_owner shared_dep shared_owner_b)
+          expect(locked.include?("shared_dep")).to be_truthy
+        end
       end
     end
+  end
+
+  describe "find_resolved_spec" do
+    it "with no platform set in SpecSet" do
+      ss = Bundler::SpecSet.new([build_stub_spec("a", "1.0"), build_stub_spec("b", "1.0")])
+      dfn = Bundler::Definition.new(nil, [], mock_source_list, true)
+      dfn.instance_variable_set("@specs", ss)
+      found = dfn.find_resolved_spec(build_spec("a", "0.9", "ruby").first)
+      expect(found.name).to eq "a"
+      expect(found.version.to_s).to eq "1.0"
+    end
+  end
+
+  describe "find_indexed_specs" do
+    it "with no platform set in indexed specs" do
+      index = Bundler::Index.new
+      %w(1.0.0 1.0.1 1.1.0).each {|v| index << build_stub_spec("foo", v) }
+
+      dfn = Bundler::Definition.new(nil, [], mock_source_list, true)
+      dfn.instance_variable_set("@index", index)
+      found = dfn.find_indexed_specs(build_spec("foo", "0.9", "ruby").first)
+      expect(found.length).to eq 3
+    end
+  end
+
+  def build_stub_spec(name, version)
+    Bundler::StubSpecification.new(name, version, nil, nil)
+  end
+
+  def mock_source_list
+    Class.new do
+      def all_sources
+        []
+      end
+
+      def path_sources
+        []
+      end
+
+      def rubygems_remotes
+        []
+      end
+
+      def replace_sources!(arg)
+        nil
+      end
+    end.new
   end
 end

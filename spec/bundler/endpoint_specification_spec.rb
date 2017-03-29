@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::EndpointSpecification do
+RSpec.describe Bundler::EndpointSpecification do
   let(:name)         { "foo" }
   let(:version)      { "1.0.0" }
   let(:platform)     { Gem::Platform::RUBY }
@@ -46,6 +46,19 @@ describe Bundler::EndpointSpecification do
       it "should raise a Bundler::GemspecError with invalid gemspec message" do
         expect { subject.send(:build_dependency, name, [requirement1, requirement2]) }.to raise_error(
           Bundler::GemspecError, /Unfortunately, the gem foo \(1\.0\.0\) has an invalid gemspec/
+        )
+      end
+    end
+  end
+
+  describe "#parse_metadata" do
+    context "when the metadata has malformed requirements" do
+      let(:metadata) { { "rubygems" => ">\n" } }
+      it "raises a helpful error message" do
+        expect { subject }.to raise_error(
+          Bundler::GemspecError,
+          a_string_including("There was an error parsing the metadata for the gem foo (1.0.0)").
+            and(a_string_including('The metadata was {"rubygems"=>">\n"}'))
         )
       end
     end

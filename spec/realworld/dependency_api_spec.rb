@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "gemcutter's dependency API", :realworld => true do
+RSpec.describe "gemcutter's dependency API", :realworld => true do
   context "when Gemcutter API takes too long to respond" do
     before do
       require_rack
@@ -26,6 +26,7 @@ describe "gemcutter's dependency API", :realworld => true do
     end
 
     after do
+      Artifice.deactivate
       @t.kill
       @t.join
     end

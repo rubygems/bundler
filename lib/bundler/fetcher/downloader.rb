@@ -38,6 +38,8 @@ module Bundler
       end
 
       def request(uri, options)
+        validate_uri_scheme!(uri)
+
         Bundler.ui.debug "HTTP GET #{uri}"
         req = Net::HTTP::Get.new uri.request_uri, options
         if uri.user
@@ -60,6 +62,15 @@ module Bundler
         else
           raise HTTPError, "Network error while fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
         end
+      end
+
+    private
+
+      def validate_uri_scheme!(uri)
+        return if uri.scheme =~ /\Ahttps?\z/
+        raise InvalidOption,
+          "The request uri `#{uri}` has an invalid scheme (`#{uri.scheme}`). " \
+          "Did you mean `http` or `https`?"
       end
     end
   end

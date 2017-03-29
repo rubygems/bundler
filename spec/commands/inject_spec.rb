@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle inject" do
+RSpec.describe "bundle inject" do
   before :each do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -39,6 +39,16 @@ describe "bundle inject" do
     it "doesn't add existing gems" do
       bundle "inject 'rack' '> 0'"
       expect(out).to match(/cannot specify the same gem twice/i)
+    end
+  end
+
+  context "incorrect arguments" do
+    it "fails when more than 2 arguments are passed" do
+      bundle "inject gem_name 1 v"
+      expect(out).to eq(<<-E.strip)
+ERROR: "bundle inject" was called with arguments ["gem_name", "1", "v"]
+Usage: "bundle inject GEM VERSION"
+      E
     end
   end
 

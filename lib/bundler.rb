@@ -3,9 +3,10 @@ require "fileutils"
 require "pathname"
 require "rbconfig"
 require "thread"
+require "tmpdir"
+
 require "bundler/errors"
 require "bundler/environment_preserver"
-require "bundler/gem_remote_fetcher"
 require "bundler/plugin"
 require "bundler/rubygems_ext"
 require "bundler/rubygems_integration"
@@ -30,6 +31,7 @@ module Bundler
   autoload :FeatureFlag,            "bundler/feature_flag"
   autoload :GemHelper,              "bundler/gem_helper"
   autoload :GemHelpers,             "bundler/gem_helpers"
+  autoload :GemRemoteFetcher,       "bundler/gem_remote_fetcher"
   autoload :GemVersionPromoter,     "bundler/gem_version_promoter"
   autoload :Graph,                  "bundler/graph"
   autoload :Index,                  "bundler/index"
@@ -38,8 +40,6 @@ module Bundler
   autoload :LazySpecification,      "bundler/lazy_specification"
   autoload :LockfileParser,         "bundler/lockfile_parser"
   autoload :MatchPlatform,          "bundler/match_platform"
-  autoload :Mirror,                 "bundler/mirror"
-  autoload :Mirrors,                "bundler/mirror"
   autoload :RemoteSpecification,    "bundler/remote_specification"
   autoload :Resolver,               "bundler/resolver"
   autoload :Retry,                  "bundler/retry"
@@ -133,7 +133,7 @@ module Bundler
       @locked_gems ||=
         if defined?(@definition) && @definition
           definition.locked_gems
-        elsif Bundler.default_lockfile.exist?
+        elsif Bundler.default_lockfile.file?
           lock = Bundler.read_file(Bundler.default_lockfile)
           LockfileParser.new(lock)
         end
@@ -143,8 +143,44 @@ module Bundler
       "#{Bundler.rubygems.ruby_engine}/#{Bundler.rubygems.config_map[:ruby_version]}"
     end
 
+    def user_home
+      @user_home ||= begin
+        home = Bundler.rubygems.user_home
+
+        warning = if home.nil?
+          "Your home directory is not set."
+        elsif !File.directory?(home)
+          "`#{home}` is not a directory."
+        elsif !File.writable?(home)
+          "`#{home}` is not writable."
+        end
+
+        if warning
+          user_home = tmp_home_path(Etc.getlogin, warning)
+          Bundler.ui.warn "#{warning}\nBundler will use `#{user_home}' as your home directory temporarily.\n"
+          user_home
+        else
+          Pathname.new(home)
+        end
+      end
+    end
+
+    def tmp_home_path(login, warning)
+      login ||= "unknown"
+      path = Pathname.new(Dir.tmpdir).join("bundler", "home")
+      SharedHelpers.filesystem_access(path) do |tmp_home_path|
+        unless tmp_home_path.exist?
+          tmp_home_path.mkpath
+          tmp_home_path.chmod(0o777)
+        end
+        tmp_home_path.join(login).tap(&:mkpath)
+      end
+    rescue => e
+      raise e.exception("#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}")
+    end
+
     def user_bundle_path
-      Pathname.new(Bundler.rubygems.user_home).join(".bundle")
+      Pathname.new(user_home).join(".bundle")
     end
 
     def home
@@ -258,6 +294,11 @@ EOF
       with_clean_env { Kernel.exec(*args) }
     end
 
+    def local_platform
+      return Gem::Platform::RUBY if settings[:force_ruby_platform]
+      Gem::Platform.local
+    end
+
     def default_gemfile
       SharedHelpers.default_gemfile
     end
@@ -329,16 +370,22 @@ EOF
     def sudo(str)
       SUDO_MUTEX.synchronize do
         prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
-        Your user account isn't allowed to install to the system Rubygems.
+        Your user account isn't allowed to install to the system RubyGems.
         You can cancel this installation and run:
 
             bundle install --path vendor/bundle
 
         to install the gems into ./vendor/bundle/, or you can enter your password
-        and install the bundled gems to Rubygems using sudo.
+        and install the bundled gems to RubyGems using sudo.
 
         Password:
         PROMPT
+
+        unless @prompted_for_sudo ||= system(%(sudo -k -p "#{prompt}" true))
+          raise SudoNotPermittedError,
+            "Bundler requires sudo access to install at the moment. " \
+            "Try installing again, granting Bundler sudo access when prompted, or installing into a different path."
+        end
 
         `sudo -p "#{prompt}" #{str}`
       end
@@ -395,6 +442,12 @@ EOF
     end
 
     def reset!
+      reset_paths!
+      Plugin.reset!
+      reset_rubygems!
+    end
+
+    def reset_paths!
       @root = nil
       @settings = nil
       @definition = nil
@@ -403,9 +456,10 @@ EOF
       @locked_gems = nil
       @bundle_path = nil
       @bin_path = nil
+      @user_home = nil
+    end
 
-      Plugin.reset!
-
+    def reset_rubygems!
       return unless defined?(@rubygems) && @rubygems
       rubygems.undo_replacements
       rubygems.reset
@@ -443,7 +497,10 @@ EOF
     def configure_gem_path(env = ENV, settings = self.settings)
       blank_home = env["GEM_HOME"].nil? || env["GEM_HOME"].empty?
       if settings[:disable_shared_gems]
-        env["GEM_PATH"] = nil
+        # this needs to be empty string to cause
+        # PathSupport.split_gem_path to only load up the
+        # Bundler --path setting as the GEM_PATH.
+        env["GEM_PATH"] = ""
       elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
         paths = possibles.flatten.compact.uniq.reject(&:empty?)

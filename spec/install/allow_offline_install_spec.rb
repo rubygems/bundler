@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "bundle install with :allow_offline_install" do
+RSpec.describe "bundle install with :allow_offline_install" do
   before do
     bundle "config allow_offline_install true"
   end

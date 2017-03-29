@@ -7,8 +7,12 @@ require "bundler/version"
 Gem::Specification.new do |s|
   s.name        = "bundler"
   s.version     = Bundler::VERSION
-  s.licenses    = ["MIT"]
-  s.authors     = ["André Arko", "Samuel Giddins"]
+  s.license     = "MIT"
+  s.authors     = [
+    "André Arko", "Samuel Giddins", "Chris Morris", "James Wen", "Tim Moore",
+    "André Medeiros", "Jessica Lynn Suttles", "Terence Lee", "Carl Lerche",
+    "Yehuda Katz"
+  ]
   s.email       = ["team@bundler.io"]
   s.homepage    = "http://bundler.io"
   s.summary     = "The best way to manage your application's dependencies"
@@ -27,7 +31,7 @@ Gem::Specification.new do |s|
   s.files = `git ls-files -z`.split("\x0").reject {|f| f.match(%r{^(test|spec|features)/}) }
   # we don't check in man pages, but we need to ship them because
   # we use them to generate the long-form help for each command.
-  s.files += Dir.glob("lib/bundler/man/**/*")
+  s.files += Dir.glob("man/**/*")
 
   s.bindir        = "exe"
   s.executables   = %w(bundle bundler)

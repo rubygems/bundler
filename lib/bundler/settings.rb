@@ -3,13 +3,20 @@ require "uri"
 
 module Bundler
   class Settings
+    autoload :Mirror,  "bundler/mirror"
+    autoload :Mirrors, "bundler/mirror"
+
     BOOL_KEYS = %w(
       allow_offline_install
+      auto_install
       cache_all
+      cache_all_platforms
       disable_checksum_validation
       disable_exec_load
       disable_local_branch_check
       disable_shared_gems
+      disable_version_check
+      force_ruby_platform
       frozen
       gem.coc
       gem.mit
@@ -42,11 +49,18 @@ module Bundler
       @local_config    = load_config(local_config_file)
       @global_config   = load_config(global_config_file)
       @cli_flags_given = false
+      @temporary       = {}
     end
 
     def [](name)
       key = key_for(name)
-      value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
+      value = @temporary.fetch(name) do
+              @local_config.fetch(key) do
+              ENV.fetch(key) do
+              @global_config.fetch(key) do
+              DEFAULT_CONFIG.fetch(name) do
+                nil
+              end end end end end
 
       if value.nil?
         nil
@@ -76,8 +90,18 @@ module Bundler
       local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
       set_key(key, value, @local_config, local_config_file)
     end
-
     alias_method :set_local, :[]=
+
+    def temporary(update)
+      existing = Hash[update.map {|k, _| [k, @temporary[k]] }]
+      @temporary.update(update)
+      return unless block_given?
+      begin
+        yield
+      ensure
+        existing.each {|k, v| v.nil? ? @temporary.delete(k) : @temporary[k] = v }
+      end
+    end
 
     def delete(key)
       @local_config.delete(key_for(key))
@@ -221,7 +245,12 @@ module Bundler
     end
 
     def to_bool(value)
-      !(value.nil? || value == "" || value =~ /^(false|f|no|n|0)$/i || value == false)
+      case value
+      when nil, /\A(false|f|no|n|0|)\z/i, false
+        false
+      else
+        true
+      end
     end
 
     def is_num(value)
@@ -256,7 +285,11 @@ module Bundler
       if ENV["BUNDLE_CONFIG"] && !ENV["BUNDLE_CONFIG"].empty?
         Pathname.new(ENV["BUNDLE_CONFIG"])
       else
-        Bundler.user_bundle_path.join("config")
+        begin
+          Bundler.user_bundle_path.join("config")
+        rescue PermissionError, GenericSystemCallError
+          nil
+        end
       end
     end
 
@@ -279,10 +312,10 @@ module Bundler
     }xo
 
     def load_config(config_file)
-      return unless config_file
+      return {} if !config_file || ignore_config?
       SharedHelpers.filesystem_access(config_file, :read) do |file|
         valid_file = file.exist? && !file.size.zero?
-        return {} if ignore_config? || !valid_file
+        return {} unless valid_file
         require "bundler/yaml_serializer"
         YAMLSerializer.load file.read
       end

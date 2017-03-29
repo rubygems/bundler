@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Plugin::API do
+RSpec.describe Bundler::Plugin::API do
   context "plugin declarations" do
     before do
       stub_const "UserPluginClass", Class.new(Bundler::Plugin::API)

@@ -4,7 +4,7 @@ require "stringio"
 require "bundler/cli"
 require "bundler/cli/doctor"
 
-describe "bundle doctor" do
+RSpec.describe "bundle doctor" do
   before(:each) do
     @stdout = StringIO.new
 

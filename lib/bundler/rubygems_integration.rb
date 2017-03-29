@@ -71,8 +71,13 @@ module Bundler
       spec.installed_by_version = Gem::Version.create(installed_by_version)
     end
 
-    def spec_missing_extensions?(spec)
-      !spec.respond_to?(:missing_extensions?) || spec.missing_extensions?
+    def spec_missing_extensions?(spec, default = true)
+      return spec.missing_extensions? if spec.respond_to?(:missing_extensions?)
+
+      return false if spec.respond_to?(:default_gem?) && spec.default_gem?
+      return false if spec.extensions.empty?
+
+      default
     end
 
     def path(obj)
@@ -80,6 +85,7 @@ module Bundler
     end
 
     def platforms
+      return [Gem::Platform::RUBY] if Bundler.settings[:force_ruby_platform]
       Gem.platforms
     end
 
@@ -194,6 +200,10 @@ module Bundler
       end
     end
 
+    def load_plugins
+      Gem.load_plugins if Gem.respond_to?(:load_plugins)
+    end
+
     def ui=(obj)
       Gem::DefaultUserInteraction.ui = obj
     end
@@ -203,6 +213,7 @@ module Bundler
     end
 
     def fetch_specs(all, pre, &blk)
+      require "rubygems/spec_fetcher"
       specs = Gem::SpecFetcher.new.list(all, pre)
       specs.each { yield } if block_given?
       specs
@@ -241,6 +252,10 @@ module Bundler
           self.build_args = old_args
         end
       end
+    end
+
+    def install_with_build_args(args)
+      with_build_args(args) { yield }
     end
 
     def gem_from_path(path, policy = nil)
@@ -348,6 +363,10 @@ module Bundler
 
           true
         end
+
+        # TODO: delete this in 2.0, it's a backwards compatibility shim
+        # see https://github.com/bundler/bundler/issues/5102
+        kernel_class.send(:public, :gem)
       end
     end
 
@@ -395,6 +414,17 @@ module Bundler
             "to work around a system/bundle conflict."
         end
         spec
+      end
+
+      redefine_method(gem_class, :activate_bin_path) do |name, *args|
+        exec_name = args.first
+        return ENV["BUNDLE_BIN_PATH"] if exec_name == "bundle"
+
+        # Copy of Rubygems activate_bin_path impl
+        requirement = args.last
+        spec = find_spec_for_exe name, exec_name, [requirement]
+        Gem::LOADED_SPECS_MUTEX.synchronize { spec.activate }
+        spec.bin_file exec_name
       end
 
       redefine_method(gem_class, :bin_path) do |name, *args|
@@ -489,6 +519,7 @@ module Bundler
     end
 
     def redefine_method(klass, method, unbound_method = nil, &block)
+      visibility = method_visibility(klass, method)
       begin
         if (instance_method = klass.instance_method(method)) && method != :initialize
           # doing this to ensure we also get private methods
@@ -501,8 +532,20 @@ module Bundler
       @replaced_methods[[method, klass]] = instance_method
       if unbound_method
         klass.send(:define_method, method, unbound_method)
+        klass.send(visibility, method)
       elsif block
         klass.send(:define_method, method, &block)
+        klass.send(visibility, method)
+      end
+    end
+
+    def method_visibility(klass, method)
+      if klass.private_method_defined?(method)
+        :private
+      elsif klass.protected_method_defined?(method)
+        :protected
+      else
+        :public
       end
     end
 
@@ -682,6 +725,10 @@ module Bundler
       def repository_subdirectories
         Gem::REPOSITORY_SUBDIRECTORIES
       end
+
+      def install_with_build_args(args)
+        yield
+      end
     end
 
     # RubyGems 2.1.0
@@ -721,6 +768,14 @@ module Bundler
             spec.name == name
           end.map(&:to_spec)
         end
+      end
+
+      def use_gemdeps(gemfile)
+        ENV["BUNDLE_GEMFILE"] ||= File.expand_path(gemfile)
+        runtime = Bundler.setup
+        Bundler.ui = nil
+        activated_spec_names = runtime.requested_specs.map(&:to_spec).sort_by(&:name)
+        [Gemdeps.new(runtime), activated_spec_names]
       end
     end
   end

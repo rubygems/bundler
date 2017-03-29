@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/ssl_certs/certificate_manager"
 
-describe "SSL Certificates", :rubygems_master do
+RSpec.describe "SSL Certificates", :rubygems_master do
   hosts = %w(
     rubygems.org
     index.rubygems.org

@@ -65,7 +65,7 @@ The options that can be configured are:
   The location to install the specified gems to. This defaults to Rubygems'
   setting. Bundler shares this location with Rubygems, `gem install ...` will
   have gem installed there, too. Therefore, gems installed without a
-  `--path ...` setting will show up by calling `gem list`. Accodingly, gems
+  `--path ...` setting will show up by calling `gem list`. Accordingly, gems
   installed to other locations will not get listed.
 
 * `without`:
@@ -142,7 +142,7 @@ learn more about their operation in [bundle install(1)][bundle-install].
   and key in PEM format.
 * `cache_path` (`BUNDLE_CACHE_PATH`): The directory that bundler will place
   cached gems in when running <code>bundle package</code>, and that bundler
-  will look in when installing gems.
+  will look in when installing gems. Defaults to `vendor/bundle`.
 * `disable_multisource` (`BUNDLE_DISABLE_MULTISOURCE`): When set, Gemfiles
   containing multiple sources will produce errors instead of warnings. Use
   `bundle config --delete disable_multisource` to unset.
@@ -155,6 +155,73 @@ learn more about their operation in [bundle install(1)][bundle-install].
    The number of redirects allowed for network requests. Defaults to `5`.
 * `timeout` (`BUNDLE_TIMEOUT`):
    The seconds allowed before timing out for network requests. Defaults to `10`.
+* `force_ruby_platform` (`BUNDLE_FORCE_RUBY_PLATFORM`):
+   Ignore the current machine's platform and install only `ruby` platform gems.
+   As a result, gems with native extensions will be compiled from source.
+* `specific_platform` (`BUNDLE_SPECIFIC_PLATFORM`):
+   Allow bundler to resolve for the specific running platform and store it in
+   the lockfile, instead of only using a generic platform.
+   A specific platform is the exact platform triple reported by
+   `Gem::Platform.local`, such as `x86_64-darwin-16` or `universal-java-1.8`.
+   On the other hand, generic platforms are those such as `ruby`, `mswin`, or
+   `java`. In this example, `x86_64-darwin-16` would map to `ruby` and
+   `universal-java-1.8` to `java`.
+* `disable_checksum_validation` (`BUNDLE_DISABLE_CHECKSUM_VALIDATION`):
+   Allow installing gems even if they do not match the checksum provided by
+   RubyGems.
+* `disable_version_check` (`BUNDLE_DISABLE_VERSION_CHECK`):
+   Stop Bundler from checking if a newer Bundler version is available on
+   rubygems.org.
+* `allow_offline_install` (`BUNDLE_ALLOW_OFFLINE_INSTALL`):
+   Allow Bundler to use cached data when installing without network access.
+* `auto_install` (`BUNDLE_AUTO_INSTALL`):
+   Automatically run `bundle install` when gems are missing.
+* `cache_all_platforms` (`BUNDLE_CACHE_ALL_PLATFORMS`):
+   Cache gems for all platforms.
+* `cache_all` (`BUNDLE_CACHE_ALL`):
+   Cache all gems, including path and git gems.
+* `clean` (`BUNDLE_CLEAN`):
+   Whether Bundler should run `bundle clean` automatically after
+   `bundle install`.
+* `console` (`BUNDLE_CONSOLE`):
+   The console that `bundle console` starts. Defaults to `irb`.
+* `disable_exec_load` (`BUNDLE_DISABLE_EXEC_LOAD`):
+   Stop Bundler from using `load` to launch an executable in-process in
+   `bundle exec`.
+* `disable_local_branch_check` (`BUNDLE_DISABLE_LOCAL_BRANCH_CHECK`):
+   Allow Bundler to use a local git override without a branch specified in the
+   Gemfile.
+* `disable_shared_gems` (`BUNDLE_DISABLE_SHARED_GEMS`):
+   Stop Bundler from accessing gems installed to RubyGems' normal location.
+* `jobs` (`BUNDLE_JOBS`):
+   The number of gems Bundler can install in parallel. Defaults to 1.
+* `major_deprecations` (`BUNDLE_MAJOR_DEPRECATIONS`):
+   Whether Bundler should print deprecation warnings for behavior that will
+   be changed in the next major version.
+* `no_install` (`BUNDLE_NO_INSTALL`):
+   Whether `bundle package` should skip installing gems.
+* `no_prune` (`BUNDLE_NO_PRUNE`):
+   Whether Bundler should leave outdated gems unpruned when caching.
+* `only_update_to_newer_versions` (`BUNDLE_ONLY_UPDATE_TO_NEWER_VERSIONS`):
+   During `bundle update`, only resolve to newer versions of the gems in the
+   lockfile.
+* `plugins` (`BUNDLE_PLUGINS`):
+   Enable Bundler's experimental plugin system.
+* `shebang` (`BUNDLE_SHEBANG`):
+   The program name that should be invoked for generated binstubs. Defaults to
+   the ruby install name used to generate the binstub.
+* `silence_root_warning` (`BUNDLE_SILENCE_ROOT_WARNING`):
+   Silence the warning Bundler prints when installing gems as root.
+* `ssl_verify_mode` (`BUNDLE_SSL_VERIFY_MODE`):
+   The SSL verification mode Bundler uses when making HTTPS requests.
+   Defaults to verify peer.
+* `system_bindir` (`BUNDLE_SYSTEM_BINDIR`):
+   The location where RubyGems installs binstubs. Defaults to `Gem.bindir`.
+* `user_agent` (`BUNDLE_USER_AGENT`):
+   The custom user agent fragment Bundler includes in API requests.
+* `gem.push_key` (`BUNDLE_GEM__PUSH_KEY`):
+   Sets the `--key` paramter for `gem push` when using the `rake release`
+   command with a private gemstash server.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
@@ -204,9 +271,22 @@ mirror to fetch gems.
 
     bundle config mirror.SOURCE_URL MIRROR_URL
 
-For example, to use a mirror of rubygems.org hosted at
+For example, to use a mirror of rubygems.org hosted at rubygems-mirror.org:
 
     bundle config mirror.http://rubygems.org http://rubygems-mirror.org
+
+Each mirror also provides a fallback timeout setting. If the mirror does not
+respond within the fallback timeout, Bundler will try to use the original
+server instead of the mirror.
+
+    bundle config mirror.SOURCE_URL.fallback_timeout TIMEOUT
+
+For example, to fall back to rubygems.org after 3 seconds:
+
+    bundle config mirror.https://rubygems.org.fallback_timeout 3
+
+The default fallback timeout is 0.1 seconds, but the setting can currently
+only accept whole seconds (for example, 1, 15, or 30).
 
 ## CREDENTIALS FOR GEM SOURCES
 
@@ -223,3 +303,16 @@ For example, to save the credentials of user `claudette` for the gem source at
 Or you can set the credentials as an environment variable like this:
 
     export BUNDLE_GEMS__LONGEROUS__COM="claudette:s00pers3krit"
+
+For gems with a git source with HTTP(S) URL you can specify credentials like so:
+
+    bundle config https://github.com/bundler/bundler.git username:password
+
+Or you can set the credentials as an environment variable like so:
+
+    export BUNDLE_GITHUB__COM=username:password
+
+This is especially useful for private repositories on hosts such as Github,
+where you can use personal OAuth tokens:
+
+    export BUNDLE_GITHUB__COM=abcd0123generatedtoken:x-oauth-basic

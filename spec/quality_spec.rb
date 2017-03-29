@@ -6,7 +6,7 @@ if defined?(Encoding) && Encoding.default_external.name != "UTF-8"
   Encoding.default_external = Encoding.find("UTF-8")
 end
 
-describe "The library itself" do
+RSpec.describe "The library itself" do
   def check_for_spec_defs_with_single_quotes(filename)
     failing_lines = []
 
@@ -189,6 +189,38 @@ describe "The library itself" do
       end
     end
     expect(error_messages.compact).to be_well_formed
+  end
+
+  it "documents all used settings" do
+    exemptions = %w(
+      gem.coc
+      gem.mit
+      warned_version
+    )
+
+    all_settings = Hash.new {|h, k| h[k] = [] }
+    documented_settings = exemptions
+
+    Bundler::Settings::BOOL_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::BOOL_KEYS" }
+    Bundler::Settings::NUMBER_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::NUMBER_KEYS" }
+
+    Dir.chdir(File.expand_path("../../lib", __FILE__)) do
+      key_pattern = /([a-z\._-]+)/i
+      `git ls-files -z`.split("\x0").each do |filename|
+        File.readlines(filename).each_with_index do |line, number|
+          line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `lib/#{filename}:#{number.succ}`" }
+        end
+      end
+      documented_settings = File.read("../man/bundle-config.ronn").scan(/^\* `#{key_pattern}`/).flatten
+    end
+
+    documented_settings.each {|s| all_settings.delete(s) }
+    exemptions.each {|s| all_settings.delete(s) }
+    error_messages = all_settings.map do |setting, refs|
+      "The `#{setting}` setting is undocumented\n\t- #{refs.join("\n\t- ")}\n"
+    end
+
+    expect(error_messages.sort).to be_well_formed
   end
 
   it "can still be built" do

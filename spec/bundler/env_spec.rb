@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/settings"
 
-describe Bundler::Env do
+RSpec.describe Bundler::Env do
   let(:env)            { described_class.new }
   let(:git_proxy_stub) { Bundler::Source::Git::GitProxy.new(nil, nil, nil) }
 
@@ -49,9 +49,17 @@ describe Bundler::Env do
       end
     end
 
+    context "when there no Gemfile and print_gemfile is true" do
+      let(:output) { env.report(:print_gemfile => true) }
+
+      it "prints the environment" do
+        expect(output).to start_with("## Environment")
+      end
+    end
+
     context "when Gemfile contains a gemspec and print_gemspecs is true" do
       let(:gemspec) do
-        <<-GEMSPEC.gsub(/^\s+/, "")
+        strip_whitespace(<<-GEMSPEC)
           Gem::Specification.new do |gem|
             gem.name = "foo"
             gem.author = "Fumofu"
@@ -68,7 +76,7 @@ describe Bundler::Env do
       end
 
       it "prints the gemspec" do
-        output = env.report(:print_gemspecs => true).gsub(/^\s+/, "")
+        output = env.report(:print_gemspecs => true)
 
         expect(output).to include("foo.gemspec")
         expect(output).to include(gemspec)

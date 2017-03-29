@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "Bundler.setup" do
+RSpec.describe "Bundler.setup" do
   describe "with no arguments" do
     it "makes all groups available" do
       install_gemfile <<-G
@@ -673,6 +673,34 @@ describe "Bundler.setup" do
     expect(out).to be_empty
   end
 
+  it "does not load all gemspecs", :rubygems => ">= 2.3" do
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    run! <<-R
+      File.open(File.join(Gem.dir, "specifications", "broken.gemspec"), "w") do |f|
+        f.write <<-RUBY
+# -*- encoding: utf-8 -*-
+# stub: broken 1.0.0 ruby lib
+
+Gem::Specification.new do |s|
+  s.name = "broken"
+  s.version = "1.0.0"
+  raise "BROKEN GEMSPEC"
+end
+        RUBY
+      end
+    R
+
+    run! <<-R
+      puts "WIN"
+    R
+
+    expect(out).to eq("WIN")
+  end
+
   it "ignores empty gem paths" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -1080,8 +1108,8 @@ describe "Bundler.setup" do
     end
   end
 
-  describe "when Psych is not in the Gemfile", :ruby => "~> 2.2" do
-    it "does not load Psych" do
+  describe "with gemified standard libraries" do
+    it "does not load Psych", :ruby => "~> 2.2" do
       gemfile ""
       ruby <<-RUBY
         require 'bundler/setup'
@@ -1092,6 +1120,32 @@ describe "Bundler.setup" do
       pre_bundler, post_bundler = out.split("\n")
       expect(pre_bundler).to eq("undefined")
       expect(post_bundler).to match(/\d+\.\d+\.\d+/)
+    end
+
+    it "does not load openssl" do
+      install_gemfile! ""
+      ruby! <<-RUBY
+        require "bundler/setup"
+        puts defined?(OpenSSL) || "undefined"
+        require "openssl"
+        puts defined?(OpenSSL) || "undefined"
+      RUBY
+      expect(out).to eq("undefined\nconstant")
+    end
+  end
+
+  describe "after setup" do
+    it "allows calling #gem on random objects" do
+      install_gemfile <<-G
+        source "file:#{gem_repo1}"
+        gem "rack"
+      G
+      ruby! <<-RUBY
+        require "bundler/setup"
+        Object.new.gem "rack"
+        puts Gem.loaded_specs["rack"].full_name
+      RUBY
+      expect(out).to eq("rack-1.0.0")
     end
   end
 end

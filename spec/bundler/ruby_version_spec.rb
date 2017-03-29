@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/ruby_version"
 
-describe "Bundler::RubyVersion and its subclasses" do
+RSpec.describe "Bundler::RubyVersion and its subclasses" do
   let(:version)              { "2.0.0" }
   let(:patchlevel)           { "645" }
   let(:engine)               { "jruby" }
@@ -32,6 +32,14 @@ describe "Bundler::RubyVersion and its subclasses" do
 
         it "should set engine version as the passed version" do
           expect(subject.engine_versions).to eq(["2.0.0"])
+        end
+      end
+
+      context "with engine in symbol" do
+        let(:engine) { :jruby }
+
+        it "should coerce engine to string" do
+          expect(subject.engine).to eq("jruby")
         end
       end
 

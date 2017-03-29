@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "Bundler.setup with multi platform stuff" do
+RSpec.describe "Bundler.setup with multi platform stuff" do
   it "raises a friendly error when gems are missing locally" do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -87,5 +87,37 @@ describe "Bundler.setup with multi platform stuff" do
     G
 
     expect(the_bundle).to include_gems "nokogiri 1.4.2", "platform_specific 1.0 x86-darwin-100"
+  end
+
+  it "allows specifying only-ruby-platform" do
+    simulate_platform "java"
+
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gem "nokogiri"
+      gem "platform_specific"
+    G
+
+    bundle! "config force_ruby_platform true"
+
+    bundle! "install"
+
+    expect(the_bundle).to include_gems "nokogiri 1.4.2", "platform_specific 1.0 RUBY"
+  end
+
+  it "allows specifying only-ruby-platform on windows with dependency platforms" do
+    simulate_windows do
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gem "nokogiri", :platforms => [:mingw, :mswin, :x64_mingw, :jruby]
+        gem "platform_specific"
+      G
+
+      bundle! "config force_ruby_platform true"
+
+      bundle! "install"
+
+      expect(the_bundle).to include_gems "platform_specific 1.0 RUBY"
+    end
   end
 end

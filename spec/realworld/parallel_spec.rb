@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "parallel", :realworld => true, :sometimes => true do
+RSpec.describe "parallel", :realworld => true, :sometimes => true do
   it "installs" do
     gemfile <<-G
       source "https://rubygems.org"

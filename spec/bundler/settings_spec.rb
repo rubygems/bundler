@@ -2,7 +2,7 @@
 require "spec_helper"
 require "bundler/settings"
 
-describe Bundler::Settings do
+RSpec.describe Bundler::Settings do
   subject(:settings) { described_class.new(bundled_app) }
 
   describe "#set_local" do
@@ -51,9 +51,41 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       end]
       expect(loaded).to eq(expected)
     end
+
+    context "when BUNDLE_IGNORE_CONFIG is set" do
+      before { ENV["BUNDLE_IGNORE_CONFIG"] = "TRUE" }
+
+      it "ignores the config" do
+        loaded = settings.send(:load_config, bundled_app("config"))
+        expect(loaded).to eq({})
+      end
+    end
+  end
+
+  describe "#global_config_file" do
+    context "when $HOME is not accessible" do
+      context "when $TMPDIR is not writable" do
+        it "does not raise" do
+          expect(Bundler.rubygems).to receive(:user_home).twice.and_return(nil)
+          expect(FileUtils).to receive(:mkpath).twice.with(File.join(Dir.tmpdir, "bundler", "home")).and_raise(Errno::EROFS, "Read-only file system @ dir_s_mkdir - /tmp/bundler")
+
+          expect(subject.send(:global_config_file)).to be_nil
+        end
+      end
+    end
   end
 
   describe "#[]" do
+    context "when the local config file is not found" do
+      subject(:settings) { described_class.new }
+
+      it "does not raise" do
+        expect do
+          subject["foo"]
+        end.not_to raise_error
+      end
+    end
+
     context "when not set" do
       context "when default value present" do
         it "retrieves value" do
@@ -93,6 +125,18 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
         expect { settings[:frozen] = "1" }.
           to raise_error(Bundler::PermissionError, /config/)
       end
+    end
+  end
+
+  describe "#temporary" do
+    it "reset after used" do
+      Bundler.settings[:no_install] = true
+
+      Bundler.settings.temporary(:no_install => false) do
+        expect(Bundler.settings[:no_install]).to eq false
+      end
+
+      expect(Bundler.settings[:no_install]).to eq true
     end
   end
 

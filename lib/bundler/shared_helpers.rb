@@ -8,6 +8,7 @@ require "bundler/current_ruby"
 
 module Gem
   class Dependency
+    # This is only needed for RubyGems < 1.4
     unless method_defined? :requirement
       def requirement
         version_requirements
@@ -18,8 +19,6 @@ end
 
 module Bundler
   module SharedHelpers
-    attr_accessor :gem_loaded
-
     def default_gemfile
       gemfile = find_gemfile
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
@@ -39,10 +38,12 @@ module Bundler
       bundle_dir = find_directory(".bundle")
       return nil unless bundle_dir
 
-      global_bundle_dir = File.join(Bundler.rubygems.user_home, ".bundle")
+      bundle_dir = Pathname.new(bundle_dir)
+
+      global_bundle_dir = Bundler.user_home.join(".bundle")
       return nil if bundle_dir == global_bundle_dir
 
-      Pathname.new(bundle_dir)
+      bundle_dir
     end
 
     def in_bundle?
@@ -101,16 +102,24 @@ module Bundler
     #   end
     #
     # @see {Bundler::PermissionError}
-    def filesystem_access(path, action = :write)
-      yield path.dup.untaint
+    def filesystem_access(path, action = :write, &block)
+      # Use block.call instead of yield because of a bug in Ruby 2.2.2
+      # See https://github.com/bundler/bundler/issues/5341 for details
+      block.call(path.dup.untaint)
     rescue Errno::EACCES
       raise PermissionError.new(path, action)
     rescue Errno::EAGAIN
       raise TemporaryResourceError.new(path, action)
     rescue Errno::EPROTO
       raise VirtualProtocolError.new
+    rescue Errno::ENOSPC
+      raise NoSpaceOnDeviceError.new(path, action)
     rescue *[const_get_safely(:ENOTSUP, Errno)].compact
       raise OperationNotSupportedError.new(path, action)
+    rescue Errno::EEXIST, Errno::ENOENT
+      raise
+    rescue SystemCallError => e
+      raise GenericSystemCallError.new(e, "There was an error accessing `#{path}`.")
     end
 
     def const_get_safely(constant_name, namespace)
@@ -202,24 +211,27 @@ module Bundler
 
     def set_rubylib
       rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
-      rubylib.unshift File.expand_path("../..", __FILE__)
+      rubylib.unshift bundler_ruby_lib
       ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
+    end
+
+    def bundler_ruby_lib
+      File.expand_path("../..", __FILE__)
     end
 
     def clean_load_path
       # handle 1.9 where system gems are always on the load path
-      if defined?(::Gem)
-        me = File.expand_path("../../", __FILE__)
-        me = /^#{Regexp.escape(me)}/
+      return unless defined?(::Gem)
 
-        loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
+      bundler_lib = bundler_ruby_lib
 
-        $LOAD_PATH.reject! do |p|
-          next if File.expand_path(p) =~ me
-          loaded_gem_paths.delete(p)
-        end
-        $LOAD_PATH.uniq!
+      loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
+
+      $LOAD_PATH.reject! do |p|
+        next if File.expand_path(p).start_with?(bundler_lib)
+        loaded_gem_paths.delete(p)
       end
+      $LOAD_PATH.uniq!
     end
 
     def prints_major_deprecations?
@@ -234,7 +246,7 @@ module Bundler
     def deprecate_gemfile(gemfile)
       return unless gemfile && File.basename(gemfile) == "Gemfile"
       Bundler::SharedHelpers.major_deprecation \
-        "gems.rb and gems.locked will be prefered to Gemfile and Gemfile.lock."
+        "gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock."
     end
 
     extend self

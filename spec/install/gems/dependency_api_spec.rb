@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "gemcutter's dependency API" do
+RSpec.describe "gemcutter's dependency API" do
   let(:source_hostname) { "localgemserver.test" }
   let(:source_uri) { "http://#{source_hostname}" }
 
@@ -124,7 +124,7 @@ describe "gemcutter's dependency API" do
       gem "rcov"
     G
 
-    bundle :install, :fakeweb => "windows"
+    bundle :install, :artifice => "windows"
     expect(out).to include("Fetching source index from #{source_uri}")
     expect(the_bundle).to include_gems "rcov 1.0.0"
   end

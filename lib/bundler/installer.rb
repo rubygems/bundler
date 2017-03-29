@@ -49,7 +49,7 @@ module Bundler
     # Bundler returns a warning message stating so and this method returns.
     #
     # Fourthly, Bundler checks if the default lockfile (Gemfile.lock) exists, and if so
-    # then proceeds to set up a defintion based on the default gemfile (Gemfile) and the
+    # then proceeds to set up a definition based on the default gemfile (Gemfile) and the
     # default lock file (Gemfile.lock). However, this is not the case if the platform is different
     # to that which is specified in Gemfile.lock, or if there are any missing specs for the gems.
     #
@@ -159,6 +159,7 @@ module Bundler
     # that said, it's a rare situation (other than rake), and parallel
     # installation is SO MUCH FASTER. so we let people opt in.
     def install(options)
+      Bundler.rubygems.load_plugins
       force = options["force"]
       jobs = 1
       jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?
@@ -211,7 +212,7 @@ module Bundler
     end
 
     def resolve_if_need(options)
-      if Bundler.default_lockfile.exist? && !options["update"]
+      if !options["update"] && !options[:inline] && Bundler.default_lockfile.file?
         local = Bundler.ui.silence do
           begin
             tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe "major deprecations" do
+RSpec.describe "major deprecations" do
   let(:warnings) { out } # change to err in 2.0
 
   context "in a .99 version" do
@@ -97,7 +97,7 @@ describe "major deprecations" do
         G
 
         bundle :install, :binstubs => true
-        expect(warnings).to have_major_deprecation a_string_including("the --binstubs option will be removed")
+        expect(warnings).to have_major_deprecation a_string_including("The --binstubs option will be removed")
       end
     end
   end
@@ -120,7 +120,7 @@ describe "major deprecations" do
         gem "rack"
       G
 
-      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be prefered to Gemfile and Gemfile.lock.")
+      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
     end
 
     context "with flags" do
@@ -154,7 +154,7 @@ describe "major deprecations" do
         Bundler.setup
       RUBY
 
-      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be prefered to Gemfile and Gemfile.lock.")
+      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
     end
   end
 

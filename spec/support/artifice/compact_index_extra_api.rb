@@ -15,8 +15,8 @@ class CompactIndexExtraApi < CompactIndexAPI
       file = tmp("versions.list")
       file.delete if file.file?
       file = CompactIndex::VersionsFile.new(file.to_s)
-      file.update_with(gems(gem_repo4))
-      CompactIndex.versions(file, nil, {})
+      file.create(gems(gem_repo4))
+      file.contents
     end
   end
 

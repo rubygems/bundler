@@ -37,6 +37,11 @@ module Bundler
       when Gem::InvalidSpecificationException
         Bundler.ui.error error.message, :wrap => true
       when SystemExit
+      when *[defined?(Java::JavaLang::OutOfMemoryError) && Java::JavaLang::OutOfMemoryError].compact
+        Bundler.ui.error "\nYour JVM has run out of memory, and Bundler cannot continue. " \
+          "You can decrease the amount of memory Bundler needs by removing gems from your Gemfile, " \
+          "especially large gems. (Gems can be as large as hundreds of megabytes, and Bundler has to read those files!). " \
+          "Alternatively, you can increase the amount of memory the JVM is able to use by running Bundler with jruby -J-Xmx1024m -S bundle (JRuby defaults to 500MB)."
       else request_issue_report_for(error)
       end
     end
@@ -53,25 +58,41 @@ module Bundler
     def request_issue_report_for(e)
       Bundler.ui.info <<-EOS.gsub(/^ {8}/, "")
         --- ERROR REPORT TEMPLATE -------------------------------------------------------
-        - What did you do?
+        # Error Report
+
+        ## Questions
+
+        Please fill out answers to these questions, it'll help us figure out
+        why things are going wrong.
+
+        - **What did you do?**
 
           I ran the command `#{$PROGRAM_NAME} #{ARGV.join(" ")}`
 
-        - What did you expect to happen?
+        - **What did you expect to happen?**
 
           I expected Bundler to...
 
-        - What happened instead?
+        - **What happened instead?**
 
           Instead, what happened was...
 
+        - **Have you tried any solutions posted on similar issues in our issue tracker, stack overflow, or google?**
 
-        Error details
+          I tried...
 
-            #{e.class}: #{e.message}
-              #{e.backtrace && e.backtrace.join("\n              ")}
+        - **Have you read our issues document, https://github.com/bundler/bundler/blob/master/doc/contributing/ISSUES.md?**
 
-        #{Bundler::Env.new.report(:print_gemfile => false, :print_gemspecs => false).gsub(/\n/, "\n      ").strip}
+          ...
+
+        ## Backtrace
+
+        ```
+        #{e.class}: #{e.message}
+          #{e.backtrace && e.backtrace.join("\n          ").chomp}
+        ```
+
+        #{Bundler::Env.new.report}
         --- TEMPLATE END ----------------------------------------------------------------
 
       EOS

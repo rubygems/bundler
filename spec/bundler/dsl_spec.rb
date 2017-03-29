@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Dsl do
+RSpec.describe Bundler::Dsl do
   before do
     @rubygems = double("rubygems")
     allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }
@@ -93,8 +93,8 @@ describe Bundler::Dsl do
   end
 
   describe "#gem" do
-    [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :ruby_22, :ruby_23, :mri, :mri_18, :mri_19,
-     :mri_20, :mri_21, :mri_22, :mri_23, :jruby, :rbx].each do |platform|
+    [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :ruby_22, :ruby_23, :ruby_24, :ruby_25, :mri, :mri_18, :mri_19,
+     :mri_20, :mri_21, :mri_22, :mri_23, :mri_24, :mri_25, :jruby, :rbx].each do |platform|
       it "allows #{platform} as a valid platform" do
         subject.gem("foo", :platform => platform)
       end

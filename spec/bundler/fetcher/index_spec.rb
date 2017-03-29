@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Bundler::Fetcher::Index do
+RSpec.describe Bundler::Fetcher::Index do
   let(:downloader)  { nil }
   let(:remote)      { nil }
   let(:display_uri) { "http://sample_uri.com" }
