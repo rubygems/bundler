@@ -48,7 +48,7 @@ If these options must be remembered,they must be set using `bundle config`
 
 The options that can be configured are:
 
-* `binstubs`:
+* `bin`:
   Creates a directory (defaults to `~/bin`) and place any executables from the
   gem there. These executables run in Bundler's context. If used, you might add
   this directory to your environment's `PATH` variable. For instance, if the
