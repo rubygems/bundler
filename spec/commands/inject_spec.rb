@@ -69,7 +69,7 @@ Usage: "bundle inject GEM VERSION"
       expect(gemfile).to include str
     end
 
-    it "add gem with multiple group in gemfile" do
+    it "add gem with multiple groups in gemfile" do
       bundle "inject 'rack-obama' '>0' --group=development,test"
       gemfile = bundled_app("Gemfile").read
       str = "gem 'rack-obama', '> 0', :group => [:development, :test]"
