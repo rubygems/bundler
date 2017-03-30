@@ -23,12 +23,12 @@ module Bundler
           o << %(  In Gemfile:\n)
           trees = conflict.requirement_trees
 
-          maximal = 1.upto(trees.size).flat_map do |size|
-            trees.flat_map(&:last).combination(size).to_a
-          end.select do |deps|
+          maximal = 1.upto(trees.size).map do |size|
+            trees.map(&:last).flatten(1).combination(size).to_a
+          end.flatten(1).select do |deps|
             Bundler::VersionRanges.empty?(*Bundler::VersionRanges.for_many(deps.map(&:requirement)))
           end.min_by(&:size)
-          trees.select! {|t| maximal.include?(t.last) } if maximal
+          trees.reject! {|t| !maximal.include?(t.last) } if maximal
 
           o << trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
             t = String.new
