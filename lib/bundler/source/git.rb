@@ -234,6 +234,7 @@ module Bundler
           # The gemspecs we cache should already be evaluated.
           spec = Bundler.load_gemspec(spec_path)
           next unless spec
+          Bundler.rubygems.validate(spec)
           File.open(spec_path, "wb") {|file| file.write(spec.to_ruby) }
         end
       end
@@ -298,6 +299,9 @@ module Bundler
         raise unless Bundler.feature_flag.allow_offline_install?
         Bundler.ui.warn "Using cached git data because of network errors"
       end
+
+      # no-op, since we validate when re-serializing the gemspec
+      def validate_spec(_spec); end
     end
   end
 end
