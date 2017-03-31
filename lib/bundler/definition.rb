@@ -695,8 +695,17 @@ module Bundler
           dep.platforms.concat(@platforms.map {|p| Dependency::REVERSE_PLATFORM_MAP[p] }.flatten(1)).uniq!
         end
       end
-      dependency_without_type = proc {|d| Gem::Dependency.new(d.name, *d.requirement.as_list) }
-      Set.new(@dependencies.map(&dependency_without_type)) != Set.new(@locked_deps.values.map(&dependency_without_type))
+
+      # We want to know if all match, but don't want to check all entries
+      # This means we need to return false if any dependency doesn't match
+      # the lock or doesn't exist in the lock.
+      @dependencies.any? do |dependency|
+        locked_dep = @locked_deps[dependency.name]
+        next true if locked_dep.nil?
+        # We already know the name matches from the hash lookup
+        # so we only need to check the requirement now
+        dependency.requirement != locked_dep.requirement
+      end
     end
 
     # Remove elements from the locked specs that are expired. This will most
