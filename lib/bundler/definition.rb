@@ -464,7 +464,8 @@ module Bundler
         changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
       end
 
-      msg << "\n\n#{change_reason.split(", ").join("\n")}\n"
+      reason = change_reason
+      msg << "\n\n#{reason.split(", ").join("\n")}\n" unless reason.strip.empty?
       msg << "\n\nYou have added to the Gemfile:\n" << added.join("\n") if added.any?
       msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
       msg << "\n\nYou have changed in the Gemfile:\n" << changed.join("\n") if changed.any?
