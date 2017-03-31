@@ -20,7 +20,7 @@ module Bundler
       end
 
       Bundler.definition.validate_runtime!
-      current_specs = Bundler.ui.silence { Bundler.load.specs }
+      current_specs = Bundler.ui.silence { Bundler.definition.resolve }
       current_dependencies = {}
       Bundler.ui.silence do
         Bundler.load.dependencies.each do |dep|
