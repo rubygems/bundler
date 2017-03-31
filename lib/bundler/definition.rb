@@ -119,23 +119,6 @@ module Bundler
       @local_changes = converge_locals
 
       @requires = compute_requires
-
-      fixup_dependency_types!
-    end
-
-    def fixup_dependency_types!
-      # XXX This is a temporary workaround for a bug when using rubygems 1.8.15
-      # where Gem::Dependency#== matches Gem::Dependency#type. As the lockfile
-      # doesn't carry a notion of the dependency type, if you use
-      # add_development_dependency in a gemspec that's loaded with the gemspec
-      # directive, the lockfile dependencies and resolved dependencies end up
-      # with a mismatch on #type.
-      # Test coverage to catch a regression on this is in gemspec_spec.rb
-      @dependencies.each do |d|
-        if ld = @locked_deps[d.name]
-          ld.instance_variable_set(:@type, d.type)
-        end
-      end
     end
 
     def create_gem_version_promoter
@@ -697,16 +680,24 @@ module Bundler
         end
       end
 
+      changes = false
       # We want to know if all match, but don't want to check all entries
       # This means we need to return false if any dependency doesn't match
       # the lock or doesn't exist in the lock.
-      @dependencies.any? do |dependency|
-        locked_dep = @locked_deps[dependency.name]
-        next true if locked_dep.nil?
+      @dependencies.each do |dependency|
+        unless locked_dep = @locked_deps[dependency.name]
+          changes = true
+          next
+        end
+
+        locked_dep.instance_variable_set(:@type, dependency.type)
+
         # We already know the name matches from the hash lookup
         # so we only need to check the requirement now
-        dependency.requirement != locked_dep.requirement
+        changes ||= dependency.requirement != locked_dep.requirement
       end
+
+      changes
     end
 
     # Remove elements from the locked specs that are expired. This will most
