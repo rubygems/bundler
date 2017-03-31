@@ -25,4 +25,18 @@ RSpec.describe Bundler::UI do
       expect(methods.call(described_class)).to eq(methods.call(shell))
     end
   end
+
+  describe Bundler::UI::Shell do
+    let(:options) { {} }
+    subject { described_class.new(options) }
+    describe "debug?" do
+      it "returns a boolean" do
+        subject.level = :debug
+        expect(subject.debug?).to eq(true)
+
+        subject.level = :error
+        expect(subject.debug?).to eq(false)
+      end
+    end
+  end
 end
