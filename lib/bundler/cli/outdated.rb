@@ -80,25 +80,22 @@ module Bundler
         end
 
         gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
-        if gem_outdated || (current_spec.git_version != active_spec.git_version)
-          groups = nil
-          if dependency && !options[:parseable]
-            groups = dependency.groups.join(", ")
-          end
-
-          outdated_gems_list << { :active_spec => active_spec,
-                                  :current_spec => current_spec,
-                                  :dependency => dependency,
-                                  :groups => groups }
-
-          outdated_gems_by_groups[groups] ||= []
-          outdated_gems_by_groups[groups] << { :active_spec => active_spec,
-                                               :current_spec => current_spec,
-                                               :dependency => dependency,
-                                               :groups => groups }
+        next unless gem_outdated || (current_spec.git_version != active_spec.git_version)
+        groups = nil
+        if dependency && !options[:parseable]
+          groups = dependency.groups.join(", ")
         end
 
-        Bundler.ui.debug "from #{active_spec.loaded_from}"
+        outdated_gems_list << { :active_spec => active_spec,
+                                :current_spec => current_spec,
+                                :dependency => dependency,
+                                :groups => groups }
+
+        outdated_gems_by_groups[groups] ||= []
+        outdated_gems_by_groups[groups] << { :active_spec => active_spec,
+                                             :current_spec => current_spec,
+                                             :dependency => dependency,
+                                             :groups => groups }
       end
 
       if outdated_gems_list.empty?
@@ -195,6 +192,7 @@ module Bundler
 
     def print_gem(current_spec, active_spec, dependency, groups, options_include_groups)
       spec_version = "#{active_spec.version}#{active_spec.git_version}"
+      spec_version += " (from #{active_spec.loaded_from})" if Bundler.ui.debug? && active_spec.loaded_from
       current_version = "#{current_spec.version}#{current_spec.git_version}"
 
       if dependency && dependency.specific?
