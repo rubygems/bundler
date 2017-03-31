@@ -79,4 +79,28 @@ RSpec.describe "bundle add" do
       expect(the_bundle).to include_gems "foo 2.0"
     end
   end
+
+  it "using combination of short form options works like long form" do
+    bundle "add 'foo' -s='file://#{gem_repo2}' -g='development' -v='~>1.0'"
+    expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "~> 1.0", :group => \[:development\], :source => 'file:\/\/#{gem_repo2}'})
+    expect(the_bundle).to include_gems "foo 1.1"
+  end
+
+  it "shows error message when version is not formatted correctly" do
+    bundle "add 'foo' -v='~>1 . 0'"
+    expect(out).to match('Illformed requirement ["~>1 . 0"]')
+  end
+
+  it "shows error message when gem cannot be found" do
+    bundle "add 'werk_it'"
+    expect(out).to match("Could not find gem 'werk_it' in any of the gem sources listed in your Gemfile.")
+  end
+
+  it "shows error message when source cannot be reached" do
+    bundle "add 'baz' --source='http://badhostasdf'"
+    expect(out).to include("Could not reach host badhostasdf. Check your network connection and try again.")
+
+    bundle "add 'baz' --source='file://does/not/exist'"
+    expect(out).to include("Could not fetch specs from file://does/not/exist/")
+  end
 end

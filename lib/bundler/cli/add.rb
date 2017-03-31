@@ -11,7 +11,14 @@ module Bundler
 
     def run
       version = @options[:version].nil? ? nil : @options[:version].split(",").map(&:strip)
-      dependency = Bundler::Dependency.new(@gem_name, version, @options)
+
+      begin
+        dependency = Bundler::Dependency.new(@gem_name, version, @options)
+      rescue Gem::Requirement::BadRequirementError => e
+        Bundler.ui.error(e.message)
+        return
+      end
+
       Injector.inject([dependency], :conservative_versioning => @options[:version].nil?) # Perform conservative versioning only when version is not specified
       Installer.install(Bundler.root, Bundler.definition)
     end
