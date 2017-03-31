@@ -123,7 +123,7 @@ module Bundler
 
     def create_gem_version_promoter
       locked_specs =
-        if @unlocking && @locked_specs.empty? && !@lockfile_contents.empty?
+        if unlocking? && @locked_specs.empty? && !@lockfile_contents.empty?
           # Definition uses an empty set of locked_specs to indicate all gems
           # are unlocked, but GemVersionPromoter needs the locked_specs
           # for conservative comparison.
@@ -226,7 +226,7 @@ module Bundler
     def resolve
       @resolve ||= begin
         last_resolve = converge_locked_specs
-        if Bundler.settings[:frozen] || (!@unlocking && nothing_changed?)
+        if Bundler.settings[:frozen] || (!unlocking? && nothing_changed?)
           Bundler.ui.debug("Found no changes, using resolution from the lockfile")
           last_resolve
         else
@@ -295,7 +295,7 @@ module Bundler
         end
       end
 
-      preserve_unknown_sections ||= !updating_major && (Bundler.settings[:frozen] || !@unlocking)
+      preserve_unknown_sections ||= !updating_major && (Bundler.settings[:frozen] || !unlocking?)
       return if lockfiles_equal?(@lockfile_contents, contents, preserve_unknown_sections)
 
       if Bundler.settings[:frozen]
@@ -526,14 +526,18 @@ module Bundler
     attr_reader :sources
     private :sources
 
-  private
-
     def nothing_changed?
       !@source_changes && !@dependency_changes && !@new_platform && !@path_changes && !@local_changes
     end
 
+    def unlocking?
+      @unlocking
+    end
+
+  private
+
     def change_reason
-      if @unlocking
+      if unlocking?
         unlock_reason = @unlock.reject {|_k, v| Array(v).empty? }.map do |k, v|
           if v == true
             k.to_s
