@@ -321,6 +321,10 @@ module Bundler
 
       normalize_hash(opts)
 
+      if opts["branch"] && !(opts["git"] || opts["github"])
+        raise GemfileError, %(The `branch` option for `gem "#{name}"` is not allowed. Only gems with a git source can specify a branch)
+      end
+
       git_names = @git_sources.keys.map(&:to_s)
       validate_keys("gem '#{name}'", opts, valid_keys + git_names)
 
