@@ -55,6 +55,7 @@ module Bundler
   autoload :StubSpecification,      "bundler/stub_specification"
   autoload :UI,                     "bundler/ui"
   autoload :URICredentialsFilter,   "bundler/uri_credentials_filter"
+  autoload :VersionRanges,          "bundler/version_ranges"
 
   class << self
     attr_writer :bundle_path

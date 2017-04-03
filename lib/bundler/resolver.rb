@@ -21,7 +21,16 @@ module Bundler
             o << %(\n)
           end
           o << %(  In Gemfile:\n)
-          o << conflict.requirement_trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
+          trees = conflict.requirement_trees
+
+          maximal = 1.upto(trees.size).map do |size|
+            trees.map(&:last).flatten(1).combination(size).to_a
+          end.flatten(1).select do |deps|
+            Bundler::VersionRanges.empty?(*Bundler::VersionRanges.for_many(deps.map(&:requirement)))
+          end.min_by(&:size)
+          trees.reject! {|t| !maximal.include?(t.last) } if maximal
+
+          o << trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
             t = String.new
             depth = 2
             tree.each do |req|
