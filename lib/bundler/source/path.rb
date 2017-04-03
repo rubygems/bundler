@@ -144,6 +144,10 @@ module Bundler
         SharedHelpers.in_bundle? && app_cache_path.exist?
       end
 
+      def validate_spec(spec)
+        Bundler.rubygems.validate(spec)
+      end
+
       def load_spec_files
         index = Index.new
 
@@ -155,7 +159,7 @@ module Bundler
             Bundler.rubygems.set_installed_by_version(spec)
             # Validation causes extension_dir to be calculated, which depends
             # on #source, so we validate here instead of load_gemspec
-            Bundler.rubygems.validate(spec)
+            validate_spec(spec)
             index << spec
           end
 
