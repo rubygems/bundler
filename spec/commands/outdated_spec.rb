@@ -489,6 +489,21 @@ RSpec.describe "bundle outdated" do
     it_behaves_like "version update is detected"
   end
 
+  context "when on a new machine" do
+    before do
+      simulate_new_machine
+
+      update_git "foo", :path => lib_path("foo")
+      update_repo2 do
+        build_gem "activesupport", "3.3.5"
+        build_gem "weakling", "0.8.0"
+      end
+    end
+
+    subject { bundle "outdated" }
+    it_behaves_like "version update is detected"
+  end
+
   shared_examples_for "minor version updates are detected" do
     before do
       update_repo2 do

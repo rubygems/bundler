@@ -99,6 +99,11 @@ module Bundler
       @__identifier ||= Identifier.new(name, version, source, platform, dependencies)
     end
 
+    def git_version
+      return unless source.is_a?(Bundler::Source::Git)
+      " #{source.revision[0..6]}"
+    end
+
   private
 
     def to_ary
