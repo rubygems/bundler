@@ -32,7 +32,6 @@ module Bundler
         return
       end
 
-
       if args.empty?
         return Bundler.ui.info(Bundler.settings[name]) if options[:parseable]
 
@@ -47,11 +46,20 @@ module Bundler
   private
 
     def confirm_all
-      Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
-      Bundler.settings.all.each do |setting|
-        Bundler.ui.confirm "#{setting}"
-        show_pretty_values_for(setting)
-        Bundler.ui.confirm ""
+      if @options[:parseable]
+        thor.with_padding do
+          Bundler.settings.all.each do |setting|
+            value = Bundler.settings[setting]
+            Bundler.ui.info "#{setting}=#{value}"
+          end
+        end
+      else
+        Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
+        Bundler.settings.all.each do |setting|
+          Bundler.ui.confirm "#{setting}"
+          show_pretty_values_for(setting)
+          Bundler.ui.confirm ""
+        end
       end
     end
 

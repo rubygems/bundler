@@ -9,6 +9,25 @@ RSpec.describe ".bundle/config" do
     G
   end
 
+  describe "config" do
+    before { bundle "config foo bar" }
+
+    it "prints a detailed report of local and user configuration" do
+      bundle "config"
+
+      expect(out).to include("Settings are listed in order of priority. The top value will be used")
+      expect(out).to include("foo\nSet for the current user")
+      expect(out).to include(": \"bar\"")
+    end
+
+    context "given --parseable flag" do
+      it "prints a minimal report of local and user configuration" do
+        bundle "config --parseable"
+        expect(out).to include("foo=bar")
+      end
+    end
+  end
+
   describe "BUNDLE_APP_CONFIG" do
     it "can be moved with an environment variable" do
       ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
