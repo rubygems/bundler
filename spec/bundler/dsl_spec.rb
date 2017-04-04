@@ -147,7 +147,7 @@ RSpec.describe Bundler::Dsl do
 
     it "rejects branch option on non-git gems" do
       expect { subject.gem("foo", :branch => "test") }.
-        to raise_error(Bundler::GemfileError, /The `branch` option for `gem "foo"` is not allowed. Only gems with a git source can specify a branch/)
+        to raise_error(Bundler::GemfileError, /The `branch` option for `gem 'foo'` is not allowed. Only gems with a git source can specify a branch/)
     end
   end
 
