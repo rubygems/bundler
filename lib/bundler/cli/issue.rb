@@ -18,9 +18,9 @@ module Bundler
         3. Information about each Bundler command can be found in the Bundler
         man pages: http://bundler.io/man/bundle.1.html
 
-        Hopefully the trouble shooting steps above resolved your problem!  If things
+        Hopefully the troubleshooting steps above resolved your problem!  If things
         still aren't working the way you expect them to, please let us know so
-        that we can diagnose and hopefully fix the problem you're having. Please
+        that we can diagnose and help fix the problem you're having. Please
         view the Filing Issues guide for more information:
         https://github.com/bundler/bundler/blob/master/doc/contributing/ISSUES.md
 
