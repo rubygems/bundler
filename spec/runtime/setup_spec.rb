@@ -1134,20 +1134,30 @@ end
     end
 
     describe "default gem activation" do
+      let(:exemptions) do
+        if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7") || ENV["RGV"] == "master"
+          []
+        else
+          %w(io-console openssl)
+        end << "bundler"
+      end
+
       let(:code) { strip_whitespace(<<-RUBY) }
         require "rubygems"
         Gem::Specification.send(:alias_method, :bundler_spec_activate, :activate)
         Gem::Specification.send(:define_method, :activate) do
-          warn '-' * 80
-          warn "activating \#{full_name}"
-          warn *caller
-          warn '*' * 80
+          unless #{exemptions.inspect}.include?(name)
+            warn '-' * 80
+            warn "activating \#{full_name}"
+            warn *caller
+            warn '*' * 80
+          end
           bundler_spec_activate
         end
         require "bundler/setup"
         require "pp"
         loaded_specs = Gem.loaded_specs.dup
-        loaded_specs.delete("bundler")
+        #{exemptions.inspect}.each {|s| loaded_specs.delete(s) }
         pp loaded_specs
       RUBY
 
@@ -1167,10 +1177,13 @@ end
       end
 
       it "activates no gems with bundle exec that is loaded" do
+        # TODO: remove once https://github.com/erikhuda/thor/pull/539 is released
+        exemptions << "io-console"
+
         install_gemfile! ""
         create_file("script.rb", "#!/usr/bin/env ruby\n\n#{code}")
         FileUtils.chmod(0o777, bundled_app("script.rb"))
-        bundle! "exec ./script.rb"
+        bundle! "exec ./script.rb", :artifice => nil
         expect(err).to eq("")
         expect(out).to eq("{}")
       end
