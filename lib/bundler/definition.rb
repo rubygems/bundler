@@ -119,28 +119,11 @@ module Bundler
       @local_changes = converge_locals
 
       @requires = compute_requires
-
-      fixup_dependency_types!
-    end
-
-    def fixup_dependency_types!
-      # XXX This is a temporary workaround for a bug when using rubygems 1.8.15
-      # where Gem::Dependency#== matches Gem::Dependency#type. As the lockfile
-      # doesn't carry a notion of the dependency type, if you use
-      # add_development_dependency in a gemspec that's loaded with the gemspec
-      # directive, the lockfile dependencies and resolved dependencies end up
-      # with a mismatch on #type.
-      # Test coverage to catch a regression on this is in gemspec_spec.rb
-      @dependencies.each do |d|
-        if ld = @locked_deps[d.name]
-          ld.instance_variable_set(:@type, d.type)
-        end
-      end
     end
 
     def create_gem_version_promoter
       locked_specs =
-        if @unlocking && @locked_specs.empty? && !@lockfile_contents.empty?
+        if unlocking? && @locked_specs.empty? && !@lockfile_contents.empty?
           # Definition uses an empty set of locked_specs to indicate all gems
           # are unlocked, but GemVersionPromoter needs the locked_specs
           # for conservative comparison.
@@ -243,7 +226,7 @@ module Bundler
     def resolve
       @resolve ||= begin
         last_resolve = converge_locked_specs
-        if Bundler.settings[:frozen] || (!@unlocking && nothing_changed?)
+        if Bundler.settings[:frozen] || (!unlocking? && nothing_changed?)
           Bundler.ui.debug("Found no changes, using resolution from the lockfile")
           last_resolve
         else
@@ -312,7 +295,7 @@ module Bundler
         end
       end
 
-      preserve_unknown_sections ||= !updating_major && (Bundler.settings[:frozen] || !@unlocking)
+      preserve_unknown_sections ||= !updating_major && (Bundler.settings[:frozen] || !unlocking?)
       return if lockfiles_equal?(@lockfile_contents, contents, preserve_unknown_sections)
 
       if Bundler.settings[:frozen]
@@ -464,7 +447,8 @@ module Bundler
         changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
       end
 
-      msg << "\n\n#{change_reason.split(", ").join("\n")}\n"
+      reason = change_reason
+      msg << "\n\n#{reason.split(", ").join("\n")}\n" unless reason.strip.empty?
       msg << "\n\nYou have added to the Gemfile:\n" << added.join("\n") if added.any?
       msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
       msg << "\n\nYou have changed in the Gemfile:\n" << changed.join("\n") if changed.any?
@@ -542,14 +526,18 @@ module Bundler
     attr_reader :sources
     private :sources
 
-  private
-
     def nothing_changed?
       !@source_changes && !@dependency_changes && !@new_platform && !@path_changes && !@local_changes
     end
 
+    def unlocking?
+      @unlocking
+    end
+
+  private
+
     def change_reason
-      if @unlocking
+      if unlocking?
         unlock_reason = @unlock.reject {|_k, v| Array(v).empty? }.map do |k, v|
           if v == true
             k.to_s
@@ -696,16 +684,30 @@ module Bundler
         end
       end
 
+      changes = false
       # We want to know if all match, but don't want to check all entries
       # This means we need to return false if any dependency doesn't match
       # the lock or doesn't exist in the lock.
-      @dependencies.any? do |dependency|
-        locked_dep = @locked_deps[dependency.name]
-        next true if locked_dep.nil?
+      @dependencies.each do |dependency|
+        unless locked_dep = @locked_deps[dependency.name]
+          changes = true
+          next
+        end
+
+        # Gem::Dependency#== matches Gem::Dependency#type. As the lockfile
+        # doesn't carry a notion of the dependency type, if you use
+        # add_development_dependency in a gemspec that's loaded with the gemspec
+        # directive, the lockfile dependencies and resolved dependencies end up
+        # with a mismatch on #type. Work around that by setting the type on the
+        # dep from the lockfile.
+        locked_dep.instance_variable_set(:@type, dependency.type)
+
         # We already know the name matches from the hash lookup
         # so we only need to check the requirement now
-        dependency.requirement != locked_dep.requirement
+        changes ||= dependency.requirement != locked_dep.requirement
       end
+
+      changes
     end
 
     # Remove elements from the locked specs that are expired. This will most
