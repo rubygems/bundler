@@ -171,7 +171,15 @@ module Bundler
       end
     end
 
-    NAME_VERSION = /^( {2}| {4}| {6})(?! )(.*?)(?: \(([^-]*)(?:-(.*))?\))?(!)?$/
+    space = / /
+    NAME_VERSION = /
+      ^(#{space}{2}|#{space}{4}|#{space}{6})(?!#{space}) # Exactly 2, 4, or 6 spaces at the start of the line
+      (.*?)                                              # Name
+      (?:#{space}\(([^-]*)                               # Space, followed by version
+      (?:-(.*))?\))?                                     # Optional platform
+      (!)?                                               # Optional pinned marker
+      $                                                  # Line end
+    /xo
 
     def parse_dependency(line)
       return unless line =~ NAME_VERSION
