@@ -48,6 +48,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 
 ## UTILITIES
 
+* `bundle binstubs(1)`:
+  Generate binstubs for executables in a gem
+
 * `bundle check(1)`:
   Determine whether the requirements for your application are installed
   and available to bundler
