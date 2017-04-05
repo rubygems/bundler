@@ -1144,16 +1144,20 @@ end
 
       let(:code) { strip_whitespace(<<-RUBY) }
         require "rubygems"
-        Gem::Specification.send(:alias_method, :bundler_spec_activate, :activate)
-        Gem::Specification.send(:define_method, :activate) do
-          unless #{exemptions.inspect}.include?(name)
-            warn '-' * 80
-            warn "activating \#{full_name}"
-            warn *caller
-            warn '*' * 80
+
+        if Gem::Specification.instance_methods.map(&:to_sym).include?(:activate)
+          Gem::Specification.send(:alias_method, :bundler_spec_activate, :activate)
+          Gem::Specification.send(:define_method, :activate) do
+            unless #{exemptions.inspect}.include?(name)
+              warn '-' * 80
+              warn "activating \#{full_name}"
+              warn *caller
+              warn '*' * 80
+            end
+            bundler_spec_activate
           end
-          bundler_spec_activate
         end
+
         require "bundler/setup"
         require "pp"
         loaded_specs = Gem.loaded_specs.dup
