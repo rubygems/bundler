@@ -758,7 +758,13 @@ module Bundler
       end
 
       def backport_ext_builder_monitor
-        require "rubygems/ext"
+        # So we can avoid requiring "rubygems/ext" in its entirety
+        Gem.module_eval <<-RB, __FILE__, __LINE__ + 1
+          module Ext
+          end
+        RB
+
+        require "rubygems/ext/builder"
 
         Gem::Ext::Builder.class_eval do
           unless const_defined?(:CHDIR_MONITOR)
