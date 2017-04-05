@@ -23,7 +23,23 @@ RSpec.describe ".bundle/config" do
     context "given --parseable flag" do
       it "prints a minimal report of local and user configuration" do
         bundle "config --parseable"
-        expect(out).to include("foo=bar")
+        expect(out).to include("foo: local= global=bar env=")
+      end
+
+      context "with global config" do
+        it "prints config assigned to local scope" do
+          bundle "config --local foo2 bar"
+          bundle "config --parseable"
+          expect(out).to include("foo2: local=bar global= env=")
+        end
+      end
+
+      context "with env overwrite" do
+        it "prints config with env" do
+          bundle "config foo bar"
+          bundle "config --parseable", :env => { "BUNDLE_FOO" => "bar2" }
+          expect(out).to include("foo: local= global=bar env=bar2")
+        end
       end
     end
   end
