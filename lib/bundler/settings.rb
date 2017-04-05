@@ -155,15 +155,6 @@ module Bundler
       locations
     end
 
-    def minimal_values_for(exposed_key)
-      key = key_for(exposed_key)
-      line = String.new
-
-      line << "local=#{@local_config[key]}"
-      line << " global=#{@global_config[key]}"
-      line << " env=#{ENV[key]}"
-    end
-
     def pretty_values_for(exposed_key)
       key = key_for(exposed_key)
 

@@ -49,8 +49,8 @@ module Bundler
       if @options[:parseable]
         thor.with_padding do
           Bundler.settings.all.each do |setting|
-            config = Bundler.settings.minimal_values_for(setting)
-            Bundler.ui.info "#{setting}: #{config}"
+            val = Bundler.settings[setting]
+            Bundler.ui.info "#{setting}=#{val}"
           end
         end
       else
