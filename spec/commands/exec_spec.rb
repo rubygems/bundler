@@ -218,6 +218,32 @@ RSpec.describe "bundle exec" do
     expect(out).to include("bundler: exec needs a command to run")
   end
 
+  it "raises a helpful error when exec'ing to something outside of the bundle", :rubygems => ">= 2.5.2" do
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gem "with_license"
+    G
+    [true, false].each do |l|
+      bundle! "config disable_exec_load #{l}"
+      bundle "exec rackup"
+      expect(err).to include "can't find executable rackup for gem rack. rack is not currently included in the bundle, perhaps you meant to add it to your Gemfile?"
+    end
+  end
+
+  # Different error message on old RG versions (before activate_bin_path) because they
+  # called `Kernel#gem` directly
+  it "raises a helpful error when exec'ing to something outside of the bundle", :rubygems => "< 2.5.2" do
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gem "with_license"
+    G
+    [true, false].each do |l|
+      bundle! "config disable_exec_load #{l}"
+      bundle "exec rackup"
+      expect(err).to include "rack is not part of the bundle. Add it to your Gemfile."
+    end
+  end
+
   describe "with help flags" do
     each_prefix = proc do |string, &blk|
       1.upto(string.length) {|l| blk.call(string[0, l]) }

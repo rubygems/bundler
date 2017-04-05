@@ -891,7 +891,7 @@ end
         end
       R
 
-      expect(out).to eq("rack is not part of the bundle. Add it to Gemfile.")
+      expect(out).to eq("rack is not part of the bundle. Add it to your Gemfile.")
     end
 
     it "sets GEM_HOME appropriately" do
