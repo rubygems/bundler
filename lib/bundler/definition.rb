@@ -776,14 +776,15 @@ module Bundler
 
       resolve = SpecSet.new(converged)
       resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems])
-      diff    = @locked_specs.to_a - resolve.to_a
+      diff    = nil
 
       # Now, we unlock any sources that do not have anymore gems pinned to it
       sources.all_sources.each do |source|
         next unless source.respond_to?(:unlock!)
 
         unless resolve.any? {|s| s.source == source }
-          source.unlock! if !diff.empty? && diff.any? {|s| s.source == source }
+          diff ||= @locked_specs.to_a - resolve.to_a
+          source.unlock! if diff.any? {|s| s.source == source }
         end
       end
 
