@@ -149,6 +149,12 @@ RSpec.describe Bundler::Dsl do
       expect { subject.gem("foo", :branch => "test") }.
         to raise_error(Bundler::GemfileError, /The `branch` option for `gem 'foo'` is not allowed. Only gems with a git source can specify a branch/)
     end
+
+    it "allows specifiying a branch on git gems" do
+      subject.gem("foo", :branch => "test", :git => "http://mytestrepo")
+      dep = subject.dependencies.last
+      expect(dep.name).to eq "foo"
+    end
   end
 
   describe "#gemspec" do
