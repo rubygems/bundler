@@ -51,7 +51,14 @@ module Bundler
       @new_deps.map do |d|
         name = "'#{d.name}'"
         requirement = ", '#{d.requirement}'"
-        group = ", :group => #{d.groups.inspect}" if d.groups != Array(:default)
+        if d.groups != Array(:default)
+          group =
+            if d.groups.size == 1
+              ", :group => #{d.groups.inspect}"
+            else
+              ", :groups => #{d.groups.inspect}"
+            end
+        end
         source = ", :source => '#{d.source}'" unless d.source.nil?
         %(gem #{name}#{requirement}#{group}#{source})
       end.join("\n")
