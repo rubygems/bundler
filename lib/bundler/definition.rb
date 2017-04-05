@@ -796,7 +796,7 @@ module Bundler
     end
 
     def satisfies_locked_spec?(dep)
-      @locked_specs.any? {|s| s.satisfies?(dep) && (!dep.source || s.source.include?(dep.source)) }
+      @locked_specs[dep].any? {|s| s.satisfies?(dep) && (!dep.source || s.source.include?(dep.source)) }
     end
 
     # This list of dependencies is only used in #resolve, so it's OK to add
