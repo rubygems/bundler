@@ -530,6 +530,12 @@ module Bundler
       Doctor.new(options).run
     end
 
+    desc "issue", "Learn how to report an issue in Bundler"
+    def issue
+      require "bundler/cli/issue"
+      Issue.new.run
+    end
+
     if Bundler.feature_flag.plugins?
       require "bundler/cli/plugin"
       desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
