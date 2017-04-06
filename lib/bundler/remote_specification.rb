@@ -11,6 +11,7 @@ module Bundler
     include Comparable
 
     attr_reader :name, :version, :platform
+    attr_writer :dependencies
     attr_accessor :source, :remote
 
     def initialize(name, version, platform, spec_fetcher)
@@ -18,6 +19,7 @@ module Bundler
       @version      = Gem::Version.create version
       @platform     = platform
       @spec_fetcher = spec_fetcher
+      @dependencies = nil
     end
 
     # Needed before installs, since the arch matters then and quick
@@ -76,7 +78,15 @@ module Bundler
       "#<#{self.class} name=#{name} version=#{version} platform=#{platform}>"
     end
 
+    def dependencies
+      @dependencies || method_missing(:dependencies)
+    end
+
   private
+
+    def to_ary
+      nil
+    end
 
     def _remote_specification
       @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])

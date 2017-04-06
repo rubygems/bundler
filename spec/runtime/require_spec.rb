@@ -360,6 +360,29 @@ RSpec.describe "Bundler.require" do
       end
     end
   end
+
+  it "does not load rubygems gemspecs that are used", :rubygems => ">= 2.3" do
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    run! <<-R
+      path = File.join(Gem.dir, "specifications", "rack-1.0.0.gemspec")
+      contents = File.read(path)
+      contents = contents.lines.insert(-2, "\n  raise 'broken gemspec'\n").join
+      File.open(path, "w") do |f|
+        f.write contents
+      end
+    R
+
+    run! <<-R
+      Bundler.require
+      puts "WIN"
+    R
+
+    expect(out).to eq("WIN")
+  end
 end
 
 RSpec.describe "Bundler.require with platform specific dependencies" do

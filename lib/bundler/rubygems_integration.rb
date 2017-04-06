@@ -323,11 +323,12 @@ module Bundler
     def replace_gem(specs, specs_by_name)
       reverse_rubygems_kernel_mixin
 
-      executables = specs.map(&:executables).flatten
+      executables = nil
 
       kernel = (class << ::Kernel; self; end)
       [kernel, ::Kernel].each do |kernel_class|
         redefine_method(kernel_class, :gem) do |dep, *reqs|
+          executables ||= specs.map(&:executables).flatten
           if executables.include? File.basename(caller.first.split(":").first)
             break
           end
