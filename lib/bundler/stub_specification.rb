@@ -40,8 +40,10 @@ module Bundler
       stub.full_gem_path
     end
 
-    def full_require_paths
-      stub.full_require_paths
+    if Bundler.rubygems.provides?(">= 2.2.0")
+      def full_require_paths
+        stub.full_require_paths
+      end
     end
 
     def loaded_from
