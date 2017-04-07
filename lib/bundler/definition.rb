@@ -746,11 +746,13 @@ module Bundler
 
         # Don't add a spec to the list if its source is expired. For example,
         # if you change a Git gem to Rubygems.
-        next if s.source.nil? || @unlock[:sources].include?(s.source.name)
+        next if s.source.nil?
+        next if @unlock[:sources].include?(s.source.name)
 
         # XXX This is a backwards-compatibility fix to preserve the ability to
         # unlock a single gem by passing its name via `--source`. See issue #3759
-        next if s.source.nil? || @unlock[:sources].include?(s.name)
+        # TODO: delete in Bundler 2
+        next if @unlock[:sources].include?(s.name)
 
         # If the spec is from a path source and it doesn't exist anymore
         # then we unlock it.
@@ -774,14 +776,15 @@ module Bundler
 
       resolve = SpecSet.new(converged)
       resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems])
-      diff    = @locked_specs.to_a - resolve.to_a
+      diff    = nil
 
       # Now, we unlock any sources that do not have anymore gems pinned to it
       sources.all_sources.each do |source|
         next unless source.respond_to?(:unlock!)
 
         unless resolve.any? {|s| s.source == source }
-          source.unlock! if !diff.empty? && diff.any? {|s| s.source == source }
+          diff ||= @locked_specs.to_a - resolve.to_a
+          source.unlock! if diff.any? {|s| s.source == source }
         end
       end
 
@@ -796,7 +799,7 @@ module Bundler
     end
 
     def satisfies_locked_spec?(dep)
-      @locked_specs.any? {|s| s.satisfies?(dep) && (!dep.source || s.source.include?(dep.source)) }
+      @locked_specs[dep].any? {|s| s.satisfies?(dep) && (!dep.source || s.source.include?(dep.source)) }
     end
 
     # This list of dependencies is only used in #resolve, so it's OK to add

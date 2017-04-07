@@ -413,20 +413,20 @@ EOF
 
     def load_gemspec_uncached(file, validate = false)
       path = Pathname.new(file)
-      # Eval the gemspec from its parent directory, because some gemspecs
-      # depend on "./" relative paths.
-      SharedHelpers.chdir(path.dirname.to_s) do
-        contents = path.read
-        spec = if contents[0..2] == "---" # YAML header
-          eval_yaml_gemspec(path, contents)
-        else
+      contents = path.read
+      spec = if contents.start_with?("---") # YAML header
+        eval_yaml_gemspec(path, contents)
+      else
+        # Eval the gemspec from its parent directory, because some gemspecs
+        # depend on "./" relative paths.
+        SharedHelpers.chdir(path.dirname.to_s) do
           eval_gemspec(path, contents)
         end
-        return unless spec
-        spec.loaded_from = path.expand_path.to_s
-        Bundler.rubygems.validate(spec) if validate
-        spec
       end
+      return unless spec
+      spec.loaded_from = path.expand_path.to_s
+      Bundler.rubygems.validate(spec) if validate
+      spec
     end
 
     def clear_gemspec_cache
