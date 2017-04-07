@@ -48,8 +48,8 @@ module Bundler
       stub.loaded_from
     end
 
-    def matches_for_glob
-      stub.matches_for_glob
+    def matches_for_glob(glob)
+      stub.matches_for_glob(glob)
     end
 
     def raw_require_paths
@@ -77,6 +77,8 @@ module Bundler
             " was missing or broken. Try running `gem pristine #{name} -v #{version}`" \
             " to fix the cached spec."
         end
+
+        rs.source = source
 
         rs
       end
