@@ -304,7 +304,10 @@ module Bundler
       # no-op, since we validate when re-serializing the gemspec
       def validate_spec(_spec); end
 
-      if defined?(::Gem::StubSpecification)
+      # only 2.5.1+ has this method for stub creation, and since this is a
+      # performance optimization _only_, we'll restrict ourselves to the most
+      # recent RG versions instead of all versions that have stubs
+      if Bundler.rubygems.provides?(">= 2.5.1")
         def load_gemspec(file)
           stub = Gem::StubSpecification.gemspec_stub(file, install_path.parent, install_path.parent)
           stub.full_gem_path = Pathname.new(file).dirname.expand_path(root).to_s.untaint
