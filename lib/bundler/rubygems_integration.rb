@@ -320,18 +320,22 @@ module Bundler
       end
     end
 
+    def binstubs_call_gem?
+      true
+    end
+
     def replace_gem(specs, specs_by_name)
       reverse_rubygems_kernel_mixin
 
-      executables = nil
+      executables = specs.map(&:executables).flatten if binstubs_call_gem?
 
       kernel = (class << ::Kernel; self; end)
       [kernel, ::Kernel].each do |kernel_class|
         redefine_method(kernel_class, :gem) do |dep, *reqs|
-          executables ||= specs.map(&:executables).flatten
-          if executables.include? File.basename(caller.first.split(":").first)
+          if executables && executables.include?(File.basename(caller.first.split(":").first))
             break
           end
+
           reqs.pop if reqs.last.is_a?(Hash)
 
           unless dep.respond_to?(:name) && dep.respond_to?(:requirement)
@@ -795,6 +799,12 @@ module Bundler
         Bundler.ui = nil
         activated_spec_names = runtime.requested_specs.map(&:to_spec).sort_by(&:name)
         [Gemdeps.new(runtime), activated_spec_names]
+      end
+
+      if provides?(">= 2.5.2")
+        def binstubs_call_gem?
+          false
+        end
       end
     end
   end
