@@ -383,6 +383,30 @@ RSpec.describe "Bundler.require" do
 
     expect(out).to eq("WIN")
   end
+
+  it "does not load git gemspecs that are used", :rubygems => ">= 2.3" do
+    build_git "foo"
+
+    install_gemfile! <<-G
+      gem "foo", :git => "#{lib_path("foo-1.0")}"
+    G
+
+    run! <<-R
+      path = Gem.loaded_specs["foo"].loaded_from
+      contents = File.read(path)
+      contents = contents.lines.insert(-2, "\n  raise 'broken gemspec'\n").join
+      File.open(path, "w") do |f|
+        f.write contents
+      end
+    R
+
+    run! <<-R
+      Bundler.require
+      puts "WIN"
+    R
+
+    expect(out).to eq("WIN")
+  end
 end
 
 RSpec.describe "Bundler.require with platform specific dependencies" do

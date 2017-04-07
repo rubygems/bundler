@@ -234,6 +234,7 @@ module Bundler
           # The gemspecs we cache should already be evaluated.
           spec = Bundler.load_gemspec(spec_path)
           next unless spec
+          Bundler.rubygems.set_installed_by_version(spec)
           Bundler.rubygems.validate(spec)
           File.open(spec_path, "wb") {|file| file.write(spec.to_ruby) }
         end
@@ -302,6 +303,13 @@ module Bundler
 
       # no-op, since we validate when re-serializing the gemspec
       def validate_spec(_spec); end
+
+      if defined?(::Gem::StubSpecification)
+        def load_gemspec(file)
+          stub = Gem::StubSpecification.gemspec_stub(file, install_path.parent, install_path.parent)
+          StubSpecification.from_stub(stub)
+        end
+      end
     end
   end
 end
