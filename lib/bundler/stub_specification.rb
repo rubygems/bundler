@@ -48,8 +48,10 @@ module Bundler
       stub.loaded_from
     end
 
-    def matches_for_glob(glob)
-      stub.matches_for_glob(glob)
+    if Bundler.rubygems.stubs_provide_full_functionality?
+      def matches_for_glob(glob)
+        stub.matches_for_glob(glob)
+      end
     end
 
     def raw_require_paths
@@ -69,7 +71,7 @@ module Bundler
         rs = stub.to_spec
         if rs.equal?(self) # happens when to_spec gets the spec from Gem.loaded_specs
           rs = Gem::Specification.load(loaded_from)
-          stub.instance_variable_set(:@spec, rs)
+          Bundler.rubygems.stub_set_spec(stub, rs)
         end
 
         unless rs

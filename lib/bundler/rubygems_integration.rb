@@ -80,6 +80,10 @@ module Bundler
       default
     end
 
+    def stub_set_spec(stub, spec)
+      stub.instance_variable_set(:@spec, spec)
+    end
+
     def path(obj)
       obj.to_s
     end
@@ -324,14 +328,19 @@ module Bundler
       true
     end
 
+    def stubs_provide_full_functionality?
+      false
+    end
+
     def replace_gem(specs, specs_by_name)
       reverse_rubygems_kernel_mixin
 
-      executables = specs.map(&:executables).flatten if binstubs_call_gem?
+      executables = nil
 
       kernel = (class << ::Kernel; self; end)
       [kernel, ::Kernel].each do |kernel_class|
         redefine_method(kernel_class, :gem) do |dep, *reqs|
+          executables ||= specs.map(&:executables).flatten if ::Bundler.rubygems.binstubs_call_gem?
           if executables && executables.include?(File.basename(caller.first.split(":").first))
             break
           end
@@ -804,8 +813,17 @@ module Bundler
       end
 
       if provides?(">= 2.5.2")
+        # RubyGems-generated binstubs call Kernel#gem
         def binstubs_call_gem?
           false
+        end
+
+        # only 2.5.2+ has all of the stub methods we want to use, and since this
+        # is a performance optimization _only_,
+        # we'll restrict ourselves to the most
+        # recent RG versions instead of all versions that have stubs
+        def stubs_provide_full_functionality?
+          true
         end
       end
     end

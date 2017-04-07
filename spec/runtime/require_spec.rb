@@ -361,7 +361,7 @@ RSpec.describe "Bundler.require" do
     end
   end
 
-  it "does not load rubygems gemspecs that are used", :rubygems => ">= 2.3" do
+  it "does not load rubygems gemspecs that are used", :rubygems => ">= 2.5.2" do
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
       gem "rack"
@@ -384,7 +384,7 @@ RSpec.describe "Bundler.require" do
     expect(out).to eq("WIN")
   end
 
-  it "does not load git gemspecs that are used", :rubygems => ">= 2.5.1" do
+  it "does not load git gemspecs that are used", :rubygems => ">= 2.5.2" do
     build_git "foo"
 
     install_gemfile! <<-G
