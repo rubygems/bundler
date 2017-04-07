@@ -36,17 +36,8 @@ module Bundler
       stub.default_gem
     end
 
-    # This is what we do in bundler/rubygems_ext
     def full_gem_path
-      # this cannot check source.is_a?(Bundler::Plugin::API::Source)
-      # because that _could_ trip the autoload, and if there are unresolved
-      # gems at that time, this method could be called inside another require,
-      # thus raising with that constant being undefined. Better to check a method
-      if source.respond_to?(:path) || (source.respond_to?(:bundler_plugin_api_source?) && source.bundler_plugin_api_source?)
-        Pathname.new(loaded_from).dirname.expand_path(source.root).to_s.untaint
-      else
-        rg_full_gem_path
-      end
+      stub.full_gem_path
     end
 
     def full_require_paths

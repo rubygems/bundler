@@ -82,6 +82,11 @@ module Bundler
       @dependencies || method_missing(:dependencies)
     end
 
+    def git_version
+      return unless loaded_from && source.is_a?(Bundler::Source::Git)
+      " #{source.revision[0..6]}"
+    end
+
   private
 
     def to_ary

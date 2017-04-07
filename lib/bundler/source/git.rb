@@ -307,6 +307,7 @@ module Bundler
       if defined?(::Gem::StubSpecification)
         def load_gemspec(file)
           stub = Gem::StubSpecification.gemspec_stub(file, install_path.parent, install_path.parent)
+          stub.full_gem_path = Pathname.new(file).dirname.expand_path(root).to_s.untaint
           StubSpecification.from_stub(stub)
         end
       end

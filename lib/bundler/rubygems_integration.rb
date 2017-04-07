@@ -437,8 +437,10 @@ module Bundler
         # Copy of Rubygems activate_bin_path impl
         requirement = args.last
         spec = find_spec_for_exe name, exec_name, [requirement]
-        Gem::LOADED_SPECS_MUTEX.synchronize { spec.activate }
-        spec.bin_file exec_name
+
+        gem_bin = File.join(spec.full_gem_path, spec.bindir, exec_name)
+        gem_from_path_bin = File.join(File.dirname(spec.loaded_from), spec.bindir, exec_name)
+        File.exist?(gem_bin) ? gem_bin : gem_from_path_bin
       end
 
       redefine_method(gem_class, :bin_path) do |name, *args|
