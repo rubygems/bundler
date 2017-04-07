@@ -6,7 +6,7 @@ module Bundler
       @options = options
       @name = name
       @version = version || last_version_number
-      @group = options[:group]
+      @group = options[:group].split(",") unless options[:group].nil?
       @source = options[:source]
       @gems = []
     end
@@ -31,7 +31,13 @@ module Bundler
 
       if added.any?
         Bundler.ui.confirm "Added to Gemfile:"
-        Bundler.ui.confirm added.map {|g| "  #{g}" }.join("\n")
+        Bundler.ui.confirm(added.map do |d|
+          name = "'#{d.name}'"
+          requirement = ", '#{d.requirement}'"
+          group = ", :group => #{d.groups.inspect}" if d.groups != Array(:default)
+          source = ", :source => '#{d.source}'" unless d.source.nil?
+          %(gem #{name}#{requirement}#{group}#{source})
+        end.join("\n"))
       else
         Bundler.ui.confirm "All gems were already present in the Gemfile"
       end
