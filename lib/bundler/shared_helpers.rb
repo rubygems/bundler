@@ -145,6 +145,13 @@ module Bundler
       major_deprecation("Bundler will only support rubygems >= 2.0, you are running #{Bundler.rubygems.version}")
     end
 
+    def trap(signal, override = false, &block)
+      prior = Signal.trap(signal) do
+        block.call
+        prior.call unless override
+      end
+    end
+
   private
 
     def find_gemfile
