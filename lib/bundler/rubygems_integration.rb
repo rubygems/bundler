@@ -80,6 +80,10 @@ module Bundler
       default
     end
 
+    def stub_set_spec(stub, spec)
+      stub.instance_variable_set(:@spec, spec)
+    end
+
     def path(obj)
       obj.to_s
     end
@@ -320,17 +324,27 @@ module Bundler
       end
     end
 
+    def binstubs_call_gem?
+      true
+    end
+
+    def stubs_provide_full_functionality?
+      false
+    end
+
     def replace_gem(specs, specs_by_name)
       reverse_rubygems_kernel_mixin
 
-      executables = specs.map(&:executables).flatten
+      executables = nil
 
       kernel = (class << ::Kernel; self; end)
       [kernel, ::Kernel].each do |kernel_class|
         redefine_method(kernel_class, :gem) do |dep, *reqs|
-          if executables.include? File.basename(caller.first.split(":").first)
+          executables ||= specs.map(&:executables).flatten if ::Bundler.rubygems.binstubs_call_gem?
+          if executables && executables.include?(File.basename(caller.first.split(":").first))
             break
           end
+
           reqs.pop if reqs.last.is_a?(Hash)
 
           unless dep.respond_to?(:name) && dep.respond_to?(:requirement)
@@ -432,8 +446,10 @@ module Bundler
         # Copy of Rubygems activate_bin_path impl
         requirement = args.last
         spec = find_spec_for_exe name, exec_name, [requirement]
-        Gem::LOADED_SPECS_MUTEX.synchronize { spec.activate }
-        spec.bin_file exec_name
+
+        gem_bin = File.join(spec.full_gem_path, spec.bindir, exec_name)
+        gem_from_path_bin = File.join(File.dirname(spec.loaded_from), spec.bindir, exec_name)
+        File.exist?(gem_bin) ? gem_bin : gem_from_path_bin
       end
 
       redefine_method(gem_class, :bin_path) do |name, *args|
@@ -794,6 +810,21 @@ module Bundler
         Bundler.ui = nil
         activated_spec_names = runtime.requested_specs.map(&:to_spec).sort_by(&:name)
         [Gemdeps.new(runtime), activated_spec_names]
+      end
+
+      if provides?(">= 2.5.2")
+        # RubyGems-generated binstubs call Kernel#gem
+        def binstubs_call_gem?
+          false
+        end
+
+        # only 2.5.2+ has all of the stub methods we want to use, and since this
+        # is a performance optimization _only_,
+        # we'll restrict ourselves to the most
+        # recent RG versions instead of all versions that have stubs
+        def stubs_provide_full_functionality?
+          true
+        end
       end
     end
   end

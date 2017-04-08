@@ -144,6 +144,12 @@ module Bundler
         SharedHelpers.in_bundle? && app_cache_path.exist?
       end
 
+      def load_gemspec(file)
+        return unless spec = Bundler.load_gemspec(file)
+        Bundler.rubygems.set_installed_by_version(spec)
+        spec
+      end
+
       def validate_spec(spec)
         Bundler.rubygems.validate(spec)
       end
@@ -154,9 +160,9 @@ module Bundler
         if File.directory?(expanded_path)
           # We sort depth-first since `<<` will override the earlier-found specs
           Dir["#{expanded_path}/#{@glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }.each do |file|
-            next unless spec = Bundler.load_gemspec(file)
+            next unless spec = load_gemspec(file)
             spec.source = self
-            Bundler.rubygems.set_installed_by_version(spec)
+
             # Validation causes extension_dir to be calculated, which depends
             # on #source, so we validate here instead of load_gemspec
             validate_spec(spec)
