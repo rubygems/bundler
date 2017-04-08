@@ -155,6 +155,13 @@ RSpec.describe Bundler::Dsl do
       dep = subject.dependencies.last
       expect(dep.name).to eq "foo"
     end
+
+    it "allows specifiying a branch on git gems with a git_source" do
+      subject.git_source(:test_source) {|n| "https://github.com/#{n}" }
+      subject.gem("foo", :branch => "test", :test_source => "bundler/bundler")
+      dep = subject.dependencies.last
+      expect(dep.name).to eq "foo"
+    end
   end
 
   describe "#gemspec" do

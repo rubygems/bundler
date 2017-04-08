@@ -385,7 +385,8 @@ module Bundler
     def validate_keys(command, opts, valid_keys)
       invalid_keys = opts.keys - valid_keys
 
-      if opts["branch"] && !(opts["git"] || opts["github"])
+      git_source = opts.keys & @git_sources.keys.map(&:to_s)
+      if opts["branch"] && !(opts["git"] || opts["github"] || git_source.any?)
         raise GemfileError, %(The `branch` option for `#{command}` is not allowed. Only gems with a git source can specify a branch)
       end
 
