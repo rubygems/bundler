@@ -1258,6 +1258,29 @@ RSpec.describe "the lockfile format" do
     L
   end
 
+  it "raises a helpful error message when the lockfile is missing deps" do
+    lockfile <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack_middleware (1.0)
+
+      PLATFORMS
+        #{local}
+
+      DEPENDENCIES
+        rack_middleware
+    L
+
+    install_gemfile <<-G
+      source "file:#{gem_repo1}"
+      gem "rack_middleware"
+    G
+
+    expect(out).to include("Downloading rack_middleware-1.0 revealed dependencies not in the API or the lockfile (rack (= 0.9.1)).").
+      and include("Either installing with `--full-index` or running `bundle update rack_middleware` should fix the problem.")
+  end
+
   describe "a line ending" do
     def set_lockfile_mtime_to_known_value
       time = Time.local(2000, 1, 1, 0, 0, 0)

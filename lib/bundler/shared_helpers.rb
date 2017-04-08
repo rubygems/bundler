@@ -152,6 +152,21 @@ module Bundler
       end
     end
 
+    def ensure_same_dependencies(spec, old, new)
+      new = new.reject {|d| d.type == :development }
+      old = old.reject {|d| d.type == :development }
+
+      without_type = proc {|d| Gem::Dependency.new(d.name, d.requirements_list.sort) }
+      new.map!(&without_type)
+      old.map!(&without_type)
+
+      extra_deps = new - old
+      return if extra_deps.empty?
+      raise APIResponseMismatchError,
+        "Downloading #{spec.full_name} revealed dependencies not in the API or the lockfile (#{extra_deps.map(&:to_s).join(", ")})." \
+        "\nEither installing with `--full-index` or running `bundle update #{spec.name}` should fix the problem."
+    end
+
   private
 
     def find_gemfile
