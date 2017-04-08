@@ -44,6 +44,12 @@ module Bundler
       def full_require_paths
         stub.full_require_paths
       end
+
+      # This is what we do in bundler/rubygems_ext
+      # full_require_paths is always implemented in >= 2.2.0
+      def load_paths
+        full_require_paths
+      end
     end
 
     def loaded_from
@@ -58,12 +64,6 @@ module Bundler
 
     def raw_require_paths
       stub.raw_require_paths
-    end
-
-    # This is what we do in bundler/rubygems_ext
-    # full_require_paths is always implemented in versions that have stubs
-    def load_paths
-      full_require_paths
     end
 
   private
