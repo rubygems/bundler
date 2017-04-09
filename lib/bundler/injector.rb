@@ -76,8 +76,9 @@ module Bundler
                 ", :groups => #{d.groups.inspect}"
               end
         end
-        
-        source = ", :source => '#{d.source}'" unless d.source.nil?
+
+        source = ", :source => \"#{d.source}\"" unless d.source.nil?
+
         %(gem #{name}#{requirement}#{group}#{source})
       end.join("\n")
     end

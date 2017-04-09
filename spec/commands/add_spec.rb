@@ -67,7 +67,7 @@ RSpec.describe "bundle add" do
 
     it "adds dependency to more than one group" do
       bundle "add 'foo' --group='development, test'"
-      expect(bundled_app("Gemfile").read).to match(/gem "foo", "~> 2.0", :group => \[:development, :test\]/)
+      expect(bundled_app("Gemfile").read).to match(/gem "foo", "~> 2.0", :groups => \[:development, :test\]/)
       expect(the_bundle).to include_gems "foo 2.0"
     end
   end
@@ -75,14 +75,14 @@ RSpec.describe "bundle add" do
   describe "with --source" do
     it "adds dependency with specified source" do
       bundle "add 'foo' --source='file://#{gem_repo2}'"
-      expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "~> 2.0", :source => 'file:\/\/#{gem_repo2}'})
+      expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "~> 2.0", :source => "file:\/\/#{gem_repo2}"})
       expect(the_bundle).to include_gems "foo 2.0"
     end
   end
 
   it "using combination of short form options works like long form" do
     bundle "add 'foo' -s='file://#{gem_repo2}' -g='development' -v='~>1.0'"
-    expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "~> 1.0", :group => \[:development\], :source => 'file:\/\/#{gem_repo2}'})
+    expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "~> 1.0", :group => \[:development\], :source => "file:\/\/#{gem_repo2}"})
     expect(the_bundle).to include_gems "foo 1.1"
   end
 
