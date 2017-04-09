@@ -88,7 +88,7 @@ RSpec.describe "bundle add" do
 
   it "shows error message when version is not formatted correctly" do
     bundle "add 'foo' -v='~>1 . 0'"
-    expect(out).to match('Illformed requirement ["~>1 . 0"]')
+    expect(out).to match("Invalid gem requirement pattern '~>1 . 0'")
   end
 
   it "shows error message when gem cannot be found" do
