@@ -69,12 +69,7 @@ module Bundler
         end
 
         if d.groups != Array(:default)
-          group =
-              if d.groups.size == 1
-                ", :group => #{d.groups.inspect}"
-              else
-                ", :groups => #{d.groups.inspect}"
-              end
+          group = d.groups.size == 1 ? ", :group => #{d.groups.inspect}" : ", :groups => #{d.groups.inspect}"
         end
 
         source = ", :source => \"#{d.source}\"" unless d.source.nil?
