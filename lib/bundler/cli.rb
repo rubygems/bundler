@@ -553,6 +553,12 @@ module Bundler
       Issue.new.run
     end
 
+    desc "pristine", "Restores installed gems to pristine condition from files located in the gem cache. Gem installed from a git repository will be issued `git checkout --force`."
+    def pristine
+      require "bundler/cli/pristine"
+      Pristine.new.run
+    end
+
     if Bundler.feature_flag.plugins?
       require "bundler/cli/plugin"
       desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"

@@ -171,7 +171,10 @@ module Bundler
           git_proxy.copy_to(install_path, submodules)
           serialize_gemspecs_in(install_path)
           @copied = true
+        elsif force
+          git_proxy.copy_to(install_path, submodules)
         end
+
         generate_bin_options = { :disable_extensions => !Bundler.rubygems.spec_missing_extensions?(spec), :build_args => options[:build_args] }
         generate_bin(spec, generate_bin_options)
 
