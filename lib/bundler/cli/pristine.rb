@@ -16,6 +16,7 @@ module Bundler
             next
           end
 
+          FileUtils.rm_rf spec.full_gem_path
           spec.source.install(spec, :force => true)
         when Source::Git
           git_source = spec.source
