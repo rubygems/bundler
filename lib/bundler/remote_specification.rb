@@ -51,7 +51,7 @@ module Bundler
     # once the remote gem is downloaded, the backend specification will
     # be swapped out.
     def __swap__(spec)
-      SharedHelpers.ensure_same_dependencies(spec, dependencies, spec.dependencies)
+      SharedHelpers.ensure_same_dependencies(self, dependencies, spec.dependencies)
       @_remote_specification = spec
     end
 

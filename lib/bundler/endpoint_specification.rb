@@ -91,7 +91,7 @@ module Bundler
     end
 
     def __swap__(spec)
-      SharedHelpers.ensure_same_dependencies(spec, dependencies, spec.dependencies)
+      SharedHelpers.ensure_same_dependencies(self, dependencies, spec.dependencies)
       @remote_specification = spec
     end
 
