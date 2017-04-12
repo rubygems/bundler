@@ -289,8 +289,10 @@ module Bundler
           idx = Index.new
           have_bundler = false
           Bundler.rubygems.all_specs.reverse_each do |spec|
-            next if spec.name == "bundler" && spec.version.to_s != VERSION
-            have_bundler = true if spec.name == "bundler"
+            if spec.name == "bundler"
+              next unless spec.version.to_s == VERSION
+              have_bundler = true
+            end
             spec.source = self
             if Bundler.rubygems.spec_missing_extensions?(spec, false)
               Bundler.ui.debug "Source #{self} is ignoring #{spec} because it is missing extensions"
