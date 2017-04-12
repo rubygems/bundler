@@ -79,7 +79,10 @@ module Bundler
 
     def message
       locations = Bundler.settings.locations(name)
-      if scope == "global"
+      if @options[:parseable]
+        value = locations[:local] || locations[:env] || locations[:global]
+        "#{name}=#{value}" if value
+      elsif scope == "global"
         if locations[:local]
           "Your application has set #{name} to #{locations[:local].inspect}. " \
             "This will override the global value you are currently setting"

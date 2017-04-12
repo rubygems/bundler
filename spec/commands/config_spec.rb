@@ -142,6 +142,16 @@ RSpec.describe ".bundle/config" do
       run "puts Bundler.settings['foo']"
       expect(out).to eq("value")
     end
+
+    context "when replacing a current value with the parseable flag" do
+      before { bundle "config --global foo value" }
+      it "prints the current value in a parseable format" do
+        bundle "config --global --parseable foo value2"
+        expect(out).to eq "foo=value"
+        run "puts Bundler.settings['foo']"
+        expect(out).to eq("value2")
+      end
+    end
   end
 
   describe "local" do
@@ -191,6 +201,7 @@ RSpec.describe ".bundle/config" do
     it "can be deleted with parseable option" do
       bundle "config --local foo value"
       bundle "config --delete --parseable foo"
+      expect(out).to eq ""
       run "puts Bundler.settings['foo'] == nil"
       expect(out).to eq("true")
     end
