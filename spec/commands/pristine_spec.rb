@@ -24,8 +24,6 @@ RSpec.describe "bundle pristine" do
 
       gemspec
     G
-
-    bundle "install"
   end
 
   context "when sourced from Rubygems" do
@@ -38,6 +36,14 @@ RSpec.describe "bundle pristine" do
 
       bundle "pristine"
       expect(changes_txt).to_not be_file
+    end
+
+    it "does not delete the bundler gem" do
+      system_gems :bundler
+      bundle! "install"
+      bundle! "pristine", :system_bundler => true
+      bundle! "-v", :system_bundler => true
+      expect(out).to end_with(Bundler::VERSION)
     end
   end
 
