@@ -1277,7 +1277,7 @@ RSpec.describe "the lockfile format" do
       gem "rack_middleware"
     G
 
-    expect(out).to include("Downloading rack_middleware-1.0 revealed dependencies not in the API or the lockfile (rack (= 0.9.1)).").
+    expect(out).to include("Downloading rack_middleware-1.0 revealed dependencies not in the API or the lockfile (#{Gem::Dependency.new("rack", "= 0.9.1")}).").
       and include("Either installing with `--full-index` or running `bundle update rack_middleware` should fix the problem.")
   end
 
