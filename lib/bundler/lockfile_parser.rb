@@ -12,7 +12,7 @@
 
 module Bundler
   class LockfileParser
-    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version, :ruby_version
+    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version, :ruby_version, :checksum
 
     BUNDLED      = "BUNDLED WITH".freeze
     DEPENDENCIES = "DEPENDENCIES".freeze
@@ -25,6 +25,7 @@ module Bundler
     SPECS        = "  specs:".freeze
     OPTIONS      = /^  ([a-z]+): (.*)$/i
     SOURCE       = [GIT, GEM, PATH, PLUGIN].freeze
+    CHECKSUM      = "CHECKSUM".freeze
 
     SECTIONS_BY_VERSION_INTRODUCED = {
       # The strings have to be dup'ed for old RG on Ruby 2.3+
@@ -33,6 +34,7 @@ module Bundler
       Gem::Version.create("1.10".dup) => [BUNDLED].freeze,
       Gem::Version.create("1.12".dup) => [RUBY].freeze,
       Gem::Version.create("1.13".dup) => [PLUGIN].freeze,
+      Gem::Version.create("1.14".dup) => [CHECKSUM].freeze,
     }.freeze
 
     KNOWN_SECTIONS = SECTIONS_BY_VERSION_INTRODUCED.values.flatten.freeze
@@ -84,6 +86,8 @@ module Bundler
           @state = :ruby
         elsif line == BUNDLED
           @state = :bundled_with
+        elsif line == CHECKSUM
+          @state = :checksum
         elsif line =~ /^[^\s]/
           @state = nil
         elsif @state
@@ -237,6 +241,10 @@ module Bundler
 
     def parse_ruby(line)
       @ruby_version = line.strip
+    end
+
+    def parse_checksum(line)
+      @checksum = line.strip
     end
   end
 end

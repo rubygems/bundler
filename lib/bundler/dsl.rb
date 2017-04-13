@@ -30,6 +30,7 @@ module Bundler
       @ruby_version         = nil
       @gemspecs             = []
       @gemfile              = nil
+      @checksum             = nil
       add_git_sources
     end
 
@@ -39,6 +40,7 @@ module Bundler
       @gemfile = expanded_gemfile_path
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents.dup.untaint, gemfile.to_s, 1)
+      @checksum = generate_checksum(contents)
     rescue Exception => e
       message = "There was an error " \
         "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \
@@ -197,7 +199,7 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups)
+      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups, @checksum)
     end
 
     def group(*args, &blk)
@@ -447,6 +449,10 @@ The :#{name} git source is deprecated, and will be removed in Bundler 2.0. Add t
       "#{repo_string}"
     end
       EOS
+    end
+
+    def generate_checksum(gemfile_source)
+      Digest::MD5.hexdigest(gemfile_source)
     end
 
     class DSLError < GemfileError

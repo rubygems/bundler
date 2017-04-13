@@ -75,6 +75,10 @@ module Bundler
         return
       end
 
+
+      # EXPERIMENT: Evaluate benefit if we skip resolution by comparing Gemfile checksum against the checksum saved in the lockfile.
+      return if Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil).checksum_matches?
+
       resolve_if_need(options)
       ensure_specs_are_compatible!
       install(options)

@@ -51,7 +51,7 @@ module Bundler
     #   to be updated or true if all gems should be updated
     # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
     # @param optional_groups [Array(String)] A list of optional groups
-    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [], checksum = nil)
       @unlocking = unlock == true || !unlock.empty?
 
       @dependencies    = dependencies
@@ -61,19 +61,22 @@ module Bundler
       @remote          = false
       @specs           = nil
       @ruby_version    = ruby_version
+      @checksum        = checksum
 
       @lockfile               = lockfile
       @lockfile_contents      = String.new
       @locked_bundler_version = nil
       @locked_ruby_version    = nil
+      @locked_checksum        = nil
 
       if lockfile && File.exist?(lockfile)
-        @lockfile_contents = Bundler.read_file(lockfile)
-        @locked_gems = LockfileParser.new(@lockfile_contents)
-        @locked_platforms = @locked_gems.platforms
-        @platforms = @locked_platforms.dup
+        @lockfile_contents      = Bundler.read_file(lockfile)
+        @locked_gems            = LockfileParser.new(@lockfile_contents)
+        @locked_platforms       = @locked_gems.platforms
+        @platforms              = @locked_platforms.dup
         @locked_bundler_version = @locked_gems.bundler_version
-        @locked_ruby_version = @locked_gems.ruby_version
+        @locked_ruby_version    = @locked_gems.ruby_version
+        @locked_checksum        = @locked_gems.checksum
 
         if unlock != true
           @locked_deps    = @locked_gems.dependencies
@@ -354,6 +357,10 @@ module Bundler
       end
     end
 
+    def checksum_matches?
+      !@checksum.nil? && @checksum == @locked_checksum
+    end
+
     def to_lock
       out = String.new
 
@@ -398,6 +405,10 @@ module Bundler
       # Record the version of Bundler that was used to create the lockfile
       out << "\nBUNDLED WITH\n"
       out << "   #{locked_bundler_version}\n"
+
+      # Record the Gemfile checksum at point of creating the lockfile
+      out << "\nCHECKSUM\n"
+      out << "   #{@checksum}\n"
 
       out
     end
