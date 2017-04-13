@@ -14,7 +14,7 @@ module Bundler
       @specs = specs.sort_by(&:name)
     end
 
-    def for(dependencies, skip = [], check = false, match_current_platform = false)
+    def for(dependencies, skip = [], check = false, match_current_platform = false, raise_on_missing = true)
       handled = {}
       deps = dependencies.dup
       specs = []
@@ -36,6 +36,8 @@ module Bundler
           end
         elsif check
           return false
+        elsif raise_on_missing
+          raise "Unable to find a spec satisfying #{dep} in the set. Perhaps the lockfile is corrupted?"
         end
       end
 
@@ -75,7 +77,7 @@ module Bundler
     end
 
     def materialize(deps, missing_specs = nil)
-      materialized = self.for(deps, [], false, true).to_a
+      materialized = self.for(deps, [], false, true, missing_specs).to_a
       deps = materialized.map(&:name).uniq
       materialized.map! do |s|
         next s unless s.is_a?(LazySpecification)

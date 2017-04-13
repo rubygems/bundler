@@ -775,7 +775,7 @@ module Bundler
       end
 
       resolve = SpecSet.new(converged)
-      resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems])
+      resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems], false, false, false)
       diff    = nil
 
       # Now, we unlock any sources that do not have anymore gems pinned to it
