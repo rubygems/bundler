@@ -695,7 +695,7 @@ __FILE__: #{path.to_s.inspect}
     end
 
     context "with a system gem that shadows a default gem" do
-      let(:openssl_version) { "2.0.3" }
+      let(:openssl_version) { "99.9.9" }
       let(:expected) { ruby "gem 'openssl', '< 999999'; require 'openssl'; puts OpenSSL::VERSION", :artifice => nil }
 
       it "only leaves the default gem in the stdlib available" do
