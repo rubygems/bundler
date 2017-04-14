@@ -448,7 +448,7 @@ module Bundler
       end
 
       reason = change_reason
-      msg << "\n\n#{reason.split(", ").join("\n")}\n" unless reason.strip.empty?
+      msg << "\n\n#{reason.split(", ").map(&:capitalize).join("\n")}" unless reason.strip.empty?
       msg << "\n\nYou have added to the Gemfile:\n" << added.join("\n") if added.any?
       msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
       msg << "\n\nYou have changed in the Gemfile:\n" << changed.join("\n") if changed.any?
@@ -775,7 +775,7 @@ module Bundler
       end
 
       resolve = SpecSet.new(converged)
-      resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems])
+      resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems], false, false, false)
       diff    = nil
 
       # Now, we unlock any sources that do not have anymore gems pinned to it

@@ -5,8 +5,8 @@ module Bundler
     ILLFORMED_MESSAGE = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'.freeze
     include MatchPlatform
 
-    attr_reader :name, :version, :platform, :dependencies, :required_rubygems_version, :required_ruby_version, :checksum
-    attr_accessor :source, :remote
+    attr_reader :name, :version, :platform, :required_rubygems_version, :required_ruby_version, :checksum
+    attr_accessor :source, :remote, :dependencies
 
     def initialize(name, version, platform, dependencies, metadata = nil)
       @name         = name
@@ -91,13 +91,7 @@ module Bundler
     end
 
     def __swap__(spec)
-      without_type = proc {|d| Gem::Dependency.new(d.name, d.requirements_list.sort) }
-      if (extra_deps = spec.runtime_dependencies.map(&without_type).-(dependencies.map(&without_type))) && extra_deps.any?
-        Bundler.ui.debug "#{full_name} from #{remote} has corrupted API dependencies (API returned #{dependencies}, real spec has (#{spec.runtime_dependencies}))"
-        raise APIResponseMismatchError,
-          "Downloading #{full_name} revealed dependencies not in the API (#{extra_deps.map(&:to_s).join(", ")})." \
-          "\nInstalling with `--full-index` should fix the problem."
-      end
+      SharedHelpers.ensure_same_dependencies(self, dependencies, spec.dependencies)
       @remote_specification = spec
     end
 

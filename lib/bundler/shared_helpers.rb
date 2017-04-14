@@ -152,6 +152,24 @@ module Bundler
       end
     end
 
+    def ensure_same_dependencies(spec, old_deps, new_deps)
+      new_deps = new_deps.reject {|d| d.type == :development }
+      old_deps = old_deps.reject {|d| d.type == :development }
+
+      without_type = proc {|d| Gem::Dependency.new(d.name, d.requirements_list.sort) }
+      new_deps.map!(&without_type)
+      old_deps.map!(&without_type)
+
+      extra_deps = new_deps - old_deps
+      return if extra_deps.empty?
+
+      Bundler.ui.debug "#{spec.full_name} from #{spec.remote} has either corrupted API or lockfile dependencies" \
+        " (was expecting #{old_deps.map(&:to_s)}, but the real spec has #{new_deps.map(&:to_s)})"
+      raise APIResponseMismatchError,
+        "Downloading #{spec.full_name} revealed dependencies not in the API or the lockfile (#{extra_deps.join(", ")})." \
+        "\nEither installing with `--full-index` or running `bundle update #{spec.name}` should fix the problem."
+    end
+
   private
 
     def find_gemfile
