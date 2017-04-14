@@ -71,6 +71,10 @@ module Bundler
       def to_s
         "#<#{self.class} #{@spec.full_name} (#{state})>"
       end
+
+      def full_name
+        @spec.full_name
+      end
     end
 
     def self.call(*args)
@@ -164,7 +168,11 @@ module Bundler
         warning << "* #{missing.map(&:name).join(", ")} depended upon by #{spec.name}"
       end
 
-      Bundler.ui.warn(warning.join("\n"))
+      warning = warning.join("\n")
+
+      fatally_missing_specs = missing_dependencies.map(&:last).flatten.map(&:name) - @specs.map(&:name)
+      return Bundler.ui.warning(warning) if fatally_missing_specs.empty?
+      raise InstallError, warning.concat("\n\nBundler is unable to continue installing without #{fatal.join(",")} in the lockfile.")
     end
 
     def require_tree_for_spec(spec)
