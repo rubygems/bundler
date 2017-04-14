@@ -11,7 +11,7 @@ module Bundler
     def_delegators :sorted, :each
 
     def initialize(specs)
-      @specs = specs.sort_by(&:name)
+      @specs = specs
     end
 
     def for(dependencies, skip = [], check = false, match_current_platform = false, raise_on_missing = true)

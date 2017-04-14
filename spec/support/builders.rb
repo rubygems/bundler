@@ -205,7 +205,7 @@ module Spec
             else
               specs = Gem.source_index.find_name('')
             end
-            specs.each do |gem|
+            specs.sort_by(&:name).each do |gem|
               puts gem.full_name
             end
           Y
