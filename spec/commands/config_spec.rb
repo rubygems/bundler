@@ -139,6 +139,7 @@ RSpec.describe ".bundle/config" do
 
     it "saves with parseable option" do
       bundle "config --global --parseable foo value"
+      expect(out).to eq("foo=value")
       run "puts Bundler.settings['foo']"
       expect(out).to eq("value")
     end
@@ -147,7 +148,7 @@ RSpec.describe ".bundle/config" do
       before { bundle "config --global foo value" }
       it "prints the current value in a parseable format" do
         bundle "config --global --parseable foo value2"
-        expect(out).to eq "foo=value"
+        expect(out).to eq "foo=value2"
         run "puts Bundler.settings['foo']"
         expect(out).to eq("value2")
       end
@@ -256,14 +257,14 @@ RSpec.describe ".bundle/config" do
       bundle "config foo local"
       bundle "config foo --parseable"
 
-      expect(out).to eq "local"
+      expect(out).to eq "foo=local"
     end
 
     it "can print global config" do
       bundle "config --global bar value"
       bundle "config bar --parseable"
 
-      expect(out).to eq "value"
+      expect(out).to eq "bar=value"
     end
 
     it "preferes local config over global" do
@@ -271,7 +272,7 @@ RSpec.describe ".bundle/config" do
       bundle "config --global bar value"
       bundle "config bar --parseable"
 
-      expect(out).to eq "value2"
+      expect(out).to eq "bar=value2"
     end
   end
 

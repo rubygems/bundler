@@ -33,7 +33,12 @@ module Bundler
       end
 
       if args.empty?
-        return Bundler.ui.info(Bundler.settings[name]) if options[:parseable]
+        if options[:parseable]
+          if value = Bundler.settings[name]
+            Bundler.ui.info("#{name}=#{value}")
+          end
+          return
+        end
 
         confirm(name)
         return
@@ -80,8 +85,7 @@ module Bundler
     def message
       locations = Bundler.settings.locations(name)
       if @options[:parseable]
-        value = locations[:local] || locations[:env] || locations[:global]
-        "#{name}=#{value}" if value
+        "#{name}=#{new_value}" if new_value
       elsif scope == "global"
         if locations[:local]
           "Your application has set #{name} to #{locations[:local].inspect}. " \
