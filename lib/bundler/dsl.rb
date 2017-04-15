@@ -95,10 +95,10 @@ module Bundler
 
       # if there's already a dependency with this name we try to prefer one
       if current = @dependencies.find {|d| d.name == dep.name }
+        deleted_dep = @dependencies.delete(current) if current.type == :development
+
         if current.requirement != dep.requirement
-          if current.type == :development
-            @dependencies.delete current
-          else
+          unless deleted_dep
             return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
                             "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})"
@@ -111,9 +111,7 @@ module Bundler
         end
 
         if current.source != dep.source
-          if current.type == :development
-            @dependencies.delete current
-          else
+          unless deleted_dep
             return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
                             "You specified that #{dep.name} (#{dep.requirement}) should come from " \
