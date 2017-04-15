@@ -183,6 +183,8 @@ There are a number of `Gemfile` platforms:
     Same as _ruby_, but only Rubinius (not MRI)
   * `jruby`:
     JRuby
+  * `maglev`:
+    MagLev
   * `mswin`:
     Windows
 
