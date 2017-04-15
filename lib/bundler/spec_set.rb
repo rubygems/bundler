@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "tsort"
 require "forwardable"
+require "set"
 
 module Bundler
   class SpecSet
@@ -11,20 +12,18 @@ module Bundler
     def_delegators :sorted, :each
 
     def initialize(specs)
-      @specs = specs.sort_by(&:name)
+      @specs = specs
     end
 
     def for(dependencies, skip = [], check = false, match_current_platform = false, raise_on_missing = true)
-      handled = {}
+      handled = Set.new
       deps = dependencies.dup
       specs = []
       skip += ["bundler"]
 
       loop do
         break unless dep = deps.shift
-        next if handled[dep] || skip.include?(dep.name)
-
-        handled[dep] = true
+        next if !handled.add?(dep) || skip.include?(dep.name)
 
         if spec = spec_for_dependency(dep, match_current_platform)
           specs << spec
@@ -83,14 +82,15 @@ module Bundler
         next s unless s.is_a?(LazySpecification)
         s.source.dependency_names = deps if s.source.respond_to?(:dependency_names=)
         spec = s.__materialize__
-        if missing_specs
-          missing_specs << s unless spec
-        else
-          raise GemNotFound, "Could not find #{s.full_name} in any of the sources" unless spec
+        unless spec
+          unless missing_specs
+            raise GemNotFound, "Could not find #{s.full_name} in any of the sources"
+          end
+          missing_specs << s
         end
-        spec if spec
+        spec
       end
-      SpecSet.new(materialized.compact)
+      SpecSet.new(missing_specs ? materialized.compact : materialized)
     end
 
     # Materialize for all the specs in the spec set, regardless of what platform they're for
