@@ -131,6 +131,8 @@ module Bundler
           thor.template("newgem/#{src}", destination, config)
         end
       end
+      thor.chmod target.join("bin/setup"), 0755
+      thor.chmod target.join("bin/console"), 0755
 
       executables.each do |file|
         path = target.join(file)
