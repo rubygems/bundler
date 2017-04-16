@@ -105,6 +105,18 @@ RSpec.describe "install with --deployment or --frozen" do
     expect(exitstatus).to eq(0) if exitstatus
     expect(the_bundle).to include_gems "rack 1.0"
   end
+  
+  it "works with sources given by a block" do
+    install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
+      source "http://user:pass@localgemserver.test/" do
+        gem "rack-obama", ">= 1.0"
+      end
+    G
+
+    bundle "install --deployment", :exitstatus => true, :artifice => "endpoint_strict_basic_authentication"
+
+    expect(exitstatus).to eq(0)
+  end
 
   describe "with an existing lockfile" do
     before do
