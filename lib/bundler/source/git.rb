@@ -147,7 +147,6 @@ module Bundler
         changed
       end
 
-      # TODO: cache git specs
       def specs(*)
         set_local!(app_cache_path) if has_app_cache? && !local?
 
