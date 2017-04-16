@@ -14,6 +14,9 @@ module Bundler
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
 
+    VALID_KEYS = %w(group groups git path glob name branch ref tag require submodules
+                    platform platforms type source install_if).freeze
+
     attr_reader :gemspecs
     attr_accessor :dependencies
 
@@ -306,7 +309,7 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source install_if)
+      @valid_keys ||= VALID_KEYS
     end
 
     def normalize_options(name, version, opts)
