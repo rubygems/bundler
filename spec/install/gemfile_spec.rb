@@ -12,6 +12,24 @@ RSpec.describe "bundle install" do
     end
   end
 
+  context "with ~> versioning directive" do
+    before do
+      gemfile bundled_app("NotGemfile"), <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack', '~> 0.2'
+      G
+
+      bundle "config --local gemfile #{bundled_app("NotGemfile")}"
+    end
+
+    it "install latest version of 0.2.x" do
+      bundle "install"
+      bundle "show"
+
+      expect(out).to include("rack (0.2.0)")
+    end
+  end
+
   context "with --gemfile" do
     it "finds the gemfile" do
       gemfile bundled_app("NotGemfile"), <<-G
