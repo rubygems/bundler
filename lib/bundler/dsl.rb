@@ -364,8 +364,8 @@ module Bundler
         opts["source"] = source
       end
 
-      opts["source"] ||= @source
-      opts["env"] ||= @env
+      opts["source"]         ||= @source
+      opts["env"]            ||= @env
       opts["platforms"]      = platforms.dup
       opts["group"]          = groups
       opts["should_include"] = install_if
