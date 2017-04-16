@@ -99,7 +99,7 @@ RSpec.describe Bundler::SourceList do
       end
 
       it "returns the new rubygems source" do
-        expect(@new_source).to be_instance_of(Bundler::Source::Rubygems)
+        expect(@new_source).to be_instance_of(Bundler::Source::LocalRubygems)
       end
 
       it "passes the provided options to the new source" do

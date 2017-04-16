@@ -28,7 +28,7 @@ module Bundler
     end
 
     def add_rubygems_source(options = {})
-      add_source_to_list Source::Rubygems.new(options), @rubygems_sources
+      add_source_to_list Source::LocalRubygems.new(options), @rubygems_sources
     end
 
     def add_plugin_source(source, options = {})
