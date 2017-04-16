@@ -64,7 +64,7 @@ module Bundler
         elsif options["ref"]
           shortref_for_display(options["ref"])
         else
-          ref
+          ref_with_rev
         end
 
         rev = begin
@@ -74,6 +74,16 @@ module Bundler
               end
 
         "#{uri} (at #{at}#{rev})"
+      end
+
+      def ref_with_rev
+        rev = @copied ? revision : cached_revision
+
+        if rev
+          "#{ref} - #{rev}"
+        else
+          ref
+        end
       end
 
       def name
