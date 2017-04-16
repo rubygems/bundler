@@ -199,12 +199,12 @@ module Bundler
     end
 
     def group(*args, &blk)
-      opts = Hash === args.last ? args.pop.dup : {}
-      normalize_group_options(opts, args)
+      options = args.last.is_a?(Hash) ? args.pop.dup : {}
+      normalize_group_options(options, args)
 
       @groups.concat args
 
-      if opts["optional"]
+      if options["optional"]
         optional_groups = args - @optional_groups
         @optional_groups.concat optional_groups
       end
