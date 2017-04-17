@@ -150,6 +150,10 @@ module Bundler
       end
     end
 
+    def ca_cert(source)
+      ENV["SSL_CERT_FILE"] = source
+    end
+
     def git_source(name, &block)
       unless block_given?
         raise InvalidOption, "You need to pass a block to #git_source"
