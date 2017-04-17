@@ -4,11 +4,11 @@ require "bundler/source/git/git_proxy"
 
 module Bundler
   class Env
-    def write(io)
+    def self.write(io)
       io.write report
     end
 
-    def report(options = {})
+    def self.report(options = {})
       print_gemfile = options.delete(:print_gemfile) { true }
       print_gemspecs = options.delete(:print_gemspecs) { true }
 
@@ -61,9 +61,7 @@ module Bundler
       out
     end
 
-  private
-
-    def read_file(filename)
+    def self.read_file(filename)
       File.read(filename.to_s).strip
     rescue Errno::ENOENT
       "<No #{filename} found>"
@@ -71,7 +69,7 @@ module Bundler
       "#{e.class}: #{e.message}"
     end
 
-    def ruby_version
+    def self.ruby_version
       str = String.new("#{RUBY_VERSION}")
       if RUBY_VERSION < "1.9"
         str << " (#{RUBY_RELEASE_DATE}"
@@ -83,10 +81,12 @@ module Bundler
       end
     end
 
-    def git_version
+    def self.git_version
       Bundler::Source::Git::GitProxy.new(nil, nil, nil).full_version
     rescue Bundler::Source::Git::GitNotInstalledError
       "not installed"
     end
+
+    private_class_method :read_file, :ruby_version, :git_version
   end
 end

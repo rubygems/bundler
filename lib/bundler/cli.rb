@@ -530,7 +530,7 @@ module Bundler
 
     desc "env", "Print information about the environment Bundler is running under"
     def env
-      Env.new.write($stdout)
+      Env.write($stdout)
     end
 
     desc "doctor [OPTIONS]", "Checks the bundle for common problems"
