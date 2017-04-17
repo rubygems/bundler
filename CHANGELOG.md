@@ -1,3 +1,47 @@
+## 1.15.0.pre.1 (2017-04-16)
+
+Features:
+
+  - print a notification when a newer version of bundler is available (#4683, @segiddins)
+  - add man pages for all bundler commands (#4988, @feministy)
+  - add the `bundle info` command (@fredrb, @colby-swandale)
+  - all files created with `bundle gem` comply with the bundler style guide (@zachahn)
+  - if installing a gem fails, print out the reason the gem needed to be installed (#5078, @segiddins)
+  - allow setting `gem.push_key` to set the key used when running `rake release` (@DTrierweiler)
+  - print gem versions that are regressing during `bundle update` in yellow (#5506, @brchristian)
+  - avoid printing extraneous dependencies when the resolver encounters a conflict (@segiddins)
+  - add the `bundle issue` command that prints instructions for reporting issues (#4871, @jonathanpike)
+  - add `--source` and `--group` options to the `bundle inject` command (#5452, @Shekharrajak)
+  - add the `bundle add` command to add a gem to the gemfile (@denniss)
+  - add the `bundle pristine` command to re-install gems from cached `.gem` files (#4509, @denniss)
+  - add a `--parseable` option for `bundle config` (@JuanitoFatas, @colby-swandale)
+
+Performance:
+
+  - speed up gemfile initialization by storing locked dependencies as a hash (@jules2689)
+  - speed up gemfile initialization by making locked dependency comparison lazy, avoiding object allocation (@jules2689)
+  - only validate git gems when they are downloaded, instead of every time `Bundler.setup` is run (@segiddins)
+  - avoid regenerating the lockfile when nothing has changed (@segiddins)
+  - avoid diffing large arrays when no sources in the gemfile have changed (@segiddins)
+  - avoid evaluating full gemspecs when running with RubyGems 2.5+ (@segiddins)
+
+Bugfixes:
+
+  - fix cases where `bundle update` would print a resolver conflict instead of updating the selected gems (#5031, #5095, @segiddins)
+  - print out a stack trace after an interrupt when running in debug mode (@segiddins)
+  - print out when bundler starts fetching a gem from a remote server (@segiddins)
+  - fix `bundle gem` failing when `git` is unavailable (#5458, @Shekharrajak, @colby-swandale)
+  - suggest the appropriate command to unfreeze a bundle (#5009, @denniss)
+  - ensure nested calls to `bundle exec` resolve default gems correctly (#5500, @segiddins)
+  - ensure that a plugin failing to install doesn't uninstall other plugins (@kerrizor, @roseaboveit)
+  - ensure `socket` is required before being referenced (#5533, @rafaelfranca)
+  - allow running `bundle outdated` when gems aren't installed locally (#5553, @segiddins)
+  - print a helpful error when `bundle exec`ing to a gem that isn't included in the bundle (#5487, @segiddins)
+  - print an error message when a non-git gem is given a `branch` option (#5530, @colby-swandale)
+  - allow interrupts to exit the process after gems have been installed (@segiddins)
+  - print the underlying error when downloading gem metadata fails (#5579, @segiddins)
+  - avoid deadlocking when installing with a lockfile that is missing dependencies (#5378, #5480, #5519, #5526, #5529, #5549, #5572, @segiddins)
+
 ## 1.14.6 (2017-03-03)
 
 Bugfixes:
