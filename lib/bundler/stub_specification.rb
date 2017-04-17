@@ -68,6 +68,10 @@ module Bundler
       stub.raw_require_paths
     end
 
+    def to_spec
+      stub.to_spec
+    end
+
   private
 
     def _remote_specification
