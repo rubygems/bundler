@@ -217,9 +217,9 @@ module Bundler
       args.each { @groups.pop }
     end
 
-    def install_if(*args, &blk)
+    def install_if(*args)
       @install_conditionals.concat args
-      blk.call
+      yield
     ensure
       args.each { @install_conditionals.pop }
     end
