@@ -391,19 +391,19 @@ module Bundler
         raise GemfileError, %(The `branch` option for `#{command}` is not allowed. Only gems with a git source can specify a branch)
       end
 
-      if invalid_keys.any?
-        message = String.new
-        message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
-        message << if invalid_keys.size > 1
-                     "as options for #{command}, but they are invalid."
-                   else
-                     "as an option for #{command}, but it is invalid."
-                   end
+      return true unless invalid_keys.any?
 
-        message << " Valid options are: #{valid_keys.join(", ")}."
-        message << " You may be able to resolve this by upgrading Bundler to the newest version."
-        raise InvalidOption, message
-      end
+      message = String.new
+      message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
+      message << if invalid_keys.size > 1
+                   "as options for #{command}, but they are invalid."
+                 else
+                   "as an option for #{command}, but it is invalid."
+                 end
+
+      message << " Valid options are: #{valid_keys.join(", ")}."
+      message << " You may be able to resolve this by upgrading Bundler to the newest version."
+      raise InvalidOption, message
     end
 
     def normalize_source(source)
@@ -531,7 +531,7 @@ The :#{name} git source is deprecated, and will be removed in Bundler 2.0. Add t
           lines      = contents.lines.to_a
           indent     = " #  "
           indicator  = indent.tr("#", ">")
-          first_line = (line_numer.zero?)
+          first_line = line_numer.zero?
           last_line  = (line_numer == (lines.count - 1))
 
           m << "\n"
