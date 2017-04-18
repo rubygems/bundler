@@ -11,6 +11,18 @@ module Bundler
 
     attr_accessor :stub, :ignored
 
+    def source=(source)
+      super
+      # Stub has no concept of source, which means that extension_dir may be wrong
+      # This is the case for git-based gems. So, instead manually assign the extension dir
+      if source.respond_to?(:extension_dir_name)
+        path = File.join(stub.extensions_dir, source.extension_dir_name)
+        stub.extension_dir = File.expand_path(path)
+      else
+        stub.extension_dir = nil
+      end
+    end
+
     def to_yaml
       _remote_specification.to_yaml
     end
