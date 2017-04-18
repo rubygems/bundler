@@ -14,6 +14,7 @@ if Bundler.rubygems.provides?(">= 2.1")
 
     describe "#to_spec" do
       it "returns a Gem::Specification" do
+        bundle :install
         expect(with_gem_stub_spec.to_spec).to be_a(Gem::Specification)
         expect(with_bundler_stub_spec.to_spec).to be_a(Gem::Specification)
       end
