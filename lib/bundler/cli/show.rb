@@ -36,19 +36,25 @@ module Bundler
           Bundler.ui.info s.full_gem_path
         end
       else
-        Bundler.ui.info "Gems included by the bundle:"
-        Bundler.load.specs.sort_by(&:name).each do |s|
-          desc = "  * #{s.name} (#{s.version}#{s.git_version})"
-          if @verbose
-            latest = latest_specs.find {|l| l.name == s.name }
-            Bundler.ui.info <<-END.gsub(/^ +/, "")
-              #{desc}
-              \tSummary:  #{s.summary || "No description available."}
-              \tHomepage: #{s.homepage || "No website available."}
-              \tStatus:   #{outdated?(s, latest) ? "Outdated - #{s.version} < #{latest.version}" : "Up to date"}
-            END
-          else
-            Bundler.ui.info desc
+        Bundler.ui.info "Gems included by the bundle:" unless options[:count]
+        specs = Bundler.load.specs
+        if options[:count]
+          Bundler.ui.info "Required gems: #{Bundler.load.dependencies.count}"
+          Bundler.ui.info "Bundled gems: #{specs.count}"
+        else
+          specs.sort_by(&:name).each do |s|
+            desc = "  * #{s.name} (#{s.version}#{s.git_version})"
+            if @verbose
+              latest = latest_specs.find {|l| l.name == s.name }
+              Bundler.ui.info <<-END.gsub(/^ +/, "")
+                #{desc}
+                \tSummary:  #{s.summary || "No description available."}
+                \tHomepage: #{s.homepage || "No website available."}
+                \tStatus:   #{outdated?(s, latest) ? "Outdated - #{s.version} < #{latest.version}" : "Up to date"}
+              END
+            else
+              Bundler.ui.info desc
+            end
           end
         end
       end
