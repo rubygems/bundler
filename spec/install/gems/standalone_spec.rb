@@ -29,6 +29,22 @@ RSpec.shared_examples "bundle install --standalone" do
       expect(out).to eq(expected_gems.values.join("\n"))
     end
 
+    it "loads gems correctly" do
+      testrb = String.new <<-RUBY
+        $:.unshift File.expand_path("bundle")
+        require "bundler/setup"
+
+      RUBY
+      expected_gems.each do |k, _|
+        testrb << "\nputs (Gem.loaded_specs['#{k}'] || Gem::Specification.new).name"
+      end
+      Dir.chdir(bundled_app) do
+        ruby testrb, :no_lib => true
+      end
+
+      expect(out).to eq(expected_gems.keys.join("\n")), out
+    end
+
     it "works on a different system" do
       FileUtils.mv(bundled_app, "#{bundled_app}2")
 
@@ -75,10 +91,19 @@ RSpec.shared_examples "bundle install --standalone" do
       G
     end
 
-    it "generates a bundle/bundler/setup.rb with the proper paths", :rubygems => "2.4" do
-      extension_line = File.read(bundled_app("bundle/bundler/setup.rb")).each_line.find {|line| line.include? "/extensions/" }.strip
-      expect(extension_line).to start_with '$:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/extensions/'
-      expect(extension_line).to end_with '/very_simple_binary-1.0"'
+    it "loads gems correctly", :rubygems => "2.4" do
+      testrb = String.new <<-RUBY
+        $:.unshift File.expand_path("bundle")
+        require "bundler/setup"
+
+        require 'very_simple_binary'
+        puts (Gem.loaded_specs['very_simple_binary'] || Gem::Specification.new).name
+      RUBY
+      Dir.chdir(bundled_app) do
+        ruby testrb, :no_lib => true
+      end
+
+      expect(out).to eq('very_simple_binary')
     end
   end
 
