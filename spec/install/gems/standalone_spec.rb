@@ -92,18 +92,16 @@ RSpec.shared_examples "bundle install --standalone" do
     end
 
     it "loads gems correctly", :rubygems => "2.4" do
-      testrb = String.new <<-RUBY
-        $:.unshift File.expand_path("bundle")
+      testrb = <<-RUBY
+        $:.unshift "#{bundled_app("bundle")}"
         require "bundler/setup"
 
-        require 'very_simple_binary'
-        puts (Gem.loaded_specs['very_simple_binary'] || Gem::Specification.new).name
+        require 'very_simple_binary_c'
+        puts VerySimpleBinaryInC
       RUBY
-      Dir.chdir(bundled_app) do
-        ruby testrb, :no_lib => true
-      end
+      ruby testrb, :no_lib => true
 
-      expect(out).to eq('very_simple_binary')
+      expect(out).to eq("VerySimpleBinaryInC")
     end
   end
 
