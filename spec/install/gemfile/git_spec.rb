@@ -1030,6 +1030,11 @@ RSpec.describe "bundle install with git sources" do
         puts FOO
       R
       expect(out).to eq("YES")
+
+      run! <<-R
+        puts $:.grep(/ext/)
+      R
+      expect(out).to eq(Pathname.glob(system_gem_path("bundler/gems/extensions/**/foo-1.0-*")).first.to_s)
     end
 
     it "does not use old extension after ref changes" do
