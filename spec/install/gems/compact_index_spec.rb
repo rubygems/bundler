@@ -769,4 +769,16 @@ Bundler::APIResponseMismatchError: Downloading rails-2.3.2 revealed dependencies
 Either installing with `--full-index` or running `bundle update rails` should fix the problem.
     E
   end
+
+  it "does not duplicate specs in the lockfile when updating and a dependency is not installed" do
+    install_gemfile! <<-G, :artifice => "compact_index"
+      source "#{source_uri}" do
+        gem "rails"
+        gem "activemerchant"
+      end
+    G
+    gem_command! :uninstall, "activemerchant"
+    bundle! "update rails", :artifice => "compact_index"
+    expect(lockfile.scan(/activemerchant \(/).size).to eq(1)
+  end
 end

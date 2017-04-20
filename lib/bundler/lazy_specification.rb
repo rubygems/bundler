@@ -29,7 +29,7 @@ module Bundler
       @name          = name
       @version       = version
       @dependencies  = []
-      @platform      = platform
+      @platform      = platform || Gem::Platform::RUBY
       @source        = source
       @specification = nil
     end
