@@ -70,7 +70,7 @@ namespace :spec do
       sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
 
       # Install the gems with a consistent version of RubyGems
-      sh "gem update --system 2.6.4"
+      sh "gem update --system 2.6.11"
 
       $LOAD_PATH.unshift("./spec")
       require "support/rubygems_ext"
