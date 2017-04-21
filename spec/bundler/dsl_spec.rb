@@ -13,7 +13,7 @@ RSpec.describe Bundler::Dsl do
       subject.git_source(:foobar) {|repo_name| "git@foobar.com:#{repo_name}.git" }
       subject.gem("dobry-pies", :example => "strzalek/dobry-pies")
       example_uri = "git@git.example.com:strzalek/dobry-pies.git"
-      expect(subject.dependencies.first.source.uri).to eq(example_uri)
+      expect(subject.dependencies["dobry-pies"].source.uri).to eq(example_uri)
     end
 
     it "raises exception on invalid hostname" do
@@ -30,37 +30,37 @@ RSpec.describe Bundler::Dsl do
       it "converts :github to :git" do
         subject.gem("sparks", :github => "indirect/sparks")
         github_uri = "git://github.com/indirect/sparks.git"
-        expect(subject.dependencies.first.source.uri).to eq(github_uri)
+        expect(subject.dependencies["sparks"].source.uri).to eq(github_uri)
       end
 
       it "converts numeric :gist to :git" do
         subject.gem("not-really-a-gem", :gist => 2_859_988)
         github_uri = "https://gist.github.com/2859988.git"
-        expect(subject.dependencies.first.source.uri).to eq(github_uri)
+        expect(subject.dependencies["not-really-a-gem"].source.uri).to eq(github_uri)
       end
 
       it "converts :gist to :git" do
         subject.gem("not-really-a-gem", :gist => "2859988")
         github_uri = "https://gist.github.com/2859988.git"
-        expect(subject.dependencies.first.source.uri).to eq(github_uri)
+        expect(subject.dependencies["not-really-a-gem"].source.uri).to eq(github_uri)
       end
 
       it "converts 'rails' to 'rails/rails'" do
         subject.gem("rails", :github => "rails")
         github_uri = "git://github.com/rails/rails.git"
-        expect(subject.dependencies.first.source.uri).to eq(github_uri)
+        expect(subject.dependencies["rails"].source.uri).to eq(github_uri)
       end
 
       it "converts :bitbucket to :git" do
         subject.gem("not-really-a-gem", :bitbucket => "mcorp/flatlab-rails")
         bitbucket_uri = "https://mcorp@bitbucket.org/mcorp/flatlab-rails.git"
-        expect(subject.dependencies.first.source.uri).to eq(bitbucket_uri)
+        expect(subject.dependencies["not-really-a-gem"].source.uri).to eq(bitbucket_uri)
       end
 
       it "converts 'mcorp' to 'mcorp/mcorp'" do
         subject.gem("not-really-a-gem", :bitbucket => "mcorp")
         bitbucket_uri = "https://mcorp@bitbucket.org/mcorp/mcorp.git"
-        expect(subject.dependencies.first.source.uri).to eq(bitbucket_uri)
+        expect(subject.dependencies["not-really-a-gem"].source.uri).to eq(bitbucket_uri)
       end
     end
   end
@@ -183,7 +183,7 @@ RSpec.describe Bundler::Dsl do
 
       it "keeps track of the ruby platforms in the dependency" do
         subject.gemspec
-        expect(subject.dependencies.last.platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::RUBY])
+        expect(subject.dependencies["example"].platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::RUBY])
       end
     end
 
@@ -193,7 +193,7 @@ RSpec.describe Bundler::Dsl do
       it "keeps track of the jruby platforms in the dependency" do
         allow(Gem::Platform).to receive(:local).and_return(java)
         subject.gemspec
-        expect(subject.dependencies.last.platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::JAVA])
+        expect(subject.dependencies["example"].platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::JAVA])
       end
     end
   end
@@ -210,7 +210,7 @@ RSpec.describe Bundler::Dsl do
         subject.git "https://github.com/rails/rails.git" do
           rails_gems.each {|rails_gem| subject.send :gem, rails_gem }
         end
-        expect(subject.dependencies.map(&:name)).to match_array rails_gems
+        expect(subject.dependencies.values.map(&:name)).to match_array rails_gems
       end
     end
 
@@ -226,8 +226,8 @@ RSpec.describe Bundler::Dsl do
           spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
         end
 
-        subject.dependencies.each do |d|
-          expect(d.source.uri).to eq("git://github.com/spree/spree.git")
+        subject.dependencies.each do |_k,v|
+          expect(v.source.uri).to eq("git://github.com/spree/spree.git")
         end
       end
     end
@@ -261,7 +261,7 @@ RSpec.describe Bundler::Dsl do
           subject.gem("foo")
         end
 
-        expect(subject.dependencies.last.source).to eq(other_source)
+        expect(subject.dependencies["foo"].source).to eq(other_source)
       end
     end
   end

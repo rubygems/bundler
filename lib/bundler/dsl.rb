@@ -21,7 +21,7 @@ module Bundler
       @source               = nil
       @sources              = SourceList.new
       @git_sources          = {}
-      @dependencies         = []
+      @dependencies         = {}
       @groups               = []
       @install_conditionals = []
       @optional_groups      = []
@@ -94,10 +94,10 @@ module Bundler
       dep = Dependency.new(name, version, options)
 
       # if there's already a dependency with this name we try to prefer one
-      if current = @dependencies.find {|d| d.name == dep.name }
+      if current = dependencies[dep.name]
         if current.requirement != dep.requirement
           if current.type == :development
-            @dependencies.delete current
+            dependencies.delete current
           else
             return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
@@ -112,7 +112,7 @@ module Bundler
 
         if current.source != dep.source
           if current.type == :development
-            @dependencies.delete current
+            dependencies.delete current
           else
             return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
@@ -122,7 +122,7 @@ module Bundler
         end
       end
 
-      @dependencies << dep
+      dependencies[dep.name] = dep
     end
 
     def source(source, *args, &blk)
@@ -197,7 +197,7 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups)
+      Definition.new(lockfile, dependencies.values, @sources, unlock, @ruby_version, @optional_groups)
     end
 
     def group(*args, &blk)
