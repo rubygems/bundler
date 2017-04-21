@@ -93,6 +93,33 @@ end
       expect(out).to eq("CACHE")
     end
 
+    it "tracks updates when specifying the gem" do
+      git = build_git "foo"
+      old_ref = git.ref_for("master", 11)
+
+      install_gemfile <<-G
+        gem "foo", :git => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+
+      update_git "foo" do |s|
+        s.write "lib/foo.rb", "puts :CACHE"
+      end
+
+      ref = git.ref_for("master", 11)
+      expect(ref).not_to eq(old_ref)
+
+      bundle "update foo"
+
+      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
+      expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
+
+      FileUtils.rm_rf lib_path("foo-1.0")
+      run "require 'foo'"
+      expect(out).to eq("CACHE")
+    end
+
     it "uses the local repository to generate the cache" do
       git = build_git "foo"
       ref = git.ref_for("master", 11)
