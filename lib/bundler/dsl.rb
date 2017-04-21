@@ -14,6 +14,9 @@ module Bundler
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
 
+    VALID_KEYS = %w(group groups git path glob name branch ref tag require submodules
+                    platform platforms type source install_if).freeze
+
     attr_reader :gemspecs
     attr_accessor :dependencies
 
@@ -95,10 +98,10 @@ module Bundler
 
       # if there's already a dependency with this name we try to prefer one
       if current = @dependencies.find {|d| d.name == dep.name }
+        deleted_dep = @dependencies.delete(current) if current.type == :development
+
         if current.requirement != dep.requirement
-          if current.type == :development
-            @dependencies.delete current
-          else
+          unless deleted_dep
             return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
                             "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})"
@@ -111,9 +114,7 @@ module Bundler
         end
 
         if current.source != dep.source
-          if current.type == :development
-            @dependencies.delete current
-          else
+          unless deleted_dep
             return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
                             "You specified that #{dep.name} (#{dep.requirement}) should come from " \
@@ -128,6 +129,8 @@ module Bundler
     def source(source, *args, &blk)
       options = args.last.is_a?(Hash) ? args.pop.dup : {}
       options = normalize_hash(options)
+      source = normalize_source(source)
+
       if options.key?("type")
         options["type"] = options["type"].to_s
         unless Plugin.source?(options["type"])
@@ -141,10 +144,8 @@ module Bundler
         source_opts = options.merge("uri" => source)
         with_source(@sources.add_plugin_source(options["type"], source_opts), &blk)
       elsif block_given?
-        source = normalize_source(source)
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
-        source = normalize_source(source)
         check_primary_source_safety(@sources)
         @sources.add_rubygems_remote(source)
       end
@@ -201,12 +202,12 @@ module Bundler
     end
 
     def group(*args, &blk)
-      opts = Hash === args.last ? args.pop.dup : {}
-      normalize_group_options(opts, args)
+      options = args.last.is_a?(Hash) ? args.pop.dup : {}
+      normalize_group_options(options, args)
 
       @groups.concat args
 
-      if opts["optional"]
+      if options["optional"]
         optional_groups = args - @optional_groups
         @optional_groups.concat optional_groups
       end
@@ -216,9 +217,9 @@ module Bundler
       args.each { @groups.pop }
     end
 
-    def install_if(*args, &blk)
+    def install_if(*args)
       @install_conditionals.concat args
-      blk.call
+      yield
     ensure
       args.each { @install_conditionals.pop }
     end
@@ -308,7 +309,7 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source install_if)
+      @valid_keys ||= VALID_KEYS
     end
 
     def normalize_options(name, version, opts)
@@ -366,8 +367,8 @@ module Bundler
         opts["source"] = source
       end
 
-      opts["source"] ||= @source
-      opts["env"] ||= @env
+      opts["source"]         ||= @source
+      opts["env"]            ||= @env
       opts["platforms"]      = platforms.dup
       opts["group"]          = groups
       opts["should_include"] = install_if
@@ -390,19 +391,19 @@ module Bundler
         raise GemfileError, %(The `branch` option for `#{command}` is not allowed. Only gems with a git source can specify a branch)
       end
 
-      if invalid_keys.any?
-        message = String.new
-        message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
-        message << if invalid_keys.size > 1
-                     "as options for #{command}, but they are invalid."
-                   else
-                     "as an option for #{command}, but it is invalid."
-                   end
+      return true unless invalid_keys.any?
 
-        message << " Valid options are: #{valid_keys.join(", ")}."
-        message << " You may be able to resolve this by upgrading Bundler to the newest version."
-        raise InvalidOption, message
-      end
+      message = String.new
+      message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
+      message << if invalid_keys.size > 1
+                   "as options for #{command}, but they are invalid."
+                 else
+                   "as an option for #{command}, but it is invalid."
+                 end
+
+      message << " Valid options are: #{valid_keys.join(", ")}."
+      message << " You may be able to resolve this by upgrading Bundler to the newest version."
+      raise InvalidOption, message
     end
 
     def normalize_source(source)
@@ -530,7 +531,7 @@ The :#{name} git source is deprecated, and will be removed in Bundler 2.0. Add t
           lines      = contents.lines.to_a
           indent     = " #  "
           indicator  = indent.tr("#", ">")
-          first_line = (line_numer.zero?)
+          first_line = line_numer.zero?
           last_line  = (line_numer == (lines.count - 1))
 
           m << "\n"
