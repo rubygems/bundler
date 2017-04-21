@@ -52,10 +52,9 @@ module Spec
 
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
-      env = opts.delete(:env)
       groups = args.map(&:inspect).join(", ")
       setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
-      @out = ruby(setup + cmd, :env => env)
+      @out = ruby(setup + cmd, opts)
     end
     bang :run
 

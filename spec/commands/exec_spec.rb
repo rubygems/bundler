@@ -718,6 +718,7 @@ __FILE__: #{path.to_s.inspect}
           #!/usr/bin/env ruby
           require "openssl"
           puts OpenSSL::VERSION
+          warn Gem.loaded_specs.values.map(&:full_name)
         RB
         file.chmod(0o777)
 
@@ -725,10 +726,11 @@ __FILE__: #{path.to_s.inspect}
           expect(bundle!("exec #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
           expect(bundle!("exec bundle exec #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
           expect(bundle!("exec ruby #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
+          expect(run!(file.read, :no_lib => true, :artifice => nil)).to eq(expected)
         end
 
         # sanity check that we get the newer, custom version without bundler
-        sys_exec(file.to_s)
+        sys_exec("#{Gem.ruby} #{file}")
         expect(err).to include("custom openssl should not be loaded")
       end
     end
