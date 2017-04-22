@@ -43,10 +43,10 @@ Lock the gems specified in Gemfile.
 
 * `--add-platform`:
   Add a new platform to the lockfile, re-resolving for the addition of that
-  platform.
+  platform. Defaults to the local platform.
 
 * `--remove-platform`:
-  Remove a platform from the lockfile.
+  Remove a platform from the lockfile. Defaults to the local platform.
 
 * `--patch`:
   If updating, prefer updating only to next patch version.
