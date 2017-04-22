@@ -31,7 +31,11 @@ module Bundler
           full_gem_path = gem_path(spec.full_gem_path, spec).sub(version_dir, replacement)
 
           file.puts %(Gem::Specification.load("\#{path}/#{gemspec}").tap do |spec|)
-          file.puts %(  spec.full_gem_path = "\#{path}/#{full_gem_path}")
+          file.puts %(  if spec.respond_to? :full_gem_path=)
+          file.puts %(    spec.full_gem_path = "\#{path}/#{full_gem_path}")
+          file.puts %(  else)
+          file.puts %(    spec.instance_variable_set(:@full_gem_path, "\#{path}/#{full_gem_path}"))
+          file.puts %(  end)
           file.puts "end.activate"
         end
       end
