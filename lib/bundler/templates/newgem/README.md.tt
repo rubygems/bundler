@@ -39,8 +39,8 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/<%= co
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 <% end -%>
-
 <% if config[:coc] -%>
+
 ## Code of Conduct
 
 Everyone interacting in the <%= config[:constant_name] %> project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/<%= config[:github_username] %>/<%= config[:name] %>/blob/master/CODE_OF_CONDUCT.md).
