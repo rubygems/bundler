@@ -1,3 +1,11 @@
+## 1.15.0.pre.2 (2017-04-23)
+
+Bugfixes:
+
+  - ensure pre-existing fit caches are updated from remote sources (#5423, @alextaylor000)
+  - avoid duplicating specs in the lockfile after updating with the gem uninstalled (#5599, @segiddins)
+  - ensure git gems have their extensions available at runtime (#5594, @jules2689, @segiddins)
+
 ## 1.15.0.pre.1 (2017-04-16)
 
 Features:

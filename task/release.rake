@@ -58,7 +58,8 @@ namespace :release do
       abort "#{pr["html_url"]} hasn't been closed yet!" unless pr["state"] == "closed"
       next unless pr["pull_request"]
       pr["number"].to_s
-    end.compact
+    end
+    prs.compact!
 
     version_file = "lib/bundler/version.rb"
     version_contents = File.read(version_file)
