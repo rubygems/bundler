@@ -11,7 +11,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "print Bundler.original_env['PATH']"
       path = `getconf PATH`.strip + "#{File::PATH_SEPARATOR}/foo"
       with_path_as(path) do
-        result = bundle("exec ruby -e #{code.dump}")
+        result = bundle("exec #{Gem.ruby} -e #{code.dump}")
         expect(result).to eq(path)
       end
     end
@@ -33,11 +33,11 @@ RSpec.describe "Bundler.with_env helpers" do
         if count == 2
           ENV["PATH"] = "#{ENV["PATH"]}:/foo"
         end
-        exec("ruby", __FILE__, (count - 1).to_s)
+        exec(Gem.ruby, __FILE__, (count - 1).to_s)
       RB
-      path = `getconf PATH`.strip + File::PATH_SEPARATOR + File.dirname(Gem.ruby)
+      path = `getconf PATH`.strip
       with_path_as(path) do
-        bundle!("exec ruby #{bundled_app("exe.rb")} 2")
+        bundle!("exec #{Gem.ruby} #{bundled_app("exe.rb")} 2")
       end
       expect(err).to eq <<-EOS.strip
 2 false
