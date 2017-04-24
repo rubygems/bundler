@@ -223,7 +223,6 @@ end
 
       bundle "config2 set bar baz"
       run "puts Bundler.settings.send(:local_config_file).read"
-      
       expect(out).to include('BUNDLE_FOO: "$BUILD_DIR"')
     end
 
