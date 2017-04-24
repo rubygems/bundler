@@ -6,7 +6,7 @@ It would be tremendously helpful to have more people answering questions about B
 
 Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [bundler.io](http://bundler.io), we would absolutely love it if you opened an issue or pull request on the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
-Sharing your experiences and discoveries by writing them up is a valuable way to help others who have similar problems or experiences in the future. You can write a blog post, create an example and commit it to Github, take screenshots, or make videos.
+Sharing your experiences and discoveries by writing them up is a valuable way to help others who have similar problems or experiences in the future. You can write a blog post, create an example and commit it to GitHub, take screenshots, or make videos.
 
 Publishing examples of how Bundler is used helps everyone, and we’ve discovered that people already use it in ways that we never imagined when we were writing it. If you’re still not sure what to write about, there are also several projects doing interesting things based on Bundler. They could probably use publicity too.
 

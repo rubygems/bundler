@@ -190,7 +190,7 @@ module Bundler
     end
 
     def github(repo, options = {})
-      raise ArgumentError, "Github sources require a block" unless block_given?
+      raise ArgumentError, "GitHub sources require a block" unless block_given?
       github_uri  = @git_sources["github"].call(repo)
       git_options = normalize_hash(options).merge("uri" => github_uri)
       git_source  = @sources.add_git_source(git_options)
