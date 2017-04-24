@@ -140,7 +140,7 @@ module Bundler
 
     def gem_mirrors
       all.inject(Mirrors.new) do |mirrors, k|
-        mirrors.parse(k, self[k]) if k =~ /^mirror\./
+        mirrors.parse(k, self[k]) if k.start_with?("mirror.")
         mirrors
       end
     end
@@ -321,16 +321,34 @@ module Bundler
       end
     end
 
+    PER_URI_OPTIONS = %w(
+      fallback_timeout
+    ).freeze
+
+    NORMALIZE_URI_OPTIONS_PATTERN =
+      /
+        \A
+        (\w+\.)? # optional prefix key
+        (https?.*?) # URI
+        (\.#{Regexp.union(PER_URI_OPTIONS)})? # optional suffix key
+        \z
+      /ix
+
     # TODO: duplicates Rubygems#normalize_uri
     # TODO: is this the correct place to validate mirror URIs?
     def self.normalize_uri(uri)
       uri = uri.to_s
-      uri = "#{uri}/" unless uri =~ %r{/\Z}
+      if uri =~ NORMALIZE_URI_OPTIONS_PATTERN
+        prefix = $1
+        uri = $2
+        suffix = $3
+      end
+      uri = "#{uri}/" unless uri.end_with?("/")
       uri = URI(uri)
       unless uri.absolute?
         raise ArgumentError, format("Gem sources must be absolute. You provided '%s'.", uri)
       end
-      uri
+      "#{prefix}#{uri}#{suffix}".downcase
     end
   end
 end
