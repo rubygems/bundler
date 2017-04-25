@@ -1,20 +1,22 @@
-bundle-add(1) -- Add gem to Gemfile and run bundle install
+bundle-add(1) -- Add gem to the Gemfile and run bundle install
 ================================================================
 
 ## SYNOPSIS
 
-`bundle add` [--group=GROUP] [--version=VERSION] [--source=SOURCE]  [GEM]
+`bundle add` <GEM_NAME> [--group=GROUP] [--version=VERSION] [--source=SOURCE]
 
 ## DESCRIPTION
-Adds the named gem to Gemfile and run `bundle install`.
+Adds the named gem to the Gemfile and run `bundle install`.
 
 Example:
 
-bundle add "rails" --version "< 3.0, > 1.1"
+bundle add rails
 
-bundle add "rails" --version "~> 5.0.0" --source "https://gems.example.com" --group "development"
+bundle add rails --version "< 3.0, > 1.1"
 
-bundle add "rails" --group "development, test"
+bundle add rails --version "~> 5.0.0" --source "https://gems.example.com" --group "development"
+
+bundle add rails --group "development, test"
 
 ## OPTIONS
 * `--version`, `-v`:
