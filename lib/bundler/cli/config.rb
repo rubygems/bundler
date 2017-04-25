@@ -29,13 +29,6 @@ module Bundler
         end
       else
         @name = arg0
-
-        if options[:parseable]
-          if value = Bundler.settings[name]
-            Bundler.ui.info("#{name}=#{value}")
-          end
-          return
-        end
       end
 
       @scope = options[:global] ? "global" : "local"
@@ -45,8 +38,16 @@ module Bundler
 
       # Invariant: name must be set
       raise "Name is not set" if name.nil?
-      return confirm(name) unless scope_specified?
-      Bundler.ui.info(Bundler.settings.send("get_#{@scope}", name))
+
+      if options[:parseable]
+        value = scope_specified? ?  Bundler.settings.send("get_#{@scope}", name) : Bundler.settings[name]
+        if value
+          Bundler.ui.info("#{name}=#{value}")
+        end
+      else
+        return confirm(name) unless scope_specified?
+        Bundler.ui.info(Bundler.settings.send("get_#{@scope}", name))
+      end
     end
 
     def set
