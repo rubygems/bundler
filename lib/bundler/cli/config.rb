@@ -40,10 +40,8 @@ module Bundler
       raise "Name is not set" if name.nil?
 
       if options[:parseable]
-        value = scope_specified? ?  Bundler.settings.send("get_#{@scope}", name) : Bundler.settings[name]
-        if value
-          Bundler.ui.info("#{name}=#{value}")
-        end
+        value = scope_specified? ? Bundler.settings.send("get_#{@scope}", name) : Bundler.settings[name]
+        Bundler.ui.info("#{name}=#{value}") if value
       else
         return confirm(name) unless scope_specified?
         Bundler.ui.info(Bundler.settings.send("get_#{@scope}", name))
