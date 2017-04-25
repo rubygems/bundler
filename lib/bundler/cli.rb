@@ -377,7 +377,6 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
-    
     def config(*args)
       require "bundler/cli/config"
       Config.new(options, args, self).run
