@@ -1,4 +1,4 @@
-bundle-pristine(1) -- Restores installed gems to its pristine condition
+bundle-pristine(1) -- Restores installed gems to their pristine condition
 ===========================================================================
 
 ## SYNOPSIS
@@ -7,7 +7,7 @@ bundle-pristine(1) -- Restores installed gems to its pristine condition
 
 ## DESCRIPTION
 
-Restores installed gems to its pristine condition.
-This command does not revert any changes made to bundler.
-Local cache will be used to restore gems installed from Rubygems.
-Git forced checkout will be used to restore gems installed from Git repository.
+`pristine` restores the installed gems in the bundle to their pristine condition using the local gem
+cache from RubyGems. For git gems - a forced checkout will be performed.
+
+Note the Bundler gem cannot be restored to its original state with `pristine`.
