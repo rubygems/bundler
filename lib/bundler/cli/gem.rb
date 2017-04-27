@@ -2,6 +2,11 @@
 require "pathname"
 
 module Bundler
+  class CLI
+    Bundler.require_thor_actions
+    include Thor::Actions
+  end
+
   class CLI::Gem
     TEST_FRAMEWORK_VERSIONS = {
       "rspec" => "3.0",
@@ -13,7 +18,10 @@ module Bundler
     def initialize(options, gem_name, thor)
       @options = options
       @gem_name = resolve_name(gem_name)
+
       @thor = thor
+      thor.behavior = :invoke
+      thor.destination_root = nil
 
       @name = @gem_name
       @target = SharedHelpers.pwd.join(gem_name)

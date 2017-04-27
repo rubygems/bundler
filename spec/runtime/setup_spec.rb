@@ -1163,6 +1163,12 @@ end
         loaded_specs = Gem.loaded_specs.dup
         #{exemptions.inspect}.each {|s| loaded_specs.delete(s) }
         pp loaded_specs
+
+        # not a default gem, but harmful to have loaded
+        open_uri = $LOADED_FEATURES.grep(/open.uri/)
+        unless open_uri.empty?
+          warn "open_uri: \#{open_uri}"
+        end
       RUBY
 
       it "activates no gems with -rbundler/setup" do
