@@ -251,6 +251,16 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
         URI("http://rubygems-mirror.org/")
       )
     end
+
+    it "normalizes URIs with a fallback_timeout option" do
+      settings["mirror.https://rubygems.org/.fallback_timeout"] = "true"
+      expect(settings.all).to include("mirror.https://rubygems.org/.fallback_timeout")
+    end
+
+    it "normalizes URIs with a fallback_timeout option without a trailing slash" do
+      settings["mirror.https://rubygems.org.fallback_timeout"] = "true"
+      expect(settings.all).to include("mirror.https://rubygems.org/.fallback_timeout")
+    end
   end
 
   describe "BUNDLE_ keys format" do
