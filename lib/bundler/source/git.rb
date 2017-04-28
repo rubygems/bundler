@@ -61,8 +61,12 @@ module Bundler
       def to_s
         at = if local?
           path
-        elsif options["ref"]
-          shortref_for_display(options["ref"])
+        elsif user_ref = options["ref"]
+          if ref =~ /\A[a-z0-9]{4,}\z/i
+            shortref_for_display(user_ref)
+          else
+            user_ref
+          end
         else
           ref
         end
