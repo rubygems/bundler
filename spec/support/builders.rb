@@ -659,6 +659,7 @@ module Spec
       def _build(options)
         libpath = options[:path] || _default_path
         update_gemspec = options[:gemspec] || false
+        source = options[:source] || "git@#{libpath}"
 
         Dir.chdir(libpath) do
           silently "git checkout master"
@@ -684,7 +685,7 @@ module Spec
           _default_files.keys.each do |path|
             _default_files[path] += "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
-          super(options.merge(:path => libpath, :gemspec => update_gemspec))
+          super(options.merge(:path => libpath, :gemspec => update_gemspec, :source => source))
           `git add *`
           `git commit -m "BUMP"`
         end
