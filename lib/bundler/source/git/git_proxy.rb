@@ -90,18 +90,21 @@ module Bundler
         end
 
         def checkout
-          if path.exist?
-            return if has_revision_cached?
-            Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
-            in_path do
-              git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*")
-            end
-          else
-            Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+          return if path.exist? && has_revision_cached?
+          extra_ref = "#{Shellwords.shellescape(ref)}:#{Shellwords.shellescape(ref)}" if ref && ref.start_with?("refs/")
+
+          Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+
+          unless path.exist?
             SharedHelpers.filesystem_access(path.dirname) do |p|
               FileUtils.mkdir_p(p)
             end
             git_retry %(clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet)
+            return unless extra_ref
+          end
+
+          in_path do
+            git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*" #{extra_ref})
           end
         end
 
