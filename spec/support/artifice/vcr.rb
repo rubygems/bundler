@@ -35,7 +35,7 @@ class BundlerVCRHTTP < Net::HTTP
     end
 
     def recorded_response?
-      return true if ENV["BUNDLER_SPEC_RECORDING"]
+      return true if ENV["BUNDLER_SPEC_PRE_RECORDED"]
       request_pair_paths.all? {|f| File.exist?(f) }
     end
 
