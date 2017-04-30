@@ -103,8 +103,17 @@ begin
       rm_rf "tmp"
     end
 
-    desc "Run the real-world spec suite (requires internet)"
+    desc "Run the real-world spec suite"
     task :realworld => %w[set_realworld spec]
+
+    namespace :realworld do
+      desc "Re-record cassettes for the realworld specs"
+      task :record => %w[set_record realworld]
+
+      task :set_record do
+        ENV["BUNDLER_SPEC_FORCE_RECORD"] = "TRUE"
+      end
+    end
 
     task :set_realworld do
       ENV["BUNDLER_REALWORLD_TESTS"] = "1"
