@@ -23,12 +23,4 @@ RSpec.describe "bundle package" do
       expect(bundled_app("vendor/cache-foo/rack-1.0.0.gem")).to exist
     end
   end
-
-  context "when given an absolute path" do
-    it "exits with non-zero status" do
-      bundle :package, "cache-path" => "/tmp/cache-foo"
-      expect(out).to match(/must be relative/)
-      expect(exitstatus).to eq(15) if exitstatus
-    end
-  end
 end
