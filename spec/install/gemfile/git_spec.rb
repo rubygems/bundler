@@ -207,6 +207,93 @@ RSpec.describe "bundle install with git sources" do
 
       expect(out).to eq("WIN")
     end
+
+    it "works when the revision is a non-head ref" do
+      # want to ensure we don't fallback to master
+      update_git "foo", :path => lib_path("foo-1.0") do |s|
+        s.write("lib/foo.rb", "raise 'FAIL'")
+      end
+
+      Dir.chdir(lib_path("foo-1.0")) do
+        `git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1`
+      end
+
+      # want to ensure we don't fallback to HEAD
+      update_git "foo", :path => lib_path("foo-1.0"), :branch => "rando" do |s|
+        s.write("lib/foo.rb", "raise 'FAIL'")
+      end
+
+      install_gemfile! <<-G
+        git "#{lib_path("foo-1.0")}", :ref => "refs/bundler/1" do
+          gem "foo"
+        end
+      G
+      expect(err).to lack_errors
+
+      run! <<-RUBY
+        require 'foo'
+        puts "WIN" if defined?(FOO)
+      RUBY
+
+      expect(out).to eq("WIN")
+    end
+
+    it "works when the revision is a non-head ref and it was previously downloaded" do
+      install_gemfile! <<-G
+        git "#{lib_path("foo-1.0")}" do
+          gem "foo"
+        end
+      G
+
+      # want to ensure we don't fallback to master
+      update_git "foo", :path => lib_path("foo-1.0") do |s|
+        s.write("lib/foo.rb", "raise 'FAIL'")
+      end
+
+      Dir.chdir(lib_path("foo-1.0")) do
+        `git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1`
+      end
+
+      # want to ensure we don't fallback to HEAD
+      update_git "foo", :path => lib_path("foo-1.0"), :branch => "rando" do |s|
+        s.write("lib/foo.rb", "raise 'FAIL'")
+      end
+
+      install_gemfile! <<-G
+        git "#{lib_path("foo-1.0")}", :ref => "refs/bundler/1" do
+          gem "foo"
+        end
+      G
+      expect(err).to lack_errors
+
+      run! <<-RUBY
+        require 'foo'
+        puts "WIN" if defined?(FOO)
+      RUBY
+
+      expect(out).to eq("WIN")
+    end
+
+    it "does not download random non-head refs" do
+      Dir.chdir(lib_path("foo-1.0")) do
+        `git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1`
+      end
+
+      install_gemfile! <<-G
+        git "#{lib_path("foo-1.0")}" do
+          gem "foo"
+        end
+      G
+
+      # ensure we also git fetch after cloning
+      bundle! :update
+
+      Dir.chdir(Dir[system_gem_path("cache/bundler/git/foo-*")].first) do
+        @out = sys_exec("git ls-remote .")
+      end
+
+      expect(out).not_to include("refs/bundler/1")
+    end
   end
 
   describe "when specifying a branch" do
