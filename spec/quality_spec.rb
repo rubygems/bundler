@@ -105,7 +105,7 @@ RSpec.describe "The library itself" do
   end
 
   it "has no malformed whitespace" do
-    exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE/
+    exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE|vcr_cassettes/
     error_messages = []
     Dir.chdir(File.expand_path("../..", __FILE__)) do
       `git ls-files -z`.split("\x0").each do |filename|
@@ -118,7 +118,7 @@ RSpec.describe "The library itself" do
   end
 
   it "does not include any leftover debugging or development mechanisms" do
-    exempt = %r{quality_spec.rb|support/helpers}
+    exempt = %r{quality_spec.rb|support/helpers|vcr_cassettes}
     error_messages = []
     Dir.chdir(File.expand_path("../", __FILE__)) do
       `git ls-files -z`.split("\x0").each do |filename|
@@ -131,7 +131,7 @@ RSpec.describe "The library itself" do
 
   it "does not include any unresolved merge conflicts" do
     error_messages = []
-    exempt = %r{lock/lockfile_spec|quality_spec}
+    exempt = %r{lock/lockfile_spec|quality_spec|vcr_cassettes}
     Dir.chdir(File.expand_path("../", __FILE__)) do
       `git ls-files -z`.split("\x0").each do |filename|
         next if filename =~ exempt
