@@ -1197,6 +1197,50 @@ end
         expect(err).to eq("")
         expect(out).to eq("{}")
       end
+
+      let(:default_gems) do
+        ruby!(<<-RUBY).split("\n")
+          if Gem::Specification.is_a?(Enumerable)
+            puts Gem::Specification.select(&:default_gem?).map(&:name)
+          end
+        RUBY
+      end
+
+      it "activates newer versions of default gems" do
+        build_repo4 do
+          default_gems.each do |g|
+            build_gem g, "999999"
+          end
+        end
+
+        install_gemfile! <<-G
+          source "file:#{gem_repo4}"
+          #{default_gems}.each do |g|
+            gem g, "999999"
+          end
+        G
+
+        expect(the_bundle).to include_gems(*default_gems.map {|g| "#{g} 999999" })
+      end
+
+      it "activates older versions of default gems" do
+        build_repo4 do
+          default_gems.each do |g|
+            build_gem g, "0.0.0.a"
+          end
+        end
+
+        default_gems.reject! {|g| exemptions.include?(g) }
+
+        install_gemfile! <<-G
+          source "file:#{gem_repo4}"
+          #{default_gems}.each do |g|
+            gem g, "0.0.0.a"
+          end
+        G
+
+        expect(the_bundle).to include_gems(*default_gems.map {|g| "#{g} 0.0.0.a" })
+      end
     end
   end
 
