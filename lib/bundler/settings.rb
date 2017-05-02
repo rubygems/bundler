@@ -213,11 +213,7 @@ module Bundler
     end
 
     def app_cache_path
-      @app_cache_path ||= begin
-        path = self[:cache_path] || "vendor/cache"
-        raise InvalidOption, "Cache path must be relative to the bundle path" if path.start_with?("/")
-        path
-      end
+      @app_cache_path ||= self[:cache_path] || "vendor/cache"
     end
 
   private
