@@ -1,54 +1,57 @@
 # frozen_string_literal: true
 module Bundler
   class CLI::Config
-    attr_reader :name, :options, :scope, :thor
+    attr_reader :options, :scope, :thor, :command, :name, :value
     attr_accessor :args
 
     def initialize(options, args, thor)
       @options = options
-      @args = args
+      @args = args.reject {|arg| option?(arg) }
       @thor = thor
-      @name = peek = args.shift
-      @scope = "global"
-      return unless peek && peek.start_with?("--")
-      @name = args.shift
-      @scope = peek[2..-1]
     end
 
     def run
-      unless name
+      arg0 = args.shift
+
+      if arg0.nil?
         confirm_all
         return
       end
 
-      unless valid_scope?(scope)
-        Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
-        exit 1
-      end
+      if arg0 == "set" || arg0 == "unset"
+        @command = arg0.to_sym
+        @name = args.shift
+        @value = args.shift
 
-      if scope == "delete"
-        Bundler.settings.set_local(name, nil)
-        Bundler.settings.set_global(name, nil)
-        return
-      end
-
-      if args.empty?
-        if options[:parseable]
-          if value = Bundler.settings[name]
-            Bundler.ui.info("#{name}=#{value}")
-          end
-          return
+        if arg0 == "set" # Try to expand path
+          pathname = Pathname(@value)
+          @value = pathname.expand_path.to_s if @name.start_with?("local.") && pathname.directory?
         end
-
-        confirm(name)
-        return
+      else
+        @name = arg0
       end
 
-      Bundler.ui.info(message) if message
-      Bundler.settings.send("set_#{scope}", name, new_value)
+      @scope = options[:global] ? "global" : "local"
+
+      return set if command == :set
+      return unset if command == :unset
+
+      # Invariant: name must be set
+      raise "Name is not set" if name.nil?
+
+      if options[:parseable]
+        value = scope_specified? ? Bundler.settings.send("get_#{@scope}", name) : Bundler.settings[name]
+        Bundler.ui.info("#{name}=#{value}") if value
+      else
+        return confirm(name) unless scope_specified?
+        Bundler.ui.info(Bundler.settings.send("get_#{@scope}", name))
+      end
     end
 
-  private
+    def set
+      Bundler.ui.info(message) if message
+      Bundler.settings.send("set_#{scope}", name, value)
+    end
 
     def confirm_all
       if @options[:parseable]
@@ -68,24 +71,23 @@ module Bundler
       end
     end
 
-    def confirm(name)
-      Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
-      show_pretty_values_for(name)
+    def unset
+      scope == "global" ? Bundler.settings.set_global(name, nil) : Bundler.settings.set_local(name, nil)
     end
 
-    def new_value
-      pathname = Pathname.new(args.join(" "))
-      if name.start_with?("local.") && pathname.directory?
-        pathname.expand_path.to_s
-      else
-        args.join(" ")
-      end
+    def option?(arg)
+      arg == "--global" || arg == "--local" || arg == "--parseable"
+    end
+
+    def scope_specified?
+      !options[:global].nil? || !options[:local].nil?
     end
 
     def message
       locations = Bundler.settings.locations(name)
+
       if @options[:parseable]
-        "#{name}=#{new_value}" if new_value
+        "#{name}=#{value}" if value
       elsif scope == "global"
         if locations[:local]
           "Your application has set #{name} to #{locations[:local].inspect}. " \
@@ -93,14 +95,19 @@ module Bundler
         elsif locations[:env]
           "You have a bundler environment variable for #{name} set to " \
             "#{locations[:env].inspect}. This will take precedence over the global value you are setting"
-        elsif locations[:global] && locations[:global] != args.join(" ")
+        elsif locations[:global] && locations[:global] != @value
           "You are replacing the current global value of #{name}, which is currently " \
             "#{locations[:global].inspect}"
         end
-      elsif scope == "local" && locations[:local] != args.join(" ")
+      elsif scope == "local" && locations[:local] != @value
         "You are replacing the current local value of #{name}, which is currently " \
           "#{locations[:local].inspect}"
       end
+    end
+
+    def confirm(name)
+      Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
+      show_pretty_values_for(name)
     end
 
     def show_pretty_values_for(setting)
@@ -109,10 +116,6 @@ module Bundler
           Bundler.ui.info line
         end
       end
-    end
-
-    def valid_scope?(scope)
-      %w(delete local global).include?(scope)
     end
   end
 end

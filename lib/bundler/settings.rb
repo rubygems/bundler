@@ -111,6 +111,14 @@ module Bundler
       set_key(key, value, @global_config, global_config_file)
     end
 
+    def get_global(key)
+      get_key(key, @global_config)
+    end
+
+    def get_local(key)
+      get_key(key, @local_config)
+    end
+
     def all
       env_keys = ENV.keys.select {|k| k =~ /BUNDLE_.*/ }
 
@@ -275,6 +283,10 @@ module Bundler
       end
 
       value
+    end
+
+    def get_key(key, hash)
+      hash[key_for(key)]
     end
 
     def global_config_file

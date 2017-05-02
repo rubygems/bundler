@@ -360,7 +360,11 @@ module Bundler
       Exec.new(options, args).run
     end
 
-    desc "config NAME [VALUE]", "retrieve or set a configuration value"
+    desc "config COMMAND NAME [VALUE]", "Retrieve or set a configuration value"
+    method_option "global", :type => :boolean, :banner => "Modifies global configuration."
+    method_option "local", :type => :boolean, :banner => "Modifies local configuration."
+    method_option "parseable", :type => :boolean, :banner => "Use minimal formatting for more parseable output"
+
     long_desc <<-D
       Retrieves or sets a configuration value. If only one parameter is provided, retrieve the value. If two parameters are provided, replace the
       existing value with the newly provided one.
@@ -372,7 +376,6 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
-    method_option "parseable", :type => :boolean, :banner => "Use minimal formatting for more parseable output"
     def config(*args)
       require "bundler/cli/config"
       Config.new(options, args, self).run
