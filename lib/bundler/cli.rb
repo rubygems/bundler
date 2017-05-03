@@ -352,7 +352,7 @@ module Bundler
     long_desc <<-D
       Exec runs a command, providing it access to the gems in the bundle. While using
       bundle exec you can require and call the bundled gems as if they were installed
-      into the system wide Rubygems repository.
+      into the system wide RubyGems repository.
     D
     map "e" => "exec"
     def exec(*args)

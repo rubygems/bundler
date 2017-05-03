@@ -188,8 +188,8 @@ module Bundler
       if Bundler.rubygems.provides?(">= 2.1.0")
         true
       else
-        Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
-          "gems will be installed one at a time. Upgrade to Rubygems 2.1.0 " \
+        Bundler.ui.warn "RubyGems #{Gem::VERSION} is not threadsafe, so your "\
+          "gems will be installed one at a time. Upgrade to RubyGems 2.1.0 " \
           "or higher to enable parallel gem installation."
         false
       end

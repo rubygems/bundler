@@ -122,14 +122,14 @@ begin
       system "sudo rm -rf #{File.expand_path("../tmp/sudo_gem_home", __FILE__)}"
     end
 
-    # Rubygems specs by version
+    # RubyGems specs by version
     namespace :rubygems do
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
       branches = %w(master)
       releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.2 v2.6.8)
       (branches + releases).each do |rg|
-        desc "Run specs with Rubygems #{rg}"
+        desc "Run specs with RubyGems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(--format progress --color)
           t.ruby_opts  = %w(-w)
@@ -153,7 +153,7 @@ begin
               if rg == "master"
                 system("git checkout origin/master")
               else
-                system("git checkout #{rg}") || raise("Unknown Rubygems ref #{rg}")
+                system("git checkout #{rg}") || raise("Unknown RubyGems ref #{rg}")
               end
               hash = `git rev-parse HEAD`.chomp
             end
@@ -170,7 +170,7 @@ begin
         task "rubygems:all" => rg
       end
 
-      desc "Run specs under a Rubygems checkout (set RG=path)"
+      desc "Run specs under a RubyGems checkout (set RG=path)"
       RSpec::Core::RakeTask.new("co") do |t|
         t.rspec_opts = %w(--format documentation --color)
         t.ruby_opts  = %w(-w)
@@ -178,7 +178,7 @@ begin
 
       task "setup_co" do
         rg = File.expand_path ENV["RG"]
-        puts "Running specs against Rubygems in #{rg}..."
+        puts "Running specs against RubyGems in #{rg}..."
         ENV["RUBYOPT"] = "-I#{rg} #{rubyopt}"
       end
 
@@ -186,28 +186,28 @@ begin
       task "rubygems:all" => "co"
     end
 
-    desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
+    desc "Run the tests on Travis CI against a RubyGem version (using ENV['RGV'])"
     task :travis do
-      rg = ENV["RGV"] || raise("Rubygems version is required on Travis!")
+      rg = ENV["RGV"] || raise("RubyGems version is required on Travis!")
 
       if RUBY_VERSION >= "2.0.0"
         puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
         Rake::Task["rubocop"].invoke
       end
 
-      puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
+      puts "\n\e[1;33m[Travis CI] Running bundler specs against RubyGems #{rg}\e[m\n\n"
       specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
 
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
-      puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
+      puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against RubyGems #{rg}\e[m\n\n"
       sudos = system("sudo -E rake spec:rubygems:#{rg}:sudo")
       # clean up by chowning the newly root-owned tmp directory back to the travis user
       system("sudo chown -R #{ENV["USER"]} #{File.join(File.dirname(__FILE__), "tmp")}")
 
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
-      puts "\n\e[1;33m[Travis CI] Running bundler real world specs against rubygems #{rg}\e[m\n\n"
+      puts "\n\e[1;33m[Travis CI] Running bundler real world specs against RubyGems #{rg}\e[m\n\n"
       realworld = safe_task { Rake::Task["spec:rubygems:#{rg}:realworld"].invoke }
 
       { "specs" => specs, "sudo" => sudos, "realworld" => realworld }.each do |name, passed|
@@ -331,7 +331,7 @@ rescue LoadError
   end
 end
 
-desc "Update vendored SSL certs to match the certs vendored by Rubygems"
+desc "Update vendored SSL certs to match the certs vendored by RubyGems"
 task :update_certs => "spec:rubygems:clone_rubygems_master" do
   require "bundler/ssl_certs/certificate_manager"
   Bundler::SSLCerts::CertificateManager.update_from!(RUBYGEMS_REPO)

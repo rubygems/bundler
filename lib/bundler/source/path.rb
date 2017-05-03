@@ -238,7 +238,7 @@ module Bundler
                           "to modify their .gemspec so it can work with `gem build`."
         end
 
-        Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
+        Bundler.ui.warn "The validation message from RubyGems was:\n  #{e.message}"
       end
     end
   end
