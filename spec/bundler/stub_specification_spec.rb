@@ -3,13 +3,16 @@ require "spec_helper"
 
 if Bundler.rubygems.provides?(">= 2.1")
   RSpec.describe Bundler::StubSpecification do
-    let(:with_gem_stub_spec) do
-      stub = Gem::Specification.stubs.first
-      described_class.from_stub(stub)
+    let(:gemspec) do
+      Gem::Specification.new do |s|
+        s.name = "gemname"
+        s.version = "1.0.0"
+        s.loaded_from = __FILE__
+      end
     end
 
     let(:with_bundler_stub_spec) do
-      described_class.from_stub(with_gem_stub_spec)
+      described_class.from_stub(gemspec)
     end
 
     describe "#from_stub" do
