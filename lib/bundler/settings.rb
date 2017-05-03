@@ -225,14 +225,14 @@ module Bundler
     end
 
     def parent_setting_for(name)
-      split_specfic_setting_for(name)[0]
+      split_specific_setting_for(name)[0]
     end
 
-    def specfic_gem_for(name)
-      split_specfic_setting_for(name)[1]
+    def specific_gem_for(name)
+      split_specific_setting_for(name)[1]
     end
 
-    def split_specfic_setting_for(name)
+    def split_specific_setting_for(name)
       name.split(".")
     end
 

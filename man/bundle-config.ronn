@@ -220,7 +220,7 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `user_agent` (`BUNDLE_USER_AGENT`):
    The custom user agent fragment Bundler includes in API requests.
 * `gem.push_key` (`BUNDLE_GEM__PUSH_KEY`):
-   Sets the `--key` paramter for `gem push` when using the `rake release`
+   Sets the `--key` parameter for `gem push` when using the `rake release`
    command with a private gemstash server.
 
 In general, you should set these settings per-application by using the applicable

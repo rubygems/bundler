@@ -1283,7 +1283,7 @@ In Gemfile:
     end
   end
 
-  describe "when the git source is overriden with a local git repo" do
+  describe "when the git source is overridden with a local git repo" do
     before do
       bundle "config --global local.foo #{lib_path("foo")}"
     end

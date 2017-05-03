@@ -118,7 +118,7 @@ RSpec.describe "bundle update" do
   end
 
   describe "with --group option" do
-    it "should update only specifed group gems" do
+    it "should update only specified group gems" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport", :group => :development

@@ -166,10 +166,10 @@ RSpec.describe "bundle gem" do
     expect(bundled_app("test_gem/.git")).to exist
   end
 
-  context "when git is not avaiable" do
+  context "when git is not available" do
     let(:gem_name) { "test_gem" }
 
-    # This spec cannot have `git` avaiable in the test env
+    # This spec cannot have `git` available in the test env
     before do
       bundle_bin = File.expand_path("../../../exe/bundle", __FILE__)
       load_paths = [lib, spec]
