@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "thread"
 
 RSpec.describe "fetching dependencies with a mirrored source", :realworld => true, :rubygems => ">= 2.0" do

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "gemcutter's dependency API", :realworld => true do
   context "when Gemcutter API takes too long to respond" do

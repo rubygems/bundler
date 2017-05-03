@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "git base name" do
   it "base_name should strip private repo uris" do

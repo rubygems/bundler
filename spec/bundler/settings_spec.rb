@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/settings"
 
 RSpec.describe Bundler::Settings do

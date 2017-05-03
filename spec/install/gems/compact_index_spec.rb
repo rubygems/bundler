@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "compact index api" do
   let(:source_hostname) { "localgemserver.test" }

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
   def rubygems_version(name, requirement)

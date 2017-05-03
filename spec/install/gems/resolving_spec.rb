@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle install with install-time dependencies" do
   it "installs gems with implicit rake dependencies" do
