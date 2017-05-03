@@ -33,7 +33,7 @@ RSpec.describe "Bundler.setup with multi platform stuff" do
     expect(out).to eq("WIN")
   end
 
-  it "will resolve correctly on the current platform when the lockfile was targetted for a different one" do
+  it "will resolve correctly on the current platform when the lockfile was targeted for a different one" do
     lockfile <<-G
       GEM
         remote: file:#{gem_repo1}/
