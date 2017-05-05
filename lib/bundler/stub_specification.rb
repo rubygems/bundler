@@ -87,6 +87,10 @@ module Bundler
     def _remote_specification
       @_remote_specification ||= begin
         rs = stub.to_spec
+        if rs.equal?(self) # happens when to_spec gets the spec from Gem.loaded_specs
+          rs = Gem::Specification.load(loaded_from)
+          Bundler.rubygems.stub_set_spec(stub, rs)
+        end
 
         unless rs
           raise GemspecError, "The gemspec for #{full_name} at #{loaded_from}" \
