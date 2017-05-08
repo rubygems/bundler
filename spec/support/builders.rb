@@ -256,7 +256,7 @@ module Spec
         end
 
         # Capistrano did this (at least until version 2.5.10)
-        # Rubygems 2.2 doesn't allow the specifying of a dependency twice
+        # RubyGems 2.2 doesn't allow the specifying of a dependency twice
         # See https://github.com/rubygems/rubygems/commit/03dbac93a3396a80db258d9bc63500333c25bd2f
         build_gem "double_deps", "1.0", :skip_validation => true do |s|
           s.add_dependency "net-ssh", ">= 1.0.0"

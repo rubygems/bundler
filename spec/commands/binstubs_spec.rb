@@ -59,7 +59,7 @@ RSpec.describe "bundle binstubs <gem>" do
       bundle "binstubs bundler"
 
       expect(bundled_app("bin/bundle")).not_to exist
-      expect(out).to include("Sorry, Bundler can only be run via Rubygems.")
+      expect(out).to include("Sorry, Bundler can only be run via RubyGems.")
     end
 
     it "installs binstubs from git gems" do

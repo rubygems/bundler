@@ -50,8 +50,8 @@ module Bundler
         install_gem(built_gem_path, :local)
       end
 
-      desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems\n" \
-           "To prevent publishing in Rubygems use `gem_push=no rake release`"
+      desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to RubyGems\n" \
+           "To prevent publishing in RubyGems use `gem_push=no rake release`"
       task "release", [:remote] => ["build", "release:guard_clean",
                                     "release:source_control_push", "release:rubygem_push"] do
       end

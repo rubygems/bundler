@@ -26,7 +26,7 @@ RSpec.describe "bundle pristine" do
     G
   end
 
-  context "when sourced from Rubygems" do
+  context "when sourced from RubyGems" do
     it "reverts using cached .gem file" do
       spec = Bundler.definition.specs["weakling"].first
       changes_txt = Pathname.new(spec.full_gem_path).join("lib/changes.txt")

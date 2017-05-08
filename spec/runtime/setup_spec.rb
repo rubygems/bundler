@@ -652,7 +652,7 @@ RSpec.describe "Bundler.setup" do
     end
   end
 
-  # Rubygems returns loaded_from as a string
+  # RubyGems returns loaded_from as a string
   it "has loaded_from as a string on all specs" do
     build_git "foo"
     build_git "no-gemspec", :gemspec => false

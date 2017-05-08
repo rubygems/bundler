@@ -14,7 +14,7 @@ module Bundler
 
       out = String.new("## Environment\n\n```\n")
       out << "Bundler   #{Bundler::VERSION}\n"
-      out << "Rubygems  #{Gem::VERSION}\n"
+      out << "RubyGems  #{Gem::VERSION}\n"
       out << "Ruby      #{ruby_version}"
       out << "GEM_HOME  #{ENV["GEM_HOME"]}\n" unless ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
       out << "GEM_PATH  #{ENV["GEM_PATH"]}\n" unless ENV["GEM_PATH"] == ENV["GEM_HOME"]
