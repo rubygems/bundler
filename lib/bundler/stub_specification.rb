@@ -4,6 +4,7 @@ require "bundler/remote_specification"
 module Bundler
   class StubSpecification < RemoteSpecification
     def self.from_stub(stub)
+      return stub if stub.is_a?(Bundler::StubSpecification)
       spec = new(stub.name, stub.version, stub.platform, nil)
       spec.stub = stub
       spec
