@@ -184,6 +184,22 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       it "is case insensitive" do
         expect(settings.mirror_for("HTTPS://RUBYGEMS.ORG/")).to eq(mirror_uri)
       end
+
+      context "with a file URI" do
+        let(:mirror_uri) { URI("file:/foo/BAR/baz/qUx/") }
+
+        it "returns the mirror URI" do
+          expect(settings.mirror_for(uri)).to eq(mirror_uri)
+        end
+
+        it "converts a string parameter to a URI" do
+          expect(settings.mirror_for("file:/foo/BAR/baz/qUx/")).to eq(mirror_uri)
+        end
+
+        it "normalizes the URI" do
+          expect(settings.mirror_for("file:/foo/BAR/baz/qUx")).to eq(mirror_uri)
+        end
+      end
     end
   end
 
