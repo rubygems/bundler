@@ -17,6 +17,7 @@ RSpec.describe Bundler::SpecSet do
       build_spec("e", "1.0.0.pre.1"),
     ].flatten
   end
+
   subject { described_class.new(specs) }
 
   context "enumerable methods" do
@@ -26,6 +27,40 @@ RSpec.describe Bundler::SpecSet do
 
     it "has a size" do
       expect(subject.size).to eq(5)
+    end
+  end
+
+  describe "#find_by_name_and_platform" do
+    let(:platform) { Gem::Platform.new("universal-darwin-64") }
+    let(:platform_spec) { build_spec("b", "2.0", platform).first }
+    let(:specs) do
+      [
+        build_spec("a", "1.0"),
+        platform_spec,
+      ].flatten
+    end
+
+    it "finds spec with given name and platform" do
+      spec = described_class.new(specs).find_by_name_and_platform("b", platform)
+      expect(spec).to eq platform_spec
+    end
+  end
+
+  describe "#merge" do
+    let(:other_specs) do
+      [
+        build_spec("f", "1.0"),
+        build_spec("g", "2.0"),
+      ].flatten
+    end
+
+    let(:other_spec_set) { described_class.new(other_specs) }
+
+    it "merges the items in each gemspec" do
+      new_spec_set = subject.merge(other_spec_set)
+      specs = new_spec_set.to_a.map(&:full_name)
+      expect(specs).to include("a-1.0")
+      expect(specs).to include("f-1.0")
     end
   end
 
