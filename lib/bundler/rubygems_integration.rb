@@ -698,6 +698,10 @@ module Bundler
         Gem.post_reset do
           Gem::Specification.all = specs
         end
+
+        redefine_method((class << Gem; self; end), :finish_resolve) do |*|
+          []
+        end
       end
 
       def all_specs
