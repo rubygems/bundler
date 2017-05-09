@@ -104,14 +104,14 @@ begin
     end
 
     desc "Run the real-world spec suite (requires internet)"
-    task :realworld => %w(set_realworld spec)
+    task :realworld => %w[set_realworld spec]
 
     task :set_realworld do
       ENV["BUNDLER_REALWORLD_TESTS"] = "1"
     end
 
     desc "Run the spec suite with the sudo tests"
-    task :sudo => %w(set_sudo spec clean_sudo)
+    task :sudo => %w[set_sudo spec clean_sudo]
 
     task :set_sudo do
       ENV["BUNDLER_SUDO_TESTS"] = "1"
@@ -126,13 +126,13 @@ begin
     namespace :rubygems do
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
-      branches = %w(master)
-      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.2 v2.6.8)
+      branches = %w[master]
+      releases = %w[v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.2 v2.6.8]
       (branches + releases).each do |rg|
         desc "Run specs with RubyGems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
-          t.rspec_opts = %w(--format progress --color)
-          t.ruby_opts  = %w(-w)
+          t.rspec_opts = %w[--format progress --color]
+          t.ruby_opts  = %w[-w]
         end
 
         # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
@@ -172,8 +172,8 @@ begin
 
       desc "Run specs under a RubyGems checkout (set RG=path)"
       RSpec::Core::RakeTask.new("co") do |t|
-        t.rspec_opts = %w(--format documentation --color)
-        t.ruby_opts  = %w(-w)
+        t.rspec_opts = %w[--format documentation --color]
+        t.ruby_opts  = %w[-w]
       end
 
       task "setup_co" do

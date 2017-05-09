@@ -3,12 +3,12 @@ require "spec_helper"
 require "bundler/ssl_certs/certificate_manager"
 
 RSpec.describe "SSL Certificates", :rubygems_master do
-  hosts = %w(
+  hosts = %w[
     rubygems.org
     index.rubygems.org
     rubygems.global.ssl.fastly.net
     staging.rubygems.org
-  )
+  ]
 
   hosts.each do |host|
     it "can securely connect to #{host}", :realworld do

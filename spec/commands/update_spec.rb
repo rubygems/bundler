@@ -492,17 +492,17 @@ RSpec.describe "bundle update conservative" do
   context "patch and minor options" do
     before do
       build_repo4 do
-        build_gem "foo", %w(1.4.3 1.4.4) do |s|
+        build_gem "foo", %w[1.4.3 1.4.4] do |s|
           s.add_dependency "bar", "~> 2.0"
         end
-        build_gem "foo", %w(1.4.5 1.5.0) do |s|
+        build_gem "foo", %w[1.4.5 1.5.0] do |s|
           s.add_dependency "bar", "~> 2.1"
         end
-        build_gem "foo", %w(1.5.1) do |s|
+        build_gem "foo", %w[1.5.1] do |s|
           s.add_dependency "bar", "~> 3.0"
         end
-        build_gem "bar", %w(2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0)
-        build_gem "qux", %w(1.0.0 1.0.1 1.1.0 2.0.0)
+        build_gem "bar", %w[2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0]
+        build_gem "qux", %w[1.0.0 1.0.1 1.1.0 2.0.0]
       end
 
       # establish a lockfile set to 1.4.3
@@ -562,18 +562,18 @@ RSpec.describe "bundle update conservative" do
   context "eager unlocking" do
     before do
       build_repo4 do
-        build_gem "isolated_owner", %w(1.0.1 1.0.2) do |s|
+        build_gem "isolated_owner", %w[1.0.1 1.0.2] do |s|
           s.add_dependency "isolated_dep", "~> 2.0"
         end
-        build_gem "isolated_dep", %w(2.0.1 2.0.2)
+        build_gem "isolated_dep", %w[2.0.1 2.0.2]
 
-        build_gem "shared_owner_a", %w(3.0.1 3.0.2) do |s|
+        build_gem "shared_owner_a", %w[3.0.1 3.0.2] do |s|
           s.add_dependency "shared_dep", "~> 5.0"
         end
-        build_gem "shared_owner_b", %w(4.0.1 4.0.2) do |s|
+        build_gem "shared_owner_b", %w[4.0.1 4.0.2] do |s|
           s.add_dependency "shared_dep", "~> 5.0"
         end
-        build_gem "shared_dep", %w(5.0.1 5.0.2)
+        build_gem "shared_dep", %w[5.0.1 5.0.2]
       end
 
       gemfile <<-G

@@ -187,7 +187,7 @@ module Bundler
     end
 
     def gem_push?
-      !%w(n no nil false off 0).include?(ENV["gem_push"].to_s.downcase)
+      !%w[n no nil false off 0].include?(ENV["gem_push"].to_s.downcase)
     end
   end
 end

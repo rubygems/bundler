@@ -22,7 +22,7 @@ RSpec.describe Bundler::EnvironmentPreserver do
 
     it "should not affect the original env" do
       subject
-      expect(env.keys.sort).to eq(%w(bar foo))
+      expect(env.keys.sort).to eq(%w[bar foo])
     end
 
     context "when a key is empty" do

@@ -86,7 +86,7 @@ RSpec.describe "Bundler.require" do
 
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
-    expect(out.split("\n").sort).to eq(%w(seven three))
+    expect(out.split("\n").sort).to eq(%w[seven three])
 
     # test require: true
     run "Bundler.require(:require_true)"

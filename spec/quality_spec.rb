@@ -67,7 +67,7 @@ RSpec.describe "The library itself" do
     failing_lines = []
     File.readlines(filename).each_with_index do |line, number|
       next if line =~ /^\s+#.*\s+\n$/
-      next if %w(LICENCE.md).include?(line)
+      next if %w[LICENCE.md].include?(line)
       failing_lines << number + 1 if line =~ /\s+\n$/
     end
 
@@ -77,7 +77,7 @@ RSpec.describe "The library itself" do
 
   def check_for_expendable_words(filename)
     failing_line_message = []
-    useless_words = %w(
+    useless_words = %w[
       actually
       basically
       clearly
@@ -85,7 +85,7 @@ RSpec.describe "The library itself" do
       obviously
       really
       simply
-    )
+    ]
     pattern = /\b#{Regexp.union(useless_words)}\b/i
 
     File.readlines(filename).each_with_index do |line, number|
@@ -192,11 +192,11 @@ RSpec.describe "The library itself" do
   end
 
   it "documents all used settings" do
-    exemptions = %w(
+    exemptions = %w[
       gem.coc
       gem.mit
       warned_version
-    )
+    ]
 
     all_settings = Hash.new {|h, k| h[k] = [] }
     documented_settings = exemptions
@@ -241,11 +241,11 @@ RSpec.describe "The library itself" do
 
   it "does not contain any warnings" do
     Dir.chdir(root.join("lib")) do
-      exclusions = %w(
+      exclusions = %w[
         bundler/capistrano.rb
         bundler/gem_tasks.rb
         bundler/vlad.rb
-      )
+      ]
       lib_files = `git ls-files -z`.split("\x0").grep(/\.rb$/) - exclusions
       lib_files.reject! {|f| f.start_with?("bundler/vendor") }
       lib_files.map! {|f| f.chomp(".rb") }

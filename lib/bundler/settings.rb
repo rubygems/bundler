@@ -6,7 +6,7 @@ module Bundler
     autoload :Mirror,  "bundler/mirror"
     autoload :Mirrors, "bundler/mirror"
 
-    BOOL_KEYS = %w(
+    BOOL_KEYS = %w[
       allow_offline_install
       auto_install
       cache_all
@@ -28,14 +28,14 @@ module Bundler
       plugins
       silence_root_warning
       error_on_stderr
-    ).freeze
+    ].freeze
 
-    NUMBER_KEYS = %w(
+    NUMBER_KEYS = %w[
       redirect
       retry
       ssl_verify_mode
       timeout
-    ).freeze
+    ].freeze
 
     DEFAULT_CONFIG = {
       :redirect => 5,
@@ -318,9 +318,9 @@ module Bundler
       end
     end
 
-    PER_URI_OPTIONS = %w(
+    PER_URI_OPTIONS = %w[
       fallback_timeout
-    ).freeze
+    ].freeze
 
     NORMALIZE_URI_OPTIONS_PATTERN =
       /
