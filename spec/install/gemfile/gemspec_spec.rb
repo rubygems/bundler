@@ -231,6 +231,30 @@ RSpec.describe "bundle install from an existing gemspec" do
     expect(the_bundle).to include_gems "foo 1.0.0"
   end
 
+  it "does not break Gem.finish_resolve with conflicts", :rubygems => ">= 2" do
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.version = "1.0.0"
+      s.add_dependency "bar", "= 1.0.0"
+    end
+    build_repo2 do
+      build_gem "deps" do |s|
+        s.add_dependency "foo", "= 0.0.1"
+      end
+      build_gem "foo", "0.0.1"
+    end
+
+    install_gemfile! <<-G
+      source "file://#{gem_repo2}"
+      gem "deps"
+      gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
+    G
+
+    expect(the_bundle).to include_gems "foo 1.0.0"
+
+    run! "Gem.finish_resolve; puts 'WIN'"
+    expect(out).to eq("WIN")
+  end
+
   context "in deployment mode" do
     context "when the lockfile was not updated after a change to the gemspec's dependencies" do
       it "reports that installation failed" do
