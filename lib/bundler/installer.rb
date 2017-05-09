@@ -215,7 +215,7 @@ module Bundler
       if !options["update"] && !options[:inline] && Bundler.default_lockfile.file?
         local = Bundler.ui.silence do
           begin
-            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
+            tmpdef = @definition.dup
             true unless tmpdef.new_platform? || tmpdef.missing_dependencies.any?
           rescue BundlerError
           end
