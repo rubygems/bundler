@@ -1,3 +1,10 @@
+## 1.15.0.pre.4 (2017-05-10)
+
+Bugfixes:
+
+  - avoid conflicts when `Gem.finish_resolve` is called after the bundle has been set up (@segiddins)
+  - ensure that `Gem::Specification.find_by_name` always returns an object that can have `#to_spec` called on it (#5592, @jules2689)
+
 ## 1.15.0.pre.3 (2017-04-30)
 
 Bugfixes:
