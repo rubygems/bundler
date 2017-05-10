@@ -344,7 +344,7 @@ module Bundler
       unless uri.absolute?
         raise ArgumentError, format("Gem sources must be absolute. You provided '%s'.", uri)
       end
-      "#{prefix}#{uri}#{suffix}".downcase
+      "#{prefix}#{uri}#{suffix}"
     end
   end
 end

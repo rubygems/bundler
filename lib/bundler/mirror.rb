@@ -45,7 +45,8 @@ module Bundler
     private
 
       def fetch_valid_mirror_for(uri)
-        mirror = @mirrors[uri.to_s.downcase] || @mirrors[URI(uri.to_s).host] || Mirror.new(uri)
+        downcased = uri.to_s.downcase
+        mirror = @mirrors[downcased] || @mirrors[URI(downcased).host] || Mirror.new(uri)
         mirror.validate!(@prober)
         mirror = Mirror.new(uri) unless mirror.valid?
         mirror
@@ -72,7 +73,7 @@ module Bundler
         @uri = if uri.nil?
           nil
         else
-          URI(uri.to_s.downcase)
+          URI(uri.to_s)
         end
         @valid = nil
       end
