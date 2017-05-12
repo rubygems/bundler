@@ -116,10 +116,6 @@ module Bundler
         Bundler.root
       end
 
-      def is_a_path?
-        instance_of?(Path)
-      end
-
       def expanded_original_path
         @expanded_original_path ||= expand(original_path)
       end

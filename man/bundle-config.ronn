@@ -121,6 +121,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `allow_bundler_dependency_conflicts` (`BUNDLE_ALLOW_BUNDLER_DEPENDENCY_CONFLICTS`):
    Allow resolving to specifications that have dependencies on `bundler` that
    are incompatible with the running Bundler version.
+* `allow_deployment_source_credential_changes` (`BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES`):
+   When in deployment mode, allow changing the credentials to a gem's source.
+   Ex: `https://some.host.com/gems/path/` -> `https://user_name:password@some.host.com/gems/path`
 * `allow_offline_install` (`BUNDLE_ALLOW_OFFLINE_INSTALL`):
    Allow Bundler to use cached data when installing without network access.
 * `auto_install` (`BUNDLE_AUTO_INSTALL`):

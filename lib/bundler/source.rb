@@ -46,6 +46,10 @@ module Bundler
       "#<#{self.class}:0x#{object_id} #{self}>"
     end
 
+    def path?
+      instance_of?(Bundler::Source::Path)
+    end
+
   private
 
     def version_color(spec_version, locked_spec_version)

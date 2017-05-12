@@ -73,7 +73,7 @@ module Bundler
     end
 
     def get(source)
-      source_list_for(source).find {|s| source == s }
+      source_list_for(source).find {|s| equal_source?(source, s) || equivalent_source?(source, s) }
     end
 
     def lock_sources
@@ -101,7 +101,7 @@ module Bundler
         replacement_sources.detect {|s| s.is_a?(Source::Rubygems) }
       @rubygems_aggregate = replacement_rubygems if replacement_rubygems
 
-      return true if lock_sources.to_set != replacement_sources.to_set
+      return true if !equal_sources?(lock_sources, replacement_sources) && !equivalent_sources?(lock_sources, replacement_sources)
       return true if replacement_rubygems && rubygems_remotes.to_set != replacement_rubygems.remotes.to_set
 
       false
@@ -153,6 +153,34 @@ module Bundler
           "`bundle config git.allow_insecure true`, or switch to the `https` " \
           "protocol to keep your data secure."
       end
+    end
+
+    def equal_sources?(lock_sources, replacement_sources)
+      lock_sources.to_set == replacement_sources.to_set
+    end
+
+    def equal_source?(source, other_source)
+      source == other_source
+    end
+
+    def equivalent_source?(source, other_source)
+      return false unless Bundler.settings[:allow_deployment_source_credential_changes] && source.is_a?(Source::Rubygems)
+
+      equivalent_rubygems_sources?([source], [other_source])
+    end
+
+    def equivalent_sources?(lock_sources, replacement_sources)
+      return false unless Bundler.settings[:allow_deployment_source_credential_changes]
+
+      lock_rubygems_sources, lock_other_sources = lock_sources.partition {|s| s.is_a?(Source::Rubygems) }
+      replacement_rubygems_sources, replacement_other_sources = replacement_sources.partition {|s| s.is_a?(Source::Rubygems) }
+
+      equivalent_rubygems_sources?(lock_rubygems_sources, replacement_rubygems_sources) && equal_sources?(lock_other_sources, replacement_other_sources)
+    end
+
+    def equivalent_rubygems_sources?(lock_sources, replacement_sources)
+      actual_remotes = replacement_sources.map(&:remotes).flatten.uniq
+      lock_sources.all? {|s| s.equivalent_remotes?(actual_remotes) }
     end
   end
 end
