@@ -240,11 +240,14 @@ begin
   namespace :man do
     directory "man"
 
+    index = []
     sources = Dir["man/*.ronn"].map {|f| File.basename(f, ".ronn") }
     sources.map do |basename|
       ronn = "man/#{basename}.ronn"
-      manual_section = ".1" unless basename =~ /.*(\d+)\Z/
+      manual_section = ".1" unless basename =~ /\.(\d+)\Z/
       roff = "man/#{basename}#{manual_section}"
+
+      index << [ronn, File.basename(roff)]
 
       file roff => ["man", ronn] do
         sh "#{Gem.ruby} -S ronn --roff --pipe #{ronn} > #{roff}"
@@ -257,9 +260,23 @@ begin
       task :build_all_pages => "#{roff}.txt"
     end
 
+    file "index.txt" do
+      index.map! do |(ronn, roff)|
+        [File.read(ronn).split(" ").first, roff]
+      end
+      index = index.sort_by(&:first)
+      justification = index.map {|(n, _f)| n.length }.max + 4
+      File.open("man/index.txt", "w") do |f|
+        index.each do |name, filename|
+          f << name.ljust(justification) << filename << "\n"
+        end
+      end
+    end
+    task :build_all_pages => "index.txt"
+
     task :clean do
       leftovers = Dir["man/*"].reject do |f|
-        File.extname(f) == ".ronn" || f == "man/index.txt"
+        File.extname(f) == ".ronn"
       end
       rm leftovers if leftovers.any?
     end
