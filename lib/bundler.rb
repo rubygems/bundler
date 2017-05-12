@@ -89,16 +89,13 @@ module Bundler
     end
 
     def setup(*groups)
-      # Return if all groups are already loaded
-      return @setup if defined?(@setup) && @setup
-
       definition.validate_runtime!
 
       SharedHelpers.print_major_deprecations!
 
       if groups.empty?
         # Load all groups, but only once
-        @setup = load.setup
+        load.setup
       else
         load.setup(*groups)
       end
@@ -452,7 +449,6 @@ EOF
       @root = nil
       @settings = nil
       @definition = nil
-      @setup = nil
       @load = nil
       @locked_gems = nil
       @bundle_path = nil
