@@ -178,12 +178,12 @@ module Bundler
 
         next unless required_ruby_version || required_rubygems_version
 
-        unless required_ruby_version.satisfied_by?(system_ruby.gem_version)
+        unless required_ruby_version && required_ruby_version.satisfied_by?(system_ruby.gem_version)
           raise InstallError, "#{spec.full_name} requires ruby version #{required_ruby_version}, " \
             "which is incompatible with the current version, #{system_ruby}"
         end
 
-        unless required_rubygems_version.satisfied_by?(rubygems_version)
+        unless required_rubygems_version && required_rubygems_version.satisfied_by?(rubygems_version)
           raise InstallError, "#{spec.full_name} requires rubygems version #{required_rubygems_version}, " \
             "which is incompatible with the current version, #{rubygems_version}"
         end
