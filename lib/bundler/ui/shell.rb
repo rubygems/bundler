@@ -36,6 +36,7 @@ module Bundler
       end
 
       def error(msg, newline = nil)
+        return tell_err(msg, :red, newline) if Bundler.feature_flag.stderr?
         tell_me(msg, :red, newline) if level("error")
       end
 

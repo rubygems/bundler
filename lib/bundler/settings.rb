@@ -27,6 +27,7 @@ module Bundler
       only_update_to_newer_versions
       plugins
       silence_root_warning
+      stderr
     ).freeze
 
     NUMBER_KEYS = %w(
