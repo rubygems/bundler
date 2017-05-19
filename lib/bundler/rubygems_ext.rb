@@ -166,6 +166,10 @@ module Gem
 
       requirement.satisfied_by?(spec.version)
     end unless allocate.respond_to?(:matches_spec?)
+
+    def force_version?
+      false
+    end
   end
 
   class Requirement

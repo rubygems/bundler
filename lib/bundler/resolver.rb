@@ -354,7 +354,7 @@ module Bundler
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
-      return false unless requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
+      return false unless requirement.matches_spec?(spec) || allows_conflicts?(requirement, activated, spec)
       spec.activate_platform!(requirement.__platform) if !@platforms || @platforms.include?(requirement.__platform)
       true
     end
@@ -455,6 +455,13 @@ module Bundler
         version_platform_str
       end
       version_platform_strs.join(", ")
+    end
+
+    def allows_conflicts?(requirement, activated, spec)
+      return true if spec.source.is_a?(Source::Gemspec)
+      return false if requirement.force_version?
+      return true if activated.vertex_named(spec.name).requirements.any?(&:force_version?)
+      false
     end
   end
 end

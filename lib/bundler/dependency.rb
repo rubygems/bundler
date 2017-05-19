@@ -88,6 +88,7 @@ module Bundler
       @should_include = options.fetch("should_include", true)
 
       @autorequire = Array(options["require"] || []) if options.key?("require")
+      @force_version = options.fetch("force_version", false)
     end
 
     def gem_platforms(valid_platforms)
@@ -104,6 +105,10 @@ module Bundler
 
     def should_include?
       @should_include && current_env? && current_platform?
+    end
+
+    def force_version?
+      @force_version
     end
 
     def current_env?
