@@ -42,7 +42,7 @@ RSpec.describe Bundler::UI::Shell do
     context "when stderr flag is enabled" do
       before { bundle "config error_on_stderr true" }
       it "prints to stderr" do
-        expect { subject.error("error!!!") }.to output("\e[31merror!!!\e[0m").to_stderr
+        expect { subject.error("error!!!") }.to output("\e[31merror!!!\e[0m\n").to_stderr
       end
     end
   end

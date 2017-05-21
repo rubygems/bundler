@@ -105,6 +105,9 @@ module Bundler
       end
 
       def tell_err(message, color = nil, newline = nil)
+        newline = message.to_s !~ /( |\t)\Z/ unless newline
+        message = word_wrap(message) if newline.is_a?(Hash) && newline[:wrap]
+
         buffer = @shell.send(:prepare_message, message, *color)
         buffer << "\n" if newline && !message.to_s.end_with?("\n")
 
