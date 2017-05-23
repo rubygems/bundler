@@ -230,6 +230,21 @@ module Bundler
       env_cis.find_all {|env, _| ENV[env] }.map {|_, ci| ci }
     end
 
+    def cis
+      env_cis = {
+        "TRAVIS" => "travis",
+        "CIRCLECI" => "circle",
+        "SEMAPHORE" => "semaphore",
+        "JENKINS_URL" => "jenkins",
+        "BUILDBOX" => "buildbox",
+        "GO_SERVER_URL" => "go",
+        "SNAP_CI" => "snap",
+        "CI_NAME" => ENV["CI_NAME"],
+        "CI" => "ci"
+      }
+      env_cis.find_all{ |env, ci| ENV[env]}.map{ |env, ci| ci }
+    end
+
     def connection
       @connection ||= begin
         needs_ssl = remote_uri.scheme == "https" ||
