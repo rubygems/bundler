@@ -40,7 +40,7 @@ RSpec.describe Bundler::UI::Shell do
     end
 
     context "when stderr flag is enabled" do
-      before { bundle "config error_on_stderr true" }
+      before { Bundler.settings.temporary(:error_on_stderr => true) }
       it "prints to stderr" do
         expect { subject.error("error!!!") }.to output("error!!!\n").to_stderr
       end
