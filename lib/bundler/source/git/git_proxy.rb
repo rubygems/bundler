@@ -135,7 +135,7 @@ module Bundler
             if submodules
               git_retry "submodule update --init --recursive"
             elsif Gem::Version.create(version) >= Gem::Version.create("2.9.0")
-              git_retry "submodule deinit --all"
+              git_retry "submodule deinit --all --force"
             end
           end
         end
