@@ -11,6 +11,9 @@
 #                          user's system should be installed.
 #                          Defaults to `false`.
 #
+# @param options [Hash] :ui the Bundler-UI to use
+#                       :local pass true to use the local bundler cache for installation
+#
 # @param gemfile [Proc]    a block that is evaluated as a `Gemfile`.
 #
 # @example Using an inline Gemfile
@@ -32,6 +35,7 @@ def gemfile(install = false, options = {}, &gemfile)
   require "bundler"
 
   opts = options.dup
+  local = opts.delete(:local) { false }
   ui = opts.delete(:ui) { Bundler::UI::Shell.new }
   raise ArgumentError, "Unknown options: #{opts.keys.join(", ")}" unless opts.empty?
 
@@ -60,7 +64,7 @@ def gemfile(install = false, options = {}, &gemfile)
 
   Bundler.ui = ui if install
   if install || missing_specs.call
-    installer = Bundler::Installer.install(Bundler.root, definition, :system => true, :inline => true)
+    installer = Bundler::Installer.install(Bundler.root, definition, :system => true, :inline => true, :local => local)
     installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post-install message from #{name}:\n#{message}"
     end
