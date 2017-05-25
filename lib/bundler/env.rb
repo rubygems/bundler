@@ -29,14 +29,16 @@ module Bundler
 
       out << "```\n"
 
-      out << "\n## Bundler settings\n\n```\n" unless Bundler.settings.all.empty?
-      Bundler.settings.all.each do |setting|
-        out << setting << "\n"
-        Bundler.settings.pretty_values_for(setting).each do |line|
-          out << "  " << line << "\n"
+      unless Bundler.settings.all.empty?
+        out << "\n## Bundler settings\n\n```\n"
+        Bundler.settings.all.each do |setting|
+          out << setting << "\n"
+          Bundler.settings.pretty_values_for(setting).each do |line|
+            out << "  " << line << "\n"
+          end
         end
+        out << "```\n"
       end
-      out << "```\n"
 
       return out unless SharedHelpers.in_bundle?
 
