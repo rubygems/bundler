@@ -10,7 +10,7 @@ module Bundler
         gem_name = "#{spec.name} (#{spec.version}#{spec.git_version})"
         gem_name += " (#{spec.platform})" if !spec.platform.nil? && spec.platform != Gem::Platform::RUBY
 
-        case spec.source
+        case source = spec.source
         when Source::Rubygems
           cached_gem = spec.cache_file
           unless File.exist?(cached_gem)
@@ -19,11 +19,11 @@ module Bundler
           end
 
           FileUtils.rm_rf spec.full_gem_path
-          spec.source.install(spec, :force => true)
+          source.install(spec, :force => true)
         when Source::Git
-          git_source = spec.source
-          git_source.remote!
-          git_source.install(spec, :force => true)
+          source.remote!
+          FileUtils.rm_rf spec.full_gem_path
+          source.install(spec, :force => true)
         else
           Bundler.ui.warn("Cannot pristine #{gem_name}. Gem is sourced from local path.")
         end

@@ -52,11 +52,22 @@ RSpec.describe "bundle pristine" do
       changed_file = Pathname.new(spec.full_gem_path).join("lib/foo.rb")
       diff = "#Pristine spec changes"
 
-      File.open(changed_file, "a") {|f| f.puts "#Pristine spec changes" }
+      File.open(changed_file, "a") {|f| f.puts diff }
       expect(File.read(changed_file)).to include(diff)
 
-      bundle "pristine"
+      bundle! "pristine"
       expect(File.read(changed_file)).to_not include(diff)
+    end
+
+    it "removes added files" do
+      spec = Bundler.definition.specs["foo"].first
+      changes_txt = Pathname.new(spec.full_gem_path).join("lib/changes.txt")
+
+      FileUtils.touch(changes_txt)
+      expect(changes_txt).to be_file
+
+      bundle! "pristine"
+      expect(changes_txt).not_to be_file
     end
   end
 
@@ -66,7 +77,7 @@ RSpec.describe "bundle pristine" do
       changed_file = Pathname.new(spec.full_gem_path).join("lib/baz.rb")
       diff = "#Pristine spec changes"
 
-      File.open(changed_file, "a") {|f| f.puts "#Pristine spec changes" }
+      File.open(changed_file, "a") {|f| f.puts diff }
       expect(File.read(changed_file)).to include(diff)
 
       bundle "pristine"
