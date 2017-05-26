@@ -3,9 +3,14 @@ require "bundler/cli/common"
 
 module Bundler
   class CLI::Pristine
+    def initialize(gems)
+      @gems = gems
+    end
+
     def run
       Bundler.load.specs.each do |spec|
         next if spec.name == "bundler" # Source::Rubygems doesn't install bundler
+        next if !@gems.empty? && !@gems.include?(spec.name)
 
         gem_name = "#{spec.name} (#{spec.version}#{spec.git_version})"
         gem_name += " (#{spec.platform})" if !spec.platform.nil? && spec.platform != Gem::Platform::RUBY
