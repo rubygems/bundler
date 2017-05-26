@@ -3,7 +3,7 @@ require "shellwords"
 require "tempfile"
 module Bundler
   class Source
-    class Git < Path
+    class Git
       class GitNotInstalledError < GitError
         def initialize
           msg = String.new
