@@ -222,6 +222,8 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `gem.push_key` (`BUNDLE_GEM__PUSH_KEY`):
    Sets the `--key` parameter for `gem push` when using the `rake release`
    command with a private gemstash server.
+* `error_on_stderr` (`BUNDLE_ERROR_ON_STDERR`)
+   Print Bundler errors to stderr
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
