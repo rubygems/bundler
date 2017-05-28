@@ -21,7 +21,7 @@ Generally, great ways to get started helping out with Bundler are:
   - reviewing [pull requests](https://github.com/bundler/bundler/pulls) and suggesting improvements
   - improving existing code, including suggestions from [PullReview](https://www.pullreview.com/github/bundler/bundler/reviews/master) or [CodeClimate](https://codeclimate.com/github/bundler/bundler)
   - writing code (no patch is too small! fix typos or bad whitespace)
-    - get started setting up your dev environment with [these instructions](../development/DEVELOPMENT_SETUP.md)
+    - get started setting up your dev environment with [these instructions](../development/SETUP.md)
   - backfilling [unit tests](https://github.com/bundler/bundler/tree/master/spec/bundler) for modules that lack [coverage](https://codeclimate.com/github/bundler/bundler/coverage)
 
 If nothing on those lists looks good, [talk to us](http://slack.bundler.io/), and we'll figure out what you can help with. We can absolutely use your help, no matter what level of programming skill you have at the moment.
