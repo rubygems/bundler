@@ -67,7 +67,7 @@ class CompactIndexAPI < Endpoint
       @gems ||= {}
       @gems[gem_repo] ||= begin
         specs = Bundler::Deprecate.skip_during do
-          %w(specs.4.8 prerelease_specs.4.8).map do |filename|
+          %w[specs.4.8 prerelease_specs.4.8].map do |filename|
             Marshal.load(File.open(gem_repo.join(filename)).read).map do |name, version, platform|
               load_spec(name, version, platform, gem_repo)
             end

@@ -22,7 +22,7 @@ module Bundler
       out << "Git       #{git_version}\n"
       out << "Platform  #{Gem::Platform.local}\n"
       out << "OpenSSL   #{OpenSSL::OPENSSL_VERSION}\n" if defined?(OpenSSL::OPENSSL_VERSION)
-      %w(rubygems-bundler open_gem).each do |name|
+      %w[rubygems-bundler open_gem].each do |name|
         specs = Bundler.rubygems.find_name(name)
         out << "#{name} (#{specs.map(&:version).join(",")})\n" unless specs.empty?
       end

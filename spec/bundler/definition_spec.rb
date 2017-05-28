@@ -221,7 +221,7 @@ RSpec.describe Bundler::Definition do
             :gems => ["shared_owner_a"], :lock_shared_dependencies => true
           )
           locked = definition.send(:converge_locked_specs).map(&:name)
-          expect(locked).to eq %w(isolated_dep isolated_owner shared_dep shared_owner_b)
+          expect(locked).to eq %w[isolated_dep isolated_owner shared_dep shared_owner_b]
           expect(locked.include?("shared_dep")).to be_truthy
         end
       end
@@ -242,7 +242,7 @@ RSpec.describe Bundler::Definition do
   describe "find_indexed_specs" do
     it "with no platform set in indexed specs" do
       index = Bundler::Index.new
-      %w(1.0.0 1.0.1 1.1.0).each {|v| index << build_stub_spec("foo", v) }
+      %w[1.0.0 1.0.1 1.1.0].each {|v| index << build_stub_spec("foo", v) }
 
       dfn = Bundler::Definition.new(nil, [], mock_source_list, true)
       dfn.instance_variable_set("@index", index)

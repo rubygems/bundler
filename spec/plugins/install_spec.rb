@@ -58,7 +58,7 @@ RSpec.describe "bundler plugin install" do
             end
           end
         RUBY
-        s.require_paths = %w(lib src)
+        s.require_paths = %w[lib src]
         s.write("src/fubar.rb")
       end
     end

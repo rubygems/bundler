@@ -70,7 +70,7 @@ RSpec.describe Bundler::RubygemsIntegration do
         expect(fetcher).to receive(:fetch_path).with(uri + "specs.4.8.gz").and_return(specs_response)
         expect(fetcher).to receive(:fetch_path).with(uri + "prerelease_specs.4.8.gz").and_return(prerelease_specs_response)
         result = Bundler.rubygems.fetch_all_remote_specs(remote_with_mirror)
-        expect(result).to eq(%w(specs prerelease_specs))
+        expect(result).to eq(%w[specs prerelease_specs])
       end
     end
 
@@ -83,7 +83,7 @@ RSpec.describe Bundler::RubygemsIntegration do
         expect(fetcher).to receive(:fetch_path).with(uri + "specs.4.8.gz").and_return(specs_response)
         expect(fetcher).to receive(:fetch_path).with(uri + "prerelease_specs.4.8.gz").and_return(prerelease_specs_response)
         result = Bundler.rubygems.fetch_all_remote_specs(remote_no_mirror)
-        expect(result).to eq(%w(specs prerelease_specs))
+        expect(result).to eq(%w[specs prerelease_specs])
       end
     end
   end

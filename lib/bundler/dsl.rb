@@ -14,8 +14,8 @@ module Bundler
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
 
-    VALID_KEYS = %w(group groups git path glob name branch ref tag require submodules
-                    platform platforms type source install_if).freeze
+    VALID_KEYS = %w[group groups git path glob name branch ref tag require submodules
+                    platform platforms type source install_if].freeze
 
     attr_reader :gemspecs
     attr_accessor :dependencies
@@ -356,7 +356,7 @@ module Bundler
         opts["git"] = @git_sources[git_name].call(opts[git_name])
       end
 
-      %w(git path).each do |type|
+      %w[git path].each do |type|
         next unless param = opts[type]
         if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
           options = opts.merge("name" => name, "version" => $1)
@@ -378,7 +378,7 @@ module Bundler
       normalize_hash(opts)
 
       groups = groups.map {|group| ":#{group}" }.join(", ")
-      validate_keys("group #{groups}", opts, %w(optional))
+      validate_keys("group #{groups}", opts, %w[optional])
 
       opts["optional"] ||= false
     end

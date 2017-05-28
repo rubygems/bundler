@@ -197,7 +197,7 @@ RSpec.describe "bundle install from an existing gemspec" do
     #
     # issue was caused by rubygems having an unresolved gem during a require,
     # so emulate that
-    system_gems %w(rack-1.0.0 rack-0.9.1 rack-obama-1.0)
+    system_gems %w[rack-1.0.0 rack-0.9.1 rack-obama-1.0]
 
     build_lib("foo", :path => bundled_app)
     gemspec = bundled_app("foo.gemspec").read
@@ -415,7 +415,7 @@ RSpec.describe "bundle install from an existing gemspec" do
           end
         end
 
-        %w(ruby jruby).each do |platform|
+        %w[ruby jruby].each do |platform|
           simulate_platform(platform) do
             install_gemfile <<-G
               source "file://#{gem_repo2}"

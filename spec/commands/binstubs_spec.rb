@@ -66,7 +66,7 @@ RSpec.describe "bundle binstubs <gem>" do
       FileUtils.mkdir_p(lib_path("foo/bin"))
       FileUtils.touch(lib_path("foo/bin/foo"))
       build_git "foo", "1.0", :path => lib_path("foo") do |s|
-        s.executables = %w(foo)
+        s.executables = %w[foo]
       end
       install_gemfile <<-G
         gem "foo", :git => "#{lib_path("foo")}"
@@ -81,7 +81,7 @@ RSpec.describe "bundle binstubs <gem>" do
       FileUtils.mkdir_p(lib_path("foo/bin"))
       FileUtils.touch(lib_path("foo/bin/foo"))
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-        s.executables = %w(foo)
+        s.executables = %w[foo]
       end
       install_gemfile <<-G
         gem "foo", :path => "#{lib_path("foo")}"

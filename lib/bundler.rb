@@ -15,7 +15,7 @@ require "bundler/constants"
 require "bundler/current_ruby"
 
 module Bundler
-  environment_preserver = EnvironmentPreserver.new(ENV, %w(PATH GEM_PATH))
+  environment_preserver = EnvironmentPreserver.new(ENV, %w[PATH GEM_PATH])
   ORIGINAL_ENV = environment_preserver.restore
   ENV.replace(environment_preserver.backup)
   SUDO_MUTEX = Mutex.new

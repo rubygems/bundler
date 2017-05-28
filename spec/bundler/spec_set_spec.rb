@@ -66,13 +66,13 @@ RSpec.describe Bundler::SpecSet do
 
   describe "#to_a" do
     it "returns the specs in order" do
-      expect(subject.to_a.map(&:full_name)).to eq %w(
+      expect(subject.to_a.map(&:full_name)).to eq %w[
         a-1.0
         b-1.0
         e-1.0.0.pre.1
         c-1.1
         d-2.0
-      )
+      ]
     end
   end
 end

@@ -718,7 +718,7 @@ end
       build_gem("requirepaths") do |s|
         s.write("lib/rq.rb", "puts 'yay'")
         s.write("src/rq.rb", "puts 'nooo'")
-        s.require_paths = %w(lib src)
+        s.require_paths = %w[lib src]
       end
     end
 
@@ -1138,7 +1138,7 @@ end
         if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7") || ENV["RGV"] == "master"
           []
         else
-          %w(io-console openssl)
+          %w[io-console openssl]
         end << "bundler"
       end
 

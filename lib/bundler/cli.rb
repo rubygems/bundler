@@ -4,7 +4,7 @@ require "bundler/vendored_thor"
 
 module Bundler
   class CLI < Thor
-    AUTO_INSTALL_CMDS = %w(show binstubs outdated exec open console licenses clean).freeze
+    AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
 
     def self.start(*)
       super
@@ -241,7 +241,7 @@ module Bundler
       Show.new(options, gem_name).run
     end
     # TODO: 2.0 remove `bundle list`
-    map %w(list) => "show"
+    map %w[list] => "show"
 
     desc "info GEM [OPTIONS]", "Show information for the given gem"
     method_option "path", :type => :boolean, :banner => "Print full path to gem"
@@ -345,7 +345,7 @@ module Bundler
       require "bundler/cli/package"
       Package.new(options).run
     end
-    map %w(pack) => :package
+    map %w[pack] => :package
 
     desc "exec [OPTIONS]", "Run the command in context of the bundle"
     method_option :keep_file_descriptors, :type => :boolean, :default => false
@@ -395,7 +395,7 @@ module Bundler
     def version
       Bundler.ui.info "Bundler version #{Bundler::VERSION}"
     end
-    map %w(-v --version) => :version
+    map %w[-v --version] => :version
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
@@ -569,14 +569,14 @@ module Bundler
     # into the corresponding `bundle help #{command}` call
     def self.reformatted_help_args(args)
       bundler_commands = all_commands.keys
-      help_flags = %w(--help -h)
-      exec_commands = %w(e ex exe exec)
+      help_flags = %w[--help -h]
+      exec_commands = %w[e ex exe exec]
       help_used = args.index {|a| help_flags.include? a }
       exec_used = args.index {|a| exec_commands.include? a }
       command = args.find {|a| bundler_commands.include? a }
       if exec_used && help_used
         if exec_used + help_used == 1
-          %w(help exec)
+          %w[help exec]
         else
           args
         end
@@ -615,7 +615,7 @@ module Bundler
       return unless ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] || Bundler.ui.debug?
       _, _, config = @_initializer
       current_command = config[:current_command].name
-      return if %w(exec version check platform show help).include?(current_command)
+      return if %w[exec version check platform show help].include?(current_command)
       command = ["bundle", current_command] + args
       command << Thor::Options.to_switches(options)
       command.reject!(&:empty?)
