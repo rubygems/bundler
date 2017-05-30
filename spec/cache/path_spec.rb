@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 %w[cache package].each do |cmd|
   RSpec.describe "bundle #{cmd} with path" do

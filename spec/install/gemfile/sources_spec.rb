@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle install with gems on multiple sources" do
   # repo1 is built automatically before all of the specs run

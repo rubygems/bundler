@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/ssl_certs/certificate_manager"
 
 RSpec.describe "SSL Certificates", :rubygems_master do

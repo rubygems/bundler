@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.context "when installing a bundle that includes yanked gems" do
   before(:each) do

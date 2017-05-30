@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle lock" do
   def strip_lockfile(lockfile)

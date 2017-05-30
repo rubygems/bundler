@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle install with gem sources" do
   describe "the simple case" do

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "major deprecations" do
   let(:warnings) { out } # change to err in 2.0

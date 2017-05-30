@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/cli"
 
 RSpec.describe "bundle executable" do

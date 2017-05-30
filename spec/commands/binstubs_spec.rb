@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle binstubs <gem>" do
   context "when the gem exists in the lockfile" do
