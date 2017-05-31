@@ -18,7 +18,13 @@ module Bundler
           Bundler.ui.error "Gem specification #{gemspec} doesn't exist"
           exit 1
         end
+
         spec = Gem::Specification.load(gemspec)
+        unless spec
+          Bundler.ui.error "Gem specification #{gemspec} is invalid"
+          exit 1
+        end
+
         puts "Writing new Gemfile to #{SharedHelpers.pwd}/Gemfile"
         File.open("Gemfile", "wb") do |file|
           file << "# Generated from #{gemspec}\n"
