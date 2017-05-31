@@ -58,7 +58,7 @@ RSpec.describe "bundle init" do
         end
 
         bundle :init, :gemspec => spec_file
-        expect(out).to include("Gem specification #{spec_file} is invalid")
+        expect(out).to include("There was an error while loading `test.gemspec`")
       end
     end
   end

@@ -19,11 +19,7 @@ module Bundler
           exit 1
         end
 
-        spec = Gem::Specification.load(gemspec)
-        unless spec
-          Bundler.ui.error "Gem specification #{gemspec} is invalid"
-          exit 1
-        end
+        spec = Bundler.load_gemspec_uncached(gemspec)
 
         puts "Writing new Gemfile to #{SharedHelpers.pwd}/Gemfile"
         File.open("Gemfile", "wb") do |file|
