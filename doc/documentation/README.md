@@ -16,13 +16,13 @@ Not sure where to write documentation? In general, follow these guidelines:
 
 If you are unsure where to begin, ping [@feministy](https://github.com/feministy) or [@indirect](https://github.com/indirect) in the Bundler Slack ([get an invite here](../contributing/GETTING_HELP.md)).
 
-## [Writing docs for man pages)](WRITING.md)
+## [Writing docs for man pages](WRITING.md)
 
-If you’d like to submit a patch to the man pages, you're in the right place! Details on editing and previewing changes to man pages can be found here.
+If you’d like to submit a patch to the man pages, you're in the right place! Details on editing and previewing changes to man pages can be found [here](WRITING.md).
 
 ## [Documentation vision](VISION.md)
 
-Just like Bundler, we have a grand plan (really, a wish list of sorts) for Bundler documentation. Preview our hopes and dreams for our documentation here.
+Just like Bundler, we have a grand plan (really, a wish list of sorts) for Bundler documentation. Preview our hopes and dreams for our documentation [here](VISION.md).
 
 ## Translations
 
