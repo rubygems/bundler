@@ -22,7 +22,15 @@ module Bundler
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
       update = options[:update]
-      update = { :gems => update, :lock_shared_dependencies => options[:conservative] } if update.is_a?(Array)
+      if update.is_a?(Array) # unlocking specific gems
+        # cycle through the requested gems, to make sure they exist
+        names = Bundler.locked_gems.specs.map(&:name)
+        update.each do |g|
+          next if names.include?(g)
+          raise GemNotFound, Bundler::CLI::Common.gem_not_found_message(g, names)
+        end
+        update = { :gems => update, :lock_shared_dependencies => options[:conservative] }
+      end
       definition = Bundler.definition(update)
 
       Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options) if options[:update]
