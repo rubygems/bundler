@@ -93,6 +93,11 @@ module Spec
       tmp "tmpdir", *args
     end
 
+    def default_gem_path(gem_name)
+      gem = Gem::Specification.find_by_name(gem_name)
+      nil unless gem.default_gem?
+    end
+
     extend self
   end
 end

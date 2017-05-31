@@ -26,13 +26,18 @@ module Bundler
       "Gems in the #{group_str} #{group_list} were not installed."
     end
 
-    def self.select_spec(name, regex_match = nil)
+    def self.select_spec(name, regex_match = nil, options = {})
       specs = []
       regexp = Regexp.new(name) if regex_match
 
       Bundler.definition.specs.each do |spec|
         return spec if spec.name == name
         specs << spec if regexp && spec.name =~ regexp
+      end
+
+      if options[:include_default] && Gem::Specification.respond_to?(:find_all_by_name)
+        spec = Gem::Specification.find_all_by_name(name).last
+        return spec if spec.respond_to?(:default_gem?) && spec.default_gem?
       end
 
       case specs.count
