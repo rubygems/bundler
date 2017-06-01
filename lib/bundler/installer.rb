@@ -212,7 +212,7 @@ module Bundler
     end
 
     def resolve_if_need(options)
-      if !options["update"] && !options[:inline] && Bundler.default_lockfile.file?
+      if !options["update"] && !options[:inline] && !options["force"] && Bundler.default_lockfile.file?
         local = Bundler.ui.silence do
           begin
             tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
