@@ -106,6 +106,15 @@ RSpec.describe "bundle lock" do
     expect(read_lockfile).to eq(@lockfile)
   end
 
+  it "errors when updating a missing specific gems using --update" do
+    lockfile @lockfile
+
+    bundle "lock --update blahblah"
+    expect(out).to eq("Could not find gem 'blahblah'.")
+
+    expect(read_lockfile).to eq(@lockfile)
+  end
+
   # see update_spec for more coverage on same options. logic is shared so it's not necessary
   # to repeat coverage here.
   context "conservative updates" do
