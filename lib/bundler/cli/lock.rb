@@ -23,12 +23,7 @@ module Bundler
 
       update = options[:update]
       if update.is_a?(Array) # unlocking specific gems
-        # cycle through the requested gems, to make sure they exist
-        names = Bundler.locked_gems.specs.map(&:name)
-        update.each do |g|
-          next if names.include?(g)
-          raise GemNotFound, Bundler::CLI::Common.gem_not_found_message(g, names)
-        end
+        Bundler::CLI::Common.ensure_all_gems_in_lockfile!(update)
         update = { :gems => update, :lock_shared_dependencies => options[:conservative] }
       end
       definition = Bundler.definition(update)
