@@ -26,6 +26,14 @@ module Bundler
         specs = Bundler.rubygems.find_name(name)
         out << "#{name} (#{specs.map(&:version).join(",")})\n" unless specs.empty?
       end
+      if (exe = caller.last.split(":").first) && exe =~ %r{(exe|bin)/bundler?\z}
+        shebang = File.read(exe).lines.first
+        shebang.sub!(/^#!\s*/, "")
+        unless shebang.start_with?(Gem.ruby, "/usr/bin/env ruby")
+          out << "Gem.ruby  #{Gem.ruby}\n"
+          out << "bundle #! #{shebang}\n"
+        end
+      end
 
       out << "```\n"
 
