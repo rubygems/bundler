@@ -13,28 +13,11 @@ module Bundler
       print_gemspecs = options.delete(:print_gemspecs) { true }
 
       out = String.new("## Environment\n\n```\n")
-      out << "Bundler   #{Bundler::VERSION}\n"
-      out << "RubyGems  #{Gem::VERSION}\n"
-      out << "Ruby      #{ruby_version}"
-      out << "GEM_HOME  #{ENV["GEM_HOME"]}\n" unless ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
-      out << "GEM_PATH  #{ENV["GEM_PATH"]}\n" unless ENV["GEM_PATH"] == ENV["GEM_HOME"]
-      out << "RVM       #{ENV["rvm_version"]}\n" if ENV["rvm_version"]
-      out << "Git       #{git_version}\n"
-      out << "Platform  #{Gem::Platform.local}\n"
-      out << "OpenSSL   #{OpenSSL::OPENSSL_VERSION}\n" if defined?(OpenSSL::OPENSSL_VERSION)
-      %w[rubygems-bundler open_gem].each do |name|
-        specs = Bundler.rubygems.find_name(name)
-        out << "#{name} (#{specs.map(&:version).join(",")})\n" unless specs.empty?
+      env = environment
+      environment_ljust = env.map {|(k, _v)| k.to_s.length }.max
+      env.each do |(k, v)|
+        out << "#{k.to_s.ljust(environment_ljust)}  #{v}\n"
       end
-      if (exe = caller.last.split(":").first) && exe =~ %r{(exe|bin)/bundler?\z}
-        shebang = File.read(exe).lines.first
-        shebang.sub!(/^#!\s*/, "")
-        unless shebang.start_with?(Gem.ruby, "/usr/bin/env ruby")
-          out << "Gem.ruby  #{Gem.ruby}\n"
-          out << "bundle #! #{shebang}\n"
-        end
-      end
-
       out << "```\n"
 
       unless Bundler.settings.all.empty?
@@ -84,10 +67,10 @@ module Bundler
       if RUBY_VERSION < "1.9"
         str << " (#{RUBY_RELEASE_DATE}"
         str << " patchlevel #{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
-        str << ") [#{RUBY_PLATFORM}]\n"
+        str << ") [#{RUBY_PLATFORM}]"
       else
         str << "p#{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
-        str << " (#{RUBY_RELEASE_DATE} revision #{RUBY_REVISION}) [#{RUBY_PLATFORM}]\n"
+        str << " (#{RUBY_RELEASE_DATE} revision #{RUBY_REVISION}) [#{RUBY_PLATFORM}]"
       end
     end
 
@@ -95,6 +78,34 @@ module Bundler
       Bundler::Source::Git::GitProxy.new(nil, nil, nil).full_version
     rescue Bundler::Source::Git::GitNotInstalledError
       "not installed"
+    end
+
+    def self.environment
+      out = []
+
+      out << ["Bundler", Bundler::VERSION]
+      out << ["RubyGems", Gem::VERSION]
+      out << ["Ruby", ruby_version]
+      out << ["GEM_HOME", ENV["GEM_HOME"]] unless ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
+      out << ["GEM_PATH", ENV["GEM_PATH"]] unless ENV["GEM_PATH"].nil? || ENV["GEM_PATH"].empty?
+      out << ["RVM", ENV["rvm_version"]] if ENV["rvm_version"]
+      out << ["Git", git_version]
+      out << ["Platform", Gem::Platform.local]
+      out << ["OpenSSL", OpenSSL::OPENSSL_VERSION] if defined?(OpenSSL::OPENSSL_VERSION)
+      %w[rubygems-bundler open_gem].each do |name|
+        specs = Bundler.rubygems.find_name(name)
+        out << [name, "(#{specs.map(&:version).join(",")})"] unless specs.empty?
+      end
+      if (exe = caller.last.split(":").first) && exe =~ %r{(exe|bin)/bundler?\z}
+        shebang = File.read(exe).lines.first
+        shebang.sub!(/^#!\s*/, "")
+        unless shebang.start_with?(Gem.ruby, "/usr/bin/env ruby")
+          out << ["Gem.ruby", Gem.ruby]
+          out << ["bundle #!", shebang]
+        end
+      end
+
+      out
     end
 
     private_class_method :read_file, :ruby_version, :git_version
