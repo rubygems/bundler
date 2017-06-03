@@ -162,11 +162,21 @@ module Bundler
     # that said, it's a rare situation (other than rake), and parallel
     # installation is SO MUCH FASTER. so we let people opt in.
     def install(options)
-      Bundler.rubygems.load_plugins
+      load_plugins
       force = options["force"]
       jobs = 1
       jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?
       install_in_parallel jobs, options[:standalone], force
+    end
+
+    def load_plugins
+      Bundler.rubygems.load_plugins
+
+      requested_path_gems = @definition.requested_specs.select {|s| s.source.is_a?(Source::Path) }
+      path_plugin_files = requested_path_gems.map do |spec|
+        spec.matches_for_glob("rubygems_plugin#{Bundler.rubygems.suffix_pattern}")
+      end.flatten
+      Bundler.rubygems.load_plugin_files(path_plugin_files)
     end
 
     def ensure_specs_are_compatible!

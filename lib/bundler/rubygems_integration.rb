@@ -158,6 +158,10 @@ module Bundler
       Gem.post_reset_hooks
     end
 
+    def suffix_pattern
+      Gem.suffix_pattern
+    end
+
     def gem_cache
       gem_path.map {|p| File.expand_path("cache", p) }
     end
@@ -210,6 +214,10 @@ module Bundler
 
     def load_plugins
       Gem.load_plugins if Gem.respond_to?(:load_plugins)
+    end
+
+    def load_plugin_files(files)
+      Gem.load_plugin_files(files) if Gem.respond_to?(:load_plugin_files)
     end
 
     def ui=(obj)
