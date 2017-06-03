@@ -25,7 +25,7 @@ module Bundler
 
       normalize_groups
 
-      ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
+      Bundler::SharedHelpers.set_env "RB_USER_INSTALL", "1" if Bundler::FREEBSD
 
       # Disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]

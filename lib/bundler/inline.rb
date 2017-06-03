@@ -39,7 +39,7 @@ def gemfile(install = false, options = {}, &gemfile)
   def Bundler.root
     Bundler::SharedHelpers.pwd.expand_path
   end
-  ENV["BUNDLE_GEMFILE"] = "Gemfile"
+  Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", "Gemfile"
 
   Bundler::Plugin.gemfile_install(&gemfile) if Bundler.feature_flag.plugins?
   builder = Bundler::Dsl.new
