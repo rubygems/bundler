@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 module Bundler
   class GemInstaller
-    attr_reader :spec, :standalone, :worker, :force, :installer
+    attr_reader :spec, :standalone, :worker, :force, :installer, :installations
 
-    def initialize(spec, installer, standalone = false, worker = 0, force = false)
+    def initialize(spec, installer, standalone = false, worker = 0, force = false, installations = [])
       @spec = spec
       @installer = installer
       @standalone = standalone
       @worker = worker
       @force = force
+      @installations = []
     end
 
     def install_from_spec
@@ -52,7 +53,15 @@ module Bundler
     end
 
     def install
-      spec.source.install(spec, :force => force, :ensure_builtin_gems_cached => standalone, :build_args => Array(spec_settings))
+      spec.source.download_gem(spec, :force => force)
+      spec.dependencies.each do |dep|
+        next unless dep.type == :runtime
+        next if installations.find do |si|
+          si.installed? && dep.matches_spec?(si)
+        end
+        raise "Dependency #{dep} for #{spec} is not satisfied at installation time"
+      end
+      spec.source.install(spec, :force => force, :ensure_builtin_gems_cached => standalone, :build_args => Array(spec_settings), :skip_download => true)
     end
 
     def install_with_settings

@@ -59,8 +59,7 @@ module Bundler
       end
 
       def missing_lockfile_dependencies(all_spec_names)
-        deps = all_dependencies.reject {|dep| ignorable_dependency? dep }
-        deps.reject {|dep| all_spec_names.include? dep.name }
+        dependencies.reject {|dep| all_spec_names.include? dep.name }
       end
 
       # Represents all dependencies
@@ -110,12 +109,13 @@ module Bundler
     def worker_pool
       @worker_pool ||= Bundler::Worker.new @size, "Parallel Installer", lambda { |spec_install, worker_num|
         gem_installer = Bundler::GemInstaller.new(
-          spec_install.spec, @installer, @standalone, worker_num, @force
+          spec_install.spec, @installer, @standalone, worker_num, @force, @specs
         )
         success, message = gem_installer.install_from_spec
-        if success && !message.nil?
-          spec_install.post_install_message = message
-        elsif !success
+        if success
+          spec_install.post_install_message = message unless message.nil?
+          spec_install.state = :installed
+        else
           spec_install.state = :failed
           spec_install.error = "#{message}\n\n#{require_tree_for_spec(spec_install.spec)}"
         end
@@ -129,8 +129,7 @@ module Bundler
     # processed so the call to `enqueue_specs` is important after every
     # dequeue.
     def process_specs
-      spec = worker_pool.deq
-      spec.state = :installed unless spec.failed?
+      worker_pool.deq
       enqueue_specs
     end
 

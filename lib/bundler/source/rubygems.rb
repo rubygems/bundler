@@ -86,6 +86,23 @@ module Bundler
         end
       end
 
+      def download_gem(spec, opts = {})
+        force = opts[:force]
+
+        return if installed?(spec) && (!force || spec.name.eql?("bundler"))
+
+        return unless spec.remote
+
+        # Check for this spec from other sources
+        uris = [spec.remote.anonymized_uri]
+        uris += remotes_for_spec(spec).map(&:anonymized_uri)
+        uris.uniq!
+        Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
+
+        s = Bundler.rubygems.spec_from_gem(fetch_gem(spec), Bundler.settings["trust-policy"])
+        spec.__swap__(s)
+      end
+
       def install(spec, opts = {})
         force = opts[:force]
         ensure_builtin_gems_cached = opts[:ensure_builtin_gems_cached]
@@ -105,17 +122,8 @@ module Bundler
         end
 
         # Download the gem to get the spec, because some specs that are returned
-        # by rubygems.org are broken and wrong.
-        if spec.remote
-          # Check for this spec from other sources
-          uris = [spec.remote.anonymized_uri]
-          uris += remotes_for_spec(spec).map(&:anonymized_uri)
-          uris.uniq!
-          Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
-
-          s = Bundler.rubygems.spec_from_gem(fetch_gem(spec), Bundler.settings["trust-policy"])
-          spec.__swap__(s)
-        end
+        # by rubygems.org are inconsistent.
+        download_gem(spec, opts) unless opts[:skip_download]
 
         unless Bundler.settings[:no_install]
           message = "Installing #{version_message(spec)}"
