@@ -6,6 +6,11 @@ RSpec.describe "bundle init" do
     expect(bundled_app("Gemfile")).to exist
   end
 
+  it "prints a message to the user" do
+    bundle :init
+    expect(out).to include("Writing new Gemfile")
+  end
+
   context "when a Gemfile already exists" do
     before do
       gemfile <<-G
@@ -63,8 +68,8 @@ RSpec.describe "bundle init" do
     end
   end
 
-  context "when new_gemfile_name setting is enabled" do
-    before { bundle "config new_gemfile_name true" }
+  context "when init_gems_rb setting is enabled" do
+    before { bundle "config init_gems_rb true" }
 
     it "generates a gems.rb file" do
       bundle :init
@@ -91,7 +96,7 @@ RSpec.describe "bundle init" do
     context "given --gemspec option" do
       let(:spec_file) { tmp.join("test.gemspec") }
 
-      it "should generate from an existing gemspec" do
+      before do
         File.open(spec_file, "w") do |file|
           file << <<-S
             Gem::Specification.new do |s|
@@ -101,7 +106,9 @@ RSpec.describe "bundle init" do
             end
           S
         end
+      end
 
+      it "should generate from an existing gemspec" do
         bundle :init, :gemspec => spec_file
 
         gemfile = bundled_app("gems.rb").read
@@ -109,6 +116,12 @@ RSpec.describe "bundle init" do
         expect(gemfile.scan(/gem "rack", "= 1.0.1"/).size).to eq(1)
         expect(gemfile.scan(/gem "rspec", "= 1.2"/).size).to eq(1)
         expect(gemfile.scan(/group :development/).size).to eq(1)
+      end
+
+      it "prints message to user" do
+        bundle :init, :gemspec => spec_file
+
+        expect(out).to include("Writing new gems.rb")
       end
     end
   end

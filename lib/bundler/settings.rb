@@ -28,7 +28,7 @@ module Bundler
       plugins
       silence_root_warning
       error_on_stderr
-      new_gemfile_name
+      init_gems_rb
     ].freeze
 
     NUMBER_KEYS = %w[

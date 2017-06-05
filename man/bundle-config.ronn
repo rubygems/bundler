@@ -224,7 +224,7 @@ learn more about their operation in [bundle install(1)][bundle-install].
    command with a private gemstash server.
 * `error_on_stderr` (`BUNDLE_ERROR_ON_STDERR`)
    Print Bundler errors to stderr
-* `new_gemfile_name` (`BUNDLE_NEW_GEMFILE_NAME`)
+* `init_gems_rb` (`BUNDLE_NEW_GEMFILE_NAME`)
    generate a new gems.rb on `bundle init` instead of the `Gemfile`
 
 In general, you should set these settings per-application by using the applicable
