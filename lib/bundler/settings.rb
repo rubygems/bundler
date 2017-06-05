@@ -16,19 +16,19 @@ module Bundler
       disable_local_branch_check
       disable_shared_gems
       disable_version_check
+      error_on_stderr
       force_ruby_platform
       frozen
       gem.coc
       gem.mit
       ignore_messages
+      init_gems_rb
       major_deprecations
       no_install
       no_prune
       only_update_to_newer_versions
       plugins
       silence_root_warning
-      error_on_stderr
-      init_gems_rb
     ].freeze
 
     NUMBER_KEYS = %w[
