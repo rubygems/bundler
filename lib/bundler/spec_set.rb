@@ -160,7 +160,8 @@ module Bundler
     end
 
     def tsort_each_node
-      @specs.each {|s| yield s }
+      # MUST sort by name for backwards compatibility
+      @specs.sort_by(&:name).each {|s| yield s }
     end
 
     def spec_for_dependency(dep, match_current_platform)
