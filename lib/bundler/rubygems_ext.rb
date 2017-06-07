@@ -115,6 +115,24 @@ module Gem
       dependencies - development_dependencies
     end
 
+    # This method doesn't exist before RubyGems 1.8.
+    unless method_defined?(:activate)
+      def activate
+        raise_if_conflicts
+
+        return false if Gem.loaded_specs[self.name]
+
+        activate_dependencies
+        add_self_to_load_path
+
+        Gem.loaded_specs[self.name] = self
+        @activated = true
+        @loaded = true
+
+        return true
+      end
+    end
+
   private
 
     def dependencies_to_gemfile(dependencies, group = nil)

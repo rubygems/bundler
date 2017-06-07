@@ -15,23 +15,33 @@ module Bundler
         file.puts "ruby_engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby'"
         file.puts "ruby_version = RbConfig::CONFIG[\"ruby_version\"]"
         file.puts "path = File.expand_path('..', __FILE__)"
-        paths.each do |path|
-          file.puts %($:.unshift "\#{path}/#{path}")
+
+        @specs.each do |spec|
+          next if spec.name == "bundler"
+
+          # Ensure that all `require_paths` exist.
+          Array(spec.require_paths).map do |path|
+            gem_path(path, spec)
+          end
+
+          # This is a static string intentionally. It's interpolated at a later time.
+          replacement = '#{ruby_engine}/#{ruby_version}'
+
+          gemspec = gem_path(spec.loaded_from, spec).sub(version_dir, replacement)
+          full_gem_path = gem_path(spec.full_gem_path, spec).sub(version_dir, replacement)
+
+          file.puts %(Gem::Specification.load("\#{path}/#{gemspec}").tap do |spec|)
+          file.puts %(  if spec.respond_to? :full_gem_path=)
+          file.puts %(    spec.full_gem_path = "\#{path}/#{full_gem_path}")
+          file.puts %(  else)
+          file.puts %(    spec.instance_variable_set(:@full_gem_path, "\#{path}/#{full_gem_path}"))
+          file.puts %(  end)
+          file.puts "end.activate"
         end
       end
     end
 
   private
-
-    def paths
-      @specs.map do |spec|
-        next if spec.name == "bundler"
-        Array(spec.require_paths).map do |path|
-          gem_path(path, spec).sub(version_dir, '#{ruby_engine}/#{ruby_version}')
-          # This is a static string intentionally. It's interpolated at a later time.
-        end
-      end.flatten
-    end
 
     def version_dir
       "#{Bundler::RubyVersion.system.engine}/#{RbConfig::CONFIG["ruby_version"]}"
