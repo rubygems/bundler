@@ -61,6 +61,18 @@ RSpec.describe Bundler::Dsl do
         bitbucket_uri = "https://mcorp@bitbucket.org/mcorp/mcorp.git"
         expect(subject.dependencies.first.source.uri).to eq(bitbucket_uri)
       end
+
+      it "converts :gitlab to :git" do
+        subject.gem("sparks", :gitlab => "indirect/sparks")
+        gitlab_uri = "https://gitlab.com/indirect/sparks.git"
+        expect(subject.dependencies.first.source.uri).to eq(gitlab_uri)
+      end
+
+      it "converts 'mcorp' to 'mcorp/mcorp' in :gitlab" do
+        subject.gem("sparks", :gitlab => "mcorp")
+        gitlab_uri = "https://gitlab.com/mcorp/mcorp.git"
+        expect(subject.dependencies.first.source.uri).to eq(gitlab_uri)
+      end
     end
   end
 
