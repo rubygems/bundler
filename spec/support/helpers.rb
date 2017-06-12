@@ -250,6 +250,8 @@ module Spec
         path = if g == :bundler
           Dir.chdir(root) { gem_command! :build, "#{root}/bundler.gemspec" }
           bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
+        elsif g.to_s =~ %r{\A/.*\.gem\z}
+          g
         else
           "#{gem_repo}/gems/#{g}.gem"
         end
