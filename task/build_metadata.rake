@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 file "lib/bundler/generated/build_metadata.rb" => [".git/HEAD", ".git/logs/HEAD", __FILE__, :git_hooks] do |t|
-  sh "git update-index --assume-unchanged #{t.name}"
+  sh "git update-index --assume-unchanged #{t.name}", :verbose => false
 
   build_metadata = {
     :built_at => BUNDLER_SPEC.date.strftime("%Y-%m-%d"),

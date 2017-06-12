@@ -10,7 +10,7 @@ set -e
 .git/hooks/run-ruby bin/rake generate_files
   SH
 
-  chmod 0o755, t.name
+  chmod 0o755, t.name, :verbose => false
 end
 
 file ".git/hooks/pre-commit" => [__FILE__] do |t|
@@ -23,12 +23,12 @@ set -e
 .git/hooks/run-ruby bin/rspec spec/quality_spec.rb
   SH
 
-  chmod 0o755, t.name
+  chmod 0o755, t.name, :verbose => false
 end
 
 file ".git/hooks/pre-push" => [__FILE__] do |_t|
   Dir.chdir(".git/hooks") do
-    safe_ln "pre-commit", "pre-push"
+    safe_ln "pre-commit", "pre-push", :verbose => false
   end
 end
 
@@ -41,7 +41,7 @@ command -v chruby-exec >/dev/null 2>&1 && [[ -f ~/.ruby-version ]] && ruby="chru
 ruby $@
   SH
 
-  chmod 0o755, t.name
+  chmod 0o755, t.name, :verbose => false
 end
 
 task :git_hooks => Rake::Task.tasks.select {|t| t.name.start_with?(".git/hooks") }
