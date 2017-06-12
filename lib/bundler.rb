@@ -13,6 +13,7 @@ require "bundler/rubygems_integration"
 require "bundler/version"
 require "bundler/constants"
 require "bundler/current_ruby"
+require "bundler/generated/build_metadata"
 
 module Bundler
   environment_preserver = EnvironmentPreserver.new(ENV, %w[PATH GEM_PATH])

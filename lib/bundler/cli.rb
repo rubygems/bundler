@@ -393,7 +393,10 @@ module Bundler
 
     desc "version", "Prints the bundler's version information"
     def version
-      Bundler.ui.info "Bundler version #{Bundler::VERSION}"
+      if ARGV.include?("version")
+        build_info = " (#{BUILD_METADATA[:built_at]} commit #{BUILD_METADATA[:git_sha]})"
+      end
+      Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
     end
     map %w[-v --version] => :version
 
