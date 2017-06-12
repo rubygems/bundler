@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-file "lib/bundler/generated/build_metadata.rb" => [".git/HEAD", __FILE__] do |t|
+file "lib/bundler/generated/build_metadata.rb" => [".git/HEAD", ".git/logs/HEAD", __FILE__] do |t|
   sh "git update-index --assume-unchanged #{t.name}"
 
   build_metadata = {
