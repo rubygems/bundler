@@ -355,9 +355,11 @@ task :update_certs => "spec:rubygems:clone_rubygems_master" do
 end
 
 require "bundler/gem_tasks"
-task :build => ["man:build"]
+task :build => ["man:build", "generate_files"]
 task :release => ["man:require", "man:build"]
 
 task :default => :spec
 
 Dir["task/*.{rb,rake}"].each(&method(:load))
+
+task :generate_files => Rake::Task.tasks.select {|t| t.name.start_with?("lib/bundler/generated") }
