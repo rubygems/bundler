@@ -12,13 +12,8 @@ module Bundler
       print_gemfile = options.delete(:print_gemfile) { true }
       print_gemspecs = options.delete(:print_gemspecs) { true }
 
-      out = String.new("## Environment\n\n```\n")
-      env = environment
-      environment_ljust = env.map {|(k, _v)| k.to_s.length }.max
-      env.each do |(k, v)|
-        out << "#{k.to_s.ljust(environment_ljust)}  #{v}\n"
-      end
-      out << "```\n"
+      out = String.new
+      append_formatted_table("Environment", environment, out)
 
       unless Bundler.settings.all.empty?
         out << "\n## Bundler settings\n\n```\n"
@@ -108,6 +103,17 @@ module Bundler
       out
     end
 
-    private_class_method :read_file, :ruby_version, :git_version
+    def self.append_formatted_table(title, pairs, out)
+      return if pairs.empty?
+      out << "\n" unless out.empty?
+      out << "## #{title}\n\n```\n"
+      ljust = pairs.map {|k, _v| k.to_s.length }.max
+      pairs.each do |k, v|
+        out << "#{k.to_s.ljust(ljust)}  #{v}\n"
+      end
+      out << "```\n"
+    end
+
+    private_class_method :read_file, :ruby_version, :git_version, :append_formatted_table
   end
 end
