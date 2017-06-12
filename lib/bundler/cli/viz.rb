@@ -7,6 +7,9 @@ module Bundler
     end
 
     def run
+      # make sure we get the right `graphviz`. There is also a `graphviz`
+      # gem we're not built to support
+      gem "ruby-graphviz"
       require "graphviz"
 
       options[:without] = options[:without].join(":").tr(" ", ":").split(":")
