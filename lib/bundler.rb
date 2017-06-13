@@ -206,7 +206,7 @@ module Bundler
 
     def root
       @root ||= begin
-                  default_gemfile.dirname.expand_path
+                  SharedHelpers.root
                 rescue GemfileNotFound
                   bundle_dir = default_bundle_dir
                   raise GemfileNotFound, "Could not locate Gemfile or .bundle/ directory" unless bundle_dir

@@ -5,7 +5,7 @@ RSpec.describe Bundler::Definition do
   describe "#lock" do
     before do
       allow(Bundler).to receive(:settings) { Bundler::Settings.new(".") }
-      allow(Bundler).to receive(:default_gemfile) { Pathname.new("Gemfile") }
+      allow(Bundler::SharedHelpers).to receive(:find_gemfile) { Pathname.new("Gemfile") }
       allow(Bundler).to receive(:ui) { double("UI", :info => "", :debug => "") }
     end
     context "when it's not possible to write to the file" do
