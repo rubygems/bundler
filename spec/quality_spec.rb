@@ -244,6 +244,7 @@ RSpec.describe "The library itself" do
         bundler/capistrano.rb
         bundler/gem_tasks.rb
         bundler/vlad.rb
+        bundler/templates/gems.rb
       ]
       lib_files = `git ls-files -z`.split("\x0").grep(/\.rb$/) - exclusions
       lib_files.reject! {|f| f.start_with?("bundler/vendor") }
