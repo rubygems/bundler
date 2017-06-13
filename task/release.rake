@@ -1,4 +1,11 @@
 # frozen_string_literal: true
+
+require "bundler/gem_tasks"
+task :build => ["build_metadata", "man:build", "generate_files"] do
+  Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
+end
+task :release => ["man:require", "man:build", "build_metadata"]
+
 namespace :release do
   def confirm(prompt = "")
     loop do

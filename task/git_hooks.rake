@@ -1,18 +1,6 @@
 # frozen_string_literal: true
 directory ".git/hooks"
 
-file ".git/hooks/post-commit" => [__FILE__] do |t|
-  File.open(t.name, "w") {|f| f << <<-SH }
-#! /usr/bin/env sh
-
-set -e
-
-.git/hooks/run-ruby bin/rake generate_files
-  SH
-
-  chmod 0o755, t.name, :verbose => false
-end
-
 file ".git/hooks/pre-commit" => [__FILE__] do |t|
   File.open(t.name, "w") {|f| f << <<-SH }
 #!/bin/sh

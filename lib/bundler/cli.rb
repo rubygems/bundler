@@ -394,7 +394,7 @@ module Bundler
     desc "version", "Prints the bundler's version information"
     def version
       if ARGV.include?("version")
-        build_info = " (#{BUILD_METADATA[:built_at]} commit #{BUILD_METADATA[:git_sha]})"
+        build_info = " (#{BuildMetadata.built_at} commit #{BuildMetadata.git_commit_sha})"
       end
       Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
     end
