@@ -3,6 +3,11 @@
 require "rubygems"
 
 module Gem
+  if version = ENV["BUNDLER_SPEC_RUBYGEMS_VERSION"]
+    remove_const(:VERSION) if const_defined?(:VERSION)
+    VERSION = version
+  end
+
   class Platform
     @local = new(ENV["BUNDLER_SPEC_PLATFORM"]) if ENV["BUNDLER_SPEC_PLATFORM"]
   end

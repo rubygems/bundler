@@ -481,6 +481,14 @@ module Spec
       ENV["BUNDLER_SPEC_VERSION"] = old if block_given?
     end
 
+    def simulate_rubygems_version(version)
+      old = ENV["BUNDLER_SPEC_RUBYGEMS_VERSION"]
+      ENV["BUNDLER_SPEC_RUBYGEMS_VERSION"] = version.to_s
+      yield if block_given?
+    ensure
+      ENV["BUNDLER_SPEC_RUBYGEMS_VERSION"] = old if block_given?
+    end
+
     def simulate_windows
       old = ENV["BUNDLER_SPEC_WINDOWS"]
       ENV["BUNDLER_SPEC_WINDOWS"] = "true"
