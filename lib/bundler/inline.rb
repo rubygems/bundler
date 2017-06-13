@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "bundler/compatibility_guard"
 
 # Allows for declaring a Gemfile inline in a ruby script, optionally installing
 # any gems that aren't already installed on the user's system.
