@@ -84,6 +84,14 @@ module Bundler
       spec.respond_to?(:default_gem?) && spec.default_gem?
     end
 
+    def spec_matches_for_glob(spec, glob)
+      return spec.matches_for_glob(glob) if spec.respond_to?(:matches_for_glob)
+
+      spec.load_paths.map do |lp|
+        Dir["#{lp}/#{glob}#{suffix_pattern}"]
+      end.flatten(1)
+    end
+
     def stub_set_spec(stub, spec)
       stub.instance_variable_set(:@spec, spec)
     end
