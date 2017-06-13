@@ -168,7 +168,7 @@ module Bundler
 
     def tmp_home_path(login, warning)
       login ||= "unknown"
-      require "tmpdir"
+      Kernel.send(:require, "tmpdir")
       path = Pathname.new(Dir.tmpdir).join("bundler", "home")
       SharedHelpers.filesystem_access(path) do |tmp_home_path|
         unless tmp_home_path.exist?
@@ -229,7 +229,7 @@ module Bundler
     end
 
     def tmp(name = Process.pid.to_s)
-      require "tmpdir"
+      Kernel.send(:require, "tmpdir")
       Pathname.new(Dir.mktmpdir(["bundler", name]))
     end
 
