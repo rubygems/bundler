@@ -55,7 +55,14 @@ module Bundler
     check_unknown_options!(:except => [:config, :exec])
     stop_on_unknown_option! :exec
 
-    default_task :install
+    desc "cli_help", "Prints a summary of bundler commands", :hide => true
+    def cli_help
+      version
+      Bundler.ui.info "\n"
+      self.class.help(shell)
+    end
+    default_task(Bundler.feature_flag.default_cli_command)
+
     class_option "no-color", :type => :boolean, :desc => "Disable colorization in output"
     class_option "retry",    :type => :numeric, :aliases => "-r", :banner => "NUM",
                              :desc => "Specify the number of times you wish to attempt network commands"
