@@ -34,6 +34,28 @@ RSpec.describe "bundle update" do
     end
   end
 
+  context "when update_requires_all_flag is set" do
+    before { bundle! "config update_requires_all_flag true" }
+
+    it "errors when passed nothing" do
+      install_gemfile! ""
+      bundle :update
+      expect(out).to eq("To update everything, pass the `--all` flag.")
+    end
+
+    it "errors when passed --all and another option" do
+      install_gemfile! ""
+      bundle "update --all foo"
+      expect(out).to eq("Cannot specify --all along with specific options.")
+    end
+
+    it "updates everything when passed --all" do
+      install_gemfile! ""
+      bundle "update --all"
+      expect(out).to include("Bundle updated!")
+    end
+  end
+
   describe "--quiet argument" do
     it "hides UI messages" do
       bundle "update --quiet"
