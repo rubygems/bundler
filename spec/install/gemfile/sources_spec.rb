@@ -271,74 +271,78 @@ RSpec.describe "bundle install with gems on multiple sources" do
     end
 
     context "when a top-level gem has an indirect dependency" do
-      before do
-        build_repo gem_repo2 do
-          build_gem "depends_on_rack", "1.0.1" do |s|
-            s.add_dependency "rack"
-          end
-        end
+      context "when lockfile_uses_separate_rubygems_sources is set" do
+        before { bundle! "config lockfile_uses_separate_rubygems_sources true" }
 
-        build_repo gem_repo3 do
-          build_gem "unrelated_gem", "1.0.0"
-        end
-
-        gemfile <<-G
-          source "file://#{gem_repo2}"
-
-          gem "depends_on_rack"
-
-          source "file://#{gem_repo3}" do
-            gem "unrelated_gem"
-          end
-        G
-      end
-
-      context "and the dependency is only in the top-level source" do
         before do
-          update_repo gem_repo2 do
-            build_gem "rack", "1.0.0"
-          end
-        end
-
-        it "installs all gems without warning" do
-          bundle :install
-          expect(out).not_to include("Warning")
-          should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
-        end
-      end
-
-      context "and the dependency is only in a pinned source" do
-        before do
-          update_repo gem_repo3 do
-            build_gem "rack", "1.0.0" do |s|
-              s.write "lib/rack.rb", "RACK = 'FAIL'"
+          build_repo gem_repo2 do
+            build_gem "depends_on_rack", "1.0.1" do |s|
+              s.add_dependency "rack"
             end
           end
-        end
 
-        it "does not find the dependency" do
-          bundle :install
-          expect(out).to include("Could not find gem 'rack (>= 0) ruby'")
-        end
-      end
-
-      context "and the dependency is in both the top-level and a pinned source" do
-        before do
-          update_repo gem_repo2 do
-            build_gem "rack", "1.0.0"
+          build_repo gem_repo3 do
+            build_gem "unrelated_gem", "1.0.0"
           end
 
-          update_repo gem_repo3 do
-            build_gem "rack", "1.0.0" do |s|
-              s.write "lib/rack.rb", "RACK = 'FAIL'"
+          gemfile <<-G
+            source "file://#{gem_repo2}"
+
+            gem "depends_on_rack"
+
+            source "file://#{gem_repo3}" do
+              gem "unrelated_gem"
+            end
+          G
+        end
+
+        context "and the dependency is only in the top-level source" do
+          before do
+            update_repo gem_repo2 do
+              build_gem "rack", "1.0.0"
             end
           end
+
+          it "installs all gems without warning" do
+            bundle :install
+            expect(out).not_to include("Warning")
+            expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
+          end
         end
 
-        it "installs the dependency from the top-level source without warning" do
-          bundle :install
-          expect(out).not_to include("Warning")
-          should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
+        context "and the dependency is only in a pinned source" do
+          before do
+            update_repo gem_repo3 do
+              build_gem "rack", "1.0.0" do |s|
+                s.write "lib/rack.rb", "RACK = 'FAIL'"
+              end
+            end
+          end
+
+          it "does not find the dependency" do
+            bundle :install
+            expect(out).to include("Could not find gem 'rack (>= 0) ruby'")
+          end
+        end
+
+        context "and the dependency is in both the top-level and a pinned source" do
+          before do
+            update_repo gem_repo2 do
+              build_gem "rack", "1.0.0"
+            end
+
+            update_repo gem_repo3 do
+              build_gem "rack", "1.0.0" do |s|
+                s.write "lib/rack.rb", "RACK = 'FAIL'"
+              end
+            end
+          end
+
+          it "installs the dependency from the top-level source without warning" do
+            bundle :install
+            expect(out).not_to include("Warning")
+            expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
+          end
         end
       end
     end
