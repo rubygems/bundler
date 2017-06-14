@@ -8,6 +8,8 @@ module Bundler
     end
 
     def run
+      CLI::Common.ensure_all_gems_in_lockfile!(@gems)
+
       Bundler.load.specs.each do |spec|
         next if spec.name == "bundler" # Source::Rubygems doesn't install bundler
         next if !@gems.empty? && !@gems.include?(spec.name)

@@ -128,16 +128,21 @@ RSpec.describe "bundle pristine" do
       FileUtils.touch(weakling_changes_txt)
       expect(weakling_changes_txt).to be_file
 
-      bundle! "pristine foo bar weakling bundler"
+      bundle! "pristine foo bar weakling"
 
       expect(out).to eq(strip_whitespace(<<-EOS).strip)
-        Installing weakling 1.0
-        Using foo 1.0 from #{lib_path("foo")} (at master@#{foo_ref})
         Cannot pristine bar (1.0). Gem is sourced from local path.
+        Using foo 1.0 from #{lib_path("foo")} (at master@#{foo_ref})
+        Installing weakling 1.0
       EOS
       expect(weakling_changes_txt).not_to be_file
       expect(foo_changes_txt).not_to be_file
       expect(bar_changes_txt).to be_file
+    end
+
+    it "raises when one of them is not in the lockfile" do
+      bundle "pristine abcabcabc"
+      expect(out).to include("Could not find gem 'abcabcabc'.")
     end
   end
 end
