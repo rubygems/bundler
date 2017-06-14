@@ -28,6 +28,7 @@ module Bundler
       global_gem_cache
       ignore_messages
       init_gems_rb
+      install_caches_by_default
       lockfile_uses_separate_rubygems_sources
       major_deprecations
       no_install

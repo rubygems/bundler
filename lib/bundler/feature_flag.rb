@@ -34,6 +34,7 @@ module Bundler
     settings_flag(:error_on_stderr) { bundler_2_mode? }
     settings_flag(:global_gem_cache) { bundler_2_mode? }
     settings_flag(:init_gems_rb) { bundler_2_mode? }
+    settings_flag(:install_caches_by_default) { !bundler_2_mode? }
     settings_flag(:lockfile_uses_separate_rubygems_sources) { bundler_2_mode? }
     settings_flag(:only_update_to_newer_versions) { bundler_2_mode? }
     settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }

@@ -222,16 +222,16 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `gem.push_key` (`BUNDLE_GEM__PUSH_KEY`):
    Sets the `--key` parameter for `gem push` when using the `rake release`
    command with a private gemstash server.
-* `error_on_stderr` (`BUNDLE_ERROR_ON_STDERR`)
+* `error_on_stderr` (`BUNDLE_ERROR_ON_STDERR`):
    Print Bundler errors to stderr.
-* `init_gems_rb` (`BUNDLE_NEW_GEMFILE_NAME`)
+* `init_gems_rb` (`BUNDLE_NEW_GEMFILE_NAME`):
    Generate a `gems.rb` instead of a `Gemfile` when running `bundle init`.
-* `prefer_gems_rb` (`BUNDLE_PREFER_GEMS_RB`)
+* `prefer_gems_rb` (`BUNDLE_PREFER_GEMS_RB`):
    Prefer `gems.rb` to `Gemfile` when Bundler is searching for a Gemfile.
 * `unlock_source_unlocks_spec` (`BUNDLE_UNLOCK_SOURCE_UNLOCKS_SPEC`):
    Whether running `bundle update --source NAME` unlocks a gem with the given
    name. Defaults to `true`.
-* `update_requires_all_flag` (`BUNDLE_UPDATE_REQUIRES_ALL_FLAG`)
+* `update_requires_all_flag` (`BUNDLE_UPDATE_REQUIRES_ALL_FLAG`):
    Require passing `--all` to `bundle update` when everything should be updated,
    and disallow passing no options to `bundle update`.
 * `allow_bundler_dependency_conflicts` (`BUNDLE_ALLOW_BUNDLER_DEPENDENCY_CONFLICTS`):
@@ -243,6 +243,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `skip_default_git_sources` (`BUNDLE_SKIP_DEFAULT_GIT_SOURCES`):
    Whether Bundler should skip adding default git source shortcuts to the
    Gemfile DSL.
+* `install_caches_by_default` (`BUNDLE_INSTALL_CACHES_BY_DEFAULT`):
+   Whether `bundle install` with no options passed should act as if `--cache`
+   has been passed.
 * `suppress_install_using_messages` (`BUNDLE_SUPPRESS_INSTALL_USING_MESSAGES`):
    Avoid printing `Using ...` messages during installation when the version of
    a gem has not changed.
