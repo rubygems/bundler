@@ -208,10 +208,11 @@ module Bundler
 
       Bundler.settings[:clean]               = options["clean"] if options["clean"]
 
-      Bundler.settings.without               = options[:without]
-      Bundler.settings.with                  = options[:with]
+      Bundler.settings.without               = options[:without] unless Bundler.settings.without == options[:without]
+      Bundler.settings.with                  = options[:with] unless Bundler.settings.with == options[:with]
 
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? true : nil
+      disable_shared_gems = Bundler.settings[:path] ? true : nil
+      Bundler.settings[:disable_shared_gems] = disable_shared_gems unless Bundler.settings[:disable_shared_gems] == disable_shared_gems
     end
 
     def warn_ambiguous_gems
