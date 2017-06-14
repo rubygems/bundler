@@ -24,6 +24,7 @@ module Bundler
       gem.mit
       ignore_messages
       init_gems_rb
+      lockfile_uses_separate_rubygems_sources
       major_deprecations
       no_install
       no_prune

@@ -30,6 +30,7 @@ module Bundler
     settings_flag(:allow_offline_install) { bundler_2_mode? }
     settings_flag(:error_on_stderr) { bundler_2_mode? }
     settings_flag(:init_gems_rb) { bundler_2_mode? }
+    settings_flag(:lockfile_uses_separate_rubygems_sources) { bundler_2_mode? }
     settings_flag(:only_update_to_newer_versions) { bundler_2_mode? }
     settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }
     settings_flag(:prefer_gems_rb) { bundler_2_mode? }
