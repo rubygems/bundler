@@ -209,35 +209,46 @@ module Bundler
       end
     end
 
+    def set_env(key, value)
+      raise ArgumentError, "new key #{key}" unless EnvironmentPreserver::BUNDLER_KEYS.include?(key)
+      orig_key = "#{EnvironmentPreserver::BUNDLER_PREFIX}#{key}"
+      orig = ENV[key]
+      orig ||= EnvironmentPreserver::INTENTIONALLY_NIL
+      ENV[orig_key] ||= orig
+
+      ENV[key] = value
+    end
+    public :set_env
+
     def set_bundle_variables
       begin
-        ENV["BUNDLE_BIN_PATH"] = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
+        Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
       rescue Gem::GemNotFoundException
-        ENV["BUNDLE_BIN_PATH"] = File.expand_path("../../../exe/bundle", __FILE__)
+        Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", File.expand_path("../../../exe/bundle", __FILE__)
       end
 
       # Set BUNDLE_GEMFILE
-      ENV["BUNDLE_GEMFILE"] = find_gemfile.to_s
-      ENV["BUNDLER_VERSION"] = Bundler::VERSION
+      Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", find_gemfile.to_s
+      Bundler::SharedHelpers.set_env "BUNDLER_VERSION", Bundler::VERSION
     end
 
     def set_path
       paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
       paths.unshift "#{Bundler.bundle_path}/bin"
-      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
+      Bundler::SharedHelpers.set_env "PATH", paths.uniq.join(File::PATH_SEPARATOR)
     end
 
     def set_rubyopt
       rubyopt = [ENV["RUBYOPT"]].compact
       return if !rubyopt.empty? && rubyopt.first =~ %r{-rbundler/setup}
       rubyopt.unshift %(-rbundler/setup)
-      ENV["RUBYOPT"] = rubyopt.join(" ")
+      Bundler::SharedHelpers.set_env "RUBYOPT", rubyopt.join(" ")
     end
 
     def set_rubylib
       rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
       rubylib.unshift bundler_ruby_lib
-      ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
+      Bundler::SharedHelpers.set_env "RUBYLIB", rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
     def bundler_ruby_lib

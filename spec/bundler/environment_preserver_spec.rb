@@ -28,7 +28,7 @@ RSpec.describe Bundler::EnvironmentPreserver do
       let(:env) { { "foo" => "" } }
 
       it "should not create backup entries" do
-        expect(subject.key?("BUNDLER_ORIG_foo")).to eq(false)
+        expect(subject).not_to have_key "BUNDLER_ORIG_foo"
       end
     end
 

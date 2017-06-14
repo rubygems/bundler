@@ -96,7 +96,7 @@ RSpec.configure do |config|
   config.filter_run_when_matching :focus unless ENV["CI"]
 
   original_wd  = Dir.pwd
-  original_env = ENV.to_hash
+  original_env = ENV.to_hash.delete_if {|k, _v| k.start_with?(Bundler::EnvironmentPreserver::BUNDLER_PREFIX) }
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
