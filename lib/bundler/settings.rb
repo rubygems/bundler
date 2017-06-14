@@ -76,6 +76,8 @@ module Bundler
     end
 
     def []=(key, value)
+      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
+
       if cli_flags_given
         command = if value.nil?
           "bundle config --delete #{key}"
@@ -89,7 +91,7 @@ module Bundler
           "you want remembered between commands using `bundle config " \
           "<setting name> <setting value>`, i.e. `#{command}`"
       end
-      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
+
       set_key(key, value, @local_config, local_config_file)
     end
     alias_method :set_local, :[]=
