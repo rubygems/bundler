@@ -2,6 +2,7 @@
 
 RSpec.describe "major deprecations" do
   let(:warnings) { out } # change to err in 2.0
+  let(:warnings_without_version_messages) { warnings.gsub(/#{Spec::Matchers::MAJOR_DEPRECATION}Bundler will only support ruby(gems)? >= .*/, "") }
 
   context "in a .99 version" do
     before do
@@ -86,7 +87,7 @@ RSpec.describe "major deprecations" do
     describe "bundle update --quiet" do
       it "does not print any deprecations" do
         bundle :update, :quiet => true
-        expect(warnings).not_to have_major_deprecation
+        expect(warnings_without_version_messages).not_to have_major_deprecation
       end
     end
 
@@ -103,7 +104,7 @@ RSpec.describe "major deprecations" do
 
       it "does not warn when --all is passed" do
         bundle! "update --all"
-        expect(warnings).not_to have_major_deprecation
+        expect(warnings_without_version_messages).not_to have_major_deprecation
       end
     end
 
@@ -127,8 +128,7 @@ RSpec.describe "major deprecations" do
       G
 
       bundle :install
-      expect(err).not_to have_major_deprecation
-      expect(out).not_to have_major_deprecation
+      expect(warnings_without_version_messages).not_to have_major_deprecation
     end
 
     it "should print a Gemfile deprecation warning" do
