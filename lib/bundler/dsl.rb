@@ -432,8 +432,7 @@ repo_name ||= user_name
     def check_primary_source_safety(source)
       return unless source.rubygems_primary_remotes.any?
 
-      # TODO: 2.0 upgrade from setting to default
-      if Bundler.settings[:disable_multisource]
+      if Bundler.feature_flag.disable_multisource?
         raise GemfileError, "Warning: this Gemfile contains multiple primary sources. " \
           "Each source after the first must include a block to indicate which gems " \
           "should come from that source. To downgrade this error to a warning, run " \

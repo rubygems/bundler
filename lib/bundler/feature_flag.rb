@@ -28,6 +28,7 @@ module Bundler
 
     settings_flag(:allow_bundler_dependency_conflicts) { bundler_2_mode? }
     settings_flag(:allow_offline_install) { bundler_2_mode? }
+    settings_flag(:disable_multisource) { bundler_2_mode? }
     settings_flag(:error_on_stderr) { bundler_2_mode? }
     settings_flag(:init_gems_rb) { bundler_2_mode? }
     settings_flag(:lockfile_uses_separate_rubygems_sources) { bundler_2_mode? }
