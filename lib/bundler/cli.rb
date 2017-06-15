@@ -221,6 +221,8 @@ module Bundler
       "Do not allow any gem to be updated past latest --patch | --minor | --major"
     method_option "conservative", :type => :boolean, :banner =>
       "Use bundle install conservative update behavior and do not allow shared dependencies to be updated."
+    method_option "all", :type => :boolean, :banner =>
+      "Update everything."
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run
