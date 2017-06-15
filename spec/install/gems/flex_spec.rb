@@ -246,11 +246,11 @@ RSpec.describe "bundle flex_install" do
   describe "when adding a new source" do
     it "updates the lockfile" do
       build_repo2
-      install_gemfile <<-G
+      install_gemfile! <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
-      install_gemfile <<-G
+      install_gemfile! <<-G
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "rack"

@@ -47,7 +47,10 @@ module Bundler
     end
 
     def add_rubygems_remote(uri)
-      return if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+        return if Bundler.feature_flag.disable_multisource?
+        raise InvalidOption, "`lockfile_uses_separate_rubygems_sources` cannot be set without `disable_multisource` being set"
+      end
       @rubygems_aggregate.add_remote(uri)
       @rubygems_aggregate
     end

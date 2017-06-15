@@ -189,7 +189,10 @@ RSpec.describe "bundle install with gems on multiple sources" do
           end
 
           context "when lockfile_uses_separate_rubygems_sources is set" do
-            before { bundle! "config lockfile_uses_separate_rubygems_sources true" }
+            before do
+              bundle! "config lockfile_uses_separate_rubygems_sources true"
+              bundle! "config disable_multisource true"
+            end
 
             it "installs from the same source without any warning" do
               bundle! :install
@@ -294,7 +297,10 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
     context "when a top-level gem has an indirect dependency" do
       context "when lockfile_uses_separate_rubygems_sources is set" do
-        before { bundle! "config lockfile_uses_separate_rubygems_sources true" }
+        before do
+          bundle! "config lockfile_uses_separate_rubygems_sources true"
+          bundle! "config disable_multisource true"
+        end
 
         before do
           build_repo gem_repo2 do
