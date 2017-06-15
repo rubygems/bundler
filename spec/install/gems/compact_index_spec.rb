@@ -363,6 +363,30 @@ The checksum of /versions does not match the checksum provided by the server! So
     expect(the_bundle).to include_gems "back_deps 1.0"
   end
 
+  it "does not fetch every spec if the index of gems is large when doing back deps & everything is the compact index" do
+    build_repo4 do
+      build_gem "back_deps" do |s|
+        s.add_dependency "foo"
+      end
+      build_gem "missing"
+      # need to hit the limit
+      1.upto(Bundler::Source::Rubygems::API_REQUEST_LIMIT) do |i|
+        build_gem "gem#{i}"
+      end
+
+      FileUtils.rm_rf Dir[gem_repo4("gems/foo-*.gem")]
+    end
+
+    install_gemfile! <<-G, :artifice => "compact_index_extra_api_missing"
+      source "#{source_uri}"
+      source "#{source_uri}/extra" do
+        gem "back_deps"
+      end
+    G
+
+    expect(the_bundle).to include_gem "back_deps 1.0"
+  end
+
   it "uses the endpoint if all sources support it" do
     gemfile <<-G
       source "#{source_uri}"
