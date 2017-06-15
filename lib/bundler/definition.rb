@@ -266,8 +266,6 @@ module Bundler
     # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
     # each spec we found, we add all possible versions from all sources to the index.
     def double_check_for_index(idx, dependency_names)
-      return unless Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
-
       loop do
         idxcount = idx.size
         sources.all_sources.each do |source|
