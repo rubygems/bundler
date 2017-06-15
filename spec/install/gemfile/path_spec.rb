@@ -590,5 +590,28 @@ RSpec.describe "bundle install with explicit source paths" do
         :requires => [lib_path("install_hooks.rb")]
       expect(out).to include("failed for foo-1.0")
     end
+
+    it "loads plugins from the path gem" do
+      foo_file = home("foo_plugin_loaded")
+      bar_file = home("bar_plugin_loaded")
+      expect(foo_file).not_to be_file
+      expect(bar_file).not_to be_file
+
+      build_lib "foo" do |s|
+        s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{foo_file}')")
+      end
+
+      build_git "bar" do |s|
+        s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{bar_file}')")
+      end
+
+      install_gemfile! <<-G
+        gem "foo", :path => "#{lib_path("foo-1.0")}"
+        gem "bar", :path => "#{lib_path("bar-1.0")}"
+      G
+
+      expect(foo_file).to be_file
+      expect(bar_file).to be_file
+    end
   end
 end
