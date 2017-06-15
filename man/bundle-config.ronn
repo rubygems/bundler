@@ -228,6 +228,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
    Generate a `gems.rb` instead of a `Gemfile` when running `bundle init`.
 * `prefer_gems_rb` (`BUNDLE_PREFER_GEMS_RB`)
    Prefer `gems.rb` to `Gemfile` when Bundler is searching for a Gemfile.
+* `unlock_source_unlocks_spec` (`BUNDLE_UNLOCK_SOURCE_UNLOCKS_SPEC`):
+   Whether running `bundle update --source NAME` unlocks a gem with the given
+   name. Defaults to `true`.
 * `update_requires_all_flag` (`BUNDLE_UPDATE_REQUIRES_ALL_FLAG`)
    Require passing `--all` to `bundle update` when everything should be updated,
    and disallow passing no options to `bundle update`.
