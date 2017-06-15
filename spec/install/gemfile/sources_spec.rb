@@ -78,6 +78,10 @@ RSpec.describe "bundle install with gems on multiple sources" do
           build_gem "rack", "1.0.0" do |s|
             s.write "lib/rack.rb", "RACK = 'FAIL'"
           end
+
+          build_gem "rack-obama" do |s|
+            s.add_dependency "rack"
+          end
         end
 
         gemfile <<-G
@@ -91,19 +95,19 @@ RSpec.describe "bundle install with gems on multiple sources" do
       end
 
       it "installs the gems without any warning" do
-        bundle :install
+        bundle! :install
         expect(out).not_to include("Warning")
         expect(the_bundle).to include_gems("rack-obama 1.0.0")
         expect(the_bundle).to include_gems("rack 1.0.0", :source => "remote1")
       end
 
       it "can cache and deploy" do
-        bundle :package
+        bundle! :package
 
         expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
         expect(bundled_app("vendor/cache/rack-obama-1.0.gem")).to exist
 
-        bundle "install --deployment"
+        bundle! "install --deployment"
 
         expect(exitstatus).to eq(0) if exitstatus
         expect(the_bundle).to include_gems("rack-obama 1.0.0", "rack 1.0.0")
@@ -117,6 +121,10 @@ RSpec.describe "bundle install with gems on multiple sources" do
         build_repo gem_repo3 do
           build_gem "rack", "1.0.0" do |s|
             s.write "lib/rack.rb", "RACK = 'FAIL'"
+          end
+
+          build_gem "rack-obama" do |s|
+            s.add_dependency "rack"
           end
         end
 
@@ -335,7 +343,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
           it "does not find the dependency" do
             bundle :install
-            expect(out).to include("Could not find gem 'rack (>= 0) ruby'")
+            expect(out).to include("Could not find gem 'rack', which is required by gem 'depends_on_rack', in any of the relevant sources")
           end
         end
 

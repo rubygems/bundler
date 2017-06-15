@@ -50,6 +50,7 @@ module Bundler
       end
 
       def can_lock?(spec)
+        return super if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
         spec.source.is_a?(Rubygems)
       end
 
@@ -70,8 +71,12 @@ module Bundler
       end
 
       def to_s
-        remote_names = remotes.map(&:to_s).join(", ")
-        "rubygems repository #{remote_names}"
+        if remotes.empty?
+          "locally installed gems"
+        else
+          remote_names = remotes.map(&:to_s).join(", ")
+          "rubygems repository #{remote_names} or installed locally"
+        end
       end
       alias_method :name, :to_s
 
@@ -235,6 +240,20 @@ module Bundler
           remote = Source::Rubygems::Remote.new(uri)
           Bundler::Fetcher.new(remote)
         end
+      end
+
+      def double_check_for(unmet_dependency_names, override_dupes = false, index = specs)
+        return unless @allow_remote
+        raise ArgumentError, "missing index" unless index
+
+        return unless api_fetchers.any?
+
+        unmet_dependency_names = unmet_dependency_names.call
+        Bundler.ui.debug "#{self}: 2x check for #{unmet_dependency_names}"
+
+        return if unmet_dependency_names && unmet_dependency_names.empty?
+
+        fetch_names(api_fetchers, unmet_dependency_names, index, override_dupes)
       end
 
     protected

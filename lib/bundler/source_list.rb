@@ -3,14 +3,18 @@ module Bundler
   class SourceList
     attr_reader :path_sources,
       :git_sources,
-      :plugin_sources
+      :plugin_sources,
+      :global_rubygems_source,
+      :metadata_source
 
     def initialize
-      @path_sources       = []
-      @git_sources        = []
-      @plugin_sources     = []
-      @rubygems_aggregate = Source::Rubygems.new
-      @rubygems_sources   = []
+      @path_sources           = []
+      @git_sources            = []
+      @plugin_sources         = []
+      @global_rubygems_source = nil
+      @rubygems_aggregate     = rubygems_aggregate_class.new
+      @rubygems_sources       = []
+      @metadata_source        = Source::Metadata.new
     end
 
     def add_path_source(options = {})
@@ -35,13 +39,25 @@ module Bundler
       add_source_to_list Plugin.source(source).new(options), @plugin_sources
     end
 
+    def global_rubygems_source=(uri)
+      if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+        @global_rubygems_source ||= Source::Rubygems.new("remotes" => uri)
+      end
+      add_rubygems_remote(uri)
+    end
+
     def add_rubygems_remote(uri)
+      return if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
       @rubygems_aggregate.add_remote(uri)
       @rubygems_aggregate
     end
 
+    def default_source
+      global_rubygems_source || @rubygems_aggregate
+    end
+
     def rubygems_sources
-      @rubygems_sources + [@rubygems_aggregate]
+      @rubygems_sources + [default_source]
     end
 
     def rubygems_remotes
@@ -49,7 +65,7 @@ module Bundler
     end
 
     def all_sources
-      path_sources + git_sources + plugin_sources + rubygems_sources
+      path_sources + git_sources + plugin_sources + rubygems_sources + [metadata_source]
     end
 
     def get(source)
@@ -57,8 +73,14 @@ module Bundler
     end
 
     def lock_sources
-      lock_sources = (path_sources + git_sources + plugin_sources).sort_by(&:to_s)
-      lock_sources << combine_rubygems_sources
+      if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+        [rubygems_sources, git_sources, path_sources, plugin_sources].map do |sources|
+          sources.sort_by(&:to_s)
+        end.flatten(1)
+      else
+        lock_sources = (path_sources + git_sources + plugin_sources).sort_by(&:to_s)
+        lock_sources << combine_rubygems_sources
+      end
     end
 
     def replace_sources!(replacement_sources)
@@ -92,6 +114,10 @@ module Bundler
     end
 
   private
+
+    def rubygems_aggregate_class
+      Source::Rubygems
+    end
 
     def add_source_to_list(source, list)
       list.unshift(source).uniq!

@@ -147,7 +147,8 @@ RSpec.describe "bundle install with install-time dependencies" do
                 require_ruby was resolved to 1.0, which depends on
                   ruby\0 (> 9000)
 
-            Could not find gem 'ruby\0 (> 9000)', which is required by gem 'require_ruby', in any of the sources.
+            Could not find gem 'ruby\0 (> 9000)', which is required by gem 'require_ruby', in any of the relevant sources:
+              the local ruby installation
           E
           expect(last_command.bundler_err).to end_with(nice_error)
         end

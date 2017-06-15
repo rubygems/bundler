@@ -3,6 +3,7 @@ module Bundler
   class Source
     autoload :Gemspec,  "bundler/source/gemspec"
     autoload :Git,      "bundler/source/git"
+    autoload :Metadata, "bundler/source/metadata"
     autoload :Path,     "bundler/source/path"
     autoload :Rubygems, "bundler/source/rubygems"
 
@@ -30,6 +31,11 @@ module Bundler
     def can_lock?(spec)
       spec.source == self
     end
+
+    # it's possible that gems from one source depend on gems from some
+    # other source, so now we download gemspecs and iterate over those
+    # dependencies, looking for gems we don't have info on yet.
+    def double_check_for(*); end
 
     def include?(other)
       other == self

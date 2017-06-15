@@ -12,6 +12,7 @@ RSpec.describe Bundler::SourceList do
   subject(:source_list) { Bundler::SourceList.new }
 
   let(:rubygems_aggregate) { Bundler::Source::Rubygems.new }
+  let(:metadata_source) { Bundler::Source::Metadata.new }
 
   describe "adding sources" do
     before do
@@ -203,6 +204,7 @@ RSpec.describe Bundler::SourceList do
         Bundler::Source::Rubygems.new("remotes" => ["https://fourth-rubygems.org"]),
         Bundler::Source::Rubygems.new("remotes" => ["https://fifth-rubygems.org"]),
         rubygems_aggregate,
+        metadata_source,
       ]
     end
   end

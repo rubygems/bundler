@@ -114,7 +114,7 @@ module Bundler
     end
 
     def all
-      env_keys = ENV.keys.select {|k| k =~ /BUNDLE_.*/ }
+      env_keys = ENV.keys.grep(/\ABUNDLE_.+/)
 
       keys = @global_config.keys | @local_config.keys | env_keys
 
