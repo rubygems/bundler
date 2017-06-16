@@ -1,7 +1,6 @@
-require 'spec_helper'
+# frozen_string_literal: true
 
-describe "bundle install" do
-
+RSpec.describe "bundle install" do
   describe "with bundler dependencies" do
     before(:each) do
       build_repo2 do
@@ -19,7 +18,7 @@ describe "bundle install" do
         gem "rails", "3.0"
       G
 
-      should_be_installed "bundler #{Bundler::VERSION}"
+      expect(the_bundle).to include_gems "bundler #{Bundler::VERSION}"
     end
 
     it "are not added if not already present" do
@@ -27,7 +26,7 @@ describe "bundle install" do
         source "file://#{gem_repo1}"
         gem "rack"
       G
-      should_not_be_installed "bundler #{Bundler::VERSION}"
+      expect(the_bundle).not_to include_gems "bundler #{Bundler::VERSION}"
     end
 
     it "causes a conflict if explicitly requesting a different version" do
@@ -37,17 +36,21 @@ describe "bundle install" do
         gem "bundler", "0.9.2"
       G
 
-      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+      nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Fetching source index from file:#{gem_repo2}/
         Resolving dependencies...
         Bundler could not find compatible versions for gem "bundler":
           In Gemfile:
-            bundler (= 0.9.2) ruby
+            bundler (= 0.9.2)
 
           Current Bundler version:
             bundler (#{Bundler::VERSION})
+        This Gemfile requires a different version of Bundler.
+        Perhaps you need to update Bundler by running `gem install bundler`?
+
+        Could not find gem 'bundler (= 0.9.2)' in any of the sources
         E
-      expect(out).to include(nice_error)
+      expect(out).to eq(nice_error)
     end
 
     it "works for gems with multiple versions in its dependencies" do
@@ -57,7 +60,6 @@ describe "bundle install" do
         gem "multiple_versioned_deps"
       G
 
-
       install_gemfile <<-G
         source "file://#{gem_repo2}"
 
@@ -65,7 +67,7 @@ describe "bundle install" do
         gem "rack"
       G
 
-      should_be_installed "multiple_versioned_deps 1.0.0"
+      expect(the_bundle).to include_gems "multiple_versioned_deps 1.0.0"
     end
 
     it "includes bundler in the bundle when it's a child dependency" do
@@ -95,18 +97,18 @@ describe "bundle install" do
         gem "rails_fail"
       G
 
-      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+      nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Fetching source index from file:#{gem_repo2}/
         Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            activemerchant (>= 0) ruby depends on
-              activesupport (>= 2.0.0) ruby
+            activemerchant was resolved to 1.0, which depends on
+              activesupport (>= 2.0.0)
 
-            rails_fail (>= 0) ruby depends on
-              activesupport (1.2.3)
+            rails_fail was resolved to 1.0, which depends on
+              activesupport (= 1.2.3)
       E
-      expect(out).to eq(nice_error)
+      expect(out).to include(nice_error)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -116,17 +118,17 @@ describe "bundle install" do
         gem "activesupport", "2.3.5"
       G
 
-      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+      nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Fetching source index from file:#{gem_repo2}/
         Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            rails_fail (>= 0) ruby depends on
-              activesupport (= 1.2.3) ruby
+            activesupport (= 2.3.5)
 
-            activesupport (2.3.5)
+            rails_fail was resolved to 1.0, which depends on
+              activesupport (= 1.2.3)
       E
-      expect(out).to eq(nice_error)
+      expect(out).to include(nice_error)
     end
 
     it "can install dependencies with newer bundler version" do
@@ -136,11 +138,9 @@ describe "bundle install" do
       G
 
       simulate_bundler_version "10.0.0"
-      #simulate_new_machine
 
       bundle "check"
-      expect(out).to eq("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The Gemfile's dependencies are satisfied")
     end
   end
-
 end

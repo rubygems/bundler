@@ -1,5 +1,6 @@
-require 'bundler/ui'
-require 'rubygems/user_interaction'
+# frozen_string_literal: true
+require "bundler/ui"
+require "rubygems/user_interaction"
 
 module Bundler
   module UI
@@ -10,11 +11,7 @@ module Bundler
       end
 
       def say(message)
-        if message =~ /native extensions/
-          @ui.info "with native extensions "
-        else
-          @ui.debug(message)
-        end
+        @ui && @ui.debug(message)
       end
     end
   end

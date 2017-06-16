@@ -1,6 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
 
-describe "bundle show" do
+RSpec.describe "bundle show" do
   context "with a standard Gemfile" do
     before :each do
       install_gemfile <<-G
@@ -27,7 +27,7 @@ describe "bundle show" do
 
     it "prints path if gem exists in bundle" do
       bundle "show rails"
-      expect(out).to eq(default_bundle_path('gems', 'rails-2.3.2').to_s)
+      expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
     it "warns if path no longer exists on disk" do
@@ -36,12 +36,12 @@ describe "bundle show" do
       bundle "show rails"
 
       expect(out).to match(/has been deleted/i)
-      expect(out).to include(default_bundle_path('gems', 'rails-2.3.2').to_s)
+      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
     it "prints the path to the running bundler" do
       bundle "show bundler"
-      expect(out).to eq(File.expand_path('../../../', __FILE__))
+      expect(out).to eq(File.expand_path("../../../", __FILE__))
     end
 
     it "complains if gem not in bundle" do
@@ -52,19 +52,21 @@ describe "bundle show" do
     it "prints path of all gems in bundle sorted by name" do
       bundle "show --paths"
 
-      expect(out).to include(default_bundle_path('gems', 'rake-10.0.2').to_s)
-      expect(out).to include(default_bundle_path('gems', 'rails-2.3.2').to_s)
+      expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
+      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
 
       # Gem names are the last component of their path.
-      gem_list = out.split.map { |p| p.split('/').last }
+      gem_list = out.split.map {|p| p.split("/").last }
       expect(gem_list).to eq(gem_list.sort)
     end
 
     it "prints summary of gems" do
       bundle "show --verbose"
 
-      expect(out).to include(' - This is just a fake gem for testing')
-      expect(out).to include(' - Ruby based make-like utility.')
+      expect(out).to include("* actionmailer (2.3.2)")
+      expect(out).to include("\tSummary:  This is just a fake gem for testing")
+      expect(out).to include("\tHomepage: No website available.")
+      expect(out).to include("\tStatus:   Up to date")
     end
   end
 
@@ -75,12 +77,12 @@ describe "bundle show" do
 
     it "prints out git info" do
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
-      should_be_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
 
       bundle :show
-      expect(out).to include("foo (1.0 #{@git.ref_for('master', 6)}")
+      expect(out).to include("foo (1.0 #{@git.ref_for("master", 6)}")
     end
 
     it "prints out branch names other than master" do
@@ -90,22 +92,33 @@ describe "bundle show" do
       @revision = revision_for(lib_path("foo-1.0"))[0...6]
 
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo-1.0')}", :branch => "omg"
+        gem "foo", :git => "#{lib_path("foo-1.0")}", :branch => "omg"
       G
-      should_be_installed "foo 1.0.omg"
+      expect(the_bundle).to include_gems "foo 1.0.omg"
 
       bundle :show
-      expect(out).to include("foo (1.0 #{@git.ref_for('omg', 6)}")
+      expect(out).to include("foo (1.0 #{@git.ref_for("omg", 6)}")
     end
 
     it "doesn't print the branch when tied to a ref" do
       sha = revision_for(lib_path("foo-1.0"))
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo-1.0')}", :ref => "#{sha}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}", :ref => "#{sha}"
       G
 
       bundle :show
       expect(out).to include("foo (1.0 #{sha[0..6]})")
+    end
+
+    it "handles when a version is a '-' prerelease", :rubygems => "2.1" do
+      @git = build_git("foo", "1.0.0-beta.1", :path => lib_path("foo"))
+      install_gemfile <<-G
+        gem "foo", "1.0.0-beta.1", :git => "#{lib_path("foo")}"
+      G
+      expect(the_bundle).to include_gems "foo 1.0.0.pre.beta.1"
+
+      bundle! :show
+      expect(out).to include("foo (1.0.0.pre.beta.1")
     end
   end
 
@@ -113,13 +126,65 @@ describe "bundle show" do
     before :each do
       build_git "foo", :path => lib_path("foo")
       in_app_root_custom lib_path("foo")
-      File.open('Gemfile', 'w') {|f| f.puts "gemspec" }
-      sys_exec 'rm -rf .git && git init'
+      File.open("Gemfile", "w") {|f| f.puts "gemspec" }
+      sys_exec "rm -rf .git && git init"
     end
 
     it "does not output git errors" do
       bundle :show
-      expect(err).to be_empty
+      expect(err).to lack_errors
+    end
+  end
+
+  it "performs an automatic bundle install" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "foo"
+    G
+
+    bundle "config auto_install 1"
+    bundle :show
+    expect(out).to include("Installing foo 1.0")
+  end
+
+  context "with an invalid regexp for gem name" do
+    it "does not find the gem" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+
+      invalid_regexp = "[]"
+
+      bundle "show #{invalid_regexp}"
+      expect(out).to include("Could not find gem '#{invalid_regexp}'.")
+    end
+  end
+
+  context "--outdated option" do
+    # Regression test for https://github.com/bundler/bundler/issues/5375
+    before do
+      build_repo2
+    end
+
+    it "doesn't update gems to newer versions" do
+      install_gemfile! <<-G
+        source "file://#{gem_repo2}"
+        gem "rails"
+      G
+
+      expect(the_bundle).to include_gem("rails 2.3.2")
+
+      update_repo2 do
+        build_gem "rails", "3.0.0" do |s|
+          s.executables = "rails"
+        end
+      end
+
+      bundle! "show --outdated"
+
+      bundle! "install"
+      expect(the_bundle).to include_gem("rails 2.3.2")
     end
   end
 end

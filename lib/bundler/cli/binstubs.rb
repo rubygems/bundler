@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+require "bundler/cli/common"
+
 module Bundler
   class CLI::Binstubs
     attr_reader :options, :gems
@@ -7,7 +10,7 @@ module Bundler
     end
 
     def run
-      Bundler.definition.validate_ruby!
+      Bundler.definition.validate_runtime!
       Bundler.settings[:bin] = options["path"] if options["path"]
       Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
       installer = Installer.new(Bundler.root, Bundler.definition)
@@ -18,19 +21,21 @@ module Bundler
       end
 
       gems.each do |gem_name|
-        spec = installer.specs.find{|s| s.name == gem_name }
+        spec = Bundler.definition.specs.find {|s| s.name == gem_name }
         unless spec
           raise GemNotFound, Bundler::CLI::Common.gem_not_found_message(
-            gem_name, Bundler.definition.specs)
+            gem_name, Bundler.definition.specs
+          )
         end
 
         if spec.name == "bundler"
-          Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
+          Bundler.ui.warn "Sorry, Bundler can only be run via RubyGems."
+        elsif options[:standalone]
+          installer.generate_standalone_bundler_executable_stubs(spec)
         else
           installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
         end
       end
     end
-
   end
 end

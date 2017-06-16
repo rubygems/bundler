@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Cache
     attr_reader :options
@@ -6,9 +7,10 @@ module Bundler
     end
 
     def run
-      Bundler.definition.validate_ruby!
+      Bundler.definition.validate_runtime!
       Bundler.definition.resolve_with_cache!
       setup_cache_all
+      Bundler.settings[:cache_all_platforms] = options["all-platforms"] if options.key?("all-platforms")
       Bundler.load.cache
       Bundler.settings[:no_prune] = true if options["no-prune"]
       Bundler.load.lock
@@ -23,12 +25,11 @@ module Bundler
     def setup_cache_all
       Bundler.settings[:cache_all] = options[:all] if options.key?("all")
 
-      if Bundler.definition.sources.any? { |s| !s.is_a?(Source::Rubygems) } && !Bundler.settings[:cache_all]
+      if Bundler.definition.has_local_dependencies? && !Bundler.settings[:cache_all]
         Bundler.ui.warn "Your Gemfile contains path and git dependencies. If you want "    \
           "to package them as well, please pass the --all flag. This will be the default " \
           "on Bundler 2.0."
       end
     end
-
   end
 end

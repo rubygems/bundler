@@ -1,38 +1,72 @@
+# frozen_string_literal: true
 module Bundler
   class Source
     class Path
+      class Installer < Bundler::RubyGemsGemInstaller
+        attr_reader :spec
 
-      class Installer < Bundler::GemInstaller
         def initialize(spec, options = {})
-          @spec              = spec
-          @tmp_bin_dir       = "#{Bundler.tmp(spec.full_name)}/bin"
-          @gem_bin_dir       = "#{Bundler.rubygems.gem_dir}/bin"
-          @bin_dir           = Bundler.requires_sudo? ? @tmp_bin_dir : @gem_bin_dir
-          @gem_dir           = Bundler.rubygems.path(spec.full_gem_path)
-          @wrappers          = options[:wrappers] || true
-          @env_shebang       = options[:env_shebang] || true
-          @format_executable = options[:format_executable] || false
-          @build_args        = options[:build_args] || Bundler.rubygems.build_args
-        end
-
-        def generate_bin
-          return if spec.executables.nil? || spec.executables.empty?
+          @spec               = spec
+          @gem_dir            = Bundler.rubygems.path(spec.full_gem_path)
+          @wrappers           = true
+          @env_shebang        = true
+          @format_executable  = options[:format_executable] || false
+          @build_args         = options[:build_args] || Bundler.rubygems.build_args
+          @gem_bin_dir        = "#{Bundler.rubygems.gem_dir}/bin"
+          @disable_extensions = options[:disable_extensions]
 
           if Bundler.requires_sudo?
-            FileUtils.mkdir_p(@tmp_bin_dir) unless File.exist?(@tmp_bin_dir)
+            @tmp_dir = Bundler.tmp(spec.full_name).to_s
+            @bin_dir = "#{@tmp_dir}/bin"
+          else
+            @bin_dir = @gem_bin_dir
           end
+        end
 
+        def post_install
+          SharedHelpers.chdir(@gem_dir) do
+            run_hooks(:pre_install)
+
+            unless @disable_extensions
+              build_extensions
+              run_hooks(:post_build)
+            end
+
+            generate_bin unless spec.executables.nil? || spec.executables.empty?
+
+            run_hooks(:post_install)
+          end
+        ensure
+          Bundler.rm_rf(@tmp_dir) if Bundler.requires_sudo?
+        end
+
+      private
+
+        def generate_bin
           super
 
           if Bundler.requires_sudo?
-            Bundler.mkdir_p @gem_bin_dir
+            SharedHelpers.filesystem_access(@gem_bin_dir) do |p|
+              Bundler.mkdir_p(p)
+            end
             spec.executables.each do |exe|
-              Bundler.sudo "cp -R #{@tmp_bin_dir}/#{exe} #{@gem_bin_dir}"
+              Bundler.sudo "cp -R #{@bin_dir}/#{exe} #{@gem_bin_dir}"
             end
           end
         end
-      end
 
+        def run_hooks(type)
+          hooks_meth = "#{type}_hooks"
+          return unless Gem.respond_to?(hooks_meth)
+          Gem.send(hooks_meth).each do |hook|
+            result = hook.call(self)
+            next unless result == false
+            location = " at #{$1}" if hook.inspect =~ /@(.*:\d+)/
+            message = "#{type} hook#{location} failed for #{spec.full_name}"
+            raise InstallHookError, message
+          end
+        end
+      end
     end
   end
 end
