@@ -13,6 +13,7 @@ begin
   rspec = spec.dependencies.find {|d| d.name == "rspec" }
   gem "rspec", rspec.requirement.to_s
   require "rspec"
+  require "diff/lcs"
 rescue LoadError
   abort "Run rake spec:deps to install development dependencies"
 end
