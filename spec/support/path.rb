@@ -89,6 +89,10 @@ module Spec
       bundled_app ".bundle", "plugin", "gems", *args
     end
 
+    def tmpdir(*args)
+      tmp "tmpdir", *args
+    end
+
     extend self
   end
 end

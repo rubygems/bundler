@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "thread"
 
-describe "fetching dependencies with a not available mirror", :realworld => true do
+RSpec.describe "fetching dependencies with a not available mirror", :realworld => true do
   let(:mirror) { @mirror_uri }
   let(:original) { @server_uri }
   let(:server_port) { @server_port }
@@ -32,7 +31,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
         gem 'weakling'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
 
       expect(out).to include("Installing weakling")
       expect(out).to include("Bundle complete")
@@ -52,7 +51,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
         gem 'weakling'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
 
       expect(out).to include("Installing weakling")
       expect(out).to include("Bundle complete")
@@ -71,7 +70,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
         gem 'weakling'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
 
       expect(out).to include("Fetching source index from #{mirror}")
       expect(out).to include("Retrying fetcher due to error (2/4): Bundler::HTTPError Could not fetch specs from #{mirror}")
@@ -86,7 +85,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
         gem 'weakling'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
 
       expect(out).to eq "Fetching source index from #{mirror}/
 
@@ -108,7 +107,7 @@ Could not fetch specs from #{mirror}/"
         gem 'weakling'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
 
       expect(out).to include("Fetching source index from #{mirror}")
       expect(out).to include("Retrying fetcher due to error (2/4): Bundler::HTTPError Could not fetch specs from #{mirror}")

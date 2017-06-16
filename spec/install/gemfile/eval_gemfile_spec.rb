@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle install with gemfile that uses eval_gemfile" do
+RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
   before do
     build_lib("gunks", :path => bundled_app.join("gems/gunks")) do |s|
       s.name    = "gunks"

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle clean" do
+RSpec.describe "bundle clean" do
   def should_have_gems(*gems)
     gems.each do |g|
       expect(vendored_gems("gems/#{g}")).to exist

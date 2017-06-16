@@ -8,7 +8,7 @@ module Bundler
   end
 
   class CurrentRuby
-    KNOWN_MINOR_VERSIONS = %w(
+    KNOWN_MINOR_VERSIONS = %w[
       1.8
       1.9
       2.0
@@ -17,11 +17,11 @@ module Bundler
       2.3
       2.4
       2.5
-    ).freeze
+    ].freeze
 
     KNOWN_MAJOR_VERSIONS = KNOWN_MINOR_VERSIONS.map {|v| v.split(".", 2).first }.uniq.freeze
 
-    KNOWN_PLATFORMS = %w(
+    KNOWN_PLATFORMS = %w[
       jruby
       maglev
       mingw
@@ -31,7 +31,7 @@ module Bundler
       rbx
       ruby
       x64_mingw
-    ).freeze
+    ].freeze
 
     def ruby?
       !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby" || RUBY_ENGINE == "rbx" || RUBY_ENGINE == "maglev")
@@ -58,15 +58,15 @@ module Bundler
     end
 
     def mswin64?
-      Bundler::WINDOWS && Bundler.local_platform.os == "mswin64" && Bundler.local_platform.cpu == "x64"
+      Bundler::WINDOWS && Bundler.local_platform != Gem::Platform::RUBY && Bundler.local_platform.os == "mswin64" && Bundler.local_platform.cpu == "x64"
     end
 
     def mingw?
-      Bundler::WINDOWS && Bundler.local_platform.os == "mingw32" && Bundler.local_platform.cpu != "x64"
+      Bundler::WINDOWS && Bundler.local_platform != Gem::Platform::RUBY && Bundler.local_platform.os == "mingw32" && Bundler.local_platform.cpu != "x64"
     end
 
     def x64_mingw?
-      Bundler::WINDOWS && Bundler.local_platform.os == "mingw32" && Bundler.local_platform.cpu == "x64"
+      Bundler::WINDOWS && Bundler.local_platform != Gem::Platform::RUBY && Bundler.local_platform.os == "mingw32" && Bundler.local_platform.cpu == "x64"
     end
 
     (KNOWN_MINOR_VERSIONS + KNOWN_MAJOR_VERSIONS).each do |version|

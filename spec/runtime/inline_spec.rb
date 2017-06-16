@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundler/inline#gemfile" do
+RSpec.describe "bundler/inline#gemfile" do
   def script(code, options = {})
     requires = ["bundler/inline"]
     requires.unshift File.expand_path("../../support/artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
@@ -111,7 +110,7 @@ describe "bundler/inline#gemfile" do
       end
     RUBY
 
-    expect(out).to eq("CONFIRMED!")
+    expect(out).to eq("CONFIRMED!\nCONFIRMED!")
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -217,6 +216,24 @@ describe "bundler/inline#gemfile" do
       BUNDLED WITH
          1.13.6
     G
+
+    in_app_root do
+      script <<-RUBY
+        gemfile do
+          source "file://#{gem_repo1}"
+          gem "rack"
+        end
+
+        puts RACK
+      RUBY
+    end
+
+    expect(err).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
+
+  it "installs inline gems when BUNDLE_GEMFILE is set to an empty string" do
+    ENV["BUNDLE_GEMFILE"] = ""
 
     in_app_root do
       script <<-RUBY

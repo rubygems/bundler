@@ -13,9 +13,10 @@ require "bundler/rubygems_integration"
 require "bundler/version"
 require "bundler/constants"
 require "bundler/current_ruby"
+require "bundler/build_metadata"
 
 module Bundler
-  environment_preserver = EnvironmentPreserver.new(ENV, %w(PATH GEM_PATH))
+  environment_preserver = EnvironmentPreserver.new(ENV, EnvironmentPreserver::BUNDLER_KEYS)
   ORIGINAL_ENV = environment_preserver.restore
   ENV.replace(environment_preserver.backup)
   SUDO_MUTEX = Mutex.new
@@ -40,8 +41,6 @@ module Bundler
   autoload :LazySpecification,      "bundler/lazy_specification"
   autoload :LockfileParser,         "bundler/lockfile_parser"
   autoload :MatchPlatform,          "bundler/match_platform"
-  autoload :Mirror,                 "bundler/mirror"
-  autoload :Mirrors,                "bundler/mirror"
   autoload :RemoteSpecification,    "bundler/remote_specification"
   autoload :Resolver,               "bundler/resolver"
   autoload :Retry,                  "bundler/retry"
@@ -57,6 +56,7 @@ module Bundler
   autoload :StubSpecification,      "bundler/stub_specification"
   autoload :UI,                     "bundler/ui"
   autoload :URICredentialsFilter,   "bundler/uri_credentials_filter"
+  autoload :VersionRanges,          "bundler/version_ranges"
 
   class << self
     attr_writer :bundle_path
@@ -135,7 +135,7 @@ module Bundler
       @locked_gems ||=
         if defined?(@definition) && @definition
           definition.locked_gems
-        elsif Bundler.default_lockfile.exist?
+        elsif Bundler.default_lockfile.file?
           lock = Bundler.read_file(Bundler.default_lockfile)
           LockfileParser.new(lock)
         end
@@ -148,34 +148,37 @@ module Bundler
     def user_home
       @user_home ||= begin
         home = Bundler.rubygems.user_home
-        warning = "Your home directory is not set properly:"
-        if home.nil?
-          warning += "\n * It is not set at all"
+
+        warning = if home.nil?
+          "Your home directory is not set."
         elsif !File.directory?(home)
-          warning += "\n * `#{home}` is not a directory"
+          "`#{home}` is not a directory."
         elsif !File.writable?(home)
-          warning += "\n * `#{home}` is not writable"
+          "`#{home}` is not writable."
+        end
+
+        if warning
+          user_home = tmp_home_path(Etc.getlogin, warning)
+          Bundler.ui.warn "#{warning}\nBundler will use `#{user_home}' as your home directory temporarily.\n"
+          user_home
         else
-          return @user_home = Pathname.new(home)
+          Pathname.new(home)
         end
-
-        login = Etc.getlogin || "unknown"
-
-        tmp_home = Pathname.new(Dir.tmpdir).join("bundler", "home", login)
-        begin
-          SharedHelpers.filesystem_access(tmp_home, :write) do |p|
-            FileUtils.mkdir_p(p)
-          end
-        rescue => e
-          warning += "\n\nBundler also failed to create a temporary home directory at `#{tmp_home}`:\n#{e}"
-          raise warning
-        end
-
-        warning += "\n\nBundler will use `#{tmp_home}` as your home directory temporarily"
-
-        Bundler.ui.warn(warning)
-        tmp_home
       end
+    end
+
+    def tmp_home_path(login, warning)
+      login ||= "unknown"
+      path = Pathname.new(Dir.tmpdir).join("bundler", "home")
+      SharedHelpers.filesystem_access(path) do |tmp_home_path|
+        unless tmp_home_path.exist?
+          tmp_home_path.mkpath
+          tmp_home_path.chmod(0o777)
+        end
+        tmp_home_path.join(login).tap(&:mkpath)
+      end
+    rescue => e
+      raise e.exception("#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}")
     end
 
     def user_bundle_path
@@ -311,9 +314,9 @@ EOF
     end
 
     def system_bindir
-      # Gem.bindir doesn't always return the location that Rubygems will install
-      # system binaries. If you put '-n foo' in your .gemrc, Rubygems will
-      # install binstubs there instead. Unfortunately, Rubygems doesn't expose
+      # Gem.bindir doesn't always return the location that RubyGems will install
+      # system binaries. If you put '-n foo' in your .gemrc, RubyGems will
+      # install binstubs there instead. Unfortunately, RubyGems doesn't expose
       # that directory at all, so rather than parse .gemrc ourselves, we allow
       # the directory to be set as well, via `bundle config bindir foo`.
       Bundler.settings[:system_bindir] || Bundler.rubygems.gem_bindir
@@ -325,7 +328,7 @@ EOF
       sudo_present = which "sudo" if settings.allow_sudo?
 
       if sudo_present
-        # the bundle path and subdirectories need to be writable for Rubygems
+        # the bundle path and subdirectories need to be writable for RubyGems
         # to be able to unpack and install gems without exploding
         path = bundle_path
         path = path.parent until path.exist?
@@ -411,20 +414,20 @@ EOF
 
     def load_gemspec_uncached(file, validate = false)
       path = Pathname.new(file)
-      # Eval the gemspec from its parent directory, because some gemspecs
-      # depend on "./" relative paths.
-      SharedHelpers.chdir(path.dirname.to_s) do
-        contents = path.read
-        spec = if contents[0..2] == "---" # YAML header
-          eval_yaml_gemspec(path, contents)
-        else
+      contents = path.read
+      spec = if contents.start_with?("---") # YAML header
+        eval_yaml_gemspec(path, contents)
+      else
+        # Eval the gemspec from its parent directory, because some gemspecs
+        # depend on "./" relative paths.
+        SharedHelpers.chdir(path.dirname.to_s) do
           eval_gemspec(path, contents)
         end
-        return unless spec
-        spec.loaded_from = path.expand_path.to_s
-        Bundler.rubygems.validate(spec) if validate
-        spec
       end
+      return unless spec
+      spec.loaded_from = path.expand_path.to_s
+      Bundler.rubygems.validate(spec) if validate
+      spec
     end
 
     def clear_gemspec_cache
@@ -441,6 +444,12 @@ EOF
     end
 
     def reset!
+      reset_paths!
+      Plugin.reset!
+      reset_rubygems!
+    end
+
+    def reset_paths!
       @root = nil
       @settings = nil
       @definition = nil
@@ -450,9 +459,9 @@ EOF
       @bundle_path = nil
       @bin_path = nil
       @user_home = nil
+    end
 
-      Plugin.reset!
-
+    def reset_rubygems!
       return unless defined?(@rubygems) && @rubygems
       rubygems.undo_replacements
       rubygems.reset
@@ -509,7 +518,7 @@ EOF
         nil
       end
 
-      ENV["GEM_HOME"] = File.expand_path(bundle_path, root)
+      Bundler::SharedHelpers.set_env "GEM_HOME", File.expand_path(bundle_path, root)
       Bundler.rubygems.clear_paths
     end
 

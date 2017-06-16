@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "Bundler.load" do
+RSpec.describe "Bundler.load" do
   before :each do
     system_gems "rack-1.0.0"
   end

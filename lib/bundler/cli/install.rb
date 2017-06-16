@@ -25,7 +25,7 @@ module Bundler
 
       normalize_groups
 
-      ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
+      Bundler::SharedHelpers.set_env "RB_USER_INSTALL", "1" if Bundler::FREEBSD
 
       # Disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
@@ -78,7 +78,7 @@ module Bundler
         relative_path = absolute_path.sub(File.expand_path(".") + File::SEPARATOR, "." + File::SEPARATOR)
         Bundler.ui.confirm "Bundled gems are installed into #{relative_path}."
       else
-        Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
+        Bundler.ui.confirm "Use `bundle info [gemname]` to see where a bundled gem is installed."
       end
 
       Bundler::CLI::Common.output_post_install_messages installer.post_install_messages
@@ -163,7 +163,7 @@ module Bundler
     def check_trust_policy
       if options["trust-policy"]
         unless Bundler.rubygems.security_policies.keys.include?(options["trust-policy"])
-          Bundler.ui.error "Rubygems doesn't know about trust policy '#{options["trust-policy"]}'. " \
+          Bundler.ui.error "RubyGems doesn't know about trust policy '#{options["trust-policy"]}'. " \
             "The known policies are: #{Bundler.rubygems.security_policies.keys.join(", ")}."
           exit 1
         end
@@ -208,10 +208,11 @@ module Bundler
 
       Bundler.settings[:clean]               = options["clean"] if options["clean"]
 
-      Bundler.settings.without               = options[:without]
-      Bundler.settings.with                  = options[:with]
+      Bundler.settings.without               = options[:without] unless Bundler.settings.without == options[:without]
+      Bundler.settings.with                  = options[:with] unless Bundler.settings.with == options[:with]
 
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? true : nil
+      disable_shared_gems = Bundler.settings[:path] ? true : nil
+      Bundler.settings[:disable_shared_gems] = disable_shared_gems unless Bundler.settings[:disable_shared_gems] == disable_shared_gems
     end
 
     def warn_ambiguous_gems

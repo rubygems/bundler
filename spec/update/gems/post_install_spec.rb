@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle update" do
+RSpec.describe "bundle update" do
   let(:config) {}
 
   before do

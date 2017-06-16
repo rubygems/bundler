@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::RemoteSpecification do
+RSpec.describe Bundler::RemoteSpecification do
   let(:name)         { "foo" }
   let(:version)      { Gem::Version.new("1.0.0") }
   let(:platform)     { Gem::Platform::RUBY }
@@ -128,8 +127,8 @@ describe Bundler::RemoteSpecification do
   end
 
   describe "#__swap__" do
-    let(:spec) { double(:spec) }
-    let(:new_spec) { double(:new_spec) }
+    let(:spec) { double(:spec, :dependencies => []) }
+    let(:new_spec) { double(:new_spec, :dependencies => [], :runtime_dependencies => []) }
 
     before { subject.instance_variable_set(:@_remote_specification, spec) }
 

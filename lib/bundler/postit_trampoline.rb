@@ -60,7 +60,7 @@ The error was: #{e}
 
   ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] = installed_version.to_s
 
-  if !Gem::Requirement.new(">= 1.13.pre".dup).satisfied_by?(Gem::Version.new(running_version)) && (ARGV.empty? || ARGV.any? {|a| %w(install i).include? a })
+  if !Gem::Requirement.new(">= 1.13.pre".dup).satisfied_by?(Gem::Version.new(running_version)) && (ARGV.empty? || ARGV.any? {|a| %w[install i].include? a })
     puts <<-WARN.strip
 You're running Bundler #{installed_version} but this project uses #{running_version}. To update, run `bundle update --bundler`.
   WARN

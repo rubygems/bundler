@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle exec" do
-  let(:system_gems_to_install) { %w(rack-1.0.0 rack-0.9.1) }
+RSpec.describe "bundle exec" do
+  let(:system_gems_to_install) { %w[rack-1.0.0 rack-0.9.1] }
   before :each do
     system_gems(system_gems_to_install)
   end
@@ -216,6 +215,32 @@ describe "bundle exec" do
     bundle "exec"
     expect(exitstatus).to eq(128) if exitstatus
     expect(out).to include("bundler: exec needs a command to run")
+  end
+
+  it "raises a helpful error when exec'ing to something outside of the bundle", :rubygems => ">= 2.5.2" do
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gem "with_license"
+    G
+    [true, false].each do |l|
+      bundle! "config disable_exec_load #{l}"
+      bundle "exec rackup"
+      expect(err).to include "can't find executable rackup for gem rack. rack is not currently included in the bundle, perhaps you meant to add it to your Gemfile?"
+    end
+  end
+
+  # Different error message on old RG versions (before activate_bin_path) because they
+  # called `Kernel#gem` directly
+  it "raises a helpful error when exec'ing to something outside of the bundle", :rubygems => "< 2.5.2" do
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gem "with_license"
+    G
+    [true, false].each do |l|
+      bundle! "config disable_exec_load #{l}"
+      bundle "exec rackup"
+      expect(err).to include "rack is not part of the bundle. Add it to your Gemfile."
+    end
   end
 
   describe "with help flags" do
@@ -646,23 +671,67 @@ __FILE__: #{path.to_s.inspect}
 
   context "nested bundle exec" do
     let(:system_gems_to_install) { super() << :bundler }
-    before do
-      gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
-      bundle :install, :system_bundler => true, :path => "vendor/bundler"
+
+    context "with shared gems disabled" do
+      before do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+        bundle :install, :system_bundler => true, :path => "vendor/bundler"
+      end
+
+      it "overrides disable_shared_gems so bundler can be found" do
+        file = bundled_app("file_that_bundle_execs.rb")
+        create_file(file, <<-RB)
+          #!#{Gem.ruby}
+          puts `bundle exec echo foo`
+        RB
+        file.chmod(0o777)
+        bundle! "exec #{file}", :system_bundler => true
+        expect(out).to eq("foo")
+      end
     end
 
-    it "overrides disable_shared_gems so bundler can be found" do
-      file = bundled_app("file_that_bundle_execs.rb")
-      create_file(file, <<-RB)
-        #!#{Gem.ruby}
-        puts `bundle exec echo foo`
-      RB
-      file.chmod(0o777)
-      bundle! "exec #{file}", :system_bundler => true
-      expect(out).to eq("foo")
+    context "with a system gem that shadows a default gem" do
+      let(:openssl_version) { "99.9.9" }
+      let(:expected) { ruby "gem 'openssl', '< 999999'; require 'openssl'; puts OpenSSL::VERSION", :artifice => nil }
+
+      it "only leaves the default gem in the stdlib available" do
+        skip "openssl isn't a default gem" if expected.empty?
+
+        install_gemfile! "" # must happen before installing the broken system gem
+
+        build_repo4 do
+          build_gem "openssl", openssl_version do |s|
+            s.write("lib/openssl.rb", <<-RB)
+              raise "custom openssl should not be loaded, it's not in the gemfile!"
+            RB
+          end
+        end
+
+        system_gems(:bundler, "openssl-#{openssl_version}", :gem_repo => gem_repo4)
+
+        file = bundled_app("require_openssl.rb")
+        create_file(file, <<-RB)
+          #!/usr/bin/env ruby
+          require "openssl"
+          puts OpenSSL::VERSION
+          warn Gem.loaded_specs.values.map(&:full_name)
+        RB
+        file.chmod(0o777)
+
+        aggregate_failures do
+          expect(bundle!("exec #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
+          expect(bundle!("exec bundle exec #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
+          expect(bundle!("exec ruby #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
+          expect(run!(file.read, :no_lib => true, :artifice => nil)).to eq(expected)
+        end
+
+        # sanity check that we get the newer, custom version without bundler
+        sys_exec("#{Gem.ruby} #{file}")
+        expect(err).to include("custom openssl should not be loaded")
+      end
     end
   end
 end

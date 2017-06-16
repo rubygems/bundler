@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/ruby_version"
 
-describe "Bundler::RubyVersion and its subclasses" do
+RSpec.describe "Bundler::RubyVersion and its subclasses" do
   let(:version)              { "2.0.0" }
   let(:patchlevel)           { "645" }
   let(:engine)               { "jruby" }

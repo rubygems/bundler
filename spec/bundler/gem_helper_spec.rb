@@ -1,9 +1,8 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "rake"
 require "bundler/gem_helper"
 
-describe Bundler::GemHelper do
+RSpec.describe Bundler::GemHelper do
   let(:app_name) { "lorem__ipsum" }
   let(:app_path) { bundled_app app_name }
   let(:app_gemspec_path) { app_path.join("#{app_name}.gemspec") }
@@ -105,8 +104,8 @@ describe Bundler::GemHelper do
 
       context "defines Rake tasks" do
         let(:task_names) do
-          %w(build install release release:guard_clean
-             release:source_control_push release:rubygem_push)
+          %w[build install release release:guard_clean
+             release:source_control_push release:rubygem_push]
         end
 
         context "before installation" do
@@ -160,9 +159,10 @@ describe Bundler::GemHelper do
         it "gem is installed" do
           mock_build_message app_name, app_version
           mock_confirm_message "#{app_name} (#{app_version}) installed."
-          subject.install_gem
+          subject.install_gem(nil, :local)
           expect(app_gem_path).to exist
-          expect(`gem list`).to include("#{app_name} (#{app_version})")
+          gem_command! :list
+          expect(out).to include("#{app_name} (#{app_version})")
         end
       end
 

@@ -33,25 +33,26 @@ module Bundler
 
     # Runs the install procedures for a specific Gemfile.
     #
-    # Firstly, this method will check to see if Bundler.bundle_path exists
-    # and if not then will create it. This is usually the location of gems
-    # on the system, be it RVM or at a system path.
+    # Firstly, this method will check to see if `Bundler.bundle_path` exists
+    # and if not then Bundler will create the directory. This is usually the same
+    # location as RubyGems which typically is the `~/.gem` directory
+    # unless other specified.
     #
-    # Secondly, it checks if Bundler has been configured to be "frozen"
+    # Secondly, it checks if Bundler has been configured to be "frozen".
     # Frozen ensures that the Gemfile and the Gemfile.lock file are matching.
     # This stops a situation where a developer may update the Gemfile but may not run
     # `bundle install`, which leads to the Gemfile.lock file not being correctly updated.
     # If this file is not correctly updated then any other developer running
     # `bundle install` will potentially not install the correct gems.
     #
-    # Thirdly, Bundler checks if there are any dependencies specified in the Gemfile using
-    # Bundler::Environment#dependencies. If there are no dependencies specified then
-    # Bundler returns a warning message stating so and this method returns.
+    # Thirdly, Bundler checks if there are any dependencies specified in the Gemfile.
+    # If there are no dependencies specified then Bundler returns a warning message stating
+    # so and this method returns.
     #
-    # Fourthly, Bundler checks if the default lockfile (Gemfile.lock) exists, and if so
-    # then proceeds to set up a defintion based on the default gemfile (Gemfile) and the
-    # default lock file (Gemfile.lock). However, this is not the case if the platform is different
-    # to that which is specified in Gemfile.lock, or if there are any missing specs for the gems.
+    # Fourthly, Bundler checks if the Gemfile.lock exists, and if so
+    # then proceeds to set up a definition based on the Gemfile and the Gemfile.lock.
+    # During this step Bundler will also download infomrmation about any new gems
+    # that are not in the Gemfile.lock and resolve any dependencies if needed.
     #
     # Fifthly, Bundler resolves the dependencies either through a cache of gems or by remote.
     # This then leads into the gems being installed, along with stubs for their executables,
@@ -61,7 +62,9 @@ module Bundler
     # Sixthly, a new Gemfile.lock is created from the installed gems to ensure that the next time
     # that a user runs `bundle install` they will receive any updates from this process.
     #
-    # Finally: TODO add documentation for how the standalone process works.
+    # Finally, if the user has specified the standalone flag, Bundler will generate the needed
+    # require paths and save them in a `setup.rb` file. See `bundle standalone --help` for more
+    # information.
     def run(options)
       create_bundle_path
 
@@ -159,11 +162,26 @@ module Bundler
     # that said, it's a rare situation (other than rake), and parallel
     # installation is SO MUCH FASTER. so we let people opt in.
     def install(options)
-      Bundler.rubygems.load_plugins
+      load_plugins
       force = options["force"]
       jobs = 1
       jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?
       install_in_parallel jobs, options[:standalone], force
+    end
+
+    def load_plugins
+      Bundler.rubygems.load_plugins
+
+      requested_path_gems = @definition.requested_specs.select {|s| s.source.is_a?(Source::Path) }
+      path_plugin_files = requested_path_gems.map do |spec|
+        begin
+          Bundler.rubygems.spec_matches_for_glob(spec, "rubygems_plugin#{Bundler.rubygems.suffix_pattern}")
+        rescue TypeError
+          error_message = "#{spec.name} #{spec.version} has an invalid gemspec"
+          raise Gem::InvalidSpecificationException, error_message
+        end
+      end.flatten
+      Bundler.rubygems.load_plugin_files(path_plugin_files)
     end
 
     def ensure_specs_are_compatible!
@@ -188,8 +206,8 @@ module Bundler
       if Bundler.rubygems.provides?(">= 2.1.0")
         true
       else
-        Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
-          "gems will be installed one at a time. Upgrade to Rubygems 2.1.0 " \
+        Bundler.ui.warn "RubyGems #{Gem::VERSION} is not threadsafe, so your "\
+          "gems will be installed one at a time. Upgrade to RubyGems 2.1.0 " \
           "or higher to enable parallel gem installation."
         false
       end
@@ -212,7 +230,7 @@ module Bundler
     end
 
     def resolve_if_need(options)
-      if Bundler.default_lockfile.exist? && !options["update"] && !options[:inline]
+      if !options["update"] && !options[:inline] && !options["force"] && Bundler.default_lockfile.file?
         local = Bundler.ui.silence do
           begin
             tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)

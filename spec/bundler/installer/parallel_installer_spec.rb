@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/installer/parallel_installer"
 
-describe Bundler::ParallelInstaller do
+RSpec.describe Bundler::ParallelInstaller do
   let(:installer) { instance_double("Installer") }
   let(:all_specs) { [] }
   let(:size) { 1 }

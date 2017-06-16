@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "Bundler.setup" do
+RSpec.describe "Bundler.setup" do
   describe "with no arguments" do
     it "makes all groups available" do
       install_gemfile <<-G
@@ -109,6 +108,17 @@ describe "Bundler.setup" do
   end
 
   context "load order" do
+    def clean_load_path(lp)
+      without_bundler_load_path = ruby!("puts $LOAD_PATH").split("\n")
+      lp = lp - [
+        bundler_path.to_s,
+        bundler_path.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
+        tmp("rubygems/lib").to_s,
+        root.join("../lib").expand_path.to_s,
+      ] - without_bundler_load_path
+      lp.map! {|p| p.sub(/^#{system_gem_path}/, "") }
+    end
+
     it "puts loaded gems after -I and RUBYLIB" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
@@ -140,20 +150,14 @@ describe "Bundler.setup" do
         gem "rails"
       G
 
-      ruby <<-RUBY
+      ruby! <<-RUBY
         require 'rubygems'
         require 'bundler'
         Bundler.setup
         puts $LOAD_PATH
       RUBY
 
-      load_path = out.split("\n") - [
-        bundler_path.to_s,
-        bundler_path.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
-        tmp("rubygems/lib").to_s,
-        root.join("../lib").expand_path.to_s,
-      ]
-      load_path.map! {|lp| lp.sub(/^#{system_gem_path}/, "") }
+      load_path = clean_load_path(out.split("\n"))
 
       expect(load_path).to start_with(
         "/gems/rails-2.3.2/lib",
@@ -163,6 +167,29 @@ describe "Bundler.setup" do
         "/gems/actionmailer-2.3.2/lib",
         "/gems/activesupport-2.3.2/lib",
         "/gems/rake-10.0.2/lib"
+      )
+    end
+
+    it "falls back to order the load path alphabetically for backwards compatibility" do
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gem "weakling"
+        gem "duradura"
+        gem "terranova"
+      G
+
+      ruby! <<-RUBY
+        require 'rubygems'
+        require 'bundler/setup'
+        puts $LOAD_PATH
+      RUBY
+
+      load_path = clean_load_path(out.split("\n"))
+
+      expect(load_path).to start_with(
+        "/gems/weakling-0.0.3/lib",
+        "/gems/terranova-8/lib",
+        "/gems/duradura-7.0/lib"
       )
     end
   end
@@ -652,7 +679,7 @@ describe "Bundler.setup" do
     end
   end
 
-  # Rubygems returns loaded_from as a string
+  # RubyGems returns loaded_from as a string
   it "has loaded_from as a string on all specs" do
     build_git "foo"
     build_git "no-gemspec", :gemspec => false
@@ -673,6 +700,34 @@ describe "Bundler.setup" do
     expect(out).to be_empty
   end
 
+  it "does not load all gemspecs", :rubygems => ">= 2.3" do
+    install_gemfile! <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    run! <<-R
+      File.open(File.join(Gem.dir, "specifications", "broken.gemspec"), "w") do |f|
+        f.write <<-RUBY
+# -*- encoding: utf-8 -*-
+# stub: broken 1.0.0 ruby lib
+
+Gem::Specification.new do |s|
+  s.name = "broken"
+  s.version = "1.0.0"
+  raise "BROKEN GEMSPEC"
+end
+        RUBY
+      end
+    R
+
+    run! <<-R
+      puts "WIN"
+    R
+
+    expect(out).to eq("WIN")
+  end
+
   it "ignores empty gem paths" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -690,7 +745,7 @@ describe "Bundler.setup" do
       build_gem("requirepaths") do |s|
         s.write("lib/rq.rb", "puts 'yay'")
         s.write("src/rq.rb", "puts 'nooo'")
-        s.require_paths = %w(lib src)
+        s.require_paths = %w[lib src]
       end
     end
 
@@ -863,7 +918,7 @@ describe "Bundler.setup" do
         end
       R
 
-      expect(out).to eq("rack is not part of the bundle. Add it to Gemfile.")
+      expect(out).to eq("rack is not part of the bundle. Add it to your Gemfile.")
     end
 
     it "sets GEM_HOME appropriately" do
@@ -1080,8 +1135,8 @@ describe "Bundler.setup" do
     end
   end
 
-  describe "when Psych is not in the Gemfile", :ruby => "~> 2.2" do
-    it "does not load Psych" do
+  describe "with gemified standard libraries" do
+    it "does not load Psych", :ruby => "~> 2.2" do
       gemfile ""
       ruby <<-RUBY
         require 'bundler/setup'
@@ -1092,6 +1147,127 @@ describe "Bundler.setup" do
       pre_bundler, post_bundler = out.split("\n")
       expect(pre_bundler).to eq("undefined")
       expect(post_bundler).to match(/\d+\.\d+\.\d+/)
+    end
+
+    it "does not load openssl" do
+      install_gemfile! ""
+      ruby! <<-RUBY
+        require "bundler/setup"
+        puts defined?(OpenSSL) || "undefined"
+        require "openssl"
+        puts defined?(OpenSSL) || "undefined"
+      RUBY
+      expect(out).to eq("undefined\nconstant")
+    end
+
+    describe "default gem activation" do
+      let(:exemptions) do
+        if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7") || ENV["RGV"] == "master"
+          []
+        else
+          %w[io-console openssl]
+        end << "bundler"
+      end
+
+      let(:code) { strip_whitespace(<<-RUBY) }
+        require "rubygems"
+
+        if Gem::Specification.instance_methods.map(&:to_sym).include?(:activate)
+          Gem::Specification.send(:alias_method, :bundler_spec_activate, :activate)
+          Gem::Specification.send(:define_method, :activate) do
+            unless #{exemptions.inspect}.include?(name)
+              warn '-' * 80
+              warn "activating \#{full_name}"
+              warn *caller
+              warn '*' * 80
+            end
+            bundler_spec_activate
+          end
+        end
+
+        require "bundler/setup"
+        require "pp"
+        loaded_specs = Gem.loaded_specs.dup
+        #{exemptions.inspect}.each {|s| loaded_specs.delete(s) }
+        pp loaded_specs
+
+        # not a default gem, but harmful to have loaded
+        open_uri = $LOADED_FEATURES.grep(/open.uri/)
+        unless open_uri.empty?
+          warn "open_uri: \#{open_uri}"
+        end
+      RUBY
+
+      it "activates no gems with -rbundler/setup" do
+        install_gemfile! ""
+        ruby!(code)
+        expect(err).to eq("")
+        expect(out).to eq("{}")
+      end
+
+      it "activates no gems with bundle exec" do
+        install_gemfile! ""
+        create_file("script.rb", code)
+        bundle! "exec ruby ./script.rb"
+        expect(err).to eq("")
+        expect(out).to eq("{}")
+      end
+
+      it "activates no gems with bundle exec that is loaded" do
+        # TODO: remove once https://github.com/erikhuda/thor/pull/539 is released
+        exemptions << "io-console"
+
+        install_gemfile! ""
+        create_file("script.rb", "#!/usr/bin/env ruby\n\n#{code}")
+        FileUtils.chmod(0o777, bundled_app("script.rb"))
+        bundle! "exec ./script.rb", :artifice => nil
+        expect(err).to eq("")
+        expect(out).to eq("{}")
+      end
+
+      let(:default_gems) do
+        ruby!(<<-RUBY).split("\n")
+          if Gem::Specification.is_a?(Enumerable)
+            puts Gem::Specification.select(&:default_gem?).map(&:name)
+          end
+        RUBY
+      end
+
+      it "activates newer versions of default gems" do
+        build_repo4 do
+          default_gems.each do |g|
+            build_gem g, "999999"
+          end
+        end
+
+        install_gemfile! <<-G
+          source "file:#{gem_repo4}"
+          #{default_gems}.each do |g|
+            gem g, "999999"
+          end
+        G
+
+        expect(the_bundle).to include_gems(*default_gems.map {|g| "#{g} 999999" })
+      end
+
+      it "activates older versions of default gems" do
+        build_repo4 do
+          default_gems.each do |g|
+            build_gem g, "0.0.0.a"
+          end
+        end
+
+        default_gems.reject! {|g| exemptions.include?(g) }
+
+        install_gemfile! <<-G
+          source "file:#{gem_repo4}"
+          #{default_gems}.each do |g|
+            gem g, "0.0.0.a"
+          end
+        G
+
+        expect(the_bundle).to include_gems(*default_gems.map {|g| "#{g} 0.0.0.a" })
+      end
     end
   end
 

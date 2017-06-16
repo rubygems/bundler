@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/yaml_serializer"
 
-describe Bundler::YAMLSerializer do
+RSpec.describe Bundler::YAMLSerializer do
   subject(:serializer) { Bundler::YAMLSerializer }
 
   describe "#dump" do

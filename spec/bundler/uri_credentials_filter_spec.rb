@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::URICredentialsFilter do
+RSpec.describe Bundler::URICredentialsFilter do
   subject { described_class }
 
   describe "#credential_filtered_uri" do

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::SourceList do
+RSpec.describe Bundler::SourceList do
   before do
     allow(Bundler).to receive(:root) { Pathname.new "./tmp/bundled_app" }
 
