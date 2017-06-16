@@ -223,9 +223,11 @@ learn more about their operation in [bundle install(1)][bundle-install].
    Sets the `--key` parameter for `gem push` when using the `rake release`
    command with a private gemstash server.
 * `error_on_stderr` (`BUNDLE_ERROR_ON_STDERR`)
-   Print Bundler errors to stderr
+   Print Bundler errors to stderr.
 * `init_gems_rb` (`BUNDLE_NEW_GEMFILE_NAME`)
-   generate a new gems.rb on `bundle init` instead of the `Gemfile`
+   Generate a `gems.rb` instead of a `Gemfile` when running `bundle init`.
+* `prefer_gems_rb` (`BUNDLE_PREFER_GEMS_RB`)
+   Prefer `gems.rb` to `Gemfile` when Bundler is searching for a Gemfile.
 * `update_requires_all_flag` (`BUNDLE_UPDATE_REQUIRES_ALL_FLAG`)
    Require passing `--all` to `bundle update` when everything should be updated,
    and disallow passing no options to `bundle update`.

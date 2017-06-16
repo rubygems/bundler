@@ -19,8 +19,14 @@ end
 
 module Bundler
   module SharedHelpers
-    def default_gemfile
+    def root
       gemfile = find_gemfile
+      raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
+      Pathname.new(gemfile).untaint.expand_path.parent
+    end
+
+    def default_gemfile
+      gemfile = find_gemfile(:order_matters)
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
       Pathname.new(gemfile).untaint
     end
@@ -137,7 +143,7 @@ module Bundler
     end
 
     def print_major_deprecations!
-      deprecate_gemfile(find_gemfile) if find_gemfile == find_file("Gemfile")
+      deprecate_gemfile(find_gemfile) if find_gemfile(:order_matters) == find_file("Gemfile")
       if RUBY_VERSION < "2"
         major_deprecation("Bundler will only support ruby >= 2.0, you are running #{RUBY_VERSION}")
       end
@@ -172,10 +178,16 @@ module Bundler
 
   private
 
-    def find_gemfile
+    def find_gemfile(order_matters = false)
       given = ENV["BUNDLE_GEMFILE"]
       return given if given && !given.empty?
-      find_file("Gemfile", "gems.rb")
+      names = gemfile_names
+      names.reverse! if order_matters && Bundler.feature_flag.prefer_gems_rb?
+      find_file(*names)
+    end
+
+    def gemfile_names
+      ["Gemfile", "gems.rb"]
     end
 
     def find_file(*names)
@@ -228,7 +240,7 @@ module Bundler
       end
 
       # Set BUNDLE_GEMFILE
-      Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", find_gemfile.to_s
+      Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", find_gemfile(:order_matters).to_s
       Bundler::SharedHelpers.set_env "BUNDLER_VERSION", Bundler::VERSION
     end
 

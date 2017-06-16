@@ -28,6 +28,7 @@ module Bundler
       no_prune
       only_update_to_newer_versions
       plugins
+      prefer_gems_rb
       silence_root_warning
       update_requires_all_flag
     ].freeze
