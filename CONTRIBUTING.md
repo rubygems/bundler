@@ -1,21 +1,17 @@
-# Creating Issues
+# Contributing to Bundler
 
-If you're having a problem, please see [ISSUES](https://github.com/bundler/bundler/blob/master/ISSUES.md) for troubleshooting steps and a guide for how to submit a ticket that will help us solve the problem you are having as quickly as possible.
+Welcome to Bundler! We are so happy that you're here. We know it can be daunting to joining a new open source project, so here's a quick overview of what you can expect from this documentation.
 
-# Requesting Features
+Bundler welcomes contributions from *everyone*. While contributing, please follow the project [code of conduct](http://bundler.io/conduct.html), so that everyone can be included.
 
-Head on over to the [Bundler
-features](https://github.com/bundler/bundler-features) project, or any of the
-lists or channels listed below. Feature-wise we consider Bundler stable, so the
-core team does not tend to work on feature suggestions. Pull requests welcome
-though!
+## Quick start
 
-# Discussing Bundler
+Some guides you might find useful:
 
-If you'd like to discuss features, ask questions, or just engage in general Bundler-focused discussion, please see the [#bundler](irc://irc.freenode.net/#bundler) IRC channel on Freenode, and the [Bundler mailing list](http://groups.google.com/group/ruby-bundler) on Google Groups.
+* [Submitting pull requests](doc/development/PULL_REQUESTS.md)
+* [Filing an issue](doc/contributing/ISSUES.md)
+* [Bug triage](doc/contributing/BUG_TRIAGE.md)
 
-# Helping Out
+## Comprehensive guides
 
-If you'd like to help make Bundler better, you totally rock! Please check out the [DEVELOPMENT](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md) file for an introduction to the project, guidelines for contributing, and suggestions for things anyone can do that would be helpful.
-
-Thanks for helping us make Bundler better.
+Not finding what you're looking for? More comprehensive guides are [available here](doc/README.md).

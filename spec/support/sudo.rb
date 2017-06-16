@@ -1,11 +1,8 @@
+# frozen_string_literal: true
 module Spec
   module Sudo
     def self.present?
       @which_sudo ||= Bundler.which("sudo")
-    end
-
-    def self.test_sudo?
-      present? && ENV['BUNDLER_SUDO_TESTS']
     end
 
     def sudo(cmd)

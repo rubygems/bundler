@@ -1,21 +1,22 @@
-require 'set'
+# frozen_string_literal: true
+require "set"
 module Bundler
   class Graph
     GRAPH_NAME = :Gemfile
 
-    def initialize(env, output_file, show_version = false, show_requirements = false, output_format = "png")
+    def initialize(env, output_file, show_version = false, show_requirements = false, output_format = "png", without = [])
       @env               = env
       @output_file       = output_file
       @show_version      = show_version
       @show_requirements = show_requirements
       @output_format     = output_format
+      @without_groups    = without.map(&:to_sym)
 
       @groups            = []
-      @relations         = Hash.new {|h, k| h[k] = Set.new}
+      @relations         = Hash.new {|h, k| h[k] = Set.new }
       @node_options      = {}
       @edge_options      = {}
 
-      _patching_gem_dependency_class
       _populate_relations
     end
 
@@ -25,34 +26,34 @@ module Bundler
       GraphVizClient.new(self).run
     end
 
-    private
+  private
 
     def _populate_relations
       parent_dependencies = _groups.values.to_set.flatten
-      while true
-        if parent_dependencies.empty?
-          break
-        else
-          tmp = Set.new
-          parent_dependencies.each do |dependency|
-            child_dependencies = dependency.to_spec.runtime_dependencies.to_set
-            @relations[dependency.name] += child_dependencies.map(&:name).to_set
-            tmp += child_dependencies
+      loop do
+        break if parent_dependencies.empty?
 
-            @node_options[dependency.name] = _make_label(dependency, :node)
-            child_dependencies.each do |c_dependency|
-              @edge_options["#{dependency.name}_#{c_dependency.name}"] = _make_label(c_dependency, :edge)
-            end
+        tmp = Set.new
+        parent_dependencies.each do |dependency|
+          child_dependencies = spec_for_dependency(dependency).runtime_dependencies.to_set
+          @relations[dependency.name] += child_dependencies.map(&:name).to_set
+          tmp += child_dependencies
+
+          @node_options[dependency.name] = _make_label(dependency, :node)
+          child_dependencies.each do |c_dependency|
+            @edge_options["#{dependency.name}_#{c_dependency.name}"] = _make_label(c_dependency, :edge)
           end
-          parent_dependencies = tmp
         end
+        parent_dependencies = tmp
       end
     end
 
     def _groups
-      relations = Hash.new {|h, k| h[k] = Set.new}
+      relations = Hash.new {|h, k| h[k] = Set.new }
       @env.current_dependencies.each do |dependency|
         dependency.groups.each do |group|
+          next if @without_groups.include?(group)
+
           relations[group.to_s].add(dependency)
           @relations[group.to_s].add(dependency.name)
 
@@ -69,7 +70,7 @@ module Bundler
       when :node
         if symbol_or_string_or_dependency.is_a?(Gem::Dependency)
           label = symbol_or_string_or_dependency.name.dup
-          label << "\n#{symbol_or_string_or_dependency.to_spec.version.to_s}" if @show_version
+          label << "\n#{spec_for_dependency(symbol_or_string_or_dependency).version}" if @show_version
         else
           label = symbol_or_string_or_dependency.to_s
         end
@@ -85,25 +86,8 @@ module Bundler
       label.nil? ? {} : { :label => label }
     end
 
-    def _patching_gem_dependency_class
-      # method borrow from rubygems/dependency.rb
-      # redefinition of matching_specs will also redefine to_spec and to_specs
-      Gem::Dependency.class_eval do
-        def matching_specs platform_only = false
-          matches = Bundler.load.specs.select { |spec|
-            self.name === spec.name and # TODO: == instead of ===
-              requirement.satisfied_by? spec.version
-          }
-
-          if platform_only
-            matches.reject! { |spec|
-              not Gem::Platform.match spec.platform
-            }
-          end
-
-          matches = matches.sort_by { |s| s.sort_obj } # HACK: shouldn't be needed
-        end
-      end
+    def spec_for_dependency(dependency)
+      @env.requested_specs.find {|s| s.name == dependency.name }
     end
 
     class GraphVizClient
@@ -118,9 +102,9 @@ module Bundler
       end
 
       def g
-        @g ||= ::GraphViz.digraph(@graph_name, {:concentrate => true, :normalize => true, :nodesep => 0.55}) do |g|
+        @g ||= ::GraphViz.digraph(@graph_name, :concentrate => true, :normalize => true, :nodesep => 0.55) do |g|
           g.edge[:weight]   = 2
-          g.edge[:fontname] = g.node[:fontname] = 'Arial, Helvetica, SansSerif'
+          g.edge[:fontname] = g.node[:fontname] = "Arial, Helvetica, SansSerif"
           g.edge[:fontsize] = 12
         end
       end
@@ -128,19 +112,20 @@ module Bundler
       def run
         @groups.each do |group|
           g.add_nodes(
-            group,
-            {:style     => 'filled',
-             :fillcolor => '#B9B9D5',
-             :shape     => "box3d",
-             :fontsize  => 16}.merge(@node_options[group])
+            group, {
+              :style     => "filled",
+              :fillcolor => "#B9B9D5",
+              :shape     => "box3d",
+              :fontsize  => 16
+            }.merge(@node_options[group])
           )
         end
 
         @relations.each do |parent, children|
           children.each do |child|
             if @groups.include?(parent)
-              g.add_nodes(child, {:style => 'filled', :fillcolor => '#B9B9D5'}.merge(@node_options[child]))
-              g.add_edges(parent, child, {:constraint => false}.merge(@edge_options["#{parent}_#{child}"]))
+              g.add_nodes(child, { :style => "filled", :fillcolor => "#B9B9D5" }.merge(@node_options[child]))
+              g.add_edges(parent, child, { :constraint => false }.merge(@edge_options["#{parent}_#{child}"]))
             else
               g.add_nodes(child, @node_options[child])
               g.add_edges(parent, child, @edge_options["#{parent}_#{child}"])

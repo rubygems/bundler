@@ -3,23 +3,19 @@
 # https://help.github.com/articles/ignoring-files and find useful gitignore
 # samples at https://github.com/github/gitignore
 
-# system crap
-.DS_Store
-.*.swp
-
 # files created by running the specs
-tmp/
+/tmp/
 
-# built gems
-pkg/
-*.gem
-
-# rubinius bytecode
-*.rbc
-.rbx/
+# gems built by `rake build`
+/pkg/
 
 # output from ronn
-lib/bundler/man/
+/lib/bundler/man/
+man/*
+!man/*.ronn
 
-# output from ci_reporter
-spec/reports/
+# rspec failure tracking
+.rspec_status
+
+# files generated during packaging
+/lib/bundler/generated/

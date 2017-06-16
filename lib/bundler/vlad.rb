@@ -1,8 +1,9 @@
+# frozen_string_literal: true
 # Vlad task for Bundler.
 #
-# Just add "require 'bundler/vlad'" in your Vlad deploy.rb, and
+# Add "require 'bundler/vlad'" in your Vlad deploy.rb, and
 # include the vlad:bundle:install task in your vlad:deploy task.
-require 'bundler/deployment'
+require "bundler/deployment"
 
 include Rake::DSL if defined? Rake::DSL
 

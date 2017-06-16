@@ -1,6 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
 
-describe "bundle binstubs <gem>" do
+RSpec.describe "bundle binstubs <gem>" do
   context "when the gem exists in the lockfile" do
     it "sets up the binstub" do
       install_gemfile <<-G
@@ -45,9 +45,9 @@ describe "bundle binstubs <gem>" do
         gem "rack"
       G
 
-      bundle "binstubs", :exitstatus => true
-      expect(exitstatus).to eq(1)
-      expect(out).to eq("`bundle binstubs` needs at least one gem to run.")
+      bundle "binstubs"
+      expect(exitstatus).to eq(1) if exitstatus
+      expect(out).to include("`bundle binstubs` needs at least one gem to run.")
     end
 
     it "does not bundle the bundler binary" do
@@ -58,17 +58,17 @@ describe "bundle binstubs <gem>" do
       bundle "binstubs bundler"
 
       expect(bundled_app("bin/bundle")).not_to exist
-      expect(out).to eq("Sorry, Bundler can only be run via Rubygems.")
+      expect(out).to include("Sorry, Bundler can only be run via RubyGems.")
     end
 
     it "installs binstubs from git gems" do
       FileUtils.mkdir_p(lib_path("foo/bin"))
       FileUtils.touch(lib_path("foo/bin/foo"))
       build_git "foo", "1.0", :path => lib_path("foo") do |s|
-        s.executables = %w(foo)
+        s.executables = %w[foo]
       end
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo')}"
+        gem "foo", :git => "#{lib_path("foo")}"
       G
 
       bundle "binstubs foo"
@@ -79,16 +79,42 @@ describe "bundle binstubs <gem>" do
     it "installs binstubs from path gems" do
       FileUtils.mkdir_p(lib_path("foo/bin"))
       FileUtils.touch(lib_path("foo/bin/foo"))
-      build_lib "foo" , "1.0", :path => lib_path("foo") do |s|
-        s.executables = %w(foo)
+      build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+        s.executables = %w[foo]
       end
       install_gemfile <<-G
-        gem "foo", :path => "#{lib_path('foo')}"
+        gem "foo", :path => "#{lib_path("foo")}"
       G
 
       bundle "binstubs foo"
 
       expect(bundled_app("bin/foo")).to exist
+    end
+
+    it "sets correct permissions for binstubs" do
+      with_umask(0o002) do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        bundle "binstubs rack"
+        binary = bundled_app("bin/rackup")
+        expect(File.stat(binary).mode.to_s(8)).to eq("100775")
+      end
+    end
+  end
+
+  context "when the gem doesn't exist" do
+    it "displays an error with correct status" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+      G
+
+      bundle "binstubs doesnt_exist"
+
+      expect(exitstatus).to eq(7) if exitstatus
+      expect(out).to include("Could not find gem 'doesnt_exist'.")
     end
   end
 
@@ -118,10 +144,26 @@ describe "bundle binstubs <gem>" do
     end
   end
 
+  context "after installing with --standalone" do
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      bundle "install --standalone"
+    end
+
+    it "includes the standalone path" do
+      bundle "binstubs rack --standalone"
+      standalone_line = File.read(bundled_app("bin/rackup")).each_line.find {|line| line.include? "$:.unshift" }.strip
+      expect(standalone_line).to eq %($:.unshift File.expand_path "../../bundle", path.realpath)
+    end
+  end
+
   context "when the bin already exists" do
     it "doesn't overwrite and warns" do
       FileUtils.mkdir_p(bundled_app("bin"))
-      File.open(bundled_app("bin/rackup"), 'wb') do |file|
+      File.open(bundled_app("bin/rackup"), "wb") do |file|
         file.print "OMG"
       end
 
@@ -141,7 +183,7 @@ describe "bundle binstubs <gem>" do
     context "when using --force" do
       it "overwrites the binstub" do
         FileUtils.mkdir_p(bundled_app("bin"))
-        File.open(bundled_app("bin/rackup"), 'wb') do |file|
+        File.open(bundled_app("bin/rackup"), "wb") do |file|
           file.print "OMG"
         end
 
@@ -166,8 +208,8 @@ describe "bundle binstubs <gem>" do
       G
 
       bundle "binstubs rack-obama"
-      expect(out).to include('rack-obama has no executables')
-      expect(out).to include('rack has: rackup')
+      expect(out).to include("rack-obama has no executables")
+      expect(out).to include("rack has: rackup")
     end
 
     it "works if child gems don't have bins" do
@@ -177,7 +219,7 @@ describe "bundle binstubs <gem>" do
       G
 
       bundle "binstubs actionpack"
-      expect(out).to include('no executables for the gem actionpack')
+      expect(out).to include("no executables for the gem actionpack")
     end
 
     it "works if the gem has development dependencies" do
@@ -187,7 +229,32 @@ describe "bundle binstubs <gem>" do
       G
 
       bundle "binstubs with_development_dependency"
-      expect(out).to include('no executables for the gem with_development_dependency')
+      expect(out).to include("no executables for the gem with_development_dependency")
+    end
+  end
+
+  context "when BUNDLE_INSTALL is specified" do
+    it "performs an automatic bundle install" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "config auto_install 1"
+      bundle "binstubs rack"
+      expect(out).to include("Installing rack 1.0.0")
+      expect(the_bundle).to include_gems "rack 1.0.0"
+    end
+
+    it "does nothing when already up to date" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "config auto_install 1"
+      bundle "binstubs rack", :env => { "BUNDLE_INSTALL" => 1 }
+      expect(out).not_to include("Installing rack 1.0.0")
     end
   end
 end
