@@ -6,17 +6,6 @@ if defined?(Encoding) && Encoding.default_external.name != "UTF-8"
 end
 
 RSpec.describe "The library itself" do
-  def check_for_spec_defs_with_single_quotes(filename)
-    failing_lines = []
-
-    File.readlines(filename).each_with_index do |line, number|
-      failing_lines << number + 1 if line =~ /^ *(describe|it|context) {1}'{1}/
-    end
-
-    return if failing_lines.empty?
-    "#{filename} uses inconsistent single quotes on lines #{failing_lines.join(", ")}"
-  end
-
   def check_for_debugging_mechanisms(filename)
     debugging_mechanisms_regex = /
       (binding\.pry)|
@@ -116,7 +105,7 @@ RSpec.describe "The library itself" do
   end
 
   it "has no malformed whitespace" do
-    exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE/
+    exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE|vcr_cassettes/
     error_messages = []
     Dir.chdir(File.expand_path("../..", __FILE__)) do
       `git ls-files -z`.split("\x0").each do |filename|
@@ -128,20 +117,8 @@ RSpec.describe "The library itself" do
     expect(error_messages.compact).to be_well_formed
   end
 
-  it "uses double-quotes consistently in specs" do
-    included = /spec/
-    error_messages = []
-    Dir.chdir(File.expand_path("../", __FILE__)) do
-      `git ls-files -z`.split("\x0").each do |filename|
-        next unless filename =~ included
-        error_messages << check_for_spec_defs_with_single_quotes(filename)
-      end
-    end
-    expect(error_messages.compact).to be_well_formed
-  end
-
   it "does not include any leftover debugging or development mechanisms" do
-    exempt = %r{quality_spec.rb|support/helpers}
+    exempt = %r{quality_spec.rb|support/helpers|vcr_cassettes}
     error_messages = []
     Dir.chdir(File.expand_path("../", __FILE__)) do
       `git ls-files -z`.split("\x0").each do |filename|
@@ -154,7 +131,7 @@ RSpec.describe "The library itself" do
 
   it "does not include any unresolved merge conflicts" do
     error_messages = []
-    exempt = %r{lock/lockfile_spec|quality_spec}
+    exempt = %r{lock/lockfile_spec|quality_spec|vcr_cassettes}
     Dir.chdir(File.expand_path("../", __FILE__)) do
       `git ls-files -z`.split("\x0").each do |filename|
         next if filename =~ exempt

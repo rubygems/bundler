@@ -103,8 +103,17 @@ begin
       rm_rf "tmp"
     end
 
-    desc "Run the real-world spec suite (requires internet)"
+    desc "Run the real-world spec suite"
     task :realworld => %w[set_realworld spec]
+
+    namespace :realworld do
+      desc "Re-record cassettes for the realworld specs"
+      task :record => %w[set_record realworld]
+
+      task :set_record do
+        ENV["BUNDLER_SPEC_FORCE_RECORD"] = "TRUE"
+      end
+    end
 
     task :set_realworld do
       ENV["BUNDLER_REALWORLD_TESTS"] = "1"
@@ -189,6 +198,9 @@ begin
     desc "Run the tests on Travis CI against a RubyGem version (using ENV['RGV'])"
     task :travis do
       rg = ENV["RGV"] || raise("RubyGems version is required on Travis!")
+
+      # disallow making network requests on CI
+      ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
 
       if RUBY_VERSION >= "2.0.0"
         puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
@@ -354,10 +366,8 @@ task :update_certs => "spec:rubygems:clone_rubygems_master" do
   Bundler::SSLCerts::CertificateManager.update_from!(RUBYGEMS_REPO)
 end
 
-require "bundler/gem_tasks"
-task :build => ["man:build"]
-task :release => ["man:require", "man:build"]
-
 task :default => :spec
 
 Dir["task/*.{rb,rake}"].each(&method(:load))
+
+task :generate_files => Rake::Task.tasks.select {|t| t.name.start_with?("lib/bundler/generated") }

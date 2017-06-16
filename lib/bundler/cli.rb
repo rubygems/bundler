@@ -25,7 +25,7 @@ module Bundler
 
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
       if custom_gemfile && !custom_gemfile.empty?
-        ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile)
+        Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", File.expand_path(custom_gemfile)
         Bundler.reset_paths!
       end
 
@@ -221,6 +221,8 @@ module Bundler
       "Do not allow any gem to be updated past latest --patch | --minor | --major"
     method_option "conservative", :type => :boolean, :banner =>
       "Use bundle install conservative update behavior and do not allow shared dependencies to be updated."
+    method_option "all", :type => :boolean, :banner =>
+      "Update everything."
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run
@@ -395,7 +397,10 @@ module Bundler
 
     desc "version", "Prints the bundler's version information"
     def version
-      Bundler.ui.info "Bundler version #{Bundler::VERSION}"
+      if ARGV.include?("version")
+        build_info = " (#{BuildMetadata.built_at} commit #{BuildMetadata.git_commit_sha})"
+      end
+      Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
     end
     map %w[-v --version] => :version
 
@@ -555,10 +560,10 @@ module Bundler
       Issue.new.run
     end
 
-    desc "pristine", "Restores installed gems to pristine condition from files located in the gem cache. Gem installed from a git repository will be issued `git checkout --force`."
-    def pristine
+    desc "pristine [GEMS...]", "Restores installed gems to pristine condition from files located in the gem cache. Gem installed from a git repository will be issued `git checkout --force`."
+    def pristine(*gems)
       require "bundler/cli/pristine"
-      Pristine.new.run
+      Pristine.new(gems).run
     end
 
     if Bundler.feature_flag.plugins?

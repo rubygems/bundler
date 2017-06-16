@@ -226,6 +226,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
    Print Bundler errors to stderr
 * `init_gems_rb` (`BUNDLE_NEW_GEMFILE_NAME`)
    generate a new gems.rb on `bundle init` instead of the `Gemfile`
+* `update_requires_all_flag` (`BUNDLE_UPDATE_REQUIRES_ALL_FLAG`)
+   Require passing `--all` to `bundle update` when everything should be updated,
+   and disallow passing no options to `bundle update`.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
