@@ -366,10 +366,8 @@ task :update_certs => "spec:rubygems:clone_rubygems_master" do
   Bundler::SSLCerts::CertificateManager.update_from!(RUBYGEMS_REPO)
 end
 
-require "bundler/gem_tasks"
-task :build => ["man:build"]
-task :release => ["man:require", "man:build"]
-
 task :default => :spec
 
 Dir["task/*.{rb,rake}"].each(&method(:load))
+
+task :generate_files => Rake::Task.tasks.select {|t| t.name.start_with?("lib/bundler/generated") }
