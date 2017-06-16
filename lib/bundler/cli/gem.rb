@@ -71,10 +71,10 @@ module Bundler
         "bin/setup.tt" => "bin/setup"
       }
 
-      executables = %w(
+      executables = %w[
         bin/console
         bin/setup
-      )
+      ]
 
       templates.merge!("gitignore.tt" => ".gitignore") if Bundler.git_present?
 

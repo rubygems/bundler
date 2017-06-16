@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundler version trampolining" do
   before do
@@ -83,7 +82,7 @@ RSpec.describe "bundler version trampolining" do
       if Bundler::RubygemsIntegration.provides?("< 2.6.4")
         # necessary since we intall with 2.6.4 but the specs can run against
         # older versions that match againt the "gem" invocation
-        %w(bundle bundler).each do |exe|
+        %w[bundle bundler].each do |exe|
           system_gem_path.join("bin", exe).open("a") do |f|
             f << %(\ngem "bundler", ">= 0.a"\n)
           end

@@ -3,7 +3,7 @@ module Spec
   module Helpers
     def reset!
       Dir.glob("#{tmp}/{gems/*,*}", File::FNM_DOTMATCH).each do |dir|
-        next if %w(base remote1 gems rubygems . ..).include?(File.basename(dir))
+        next if %w[base remote1 gems rubygems . ..].include?(File.basename(dir))
         if ENV["BUNDLER_SUDO_TESTS"]
           `sudo rm -rf "#{dir}"`
         else
@@ -91,11 +91,23 @@ module Spec
         bundle_bin = "-S bundle"
       end
 
+      env = options.delete(:env) || {}
+      env["PATH"].gsub!("#{Path.root}/exe", "") if env["PATH"] && system_bundler
+
       requires = options.delete(:requires) || []
-      if artifice = options.delete(:artifice) { "fail" unless RSpec.current_example.metadata[:realworld] }
-        requires << File.expand_path("../artifice/#{artifice}.rb", __FILE__)
-      end
       requires << "support/hax"
+
+      artifice = options.delete(:artifice) do
+        if RSpec.current_example.metadata[:realworld]
+          "vcr"
+        else
+          "fail"
+        end
+      end
+      if artifice
+        requires << File.expand_path("../artifice/#{artifice}", __FILE__)
+      end
+
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
 
       load_path = []
@@ -103,8 +115,8 @@ module Spec
       load_path << spec
       load_path_str = "-I#{load_path.join(File::PATH_SEPARATOR)}"
 
-      env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}'" }.join(" ")
-      env["PATH"].gsub!("#{Path.root}/exe", "") if env["PATH"] && system_bundler
+      env = env.map {|k, v| "#{k}='#{v}'" }.join(" ")
+
       args = options.map do |k, v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
@@ -250,6 +262,8 @@ module Spec
         path = if g == :bundler
           Dir.chdir(root) { gem_command! :build, "#{root}/bundler.gemspec" }
           bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
+        elsif g.to_s =~ %r{\A/.*\.gem\z}
+          g
         else
           "#{gem_repo}/gems/#{g}.gem"
         end

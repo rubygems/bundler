@@ -162,11 +162,26 @@ module Bundler
     # that said, it's a rare situation (other than rake), and parallel
     # installation is SO MUCH FASTER. so we let people opt in.
     def install(options)
-      Bundler.rubygems.load_plugins
+      load_plugins
       force = options["force"]
       jobs = 1
       jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?
       install_in_parallel jobs, options[:standalone], force
+    end
+
+    def load_plugins
+      Bundler.rubygems.load_plugins
+
+      requested_path_gems = @definition.requested_specs.select {|s| s.source.is_a?(Source::Path) }
+      path_plugin_files = requested_path_gems.map do |spec|
+        begin
+          Bundler.rubygems.spec_matches_for_glob(spec, "rubygems_plugin#{Bundler.rubygems.suffix_pattern}")
+        rescue TypeError
+          error_message = "#{spec.name} #{spec.version} has an invalid gemspec"
+          raise Gem::InvalidSpecificationException, error_message
+        end
+      end.flatten
+      Bundler.rubygems.load_plugin_files(path_plugin_files)
     end
 
     def ensure_specs_are_compatible!
@@ -215,7 +230,7 @@ module Bundler
     end
 
     def resolve_if_need(options)
-      if !options["update"] && !options[:inline] && Bundler.default_lockfile.file?
+      if !options["update"] && !options[:inline] && !options["force"] && Bundler.default_lockfile.file?
         local = Bundler.ui.silence do
           begin
             tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)

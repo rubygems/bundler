@@ -18,7 +18,7 @@ module Bundler
         @allow_remote = false
 
         # Stringify options that could be set as symbols
-        %w(ref branch tag revision).each {|k| options[k] = options[k].to_s if options[k] }
+        %w[ref branch tag revision].each {|k| options[k] = options[k].to_s if options[k] }
 
         @uri        = options["uri"] || ""
         @branch     = options["branch"]
@@ -39,7 +39,7 @@ module Bundler
         out = String.new("GIT\n")
         out << "  remote: #{@uri}\n"
         out << "  revision: #{revision}\n"
-        %w(ref branch tag submodules).each do |opt|
+        %w[ref branch tag submodules].each do |opt|
           out << "  #{opt}: #{options[opt]}\n" if options[opt]
         end
         out << "  glob: #{@glob}\n" unless @glob == DEFAULT_GLOB

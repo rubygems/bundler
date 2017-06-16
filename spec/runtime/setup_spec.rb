@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "Bundler.setup" do
   describe "with no arguments" do
@@ -109,6 +108,17 @@ RSpec.describe "Bundler.setup" do
   end
 
   context "load order" do
+    def clean_load_path(lp)
+      without_bundler_load_path = ruby!("puts $LOAD_PATH").split("\n")
+      lp = lp - [
+        bundler_path.to_s,
+        bundler_path.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
+        tmp("rubygems/lib").to_s,
+        root.join("../lib").expand_path.to_s,
+      ] - without_bundler_load_path
+      lp.map! {|p| p.sub(/^#{system_gem_path}/, "") }
+    end
+
     it "puts loaded gems after -I and RUBYLIB" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
@@ -140,20 +150,14 @@ RSpec.describe "Bundler.setup" do
         gem "rails"
       G
 
-      ruby <<-RUBY
+      ruby! <<-RUBY
         require 'rubygems'
         require 'bundler'
         Bundler.setup
         puts $LOAD_PATH
       RUBY
 
-      load_path = out.split("\n") - [
-        bundler_path.to_s,
-        bundler_path.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
-        tmp("rubygems/lib").to_s,
-        root.join("../lib").expand_path.to_s,
-      ]
-      load_path.map! {|lp| lp.sub(/^#{system_gem_path}/, "") }
+      load_path = clean_load_path(out.split("\n"))
 
       expect(load_path).to start_with(
         "/gems/rails-2.3.2/lib",
@@ -163,6 +167,29 @@ RSpec.describe "Bundler.setup" do
         "/gems/actionmailer-2.3.2/lib",
         "/gems/activesupport-2.3.2/lib",
         "/gems/rake-10.0.2/lib"
+      )
+    end
+
+    it "falls back to order the load path alphabetically for backwards compatibility" do
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gem "weakling"
+        gem "duradura"
+        gem "terranova"
+      G
+
+      ruby! <<-RUBY
+        require 'rubygems'
+        require 'bundler/setup'
+        puts $LOAD_PATH
+      RUBY
+
+      load_path = clean_load_path(out.split("\n"))
+
+      expect(load_path).to start_with(
+        "/gems/weakling-0.0.3/lib",
+        "/gems/terranova-8/lib",
+        "/gems/duradura-7.0/lib"
       )
     end
   end
@@ -718,7 +745,7 @@ end
       build_gem("requirepaths") do |s|
         s.write("lib/rq.rb", "puts 'yay'")
         s.write("src/rq.rb", "puts 'nooo'")
-        s.require_paths = %w(lib src)
+        s.require_paths = %w[lib src]
       end
     end
 
@@ -1138,7 +1165,7 @@ end
         if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7") || ENV["RGV"] == "master"
           []
         else
-          %w(io-console openssl)
+          %w[io-console openssl]
         end << "bundler"
       end
 

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "gemcutter's dependency API" do
   let(:source_hostname) { "localgemserver.test" }

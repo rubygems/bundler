@@ -262,9 +262,6 @@ module Bundler
     end
 
     def setup_manpath
-      # Store original MANPATH for restoration later in with_clean_env()
-      ENV["BUNDLER_ORIG_MANPATH"] = ENV["MANPATH"]
-
       # Add man/ subdirectories from activated bundles to MANPATH for man(1)
       manuals = $LOAD_PATH.map do |path|
         man_subdir = path.sub(/lib$/, "man")
@@ -272,7 +269,7 @@ module Bundler
       end.compact
 
       return if manuals.empty?
-      ENV["MANPATH"] = manuals.concat(
+      Bundler::SharedHelpers.set_env "MANPATH", manuals.concat(
         ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
       ).uniq.join(File::PATH_SEPARATOR)
     end

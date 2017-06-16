@@ -1,3 +1,16 @@
+## 1.15.1 (2017-06-02)
+
+Bugfixes:
+
+  - `bundle lock --update GEM` will fail gracefully when the gem is not in the lockfile (#5693, @segiddins)
+  - `bundle init --gemspec` will fail gracefully when the gemspec is invalid (@colby-swandale)
+  - `bundle install --force` works when the gemfile contains git gems (#5678, @segiddins)
+  - `bundle env` will print well-formed markdown when there are no settings (#5677, @segiddins)
+
+## 1.15.0 (2017-05-19)
+
+This space intentionally left blank.
+
 ## 1.15.0.pre.4 (2017-05-10)
 
 Bugfixes:

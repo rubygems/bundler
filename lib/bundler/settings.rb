@@ -6,7 +6,7 @@ module Bundler
     autoload :Mirror,  "bundler/mirror"
     autoload :Mirrors, "bundler/mirror"
 
-    BOOL_KEYS = %w(
+    BOOL_KEYS = %w[
       allow_offline_install
       auto_install
       cache_all
@@ -16,25 +16,28 @@ module Bundler
       disable_local_branch_check
       disable_shared_gems
       disable_version_check
+      error_on_stderr
       force_ruby_platform
       frozen
       gem.coc
       gem.mit
       ignore_messages
+      init_gems_rb
       major_deprecations
       no_install
       no_prune
       only_update_to_newer_versions
       plugins
       silence_root_warning
-    ).freeze
+      update_requires_all_flag
+    ].freeze
 
-    NUMBER_KEYS = %w(
+    NUMBER_KEYS = %w[
       redirect
       retry
       ssl_verify_mode
       timeout
-    ).freeze
+    ].freeze
 
     DEFAULT_CONFIG = {
       :redirect => 5,
@@ -74,6 +77,8 @@ module Bundler
     end
 
     def []=(key, value)
+      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
+
       if cli_flags_given
         command = if value.nil?
           "bundle config --delete #{key}"
@@ -87,7 +92,7 @@ module Bundler
           "you want remembered between commands using `bundle config " \
           "<setting name> <setting value>`, i.e. `#{command}`"
       end
-      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
+
       set_key(key, value, @local_config, local_config_file)
     end
     alias_method :set_local, :[]=
@@ -317,9 +322,9 @@ module Bundler
       end
     end
 
-    PER_URI_OPTIONS = %w(
+    PER_URI_OPTIONS = %w[
       fallback_timeout
-    ).freeze
+    ].freeze
 
     NORMALIZE_URI_OPTIONS_PATTERN =
       /

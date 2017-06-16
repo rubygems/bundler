@@ -13,9 +13,10 @@ require "bundler/rubygems_integration"
 require "bundler/version"
 require "bundler/constants"
 require "bundler/current_ruby"
+require "bundler/build_metadata"
 
 module Bundler
-  environment_preserver = EnvironmentPreserver.new(ENV, %w(PATH GEM_PATH))
+  environment_preserver = EnvironmentPreserver.new(ENV, EnvironmentPreserver::BUNDLER_KEYS)
   ORIGINAL_ENV = environment_preserver.restore
   ENV.replace(environment_preserver.backup)
   SUDO_MUTEX = Mutex.new
@@ -517,7 +518,7 @@ EOF
         nil
       end
 
-      ENV["GEM_HOME"] = File.expand_path(bundle_path, root)
+      Bundler::SharedHelpers.set_env "GEM_HOME", File.expand_path(bundle_path, root)
       Bundler.rubygems.clear_paths
     end
 

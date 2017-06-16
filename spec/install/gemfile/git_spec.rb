@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle install with git sources" do
   describe "when floating on master" do
@@ -1145,11 +1144,11 @@ RSpec.describe "bundle install with git sources" do
           end
           `git commit -m 'commit for iteration #{i}' ext/foo.c`
         end
-        git_sha = git_reader.ref_for("HEAD")
+        git_commit_sha = git_reader.ref_for("HEAD")
 
         install_gemfile <<-G
           source "file://#{gem_repo1}"
-          gem "foo", :git => "#{lib_path("foo-1.0")}", :ref => "#{git_sha}"
+          gem "foo", :git => "#{lib_path("foo-1.0")}", :ref => "#{git_commit_sha}"
         G
 
         run <<-R

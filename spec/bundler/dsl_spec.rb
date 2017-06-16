@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe Bundler::Dsl do
   before do
@@ -206,7 +205,7 @@ RSpec.describe Bundler::Dsl do
     # end
     describe "#git" do
       it "from a single repo" do
-        rails_gems = %w(railties action_pack active_model)
+        rails_gems = %w[railties action_pack active_model]
         subject.git "https://github.com/rails/rails.git" do
           rails_gems.each {|rails_gem| subject.send :gem, rails_gem }
         end
@@ -221,7 +220,7 @@ RSpec.describe Bundler::Dsl do
     # end
     describe "#github" do
       it "from github" do
-        spree_gems = %w(spree_core spree_api spree_backend)
+        spree_gems = %w[spree_core spree_api spree_backend]
         subject.github "spree" do
           spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
         end

@@ -39,7 +39,7 @@ namespace :spec do
     deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
-    deps["rubocop"] ||= "= 0.48.0" if RUBY_VERSION >= "2.0.0" # can't go in the gemspec because of the ruby version requirement
+    deps["rubocop"] ||= "= 0.49.1" if RUBY_VERSION >= "2.0.0" # can't go in the gemspec because of the ruby version requirement
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
@@ -93,7 +93,7 @@ begin
 
   if RUBY_VERSION >= "2.0.0"
     # can't go in the gemspec because of the ruby version requirement
-    gem "rubocop", "= 0.48.0"
+    gem "rubocop", "= 0.49.1"
     require "rubocop/rake_task"
     RuboCop::RakeTask.new
   end
@@ -103,15 +103,24 @@ begin
       rm_rf "tmp"
     end
 
-    desc "Run the real-world spec suite (requires internet)"
-    task :realworld => %w(set_realworld spec)
+    desc "Run the real-world spec suite"
+    task :realworld => %w[set_realworld spec]
+
+    namespace :realworld do
+      desc "Re-record cassettes for the realworld specs"
+      task :record => %w[set_record realworld]
+
+      task :set_record do
+        ENV["BUNDLER_SPEC_FORCE_RECORD"] = "TRUE"
+      end
+    end
 
     task :set_realworld do
       ENV["BUNDLER_REALWORLD_TESTS"] = "1"
     end
 
     desc "Run the spec suite with the sudo tests"
-    task :sudo => %w(set_sudo spec clean_sudo)
+    task :sudo => %w[set_sudo spec clean_sudo]
 
     task :set_sudo do
       ENV["BUNDLER_SUDO_TESTS"] = "1"
@@ -126,13 +135,13 @@ begin
     namespace :rubygems do
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
-      branches = %w(master)
-      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.2 v2.6.8)
+      branches = %w[master]
+      releases = %w[v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.2 v2.6.8]
       (branches + releases).each do |rg|
         desc "Run specs with RubyGems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
-          t.rspec_opts = %w(--format progress --color)
-          t.ruby_opts  = %w(-w)
+          t.rspec_opts = %w[--format progress --color]
+          t.ruby_opts  = %w[-w]
         end
 
         # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
@@ -172,8 +181,8 @@ begin
 
       desc "Run specs under a RubyGems checkout (set RG=path)"
       RSpec::Core::RakeTask.new("co") do |t|
-        t.rspec_opts = %w(--format documentation --color)
-        t.ruby_opts  = %w(-w)
+        t.rspec_opts = %w[--format documentation --color]
+        t.ruby_opts  = %w[-w]
       end
 
       task "setup_co" do
@@ -189,6 +198,9 @@ begin
     desc "Run the tests on Travis CI against a RubyGem version (using ENV['RGV'])"
     task :travis do
       rg = ENV["RGV"] || raise("RubyGems version is required on Travis!")
+
+      # disallow making network requests on CI
+      ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
 
       if RUBY_VERSION >= "2.0.0"
         puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
@@ -354,10 +366,8 @@ task :update_certs => "spec:rubygems:clone_rubygems_master" do
   Bundler::SSLCerts::CertificateManager.update_from!(RUBYGEMS_REPO)
 end
 
-require "bundler/gem_tasks"
-task :build => ["man:build"]
-task :release => ["man:require", "man:build"]
-
 task :default => :spec
 
 Dir["task/*.{rb,rake}"].each(&method(:load))
+
+task :generate_files => Rake::Task.tasks.select {|t| t.name.start_with?("lib/bundler/generated") }

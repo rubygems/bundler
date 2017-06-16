@@ -84,6 +84,14 @@ module Bundler
       spec.respond_to?(:default_gem?) && spec.default_gem?
     end
 
+    def spec_matches_for_glob(spec, glob)
+      return spec.matches_for_glob(glob) if spec.respond_to?(:matches_for_glob)
+
+      spec.load_paths.map do |lp|
+        Dir["#{lp}/#{glob}#{suffix_pattern}"]
+      end.flatten(1)
+    end
+
     def stub_set_spec(stub, spec)
       stub.instance_variable_set(:@spec, spec)
     end
@@ -158,6 +166,10 @@ module Bundler
       Gem.post_reset_hooks
     end
 
+    def suffix_pattern
+      Gem.suffix_pattern
+    end
+
     def gem_cache
       gem_path.map {|p| File.expand_path("cache", p) }
     end
@@ -179,7 +191,7 @@ module Bundler
     end
 
     def repository_subdirectories
-      %w(cache doc gems specifications)
+      %w[cache doc gems specifications]
     end
 
     def clear_paths
@@ -210,6 +222,10 @@ module Bundler
 
     def load_plugins
       Gem.load_plugins if Gem.respond_to?(:load_plugins)
+    end
+
+    def load_plugin_files(files)
+      Gem.load_plugin_files(files) if Gem.respond_to?(:load_plugin_files)
     end
 
     def ui=(obj)
@@ -306,7 +322,7 @@ module Bundler
     end
 
     def security_policy_keys
-      %w(High Medium Low AlmostNo No).map {|level| "#{level}Security" }
+      %w[High Medium Low AlmostNo No].map {|level| "#{level}Security" }
     end
 
     def security_policies

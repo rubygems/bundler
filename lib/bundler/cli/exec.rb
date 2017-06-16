@@ -5,7 +5,7 @@ module Bundler
   class CLI::Exec
     attr_reader :options, :args, :cmd
 
-    RESERVED_SIGNALS = %w(SEGV BUS ILL FPE VTALRM KILL STOP).freeze
+    RESERVED_SIGNALS = %w[SEGV BUS ILL FPE VTALRM KILL STOP].freeze
 
     def initialize(options, args)
       @options = options

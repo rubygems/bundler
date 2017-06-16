@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle help" do
   # RubyGems 1.4+ no longer load gem plugins so this test is no longer needed

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "rubygems/security"
 
 # unfortunately, testing signed gems with a provided CA is extremely difficult
