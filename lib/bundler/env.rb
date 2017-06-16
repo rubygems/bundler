@@ -14,6 +14,7 @@ module Bundler
 
       out = String.new
       append_formatted_table("Environment", environment, out)
+      append_formatted_table("Bundler Build Metadata", BuildMetadata.to_h, out)
 
       unless Bundler.settings.all.empty?
         out << "\n## Bundler settings\n\n```\n"
