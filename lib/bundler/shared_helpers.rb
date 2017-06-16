@@ -63,7 +63,7 @@ module Bundler
     end
 
     def with_clean_git_env(&block)
-      keys    = %w(GIT_DIR GIT_WORK_TREE)
+      keys    = %w[GIT_DIR GIT_WORK_TREE]
       old_env = keys.inject({}) do |h, k|
         h.update(k => ENV[k])
       end
@@ -152,6 +152,24 @@ module Bundler
       end
     end
 
+    def ensure_same_dependencies(spec, old_deps, new_deps)
+      new_deps = new_deps.reject {|d| d.type == :development }
+      old_deps = old_deps.reject {|d| d.type == :development }
+
+      without_type = proc {|d| Gem::Dependency.new(d.name, d.requirements_list.sort) }
+      new_deps.map!(&without_type)
+      old_deps.map!(&without_type)
+
+      extra_deps = new_deps - old_deps
+      return if extra_deps.empty?
+
+      Bundler.ui.debug "#{spec.full_name} from #{spec.remote} has either corrupted API or lockfile dependencies" \
+        " (was expecting #{old_deps.map(&:to_s)}, but the real spec has #{new_deps.map(&:to_s)})"
+      raise APIResponseMismatchError,
+        "Downloading #{spec.full_name} revealed dependencies not in the API or the lockfile (#{extra_deps.join(", ")})." \
+        "\nEither installing with `--full-index` or running `bundle update #{spec.name}` should fix the problem."
+    end
+
   private
 
     def find_gemfile
@@ -191,35 +209,46 @@ module Bundler
       end
     end
 
+    def set_env(key, value)
+      raise ArgumentError, "new key #{key}" unless EnvironmentPreserver::BUNDLER_KEYS.include?(key)
+      orig_key = "#{EnvironmentPreserver::BUNDLER_PREFIX}#{key}"
+      orig = ENV[key]
+      orig ||= EnvironmentPreserver::INTENTIONALLY_NIL
+      ENV[orig_key] ||= orig
+
+      ENV[key] = value
+    end
+    public :set_env
+
     def set_bundle_variables
       begin
-        ENV["BUNDLE_BIN_PATH"] = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
+        Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
       rescue Gem::GemNotFoundException
-        ENV["BUNDLE_BIN_PATH"] = File.expand_path("../../../exe/bundle", __FILE__)
+        Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", File.expand_path("../../../exe/bundle", __FILE__)
       end
 
       # Set BUNDLE_GEMFILE
-      ENV["BUNDLE_GEMFILE"] = find_gemfile.to_s
-      ENV["BUNDLER_VERSION"] = Bundler::VERSION
+      Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", find_gemfile.to_s
+      Bundler::SharedHelpers.set_env "BUNDLER_VERSION", Bundler::VERSION
     end
 
     def set_path
       paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
       paths.unshift "#{Bundler.bundle_path}/bin"
-      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
+      Bundler::SharedHelpers.set_env "PATH", paths.uniq.join(File::PATH_SEPARATOR)
     end
 
     def set_rubyopt
       rubyopt = [ENV["RUBYOPT"]].compact
       return if !rubyopt.empty? && rubyopt.first =~ %r{-rbundler/setup}
       rubyopt.unshift %(-rbundler/setup)
-      ENV["RUBYOPT"] = rubyopt.join(" ")
+      Bundler::SharedHelpers.set_env "RUBYOPT", rubyopt.join(" ")
     end
 
     def set_rubylib
       rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
       rubylib.unshift bundler_ruby_lib
-      ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
+      Bundler::SharedHelpers.set_env "RUBYLIB", rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
     def bundler_ruby_lib

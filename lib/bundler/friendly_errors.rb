@@ -92,7 +92,7 @@ module Bundler
           #{e.backtrace && e.backtrace.join("\n          ").chomp}
         ```
 
-        #{Bundler::Env.new.report}
+        #{Bundler::Env.report}
         --- TEMPLATE END ----------------------------------------------------------------
 
       EOS

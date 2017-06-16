@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "install with --deployment or --frozen" do
   before do
@@ -258,7 +257,17 @@ RSpec.describe "install with --deployment or --frozen" do
         gem "rack-obama"
       G
 
-      expect(the_bundle).to include_gems "rack 1.0.0"
+      expect(the_bundle).not_to include_gems "rack 1.0.0"
+      expect(err).to include strip_whitespace(<<-E).strip
+The dependencies in your gemfile changed
+
+You have added to the Gemfile:
+* rack (= 1.0.0)
+* rack-obama
+
+You have deleted from the Gemfile:
+* rack
+      E
     end
   end
 

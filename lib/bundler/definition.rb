@@ -448,7 +448,7 @@ module Bundler
       end
 
       reason = change_reason
-      msg << "\n\n#{reason.split(", ").join("\n")}\n" unless reason.strip.empty?
+      msg << "\n\n#{reason.split(", ").map(&:capitalize).join("\n")}" unless reason.strip.empty?
       msg << "\n\nYou have added to the Gemfile:\n" << added.join("\n") if added.any?
       msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
       msg << "\n\nYou have changed in the Gemfile:\n" << changed.join("\n") if changed.any?
@@ -635,12 +635,12 @@ module Bundler
     def converge_sources
       changes = false
 
-      # Get the Rubygems sources from the Gemfile.lock
+      # Get the RubyGems sources from the Gemfile.lock
       locked_gem_sources = @locked_sources.select {|s| s.is_a?(Source::Rubygems) }
-      # Get the Rubygems remotes from the Gemfile
+      # Get the RubyGems remotes from the Gemfile
       actual_remotes = sources.rubygems_remotes
 
-      # If there is a Rubygems source in both
+      # If there is a RubyGems source in both
       if !locked_gem_sources.empty? && !actual_remotes.empty?
         locked_gem_sources.each do |locked_gem|
           # Merge the remotes from the Gemfile into the Gemfile.lock
@@ -669,11 +669,12 @@ module Bundler
     end
 
     def converge_dependencies
+      frozen = Bundler.settings[:frozen]
       (@dependencies + @locked_deps.values).each do |dep|
         locked_source = @locked_deps[dep.name]
         # This is to make sure that if bundler is installing in deployment mode and
         # after locked_source and sources don't match, we still use locked_source.
-        if Bundler.settings[:frozen] && !locked_source.nil? &&
+        if frozen && !locked_source.nil? &&
             locked_source.respond_to?(:source) && locked_source.source.instance_of?(Source::Path) && locked_source.source.path.exist?
           dep.source = locked_source.source
         elsif dep.source
@@ -745,7 +746,7 @@ module Bundler
         s.source = (dep && dep.source) || sources.get(s.source)
 
         # Don't add a spec to the list if its source is expired. For example,
-        # if you change a Git gem to Rubygems.
+        # if you change a Git gem to RubyGems.
         next if s.source.nil?
         next if @unlock[:sources].include?(s.source.name)
 
@@ -775,7 +776,7 @@ module Bundler
       end
 
       resolve = SpecSet.new(converged)
-      resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems])
+      resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems], false, false, false)
       diff    = nil
 
       # Now, we unlock any sources that do not have anymore gems pinned to it
@@ -884,7 +885,7 @@ module Bundler
       specs.each do |s|
         # TODO: when two sources without blocks is an error, we can change
         # this check to !s.source.is_a?(Source::LocalRubygems). For now,
-        # we need to ask every Rubygems for every gem name.
+        # we need to ask every RubyGems for every gem name.
         if s.source.is_a?(Source::Git) || s.source.is_a?(Source::Path)
           names << s.name
         end

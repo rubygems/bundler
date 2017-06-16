@@ -14,7 +14,7 @@ begin
   # shouldn't be deferred.
   require "rubygems/source"
 rescue LoadError
-  # Not available before Rubygems 2.0.0, ignore
+  # Not available before RubyGems 2.0.0, ignore
   nil
 end
 
@@ -151,14 +151,14 @@ module Gem
 
     def to_lock
       out = String.new("  #{name}")
-      unless requirement == Gem::Requirement.default
+      unless requirement.none?
         reqs = requirement.requirements.map {|o, v| "#{o} #{v}" }.sort.reverse
         out << " (#{reqs.join(", ")})"
       end
       out
     end
 
-    # Backport of performance enhancement added to Rubygems 1.4
+    # Backport of performance enhancement added to RubyGems 1.4
     def matches_spec?(spec)
       # name can be a Regexp, so use ===
       return false unless name === spec.name
@@ -169,11 +169,16 @@ module Gem
   end
 
   class Requirement
-    # Backport of performance enhancement added to Rubygems 1.4
+    # Backport of performance enhancement added to RubyGems 1.4
     def none?
-      @none ||= (to_s == ">= 0")
+      # note that it might be tempting to replace with with RubyGems 2.0's
+      # improved implementation. Don't. It requires `DefaultRequirement` to be
+      # defined, and more importantantly, these overrides are not used when the
+      # running RubyGems defines these methods
+      to_s == ">= 0"
     end unless allocate.respond_to?(:none?)
 
+    # Backport of performance enhancement added to RubyGems 2.2
     def exact?
       return false unless @requirements.size == 1
       @requirements[0][0] == "="

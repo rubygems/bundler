@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle check" do
   it "returns success when the Gemfile is satisfied" do

@@ -8,7 +8,9 @@ module Spec
       deps = {
         # rack 2.x requires Ruby version >= 2.2.2.
         # artifice doesn't support rack 2.x now.
-        "rack" => "< 2",
+        # TODO: revert to `< 2` once https://github.com/rack/rack/issues/1168 is
+        # addressed
+        "rack" => "1.6.6",
         "artifice" => "~> 0.6.0",
         "compact_index" => "~> 0.11.0",
         "sinatra" => "~> 1.4.7",

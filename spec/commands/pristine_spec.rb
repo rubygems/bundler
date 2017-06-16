@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "fileutils"
 
 RSpec.describe "bundle pristine" do
@@ -26,7 +25,7 @@ RSpec.describe "bundle pristine" do
     G
   end
 
-  context "when sourced from Rubygems" do
+  context "when sourced from RubyGems" do
     it "reverts using cached .gem file" do
       spec = Bundler.definition.specs["weakling"].first
       changes_txt = Pathname.new(spec.full_gem_path).join("lib/changes.txt")
@@ -53,11 +52,22 @@ RSpec.describe "bundle pristine" do
       changed_file = Pathname.new(spec.full_gem_path).join("lib/foo.rb")
       diff = "#Pristine spec changes"
 
-      File.open(changed_file, "a") {|f| f.puts "#Pristine spec changes" }
+      File.open(changed_file, "a") {|f| f.puts diff }
       expect(File.read(changed_file)).to include(diff)
 
-      bundle "pristine"
+      bundle! "pristine"
       expect(File.read(changed_file)).to_not include(diff)
+    end
+
+    it "removes added files" do
+      spec = Bundler.definition.specs["foo"].first
+      changes_txt = Pathname.new(spec.full_gem_path).join("lib/changes.txt")
+
+      FileUtils.touch(changes_txt)
+      expect(changes_txt).to be_file
+
+      bundle! "pristine"
+      expect(changes_txt).not_to be_file
     end
   end
 
@@ -67,7 +77,7 @@ RSpec.describe "bundle pristine" do
       changed_file = Pathname.new(spec.full_gem_path).join("lib/baz.rb")
       diff = "#Pristine spec changes"
 
-      File.open(changed_file, "a") {|f| f.puts "#Pristine spec changes" }
+      File.open(changed_file, "a") {|f| f.puts diff }
       expect(File.read(changed_file)).to include(diff)
 
       bundle "pristine"
@@ -97,6 +107,42 @@ RSpec.describe "bundle pristine" do
       bundle "pristine"
       expect(out).to include("Cannot pristine #{spec.name} (#{spec.version}#{spec.git_version}). Gem is sourced from local path.")
       expect(changes_txt).to be_file
+    end
+  end
+
+  context "when passing a list of gems to pristine" do
+    it "resets them" do
+      foo = Bundler.definition.specs["foo"].first
+      foo_changes_txt = Pathname.new(foo.full_gem_path).join("lib/changes.txt")
+      FileUtils.touch(foo_changes_txt)
+      expect(foo_changes_txt).to be_file
+      foo_ref = Spec::Builders::GitReader.new(lib_path("foo")).ref_for("HEAD", 6)
+
+      bar = Bundler.definition.specs["bar"].first
+      bar_changes_txt = Pathname.new(bar.full_gem_path).join("lib/changes.txt")
+      FileUtils.touch(bar_changes_txt)
+      expect(bar_changes_txt).to be_file
+
+      weakling = Bundler.definition.specs["weakling"].first
+      weakling_changes_txt = Pathname.new(weakling.full_gem_path).join("lib/changes.txt")
+      FileUtils.touch(weakling_changes_txt)
+      expect(weakling_changes_txt).to be_file
+
+      bundle! "pristine foo bar weakling"
+
+      expect(out).to eq(strip_whitespace(<<-EOS).strip)
+        Cannot pristine bar (1.0). Gem is sourced from local path.
+        Using foo 1.0 from #{lib_path("foo")} (at master@#{foo_ref})
+        Installing weakling 1.0
+      EOS
+      expect(weakling_changes_txt).not_to be_file
+      expect(foo_changes_txt).not_to be_file
+      expect(bar_changes_txt).to be_file
+    end
+
+    it "raises when one of them is not in the lockfile" do
+      bundle "pristine abcabcabc"
+      expect(out).to include("Could not find gem 'abcabcabc'.")
     end
   end
 end

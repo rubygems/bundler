@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "the lockfile format" do
   include Bundler::GemHelpers
@@ -1256,6 +1255,29 @@ RSpec.describe "the lockfile format" do
       BUNDLED WITH
          #{Bundler::VERSION}
     L
+  end
+
+  it "raises a helpful error message when the lockfile is missing deps" do
+    lockfile <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack_middleware (1.0)
+
+      PLATFORMS
+        #{local}
+
+      DEPENDENCIES
+        rack_middleware
+    L
+
+    install_gemfile <<-G
+      source "file:#{gem_repo1}"
+      gem "rack_middleware"
+    G
+
+    expect(out).to include("Downloading rack_middleware-1.0 revealed dependencies not in the API or the lockfile (#{Gem::Dependency.new("rack", "= 0.9.1")}).").
+      and include("Either installing with `--full-index` or running `bundle update rack_middleware` should fix the problem.")
   end
 
   describe "a line ending" do

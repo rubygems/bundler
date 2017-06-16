@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle gem" do
   def reset!
@@ -47,7 +46,7 @@ RSpec.describe "bundle gem" do
   end
 
   after do
-    `rm "#{ENV["GIT_CONFIG"]}"` if File.exist?(ENV["GIT_CONFIG"])
+    FileUtils.rm(ENV["GIT_CONFIG"]) if File.exist?(ENV["GIT_CONFIG"])
     ENV["GIT_CONFIG"] = @git_config_location
   end
 
@@ -166,10 +165,10 @@ RSpec.describe "bundle gem" do
     expect(bundled_app("test_gem/.git")).to exist
   end
 
-  context "when git is not avaiable" do
+  context "when git is not available" do
     let(:gem_name) { "test_gem" }
 
-    # This spec cannot have `git` avaiable in the test env
+    # This spec cannot have `git` available in the test env
     before do
       bundle_bin = File.expand_path("../../../exe/bundle", __FILE__)
       load_paths = [lib, spec]

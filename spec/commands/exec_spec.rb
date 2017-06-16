@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle exec" do
-  let(:system_gems_to_install) { %w(rack-1.0.0 rack-0.9.1) }
+  let(:system_gems_to_install) { %w[rack-1.0.0 rack-0.9.1] }
   before :each do
     system_gems(system_gems_to_install)
   end
@@ -718,6 +717,7 @@ __FILE__: #{path.to_s.inspect}
           #!/usr/bin/env ruby
           require "openssl"
           puts OpenSSL::VERSION
+          warn Gem.loaded_specs.values.map(&:full_name)
         RB
         file.chmod(0o777)
 
@@ -725,10 +725,11 @@ __FILE__: #{path.to_s.inspect}
           expect(bundle!("exec #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
           expect(bundle!("exec bundle exec #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
           expect(bundle!("exec ruby #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
+          expect(run!(file.read, :no_lib => true, :artifice => nil)).to eq(expected)
         end
 
         # sanity check that we get the newer, custom version without bundler
-        sys_exec(file.to_s)
+        sys_exec("#{Gem.ruby} #{file}")
         expect(err).to include("custom openssl should not be loaded")
       end
     end
