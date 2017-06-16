@@ -17,7 +17,18 @@ module Bundler
       sources = Array(options[:source])
       groups  = Array(options[:group]).map(&:to_sym)
 
-      if gems.empty? && sources.empty? && groups.empty? && !options[:ruby] && !options[:bundler]
+      full_update = gems.empty? && sources.empty? && groups.empty? && !options[:ruby] && !options[:bundler]
+
+      if full_update && !options[:all]
+        if Bundler.feature_flag.update_requires_all_flag?
+          raise InvalidOption, "To update everything, pass the `--all` flag."
+        end
+        SharedHelpers.major_deprecation "Pass --all to `bundle update` to update everything"
+      elsif !full_update && options[:all]
+        raise InvalidOption, "Cannot specify --all along with specific options."
+      end
+
+      if full_update
         # We're doing a full update
         Bundler.definition(true)
       else

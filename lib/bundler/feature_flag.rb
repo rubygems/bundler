@@ -27,10 +27,11 @@ module Bundler
     (1..10).each {|v| define_method("bundler_#{v}_mode?") { major_version >= v } }
 
     settings_flag(:allow_offline_install) { bundler_2_mode? }
-    settings_flag(:only_update_to_newer_versions) { bundler_2_mode? }
-    settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }
     settings_flag(:error_on_stderr) { bundler_2_mode? }
     settings_flag(:init_gems_rb) { bundler_2_mode? }
+    settings_flag(:only_update_to_newer_versions) { bundler_2_mode? }
+    settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }
+    settings_flag(:update_requires_all_flag) { bundler_2_mode? }
 
     settings_option(:default_cli_command) { bundler_2_mode? ? :cli_help : :install }
 
