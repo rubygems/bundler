@@ -31,6 +31,7 @@ module Bundler
       end
 
       def cached!
+        @specs = nil
         @allow_cached = true
       end
 

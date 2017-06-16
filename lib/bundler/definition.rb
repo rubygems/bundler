@@ -194,10 +194,19 @@ module Bundler
       missing
     end
 
-    def missing_dependencies
+    def missing_dependencies?
       missing = []
       resolve.materialize(current_dependencies, missing)
-      missing
+      return false if missing.empty?
+      Bundler.ui.debug "The definition is missing #{missing.map(&:full_name)}"
+      true
+    rescue BundlerError => e
+      Bundler.ui.debug "The definition is missing dependencies, failed to resolve & materialize locally (#{e})"
+      true
+    ensure
+      @index = nil
+      @resolve = nil
+      @specs = nil
     end
 
     def requested_specs

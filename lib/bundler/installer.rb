@@ -78,7 +78,7 @@ module Bundler
         return
       end
 
-      resolve_if_need(options)
+      resolve_if_needed(options)
       ensure_specs_are_compatible!
       install(options)
 
@@ -229,18 +229,11 @@ module Bundler
         "because a file already exists at that path. Either remove or rename the file so the directory can be created."
     end
 
-    def resolve_if_need(options)
+    def resolve_if_needed(options)
       if !options["update"] && !options[:inline] && !options["force"] && Bundler.default_lockfile.file?
-        local = Bundler.ui.silence do
-          begin
-            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-            true unless tmpdef.new_platform? || tmpdef.missing_dependencies.any?
-          rescue BundlerError
-          end
-        end
+        return if @definition.nothing_changed? && !@definition.missing_dependencies?
       end
 
-      return if local
       options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
     end
 
