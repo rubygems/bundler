@@ -1,4 +1,11 @@
 # frozen_string_literal: true
+
+require "bundler/gem_tasks"
+task :build => ["build_metadata", "man:build", "generate_files"] do
+  Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
+end
+task :release => ["man:require", "man:build", "build_metadata"]
+
 namespace :release do
   def confirm(prompt = "")
     loop do
@@ -78,7 +85,8 @@ namespace :release do
 
     abort "Could not find commits for all PRs" unless commits.size == prs.size
 
-    unless system("git", "cherry-pick", "-x", "-m", "1", *commits.map(&:first))
+    if commits.any? && !system("git", "cherry-pick", "-x", "-m", "1", *commits.map(&:first))
+      warn "Opening a new shell to fix the cherry-pick errors"
       abort unless system("zsh")
     end
 

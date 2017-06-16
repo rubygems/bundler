@@ -78,7 +78,12 @@ module Spec
     RSpec::Matchers.define :have_major_deprecation do |expected|
       diffable
       match do |actual|
-        actual.split(MAJOR_DEPRECATION).any? do |d|
+        deprecations = actual.split(MAJOR_DEPRECATION)
+
+        return !expected.nil? if deprecations.size <= 1
+        return true if expected.nil?
+
+        deprecations.any? do |d|
           !d.empty? && values_match?(expected, d.strip)
         end
       end

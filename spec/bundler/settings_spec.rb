@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/settings"
 
 RSpec.describe Bundler::Settings do
@@ -184,6 +183,22 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       it "is case insensitive" do
         expect(settings.mirror_for("HTTPS://RUBYGEMS.ORG/")).to eq(mirror_uri)
       end
+
+      context "with a file URI" do
+        let(:mirror_uri) { URI("file:/foo/BAR/baz/qUx/") }
+
+        it "returns the mirror URI" do
+          expect(settings.mirror_for(uri)).to eq(mirror_uri)
+        end
+
+        it "converts a string parameter to a URI" do
+          expect(settings.mirror_for("file:/foo/BAR/baz/qUx/")).to eq(mirror_uri)
+        end
+
+        it "normalizes the URI" do
+          expect(settings.mirror_for("file:/foo/BAR/baz/qUx")).to eq(mirror_uri)
+        end
+      end
     end
   end
 
@@ -250,6 +265,16 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       expect(settings.mirror_for("https://rubygems.org/")).to eq(
         URI("http://rubygems-mirror.org/")
       )
+    end
+
+    it "normalizes URIs with a fallback_timeout option" do
+      settings["mirror.https://rubygems.org/.fallback_timeout"] = "true"
+      expect(settings.all).to include("mirror.https://rubygems.org/.fallback_timeout")
+    end
+
+    it "normalizes URIs with a fallback_timeout option without a trailing slash" do
+      settings["mirror.https://rubygems.org.fallback_timeout"] = "true"
+      expect(settings.all).to include("mirror.https://rubygems.org/.fallback_timeout")
     end
   end
 

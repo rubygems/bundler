@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "compact index api" do
   let(:source_hostname) { "localgemserver.test" }
@@ -640,7 +639,7 @@ The checksum of /versions does not match the checksum provided by the server! So
   context "when SSL certificate verification fails" do
     it "explains what happened" do
       # Install a monkeypatch that reproduces the effects of openssl raising
-      # a certificate validation error when Rubygems tries to connect.
+      # a certificate validation error when RubyGems tries to connect.
       gemfile <<-G
         class Net::HTTP
           def start

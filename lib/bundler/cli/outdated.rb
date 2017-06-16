@@ -46,7 +46,7 @@ module Bundler
         Bundler::CLI::Common.patch_level_options(options).any?
 
       filter_options_patch = options.keys &
-        %w(filter-major filter-minor filter-patch)
+        %w[filter-major filter-minor filter-patch]
 
       definition_resolution = proc do
         options[:local] ? definition.resolve_with_cache! : definition.resolve_remotely!

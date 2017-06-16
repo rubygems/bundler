@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe Bundler::Source::Git::GitProxy do
   let(:uri) { "https://github.com/bundler/bundler.git" }

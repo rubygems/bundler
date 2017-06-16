@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe Bundler::Plugin::API::Source do
   let(:uri) { "uri://to/test" }

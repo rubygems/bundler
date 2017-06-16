@@ -12,31 +12,20 @@ module Bundler
       print_gemfile = options.delete(:print_gemfile) { true }
       print_gemspecs = options.delete(:print_gemspecs) { true }
 
-      out = String.new("## Environment\n\n```\n")
-      out << "Bundler   #{Bundler::VERSION}\n"
-      out << "Rubygems  #{Gem::VERSION}\n"
-      out << "Ruby      #{ruby_version}"
-      out << "GEM_HOME  #{ENV["GEM_HOME"]}\n" unless ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
-      out << "GEM_PATH  #{ENV["GEM_PATH"]}\n" unless ENV["GEM_PATH"] == ENV["GEM_HOME"]
-      out << "RVM       #{ENV["rvm_version"]}\n" if ENV["rvm_version"]
-      out << "Git       #{git_version}\n"
-      out << "Platform  #{Gem::Platform.local}\n"
-      out << "OpenSSL   #{OpenSSL::OPENSSL_VERSION}\n" if defined?(OpenSSL::OPENSSL_VERSION)
-      %w(rubygems-bundler open_gem).each do |name|
-        specs = Bundler.rubygems.find_name(name)
-        out << "#{name} (#{specs.map(&:version).join(",")})\n" unless specs.empty?
-      end
+      out = String.new
+      append_formatted_table("Environment", environment, out)
+      append_formatted_table("Bundler Build Metadata", BuildMetadata.to_h, out)
 
-      out << "```\n"
-
-      out << "\n## Bundler settings\n\n```\n" unless Bundler.settings.all.empty?
-      Bundler.settings.all.each do |setting|
-        out << setting << "\n"
-        Bundler.settings.pretty_values_for(setting).each do |line|
-          out << "  " << line << "\n"
+      unless Bundler.settings.all.empty?
+        out << "\n## Bundler settings\n\n```\n"
+        Bundler.settings.all.each do |setting|
+          out << setting << "\n"
+          Bundler.settings.pretty_values_for(setting).each do |line|
+            out << "  " << line << "\n"
+          end
         end
+        out << "```\n"
       end
-      out << "```\n"
 
       return out unless SharedHelpers.in_bundle?
 
@@ -74,10 +63,10 @@ module Bundler
       if RUBY_VERSION < "1.9"
         str << " (#{RUBY_RELEASE_DATE}"
         str << " patchlevel #{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
-        str << ") [#{RUBY_PLATFORM}]\n"
+        str << ") [#{RUBY_PLATFORM}]"
       else
         str << "p#{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
-        str << " (#{RUBY_RELEASE_DATE} revision #{RUBY_REVISION}) [#{RUBY_PLATFORM}]\n"
+        str << " (#{RUBY_RELEASE_DATE} revision #{RUBY_REVISION}) [#{RUBY_PLATFORM}]"
       end
     end
 
@@ -87,6 +76,45 @@ module Bundler
       "not installed"
     end
 
-    private_class_method :read_file, :ruby_version, :git_version
+    def self.environment
+      out = []
+
+      out << ["Bundler", Bundler::VERSION]
+      out << ["RubyGems", Gem::VERSION]
+      out << ["Ruby", ruby_version]
+      out << ["GEM_HOME", ENV["GEM_HOME"]] unless ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
+      out << ["GEM_PATH", ENV["GEM_PATH"]] unless ENV["GEM_PATH"].nil? || ENV["GEM_PATH"].empty?
+      out << ["RVM", ENV["rvm_version"]] if ENV["rvm_version"]
+      out << ["Git", git_version]
+      out << ["Platform", Gem::Platform.local]
+      out << ["OpenSSL", OpenSSL::OPENSSL_VERSION] if defined?(OpenSSL::OPENSSL_VERSION)
+      %w[rubygems-bundler open_gem].each do |name|
+        specs = Bundler.rubygems.find_name(name)
+        out << [name, "(#{specs.map(&:version).join(",")})"] unless specs.empty?
+      end
+      if (exe = caller.last.split(":").first) && exe =~ %r{(exe|bin)/bundler?\z}
+        shebang = File.read(exe).lines.first
+        shebang.sub!(/^#!\s*/, "")
+        unless shebang.start_with?(Gem.ruby, "/usr/bin/env ruby")
+          out << ["Gem.ruby", Gem.ruby]
+          out << ["bundle #!", shebang]
+        end
+      end
+
+      out
+    end
+
+    def self.append_formatted_table(title, pairs, out)
+      return if pairs.empty?
+      out << "\n" unless out.empty?
+      out << "## #{title}\n\n```\n"
+      ljust = pairs.map {|k, _v| k.to_s.length }.max
+      pairs.each do |k, v|
+        out << "#{k.to_s.ljust(ljust)}  #{v}\n"
+      end
+      out << "```\n"
+    end
+
+    private_class_method :read_file, :ruby_version, :git_version, :append_formatted_table
   end
 end

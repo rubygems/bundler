@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle install from an existing gemspec" do
   before(:each) do
@@ -197,7 +196,7 @@ RSpec.describe "bundle install from an existing gemspec" do
     #
     # issue was caused by rubygems having an unresolved gem during a require,
     # so emulate that
-    system_gems %w(rack-1.0.0 rack-0.9.1 rack-obama-1.0)
+    system_gems %w[rack-1.0.0 rack-0.9.1 rack-obama-1.0]
 
     build_lib("foo", :path => bundled_app)
     gemspec = bundled_app("foo.gemspec").read
@@ -229,6 +228,30 @@ RSpec.describe "bundle install from an existing gemspec" do
     G
 
     expect(the_bundle).to include_gems "foo 1.0.0"
+  end
+
+  it "does not break Gem.finish_resolve with conflicts", :rubygems => ">= 2" do
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.version = "1.0.0"
+      s.add_dependency "bar", "= 1.0.0"
+    end
+    build_repo2 do
+      build_gem "deps" do |s|
+        s.add_dependency "foo", "= 0.0.1"
+      end
+      build_gem "foo", "0.0.1"
+    end
+
+    install_gemfile! <<-G
+      source "file://#{gem_repo2}"
+      gem "deps"
+      gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
+    G
+
+    expect(the_bundle).to include_gems "foo 1.0.0"
+
+    run! "Gem.finish_resolve; puts 'WIN'"
+    expect(out).to eq("WIN")
   end
 
   context "in deployment mode" do
@@ -391,7 +414,7 @@ RSpec.describe "bundle install from an existing gemspec" do
           end
         end
 
-        %w(ruby jruby).each do |platform|
+        %w[ruby jruby].each do |platform|
           simulate_platform(platform) do
             install_gemfile <<-G
               source "file://#{gem_repo2}"

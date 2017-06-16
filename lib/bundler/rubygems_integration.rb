@@ -74,10 +74,22 @@ module Bundler
     def spec_missing_extensions?(spec, default = true)
       return spec.missing_extensions? if spec.respond_to?(:missing_extensions?)
 
-      return false if spec.respond_to?(:default_gem?) && spec.default_gem?
+      return false if spec_default_gem?(spec)
       return false if spec.extensions.empty?
 
       default
+    end
+
+    def spec_default_gem?(spec)
+      spec.respond_to?(:default_gem?) && spec.default_gem?
+    end
+
+    def spec_matches_for_glob(spec, glob)
+      return spec.matches_for_glob(glob) if spec.respond_to?(:matches_for_glob)
+
+      spec.load_paths.map do |lp|
+        Dir["#{lp}/#{glob}#{suffix_pattern}"]
+      end.flatten(1)
     end
 
     def stub_set_spec(stub, spec)
@@ -154,6 +166,10 @@ module Bundler
       Gem.post_reset_hooks
     end
 
+    def suffix_pattern
+      Gem.suffix_pattern
+    end
+
     def gem_cache
       gem_path.map {|p| File.expand_path("cache", p) }
     end
@@ -161,7 +177,7 @@ module Bundler
     def spec_cache_dirs
       @spec_cache_dirs ||= begin
         dirs = gem_path.map {|dir| File.join(dir, "specifications") }
-        dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in Rubygems 2.0.3 or earlier
+        dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in RubyGems 2.0.3 or earlier
         dirs.uniq.select {|dir| File.directory? dir }
       end
     end
@@ -175,7 +191,7 @@ module Bundler
     end
 
     def repository_subdirectories
-      %w(cache doc gems specifications)
+      %w[cache doc gems specifications]
     end
 
     def clear_paths
@@ -187,7 +203,7 @@ module Bundler
     end
 
     def preserve_paths
-      # this is a no-op outside of Rubygems 1.8
+      # this is a no-op outside of RubyGems 1.8
       yield
     end
 
@@ -206,6 +222,10 @@ module Bundler
 
     def load_plugins
       Gem.load_plugins if Gem.respond_to?(:load_plugins)
+    end
+
+    def load_plugin_files(files)
+      Gem.load_plugin_files(files) if Gem.respond_to?(:load_plugin_files)
     end
 
     def ui=(obj)
@@ -229,9 +249,9 @@ module Bundler
       {} # if we can't download them, there aren't any
     end
 
-    # TODO: This is for older versions of Rubygems... should we support the
+    # TODO: This is for older versions of RubyGems... should we support the
     # X-Gemfile-Source header on these old versions?
-    # Maybe the newer implementation will work on older Rubygems?
+    # Maybe the newer implementation will work on older RubyGems?
     # It seems difficult to keep this implementation and still send the header.
     def fetch_all_remote_specs(remote)
       old_sources = Bundler.rubygems.sources
@@ -302,7 +322,7 @@ module Bundler
     end
 
     def security_policy_keys
-      %w(High Medium Low AlmostNo No).map {|level| "#{level}Security" }
+      %w[High Medium Low AlmostNo No].map {|level| "#{level}Security" }
     end
 
     def security_policies
@@ -472,7 +492,7 @@ module Bundler
       redefine_method(gem_class, :refresh) {}
     end
 
-    # Replace or hook into Rubygems to provide a bundlerized view
+    # Replace or hook into RubyGems to provide a bundlerized view
     # of the world.
     def replace_entrypoints(specs)
       specs_by_name = specs.reduce({}) do |h, s|
@@ -488,8 +508,8 @@ module Bundler
       Gem.clear_paths
     end
 
-    # This backports the correct segment generation code from Rubygems 1.4+
-    # by monkeypatching it into the method in Rubygems 1.3.6 and 1.3.7.
+    # This backports the correct segment generation code from RubyGems 1.4+
+    # by monkeypatching it into the method in RubyGems 1.3.6 and 1.3.7.
     def backport_segment_generation
       redefine_method(Gem::Version, :segments) do
         @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
@@ -508,7 +528,7 @@ module Bundler
     end
 
     # This backports base_dir which replaces installation path
-    # Rubygems 1.8+
+    # RubyGems 1.8+
     def backport_base_dir
       redefine_method(Gem::Specification, :base_dir) do
         return Gem.dir unless loaded_from
@@ -577,7 +597,7 @@ module Bundler
       end
     end
 
-    # Rubygems 1.4 through 1.6
+    # RubyGems 1.4 through 1.6
     class Legacy < RubygemsIntegration
       def initialize
         super
@@ -588,7 +608,7 @@ module Bundler
       end
 
       def stub_rubygems(specs)
-        # Rubygems versions lower than 1.7 use SourceIndex#from_gems_in
+        # RubyGems versions lower than 1.7 use SourceIndex#from_gems_in
         source_index_class = (class << Gem::SourceIndex; self; end)
         redefine_method(source_index_class, :from_gems_in) do |*args|
           Gem::SourceIndex.new.tap do |source_index|
@@ -620,7 +640,7 @@ module Bundler
       end
     end
 
-    # Rubygems versions 1.3.6 and 1.3.7
+    # RubyGems versions 1.3.6 and 1.3.7
     class Ancient < Legacy
       def initialize
         super
@@ -628,7 +648,7 @@ module Bundler
       end
     end
 
-    # Rubygems 1.7
+    # RubyGems 1.7
     class Transitional < Legacy
       def stub_rubygems(specs)
         stub_source_index(specs)
@@ -642,7 +662,7 @@ module Bundler
       end
     end
 
-    # Rubygems 1.8.5-1.8.19
+    # RubyGems 1.8.5-1.8.19
     class Modern < RubygemsIntegration
       def stub_rubygems(specs)
         Gem::Specification.all = specs
@@ -663,9 +683,9 @@ module Bundler
       end
     end
 
-    # Rubygems 1.8.0 to 1.8.4
+    # RubyGems 1.8.0 to 1.8.4
     class AlmostModern < Modern
-      # Rubygems [>= 1.8.0, < 1.8.5] has a bug that changes Gem.dir whenever
+      # RubyGems [>= 1.8.0, < 1.8.5] has a bug that changes Gem.dir whenever
       # you call Gem::Installer#install with an :install_dir set. We have to
       # change it back for our sudo mode to work.
       def preserve_paths
@@ -676,9 +696,9 @@ module Bundler
       end
     end
 
-    # Rubygems 1.8.20+
+    # RubyGems 1.8.20+
     class MoreModern < Modern
-      # Rubygems 1.8.20 and adds the skip_validation parameter, so that's
+      # RubyGems 1.8.20 and adds the skip_validation parameter, so that's
       # when we start passing it through.
       def build(spec, skip_validation = false)
         require "rubygems/builder"
@@ -686,13 +706,17 @@ module Bundler
       end
     end
 
-    # Rubygems 2.0
+    # RubyGems 2.0
     class Future < RubygemsIntegration
       def stub_rubygems(specs)
         Gem::Specification.all = specs
 
         Gem.post_reset do
           Gem::Specification.all = specs
+        end
+
+        redefine_method((class << Gem; self; end), :finish_resolve) do |*|
+          []
         end
       end
 
@@ -844,7 +868,7 @@ module Bundler
       RubygemsIntegration::Transitional.new
     elsif RubygemsIntegration.provides?(">= 1.4.0")
       RubygemsIntegration::Legacy.new
-    else # Rubygems 1.3.6 and 1.3.7
+    else # RubyGems 1.3.6 and 1.3.7
       RubygemsIntegration::Ancient.new
     end
   end

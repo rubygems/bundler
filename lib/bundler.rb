@@ -13,9 +13,10 @@ require "bundler/rubygems_integration"
 require "bundler/version"
 require "bundler/constants"
 require "bundler/current_ruby"
+require "bundler/build_metadata"
 
 module Bundler
-  environment_preserver = EnvironmentPreserver.new(ENV, %w(PATH GEM_PATH))
+  environment_preserver = EnvironmentPreserver.new(ENV, EnvironmentPreserver::BUNDLER_KEYS)
   ORIGINAL_ENV = environment_preserver.restore
   ENV.replace(environment_preserver.backup)
   SUDO_MUTEX = Mutex.new
@@ -313,9 +314,9 @@ EOF
     end
 
     def system_bindir
-      # Gem.bindir doesn't always return the location that Rubygems will install
-      # system binaries. If you put '-n foo' in your .gemrc, Rubygems will
-      # install binstubs there instead. Unfortunately, Rubygems doesn't expose
+      # Gem.bindir doesn't always return the location that RubyGems will install
+      # system binaries. If you put '-n foo' in your .gemrc, RubyGems will
+      # install binstubs there instead. Unfortunately, RubyGems doesn't expose
       # that directory at all, so rather than parse .gemrc ourselves, we allow
       # the directory to be set as well, via `bundle config bindir foo`.
       Bundler.settings[:system_bindir] || Bundler.rubygems.gem_bindir
@@ -327,7 +328,7 @@ EOF
       sudo_present = which "sudo" if settings.allow_sudo?
 
       if sudo_present
-        # the bundle path and subdirectories need to be writable for Rubygems
+        # the bundle path and subdirectories need to be writable for RubyGems
         # to be able to unpack and install gems without exploding
         path = bundle_path
         path = path.parent until path.exist?
@@ -517,7 +518,7 @@ EOF
         nil
       end
 
-      ENV["GEM_HOME"] = File.expand_path(bundle_path, root)
+      Bundler::SharedHelpers.set_env "GEM_HOME", File.expand_path(bundle_path, root)
       Bundler.rubygems.clear_paths
     end
 

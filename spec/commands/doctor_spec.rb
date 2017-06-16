@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "stringio"
 require "bundler/cli"
 require "bundler/cli/doctor"

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-%w(cache package).each do |cmd|
+%w[cache package].each do |cmd|
   RSpec.describe "bundle #{cmd} with path" do
     it "is no-op when the path is within the bundle" do
       build_lib "foo", :path => bundled_app("lib/foo")

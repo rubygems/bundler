@@ -43,6 +43,6 @@ Gem::Specification.new do |s|
   s.files += Dir.glob("man/**/*")
 
   s.bindir        = "exe"
-  s.executables   = %w(bundle bundler)
+  s.executables   = %w[bundle bundler]
   s.require_paths = ["lib"]
 end

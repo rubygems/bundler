@@ -6,7 +6,7 @@ module Bundler
     autoload :Mirror,  "bundler/mirror"
     autoload :Mirrors, "bundler/mirror"
 
-    BOOL_KEYS = %w(
+    BOOL_KEYS = %w[
       allow_offline_install
       auto_install
       cache_all
@@ -16,25 +16,28 @@ module Bundler
       disable_local_branch_check
       disable_shared_gems
       disable_version_check
+      error_on_stderr
       force_ruby_platform
       frozen
       gem.coc
       gem.mit
       ignore_messages
+      init_gems_rb
       major_deprecations
       no_install
       no_prune
       only_update_to_newer_versions
       plugins
       silence_root_warning
-    ).freeze
+      update_requires_all_flag
+    ].freeze
 
-    NUMBER_KEYS = %w(
+    NUMBER_KEYS = %w[
       redirect
       retry
       ssl_verify_mode
       timeout
-    ).freeze
+    ].freeze
 
     DEFAULT_CONFIG = {
       :redirect => 5,
@@ -74,6 +77,8 @@ module Bundler
     end
 
     def []=(key, value)
+      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
+
       if cli_flags_given
         command = if value.nil?
           "bundle config --delete #{key}"
@@ -87,7 +92,7 @@ module Bundler
           "you want remembered between commands using `bundle config " \
           "<setting name> <setting value>`, i.e. `#{command}`"
       end
-      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
+
       set_key(key, value, @local_config, local_config_file)
     end
     alias_method :set_local, :[]=
@@ -140,7 +145,7 @@ module Bundler
 
     def gem_mirrors
       all.inject(Mirrors.new) do |mirrors, k|
-        mirrors.parse(k, self[k]) if k =~ /^mirror\./
+        mirrors.parse(k, self[k]) if k.start_with?("mirror.")
         mirrors
       end
     end
@@ -213,11 +218,7 @@ module Bundler
     end
 
     def app_cache_path
-      @app_cache_path ||= begin
-        path = self[:cache_path] || "vendor/cache"
-        raise InvalidOption, "Cache path must be relative to the bundle path" if path.start_with?("/")
-        path
-      end
+      @app_cache_path ||= self[:cache_path] || "vendor/cache"
     end
 
   private
@@ -229,14 +230,14 @@ module Bundler
     end
 
     def parent_setting_for(name)
-      split_specfic_setting_for(name)[0]
+      split_specific_setting_for(name)[0]
     end
 
-    def specfic_gem_for(name)
-      split_specfic_setting_for(name)[1]
+    def specific_gem_for(name)
+      split_specific_setting_for(name)[1]
     end
 
-    def split_specfic_setting_for(name)
+    def split_specific_setting_for(name)
       name.split(".")
     end
 
@@ -321,16 +322,34 @@ module Bundler
       end
     end
 
+    PER_URI_OPTIONS = %w[
+      fallback_timeout
+    ].freeze
+
+    NORMALIZE_URI_OPTIONS_PATTERN =
+      /
+        \A
+        (\w+\.)? # optional prefix key
+        (https?.*?) # URI
+        (\.#{Regexp.union(PER_URI_OPTIONS)})? # optional suffix key
+        \z
+      /ix
+
     # TODO: duplicates Rubygems#normalize_uri
     # TODO: is this the correct place to validate mirror URIs?
     def self.normalize_uri(uri)
       uri = uri.to_s
-      uri = "#{uri}/" unless uri =~ %r{/\Z}
+      if uri =~ NORMALIZE_URI_OPTIONS_PATTERN
+        prefix = $1
+        uri = $2
+        suffix = $3
+      end
+      uri = "#{uri}/" unless uri.end_with?("/")
       uri = URI(uri)
       unless uri.absolute?
         raise ArgumentError, format("Gem sources must be absolute. You provided '%s'.", uri)
       end
-      uri
+      "#{prefix}#{uri}#{suffix}"
     end
   end
 end

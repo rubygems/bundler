@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/ruby_version"
 
 RSpec.describe "Bundler::RubyVersion and its subclasses" do
