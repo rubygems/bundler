@@ -2,17 +2,17 @@
 module Spec
   module Helpers
     def reset!
-      Dir["#{tmp}/{gems/*,*}"].each do |dir|
-        next if %(base remote1 gems rubygems).include?(File.basename(dir))
+      Dir.glob("#{tmp}/{gems/*,*}", File::FNM_DOTMATCH).each do |dir|
+        next if %w[base remote1 gems rubygems . ..].include?(File.basename(dir))
         if ENV["BUNDLER_SUDO_TESTS"]
-          `sudo rm -rf #{dir}`
+          `sudo rm -rf "#{dir}"`
         else
           FileUtils.rm_rf(dir)
         end
       end
-      FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)
-      ENV["BUNDLE_DISABLE_POSTIT"] = "1"
+      FileUtils.mkdir_p(tmpdir)
+      ENV["BUNDLE_TRAMPOLINE_DISABLE"] = "1"
       Bundler.reset!
       Bundler.ui = nil
       Bundler.ui # force it to initialize
@@ -52,10 +52,9 @@ module Spec
 
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
-      env = opts.delete(:env)
       groups = args.map(&:inspect).join(", ")
       setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
-      @out = ruby(setup + cmd, :env => env)
+      @out = ruby(setup + cmd, opts)
     end
     bang :run
 
@@ -84,7 +83,7 @@ module Spec
       with_sudo = options.delete(:sudo)
       sudo = with_sudo == :preserve_env ? "sudo -E" : "sudo" if with_sudo
 
-      options["no-color"] = true unless options.key?("no-color") || cmd.to_s.start_with?("exec", "exe", "ex", "e", "conf")
+      options["no-color"] = true unless options.key?("no-color") || cmd.to_s =~ /\A(e|ex|exe|exec|conf|confi|config)(\s|\z)/
 
       bundle_bin = options.delete("bundle_bin") || File.expand_path("../../../exe/bundle", __FILE__)
 
@@ -92,10 +91,23 @@ module Spec
         bundle_bin = "-S bundle"
       end
 
+      env = options.delete(:env) || {}
+      env["PATH"].gsub!("#{Path.root}/exe", "") if env["PATH"] && system_bundler
+
       requires = options.delete(:requires) || []
-      requires << File.expand_path("../fakeweb/" + options.delete(:fakeweb) + ".rb", __FILE__) if options.key?(:fakeweb)
-      requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
       requires << "support/hax"
+
+      artifice = options.delete(:artifice) do
+        if RSpec.current_example.metadata[:realworld]
+          "vcr"
+        else
+          "fail"
+        end
+      end
+      if artifice
+        requires << File.expand_path("../artifice/#{artifice}", __FILE__)
+      end
+
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
 
       load_path = []
@@ -103,8 +115,8 @@ module Spec
       load_path << spec
       load_path_str = "-I#{load_path.join(File::PATH_SEPARATOR)}"
 
-      env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}'" }.join(" ")
-      env["PATH"].gsub!("#{Path.root}/exe", "") if env["PATH"] && system_bundler
+      env = env.map {|k, v| "#{k}='#{v}'" }.join(" ")
+
       args = options.map do |k, v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
@@ -120,19 +132,8 @@ module Spec
     end
 
     def bundle_ruby(options = {})
-      options["no-color"] = true unless options.key?("no-color")
-
-      bundle_bin = File.expand_path("../../../exe/bundle_ruby", __FILE__)
-
-      requires = options.delete(:requires) || []
-      requires << File.expand_path("../fakeweb/" + options.delete(:fakeweb) + ".rb", __FILE__) if options.key?(:fakeweb)
-      requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
-      requires_str = requires.map {|r| "-r#{r}" }.join(" ")
-
-      env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin}"
-
-      sys_exec(cmd) {|i, o, thr| yield i, o, thr if block_given? }
+      options["bundle_bin"] = File.expand_path("../../../exe/bundle_ruby", __FILE__)
+      bundle("", options)
     end
 
     def ruby(ruby, options = {})
@@ -255,12 +256,16 @@ module Spec
     end
 
     def install_gems(*gems)
+      options = gems.last.is_a?(Hash) ? gems.pop : {}
+      gem_repo = options.fetch(:gem_repo) { gem_repo1 }
       gems.each do |g|
         path = if g == :bundler
           Dir.chdir(root) { gem_command! :build, "#{root}/bundler.gemspec" }
           bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
+        elsif g.to_s =~ %r{\A/.*\.gem\z}
+          g
         else
-          "#{gem_repo1}/gems/#{g}.gem"
+          "#{gem_repo}/gems/#{g}.gem"
         end
 
         raise "OMG `#{path}` does not exist!" unless File.exist?(path)

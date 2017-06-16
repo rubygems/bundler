@@ -3,10 +3,10 @@ require "bundler/fetcher/base"
 require "bundler/worker"
 
 module Bundler
+  autoload :CompactIndexClient, "bundler/compact_index_client"
+
   class Fetcher
     class CompactIndex < Base
-      require "bundler/compact_index_client"
-
       def self.compact_index_request(method_name)
         method = instance_method(method_name)
         undef_method(method_name)
@@ -61,12 +61,13 @@ module Bundler
       compact_index_request :fetch_spec
 
       def available?
+        return nil unless md5_available?
         user_home = Bundler.user_home
         return nil unless user_home.directory? && user_home.writable?
         # Read info file checksums out of /versions, so we can know if gems are up to date
         fetch_uri.scheme != "file" && compact_index_client.update_and_parse_checksums!
       rescue CompactIndexClient::Updater::MisMatchedChecksumError => e
-        Bundler.ui.warn(e.message)
+        Bundler.ui.debug(e.message)
         nil
       end
       compact_index_request :available?
@@ -78,9 +79,9 @@ module Bundler
     private
 
       def compact_index_client
-        @compact_index_client ||=
+        @compact_index_client ||= begin
           SharedHelpers.filesystem_access(cache_path) do
-            CompactIndexClient.new(cache_path, compact_fetcher)
+            CompactIndexClient.new(cache_path, client_fetcher)
           end.tap do |client|
             client.in_parallel = lambda do |inputs, &blk|
               func = lambda {|object, _index| blk.call(object) }
@@ -89,12 +90,13 @@ module Bundler
               inputs.map { worker.deq }
             end
           end
+        end
       end
 
       def bundle_worker(func = nil)
         @bundle_worker ||= begin
           worker_name = "Compact Index (#{display_uri.host})"
-          Bundler::Worker.new(25, worker_name, func)
+          Bundler::Worker.new(Bundler.current_ruby.rbx? ? 1 : 25, worker_name, func)
         end
         @bundle_worker.tap do |worker|
           worker.instance_variable_set(:@func, func) if func
@@ -105,16 +107,28 @@ module Bundler
         Bundler.user_cache.join("compact_index", remote.cache_slug)
       end
 
-      def compact_fetcher
-        lambda do |path, headers|
-          begin
-            downloader.fetch(fetch_uri + path, headers)
-          rescue NetworkDownError => e
-            raise unless Bundler.feature_flag.allow_offline_install? && headers["If-None-Match"]
-            Bundler.ui.warn "Using the cached data for the new index because of a network error: #{e}"
-            Net::HTTPNotModified.new(nil, nil, nil)
-          end
+      def client_fetcher
+        ClientFetcher.new(self, Bundler.ui)
+      end
+
+      ClientFetcher = Struct.new(:fetcher, :ui) do
+        def call(path, headers)
+          fetcher.downloader.fetch(fetcher.fetch_uri + path, headers)
+        rescue NetworkDownError => e
+          raise unless Bundler.feature_flag.allow_offline_install? && headers["If-None-Match"]
+          ui.warn "Using the cached data for the new index because of a network error: #{e}"
+          Net::HTTPNotModified.new(nil, nil, nil)
         end
+      end
+
+      def md5_available?
+        require "openssl"
+        OpenSSL::Digest::MD5.digest("")
+        true
+      rescue LoadError
+        true
+      rescue OpenSSL::Digest::DigestError
+        false
       end
     end
   end

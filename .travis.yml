@@ -25,9 +25,10 @@ addons:
       secure: "TrzIv116JLGUxm6PAUskCYrv8KTDguncKROVwbnjVPKTGDAgoDderd8JUdDEXrKoZ9qGLD2TPYKExt9/QDl71E+qHdWnVqWv4HKCUk2P9z/VLKzHuggOUBkCXiJUhjywUieCJhI3N92bfq2EjSBbu2/OFHqWOjLQ+QCooTEBjv8="
 
 rvm:
-  - 2.3.1
-  - 2.2
-  - 2.1
+  - 2.4.1
+  - 2.3.4
+  - 2.2.7
+  - 2.1.10
   - 2.0.0
   - 1.9.3
   - 1.8.7
@@ -38,18 +39,19 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.6.6
+  - RGV=v2.6.8
 
 matrix:
   include:
+    # Ruby 2.4, Rubygems 2.6.8 and up
     # Ruby 2.3, Rubygems 2.5.1 and up
-    - rvm: 2.2
+    - rvm: 2.2.6
       env: RGV=v2.5.2
     # Ruby 2.2, Rubygems 2.4.5 and up
-    - rvm: 2.2
+    - rvm: 2.2.6
       env: RGV=v2.4.8
     # Ruby 2.1, Rubygems 2.2.2 and up
-    - rvm: 2.1
+    - rvm: 2.1.10
       env: RGV=v2.2.5
     # Ruby 2.0.0, Rubygems 2.0.0 and up
     - rvm: 2.0.0
@@ -95,9 +97,6 @@ matrix:
       env: RGV=v1.3.7
     - rvm: 1.8.7
       env: RGV=v1.3.6
-    # For no apparent reason, this often goes over the Travis limit
-    - rvm: 1.8.7
-      env: RGV=v2.1.11
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
       env: RGV=master
@@ -119,6 +118,5 @@ matrix:
       env: RGV=v1.3.7
     - rvm: 1.8.7
       env: RGV=v1.3.6
-    - rvm: 1.8.7
-      env: RGV=v2.1.11
     - rvm: ruby-head
+      env: RGV=master

@@ -24,6 +24,7 @@ module Bundler
   module Plugin
     class API
       autoload :Source, "bundler/plugin/api/source"
+
       # The plugins should declare that they handle a command through this helper.
       #
       # @param [String] command being handled by them

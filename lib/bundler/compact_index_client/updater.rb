@@ -27,10 +27,10 @@ module Bundler
       def update(local_path, remote_path, retrying = nil)
         headers = {}
 
-        Dir.mktmpdir(local_path.basename.to_s, local_path.dirname) do |local_temp_dir|
+        Dir.mktmpdir("bundler-compact-index-") do |local_temp_dir|
           local_temp_path = Pathname.new(local_temp_dir).join(local_path.basename)
 
-          # download new file if retrying
+          # first try to fetch any new bytes on the existing file
           if retrying.nil? && local_path.file?
             FileUtils.cp local_path, local_temp_path
             headers["If-None-Match"] = etag_for(local_temp_path)
@@ -53,7 +53,7 @@ module Bundler
             local_temp_path.open(mode) {|f| f << content }
           end
 
-          response_etag = response["ETag"].gsub(%r{\AW/}, "")
+          response_etag = (response["ETag"] || "").gsub(%r{\AW/}, "")
           if etag_for(local_temp_path) == response_etag
             SharedHelpers.filesystem_access(local_path) do
               FileUtils.mv(local_temp_path, local_path)
@@ -61,7 +61,7 @@ module Bundler
             return nil
           end
 
-          unless retrying.nil?
+          if retrying
             raise MisMatchedChecksumError.new(remote_path, response_etag, etag_for(local_temp_path))
           end
 

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/mirror"
 
-describe Bundler::Settings::Mirror do
+RSpec.describe Bundler::Settings::Mirror do
   let(:mirror) { Bundler::Settings::Mirror.new }
 
   it "returns zero when fallback_timeout is not set" do
@@ -144,7 +143,7 @@ describe Bundler::Settings::Mirror do
   end
 end
 
-describe Bundler::Settings::Mirrors do
+RSpec.describe Bundler::Settings::Mirrors do
   let(:localhost_uri) { URI("http://localhost:9292") }
 
   context "with a just created mirror" do
@@ -293,7 +292,7 @@ describe Bundler::Settings::Mirrors do
   end
 end
 
-describe Bundler::Settings::TCPSocketProbe do
+RSpec.describe Bundler::Settings::TCPSocketProbe do
   let(:probe) { Bundler::Settings::TCPSocketProbe.new }
 
   context "with a listening TCP Server" do

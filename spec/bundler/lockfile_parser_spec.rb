@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/lockfile_parser"
 
-describe Bundler::LockfileParser do
+RSpec.describe Bundler::LockfileParser do
   let(:lockfile_contents) { strip_whitespace(<<-L) }
     GIT
       remote: https://github.com/alloy/peiji-san.git

@@ -5,7 +5,7 @@ module Bundler
   class CLI::Exec
     attr_reader :options, :args, :cmd
 
-    RESERVED_SIGNALS = %w(SEGV BUS ILL FPE VTALRM KILL STOP).freeze
+    RESERVED_SIGNALS = %w[SEGV BUS ILL FPE VTALRM KILL STOP].freeze
 
     def initialize(options, args)
       @options = options
@@ -91,6 +91,12 @@ module Bundler
         "#!/usr/bin/env jruby\n",
         "#!#{Gem.ruby}\n",
       ]
+
+      if File.zero?(file)
+        Bundler.ui.warn "#{file} is empty"
+        return false
+      end
+
       first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }
       possibilities.any? {|shebang| first_line.start_with?(shebang) }
     end

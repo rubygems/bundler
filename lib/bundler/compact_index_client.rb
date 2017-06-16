@@ -28,6 +28,8 @@ module Bundler
       @cache = Cache.new(@directory)
       @endpoints = Set.new
       @info_checksums_by_name = {}
+      @parsed_checksums = false
+      @mutex = Mutex.new
       @in_parallel = lambda do |inputs, &blk|
         inputs.map(&blk)
       end
@@ -72,7 +74,7 @@ module Bundler
 
     def update(local_path, remote_path)
       Bundler::CompactIndexClient.debug { "update(#{local_path}, #{remote_path})" }
-      unless @endpoints.add?(remote_path)
+      unless synchronize { @endpoints.add?(remote_path) }
         Bundler::CompactIndexClient.debug { "already fetched #{remote_path}" }
         return
       end
@@ -97,6 +99,10 @@ module Bundler
 
     def url(path)
       path
+    end
+
+    def synchronize
+      @mutex.synchronize { yield }
     end
   end
 end

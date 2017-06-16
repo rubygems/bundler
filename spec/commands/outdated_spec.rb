@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle outdated" do
+RSpec.describe "bundle outdated" do
   before :each do
     build_repo2 do
       build_git "foo", :path => lib_path("foo")
@@ -72,7 +71,136 @@ describe "bundle outdated" do
     end
   end
 
+  describe "with --group option" do
+    def test_group_option(group = nil, gems_list_size = 1)
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "weakling", "~> 0.0.1"
+        gem "terranova", '8'
+        group :development, :test do
+          gem "duradura", '7.0'
+          gem 'activesupport', '2.3.5'
+        end
+      G
+
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        build_gem "terranova", "9"
+        build_gem "duradura", "8.0"
+      end
+
+      bundle "outdated --group #{group}"
+
+      # Gem names are one per-line, between "*" and their parenthesized version.
+      gem_list = out.split("\n").map {|g| g[/\* (.*) \(/, 1] }.compact
+      expect(gem_list).to eq(gem_list.sort)
+      expect(gem_list.size).to eq gems_list_size
+    end
+
+    it "not outdated gems" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "weakling", "~> 0.0.1"
+        gem "terranova", '8'
+        group :development, :test do
+          gem 'activesupport', '2.3.5'
+          gem "duradura", '7.0'
+        end
+      G
+
+      bundle "outdated --group"
+      expect(out).to include("Bundle up to date!")
+    end
+
+    it "returns a sorted list of outdated gems from one group => 'default'" do
+      test_group_option("default")
+
+      expect(out).to include("===== Group default =====")
+      expect(out).to include("terranova (")
+
+      expect(out).not_to include("===== Group development, test =====")
+      expect(out).not_to include("activesupport")
+      expect(out).not_to include("duradura")
+    end
+
+    it "returns a sorted list of outdated gems from one group => 'development'" do
+      test_group_option("development", 2)
+
+      expect(out).not_to include("===== Group default =====")
+      expect(out).not_to include("terranova (")
+
+      expect(out).to include("===== Group development, test =====")
+      expect(out).to include("activesupport")
+      expect(out).to include("duradura")
+    end
+  end
+
+  describe "with --groups option" do
+    it "not outdated gems" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "weakling", "~> 0.0.1"
+        gem "terranova", '8'
+        group :development, :test do
+          gem 'activesupport', '2.3.5'
+          gem "duradura", '7.0'
+        end
+      G
+
+      bundle "outdated --groups"
+      expect(out).to include("Bundle up to date!")
+    end
+
+    it "returns a sorted list of outdated gems by groups" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "weakling", "~> 0.0.1"
+        gem "terranova", '8'
+        group :development, :test do
+          gem 'activesupport', '2.3.5'
+          gem "duradura", '7.0'
+        end
+      G
+
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        build_gem "terranova", "9"
+        build_gem "duradura", "8.0"
+      end
+
+      bundle "outdated --groups"
+      expect(out).to include("===== Group default =====")
+      expect(out).to include("terranova (newest 9, installed 8, requested = 8)")
+      expect(out).to include("===== Group development, test =====")
+      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
+      expect(out).to include("duradura (newest 8.0, installed 7.0, requested = 7.0)")
+
+      expect(out).not_to include("weakling (")
+
+      # TODO: check gems order inside the group
+    end
+  end
+
   describe "with --local option" do
+    it "uses local cache to return a list of outdated gems" do
+      update_repo2 do
+        build_gem "activesupport", "2.3.4"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", "2.3.4"
+      G
+
+      bundle "outdated --local"
+
+      expect(out).to include("activesupport (newest 2.3.5, installed 2.3.4, requested = 2.3.4)")
+    end
+
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)
 
@@ -195,6 +323,62 @@ describe "bundle outdated" do
 
       expect(out).to_not include("rack (1.2")
     end
+
+    describe "and filter options" do
+      it "only reports gems that match requirement and patch filter level" do
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", "~> 2.3"
+          gem "weakling", ">= 0.0.1"
+        G
+
+        update_repo2 do
+          build_gem "activesupport", %w[2.4.0 3.0.0]
+          build_gem "weakling", "0.0.5"
+        end
+
+        bundle "outdated --strict --filter-patch"
+
+        expect(out).to_not include("activesupport (newest")
+        expect(out).to include("(newest 0.0.5, installed 0.0.3")
+      end
+
+      it "only reports gems that match requirement and minor filter level" do
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", "~> 2.3"
+          gem "weakling", ">= 0.0.1"
+        G
+
+        update_repo2 do
+          build_gem "activesupport", %w[2.3.9]
+          build_gem "weakling", "0.1.5"
+        end
+
+        bundle "outdated --strict --filter-minor"
+
+        expect(out).to_not include("activesupport (newest")
+        expect(out).to include("(newest 0.1.5, installed 0.0.3")
+      end
+
+      it "only reports gems that match requirement and major filter level" do
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", "~> 2.3"
+          gem "weakling", ">= 0.0.1"
+        G
+
+        update_repo2 do
+          build_gem "activesupport", %w[2.4.0 2.5.0]
+          build_gem "weakling", "1.1.5"
+        end
+
+        bundle "outdated --strict --filter-major"
+
+        expect(out).to_not include("activesupport (newest")
+        expect(out).to include("(newest 1.1.5, installed 0.0.3")
+      end
+    end
   end
 
   describe "with invalid gem name" do
@@ -257,6 +441,33 @@ describe "bundle outdated" do
     end
   end
 
+  context "update available for a gem on the same platform while multiple platforms used for gem" do
+    it "reports that updates are available if the Ruby platform is used" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "laduradura", '= 5.15.2', :platforms => [:ruby, :jruby]
+      G
+
+      bundle "outdated"
+      expect(out).to include("Bundle up to date!")
+    end
+
+    it "reports that updates are available if the JRuby platform is used" do
+      simulate_ruby_engine "jruby", "1.6.7" do
+        simulate_platform "jruby" do
+          install_gemfile <<-G
+            source "file://#{gem_repo2}"
+            gem "laduradura", '= 5.15.2', :platforms => [:ruby, :jruby]
+          G
+
+          bundle "outdated"
+          expect(out).to include("Outdated gems included in the bundle:")
+          expect(out).to include("laduradura (newest 5.15.3, installed 5.15.2, requested = 5.15.2)")
+        end
+      end
+    end
+  end
+
   shared_examples_for "version update is detected" do
     it "reports that a gem has a newer version" do
       subject
@@ -274,6 +485,21 @@ describe "bundle outdated" do
       end
     end
 
+    it_behaves_like "version update is detected"
+  end
+
+  context "when on a new machine" do
+    before do
+      simulate_new_machine
+
+      update_git "foo", :path => lib_path("foo")
+      update_repo2 do
+        build_gem "activesupport", "3.3.5"
+        build_gem "weakling", "0.8.0"
+      end
+    end
+
+    subject { bundle "outdated" }
     it_behaves_like "version update is detected"
   end
 
@@ -302,7 +528,7 @@ describe "bundle outdated" do
   shared_examples_for "no version updates are detected" do
     it "does not detect any version updates" do
       subject
-      expect(out).to include("Bundle up to date!")
+      expect(out).to include("updates to display.")
       expect(out).to_not include("ERROR REPORT TEMPLATE")
       expect(out).to_not include("activesupport (newest")
       expect(out).to_not include("weakling (newest")
@@ -342,59 +568,163 @@ describe "bundle outdated" do
     it_behaves_like "no version updates are detected"
   end
 
-  describe "with --major option" do
-    subject { bundle "outdated --major" }
+  describe "with --filter-major option" do
+    subject { bundle "outdated --filter-major" }
 
     it_behaves_like "major version updates are detected"
     it_behaves_like "minor version is ignored"
     it_behaves_like "patch version is ignored"
   end
 
-  describe "with --minor option" do
-    subject { bundle "outdated --minor" }
+  describe "with --filter-minor option" do
+    subject { bundle "outdated --filter-minor" }
 
     it_behaves_like "minor version updates are detected"
     it_behaves_like "major version is ignored"
     it_behaves_like "patch version is ignored"
   end
 
-  describe "with --patch option" do
-    subject { bundle "outdated --patch" }
+  describe "with --filter-patch option" do
+    subject { bundle "outdated --filter-patch" }
 
     it_behaves_like "patch version updates are detected"
     it_behaves_like "major version is ignored"
     it_behaves_like "minor version is ignored"
   end
 
-  describe "with --minor --patch options" do
-    subject { bundle "outdated --minor --patch" }
+  describe "with --filter-minor --filter-patch options" do
+    subject { bundle "outdated --filter-minor --filter-patch" }
 
     it_behaves_like "minor version updates are detected"
     it_behaves_like "patch version updates are detected"
     it_behaves_like "major version is ignored"
   end
 
-  describe "with --major --minor options" do
-    subject { bundle "outdated --major --minor" }
+  describe "with --filter-major --filter-minor options" do
+    subject { bundle "outdated --filter-major --filter-minor" }
 
     it_behaves_like "major version updates are detected"
     it_behaves_like "minor version updates are detected"
     it_behaves_like "patch version is ignored"
   end
 
-  describe "with --major --patch options" do
-    subject { bundle "outdated --major --patch" }
+  describe "with --filter-major --filter-patch options" do
+    subject { bundle "outdated --filter-major --filter-patch" }
 
     it_behaves_like "major version updates are detected"
     it_behaves_like "patch version updates are detected"
     it_behaves_like "minor version is ignored"
   end
 
-  describe "with --major --minor --patch options" do
-    subject { bundle "outdated --major --minor --patch" }
+  describe "with --filter-major --filter-minor --filter-patch options" do
+    subject { bundle "outdated --filter-major --filter-minor --filter-patch" }
 
     it_behaves_like "major version updates are detected"
     it_behaves_like "minor version updates are detected"
     it_behaves_like "patch version updates are detected"
+  end
+
+  context "conservative updates" do
+    context "without update-strict" do
+      before do
+        build_repo4 do
+          build_gem "patch", %w[1.0.0 1.0.1]
+          build_gem "minor", %w[1.0.0 1.0.1 1.1.0]
+          build_gem "major", %w[1.0.0 1.0.1 1.1.0 2.0.0]
+        end
+
+        # establish a lockfile set to 1.0.0
+        install_gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'patch', '1.0.0'
+        gem 'minor', '1.0.0'
+        gem 'major', '1.0.0'
+        G
+
+        # remove 1.4.3 requirement and bar altogether
+        # to setup update specs below
+        gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'patch'
+        gem 'minor'
+        gem 'major'
+        G
+      end
+
+      it "shows nothing when patching and filtering to minor" do
+        bundle "outdated --patch --filter-minor"
+
+        expect(out).to include("No minor updates to display.")
+        expect(out).not_to include("patch (newest")
+        expect(out).not_to include("minor (newest")
+        expect(out).not_to include("major (newest")
+      end
+
+      it "shows all gems when patching and filtering to patch" do
+        bundle "outdated --patch --filter-patch"
+
+        expect(out).to include("patch (newest 1.0.1")
+        expect(out).to include("minor (newest 1.0.1")
+        expect(out).to include("major (newest 1.0.1")
+      end
+
+      it "shows minor and major when updating to minor and filtering to patch and minor" do
+        bundle "outdated --minor --filter-minor"
+
+        expect(out).not_to include("patch (newest")
+        expect(out).to include("minor (newest 1.1.0")
+        expect(out).to include("major (newest 1.1.0")
+      end
+
+      it "shows minor when updating to major and filtering to minor with parseable" do
+        bundle "outdated --major --filter-minor --parseable"
+
+        expect(out).not_to include("patch (newest")
+        expect(out).to include("minor (newest")
+        expect(out).not_to include("major (newest")
+      end
+    end
+
+    context "with update-strict" do
+      before do
+        build_repo4 do
+          build_gem "foo", %w[1.4.3 1.4.4] do |s|
+            s.add_dependency "bar", "~> 2.0"
+          end
+          build_gem "foo", %w[1.4.5 1.5.0] do |s|
+            s.add_dependency "bar", "~> 2.1"
+          end
+          build_gem "foo", %w[1.5.1] do |s|
+            s.add_dependency "bar", "~> 3.0"
+          end
+          build_gem "bar", %w[2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0]
+          build_gem "qux", %w[1.0.0 1.1.0 2.0.0]
+        end
+
+        # establish a lockfile set to 1.4.3
+        install_gemfile <<-G
+          source "file://#{gem_repo4}"
+          gem 'foo', '1.4.3'
+          gem 'bar', '2.0.3'
+          gem 'qux', '1.0.0'
+        G
+
+        # remove 1.4.3 requirement and bar altogether
+        # to setup update specs below
+        gemfile <<-G
+          source "file://#{gem_repo4}"
+          gem 'foo'
+          gem 'qux'
+        G
+      end
+
+      it "shows gems with update-strict updating to patch and filtering to patch" do
+        bundle "outdated --patch --update-strict --filter-patch"
+
+        expect(out).to include("foo (newest 1.4.4")
+        expect(out).to include("bar (newest 2.0.5")
+        expect(out).not_to include("qux (newest")
+      end
+    end
   end
 end

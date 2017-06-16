@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::Retry do
+RSpec.describe Bundler::Retry do
   it "return successful result if no errors" do
     attempts = 0
     result = Bundler::Retry.new(nil, nil, 3).attempt do
@@ -65,10 +64,10 @@ describe Bundler::Retry do
       end
     end
 
-    context "with debugging on" do
+    context "with debugging off" do
       it "print error message with newlines" do
         allow(Bundler.ui).to  receive(:debug?).and_return(false)
-        expect(Bundler.ui).to receive(:info).with("")
+        expect(Bundler.ui).to receive(:info).with("").twice
         expect(Bundler.ui).to receive(:warn).with(failure_message, false)
 
         expect do

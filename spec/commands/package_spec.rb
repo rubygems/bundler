@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle package" do
+RSpec.describe "bundle package" do
   context "with --gemfile" do
     it "finds the gemfile" do
       gemfile bundled_app("NotGemfile"), <<-G
@@ -222,7 +221,7 @@ describe "bundle package" do
   end
 end
 
-describe "bundle install with gem sources" do
+RSpec.describe "bundle install with gem sources" do
   describe "when cached and locked" do
     it "does not hit the remote at all" do
       build_repo2

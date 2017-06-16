@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle install" do
+RSpec.describe "bundle install" do
   context "with duplicated gems" do
     it "will display a warning" do
       install_gemfile <<-G
@@ -72,7 +71,7 @@ describe "bundle install" do
       simulate_ruby_version "2.3.0" do
         simulate_ruby_engine "jruby", "9.1.2.0" do
           install_gemfile! <<-G
-            source "https://rubygems.org"
+            source "file://#{gem_repo1}"
             ruby "2.3.0", :engine => :jruby, :engine_version => "9.1.2.0"
           G
 

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle check" do
+RSpec.describe "bundle check" do
   it "returns success when the Gemfile is satisfied" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
