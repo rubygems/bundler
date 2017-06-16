@@ -53,7 +53,7 @@ module Bundler
             local_temp_path.open(mode) {|f| f << content }
           end
 
-          response_etag = response["ETag"].gsub(%r{\AW/}, "")
+          response_etag = (response["ETag"] || "").gsub(%r{\AW/}, "")
           if etag_for(local_temp_path) == response_etag
             SharedHelpers.filesystem_access(local_path) do
               FileUtils.mv(local_temp_path, local_path)

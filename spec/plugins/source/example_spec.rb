@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "real source plugins" do
+RSpec.describe "real source plugins" do
   context "with a minimal source plugin" do
     before do
       build_repo2 do

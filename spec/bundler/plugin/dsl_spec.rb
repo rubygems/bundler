@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::Plugin::DSL do
+RSpec.describe Bundler::Plugin::DSL do
   DSL = Bundler::Plugin::DSL
 
   subject(:dsl) { Bundler::Plugin::DSL.new }

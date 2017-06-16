@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "when using sudo", :sudo => true do
+RSpec.describe "when using sudo", :sudo => true do
   describe "and BUNDLE_PATH is writable" do
     context "but BUNDLE_PATH/build_info is not writable" do
       before do
@@ -83,7 +82,7 @@ describe "when using sudo", :sudo => true do
       expect(the_bundle).to include_gems "rack 1.0"
     end
 
-    it "installs extensions/ compiled by Rubygems 2.2", :rubygems => "2.2" do
+    it "installs extensions/ compiled by RubyGems 2.2", :rubygems => "2.2" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "very_simple_binary"

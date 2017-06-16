@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::Plugin do
+RSpec.describe Bundler::Plugin do
   Plugin = Bundler::Plugin
 
   let(:installer) { double(:installer) }
