@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "Bundler.with_env helpers" do
   describe "Bundler.original_env" do
@@ -45,6 +44,14 @@ RSpec.describe "Bundler.with_env helpers" do
 1 true
 0 true
       EOS
+    end
+
+    it "removes variables that bundler added" do
+      system_gems :bundler
+      original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")')
+      code = 'puts Bundler.original_env.to_a.map {|e| e.join("=") }.sort.join("\n")'
+      bundle!("exec ruby -e #{code.inspect}", :system_bundler => true)
+      expect(out).to eq original
     end
   end
 

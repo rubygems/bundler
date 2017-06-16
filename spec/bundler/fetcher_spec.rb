@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/fetcher"
 
 RSpec.describe Bundler::Fetcher do
@@ -74,7 +73,7 @@ RSpec.describe Bundler::Fetcher do
 
   describe "#user_agent" do
     it "builds user_agent with current ruby version and Bundler settings" do
-      allow(Bundler.settings).to receive(:all).and_return(%w(foo bar))
+      allow(Bundler.settings).to receive(:all).and_return(%w[foo bar])
       expect(fetcher.user_agent).to match(%r{bundler/(\d.)})
       expect(fetcher.user_agent).to match(%r{rubygems/(\d.)})
       expect(fetcher.user_agent).to match(%r{ruby/(\d.)})

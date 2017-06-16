@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/source/rubygems/remote"
 
 RSpec.describe Bundler::Source::Rubygems::Remote do

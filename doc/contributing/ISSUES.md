@@ -39,7 +39,7 @@ If your version of Bundler does not have the `bundle env` command, then please i
  - Your Bundler configuration settings (run `bundle config`)
  - What version of bundler you are using (run `bundle -v`)
  - What version of Ruby you are using (run `ruby -v`)
- - What version of Rubygems you are using (run `gem -v`)
+ - What version of RubyGems you are using (run `gem -v`)
  - Whether you are using RVM, and if so what version (run `rvm -v`)
  - Whether you have the `rubygems-bundler` gem, which can break gem executables (run `gem list rubygems-bundler`)
  - Whether you have the `open_gem` gem, which can cause rake activation conflicts (run `gem list open_gem`)

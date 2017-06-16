@@ -1,6 +1,5 @@
 # encoding: utf-8
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler"
 
 RSpec.describe Bundler do
@@ -106,7 +105,7 @@ RSpec.describe Bundler do
 
   describe "#which" do
     let(:executable) { "executable" }
-    let(:path) { %w(/a /b c ../d /e) }
+    let(:path) { %w[/a /b c ../d /e] }
     let(:expected) { "executable" }
 
     before do

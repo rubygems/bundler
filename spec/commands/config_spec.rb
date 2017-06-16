@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe ".bundle/config" do
   before :each do
@@ -267,7 +266,7 @@ RSpec.describe ".bundle/config" do
       expect(out).to eq "bar=value"
     end
 
-    it "preferes local config over global" do
+    it "prefers local config over global" do
       bundle "config --local bar value2"
       bundle "config --global bar value"
       bundle "config bar --parseable"

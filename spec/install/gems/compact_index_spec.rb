@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "compact index api" do
   let(:source_hostname) { "localgemserver.test" }
@@ -640,7 +639,7 @@ The checksum of /versions does not match the checksum provided by the server! So
   context "when SSL certificate verification fails" do
     it "explains what happened" do
       # Install a monkeypatch that reproduces the effects of openssl raising
-      # a certificate validation error when Rubygems tries to connect.
+      # a certificate validation error when RubyGems tries to connect.
       gemfile <<-G
         class Net::HTTP
           def start
@@ -768,5 +767,17 @@ The checksum of /versions does not match the checksum provided by the server! So
 Bundler::APIResponseMismatchError: Downloading rails-2.3.2 revealed dependencies not in the API or the lockfile (#{deps.map(&:to_s).join(", ")}).
 Either installing with `--full-index` or running `bundle update rails` should fix the problem.
     E
+  end
+
+  it "does not duplicate specs in the lockfile when updating and a dependency is not installed" do
+    install_gemfile! <<-G, :artifice => "compact_index"
+      source "#{source_uri}" do
+        gem "rails"
+        gem "activemerchant"
+      end
+    G
+    gem_command! :uninstall, "activemerchant"
+    bundle! "update rails", :artifice => "compact_index"
+    expect(lockfile.scan(/activemerchant \(/).size).to eq(1)
   end
 end

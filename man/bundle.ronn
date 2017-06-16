@@ -48,6 +48,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 
 ## UTILITIES
 
+* `bundle add(1)`:
+  Add the named gem to the Gemfile and run `bundle install`
+
 * `bundle binstubs(1)`:
   Generate binstubs for executables in a gem
 

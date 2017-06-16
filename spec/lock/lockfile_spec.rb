@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "the lockfile format" do
   include Bundler::GemHelpers

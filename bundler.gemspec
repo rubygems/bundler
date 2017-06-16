@@ -18,6 +18,15 @@ Gem::Specification.new do |s|
   s.summary     = "The best way to manage your application's dependencies"
   s.description = "Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably"
 
+  if s.respond_to?(:metadata=)
+    s.metadata = {
+      "bug_tracker_uri" => "http://github.com/bundler/bundler/issues",
+      "changelog_uri" => "https://github.com/bundler/bundler/blob/master/CHANGELOG.md",
+      "homepage_uri" => "https://bundler.io/",
+      "source_code_uri" => "http://github.com/bundler/bundler/",
+    }
+  end
+
   s.required_ruby_version     = ">= 1.8.7"
   s.required_rubygems_version = ">= 1.3.6"
 
@@ -34,6 +43,6 @@ Gem::Specification.new do |s|
   s.files += Dir.glob("man/**/*")
 
   s.bindir        = "exe"
-  s.executables   = %w(bundle bundler)
+  s.executables   = %w[bundle bundler]
   s.require_paths = ["lib"]
 end

@@ -18,7 +18,7 @@ module Spec
 
     def build_repo1
       build_repo gem_repo1 do
-        build_gem "rack", %w(0.9.1 1.0.0) do |s|
+        build_gem "rack", %w[0.9.1 1.0.0] do |s|
           s.executables = "rackup"
           s.post_install_message = "Rack's post install message"
         end
@@ -57,7 +57,7 @@ module Spec
         build_gem "activeresource", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activesupport", %w(1.2.3 2.3.2 2.3.5)
+        build_gem "activesupport", %w[1.2.3 2.3.2 2.3.5]
 
         build_gem "activemerchant" do |s|
           s.add_dependency "activesupport", ">= 2.0.0"
@@ -256,7 +256,7 @@ module Spec
         end
 
         # Capistrano did this (at least until version 2.5.10)
-        # Rubygems 2.2 doesn't allow the specifying of a dependency twice
+        # RubyGems 2.2 doesn't allow the specifying of a dependency twice
         # See https://github.com/rubygems/rubygems/commit/03dbac93a3396a80db258d9bc63500333c25bd2f
         build_gem "double_deps", "1.0", :skip_validation => true do |s|
           s.add_dependency "net-ssh", ">= 1.0.0"
@@ -659,6 +659,7 @@ module Spec
       def _build(options)
         libpath = options[:path] || _default_path
         update_gemspec = options[:gemspec] || false
+        source = options[:source] || "git@#{libpath}"
 
         Dir.chdir(libpath) do
           silently "git checkout master"
@@ -684,7 +685,7 @@ module Spec
           _default_files.keys.each do |path|
             _default_files[path] += "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
-          super(options.merge(:path => libpath, :gemspec => update_gemspec))
+          super(options.merge(:path => libpath, :gemspec => update_gemspec, :source => source))
           `git add *`
           `git commit -m "BUMP"`
         end

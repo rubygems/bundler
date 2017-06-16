@@ -4,8 +4,7 @@ require "bundler/vendored_thor"
 
 module Bundler
   class CLI < Thor
-    include Thor::Actions
-    AUTO_INSTALL_CMDS = %w(show binstubs outdated exec open console licenses clean).freeze
+    AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
 
     def self.start(*)
       super
@@ -26,7 +25,7 @@ module Bundler
 
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
       if custom_gemfile && !custom_gemfile.empty?
-        ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile)
+        Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", File.expand_path(custom_gemfile)
         Bundler.reset_paths!
       end
 
@@ -222,6 +221,8 @@ module Bundler
       "Do not allow any gem to be updated past latest --patch | --minor | --major"
     method_option "conservative", :type => :boolean, :banner =>
       "Use bundle install conservative update behavior and do not allow shared dependencies to be updated."
+    method_option "all", :type => :boolean, :banner =>
+      "Update everything."
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run
@@ -242,7 +243,7 @@ module Bundler
       Show.new(options, gem_name).run
     end
     # TODO: 2.0 remove `bundle list`
-    map %w(list) => "show"
+    map %w[list] => "show"
 
     desc "info GEM [OPTIONS]", "Show information for the given gem"
     method_option "path", :type => :boolean, :banner => "Print full path to gem"
@@ -346,14 +347,14 @@ module Bundler
       require "bundler/cli/package"
       Package.new(options).run
     end
-    map %w(pack) => :package
+    map %w[pack] => :package
 
     desc "exec [OPTIONS]", "Run the command in context of the bundle"
     method_option :keep_file_descriptors, :type => :boolean, :default => false
     long_desc <<-D
       Exec runs a command, providing it access to the gems in the bundle. While using
       bundle exec you can require and call the bundled gems as if they were installed
-      into the system wide Rubygems repository.
+      into the system wide RubyGems repository.
     D
     map "e" => "exec"
     def exec(*args)
@@ -394,9 +395,12 @@ module Bundler
 
     desc "version", "Prints the bundler's version information"
     def version
-      Bundler.ui.info "Bundler version #{Bundler::VERSION}"
+      if ARGV.include?("version")
+        build_info = " (#{BuildMetadata.built_at} commit #{BuildMetadata.git_commit_sha})"
+      end
+      Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
     end
-    map %w(-v --version) => :version
+    map %w[-v --version] => :version
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
@@ -530,7 +534,7 @@ module Bundler
 
     desc "env", "Print information about the environment Bundler is running under"
     def env
-      Env.new.write($stdout)
+      Env.write($stdout)
     end
 
     desc "doctor [OPTIONS]", "Checks the bundle for common problems"
@@ -554,10 +558,10 @@ module Bundler
       Issue.new.run
     end
 
-    desc "pristine", "Restores installed gems to pristine condition from files located in the gem cache. Gem installed from a git repository will be issued `git checkout --force`."
-    def pristine
+    desc "pristine [GEMS...]", "Restores installed gems to pristine condition from files located in the gem cache. Gem installed from a git repository will be issued `git checkout --force`."
+    def pristine(*gems)
       require "bundler/cli/pristine"
-      Pristine.new.run
+      Pristine.new(gems).run
     end
 
     if Bundler.feature_flag.plugins?
@@ -570,14 +574,14 @@ module Bundler
     # into the corresponding `bundle help #{command}` call
     def self.reformatted_help_args(args)
       bundler_commands = all_commands.keys
-      help_flags = %w(--help -h)
-      exec_commands = %w(e ex exe exec)
+      help_flags = %w[--help -h]
+      exec_commands = %w[e ex exe exec]
       help_used = args.index {|a| help_flags.include? a }
       exec_used = args.index {|a| exec_commands.include? a }
       command = args.find {|a| bundler_commands.include? a }
       if exec_used && help_used
         if exec_used + help_used == 1
-          %w(help exec)
+          %w[help exec]
         else
           args
         end
@@ -616,7 +620,7 @@ module Bundler
       return unless ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] || Bundler.ui.debug?
       _, _, config = @_initializer
       current_command = config[:current_command].name
-      return if %w(exec version check platform show help).include?(current_command)
+      return if %w[exec version check platform show help].include?(current_command)
       command = ["bundle", current_command] + args
       command << Thor::Options.to_switches(options)
       command.reject!(&:empty?)
