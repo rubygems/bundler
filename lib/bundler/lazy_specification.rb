@@ -1,24 +1,41 @@
+# frozen_string_literal: true
 require "uri"
-require "rubygems/spec_fetcher"
+require "bundler/match_platform"
 
 module Bundler
   class LazySpecification
+    Identifier = Struct.new(:name, :version, :source, :platform, :dependencies)
+    class Identifier
+      include Comparable
+      def <=>(other)
+        return unless other.is_a?(Identifier)
+        [name, version, platform_string] <=> [other.name, other.version, other.platform_string]
+      end
+
+    protected
+
+      def platform_string
+        platform_string = platform.to_s
+        platform_string == Index::RUBY ? Index::NULL : platform_string
+      end
+    end
+
     include MatchPlatform
 
     attr_reader :name, :version, :dependencies, :platform
-    attr_accessor :source
+    attr_accessor :source, :remote
 
     def initialize(name, version, platform, source = nil)
       @name          = name
       @version       = version
       @dependencies  = []
-      @platform      = platform
+      @platform      = platform || Gem::Platform::RUBY
       @source        = source
       @specification = nil
     end
 
     def full_name
-      if platform == Gem::Platform::RUBY or platform.nil? then
+      if platform == Gem::Platform::RUBY || platform.nil?
         "#{@name}-#{@version}"
       else
         "#{@name}-#{@version}-#{platform}"
@@ -34,13 +51,15 @@ module Bundler
     end
 
     def to_lock
-      if platform == Gem::Platform::RUBY or platform.nil?
-        out = "    #{name} (#{version})\n"
+      out = String.new
+
+      if platform == Gem::Platform::RUBY || platform.nil?
+        out << "    #{name} (#{version})\n"
       else
-        out = "    #{name} (#{version}-#{platform})\n"
+        out << "    #{name} (#{version}-#{platform})\n"
       end
 
-      dependencies.sort_by {|d| d.to_s }.each do |dep|
+      dependencies.sort_by(&:to_s).uniq.each do |dep|
         next if dep.type == :development
         out << "    #{dep.to_lock}\n"
       end
@@ -49,19 +68,41 @@ module Bundler
     end
 
     def __materialize__
-      @specification = source.specs.search(Gem::Dependency.new(name, version)).last
+      search_object = Bundler.settings[:specific_platform] || Bundler.settings[:force_ruby_platform] ? self : Dependency.new(name, version)
+      @specification = if source.is_a?(Source::Gemspec) && source.gemspec.name == name
+        source.gemspec.tap {|s| s.source = source }
+      else
+        search = source.specs.search(search_object).last
+        if search && Gem::Platform.new(search.platform) != Gem::Platform.new(platform) && !search.runtime_dependencies.-(dependencies.reject {|d| d.type == :development }).empty?
+          Bundler.ui.warn "Unable to use the platform-specific (#{search.platform}) version of #{name} (#{version}) " \
+            "because it has different dependencies from the #{platform} version. " \
+            "To use the platform-specific version of the gem, run `bundle config specific_platform true` and install again."
+          search = source.specs.search(self).last
+        end
+        search.dependencies = dependencies if search.is_a?(RemoteSpecification) || search.is_a?(EndpointSpecification)
+        search
+      end
     end
 
     def respond_to?(*args)
-      super || @specification.respond_to?(*args)
+      super || @specification ? @specification.respond_to?(*args) : nil
     end
 
     def to_s
-      @__to_s ||= "#{name} (#{version})"
+      @__to_s ||= if platform == Gem::Platform::RUBY || platform.nil?
+        "#{name} (#{version})"
+      else
+        "#{name} (#{version}-#{platform})"
+      end
     end
 
     def identifier
-      @__identifier ||= [name, version, source, platform, dependencies].hash
+      @__identifier ||= Identifier.new(name, version, source, platform, dependencies)
+    end
+
+    def git_version
+      return unless source.is_a?(Bundler::Source::Git)
+      " #{source.revision[0..6]}"
     end
 
   private
@@ -77,6 +118,5 @@ module Bundler
 
       @specification.send(method, *args, &blk)
     end
-
   end
 end

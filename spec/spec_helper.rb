@@ -1,35 +1,57 @@
-$:.unshift File.expand_path('..', __FILE__)
-$:.unshift File.expand_path('../../lib', __FILE__)
-require 'bundler/psyched_yaml'
-require 'fileutils'
-require 'rubygems'
-require 'bundler'
-require 'rspec'
-require 'uri'
-require 'digest/sha1'
+# frozen_string_literal: true
+$:.unshift File.expand_path("..", __FILE__)
+$:.unshift File.expand_path("../../lib", __FILE__)
+
+require "bundler/psyched_yaml"
+require "fileutils"
+require "uri"
+require "digest/sha1"
+
+begin
+  require "rubygems"
+  spec = Gem::Specification.load("bundler.gemspec")
+  rspec = spec.dependencies.find {|d| d.name == "rspec" }
+  gem "rspec", rspec.requirement.to_s
+  require "rspec"
+  require "diff/lcs"
+rescue LoadError
+  abort "Run rake spec:deps to install development dependencies"
+end
+
+if File.expand_path(__FILE__) =~ %r{([^\w/\.])}
+  abort "The bundler specs cannot be run from a path that contains special characters (particularly #{$1.inspect})"
+end
+
+require "bundler"
 
 # Require the correct version of popen for the current platform
-if RbConfig::CONFIG['host_os'] =~ /mingw|mswin/
+if RbConfig::CONFIG["host_os"] =~ /mingw|mswin/
   begin
-    require 'win32/open3'
+    require "win32/open3"
   rescue LoadError
     abort "Run `gem install win32-open3` to be able to run specs"
   end
 else
-  require 'open3'
+  require "open3"
 end
 
-Dir["#{File.expand_path('../support', __FILE__)}/*.rb"].each do |file|
-  require file unless file =~ /fakeweb\/.*\.rb/
+Dir["#{File.expand_path("../support", __FILE__)}/*.rb"].each do |file|
+  require file unless file.end_with?("hax.rb")
 end
 
-$debug    = false
-$show_err = true
+$debug = false
 
+Spec::Manpages.setup
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
-ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r#{Spec::Path.root}/spec/support/rubygems_hax/platform.rb"
-ENV['BUNDLE_SPEC_RUN'] = "true"
+ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.root}/spec/support/hax.rb"
+ENV["BUNDLE_SPEC_RUN"] = "true"
+ENV["BUNDLE_PLUGINS"] = "true"
+
+# Don't wrap output in tests
+ENV["THOR_COLUMNS"] = "10000"
+
+Spec::CodeClimate.setup
 
 RSpec.configure do |config|
   config.include Spec::Builders
@@ -40,36 +62,42 @@ RSpec.configure do |config|
   config.include Spec::Rubygems
   config.include Spec::Platforms
   config.include Spec::Sudo
+  config.include Spec::Permissions
 
-  if Spec::Sudo.test_sudo?
+  # Enable flags like --only-failures and --next-failure
+  config.example_status_persistence_file_path = ".rspec_status"
+
+  config.disable_monkey_patching!
+
+  # Since failures cause us to keep a bunch of long strings in memory, stop
+  # once we have a large number of failures (indicative of core pieces of
+  # bundler being broken) so that running the full test suite doesn't take
+  # forever due to memory constraints
+  config.fail_fast ||= 25
+
+  if ENV["BUNDLER_SUDO_TESTS"] && Spec::Sudo.present?
     config.filter_run :sudo => true
   else
     config.filter_run_excluding :sudo => true
   end
 
-  if ENV['BUNDLER_REALWORLD_TESTS']
+  if ENV["BUNDLER_REALWORLD_TESTS"]
     config.filter_run :realworld => true
   else
     config.filter_run_excluding :realworld => true
   end
 
-  if RUBY_VERSION >= "1.9"
-    config.filter_run_excluding :ruby => "1.8"
-  else
-    config.filter_run_excluding :ruby => "1.9"
-  end
+  git_version = Bundler::Source::Git::GitProxy.new(nil, nil, nil).version
 
-  config.filter_run :focused => true unless ENV['CI']
-  config.run_all_when_everything_filtered = true
-  config.alias_example_to :fit, :focused => true
+  config.filter_run_excluding :ruby => LessThanProc.with(RUBY_VERSION)
+  config.filter_run_excluding :rubygems => LessThanProc.with(Gem::VERSION)
+  config.filter_run_excluding :git => LessThanProc.with(git_version)
+  config.filter_run_excluding :rubygems_master => (ENV["RGV"] != "master")
 
-  original_wd       = Dir.pwd
-  original_path     = ENV['PATH']
-  original_gem_home = ENV['GEM_HOME']
+  config.filter_run_when_matching :focus unless ENV["CI"]
 
-  def pending_jruby_shebang_fix
-    pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
-  end
+  original_wd  = Dir.pwd
+  original_env = ENV.to_hash.delete_if {|k, _v| k.start_with?(Bundler::EnvironmentPreserver::BUNDLER_PREFIX) }
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
@@ -77,28 +105,34 @@ RSpec.configure do |config|
 
   config.before :all do
     build_repo1
+    # HACK: necessary until rspec-mocks > 3.5.0 is used
+    # see https://github.com/bundler/bundler/pull/5363#issuecomment-278089256
+    if RUBY_VERSION < "1.9"
+      FileUtils.module_eval do
+        alias_method :mkpath, :mkdir_p
+        module_function :mkpath
+      end
+    end
   end
 
   config.before :each do
     reset!
     system_gems []
     in_app_root
+    @all_output = String.new
   end
 
-  config.after :each do
-    puts @out if example.exception
+  config.after :each do |example|
+    @all_output.strip!
+    if example.exception && !@all_output.empty?
+      warn @all_output unless config.formatters.grep(RSpec::Core::Formatters::DocumentationFormatter).empty?
+      message = example.exception.message + "\n\nCommands:\n#{@all_output}"
+      (class << example.exception; self; end).send(:define_method, :message) do
+        message
+      end
+    end
 
     Dir.chdir(original_wd)
-    # Reset ENV
-    ENV['PATH']           = original_path
-    ENV['GEM_HOME']       = original_gem_home
-    ENV['GEM_PATH']       = original_gem_home
-    ENV['BUNDLE_PATH']    = nil
-    ENV['BUNDLE_GEMFILE'] = nil
-    ENV['BUNDLER_TEST']   = nil
-    ENV['BUNDLE_FROZEN']  = nil
-    ENV['BUNDLER_SPEC_PLATFORM'] = nil
-    ENV['BUNDLER_SPEC_VERSION']  = nil
-    ENV['BUNDLE_APP_CONFIG']     = nil
+    ENV.replace(original_env)
   end
 end

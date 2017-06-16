@@ -1,20 +1,16 @@
-require "spec_helper"
+# frozen_string_literal: true
 
-describe "bundle cache with multiple platforms" do
+RSpec.describe "bundle cache with multiple platforms" do
   before :each do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
-      platforms :ruby, :ruby_18, :ruby_19, :ruby_20 do
+      platforms :mri, :rbx do
         gem "rack", "1.0.0"
       end
 
       platforms :jruby do
         gem "activesupport", "2.3.5"
-      end
-
-      platforms :mri, :mri_18, :mri_19, :mri_20 do
-        gem "activerecord", "2.3.2"
       end
     G
 
@@ -24,7 +20,6 @@ describe "bundle cache with multiple platforms" do
         specs:
           rack (1.0.0)
           activesupport (2.3.5)
-          activerecord (2.3.2)
 
       PLATFORMS
         ruby
@@ -33,25 +28,26 @@ describe "bundle cache with multiple platforms" do
       DEPENDENCIES
         rack (1.0.0)
         activesupport (2.3.5)
-        activerecord (2.3.2)
     G
 
-    cache_gems "rack-1.0.0", "activesupport-2.3.5", "activerecord-2.3.2"
+    cache_gems "rack-1.0.0", "activesupport-2.3.5"
   end
 
-  it "ensures that bundle install does not delete gems for other platforms" do
+  it "ensures that a successful bundle install does not delete gems for other platforms" do
     bundle "install"
 
+    expect(exitstatus).to eq 0 if exitstatus
+
     expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     expect(bundled_app("vendor/cache/activesupport-2.3.5.gem")).to exist
-    expect(bundled_app("vendor/cache/activerecord-2.3.2.gem")).to exist
   end
 
-  it "ensures that bundle update does not delete gems for other platforms" do
+  it "ensures that a successful bundle update does not delete gems for other platforms" do
     bundle "update"
+
+    expect(exitstatus).to eq 0 if exitstatus
 
     expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     expect(bundled_app("vendor/cache/activesupport-2.3.5.gem")).to exist
-    expect(bundled_app("vendor/cache/activerecord-2.3.2.gem")).to exist
   end
 end

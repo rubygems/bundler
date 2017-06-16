@@ -1,7 +1,7 @@
-require "spec_helper"
+# frozen_string_literal: true
 
-%w(cache package).each do |cmd|
-  describe "bundle #{cmd} with path" do
+%w[cache package].each do |cmd|
+  RSpec.describe "bundle #{cmd} with path" do
     it "is no-op when the path is within the bundle" do
       build_lib "foo", :path => bundled_app("lib/foo")
 
@@ -11,7 +11,7 @@ require "spec_helper"
 
       bundle "#{cmd} --all"
       expect(bundled_app("vendor/cache/foo-1.0")).not_to exist
-      should_be_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "copies when the path is outside the bundle " do
@@ -26,7 +26,25 @@ require "spec_helper"
       expect(bundled_app("vendor/cache/foo-1.0/.bundlecache")).to be_file
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      should_be_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
+    end
+
+    it "copies when the path is outside the bundle and the paths intersect" do
+      libname = File.basename(Dir.pwd) + "_gem"
+      libpath = File.join(File.dirname(Dir.pwd), libname)
+
+      build_lib libname, :path => libpath
+
+      install_gemfile <<-G
+        gem "#{libname}", :path => '#{libpath}'
+      G
+
+      bundle "#{cmd} --all"
+      expect(bundled_app("vendor/cache/#{libname}")).to exist
+      expect(bundled_app("vendor/cache/#{libname}/.bundlecache")).to be_file
+
+      FileUtils.rm_rf libpath
+      expect(the_bundle).to include_gems "#{libname} 1.0"
     end
 
     it "updates the path on each cache" do

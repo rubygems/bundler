@@ -1,8 +1,8 @@
-require "spec_helper"
+# frozen_string_literal: true
 
-describe "git base name" do
+RSpec.describe "git base name" do
   it "base_name should strip private repo uris" do
-    source  = Bundler::Source::Git.new("uri" => "git@github.com:bundler.git")
+    source = Bundler::Source::Git.new("uri" => "git@github.com:bundler.git")
     expect(source.send(:base_name)).to eq("bundler")
   end
 
@@ -12,8 +12,8 @@ describe "git base name" do
   end
 end
 
-%w(cache package).each do |cmd|
-  describe "bundle #{cmd} with git" do
+%w[cache package].each do |cmd|
+  RSpec.describe "bundle #{cmd} with git" do
     it "copies repository to vendor cache and uses it" do
       git = build_git "foo"
       ref = git.ref_for("master", 11)
@@ -28,7 +28,7 @@ end
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      should_be_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "copies repository to vendor cache and uses it even when installed with bundle --path" do
@@ -46,7 +46,7 @@ end
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      should_be_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "runs twice without exploding" do
@@ -59,9 +59,9 @@ end
       bundle "#{cmd} --all"
       bundle "#{cmd} --all"
 
-      expect(err).to eq("")
+      expect(err).to lack_errors
       FileUtils.rm_rf lib_path("foo-1.0")
-      should_be_installed "foo 1.0"
+      expect(the_bundle).to include_gems "foo 1.0"
     end
 
     it "tracks updates" do
@@ -92,6 +92,33 @@ end
       expect(out).to eq("CACHE")
     end
 
+    it "tracks updates when specifying the gem" do
+      git = build_git "foo"
+      old_ref = git.ref_for("master", 11)
+
+      install_gemfile <<-G
+        gem "foo", :git => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+
+      update_git "foo" do |s|
+        s.write "lib/foo.rb", "puts :CACHE"
+      end
+
+      ref = git.ref_for("master", 11)
+      expect(ref).not_to eq(old_ref)
+
+      bundle "update foo"
+
+      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
+      expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
+
+      FileUtils.rm_rf lib_path("foo-1.0")
+      run "require 'foo'"
+      expect(out).to eq("CACHE")
+    end
+
     it "uses the local repository to generate the cache" do
       git = build_git "foo"
       ref = git.ref_for("master", 11)
@@ -100,7 +127,7 @@ end
         gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
       G
 
-      bundle %|config local.foo #{lib_path('foo-1.0')}|
+      bundle %(config local.foo #{lib_path("foo-1.0")})
       bundle "install"
       bundle "#{cmd} --all"
 
@@ -122,13 +149,13 @@ end
         s.add_dependency "submodule"
       end
 
-      Dir.chdir(lib_path('has_submodule-1.0')) do
-        `git submodule add #{lib_path('submodule-1.0')} submodule-1.0`
+      Dir.chdir(lib_path("has_submodule-1.0")) do
+        sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0"
         `git commit -m "submodulator"`
       end
 
       install_gemfile <<-G
-        git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+        git "#{lib_path("has_submodule-1.0")}", :submodules => true do
           gem "has_submodule"
         end
       G
@@ -138,7 +165,7 @@ end
 
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist
-      should_be_installed "has_submodule 1.0"
+      expect(the_bundle).to include_gems "has_submodule 1.0"
     end
 
     it "displays warning message when detecting git repo in Gemfile" do
@@ -166,13 +193,13 @@ end
       expect(out).not_to include("Your Gemfile contains path and git dependencies.")
     end
 
-    it "evaluates gemspecs and writes them out" do
+    it "caches pre-evaluated gemspecs" do
       git = build_git "foo"
 
       # Insert a gemspec method that shells out
       spec_lines = lib_path("foo-1.0/foo.gemspec").read.split("\n")
       spec_lines.insert(-2, "s.description = `echo bob`")
-      update_git("foo"){ |s| s.write "foo.gemspec", spec_lines.join("\n") }
+      update_git("foo") {|s| s.write "foo.gemspec", spec_lines.join("\n") }
 
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
@@ -183,6 +210,5 @@ end
       gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
       expect(gemspec).to_not match("`echo bob`")
     end
-
   end
 end
