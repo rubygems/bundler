@@ -21,10 +21,14 @@ module Bundler
       #   must not be specified, or the engine version
       #   specified must match the version.
 
-      @versions           = Array(versions)
+      @versions = Array(versions).map do |v|
+        op, v = Gem::Requirement.parse(v)
+        op == "=" ? v.to_s : "#{op} #{v}"
+      end
+
       @gem_version        = Gem::Requirement.create(@versions.first).requirements.first.last
-      @input_engine       = engine
-      @engine             = engine || "ruby"
+      @input_engine       = engine && engine.to_s
+      @engine             = engine && engine.to_s || "ruby"
       @engine_versions    = (engine_version && Array(engine_version)) || @versions
       @engine_gem_version = Gem::Requirement.create(@engine_versions.first).requirements.first.last
       @patchlevel         = patchlevel

@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require "bundler/cli/common"
+
 module Bundler
   class CLI::Install
     attr_reader :options
@@ -23,7 +25,7 @@ module Bundler
 
       normalize_groups
 
-      ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
+      Bundler::SharedHelpers.set_env "RB_USER_INSTALL", "1" if Bundler::FREEBSD
 
       # Disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
@@ -57,11 +59,8 @@ module Bundler
 
       if options["binstubs"]
         Bundler::SharedHelpers.major_deprecation \
-          "the --binstubs option will be removed in favor of `bundle binstubs`"
+          "The --binstubs option will be removed in favor of `bundle binstubs`"
       end
-
-      # rubygems plugins sometimes hook into the gem install process
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
       Plugin.gemfile_install(Bundler.default_gemfile) if Bundler.feature_flag.plugins?
 
@@ -72,21 +71,17 @@ module Bundler
       Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]
 
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
-      confirm_without_groups
+      Bundler::CLI::Common.output_without_groups_message
 
       if Bundler.settings[:path]
         absolute_path = File.expand_path(Bundler.settings[:path])
         relative_path = absolute_path.sub(File.expand_path(".") + File::SEPARATOR, "." + File::SEPARATOR)
         Bundler.ui.confirm "Bundled gems are installed into #{relative_path}."
       else
-        Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
+        Bundler.ui.confirm "Use `bundle info [gemname]` to see where a bundled gem is installed."
       end
 
-      unless Bundler.settings["ignore_messages"]
-        installer.post_install_messages.to_a.each do |name, msg|
-          print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
-        end
-      end
+      Bundler::CLI::Common.output_post_install_messages installer.post_install_messages
 
       warn_ambiguous_gems
 
@@ -135,12 +130,6 @@ module Bundler
       end
     end
 
-    def confirm_without_groups
-      return unless Bundler.settings.without.any?
-      require "bundler/cli/common"
-      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
-    end
-
     def dependencies_count_for(definition)
       count = definition.dependencies.count
       "#{count} Gemfile #{count == 1 ? "dependency" : "dependencies"}"
@@ -149,11 +138,6 @@ module Bundler
     def gems_installed_for(definition)
       count = definition.specs.count
       "#{count} #{count == 1 ? "gem" : "gems"} now installed"
-    end
-
-    def print_post_install_message(name, msg)
-      Bundler.ui.confirm "Post-install message from #{name}:"
-      Bundler.ui.info msg
     end
 
     def check_for_group_conflicts
@@ -170,8 +154,8 @@ module Bundler
     def check_for_options_conflicts
       if (options[:path] || options[:deployment]) && options[:system]
         error_message = String.new
-        error_message << "You have specified both a path to install your gems to as well as --system. Please choose.\n" if options[:path]
-        error_message << "You have specified both --deployment as well as --system. Please choose.\n" if options[:deployment]
+        error_message << "You have specified both --path as well as --system. Please choose only one option.\n" if options[:path]
+        error_message << "You have specified both --deployment as well as --system. Please choose only one option.\n" if options[:deployment]
         raise InvalidOption.new(error_message)
       end
     end
@@ -179,7 +163,7 @@ module Bundler
     def check_trust_policy
       if options["trust-policy"]
         unless Bundler.rubygems.security_policies.keys.include?(options["trust-policy"])
-          Bundler.ui.error "Rubygems doesn't know about trust policy '#{options["trust-policy"]}'. " \
+          Bundler.ui.error "RubyGems doesn't know about trust policy '#{options["trust-policy"]}'. " \
             "The known policies are: #{Bundler.rubygems.security_policies.keys.join(", ")}."
           exit 1
         end
@@ -224,10 +208,11 @@ module Bundler
 
       Bundler.settings[:clean]               = options["clean"] if options["clean"]
 
-      Bundler.settings.without               = options[:without]
-      Bundler.settings.with                  = options[:with]
+      Bundler.settings.without               = options[:without] unless Bundler.settings.without == options[:without]
+      Bundler.settings.with                  = options[:with] unless Bundler.settings.with == options[:with]
 
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? true : nil
+      disable_shared_gems = Bundler.settings[:path] ? true : nil
+      Bundler.settings[:disable_shared_gems] = disable_shared_gems unless Bundler.settings[:disable_shared_gems] == disable_shared_gems
     end
 
     def warn_ambiguous_gems

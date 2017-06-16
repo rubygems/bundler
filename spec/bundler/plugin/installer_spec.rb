@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::Plugin::Installer do
+RSpec.describe Bundler::Plugin::Installer do
   subject(:installer) { Bundler::Plugin::Installer.new }
 
   describe "cli install" do
@@ -54,7 +53,8 @@ describe Bundler::Plugin::Installer do
         end
 
         it "returns the installed spec after installing" do
-          expect(result["ga-plugin"]).to be_kind_of(Gem::Specification)
+          spec = result["ga-plugin"]
+          expect(spec.full_name).to eq "ga-plugin-1.0"
         end
 
         it "has expected full gem path" do

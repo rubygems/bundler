@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle update" do
+RSpec.describe "bundle update" do
   describe "git sources" do
     it "floats on a branch when :branch is used" do
       build_git "foo", "1.0"

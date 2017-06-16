@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle lock with git gems" do
+RSpec.describe "bundle lock with git gems" do
   before :each do
     build_git "foo"
 

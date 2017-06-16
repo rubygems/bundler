@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle install with git sources" do
+RSpec.describe "bundle install with git sources" do
   describe "when floating on master" do
     before :each do
       build_git "foo" do |s|
@@ -206,6 +205,181 @@ describe "bundle install with git sources" do
       RUBY
 
       expect(out).to eq("WIN")
+    end
+
+    it "works when the revision is a non-head ref" do
+      # want to ensure we don't fallback to master
+      update_git "foo", :path => lib_path("foo-1.0") do |s|
+        s.write("lib/foo.rb", "raise 'FAIL'")
+      end
+
+      Dir.chdir(lib_path("foo-1.0")) do
+        `git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1`
+      end
+
+      # want to ensure we don't fallback to HEAD
+      update_git "foo", :path => lib_path("foo-1.0"), :branch => "rando" do |s|
+        s.write("lib/foo.rb", "raise 'FAIL'")
+      end
+
+      install_gemfile! <<-G
+        git "#{lib_path("foo-1.0")}", :ref => "refs/bundler/1" do
+          gem "foo"
+        end
+      G
+      expect(err).to lack_errors
+
+      run! <<-RUBY
+        require 'foo'
+        puts "WIN" if defined?(FOO)
+      RUBY
+
+      expect(out).to eq("WIN")
+    end
+
+    it "works when the revision is a non-head ref and it was previously downloaded" do
+      install_gemfile! <<-G
+        git "#{lib_path("foo-1.0")}" do
+          gem "foo"
+        end
+      G
+
+      # want to ensure we don't fallback to master
+      update_git "foo", :path => lib_path("foo-1.0") do |s|
+        s.write("lib/foo.rb", "raise 'FAIL'")
+      end
+
+      Dir.chdir(lib_path("foo-1.0")) do
+        `git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1`
+      end
+
+      # want to ensure we don't fallback to HEAD
+      update_git "foo", :path => lib_path("foo-1.0"), :branch => "rando" do |s|
+        s.write("lib/foo.rb", "raise 'FAIL'")
+      end
+
+      install_gemfile! <<-G
+        git "#{lib_path("foo-1.0")}", :ref => "refs/bundler/1" do
+          gem "foo"
+        end
+      G
+      expect(err).to lack_errors
+
+      run! <<-RUBY
+        require 'foo'
+        puts "WIN" if defined?(FOO)
+      RUBY
+
+      expect(out).to eq("WIN")
+    end
+
+    it "does not download random non-head refs" do
+      Dir.chdir(lib_path("foo-1.0")) do
+        `git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1`
+      end
+
+      install_gemfile! <<-G
+        git "#{lib_path("foo-1.0")}" do
+          gem "foo"
+        end
+      G
+
+      # ensure we also git fetch after cloning
+      bundle! :update
+
+      Dir.chdir(Dir[system_gem_path("cache/bundler/git/foo-*")].first) do
+        @out = sys_exec("git ls-remote .")
+      end
+
+      expect(out).not_to include("refs/bundler/1")
+    end
+  end
+
+  describe "when specifying a branch" do
+    let(:branch) { "branch" }
+    let(:repo) { build_git("foo").path }
+    before(:each) do
+      update_git("foo", :path => repo, :branch => branch)
+    end
+
+    it "works" do
+      install_gemfile <<-G
+        git "#{repo}", :branch => #{branch.dump} do
+          gem "foo"
+        end
+      G
+
+      expect(the_bundle).to include_gems("foo 1.0")
+    end
+
+    context "when the branch starts with a `#`" do
+      let(:branch) { "#149/redirect-url-fragment" }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :branch => #{branch.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+
+    context "when the branch includes quotes" do
+      let(:branch) { %('") }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :branch => #{branch.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+  end
+
+  describe "when specifying a tag" do
+    let(:tag) { "tag" }
+    let(:repo) { build_git("foo").path }
+    before(:each) do
+      update_git("foo", :path => repo, :tag => tag)
+    end
+
+    it "works" do
+      install_gemfile <<-G
+        git "#{repo}", :tag => #{tag.dump} do
+          gem "foo"
+        end
+      G
+
+      expect(the_bundle).to include_gems("foo 1.0")
+    end
+
+    context "when the tag starts with a `#`" do
+      let(:tag) { "#149/redirect-url-fragment" }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :tag => #{tag.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
+    end
+
+    context "when the tag includes quotes" do
+      let(:tag) { %('") }
+      it "works" do
+        install_gemfile <<-G
+          git "#{repo}", :tag => #{tag.dump} do
+            gem "foo"
+          end
+        G
+
+        expect(the_bundle).to include_gems("foo 1.0")
+      end
     end
   end
 
@@ -942,6 +1116,11 @@ describe "bundle install with git sources" do
         puts FOO
       R
       expect(out).to eq("YES")
+
+      run! <<-R
+        puts $:.grep(/ext/)
+      R
+      expect(out).to eq(Pathname.glob(system_gem_path("bundler/gems/extensions/**/foo-1.0-*")).first.to_s)
     end
 
     it "does not use old extension after ref changes" do
@@ -965,11 +1144,11 @@ describe "bundle install with git sources" do
           end
           `git commit -m 'commit for iteration #{i}' ext/foo.c`
         end
-        git_sha = git_reader.ref_for("HEAD")
+        git_commit_sha = git_reader.ref_for("HEAD")
 
         install_gemfile <<-G
           source "file://#{gem_repo1}"
-          gem "foo", :git => "#{lib_path("foo-1.0")}", :ref => "#{git_sha}"
+          gem "foo", :git => "#{lib_path("foo-1.0")}", :ref => "#{git_commit_sha}"
         G
 
         run <<-R
@@ -997,7 +1176,12 @@ describe "bundle install with git sources" do
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      expect(out).to include("An error occurred while installing foo (1.0)")
+      expect(out).to end_with(<<-M.strip)
+An error occurred while installing foo (1.0), and Bundler cannot continue.
+
+In Gemfile:
+  foo
+      M
       expect(out).not_to include("gem install foo")
     end
 
@@ -1022,20 +1206,20 @@ describe "bundle install with git sources" do
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      run <<-R
+      run! <<-R
         require 'foo'
         puts FOO
       R
 
       installed_time = out
-      expect(installed_time).to match(/\d+\.\d+/)
+      expect(installed_time).to match(/\A\d+\.\d+\z/)
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      run <<-R
+      run! <<-R
         require 'foo'
         puts FOO
       R
@@ -1098,7 +1282,7 @@ describe "bundle install with git sources" do
     end
   end
 
-  describe "when the git source is overriden with a local git repo" do
+  describe "when the git source is overridden with a local git repo" do
     before do
       bundle "config --global local.foo #{lib_path("foo")}"
     end

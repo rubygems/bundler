@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "compact index api" do
+RSpec.describe "compact index api" do
   let(:source_hostname) { "localgemserver.test" }
   let(:source_uri) { "http://#{source_hostname}" }
 
@@ -144,7 +143,7 @@ describe "compact index api" do
       gem "rcov"
     G
 
-    bundle! :install, :fakeweb => "windows"
+    bundle! :install, :artifice => "windows"
     expect(out).to include("Fetching source index from #{source_uri}")
     expect(the_bundle).to include_gems "rcov 1.0.0"
   end
@@ -640,7 +639,7 @@ The checksum of /versions does not match the checksum provided by the server! So
   context "when SSL certificate verification fails" do
     it "explains what happened" do
       # Install a monkeypatch that reproduces the effects of openssl raising
-      # a certificate validation error when Rubygems tries to connect.
+      # a certificate validation error when RubyGems tries to connect.
       gemfile <<-G
         class Net::HTTP
           def start
@@ -696,18 +695,36 @@ The checksum of /versions does not match the checksum provided by the server! So
     expect(the_bundle).to include_gems "rack 1.0.0"
   end
 
+  it "fails gracefully when the source URI has an invalid scheme" do
+    install_gemfile <<-G
+      source "htps://rubygems.org"
+      gem "rack"
+    G
+    expect(exitstatus).to eq(15) if exitstatus
+    expect(out).to end_with(<<-E.strip)
+      The request uri `htps://index.rubygems.org/versions` has an invalid scheme (`htps`). Did you mean `http` or `https`?
+    E
+  end
+
   describe "checksum validation", :rubygems => ">= 2.3.0" do
     it "raises when the checksum does not match" do
       install_gemfile <<-G, :artifice => "compact_index_wrong_gem_checksum"
         source "#{source_uri}"
         gem "rack"
       G
+
       expect(exitstatus).to eq(19) if exitstatus
       expect(out).
-        to  include("The checksum for the downloaded `rack-1.0.0.gem` did not match the checksum given by the API.").
-        and include("This means that the contents of the gem appear to be different from what was uploaded, and could be an indicator of a security issue.").
-        and match(/\(The expected SHA256 checksum was "#{"ab" * 22}", but the checksum for the downloaded gem was ".+?"\.\)/).
-        and include("Bundler cannot continue installing rack (1.0.0).")
+        to  include("Bundler cannot continue installing rack (1.0.0).").
+        and include("The checksum for the downloaded `rack-1.0.0.gem` does not match the checksum given by the server.").
+        and include("This means the contents of the downloaded gem is different from what was uploaded to the server, and could be a potential security issue.").
+        and include("To resolve this issue:").
+        and include("1. delete the downloaded gem located at: `#{system_gem_path}/gems/rack-1.0.0/rack-1.0.0.gem`").
+        and include("2. run `bundle install`").
+        and include("If you wish to continue installing the downloaded gem, and are certain it does not pose a security issue despite the mismatching checksum, do the following:").
+        and include("1. run `bundle config disable_checksum_validation true` to turn off checksum verification").
+        and include("2. run `bundle install`").
+        and match(/\(More info: The expected SHA256 checksum was "#{"ab" * 22}", but the checksum for the downloaded gem was ".+?"\.\)/)
     end
 
     it "raises when the checksum is the wrong length" do
@@ -726,5 +743,41 @@ The checksum of /versions does not match the checksum provided by the server! So
         gem "rack"
       G
     end
+  end
+
+  it "works when cache dir is world-writable" do
+    install_gemfile! <<-G, :artifice => "compact_index"
+      File.umask(0000)
+      source "#{source_uri}"
+      gem "rack"
+    G
+  end
+
+  it "doesn't explode when the API dependencies are wrong" do
+    install_gemfile <<-G, :artifice => "compact_index_wrong_dependencies", :env => { "DEBUG" => "true" }
+      source "#{source_uri}"
+      gem "rails"
+    G
+    deps = [Gem::Dependency.new("rake", "= 10.0.2"),
+            Gem::Dependency.new("actionpack", "= 2.3.2"),
+            Gem::Dependency.new("activerecord", "= 2.3.2"),
+            Gem::Dependency.new("actionmailer", "= 2.3.2"),
+            Gem::Dependency.new("activeresource", "= 2.3.2")]
+    expect(out).to include(<<-E.strip).and include("rails-2.3.2 from rubygems remote at #{source_uri}/ has either corrupted API or lockfile dependencies")
+Bundler::APIResponseMismatchError: Downloading rails-2.3.2 revealed dependencies not in the API or the lockfile (#{deps.map(&:to_s).join(", ")}).
+Either installing with `--full-index` or running `bundle update rails` should fix the problem.
+    E
+  end
+
+  it "does not duplicate specs in the lockfile when updating and a dependency is not installed" do
+    install_gemfile! <<-G, :artifice => "compact_index"
+      source "#{source_uri}" do
+        gem "rails"
+        gem "activemerchant"
+      end
+    G
+    gem_command! :uninstall, "activemerchant"
+    bundle! "update rails", :artifice => "compact_index"
+    expect(lockfile.scan(/activemerchant \(/).size).to eq(1)
   end
 end

@@ -39,7 +39,7 @@ def gemfile(install = false, options = {}, &gemfile)
   def Bundler.root
     Bundler::SharedHelpers.pwd.expand_path
   end
-  ENV["BUNDLE_GEMFILE"] ||= "Gemfile"
+  Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", "Gemfile"
 
   Bundler::Plugin.gemfile_install(&gemfile) if Bundler.feature_flag.plugins?
   builder = Bundler::Dsl.new
@@ -60,7 +60,7 @@ def gemfile(install = false, options = {}, &gemfile)
 
   Bundler.ui = ui if install
   if install || missing_specs.call
-    installer = Bundler::Installer.install(Bundler.root, definition, :system => true)
+    installer = Bundler::Installer.install(Bundler.root, definition, :system => true, :inline => true)
     installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post-install message from #{name}:\n#{message}"
     end

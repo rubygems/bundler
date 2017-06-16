@@ -11,4 +11,4 @@ require "<%= config[:namespaced_path] %>"
 # Pry.start
 
 require "irb"
-IRB.start
+IRB.start(__FILE__)

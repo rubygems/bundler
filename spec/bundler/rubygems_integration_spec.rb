@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::RubygemsIntegration do
+RSpec.describe Bundler::RubygemsIntegration do
   it "uses the same chdir lock as rubygems", :rubygems => "2.1" do
     expect(Bundler.rubygems.ext_lock).to eq(Gem::Ext::Builder::CHDIR_MONITOR)
   end
@@ -70,7 +69,7 @@ describe Bundler::RubygemsIntegration do
         expect(fetcher).to receive(:fetch_path).with(uri + "specs.4.8.gz").and_return(specs_response)
         expect(fetcher).to receive(:fetch_path).with(uri + "prerelease_specs.4.8.gz").and_return(prerelease_specs_response)
         result = Bundler.rubygems.fetch_all_remote_specs(remote_with_mirror)
-        expect(result).to eq(%w(specs prerelease_specs))
+        expect(result).to eq(%w[specs prerelease_specs])
       end
     end
 
@@ -83,7 +82,7 @@ describe Bundler::RubygemsIntegration do
         expect(fetcher).to receive(:fetch_path).with(uri + "specs.4.8.gz").and_return(specs_response)
         expect(fetcher).to receive(:fetch_path).with(uri + "prerelease_specs.4.8.gz").and_return(prerelease_specs_response)
         result = Bundler.rubygems.fetch_all_remote_specs(remote_no_mirror)
-        expect(result).to eq(%w(specs prerelease_specs))
+        expect(result).to eq(%w[specs prerelease_specs])
       end
     end
   end

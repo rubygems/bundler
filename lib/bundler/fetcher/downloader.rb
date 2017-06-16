@@ -38,6 +38,8 @@ module Bundler
       end
 
       def request(uri, options)
+        validate_uri_scheme!(uri)
+
         Bundler.ui.debug "HTTP GET #{uri}"
         req = Net::HTTP::Get.new uri.request_uri, options
         if uri.user
@@ -56,10 +58,20 @@ module Bundler
         case e.message
         when /host down:/, /getaddrinfo: nodename nor servname provided/
           raise NetworkDownError, "Could not reach host #{uri.host}. Check your network " \
-          "connection and try again."
+            "connection and try again."
         else
-          raise HTTPError, "Network error while fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+          raise HTTPError, "Network error while fetching #{URICredentialsFilter.credential_filtered_uri(uri)}" \
+            " (#{e})"
         end
+      end
+
+    private
+
+      def validate_uri_scheme!(uri)
+        return if uri.scheme =~ /\Ahttps?\z/
+        raise InvalidOption,
+          "The request uri `#{uri}` has an invalid scheme (`#{uri.scheme}`). " \
+          "Did you mean `http` or `https`?"
       end
     end
   end
