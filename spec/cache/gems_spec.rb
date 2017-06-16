@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle cache" do
+RSpec.describe "bundle cache" do
   describe "when there are only gemsources" do
     before :each do
       gemfile <<-G
@@ -238,7 +237,7 @@ describe "bundle cache" do
         gem "platform_specific"
       G
 
-      expect(cached_gem("platform_specific-1.0-#{Gem::Platform.local}")).to exist
+      expect(cached_gem("platform_specific-1.0-#{Bundler.local_platform}")).to exist
       expect(cached_gem("platform_specific-1.0-java")).to exist
     end
 

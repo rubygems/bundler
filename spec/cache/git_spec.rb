@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "git base name" do
+RSpec.describe "git base name" do
   it "base_name should strip private repo uris" do
     source = Bundler::Source::Git.new("uri" => "git@github.com:bundler.git")
     expect(source.send(:base_name)).to eq("bundler")
@@ -13,8 +12,8 @@ describe "git base name" do
   end
 end
 
-%w(cache package).each do |cmd|
-  describe "bundle #{cmd} with git" do
+%w[cache package].each do |cmd|
+  RSpec.describe "bundle #{cmd} with git" do
     it "copies repository to vendor cache and uses it" do
       git = build_git "foo"
       ref = git.ref_for("master", 11)
@@ -84,6 +83,33 @@ end
 
       bundle "update"
       bundle "#{cmd} --all"
+
+      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
+      expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
+
+      FileUtils.rm_rf lib_path("foo-1.0")
+      run "require 'foo'"
+      expect(out).to eq("CACHE")
+    end
+
+    it "tracks updates when specifying the gem" do
+      git = build_git "foo"
+      old_ref = git.ref_for("master", 11)
+
+      install_gemfile <<-G
+        gem "foo", :git => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+
+      update_git "foo" do |s|
+        s.write "lib/foo.rb", "puts :CACHE"
+      end
+
+      ref = git.ref_for("master", 11)
+      expect(ref).not_to eq(old_ref)
+
+      bundle "update foo"
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist

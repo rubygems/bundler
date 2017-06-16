@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle platform" do
+RSpec.describe "bundle platform" do
   context "without flags" do
     it "returns all the output" do
       gemfile <<-G

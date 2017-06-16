@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle install with gem sources" do
+RSpec.describe "bundle install with gem sources" do
   describe "the simple case" do
     it "prints output and returns if no dependencies are specified" do
       gemfile <<-G
@@ -216,7 +215,7 @@ describe "bundle install with gem sources" do
         G
 
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        expect(out).to eq("1.0.0 #{Gem::Platform.local}")
+        expect(out).to eq("1.0.0 #{Bundler.local_platform}")
       end
 
       it "falls back on plain ruby" do
@@ -314,14 +313,14 @@ describe "bundle install with gem sources" do
     end
 
     it "gracefully handles error when rubygems server is unavailable" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :artifice => nil
         source "file://#{gem_repo1}"
         source "http://localhost:9384"
 
         gem 'foo'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
       expect(out).to include("Could not fetch specs from http://localhost:9384/")
       expect(out).not_to include("file://")
     end

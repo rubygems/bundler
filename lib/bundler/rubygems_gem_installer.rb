@@ -31,12 +31,24 @@ module Bundler
         send(checksum_type(checksum), digest)
       end
       unless digest == checksum
-        raise SecurityError,
-          "The checksum for the downloaded `#{spec.full_name}.gem` did not match " \
-          "the checksum given by the API. This means that the contents of the " \
-          "gem appear to be different from what was uploaded, and could be an indicator of a security issue.\n" \
-          "(The expected SHA256 checksum was #{checksum.inspect}, but the checksum for the downloaded gem was #{digest.inspect}.)\n" \
-          "Bundler cannot continue installing #{spec.name} (#{spec.version})."
+        raise SecurityError, <<-MESSAGE
+          Bundler cannot continue installing #{spec.name} (#{spec.version}).
+          The checksum for the downloaded `#{spec.full_name}.gem` does not match \
+          the checksum given by the server. This means the contents of the downloaded \
+          gem is different from what was uploaded to the server, and could be a potential security issue.
+
+          To resolve this issue:
+          1. delete the downloaded gem located at: `#{spec.gem_dir}/#{spec.full_name}.gem`
+          2. run `bundle install`
+
+          If you wish to continue installing the downloaded gem, and are certain it does not pose a \
+          security issue despite the mismatching checksum, do the following:
+          1. run `bundle config disable_checksum_validation true` to turn off checksum verification
+          2. run `bundle install`
+
+          (More info: The expected SHA256 checksum was #{checksum.inspect}, but the \
+          checksum for the downloaded gem was #{digest.inspect}.)
+          MESSAGE
       end
       true
     end

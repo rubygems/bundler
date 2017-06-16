@@ -52,6 +52,9 @@ module Bundler
   class CyclicDependencyError < BundlerError; status_code(21); end
   class GemfileLockNotFound < BundlerError; status_code(22); end
   class PluginError < BundlerError; status_code(29); end
+  class SudoNotPermittedError < BundlerError; status_code(30); end
+  class ThreadCreationError < BundlerError; status_code(33); end
+  class APIResponseMismatchError < BundlerError; status_code(34); end
   class GemfileEvalError < GemfileError; end
   class MarshalError < StandardError; end
 
@@ -130,5 +133,25 @@ module Bundler
     end
 
     status_code(28)
+  end
+
+  class NoSpaceOnDeviceError < PermissionError
+    def message
+      "There was an error while trying to #{action} `#{@path}`. " \
+      "There was insufficient space remaining on the device."
+    end
+
+    status_code(31)
+  end
+
+  class GenericSystemCallError < BundlerError
+    attr_reader :underlying_error
+
+    def initialize(underlying_error, message)
+      @underlying_error = underlying_error
+      super("#{message}\nThe underlying system error is #{@underlying_error.class}: #{@underlying_error}")
+    end
+
+    status_code(32)
   end
 end

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle lock" do
+RSpec.describe "bundle lock" do
   def strip_lockfile(lockfile)
     strip_whitespace(lockfile).sub(/\n\Z/, "")
   end
@@ -10,9 +9,11 @@ describe "bundle lock" do
     strip_lockfile bundled_app(file).read
   end
 
+  let(:repo) { gem_repo1 }
+
   before :each do
     gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "file://#{repo}"
       gem "rails"
       gem "with_license"
       gem "foo"
@@ -20,7 +21,7 @@ describe "bundle lock" do
 
     @lockfile = strip_lockfile <<-L
       GEM
-        remote: file:#{gem_repo1}/
+        remote: file:#{repo}/
         specs:
           actionmailer (2.3.2)
             activesupport (= 2.3.2)
@@ -77,7 +78,7 @@ describe "bundle lock" do
   it "writes a lockfile when there is an outdated lockfile using --update" do
     lockfile @lockfile.gsub("2.3.2", "2.3.1")
 
-    bundle "lock --update"
+    bundle! "lock --update"
 
     expect(read_lockfile).to eq(@lockfile)
   end
@@ -85,7 +86,7 @@ describe "bundle lock" do
   it "does not fetch remote specs when using the --local option" do
     bundle "lock --update --local"
 
-    expect(out).to include("available on this machine.")
+    expect(out).to include("sources listed in your Gemfile")
   end
 
   it "writes to a custom location using --lockfile" do
@@ -104,11 +105,74 @@ describe "bundle lock" do
     expect(read_lockfile).to eq(@lockfile)
   end
 
+  it "errors when updating a missing specific gems using --update" do
+    lockfile @lockfile
+
+    bundle "lock --update blahblah"
+    expect(out).to eq("Could not find gem 'blahblah'.")
+
+    expect(read_lockfile).to eq(@lockfile)
+  end
+
+  # see update_spec for more coverage on same options. logic is shared so it's not necessary
+  # to repeat coverage here.
+  context "conservative updates" do
+    before do
+      build_repo4 do
+        build_gem "foo", %w[1.4.3 1.4.4] do |s|
+          s.add_dependency "bar", "~> 2.0"
+        end
+        build_gem "foo", %w[1.4.5 1.5.0] do |s|
+          s.add_dependency "bar", "~> 2.1"
+        end
+        build_gem "foo", %w[1.5.1] do |s|
+          s.add_dependency "bar", "~> 3.0"
+        end
+        build_gem "bar", %w[2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0]
+        build_gem "qux", %w[1.0.0 1.0.1 1.1.0 2.0.0]
+      end
+
+      # establish a lockfile set to 1.4.3
+      install_gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo', '1.4.3'
+        gem 'bar', '2.0.3'
+        gem 'qux', '1.0.0'
+      G
+
+      # remove 1.4.3 requirement and bar altogether
+      # to setup update specs below
+      gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'foo'
+        gem 'qux'
+      G
+    end
+
+    it "single gem updates dependent gem to minor" do
+      bundle "lock --update foo --patch"
+
+      expect(the_bundle.locked_gems.specs.map(&:full_name)).to eq(%w[foo-1.4.5 bar-2.1.1 qux-1.0.0].sort)
+    end
+
+    it "minor preferred with strict" do
+      bundle "lock --update --minor --strict"
+
+      expect(the_bundle.locked_gems.specs.map(&:full_name)).to eq(%w[foo-1.5.0 bar-2.1.1 qux-1.1.0].sort)
+    end
+  end
+
   it "supports adding new platforms" do
     bundle! "lock --add-platform java x86-mingw32"
 
     lockfile = Bundler::LockfileParser.new(read_lockfile)
     expect(lockfile.platforms).to eq([java, local, mingw])
+  end
+
+  it "supports adding the `ruby` platform" do
+    bundle! "lock --add-platform ruby"
+    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    expect(lockfile.platforms).to eq([local, "ruby"].uniq)
   end
 
   it "warns when adding an unknown platform" do
@@ -156,7 +220,7 @@ describe "bundle lock" do
 
       # we need all these versions to get the sorting the same as it would be
       # pulling from rubygems.org
-      %w(0.8.3 0.8.2 0.8.1 0.8.0).each do |v|
+      %w[0.8.3 0.8.2 0.8.1 0.8.0].each do |v|
         build_gem "win32-process", v do |s|
           s.add_dependency "ffi", ">= 1.0.0"
         end
@@ -222,5 +286,29 @@ describe "bundle lock" do
       BUNDLED WITH
          #{Bundler::VERSION}
     G
+  end
+
+  context "when an update is available" do
+    let(:repo) { gem_repo2 }
+
+    before do
+      lockfile(@lockfile)
+      build_repo2 do
+        build_gem "foo", "2.0"
+      end
+    end
+
+    it "does not implicitly update" do
+      bundle! "lock"
+
+      expect(read_lockfile).to eq(@lockfile)
+    end
+
+    it "accounts for changes in the gemfile" do
+      gemfile gemfile.gsub('"foo"', '"foo", "2.0"')
+      bundle! "lock"
+
+      expect(read_lockfile).to eq(@lockfile.sub("foo (1.0)", "foo (2.0)").sub(/foo$/, "foo (= 2.0)"))
+    end
   end
 end

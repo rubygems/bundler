@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::SharedHelpers do
+RSpec.describe Bundler::SharedHelpers do
   let(:ext_lock_double) { double(:ext_lock) }
 
   before do
@@ -234,7 +233,9 @@ describe Bundler::SharedHelpers do
     shared_examples_for "ENV['RUBYLIB'] gets set correctly" do
       let(:ruby_lib_path) { "stubbed_ruby_lib_dir" }
 
-      before { allow(File).to receive(:expand_path).and_return(ruby_lib_path) }
+      before do
+        allow(Bundler::SharedHelpers).to receive(:bundler_ruby_lib).and_return(ruby_lib_path)
+      end
 
       it "ensures bundler's ruby version lib path is in ENV['RUBYLIB']" do
         subject.set_bundle_environment
@@ -324,7 +325,6 @@ describe Bundler::SharedHelpers do
       let(:ruby_lib_path) { "stubbed_ruby_lib_dir" }
 
       before do
-        allow(File).to receive(:expand_path).and_return(ruby_lib_path)
         ENV["RUBYLIB"] = ruby_lib_path
       end
 
@@ -384,6 +384,27 @@ describe Bundler::SharedHelpers do
       it "raises a OperationNotSupportedError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
           Bundler::OperationNotSupportedError
+        )
+      end
+    end
+
+    context "system throws Errno::ENOSPC" do
+      let(:file_op_block) { proc {|_path| raise Errno::ENOSPC } }
+
+      it "raises a NoSpaceOnDeviceError" do
+        expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
+          Bundler::NoSpaceOnDeviceError
+        )
+      end
+    end
+
+    context "system throws an unhandled SystemCallError" do
+      let(:error) { SystemCallError.new("Shields down", 1337) }
+      let(:file_op_block) { proc {|_path| raise error } }
+
+      it "raises a GenericSystemCallError" do
+        expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
+          Bundler::GenericSystemCallError, /error accessing.+underlying.+Shields down/m
         )
       end
     end

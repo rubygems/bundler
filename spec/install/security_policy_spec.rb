@@ -1,11 +1,10 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "rubygems/security"
 
 # unfortunately, testing signed gems with a provided CA is extremely difficult
 # as 'gem cert' is currently the only way to add CAs to the system.
 
-describe "policies with unsigned gems" do
+RSpec.describe "policies with unsigned gems" do
   before do
     build_security_repo
     gemfile <<-G
@@ -24,7 +23,7 @@ describe "policies with unsigned gems" do
 
   it "will fail when given invalid security policy" do
     bundle "install --trust-policy=InvalidPolicyName"
-    expect(out).to include("Rubygems doesn't know about trust policy")
+    expect(out).to include("RubyGems doesn't know about trust policy")
   end
 
   it "will fail with High Security setting due to presence of unsigned gem" do
@@ -32,7 +31,7 @@ describe "policies with unsigned gems" do
     expect(out).to include("security policy didn't allow")
   end
 
-  # This spec will fail on Rubygems 2 rc1 due to a bug in policy.rb. the bug is fixed in rc3.
+  # This spec will fail on RubyGems 2 rc1 due to a bug in policy.rb. the bug is fixed in rc3.
   it "will fail with Medium Security setting due to presence of unsigned gem", :unless => ENV["RGV"] == "v2.0.0.rc.1" do
     bundle "install --trust-policy=MediumSecurity"
     expect(out).to include("security policy didn't allow")
@@ -44,7 +43,7 @@ describe "policies with unsigned gems" do
   end
 end
 
-describe "policies with signed gems and no CA" do
+RSpec.describe "policies with signed gems and no CA" do
   before do
     build_security_repo
     gemfile <<-G

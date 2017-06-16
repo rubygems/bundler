@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/ruby_dsl"
 
-describe Bundler::RubyDsl do
+RSpec.describe Bundler::RubyDsl do
   class MockDSL
     include Bundler::RubyDsl
 

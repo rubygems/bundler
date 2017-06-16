@@ -1,9 +1,8 @@
 # encoding: utf-8
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler"
 
-describe Bundler do
+RSpec.describe Bundler do
   describe "#load_gemspec_uncached" do
     let(:app_gemspec_path) { tmp("test.gemspec") }
     subject { Bundler.load_gemspec_uncached(app_gemspec_path) }
@@ -106,7 +105,7 @@ describe Bundler do
 
   describe "#which" do
     let(:executable) { "executable" }
-    let(:path) { %w(/a /b c ../d /e) }
+    let(:path) { %w[/a /b c ../d /e] }
     let(:expected) { "executable" }
 
     before do
@@ -143,12 +142,12 @@ describe Bundler do
 
   describe "configuration" do
     context "disable_shared_gems" do
-      it "should unset GEM_PATH with nil" do
+      it "should unset GEM_PATH with empty string" do
         env = {}
         settings = { :disable_shared_gems => true }
         Bundler.send(:configure_gem_path, env, settings)
         expect(env.keys).to include("GEM_PATH")
-        expect(env["GEM_PATH"]).to be_nil
+        expect(env["GEM_PATH"]).to eq ""
       end
     end
   end
@@ -156,7 +155,7 @@ describe Bundler do
   describe "#rm_rf" do
     context "the directory is world writable" do
       let(:bundler_ui) { Bundler.ui }
-      it "should show a fridenly error" do
+      it "should raise a friendly error" do
         allow(File).to receive(:exist?).and_return(true)
         allow(FileUtils).to receive(:remove_entry_secure).and_raise(ArgumentError)
         allow(File).to receive(:world_writable?).and_return(true)
@@ -168,6 +167,45 @@ EOF
         expect(bundler_ui).to receive(:warn).with(message)
         expect { Bundler.send(:rm_rf, bundled_app) }.to raise_error(Bundler::PathError)
       end
+    end
+  end
+
+  describe "#user_home" do
+    context "home directory is set" do
+      it "should return the user home" do
+        path = "/home/oggy"
+        allow(Bundler.rubygems).to receive(:user_home).and_return(path)
+        allow(File).to receive(:directory?).with(path).and_return true
+        allow(File).to receive(:writable?).with(path).and_return true
+        expect(Bundler.user_home).to eq(Pathname(path))
+      end
+    end
+
+    context "home directory is not set" do
+      it "should issue warning and return a temporary user home" do
+        allow(Bundler.rubygems).to receive(:user_home).and_return(nil)
+        allow(Etc).to receive(:getlogin).and_return("USER")
+        allow(Dir).to receive(:tmpdir).and_return("/TMP")
+        allow(FileTest).to receive(:exist?).with("/TMP/bundler/home").and_return(true)
+        expect(FileUtils).to receive(:mkpath).with("/TMP/bundler/home/USER")
+        message = <<EOF
+Your home directory is not set.
+Bundler will use `/TMP/bundler/home/USER' as your home directory temporarily.
+EOF
+        expect(Bundler.ui).to receive(:warn).with(message)
+        expect(Bundler.user_home).to eq(Pathname("/TMP/bundler/home/USER"))
+      end
+    end
+  end
+
+  describe "#tmp_home_path" do
+    it "should create temporary user home" do
+      allow(Dir).to receive(:tmpdir).and_return("/TMP")
+      allow(FileTest).to receive(:exist?).with("/TMP/bundler/home").and_return(false)
+      expect(FileUtils).to receive(:mkpath).once.ordered.with("/TMP/bundler/home")
+      expect(FileUtils).to receive(:mkpath).once.ordered.with("/TMP/bundler/home/USER")
+      expect(File).to receive(:chmod).with(0o777, "/TMP/bundler/home")
+      expect(Bundler.tmp_home_path("USER", "")).to eq(Pathname("/TMP/bundler/home/USER"))
     end
   end
 end
