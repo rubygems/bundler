@@ -11,7 +11,7 @@ Generates a directory named `GEM_NAME` with a `Rakefile`, `GEM_NAME.gemspec`,
 and other supporting files and directories that can be used to develop a
 rubygem with that name.
 
-Run `rake -T` in the resulting project for a list of Rake tasks that can used
+Run `rake -T` in the resulting project for a list of Rake tasks that can be used
 to test and publish the gem to rubygems.org.
 
 The generated project skeleton can be customized with OPTIONS, as explained
