@@ -22,10 +22,13 @@ module Bundler
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
       update = options[:update]
-      update = { :gems => update } if update.is_a?(Array)
+      if update.is_a?(Array) # unlocking specific gems
+        Bundler::CLI::Common.ensure_all_gems_in_lockfile!(update)
+        update = { :gems => update, :lock_shared_dependencies => options[:conservative] }
+      end
       definition = Bundler.definition(update)
 
-      Bundler::CLI::Common.config_gem_version_promoter(Bundler.definition, options) if options[:update]
+      Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options) if options[:update]
 
       options["remove-platform"].each do |platform|
         definition.remove_platform(platform)
@@ -33,7 +36,7 @@ module Bundler
 
       options["add-platform"].each do |platform_string|
         platform = Gem::Platform.new(platform_string)
-        if platform.to_a.compact == %w(unknown)
+        if platform.to_s == "unknown"
           Bundler.ui.warn "The platform `#{platform_string}` is unknown to RubyGems " \
             "and adding it will likely lead to resolution errors"
         end

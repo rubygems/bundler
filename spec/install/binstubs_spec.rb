@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle install" do
+RSpec.describe "bundle install" do
   describe "when system_bindir is set" do
     # On OS X, Gem.bindir defaults to /usr/bin, so system_bindir is useful if
     # you want to avoid sudo installs for system gems with OS X's default ruby

@@ -8,10 +8,12 @@ module Spec
       deps = {
         # rack 2.x requires Ruby version >= 2.2.2.
         # artifice doesn't support rack 2.x now.
-        "rack" => "< 2",
-        "fakeweb artifice" => nil,
+        # TODO: revert to `< 2` once https://github.com/rack/rack/issues/1168 is
+        # addressed
+        "rack" => "1.6.6",
+        "artifice" => "~> 0.6.0",
         "compact_index" => "~> 0.11.0",
-        "sinatra" => "1.2.7",
+        "sinatra" => "~> 1.4.7",
         # Rake version has to be consistent for tests to pass
         "rake" => "10.0.2",
         # 3.0.0 breaks 1.9.2 specs
@@ -42,16 +44,18 @@ module Spec
       end
 
       ENV["HOME"] = Path.home.to_s
+      ENV["TMPDIR"] = Path.tmpdir.to_s
 
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
     end
 
     def self.install_gems(gems)
       reqs, no_reqs = gems.partition {|_, req| !req.nil? && !req.split(" ").empty? }
+      reqs = reqs.sort_by {|name, _| name == "rack" ? 0 : 1 } # TODO: remove when we drop ruby 1.8.7 support
       no_reqs.map!(&:first)
       reqs.map! {|name, req| "'#{name}:#{req}'" }
       deps = reqs.concat(no_reqs).join(" ")
-      cmd = "gem install #{deps} --no-rdoc --no-ri"
+      cmd = "gem install #{deps} --no-rdoc --no-ri --conservative"
       puts cmd
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
     end

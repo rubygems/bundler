@@ -1,10 +1,9 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundler version trampolining" do
+RSpec.describe "bundler version trampolining" do
   before do
-    ENV["BUNDLE_DISABLE_POSTIT"] = nil
-    ENV["BUNDLE_ENABLE_TRAMPOLINE"] = "true"
+    ENV["BUNDLE_TRAMPOLINE_DISABLE"] = nil
+    ENV["BUNDLE_TRAMPOLINE_FORCE"] = "true"
     FileUtils.rm_rf(system_gem_path)
     FileUtils.cp_r(base_system_gems, system_gem_path)
   end
@@ -59,8 +58,8 @@ describe "bundler version trampolining" do
     end
   end
 
-  context "without BUNDLE_ENABLE_TRAMPOLINE" do
-    before { ENV["BUNDLE_ENABLE_TRAMPOLINE"] = nil }
+  context "without BUNDLE_TRAMPOLINE_FORCE" do
+    before { ENV["BUNDLE_TRAMPOLINE_FORCE"] = nil }
 
     context "when the version is >= 2" do
       let(:version) { "2.7182818285" }
@@ -83,7 +82,7 @@ describe "bundler version trampolining" do
       if Bundler::RubygemsIntegration.provides?("< 2.6.4")
         # necessary since we intall with 2.6.4 but the specs can run against
         # older versions that match againt the "gem" invocation
-        %w(bundle bundler).each do |exe|
+        %w[bundle bundler].each do |exe|
           system_gem_path.join("bin", exe).open("a") do |f|
             f << %(\ngem "bundler", ">= 0.a"\n)
           end

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::Source::Rubygems do
+RSpec.describe Bundler::Source::Rubygems do
   before do
     allow(Bundler).to receive(:root) { Pathname.new("root") }
   end

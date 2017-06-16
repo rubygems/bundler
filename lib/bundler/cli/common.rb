@@ -1,6 +1,23 @@
 # frozen_string_literal: true
 module Bundler
   module CLI::Common
+    def self.output_post_install_messages(messages)
+      return if Bundler.settings["ignore_messages"]
+      messages.to_a.each do |name, msg|
+        print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
+      end
+    end
+
+    def self.print_post_install_message(name, msg)
+      Bundler.ui.confirm "Post-install message from #{name}:"
+      Bundler.ui.info msg
+    end
+
+    def self.output_without_groups_message
+      return unless Bundler.settings.without.any?
+      Bundler.ui.confirm without_groups_message
+    end
+
     def self.without_groups_message
       groups = Bundler.settings.without
       group_list = [groups[0...-1].join(", "), groups[-1..-1]].
@@ -53,13 +70,24 @@ module Bundler
       message
     end
 
-    def self.config_gem_version_promoter(definition, opts)
-      patch_level = [:major, :minor, :patch].select {|v| opts.keys.include?(v.to_s) }
+    def self.ensure_all_gems_in_lockfile!(names, locked_gems = Bundler.locked_gems)
+      locked_names = locked_gems.specs.map(&:name)
+      names.-(locked_names).each do |g|
+        raise GemNotFound, gem_not_found_message(g, locked_names)
+      end
+    end
+
+    def self.configure_gem_version_promoter(definition, options)
+      patch_level = patch_level_options(options)
       raise InvalidOption, "Provide only one of the following options: #{patch_level.join(", ")}" unless patch_level.length <= 1
       definition.gem_version_promoter.tap do |gvp|
         gvp.level = patch_level.first || :major
-        gvp.strict = opts[:strict]
+        gvp.strict = options[:strict] || options["update-strict"]
       end
+    end
+
+    def self.patch_level_options(options)
+      [:major, :minor, :patch].select {|v| options.keys.include?(v.to_s) }
     end
   end
 end

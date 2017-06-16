@@ -14,3 +14,8 @@
 *.a
 mkmf.log
 <%- end -%>
+<%- if config[:test] == "rspec" -%>
+
+# rspec failure tracking
+.rspec_status
+<%- end -%>

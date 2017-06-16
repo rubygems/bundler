@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle binstubs <gem>" do
+RSpec.describe "bundle binstubs <gem>" do
   context "when the gem exists in the lockfile" do
     it "sets up the binstub" do
       install_gemfile <<-G
@@ -59,14 +58,14 @@ describe "bundle binstubs <gem>" do
       bundle "binstubs bundler"
 
       expect(bundled_app("bin/bundle")).not_to exist
-      expect(out).to include("Sorry, Bundler can only be run via Rubygems.")
+      expect(out).to include("Sorry, Bundler can only be run via RubyGems.")
     end
 
     it "installs binstubs from git gems" do
       FileUtils.mkdir_p(lib_path("foo/bin"))
       FileUtils.touch(lib_path("foo/bin/foo"))
       build_git "foo", "1.0", :path => lib_path("foo") do |s|
-        s.executables = %w(foo)
+        s.executables = %w[foo]
       end
       install_gemfile <<-G
         gem "foo", :git => "#{lib_path("foo")}"
@@ -81,7 +80,7 @@ describe "bundle binstubs <gem>" do
       FileUtils.mkdir_p(lib_path("foo/bin"))
       FileUtils.touch(lib_path("foo/bin/foo"))
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-        s.executables = %w(foo)
+        s.executables = %w[foo]
       end
       install_gemfile <<-G
         gem "foo", :path => "#{lib_path("foo")}"
@@ -157,7 +156,7 @@ describe "bundle binstubs <gem>" do
     it "includes the standalone path" do
       bundle "binstubs rack --standalone"
       standalone_line = File.read(bundled_app("bin/rackup")).each_line.find {|line| line.include? "$:.unshift" }.strip
-      expect(standalone_line).to eq "$:.unshift File.expand_path '../../bundle', path.realpath"
+      expect(standalone_line).to eq %($:.unshift File.expand_path "../../bundle", path.realpath)
     end
   end
 
