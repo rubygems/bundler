@@ -1,8 +1,7 @@
-if defined?(Thor)
-  Bundler.ui.warn "Thor has already been required. " +
-    "This may cause Bundler to malfunction in unexpected ways."
+# frozen_string_literal: true
+module Bundler
+  def self.require_thor_actions
+    Kernel.send(:require, "bundler/vendor/thor/lib/thor/actions")
+  end
 end
-vendor = File.expand_path('../vendor', __FILE__)
-$:.unshift(vendor) unless $:.include?(vendor)
-require 'thor'
-require 'thor/actions'
+require "bundler/vendor/thor/lib/thor"

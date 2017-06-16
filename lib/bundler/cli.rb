@@ -1,67 +1,105 @@
-require 'bundler'
-require 'bundler/similarity_detector'
-require 'bundler/vendored_thor'
+# frozen_string_literal: true
+require "bundler"
+require "bundler/vendored_thor"
 
 module Bundler
   class CLI < Thor
-    include Thor::Actions
+    AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
 
     def self.start(*)
       super
     rescue Exception => e
       Bundler.ui = UI::Shell.new
       raise e
+    ensure
+      warn_on_outdated_bundler
+      Bundler::SharedHelpers.print_major_deprecations!
     end
 
-    def initialize(*)
+    def self.dispatch(*)
+      super {|i| i.send(:print_command) }
+    end
+
+    def initialize(*args)
       super
-      Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
+
+      custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
+      if custom_gemfile && !custom_gemfile.empty?
+        Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", File.expand_path(custom_gemfile)
+        Bundler.reset_paths!
+      end
+
+      Bundler.settings[:retry] = options[:retry] if options[:retry]
+
+      current_cmd = args.last[:current_command].name
+      auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
     ensure
-      options ||= {}
+      self.options ||= {}
+      Bundler.settings.cli_flags_given = !options.empty?
+      unprinted_warnings = Bundler.ui.unprinted_warnings
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
+      unprinted_warnings.each {|w| Bundler.ui.warn(w) }
+
+      if ENV["RUBYGEMS_GEMDEPS"] && !ENV["RUBYGEMS_GEMDEPS"].empty?
+        Bundler.ui.warn(
+          "The RUBYGEMS_GEMDEPS environment variable is set. This enables RubyGems' " \
+          "experimental Gemfile mode, which may conflict with Bundler and cause unexpected errors. " \
+          "To remove this warning, unset RUBYGEMS_GEMDEPS.", :wrap => true
+        )
+      end
     end
 
     check_unknown_options!(:except => [:config, :exec])
     stop_on_unknown_option! :exec
 
     default_task :install
-    class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
-    class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"
+    class_option "no-color", :type => :boolean, :desc => "Disable colorization in output"
+    class_option "retry",    :type => :numeric, :aliases => "-r", :banner => "NUM",
+                             :desc => "Specify the number of times you wish to attempt network commands"
+    class_option "verbose", :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
       case cli
-      when "gemfile" then command = "gemfile.5"
+      when "gemfile" then command = "gemfile"
       when nil       then command = "bundle"
       else command = "bundle-#{cli}"
       end
 
-      manpages = %w(
-          bundle
-          bundle-config
-          bundle-exec
-          bundle-install
-          bundle-package
-          bundle-update
-          bundle-platform
-          gemfile.5)
+      man_path  = File.expand_path("../../../man", __FILE__)
+      man_pages = Hash[Dir.glob(File.join(man_path, "*")).grep(/.*\.\d*\Z/).collect do |f|
+        [File.basename(f, ".*"), f]
+      end]
 
-      if manpages.include?(command)
-        root = File.expand_path("../man", __FILE__)
-
-        if Bundler.which("man") && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          Kernel.exec "man #{root}/#{command}"
+      if man_pages.include?(command)
+        if Bundler.which("man") && man_path !~ %r{^file:/.+!/META-INF/jruby.home/.+}
+          Kernel.exec "man #{man_pages[command]}"
         else
-          puts File.read("#{root}/#{command}.txt")
+          puts File.read("#{man_path}/#{File.basename(man_pages[command])}.txt")
         end
+      elsif command_path = Bundler.which("bundler-#{cli}")
+        Kernel.exec(command_path, "--help")
       else
         super
       end
     end
 
-    desc "init", "Generates a Gemfile into the current working directory"
+    # Ensure `bundle help --no-color` is valid
+    all_commands["help"].disable_class_options = false
+
+    def self.handle_no_command_error(command, has_namespace = $thor_runner)
+      if Bundler.feature_flag.plugins? && Bundler::Plugin.command?(command)
+        return Bundler::Plugin.exec_command(command, ARGV[1..-1])
+      end
+
+      return super unless command_path = Bundler.which("bundler-#{command}")
+
+      Kernel.exec(command_path, *ARGV[1..-1])
+    end
+
+    desc "init [OPTIONS]", "Generates a Gemfile into the current working directory"
     long_desc <<-D
       Init generates a default Gemfile in the current working directory. When adding a
       Gemfile to a gem with a gemspec, the --gemspec option will automatically add each
@@ -69,71 +107,29 @@ module Bundler
     D
     method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
     def init
-      opts = options.dup
-      if File.exist?("Gemfile")
-        Bundler.ui.error "Gemfile already exists at #{Dir.pwd}/Gemfile"
-        exit 1
-      end
-
-      if opts[:gemspec]
-        gemspec = File.expand_path(opts[:gemspec])
-        unless File.exist?(gemspec)
-          Bundler.ui.error "Gem specification #{gemspec} doesn't exist"
-          exit 1
-        end
-        spec = Gem::Specification.load(gemspec)
-        puts "Writing new Gemfile to #{Dir.pwd}/Gemfile"
-        File.open('Gemfile', 'wb') do |file|
-          file << "# Generated from #{gemspec}\n"
-          file << spec.to_gemfile
-        end
-      else
-        puts "Writing new Gemfile to #{Dir.pwd}/Gemfile"
-        FileUtils.cp(File.expand_path('../templates/Gemfile', __FILE__), 'Gemfile')
-      end
+      require "bundler/cli/init"
+      Init.new(options.dup).run
     end
 
-    desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
+    desc "check [OPTIONS]", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     long_desc <<-D
       Check searches the local machine for each of the gems requested in the Gemfile. If
       all gems are found, Bundler prints a success message and exits with a status of 0.
       If not, the first missing gem is listed and Bundler exits status 1.
     D
+    method_option "dry-run", :type => :boolean, :default => false, :banner =>
+      "Lock the Gemfile"
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
-    method_option "dry-run", :type => :boolean, :default => false, :banner =>
-      "Lock the Gemfile"
+    map "c" => "check"
     def check
-      ENV['BUNDLE_GEMFILE'] = File.expand_path(options[:gemfile]) if options[:gemfile]
-
-      Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
-      begin
-        definition = Bundler.definition
-        definition.validate_ruby!
-        not_installed = definition.missing_specs
-      rescue GemNotFound, VersionConflict
-        Bundler.ui.error "Bundler can't satisfy your Gemfile's dependencies."
-        Bundler.ui.warn  "Install missing gems with `bundle install`."
-        exit 1
-      end
-
-      if not_installed.any?
-        Bundler.ui.error "The following gems are missing"
-        not_installed.each { |s| Bundler.ui.error " * #{s.name} (#{s.version})" }
-        Bundler.ui.warn "Install missing gems with `bundle install`"
-        exit 1
-      elsif !Bundler.default_lockfile.exist? && Bundler.settings[:frozen]
-        Bundler.ui.error "This bundle has been frozen, but there is no Gemfile.lock present"
-        exit 1
-      else
-        Bundler.load.lock unless options[:"dry-run"]
-        Bundler.ui.info "The Gemfile's dependencies are satisfied"
-      end
+      require "bundler/cli/check"
+      Check.new(options).run
     end
 
-    desc "install", "Install the current environment to the system"
+    desc "install [OPTIONS]", "Install the current environment to the system"
     long_desc <<-D
       Install will install all of the gems in the current bundle, making them available
       for use. In a freshly checked out repository, this command will give you the same
@@ -144,359 +140,203 @@ module Bundler
 
       If the bundle has already been installed, bundler will tell you so and then exit.
     D
-    method_option "without", :type => :array, :banner =>
-      "Exclude gems that are part of the specified named group."
-    method_option "gemfile", :type => :string, :banner =>
-      "Use the specified gemfile instead of Gemfile"
-    method_option "no-prune", :type => :boolean, :banner =>
-      "Don't remove stale gems from the cache."
-    method_option "no-cache", :type => :boolean, :banner =>
-      "Don't update the existing gem cache."
-    method_option "quiet", :type => :boolean, :banner =>
-      "Only output warnings and errors."
-    method_option "local", :type => :boolean, :banner =>
-      "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
-    method_option "shebang", :type => :string, :banner =>
-      "Specify a different shebang executable name than the default (usually 'ruby')"
-    method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
-    method_option "system", :type => :boolean, :banner =>
-      "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
-    method_option "frozen", :type => :boolean, :banner =>
-      "Do not allow the Gemfile.lock to be updated after this install"
-    method_option "deployment", :type => :boolean, :banner =>
-      "Install using defaults tuned for deployment environments"
-    method_option "standalone", :type => :array, :lazy_default => [], :banner =>
-      "Make a bundle that can work without the Bundler runtime"
-    method_option "full-index", :type => :boolean, :banner =>
-      "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
-    method_option "trust-policy", :alias => "P", :type => :string, :banner =>
-      "Gem trust policy (like gem install -P). Must be one of " +
-        Bundler.rubygems.security_policies.keys.join('|') unless
-        Bundler.rubygems.security_policies.empty?
+    method_option "deployment", :type => :boolean, :banner =>
+      "Install using defaults tuned for deployment environments"
+    method_option "frozen", :type => :boolean, :banner =>
+      "Do not allow the Gemfile.lock to be updated after this install"
+    method_option "full-index", :type => :boolean, :banner =>
+      "Fall back to using the single-file index of all gems"
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
     method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
       "Specify the number of jobs to run in parallel"
-
+    method_option "local", :type => :boolean, :banner =>
+      "Do not attempt to fetch gems remotely and use the gem cache instead"
+    method_option "no-cache", :type => :boolean, :banner =>
+      "Don't update the existing gem cache."
+    method_option "force", :type => :boolean, :banner =>
+      "Force downloading every gem."
+    method_option "no-prune", :type => :boolean, :banner =>
+      "Don't remove stale gems from the cache."
+    method_option "path", :type => :string, :banner =>
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+    method_option "quiet", :type => :boolean, :banner =>
+      "Only output warnings and errors."
+    method_option "shebang", :type => :string, :banner =>
+      "Specify a different shebang executable name than the default (usually 'ruby')"
+    method_option "standalone", :type => :array, :lazy_default => [], :banner =>
+      "Make a bundle that can work without the Bundler runtime"
+    method_option "system", :type => :boolean, :banner =>
+      "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
+    method_option "trust-policy", :alias => "P", :type => :string, :banner =>
+      "Gem trust policy (like gem install -P). Must be one of " +
+        Bundler.rubygems.security_policy_keys.join("|")
+    method_option "without", :type => :array, :banner =>
+      "Exclude gems that are part of the specified named group."
+    method_option "with", :type => :array, :banner =>
+      "Include gems that are part of the specified named group."
+    map "i" => "install"
     def install
-      opts = options.dup
-      if opts[:without]
-        opts[:without] = opts[:without].map{|g| g.tr(' ', ':') }
+      require "bundler/cli/install"
+      Bundler.settings.temporary(:no_install => false) do
+        Install.new(options.dup).run
       end
-
-      # Can't use Bundler.settings for this because settings needs gemfile.dirname
-      ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
-      ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
-
-      # Just disable color in deployment mode
-      Bundler.ui.shell = Thor::Shell::Basic.new if opts[:deployment]
-
-      if (opts[:path] || opts[:deployment]) && opts[:system]
-        Bundler.ui.error "You have specified both a path to install your gems to, \n" \
-                         "as well as --system. Please choose."
-        exit 1
-      end
-
-      if (opts["trust-policy"])
-        unless (Bundler.rubygems.security_policies.keys.include?(opts["trust-policy"]))
-          Bundler.ui.error "Rubygems doesn't know about trust policy '#{opts["trust-policy"]}'. " \
-            "The known policies are: #{Bundler.rubygems.security_policies.keys.join(', ')}."
-          exit 1
-        end
-        Bundler.settings["trust-policy"] = opts["trust-policy"]
-      else
-        Bundler.settings["trust-policy"] = nil if Bundler.settings["trust-policy"]
-      end
-
-      if opts[:deployment] || opts[:frozen]
-        unless Bundler.default_lockfile.exist?
-          flag = opts[:deployment] ? '--deployment' : '--frozen'
-          raise ProductionError, "The #{flag} flag requires a Gemfile.lock. Please make " \
-                                 "sure you have checked your Gemfile.lock into version control " \
-                                 "before deploying."
-        end
-
-        if Bundler.root.join("vendor/cache").exist?
-          opts[:local] = true
-        end
-
-        Bundler.settings[:frozen] = '1'
-      end
-
-      # When install is called with --no-deployment, disable deployment mode
-      if opts[:deployment] == false
-        Bundler.settings.delete(:frozen)
-        opts[:system] = true
-      end
-
-      opts["no-cache"] ||= opts[:local]
-
-      Bundler.settings[:path]     = nil if opts[:system]
-      Bundler.settings[:path]     = "vendor/bundle" if opts[:deployment]
-      Bundler.settings[:path]     = opts["path"] if opts["path"]
-      Bundler.settings[:path]     ||= "bundle" if opts["standalone"]
-      Bundler.settings[:bin]      = opts["binstubs"] if opts["binstubs"]
-      Bundler.settings[:bin]      = nil if opts["binstubs"] && opts["binstubs"].empty?
-      Bundler.settings[:shebang]  = opts["shebang"] if opts["shebang"]
-      Bundler.settings[:jobs]     = opts["jobs"] if opts["jobs"]
-      Bundler.settings[:no_prune] = true if opts["no-prune"]
-      Bundler.settings[:clean]    = opts["clean"] if opts["clean"]
-      Bundler.settings.without    = opts[:without]
-      Bundler.ui.level            = "warn" if opts[:quiet]
-      Bundler::Fetcher.disable_endpoint = opts["full-index"]
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
-
-      # rubygems plugins sometimes hook into the gem install process
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
-
-      definition = Bundler.definition
-      definition.validate_ruby!
-      Installer.install(Bundler.root, definition, opts)
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !opts["no-cache"]
-
-      if Bundler.settings[:path]
-        absolute_path = File.expand_path(Bundler.settings[:path])
-        relative_path = absolute_path.sub(File.expand_path('.'), '.')
-        Bundler.ui.confirm "Your bundle is complete!"
-        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
-        Bundler.ui.confirm "It was installed into #{relative_path}"
-      else
-        Bundler.ui.confirm "Your bundle is complete!"
-        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
-        Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
-      end
-      Installer.post_install_messages.to_a.each do |name, msg|
-        Bundler.ui.confirm "Post-install message from #{name}:"
-        Bundler.ui.info msg
-      end
-
-      clean if Bundler.settings[:clean] && Bundler.settings[:path]
-    rescue GemNotFound, VersionConflict => e
-      if opts[:local] && Bundler.app_cache.exist?
-        Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
-      end
-
-      if Bundler.definition.rubygems_remotes.empty?
-        Bundler.ui.warn <<-WARN, :wrap => true
-          Your Gemfile has no gem server sources. If you need gems that are \
-          not already on your machine, add a line like this to your Gemfile:
-          source 'https://rubygems.org'
-        WARN
-      end
-      raise e
     end
 
-    desc "update", "update the current environment"
+    desc "update [OPTIONS]", "update the current environment"
     long_desc <<-D
       Update will install the newest versions of the gems listed in the Gemfile. Use
       update when you have changed the Gemfile, or if you want to get the newest
       possible versions of the gems in the bundle.
     D
-    method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
+    method_option "full-index", :type => :boolean, :banner =>
+      "Fall back to using the single-file index of all gems"
+    method_option "group", :aliases => "-g", :type => :array, :banner =>
+      "Update a specific group"
+    method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
+      "Specify the number of jobs to run in parallel"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
-    method_option "full-index", :type => :boolean, :banner =>
-        "Use the rubygems modern index instead of the API endpoint"
+    method_option "source", :type => :array, :banner =>
+      "Update a specific source (and all gems associated with it)"
+    method_option "force", :type => :boolean, :banner =>
+      "Force downloading every gem."
+    method_option "ruby", :type => :boolean, :banner =>
+      "Update ruby specified in Gemfile.lock"
+    method_option "bundler", :type => :string, :lazy_default => "> 0.a", :banner =>
+      "Update the locked version of bundler"
+    method_option "patch", :type => :boolean, :banner =>
+      "Prefer updating only to next patch version"
+    method_option "minor", :type => :boolean, :banner =>
+      "Prefer updating only to next minor version"
+    method_option "major", :type => :boolean, :banner =>
+      "Prefer updating to next major version (default)"
+    method_option "strict", :type => :boolean, :banner =>
+      "Do not allow any gem to be updated past latest --patch | --minor | --major"
+    method_option "conservative", :type => :boolean, :banner =>
+      "Use bundle install conservative update behavior and do not allow shared dependencies to be updated."
+    method_option "all", :type => :boolean, :banner =>
+      "Update everything."
     def update(*gems)
-      sources = Array(options[:source])
-      Bundler.ui.level = "warn" if options[:quiet]
-
-      if gems.empty? && sources.empty?
-        # We're doing a full update
-        Bundler.definition(true)
-      else
-        # cycle through the requested gems, just to make sure they exist
-        names = Bundler.locked_gems.specs.map{ |s| s.name }
-        gems.each do |g|
-          next if names.include?(g)
-          raise GemNotFound, not_found_message(g, names)
-        end
-        Bundler.definition(:gems => gems, :sources => sources)
-      end
-
-      Bundler::Fetcher.disable_endpoint = options["full-index"]
-
-      opts = {"update" => true, "local" => options[:local]}
-      # rubygems plugins sometimes hook into the gem install process
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
-
-      Bundler.definition.validate_ruby!
-      Installer.install Bundler.root, Bundler.definition, opts
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
-      clean if Bundler.settings[:clean] && Bundler.settings[:path]
-      Bundler.ui.confirm "Your bundle is updated!"
-      Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+      require "bundler/cli/update"
+      Update.new(options, gems).run
     end
 
-    desc "show [GEM]", "Shows all gems that are part of the bundle, or the path to a given gem"
+    desc "show GEM [OPTIONS]", "Shows all gems that are part of the bundle, or the path to a given gem"
     long_desc <<-D
       Show lists the names and versions of all gems that are required by your Gemfile.
       Calling show with [GEM] will list the exact location of that gem on your machine.
     D
     method_option "paths", :type => :boolean,
-      :banner => "List the paths of all gems that are required by your Gemfile."
+                           :banner => "List the paths of all gems that are required by your Gemfile."
+    method_option "outdated", :type => :boolean,
+                              :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
-      Bundler.ui.silence do
-        Bundler.definition.validate_ruby!
-        Bundler.load.lock
-      end
-
-      if gem_name
-        if gem_name == "bundler"
-          path = File.expand_path("../../..", __FILE__)
-        else
-          spec = select_spec(gem_name, :regex_match)
-          return unless spec
-          path = spec.full_gem_path
-          if !File.directory?(path)
-            Bundler.ui.warn "The gem #{gem_name} has been deleted. It was installed at:"
-          end
-        end
-        return Bundler.ui.info(path)
-      end
-
-      if options[:paths]
-        Bundler.load.specs.sort_by { |s| s.name }.map do |s|
-          Bundler.ui.info s.full_gem_path
-        end
-      else
-        Bundler.ui.info "Gems included by the bundle:"
-        Bundler.load.specs.sort_by { |s| s.name }.each do |s|
-          Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version})"
-        end
-      end
+      Bundler::SharedHelpers.major_deprecation("use `bundle show` instead of `bundle list`") if ARGV[0] == "list"
+      require "bundler/cli/show"
+      Show.new(options, gem_name).run
     end
-    map %w(list) => "show"
+    # TODO: 2.0 remove `bundle list`
+    map %w[list] => "show"
 
-    desc "binstubs [GEM]", "install the binstubs of the listed gem"
+    desc "info GEM [OPTIONS]", "Show information for the given gem"
+    method_option "path", :type => :boolean, :banner => "Print full path to gem"
+    def info(gem_name)
+      require "bundler/cli/info"
+      Info.new(options, gem_name).run
+    end
+
+    desc "binstubs GEM [OPTIONS]", "Install the binstubs of the listed gem"
     long_desc <<-D
       Generate binstubs for executables in [GEM]. Binstubs are put into bin,
-      or the --binstubs directory if one has been set.
+      or the --binstubs directory if one has been set. Calling binstubs with [GEM [GEM]]
+      will create binstubs for all given gems.
     D
-    method_option "path", :type => :string, :lazy_default => "bin", :banner =>
-      "binstub destination directory (default bin)"
     method_option "force", :type => :boolean, :default => false, :banner =>
-      "overwrite existing binstubs if they exist"
+      "Overwrite existing binstubs if they exist"
+    method_option "path", :type => :string, :lazy_default => "bin", :banner =>
+      "Binstub destination directory (default bin)"
+    method_option "standalone", :type => :boolean, :banner =>
+      "Make binstubs that can work without the Bundler runtime"
     def binstubs(*gems)
-      Bundler.definition.validate_ruby!
-      Bundler.settings[:bin] = options["path"] if options["path"]
-      Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
-      installer = Installer.new(Bundler.root, Bundler.definition)
-
-      if gems.empty?
-        Bundler.ui.error "`bundle binstubs` needs at least one gem to run."
-        exit 1
-      end
-
-      gems.each do |gem_name|
-        spec = installer.specs.find{|s| s.name == gem_name }
-        raise GemNotFound, not_found_message(gem_name, Bundler.definition.specs) unless spec
-
-        if spec.name == "bundler"
-          Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
-        else
-          installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
-        end
-      end
+      require "bundler/cli/binstubs"
+      Binstubs.new(options, gems).run
     end
 
-    desc "outdated [GEM]", "list installed gems with newer versions available"
+    desc "add GEM VERSION", "Add gem to Gemfile and run bundle install"
+    long_desc <<-D
+      Adds the specified gem to Gemfile (if valid) and run 'bundle install' in one step.
+    D
+    method_option "version", :aliases => "-v", :type => :string
+    method_option "group", :aliases => "-g", :type => :string
+    method_option "source", :aliases => "-s", :type => :string
+
+    def add(gem_name)
+      require "bundler/cli/add"
+      Add.new(options.dup, gem_name).run
+    end
+
+    desc "outdated GEM [OPTIONS]", "list installed gems with newer versions available"
     long_desc <<-D
       Outdated lists the names and versions of gems that have a newer version available
       in the given source. Calling outdated with [GEM [GEM]] will only check for newer
       versions of the given gems. Prerelease gems are ignored by default. If your gems
       are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
+
+      For more information on patch level options (--major, --minor, --patch,
+      --update-strict) see documentation on the same options on the update command.
     D
-    method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
-    method_option "source", :type => :array, :banner => "Check against a specific source"
+    method_option "group", :aliases => "--group", :type => :string, :banner => "List gems from a specific group"
+    method_option "groups", :aliases => "--groups", :type => :boolean, :banner => "List gems organized by groups"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
+    method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
+    method_option "source", :type => :array, :banner => "Check against a specific source"
+    method_option "strict", :type => :boolean, :banner =>
+      "Only list newer versions allowed by your Gemfile requirements"
+    method_option "update-strict", :type => :boolean, :banner =>
+      "Strict conservative resolution, do not allow any gem to be updated past latest --patch | --minor | --major"
+    method_option "minor", :type => :boolean, :banner => "Prefer updating only to next minor version"
+    method_option "major", :type => :boolean, :banner => "Prefer updating to next major version (default)"
+    method_option "patch", :type => :boolean, :banner => "Prefer updating only to next patch version"
+    method_option "filter-major", :type => :boolean, :banner => "Only list major newer versions"
+    method_option "filter-minor", :type => :boolean, :banner => "Only list minor newer versions"
+    method_option "filter-patch", :type => :boolean, :banner => "Only list patch newer versions"
+    method_option "parseable", :aliases => "--porcelain", :type => :boolean, :banner =>
+      "Use minimal formatting for more parseable output"
     def outdated(*gems)
-      sources = Array(options[:source])
-      Bundler.definition.validate_ruby!
-
-      current_specs = Bundler.ui.silence { Bundler.load.specs }
-      current_dependencies = {}
-      Bundler.ui.silence { Bundler.load.dependencies.each { |dep| current_dependencies[dep.name] = dep } }
-
-      if gems.empty? && sources.empty?
-        # We're doing a full update
-        definition = Bundler.definition(true)
-      else
-        definition = Bundler.definition(:gems => gems, :sources => sources)
-      end
-      options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely!
-
-      Bundler.ui.info ""
-
-      out_count = 0
-      # Loop through the current specs
-      gemfile_specs, dependency_specs = current_specs.partition { |spec| current_dependencies.has_key? spec.name }
-      [gemfile_specs.sort_by(&:name), dependency_specs.sort_by(&:name)].flatten.each do |current_spec|
-        next if !gems.empty? && !gems.include?(current_spec.name)
-
-        active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
-
-        if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
-          active_spec = active_spec.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
-        end
-
-        active_spec = active_spec.last
-        next if active_spec.nil?
-
-        gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
-        git_outdated = current_spec.git_version != active_spec.git_version
-        if gem_outdated || git_outdated
-          if out_count == 0
-            if options["pre"]
-              Bundler.ui.info "Outdated gems included in the bundle (including pre-releases):"
-            else
-              Bundler.ui.info "Outdated gems included in the bundle:"
-            end
-          end
-
-          spec_version    = "#{active_spec.version}#{active_spec.git_version}"
-          current_version = "#{current_spec.version}#{current_spec.git_version}"
-          dependency = current_dependencies[current_spec.name]
-          dependency_version = %|Gemfile specifies "#{dependency.requirement}"| if dependency && dependency.specific?
-          Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version}) #{dependency_version}".rstrip
-          out_count += 1
-        end
-        Bundler.ui.debug "from #{active_spec.loaded_from}"
-      end
-
-      if out_count.zero?
-        Bundler.ui.info "Your bundle is up to date!\n"
-      else
-        exit 1
-      end
+      require "bundler/cli/outdated"
+      Outdated.new(options, gems).run
     end
 
-    desc "cache", "Cache all the gems to vendor/cache", :hide => true
-    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
+    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not only the current one"
+    method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
-      Bundler.definition.validate_ruby!
-      Bundler.definition.resolve_with_cache!
-      setup_cache_all
-      Bundler.load.cache
-      Bundler.settings[:no_prune] = true if options["no-prune"]
-      Bundler.load.lock
-    rescue GemNotFound => e
-      Bundler.ui.error(e.message)
-      Bundler.ui.warn "Run `bundle install` to install missing gems."
-      exit 1
+      require "bundler/cli/cache"
+      Cache.new(options).run
     end
 
-    desc "package", "Locks and then caches all of the gems into vendor/cache"
-    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
+    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not only the current one"
+    method_option "cache-path", :type => :string, :banner =>
+      "Specify a different cache path than the default (vendor/cache)."
+    method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
+    method_option "no-install", :type => :boolean, :banner => "Don't install the gems, only the package."
+    method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "path", :type => :string, :banner =>
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
+    method_option "frozen", :type => :boolean, :banner =>
+      "Do not allow the Gemfile.lock to be updated after this package operation's install"
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
@@ -504,38 +344,22 @@ module Bundler
       bundle without having to download any additional gems.
     D
     def package
-      Bundler.ui.level = "warn" if options[:quiet]
-      setup_cache_all
-      install
-      # TODO: move cache contents here now that all bundles are locked
-      Bundler.load.cache
+      require "bundler/cli/package"
+      Package.new(options).run
     end
-    map %w(pack) => :package
+    map %w[pack] => :package
 
-    desc "exec", "Run the command in context of the bundle"
+    desc "exec [OPTIONS]", "Run the command in context of the bundle"
+    method_option :keep_file_descriptors, :type => :boolean, :default => false
     long_desc <<-D
       Exec runs a command, providing it access to the gems in the bundle. While using
       bundle exec you can require and call the bundled gems as if they were installed
-      into the system wide Rubygems repository.
+      into the system wide RubyGems repository.
     D
+    map "e" => "exec"
     def exec(*args)
-      Bundler.definition.validate_ruby!
-      Bundler.load.setup_environment
-
-      begin
-        # Run
-        Kernel.exec(*args)
-      rescue Errno::EACCES
-        Bundler.ui.error "bundler: not executable: #{args.first}"
-        exit 126
-      rescue Errno::ENOENT
-        Bundler.ui.error "bundler: command not found: #{args.first}"
-        Bundler.ui.warn  "Install missing gem executables with `bundle install`"
-        exit 127
-      rescue ArgumentError
-        Bundler.ui.error "bundler: exec needs a command to run"
-        exit 128
-      end
+      require "bundler/cli/exec"
+      Exec.new(options, args).run
     end
 
     desc "config NAME [VALUE]", "retrieve or set a configuration value"
@@ -550,108 +374,37 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
+    method_option "parseable", :type => :boolean, :banner => "Use minimal formatting for more parseable output"
     def config(*args)
-      peek = args.shift
-
-      if peek && peek =~ /^\-\-/
-        name, scope = args.shift, $'
-      else
-        name, scope = peek, "global"
-      end
-
-      unless name
-        Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
-
-        Bundler.settings.all.each do |setting|
-          Bundler.ui.confirm "#{setting}"
-          with_padding do
-            Bundler.settings.pretty_values_for(setting).each do |line|
-              Bundler.ui.info line
-            end
-          end
-          Bundler.ui.confirm ""
-        end
-        return
-      end
-
-      case scope
-      when "delete"
-        Bundler.settings.set_local(name, nil)
-        Bundler.settings.set_global(name, nil)
-      when "local", "global"
-        if args.empty?
-          Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
-          with_padding do
-            Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
-          end
-          return
-        end
-
-        locations = Bundler.settings.locations(name)
-
-        if scope == "global"
-          if local = locations[:local]
-            Bundler.ui.info "Your application has set #{name} to #{local.inspect}. This will override the " \
-              "global value you are currently setting"
-          end
-
-          if env = locations[:env]
-            Bundler.ui.info "You have a bundler environment variable for #{name} set to #{env.inspect}. " \
-              "This will take precedence over the global value you are setting"
-          end
-
-          if global = locations[:global]
-            Bundler.ui.info "You are replacing the current global value of #{name}, which is currently #{global.inspect}"
-          end
-        end
-
-        if scope == "local" && local = locations[:local]
-          Bundler.ui.info "You are replacing the current local value of #{name}, which is currently #{local.inspect}"
-        end
-
-        if name.match(/\Alocal\./)
-          pathname = Pathname.new(args.join(" "))
-          args = [pathname.expand_path.to_s] if pathname.directory?
-        end
-
-        Bundler.settings.send("set_#{scope}", name, args.join(" "))
-      else
-        Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
-        exit 1
-      end
+      require "bundler/cli/config"
+      Config.new(options, args, self).run
     end
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
-      editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
-      return Bundler.ui.info("To open a bundled gem, set $EDITOR or $BUNDLER_EDITOR") unless editor
-      spec = select_spec(name, :regex_match)
-      return unless spec
-      Dir.chdir(spec.full_gem_path) do
-        command = "#{editor} #{spec.full_gem_path}"
-        success = system(command)
-        Bundler.ui.info "Could not run '#{command}'" unless success
-      end
+      require "bundler/cli/open"
+      Open.new(options, name).run
     end
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
-      group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
-      ARGV.clear
-
-      require 'irb'
-      IRB.start
+      # TODO: Remove for 2.0
+      require "bundler/cli/console"
+      Console.new(options, group).run
     end
 
     desc "version", "Prints the bundler's version information"
     def version
-      Bundler.ui.info "Bundler version #{Bundler::VERSION}"
+      if ARGV.include?("version")
+        build_info = " (#{BuildMetadata.built_at} commit #{BuildMetadata.git_commit_sha})"
+      end
+      Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
     end
-    map %w(-v --version) => :version
+    map %w[-v --version] => :version
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
-      Bundler.load.specs.sort_by { |s| s.license.to_s }.reverse.each do |s|
+      Bundler.load.specs.sort_by {|s| s.license.to_s }.reverse_each do |s|
         gem_name = s.name
         license  = s.license || s.licenses
 
@@ -663,230 +416,236 @@ module Bundler
       end
     end
 
-    desc 'viz', "Generates a visual dependency graph"
+    desc "viz [OPTIONS]", "Generates a visual dependency graph"
     long_desc <<-D
       Viz generates a PNG file of the current Gemfile as a dependency graph.
       Viz requires the ruby-graphviz gem (and its dependencies).
       The associated gems must also be installed via 'bundle install'.
     D
-    method_option :file, :type => :string, :default => 'gem_graph', :aliases => '-f', :banner => "The name to use for the generated file. see format option"
-    method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Set to show each gem version."
-    method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
-    method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
+    method_option :file, :type => :string, :default => "gem_graph", :aliases => "-f", :desc => "The name to use for the generated file. see format option"
+    method_option :format, :type => :string, :default => "png", :aliases => "-F", :desc => "This is output format option. Supported format is png, jpg, svg, dot ..."
+    method_option :requirements, :type => :boolean, :default => false, :aliases => "-R", :desc => "Set to show the version of each required dependency."
+    method_option :version, :type => :boolean, :default => false, :aliases => "-v", :desc => "Set to show each gem version."
+    method_option :without, :type => :array, :default => [], :aliases => "-W", :banner => "GROUP[ GROUP...]", :desc => "Exclude gems that are part of the specified named group."
     def viz
-      require 'graphviz'
-      output_file = File.expand_path(options[:file])
-      graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format])
-      graph.viz
-    rescue LoadError => e
-      Bundler.ui.error e.inspect
-      Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
-      Bundler.ui.warn "`gem install ruby-graphviz`"
-    rescue StandardError => e
-      if e.message =~ /GraphViz not installed or dot not in PATH/
-        Bundler.ui.error e.message
-        Bundler.ui.warn "Please install GraphViz. On a Mac with homebrew, you can run `brew install graphviz`."
-      else
-        raise
-      end
+      require "bundler/cli/viz"
+      Viz.new(options.dup).run
     end
 
-    desc "gem GEM", "Creates a skeleton for creating a rubygem"
-    method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :banner => "Generate a binary for your library."
-    method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner => "Generate a test directory for your library: 'rspec' is the default, but 'minitest' is also supported."
-    method_option :edit, :type => :string, :aliases => "-e",
-                  :lazy_default => [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? },
-                  :required => false, :banner => "/path/to/your/editor",
-                  :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
+    old_gem = instance_method(:gem)
 
+    desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
+    method_option :exe, :type => :boolean, :default => false, :aliases => ["--bin", "-b"], :desc => "Generate a binary executable for your library."
+    method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
+    method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "EDITOR",
+                         :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find {|e| !e.nil? && !e.empty? },
+                         :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
+    method_option :ext, :type => :boolean, :default => false, :desc => "Generate the boilerplate for C extension code"
+    method_option :mit, :type => :boolean, :desc => "Generate an MIT license file. Set a default with `bundle config gem.mit true`."
+    method_option :test, :type => :string, :lazy_default => "rspec", :aliases => "-t", :banner => "rspec",
+                         :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config gem.test rspec`."
     def gem(name)
-      name = name.chomp("/") # remove trailing slash if present
-      namespaced_path = name.tr('-', '/')
-      target = File.join(Dir.pwd, name)
-      constant_name = name.split('_').map{|p| p[0..0].upcase + p[1..-1] }.join
-      constant_name = constant_name.split('-').map{|q| q[0..0].upcase + q[1..-1] }.join('::') if constant_name =~ /-/
-      constant_array = constant_name.split('::')
-      git_user_name = `git config user.name`.chomp
-      git_user_email = `git config user.email`.chomp
-      opts = {
-        :name            => name,
-        :namespaced_path => namespaced_path,
-        :constant_name   => constant_name,
-        :constant_array  => constant_array,
-        :author          => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
-        :email           => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
-        :test            => options[:test]
-      }
-      gemspec_dest = File.join(target, "#{name}.gemspec")
-      template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                             opts)
-      template(File.join("newgem/Rakefile.tt"),              File.join(target, "Rakefile"),                            opts)
-      template(File.join("newgem/LICENSE.txt.tt"),           File.join(target, "LICENSE.txt"),                         opts)
-      template(File.join("newgem/README.md.tt"),             File.join(target, "README.md"),                           opts)
-      template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),                          opts)
-      template(File.join("newgem/newgem.gemspec.tt"),        gemspec_dest,                                             opts)
-      template(File.join("newgem/lib/newgem.rb.tt"),         File.join(target, "lib/#{namespaced_path}.rb"),           opts)
-      template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{namespaced_path}/version.rb"),   opts)
-      if options[:bin]
-        template(File.join("newgem/bin/newgem.tt"),          File.join(target, 'bin', name),                           opts)
-      end
-      case options[:test]
-      when 'rspec'
-        template(File.join("newgem/rspec.tt"),               File.join(target, ".rspec"),                              opts)
-        template(File.join("newgem/spec/spec_helper.rb.tt"), File.join(target, "spec/spec_helper.rb"),                 opts)
-        template(File.join("newgem/spec/newgem_spec.rb.tt"), File.join(target, "spec/#{namespaced_path}_spec.rb"),     opts)
-      when 'minitest'
-        template(File.join("newgem/test/minitest_helper.rb.tt"), File.join(target, "test/minitest_helper.rb"),         opts)
-        template(File.join("newgem/test/test_newgem.rb.tt"),     File.join(target, "test/test_#{namespaced_path}.rb"), opts)
-      end
-      if options[:test]
-        template(File.join("newgem/.travis.yml.tt"),         File.join(target, ".travis.yml"),            opts)
-      end
-      Bundler.ui.info "Initializing git repo in #{target}"
-      Dir.chdir(target) { `git init`; `git add .` }
+    end
 
-      if options[:edit]
-        run("#{options["edit"]} \"#{gemspec_dest}\"")  # Open gemspec in editor
+    commands["gem"].tap do |gem_command|
+      def gem_command.run(instance, args = [])
+        arity = 1 # name
+
+        require "bundler/cli/gem"
+        cmd_args = args + [instance]
+        cmd_args.unshift(instance.options)
+
+        cmd = begin
+          Gem.new(*cmd_args)
+        rescue ArgumentError => e
+          instance.class.handle_argument_error(self, e, args, arity)
+        end
+
+        cmd.run
       end
     end
+
+    undef_method(:gem)
+    define_method(:gem, old_gem)
+    private :gem
 
     def self.source_root
-      File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
+      File.expand_path(File.join(File.dirname(__FILE__), "templates"))
     end
 
-    desc "clean", "Cleans up unused gems in your bundler directory"
+    desc "clean [OPTIONS]", "Cleans up unused gems in your bundler directory"
     method_option "dry-run", :type => :boolean, :default => false, :banner =>
-      "only print out changes, do not actually clean gems"
+      "Only print out changes, do not clean gems"
     method_option "force", :type => :boolean, :default => false, :banner =>
-      "forces clean even if --path is not set"
+      "Forces clean even if --path is not set"
     def clean
-      if Bundler.settings[:path] || options[:force]
-        Bundler.load.clean(options[:"dry-run"])
-      else
-        Bundler.ui.error "Can only use bundle clean when --path is set or --force is set"
-        exit 1
-      end
+      require "bundler/cli/clean"
+      Clean.new(options.dup).run
     end
 
-    desc "platform", "Displays platform compatibility information"
+    desc "platform [OPTIONS]", "Displays platform compatibility information"
     method_option "ruby", :type => :boolean, :default => false, :banner =>
       "only display ruby related platform information"
     def platform
-      platforms, ruby_version = Bundler.ui.silence do
-        [ Bundler.definition.platforms.map {|p| "* #{p}" },
-          Bundler.definition.ruby_version ]
-      end
-      output = []
-
-      if options[:ruby]
-        if ruby_version
-          output << ruby_version
-        else
-          output << "No ruby version specified"
-        end
-      else
-        output << "Your platform is: #{RUBY_PLATFORM}"
-        output << "Your app has gems that work on these platforms:\n#{platforms.join("\n")}"
-
-        if ruby_version
-          output << "Your Gemfile specifies a Ruby version requirement:\n* #{ruby_version}"
-
-          begin
-            Bundler.definition.validate_ruby!
-            output << "Your current platform satisfies the Ruby version requirement."
-          rescue RubyVersionMismatch => e
-            output << e.message
-          end
-        else
-          output << "Your Gemfile does not specify a Ruby version requirement."
-        end
-      end
-
-      Bundler.ui.info output.join("\n\n")
+      require "bundler/cli/platform"
+      Platform.new(options).run
     end
 
-    desc "inject GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
-    def inject(name, version, *gems)
-      # The required arguments allow Thor to give useful feedback when the arguments
-      # are incorrect. This adds those first two arguments onto the list as a whole.
-      gems.unshift(version).unshift(name)
+    desc "inject GEM VERSION", "Add the named gem, with version requirements, to the resolved Gemfile"
+    method_option "source", :type => :string, :banner =>
+     "Install gem from the given source"
+    method_option "group", :type => :string, :banner =>
+     "Install gem into a bundler group"
+    def inject(name, version)
+      SharedHelpers.major_deprecation "The `inject` command has been replaced by the `add` command"
+      require "bundler/cli/inject"
+      Inject.new(options.dup, name, version).run
+    end
 
-      # Build an array of Dependency objects out of the arguments
-      deps = []
-      gems.each_slice(2) do |gem_name, gem_version|
-        deps << Bundler::Dependency.new(gem_name, gem_version)
-      end
-
-      added = Injector.inject(deps)
-
-      if added.any?
-        Bundler.ui.confirm "Added to Gemfile:"
-        Bundler.ui.confirm added.map{ |g| "  #{g}" }.join("\n")
-      else
-        Bundler.ui.confirm "All injected gems were already present in the Gemfile"
-      end
+    desc "lock", "Creates a lockfile without installing"
+    method_option "update", :type => :array, :lazy_default => true, :banner =>
+      "ignore the existing lockfile, update all gems by default, or update list of given gems"
+    method_option "local", :type => :boolean, :default => false, :banner =>
+      "do not attempt to fetch remote gemspecs and use the local gem cache only"
+    method_option "print", :type => :boolean, :default => false, :banner =>
+      "print the lockfile to STDOUT instead of writing to the file system"
+    method_option "lockfile", :type => :string, :default => nil, :banner =>
+      "the path the lockfile should be written to"
+    method_option "full-index", :type => :boolean, :default => false, :banner =>
+      "Fall back to using the single-file index of all gems"
+    method_option "add-platform", :type => :array, :default => [], :banner =>
+      "Add a new platform to the lockfile"
+    method_option "remove-platform", :type => :array, :default => [], :banner =>
+      "Remove a platform from the lockfile"
+    method_option "patch", :type => :boolean, :banner =>
+      "If updating, prefer updating only to next patch version"
+    method_option "minor", :type => :boolean, :banner =>
+      "If updating, prefer updating only to next minor version"
+    method_option "major", :type => :boolean, :banner =>
+      "If updating, prefer updating to next major version (default)"
+    method_option "strict", :type => :boolean, :banner =>
+      "If updating, do not allow any gem to be updated past latest --patch | --minor | --major"
+    method_option "conservative", :type => :boolean, :banner =>
+      "If updating, use bundle install conservative update behavior and do not allow shared dependencies to be updated"
+    def lock
+      require "bundler/cli/lock"
+      Lock.new(options).run
     end
 
     desc "env", "Print information about the environment Bundler is running under"
     def env
-      Env.new.write($stdout)
+      Env.write($stdout)
+    end
+
+    desc "doctor [OPTIONS]", "Checks the bundle for common problems"
+    long_desc <<-D
+      Doctor scans the OS dependencies of each of the gems requested in the Gemfile. If
+      missing dependencies are detected, Bundler prints them and exits status 1.
+      Otherwise, Bundler prints a success message and exits with a status of 0.
+    D
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
+    method_option "quiet", :type => :boolean, :banner =>
+        "Only output warnings and errors."
+    def doctor
+      require "bundler/cli/doctor"
+      Doctor.new(options).run
+    end
+
+    desc "issue", "Learn how to report an issue in Bundler"
+    def issue
+      require "bundler/cli/issue"
+      Issue.new.run
+    end
+
+    desc "pristine [GEMS...]", "Restores installed gems to pristine condition from files located in the gem cache. Gem installed from a git repository will be issued `git checkout --force`."
+    def pristine(*gems)
+      require "bundler/cli/pristine"
+      Pristine.new(gems).run
+    end
+
+    if Bundler.feature_flag.plugins?
+      require "bundler/cli/plugin"
+      desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
+      subcommand "plugin", Plugin
+    end
+
+    # Reformat the arguments passed to bundle that include a --help flag
+    # into the corresponding `bundle help #{command}` call
+    def self.reformatted_help_args(args)
+      bundler_commands = all_commands.keys
+      help_flags = %w[--help -h]
+      exec_commands = %w[e ex exe exec]
+      help_used = args.index {|a| help_flags.include? a }
+      exec_used = args.index {|a| exec_commands.include? a }
+      command = args.find {|a| bundler_commands.include? a }
+      if exec_used && help_used
+        if exec_used + help_used == 1
+          %w[help exec]
+        else
+          args
+        end
+      elsif help_used
+        args = args.dup
+        args.delete_at(help_used)
+        ["help", command || args].flatten.compact
+      else
+        args
+      end
     end
 
   private
 
-    def setup_cache_all
-      Bundler.settings[:cache_all] = options[:all] if options.key?("all")
+    # Automatically invoke `bundle install` and resume if
+    # Bundler.settings[:auto_install] exists. This is set through config cmd
+    # `bundle config auto_install 1`.
+    #
+    # Note that this method `nil`s out the global Definition object, so it
+    # should be called first, before you instantiate anything like an
+    # `Installer` that'll keep a reference to the old one instead.
+    def auto_install
+      return unless Bundler.settings[:auto_install]
 
-      if Bundler.definition.sources.any? { |s| !s.is_a?(Source::Rubygems) } && !Bundler.settings[:cache_all]
-        Bundler.ui.warn "Your Gemfile contains path and git dependencies. If you want "    \
-          "to package them as well, please pass the --all flag. This will be the default " \
-          "on Bundler 2.0."
+      begin
+        Bundler.definition.specs
+      rescue GemNotFound
+        Bundler.ui.info "Automatically installing missing gems."
+        Bundler.reset!
+        invoke :install, []
+        Bundler.reset!
       end
     end
 
-    def select_spec(name, regex_match = nil)
-      specs = []
-      regexp = Regexp.new(name) if regex_match
-
-      Bundler.definition.specs.each do |spec|
-        return spec if spec.name == name
-        specs << spec if regexp && spec.name =~ regexp
-      end
-
-      case specs.count
-      when 0
-        raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
-      when 1
-        specs.first
-      else
-        specs.each_with_index do |spec, index|
-          Bundler.ui.info "#{index.succ} : #{spec.name}", true
-        end
-        Bundler.ui.info '0 : - exit -', true
-
-        input = Bundler.ui.ask('> ')
-        (num = input.to_i) > 0 ? specs[num - 1] : nil
-      end
+    def print_command
+      return unless ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] || Bundler.ui.debug?
+      _, _, config = @_initializer
+      current_command = config[:current_command].name
+      return if %w[exec version check platform show help].include?(current_command)
+      command = ["bundle", current_command] + args
+      command << Thor::Options.to_switches(options)
+      command.reject!(&:empty?)
+      Bundler.ui.info "Running `#{command * " "}` with bundler #{Bundler::VERSION}"
     end
 
-    def not_found_message(missing_gem_name, alternatives)
-      message = "Could not find gem '#{missing_gem_name}'."
+    def self.warn_on_outdated_bundler
+      return if Bundler.settings[:disable_version_check]
 
-      # This is called as the result of a GemNotFound, let's see if
-      # there's any similarly named ones we can propose instead
-      alternate_names = alternatives.map { |a| a.respond_to?(:name) ? a.name : a }
-      suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
-      message += "\nDid you mean #{suggestions}?" if suggestions
-      message
+      latest = Fetcher::CompactIndex.
+               new(nil, Source::Rubygems::Remote.new(URI("https://rubygems.org")), nil).
+               send(:compact_index_client).
+               instance_variable_get(:@cache).
+               dependencies("bundler").
+               map {|d| Gem::Version.new(d.first) }.
+               max
+      return unless latest
+
+      current = Gem::Version.new(VERSION)
+      return if current >= latest
+
+      Bundler.ui.warn "The latest bundler is #{latest}, but you are currently running #{current}.\nTo update, run `gem install bundler#{" --pre" if latest.prerelease?}`"
+    rescue
+      nil
     end
-
-
-    def without_groups_message
-      groups = Bundler.settings.without
-      group_list = [groups[0...-1].join(", "), groups[-1..-1]].
-        reject{|s| s.to_s.empty? }.join(" and ")
-      group_str = (groups.size == 1) ? "group" : "groups"
-      "Gems in the #{group_str} #{group_list} were not installed."
-    end
-
+    private_class_method :warn_on_outdated_bundler
   end
 end

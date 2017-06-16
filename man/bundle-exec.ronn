@@ -3,7 +3,7 @@ bundle-exec(1) -- Execute a command in the context of the bundle
 
 ## SYNOPSIS
 
-`bundle exec` <command>
+`bundle exec` [--keep-file-descriptors] <command>
 
 ## DESCRIPTION
 
@@ -17,6 +17,13 @@ should run `bundle exec rspec spec/my_spec.rb`.
 
 Note that `bundle exec` does not require that an executable is
 available on your shell's `$PATH`.
+
+## OPTIONS
+
+* `--keep-file-descriptors`:
+  Exec in Ruby 2.0 began discarding non-standard file descriptors. When this
+  flag is passed, exec will revert to the 1.9 behaviour of passing all file
+  descriptors to the new process.
 
 ## BUNDLE INSTALL --BINSTUBS
 
@@ -55,6 +62,15 @@ It also modifies Rubygems:
 * Override `Gem.bin_path` to use the gems in the bundle,
   making system executables work
 * Add all gems in the bundle into Gem.loaded_specs
+
+### Loading
+
+By default, when attempting to `bundle exec` to a file with a ruby shebang,
+Bundler will `Kernel.load` that file instead of using `Kernel.exec`. For the
+vast majority of cases, this is a performance improvement. In a rare few cases,
+this could cause some subtle side-effects (such as dependence on the exact
+contents of `$0` or `__FILE__`) and the optimization can be disabled by enabling
+the `disable_exec_load` setting.
 
 ### Shelling out
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Spec
   module Platforms
     include Bundler::GemHelpers
@@ -7,7 +8,11 @@ module Spec
     end
 
     def mac
-      Gem::Platform.new('x86-darwin-10')
+      Gem::Platform.new("x86-darwin-10")
+    end
+
+    def x64_mac
+      Gem::Platform.new("x86_64-darwin-15")
     end
 
     def java
@@ -15,19 +20,19 @@ module Spec
     end
 
     def linux
-      Gem::Platform.new(['x86', 'linux', nil])
+      Gem::Platform.new(["x86", "linux", nil])
     end
 
     def mswin
-      Gem::Platform.new(['x86', 'mswin32', nil])
+      Gem::Platform.new(["x86", "mswin32", nil])
     end
 
     def mingw
-      Gem::Platform.new(['x86', 'mingw32', nil])
+      Gem::Platform.new(["x86", "mingw32", nil])
     end
 
     def x64_mingw
-      Gem::Platform.new(['x64', 'mingw32', nil])
+      Gem::Platform.new(["x64", "mingw32", nil])
     end
 
     def all_platforms
@@ -35,11 +40,11 @@ module Spec
     end
 
     def local
-      generic(Gem::Platform.local)
+      generic_local_platform
     end
 
     def not_local
-      all_platforms.find { |p| p != generic(Gem::Platform.local) }
+      all_platforms.find {|p| p != generic_local_platform }
     end
 
     def local_tag
@@ -51,7 +56,7 @@ module Spec
     end
 
     def not_local_tag
-      [:ruby, :jruby].find { |tag| tag != local_tag }
+      [:ruby, :jruby].find {|tag| tag != local_tag }
     end
 
     def local_ruby_engine
@@ -70,7 +75,6 @@ module Spec
         JRUBY_VERSION
       else
         raise BundlerError, "That RUBY_ENGINE is not recognized"
-        nil
       end
     end
 
