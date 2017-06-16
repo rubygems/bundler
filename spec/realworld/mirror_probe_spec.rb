@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "thread"
 
-describe "fetching dependencies with a not available mirror", :realworld => true do
+RSpec.describe "fetching dependencies with a not available mirror", :realworld => true do
   let(:mirror) { @mirror_uri }
   let(:original) { @server_uri }
   let(:server_port) { @server_port }
@@ -32,7 +31,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
         gem 'weakling'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
 
       expect(out).to include("Installing weakling")
       expect(out).to include("Bundle complete")
@@ -52,7 +51,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
         gem 'weakling'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
 
       expect(out).to include("Installing weakling")
       expect(out).to include("Bundle complete")
@@ -71,13 +70,29 @@ describe "fetching dependencies with a not available mirror", :realworld => true
         gem 'weakling'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
 
       expect(out).to include("Fetching source index from #{mirror}")
       expect(out).to include("Retrying fetcher due to error (2/4): Bundler::HTTPError Could not fetch specs from #{mirror}")
       expect(out).to include("Retrying fetcher due to error (3/4): Bundler::HTTPError Could not fetch specs from #{mirror}")
       expect(out).to include("Retrying fetcher due to error (4/4): Bundler::HTTPError Could not fetch specs from #{mirror}")
       expect(out).to include("Could not fetch specs from #{mirror}")
+    end
+
+    it "prints each error and warning on a new line" do
+      gemfile <<-G
+        source "#{original}"
+        gem 'weakling'
+      G
+
+      bundle :install, :artifice => nil
+
+      expect(out).to eq "Fetching source index from #{mirror}/
+
+Retrying fetcher due to error (2/4): Bundler::HTTPError Could not fetch specs from #{mirror}/
+Retrying fetcher due to error (3/4): Bundler::HTTPError Could not fetch specs from #{mirror}/
+Retrying fetcher due to error (4/4): Bundler::HTTPError Could not fetch specs from #{mirror}/
+Could not fetch specs from #{mirror}/"
     end
   end
 
@@ -92,7 +107,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
         gem 'weakling'
       G
 
-      bundle :install
+      bundle :install, :artifice => nil
 
       expect(out).to include("Fetching source index from #{mirror}")
       expect(out).to include("Retrying fetcher due to error (2/4): Bundler::HTTPError Could not fetch specs from #{mirror}")

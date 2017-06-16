@@ -14,14 +14,23 @@ module Bundler
 
       def message
         conflicts.sort.reduce(String.new) do |o, (name, conflict)|
-          o << %(Bundler could not find compatible versions for gem "#{name}":\n)
+          o << %(\nBundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
             o << %(    #{printable_dep(conflict.locked_requirement)}\n)
             o << %(\n)
           end
           o << %(  In Gemfile:\n)
-          o << conflict.requirement_trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
+          trees = conflict.requirement_trees
+
+          maximal = 1.upto(trees.size).map do |size|
+            trees.map(&:last).flatten(1).combination(size).to_a
+          end.flatten(1).select do |deps|
+            Bundler::VersionRanges.empty?(*Bundler::VersionRanges.for_many(deps.map(&:requirement)))
+          end.min_by(&:size)
+          trees.reject! {|t| !maximal.include?(t.last) } if maximal
+
+          o << trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
             t = String.new
             depth = 2
             tree.each do |req|
@@ -62,7 +71,7 @@ module Bundler
             end
           end
           o
-        end
+        end.strip
       end
     end
 
@@ -175,14 +184,15 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [], gem_version_promoter = GemVersionPromoter.new, additional_base_requirements = [])
+    def self.resolve(requirements, index, source_requirements = {}, base = [], gem_version_promoter = GemVersionPromoter.new, additional_base_requirements = [], platforms = nil)
+      platforms = Set.new(platforms) if platforms
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base, gem_version_promoter, additional_base_requirements)
+      resolver = new(index, source_requirements, base, gem_version_promoter, additional_base_requirements, platforms)
       result = resolver.start(requirements)
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base, gem_version_promoter, additional_base_requirements)
+    def initialize(index, source_requirements, base, gem_version_promoter, additional_base_requirements, platforms)
       @index = index
       @source_requirements = source_requirements
       @base = base
@@ -194,6 +204,7 @@ module Bundler
         @base_dg.add_vertex(ls.name, DepProxy.new(dep, ls.platform), true)
       end
       additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, d) }
+      @platforms = platforms
       @gem_version_promoter = gem_version_promoter
     end
 
@@ -228,11 +239,11 @@ module Bundler
 
     def debug?
       return @debug_mode if defined?(@debug_mode)
-      @debug_mode = ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"]
+      @debug_mode = ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"] || false
     end
 
     def before_resolution
-      Bundler.ui.info "Resolving dependencies...", false
+      Bundler.ui.info "Resolving dependencies...", debug?
     end
 
     def after_resolution
@@ -240,7 +251,7 @@ module Bundler
     end
 
     def indicate_progress
-      Bundler.ui.info ".", false
+      Bundler.ui.info ".", false unless debug?
     end
 
     include Molinillo::SpecificationProvider
@@ -308,13 +319,15 @@ module Bundler
 
     def requirement_satisfied_by?(requirement, activated, spec)
       return false unless requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
-      spec.activate_platform!(requirement.__platform) || spec.for?(requirement.__platform)
+      spec.activate_platform!(requirement.__platform) if !@platforms || @platforms.include?(requirement.__platform)
+      true
     end
 
     def sort_dependencies(dependencies, activated, conflicts)
       dependencies.sort_by do |dependency|
         name = name_for(dependency)
         [
+          @base_dg.vertex_named(name) ? 0 : 1,
           activated.vertex_named(name).payload ? 0 : 1,
           amount_constrained(dependency),
           conflicts[name] ? 0 : 1,
@@ -325,6 +338,12 @@ module Bundler
 
   private
 
+    # returns an integer \in (-\infty, 0]
+    # a number closer to 0 means the dependency is less constraining
+    #
+    # dependencies w/ 0 or 1 possibilities (ignoring version requirements)
+    # are given very negative values, so they _always_ sort first,
+    # before dependencies that are unconstrained
     def amount_constrained(dependency)
       @amount_constrained ||= {}
       @amount_constrained[dependency.name] ||= begin
@@ -332,8 +351,9 @@ module Bundler
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
           all = index_for(dependency).search(dependency.name).size
+
           if all <= 1
-            all
+            all - 1_000_000
           else
             search = search_for(dependency).size
             search - all
@@ -365,8 +385,13 @@ module Bundler
                        "Source does not contain any versions of '#{requirement}'"
                      end
         else
+          cache_message = begin
+                            " or in gems cached in #{Bundler.settings.app_cache_path}" if Bundler.app_cache.exist?
+                          rescue GemfileNotFound
+                            nil
+                          end
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
-            "listed in your Gemfile or available on this machine."
+            "listed in your Gemfile#{cache_message}."
         end
         raise GemNotFound, message
       end

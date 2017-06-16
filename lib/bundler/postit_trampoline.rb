@@ -8,11 +8,11 @@ environment = BundlerVendoredPostIt::PostIt::Environment.new([])
 version = Gem::Requirement.new(environment.bundler_version)
 if version.requirements.size == 1 && version.requirements.first.first == "=" # version.exact?
   if version.requirements.first.last.segments.first >= 2
-    ENV["BUNDLE_ENABLE_TRAMPOLINE"] = "true"
+    ENV["BUNDLE_TRAMPOLINE_FORCE"] = "true"
   end
 end
 
-if ENV["BUNDLE_ENABLE_TRAMPOLINE"] && !ENV["BUNDLE_DISABLE_POSTIT"]
+if ENV["BUNDLE_TRAMPOLINE_FORCE"] && !ENV["BUNDLE_TRAMPOLINE_DISABLE"]
   installed_version =
     if defined?(Bundler::VERSION)
       Bundler::VERSION
@@ -60,7 +60,7 @@ The error was: #{e}
 
   ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] = installed_version.to_s
 
-  if !Gem::Requirement.new(">= 1.13.pre".dup).satisfied_by?(Gem::Version.new(running_version)) && (ARGV.empty? || ARGV.any? {|a| %w(install i).include? a })
+  if !Gem::Requirement.new(">= 1.13.pre".dup).satisfied_by?(Gem::Version.new(running_version)) && (ARGV.empty? || ARGV.any? {|a| %w[install i].include? a })
     puts <<-WARN.strip
 You're running Bundler #{installed_version} but this project uses #{running_version}. To update, run `bundle update --bundler`.
   WARN
@@ -70,4 +70,4 @@ You're running Bundler #{installed_version} but this project uses #{running_vers
     abort "The running bundler (#{running_version}) does not match the required `#{version}`"
   end
 
-end # if ENV["BUNDLE_ENABLE_TRAMPOLINE"] && !ENV["BUNDLE_DISABLE_POSTIT"]
+end # if ENV["BUNDLE_TRAMPOLINE_FORCE"] && !ENV["BUNDLE_TRAMPOLINE_DISABLE"]

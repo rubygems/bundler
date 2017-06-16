@@ -58,17 +58,23 @@ module Bundler
     # Search this index's specs, and any source indexes that this index knows
     # about, returning all of the results.
     def search(query, base = nil)
+      sort_specs(unsorted_search(query, base))
+    end
+
+    def unsorted_search(query, base)
       results = local_search(query, base)
-      seen = results.map(&:full_name).to_set
+
+      seen = results.map(&:full_name).to_set unless @sources.empty?
 
       @sources.each do |source|
-        source.search(query, base).each do |spec|
+        source.unsorted_search(query, base).each do |spec|
           results << spec if seen.add?(spec.full_name)
         end
       end
 
-      sort_specs(results)
+      results
     end
+    protected :unsorted_search
 
     def self.sort_specs(specs)
       specs.sort_by do |s|
@@ -109,14 +115,19 @@ module Bundler
 
     # returns a list of the dependencies
     def unmet_dependency_names
-      names = dependency_names
-      names.delete_if {|n| n == "bundler" }
-      names.select {|n| search(n).empty? }
+      dependency_names.select do |name|
+        name != "bundler" && search(name).empty?
+      end
     end
 
     def dependency_names
       names = []
-      each {|s| names.concat(s.dependencies.map(&:name)) }
+      each do |spec|
+        spec.dependencies.each do |dep|
+          next if dep.type == :development
+          names << dep.name
+        end
+      end
       names.uniq
     end
 
@@ -139,6 +150,8 @@ module Bundler
       end
     end
 
+    # Whether all the specs in self are in other
+    # TODO: rename to #include?
     def ==(other)
       all? do |spec|
         other_spec = other[spec].first

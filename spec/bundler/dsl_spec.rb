@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::Dsl do
+RSpec.describe Bundler::Dsl do
   before do
     @rubygems = double("rubygems")
     allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }
@@ -93,8 +92,8 @@ describe Bundler::Dsl do
   end
 
   describe "#gem" do
-    [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :ruby_22, :ruby_23, :ruby_24, :mri, :mri_18, :mri_19,
-     :mri_20, :mri_21, :mri_22, :mri_23, :mri_24, :jruby, :rbx].each do |platform|
+    [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :ruby_22, :ruby_23, :ruby_24, :ruby_25, :mri, :mri_18, :mri_19,
+     :mri_20, :mri_21, :mri_22, :mri_23, :mri_24, :mri_25, :jruby, :rbx].each do |platform|
       it "allows #{platform} as a valid platform" do
         subject.gem("foo", :platform => platform)
       end
@@ -144,6 +143,24 @@ describe Bundler::Dsl do
       expect { subject.gem(:foo) }.
         to raise_error(Bundler::GemfileError, /You need to specify gem names as Strings. Use 'gem "foo"' instead/)
     end
+
+    it "rejects branch option on non-git gems" do
+      expect { subject.gem("foo", :branch => "test") }.
+        to raise_error(Bundler::GemfileError, /The `branch` option for `gem 'foo'` is not allowed. Only gems with a git source can specify a branch/)
+    end
+
+    it "allows specifying a branch on git gems" do
+      subject.gem("foo", :branch => "test", :git => "http://mytestrepo")
+      dep = subject.dependencies.last
+      expect(dep.name).to eq "foo"
+    end
+
+    it "allows specifying a branch on git gems with a git_source" do
+      subject.git_source(:test_source) {|n| "https://github.com/#{n}" }
+      subject.gem("foo", :branch => "test", :test_source => "bundler/bundler")
+      dep = subject.dependencies.last
+      expect(dep.name).to eq "foo"
+    end
   end
 
   describe "#gemspec" do
@@ -188,7 +205,7 @@ describe Bundler::Dsl do
     # end
     describe "#git" do
       it "from a single repo" do
-        rails_gems = %w(railties action_pack active_model)
+        rails_gems = %w[railties action_pack active_model]
         subject.git "https://github.com/rails/rails.git" do
           rails_gems.each {|rails_gem| subject.send :gem, rails_gem }
         end
@@ -203,7 +220,7 @@ describe Bundler::Dsl do
     # end
     describe "#github" do
       it "from github" do
-        spree_gems = %w(spree_core spree_api spree_backend)
+        spree_gems = %w[spree_core spree_api spree_backend]
         subject.github "spree" do
           spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
         end

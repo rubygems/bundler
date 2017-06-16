@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle inject" do
+RSpec.describe "bundle inject" do
   before :each do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -39,6 +38,41 @@ describe "bundle inject" do
     it "doesn't add existing gems" do
       bundle "inject 'rack' '> 0'"
       expect(out).to match(/cannot specify the same gem twice/i)
+    end
+  end
+
+  context "incorrect arguments" do
+    it "fails when more than 2 arguments are passed" do
+      bundle "inject gem_name 1 v"
+      expect(out).to eq(<<-E.strip)
+ERROR: "bundle inject" was called with arguments ["gem_name", "1", "v"]
+Usage: "bundle inject GEM VERSION"
+      E
+    end
+  end
+
+  context "with source option" do
+    it "add gem with source option in gemfile" do
+      bundle "inject 'foo' '>0' --source file://#{gem_repo1}"
+      gemfile = bundled_app("Gemfile").read
+      str = "gem \"foo\", \"> 0\", :source => \"file://#{gem_repo1}\""
+      expect(gemfile).to include str
+    end
+  end
+
+  context "with group option" do
+    it "add gem with group option in gemfile" do
+      bundle "inject 'rack-obama' '>0' --group=development"
+      gemfile = bundled_app("Gemfile").read
+      str = "gem \"rack-obama\", \"> 0\", :group => [:development]"
+      expect(gemfile).to include str
+    end
+
+    it "add gem with multiple groups in gemfile" do
+      bundle "inject 'rack-obama' '>0' --group=development,test"
+      gemfile = bundled_app("Gemfile").read
+      str = "gem \"rack-obama\", \"> 0\", :groups => [:development, :test]"
+      expect(gemfile).to include str
     end
   end
 

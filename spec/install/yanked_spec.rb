@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-context "when installing a bundle that includes yanked gems" do
+RSpec.context "when installing a bundle that includes yanked gems" do
   before(:each) do
     build_repo4 do
       build_gem "foo", "9.0.0"
@@ -42,7 +41,7 @@ context "when installing a bundle that includes yanked gems" do
   end
 end
 
-context "when using gem before installing" do
+RSpec.context "when using gem before installing" do
   it "does not suggest the author has yanked the gem" do
     gemfile <<-G
         source "file://#{gem_repo1}"

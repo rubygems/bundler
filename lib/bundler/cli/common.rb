@@ -1,6 +1,23 @@
 # frozen_string_literal: true
 module Bundler
   module CLI::Common
+    def self.output_post_install_messages(messages)
+      return if Bundler.settings["ignore_messages"]
+      messages.to_a.each do |name, msg|
+        print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
+      end
+    end
+
+    def self.print_post_install_message(name, msg)
+      Bundler.ui.confirm "Post-install message from #{name}:"
+      Bundler.ui.info msg
+    end
+
+    def self.output_without_groups_message
+      return unless Bundler.settings.without.any?
+      Bundler.ui.confirm without_groups_message
+    end
+
     def self.without_groups_message
       groups = Bundler.settings.without
       group_list = [groups[0...-1].join(", "), groups[-1..-1]].
@@ -51,6 +68,13 @@ module Bundler
       suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
+    end
+
+    def self.ensure_all_gems_in_lockfile!(names, locked_gems = Bundler.locked_gems)
+      locked_names = locked_gems.specs.map(&:name)
+      names.-(locked_names).each do |g|
+        raise GemNotFound, gem_not_found_message(g, locked_names)
+      end
     end
 
     def self.configure_gem_version_promoter(definition, options)

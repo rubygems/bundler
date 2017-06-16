@@ -16,7 +16,7 @@ module Bundler
       Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       generate_executable_stubs
       return true, post_install_message
-    rescue Bundler::InstallHookError, Bundler::SecurityError
+    rescue Bundler::InstallHookError, Bundler::SecurityError, APIResponseMismatchError
       raise
     rescue Errno::ENOSPC
       return false, out_of_space_message
@@ -52,12 +52,12 @@ module Bundler
     end
 
     def install
-      spec.source.install(spec, :force => force, :ensure_builtin_gems_cached => standalone)
+      spec.source.install(spec, :force => force, :ensure_builtin_gems_cached => standalone, :build_args => Array(spec_settings))
     end
 
     def install_with_settings
       # Build arguments are global, so this is mutexed
-      Bundler.rubygems.with_build_args([spec_settings]) { install }
+      Bundler.rubygems.install_with_build_args([spec_settings]) { install }
     end
 
     def out_of_space_message

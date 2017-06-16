@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::Plugin::API do
+RSpec.describe Bundler::Plugin::API do
   context "plugin declarations" do
     before do
       stub_const "UserPluginClass", Class.new(Bundler::Plugin::API)
@@ -60,15 +59,15 @@ describe Bundler::Plugin::API do
 
     # A test of delegation
     it "provides the Bundler's functions" do
-      expect(Bundler).to receive(:an_unkown_function).once
+      expect(Bundler).to receive(:an_unknown_function).once
 
-      api.an_unkown_function
+      api.an_unknown_function
     end
 
     it "includes Bundler::SharedHelpers' functions" do
-      expect(Bundler::SharedHelpers).to receive(:an_unkown_helper).once
+      expect(Bundler::SharedHelpers).to receive(:an_unknown_helper).once
 
-      api.an_unkown_helper
+      api.an_unknown_helper
     end
 
     context "#tmp" do

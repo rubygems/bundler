@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle help" do
-  # Rubygems 1.4+ no longer load gem plugins so this test is no longer needed
-  rubygems_under_14 = Gem::Requirement.new("< 1.4").satisfied_by?(Gem::Version.new(Gem::VERSION))
-  it "complains if older versions of bundler are installed", :if => rubygems_under_14 do
+RSpec.describe "bundle help" do
+  # RubyGems 1.4+ no longer load gem plugins so this test is no longer needed
+  it "complains if older versions of bundler are installed", :rubygems => "< 1.4" do
     system_gems "bundler-0.8.1"
 
     bundle "help"
@@ -34,8 +32,8 @@ describe "bundle help" do
   end
 
   it "still outputs the old help for commands that do not have man pages yet" do
-    bundle "help check"
-    expect(out).to include("Check searches the local machine")
+    bundle "help version"
+    expect(out).to include("Prints the bundler's version information")
   end
 
   it "looks for a binary and executes it with --help option if it's named bundler-<task>" do

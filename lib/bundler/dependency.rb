@@ -18,6 +18,7 @@ module Bundler
       :ruby_22  => Gem::Platform::RUBY,
       :ruby_23  => Gem::Platform::RUBY,
       :ruby_24  => Gem::Platform::RUBY,
+      :ruby_25  => Gem::Platform::RUBY,
       :mri      => Gem::Platform::RUBY,
       :mri_18   => Gem::Platform::RUBY,
       :mri_19   => Gem::Platform::RUBY,
@@ -26,6 +27,7 @@ module Bundler
       :mri_22   => Gem::Platform::RUBY,
       :mri_23   => Gem::Platform::RUBY,
       :mri_24   => Gem::Platform::RUBY,
+      :mri_25   => Gem::Platform::RUBY,
       :rbx      => Gem::Platform::RUBY,
       :jruby    => Gem::Platform::JAVA,
       :jruby_18 => Gem::Platform::JAVA,
@@ -38,6 +40,7 @@ module Bundler
       :mswin_22 => Gem::Platform::MSWIN,
       :mswin_23 => Gem::Platform::MSWIN,
       :mswin_24 => Gem::Platform::MSWIN,
+      :mswin_25 => Gem::Platform::MSWIN,
       :mswin64    => Gem::Platform::MSWIN64,
       :mswin64_19 => Gem::Platform::MSWIN64,
       :mswin64_20 => Gem::Platform::MSWIN64,
@@ -45,6 +48,7 @@ module Bundler
       :mswin64_22 => Gem::Platform::MSWIN64,
       :mswin64_23 => Gem::Platform::MSWIN64,
       :mswin64_24 => Gem::Platform::MSWIN64,
+      :mswin64_25 => Gem::Platform::MSWIN64,
       :mingw    => Gem::Platform::MINGW,
       :mingw_18 => Gem::Platform::MINGW,
       :mingw_19 => Gem::Platform::MINGW,
@@ -53,12 +57,14 @@ module Bundler
       :mingw_22 => Gem::Platform::MINGW,
       :mingw_23 => Gem::Platform::MINGW,
       :mingw_24 => Gem::Platform::MINGW,
+      :mingw_25 => Gem::Platform::MINGW,
       :x64_mingw    => Gem::Platform::X64_MINGW,
       :x64_mingw_20 => Gem::Platform::X64_MINGW,
       :x64_mingw_21 => Gem::Platform::X64_MINGW,
       :x64_mingw_22 => Gem::Platform::X64_MINGW,
       :x64_mingw_23 => Gem::Platform::X64_MINGW,
-      :x64_mingw_24 => Gem::Platform::X64_MINGW
+      :x64_mingw_24 => Gem::Platform::X64_MINGW,
+      :x64_mingw_25 => Gem::Platform::X64_MINGW,
     }.freeze
 
     REVERSE_PLATFORM_MAP = {}.tap do |reverse_platform_map|
