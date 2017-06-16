@@ -1,19 +1,19 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/settings"
 
-describe Bundler::Env do
-  let(:env) { described_class.new }
+RSpec.describe Bundler::Env do
+  let(:git_proxy_stub) { Bundler::Source::Git::GitProxy.new(nil, nil, nil) }
 
   describe "#report" do
     it "prints the environment" do
-      out = env.report
+      out = described_class.report
 
       expect(out).to include("Environment")
       expect(out).to include(Bundler::VERSION)
       expect(out).to include(Gem::VERSION)
-      expect(out).to include(env.send(:ruby_version))
-      expect(out).to include(env.send(:git_version))
+      expect(out).to include(described_class.send(:ruby_version))
+      expect(out).to include(described_class.send(:git_version))
+      expect(out).to include(OpenSSL::OPENSSL_VERSION)
     end
 
     context "when there is a Gemfile and a lockfile and print_gemfile is true" do
@@ -34,7 +34,7 @@ describe Bundler::Env do
         L
       end
 
-      let(:output) { env.report(:print_gemfile => true) }
+      let(:output) { described_class.report(:print_gemfile => true) }
 
       it "prints the Gemfile" do
         expect(output).to include("Gemfile")
@@ -47,9 +47,17 @@ describe Bundler::Env do
       end
     end
 
+    context "when there no Gemfile and print_gemfile is true" do
+      let(:output) { described_class.report(:print_gemfile => true) }
+
+      it "prints the environment" do
+        expect(output).to start_with("## Environment")
+      end
+    end
+
     context "when Gemfile contains a gemspec and print_gemspecs is true" do
       let(:gemspec) do
-        <<-GEMSPEC.gsub(/^\s+/, "")
+        strip_whitespace(<<-GEMSPEC)
           Gem::Specification.new do |gem|
             gem.name = "foo"
             gem.author = "Fumofu"
@@ -66,10 +74,20 @@ describe Bundler::Env do
       end
 
       it "prints the gemspec" do
-        output = env.report(:print_gemspecs => true).gsub(/^\s+/, "")
+        output = described_class.report(:print_gemspecs => true)
 
         expect(output).to include("foo.gemspec")
         expect(output).to include(gemspec)
+      end
+    end
+
+    context "when the git version is OS specific" do
+      it "includes OS specific information with the version number" do
+        expect(git_proxy_stub).to receive(:git).with("--version").
+          and_return("git version 1.2.3 (Apple Git-BS)")
+        expect(Bundler::Source::Git::GitProxy).to receive(:new).and_return(git_proxy_stub)
+
+        expect(described_class.report).to include("Git       1.2.3 (Apple Git-BS)")
       end
     end
   end

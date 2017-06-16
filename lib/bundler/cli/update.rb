@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require "bundler/cli/common"
+
 module Bundler
   class CLI::Update
     attr_reader :options, :gems
@@ -10,10 +12,23 @@ module Bundler
     def run
       Bundler.ui.level = "error" if options[:quiet]
 
+      Plugin.gemfile_install(Bundler.default_gemfile) if Bundler.feature_flag.plugins?
+
       sources = Array(options[:source])
       groups  = Array(options[:group]).map(&:to_sym)
 
-      if gems.empty? && sources.empty? && groups.empty? && !options[:ruby] && !options[:bundler]
+      full_update = gems.empty? && sources.empty? && groups.empty? && !options[:ruby] && !options[:bundler]
+
+      if full_update && !options[:all]
+        if Bundler.feature_flag.update_requires_all_flag?
+          raise InvalidOption, "To update everything, pass the `--all` flag."
+        end
+        SharedHelpers.major_deprecation "Pass --all to `bundle update` to update everything"
+      elsif !full_update && options[:all]
+        raise InvalidOption, "Cannot specify --all along with specific options."
+      end
+
+      if full_update
         # We're doing a full update
         Bundler.definition(true)
       else
@@ -21,21 +36,18 @@ module Bundler
           raise GemfileLockNotFound, "This Bundle hasn't been installed yet. " \
             "Run `bundle install` to update and install the bundled gems."
         end
-        # cycle through the requested gems, to make sure they exist
-        names = Bundler.locked_gems.specs.map(&:name)
-        gems.each do |g|
-          next if names.include?(g)
-          require "bundler/cli/common"
-          raise GemNotFound, Bundler::CLI::Common.gem_not_found_message(g, names)
-        end
+        Bundler::CLI::Common.ensure_all_gems_in_lockfile!(gems)
 
         if groups.any?
           specs = Bundler.definition.specs_for groups
           gems.concat(specs.map(&:name))
         end
 
-        Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby])
+        Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby],
+                           :lock_shared_dependencies => options[:conservative])
       end
+
+      Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options)
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
@@ -45,11 +57,8 @@ module Bundler
 
       Bundler.settings[:jobs] = opts["jobs"] if opts["jobs"]
 
-      # rubygems plugins sometimes hook into the gem install process
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
-
-      Bundler.definition.validate_ruby!
-      Installer.install Bundler.root, Bundler.definition, opts
+      Bundler.definition.validate_runtime!
+      installer = Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.app_cache.exist?
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
@@ -58,15 +67,8 @@ module Bundler
       end
 
       Bundler.ui.confirm "Bundle updated!"
-      without_groups_messages
-    end
-
-  private
-
-    def without_groups_messages
-      return unless Bundler.settings.without.any?
-      require "bundler/cli/common"
-      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
+      Bundler::CLI::Common.output_without_groups_message
+      Bundler::CLI::Common.output_post_install_messages installer.post_install_messages
     end
   end
 end

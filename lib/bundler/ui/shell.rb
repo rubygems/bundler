@@ -4,12 +4,12 @@ require "bundler/vendored_thor"
 module Bundler
   module UI
     class Shell
-      LEVELS = %w(silent error warn confirm info debug).freeze
+      LEVELS = %w[silent error warn confirm info debug].freeze
 
       attr_writer :shell
 
       def initialize(options = {})
-        if options["no-color"] || !STDOUT.tty?
+        if options["no-color"] || !$stdout.tty?
           Thor::Base.shell = Thor::Shell::Basic
         end
         @shell = Thor::Base.shell.new
@@ -17,8 +17,8 @@ module Bundler
         @warning_history = []
       end
 
-      def add_color(string, color)
-        @shell.set_color(string, color)
+      def add_color(string, *color)
+        @shell.set_color(string, *color)
       end
 
       def info(msg, newline = nil)
@@ -36,20 +36,21 @@ module Bundler
       end
 
       def error(msg, newline = nil)
-        tell_me(msg, :red, newline) if level("error")
+        return unless level("error")
+        return tell_err(msg, :red, newline) if Bundler.feature_flag.error_on_stderr?
+        tell_me(msg, :red, newline)
       end
 
       def debug(msg, newline = nil)
-        tell_me(msg, nil, newline) if level("debug")
+        tell_me(msg, nil, newline) if debug?
       end
 
       def debug?
-        # needs to be false instead of nil to be newline param to other methods
         level("debug")
       end
 
       def quiet?
-        LEVELS.index(@level) <= LEVELS.index("warn")
+        level("quiet")
       end
 
       def ask(msg)
@@ -66,11 +67,15 @@ module Bundler
 
       def level=(level)
         raise ArgumentError unless LEVELS.include?(level.to_s)
-        @level = level
+        @level = level.to_s
       end
 
       def level(name = nil)
-        name ? LEVELS.index(name) <= LEVELS.index(@level) : @level
+        return @level unless name
+        unless index = LEVELS.index(name)
+          raise "#{name.inspect} is not a valid level"
+        end
+        index <= LEVELS.index(@level)
       end
 
       def trace(e, newline = nil, force = false)
@@ -79,12 +84,12 @@ module Bundler
         tell_me(msg, nil, newline)
       end
 
-      def silence
-        old_level = @level
-        @level = "silent"
-        yield
-      ensure
-        @level = old_level
+      def silence(&blk)
+        with_level("silent", &blk)
+      end
+
+      def unprinted_warnings
+        []
       end
 
     private
@@ -99,6 +104,19 @@ module Bundler
         end
       end
 
+      def tell_err(message, color = nil, newline = nil)
+        newline = message.to_s !~ /( |\t)\Z/ unless newline
+        message = word_wrap(message) if newline.is_a?(Hash) && newline[:wrap]
+
+        color = nil if color && !$stderr.tty?
+
+        buffer = @shell.send(:prepare_message, message, *color)
+        buffer << "\n" if newline && !message.to_s.end_with?("\n")
+
+        @shell.send(:stderr).print(buffer)
+        @shell.send(:stderr).flush
+      end
+
       def strip_leading_spaces(text)
         spaces = text[/\A\s+/, 0]
         spaces ? text.gsub(/#{spaces}/, "") : text
@@ -108,6 +126,14 @@ module Bundler
         strip_leading_spaces(text).split("\n").collect do |line|
           line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1\n").strip : line
         end * "\n"
+      end
+
+      def with_level(level)
+        original = @level
+        @level = level
+        yield
+      ensure
+        @level = original
       end
     end
   end

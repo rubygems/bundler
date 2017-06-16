@@ -1,3 +1,3 @@
-module BundlerVendoredPostIt
-  VERSION = '0.1.2'.freeze
+module BundlerVendoredPostIt::PostIt
+  VERSION = '0.2.0'.freeze
 end

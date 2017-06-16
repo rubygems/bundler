@@ -19,6 +19,7 @@ module Bundler
     # This is the error raised if OpenSSL fails the cert verification
     class CertificateFailureError < HTTPError
       def initialize(remote_uri)
+        remote_uri = filter_uri(remote_uri)
         super "Could not verify the SSL certificate for #{remote_uri}.\nThere" \
           " is a chance you are experiencing a man-in-the-middle attack, but" \
           " most likely your system doesn't have the CA certificates needed" \
@@ -39,6 +40,7 @@ module Bundler
     # This error is raised if HTTP authentication is required, but not provided.
     class AuthenticationRequiredError < HTTPError
       def initialize(remote_uri)
+        remote_uri = filter_uri(remote_uri)
         super "Authentication is required for #{remote_uri}.\n" \
           "Please supply credentials for this source. You can do this by running:\n" \
           " bundle config #{remote_uri} username:password"
@@ -47,6 +49,7 @@ module Bundler
     # This error is raised if HTTP authentication is provided, but incorrect.
     class BadAuthenticationError < HTTPError
       def initialize(remote_uri)
+        remote_uri = filter_uri(remote_uri)
         super "Bad username or password for #{remote_uri}.\n" \
           "Please double-check your credentials and correct them."
       end
@@ -128,10 +131,10 @@ module Bundler
         @use_api = false if fetchers.none?(&:api_fetcher?)
       end
 
-      specs.each do |name, version, platform, dependencies|
+      specs.each do |name, version, platform, dependencies, metadata|
         next if name == "bundler"
         spec = if dependencies
-          EndpointSpecification.new(name, version, platform, dependencies)
+          EndpointSpecification.new(name, version, platform, dependencies, metadata)
         else
           RemoteSpecification.new(name, version, platform, self)
         end
@@ -234,7 +237,7 @@ module Bundler
           Bundler.settings[:ssl_client_cert]
         raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
-        con = Net::HTTP::Persistent.new "bundler", :ENV
+        con = Bundler::Persistent::Net::HTTP::Persistent.new "bundler", :ENV
         if gem_proxy = Bundler.rubygems.configuration[:http_proxy]
           con.proxy = URI.parse(gem_proxy) if gem_proxy != :no_proxy
         end
@@ -252,6 +255,7 @@ module Bundler
         end
 
         con.read_timeout = Fetcher.api_timeout
+        con.open_timeout = Fetcher.api_timeout
         con.override_headers["User-Agent"] = user_agent
         con.override_headers["X-Gemfile-Source"] = @remote.original_uri.to_s if @remote.original_uri
         con
@@ -269,7 +273,7 @@ module Bundler
       Timeout::Error, EOFError, SocketError, Errno::ENETDOWN, Errno::ENETUNREACH,
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
-      Net::HTTP::Persistent::Error, Zlib::BufError, Errno::EHOSTUNREACH
+      Bundler::Persistent::Net::HTTP::Persistent::Error, Zlib::BufError, Errno::EHOSTUNREACH
     ].freeze
 
     def bundler_cert_store

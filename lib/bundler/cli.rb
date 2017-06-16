@@ -4,22 +4,30 @@ require "bundler/vendored_thor"
 
 module Bundler
   class CLI < Thor
-    include Thor::Actions
-    AUTO_INSTALL_CMDS = %w(show binstubs outdated exec open console licenses clean).freeze
+    AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
 
     def self.start(*)
       super
     rescue Exception => e
       Bundler.ui = UI::Shell.new
       raise e
+    ensure
+      warn_on_outdated_bundler
+      Bundler::SharedHelpers.print_major_deprecations!
+    end
+
+    def self.dispatch(*)
+      super {|i| i.send(:print_command) }
     end
 
     def initialize(*args)
       super
-      Bundler.reset!
 
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
-      ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile) if custom_gemfile && !custom_gemfile.empty?
+      if custom_gemfile && !custom_gemfile.empty?
+        Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", File.expand_path(custom_gemfile)
+        Bundler.reset_paths!
+      end
 
       Bundler.settings[:retry] = options[:retry] if options[:retry]
 
@@ -29,14 +37,18 @@ module Bundler
       raise InvalidOption, e.message
     ensure
       self.options ||= {}
+      Bundler.settings.cli_flags_given = !options.empty?
+      unprinted_warnings = Bundler.ui.unprinted_warnings
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
+      unprinted_warnings.each {|w| Bundler.ui.warn(w) }
 
       if ENV["RUBYGEMS_GEMDEPS"] && !ENV["RUBYGEMS_GEMDEPS"].empty?
         Bundler.ui.warn(
           "The RUBYGEMS_GEMDEPS environment variable is set. This enables RubyGems' " \
           "experimental Gemfile mode, which may conflict with Bundler and cause unexpected errors. " \
-          "To remove this warning, unset RUBYGEMS_GEMDEPS.", :wrap => true)
+          "To remove this warning, unset RUBYGEMS_GEMDEPS.", :wrap => true
+        )
       end
     end
 
@@ -51,29 +63,21 @@ module Bundler
 
     def help(cli = nil)
       case cli
-      when "gemfile" then command = "gemfile.5"
+      when "gemfile" then command = "gemfile"
       when nil       then command = "bundle"
       else command = "bundle-#{cli}"
       end
 
-      manpages = %w(
-        bundle
-        bundle-config
-        bundle-exec
-        bundle-gem
-        bundle-install
-        bundle-package
-        bundle-update
-        bundle-platform
-        gemfile.5)
+      man_path  = File.expand_path("../../../man", __FILE__)
+      man_pages = Hash[Dir.glob(File.join(man_path, "*")).grep(/.*\.\d*\Z/).collect do |f|
+        [File.basename(f, ".*"), f]
+      end]
 
-      if manpages.include?(command)
-        root = File.expand_path("../man", __FILE__)
-
-        if Bundler.which("man") && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          Kernel.exec "man #{root}/#{command}"
+      if man_pages.include?(command)
+        if Bundler.which("man") && man_path !~ %r{^file:/.+!/META-INF/jruby.home/.+}
+          Kernel.exec "man #{man_pages[command]}"
         else
-          puts File.read("#{root}/#{command}.txt")
+          puts File.read("#{man_path}/#{File.basename(man_pages[command])}.txt")
         end
       elsif command_path = Bundler.which("bundler-#{cli}")
         Kernel.exec(command_path, "--help")
@@ -82,8 +86,11 @@ module Bundler
       end
     end
 
+    # Ensure `bundle help --no-color` is valid
+    all_commands["help"].disable_class_options = false
+
     def self.handle_no_command_error(command, has_namespace = $thor_runner)
-      if Bundler.settings[:plugins] && Bundler::Plugin.command?(command)
+      if Bundler.feature_flag.plugins? && Bundler::Plugin.command?(command)
         return Bundler::Plugin.exec_command(command, ARGV[1..-1])
       end
 
@@ -175,11 +182,9 @@ module Bundler
     map "i" => "install"
     def install
       require "bundler/cli/install"
-      no_install = Bundler.settings[:no_install]
-      Bundler.settings[:no_install] = false if no_install == true
-      Install.new(options.dup).run
-    ensure
-      Bundler.settings[:no_install] = no_install unless no_install.nil?
+      Bundler.settings.temporary(:no_install => false) do
+        Install.new(options.dup).run
+      end
     end
 
     desc "update [OPTIONS]", "update the current environment"
@@ -206,6 +211,18 @@ module Bundler
       "Update ruby specified in Gemfile.lock"
     method_option "bundler", :type => :string, :lazy_default => "> 0.a", :banner =>
       "Update the locked version of bundler"
+    method_option "patch", :type => :boolean, :banner =>
+      "Prefer updating only to next patch version"
+    method_option "minor", :type => :boolean, :banner =>
+      "Prefer updating only to next minor version"
+    method_option "major", :type => :boolean, :banner =>
+      "Prefer updating to next major version (default)"
+    method_option "strict", :type => :boolean, :banner =>
+      "Do not allow any gem to be updated past latest --patch | --minor | --major"
+    method_option "conservative", :type => :boolean, :banner =>
+      "Use bundle install conservative update behavior and do not allow shared dependencies to be updated."
+    method_option "all", :type => :boolean, :banner =>
+      "Update everything."
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run
@@ -221,10 +238,19 @@ module Bundler
     method_option "outdated", :type => :boolean,
                               :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
+      Bundler::SharedHelpers.major_deprecation("use `bundle show` instead of `bundle list`") if ARGV[0] == "list"
       require "bundler/cli/show"
       Show.new(options, gem_name).run
     end
-    map %w(list) => "show"
+    # TODO: 2.0 remove `bundle list`
+    map %w[list] => "show"
+
+    desc "info GEM [OPTIONS]", "Show information for the given gem"
+    method_option "path", :type => :boolean, :banner => "Print full path to gem"
+    def info(gem_name)
+      require "bundler/cli/info"
+      Info.new(options, gem_name).run
+    end
 
     desc "binstubs GEM [OPTIONS]", "Install the binstubs of the listed gem"
     long_desc <<-D
@@ -236,11 +262,24 @@ module Bundler
       "Overwrite existing binstubs if they exist"
     method_option "path", :type => :string, :lazy_default => "bin", :banner =>
       "Binstub destination directory (default bin)"
-    method_option "standalone", :type => :array, :lazy_default => [], :banner =>
+    method_option "standalone", :type => :boolean, :banner =>
       "Make binstubs that can work without the Bundler runtime"
     def binstubs(*gems)
       require "bundler/cli/binstubs"
       Binstubs.new(options, gems).run
+    end
+
+    desc "add GEM VERSION", "Add gem to Gemfile and run bundle install"
+    long_desc <<-D
+      Adds the specified gem to Gemfile (if valid) and run 'bundle install' in one step.
+    D
+    method_option "version", :aliases => "-v", :type => :string
+    method_option "group", :aliases => "-g", :type => :string
+    method_option "source", :aliases => "-s", :type => :string
+
+    def add(gem_name)
+      require "bundler/cli/add"
+      Add.new(options.dup, gem_name).run
     end
 
     desc "outdated GEM [OPTIONS]", "list installed gems with newer versions available"
@@ -249,16 +288,26 @@ module Bundler
       in the given source. Calling outdated with [GEM [GEM]] will only check for newer
       versions of the given gems. Prerelease gems are ignored by default. If your gems
       are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
+
+      For more information on patch level options (--major, --minor, --patch,
+      --update-strict) see documentation on the same options on the update command.
     D
+    method_option "group", :aliases => "--group", :type => :string, :banner => "List gems from a specific group"
+    method_option "groups", :aliases => "--groups", :type => :boolean, :banner => "List gems organized by groups"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
     method_option "source", :type => :array, :banner => "Check against a specific source"
     method_option "strict", :type => :boolean, :banner =>
       "Only list newer versions allowed by your Gemfile requirements"
-    method_option "major", :type => :boolean, :banner => "Only list major newer versions"
-    method_option "minor", :type => :boolean, :banner => "Only list minor newer versions"
-    method_option "patch", :type => :boolean, :banner => "Only list patch newer versions"
+    method_option "update-strict", :type => :boolean, :banner =>
+      "Strict conservative resolution, do not allow any gem to be updated past latest --patch | --minor | --major"
+    method_option "minor", :type => :boolean, :banner => "Prefer updating only to next minor version"
+    method_option "major", :type => :boolean, :banner => "Prefer updating to next major version (default)"
+    method_option "patch", :type => :boolean, :banner => "Prefer updating only to next patch version"
+    method_option "filter-major", :type => :boolean, :banner => "Only list major newer versions"
+    method_option "filter-minor", :type => :boolean, :banner => "Only list minor newer versions"
+    method_option "filter-patch", :type => :boolean, :banner => "Only list patch newer versions"
     method_option "parseable", :aliases => "--porcelain", :type => :boolean, :banner =>
       "Use minimal formatting for more parseable output"
     def outdated(*gems)
@@ -298,14 +347,14 @@ module Bundler
       require "bundler/cli/package"
       Package.new(options).run
     end
-    map %w(pack) => :package
+    map %w[pack] => :package
 
     desc "exec [OPTIONS]", "Run the command in context of the bundle"
     method_option :keep_file_descriptors, :type => :boolean, :default => false
     long_desc <<-D
       Exec runs a command, providing it access to the gems in the bundle. While using
       bundle exec you can require and call the bundled gems as if they were installed
-      into the system wide Rubygems repository.
+      into the system wide RubyGems repository.
     D
     map "e" => "exec"
     def exec(*args)
@@ -325,6 +374,7 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
+    method_option "parseable", :type => :boolean, :banner => "Use minimal formatting for more parseable output"
     def config(*args)
       require "bundler/cli/config"
       Config.new(options, args, self).run
@@ -338,15 +388,19 @@ module Bundler
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
+      # TODO: Remove for 2.0
       require "bundler/cli/console"
       Console.new(options, group).run
     end
 
     desc "version", "Prints the bundler's version information"
     def version
-      Bundler.ui.info "Bundler version #{Bundler::VERSION}"
+      if ARGV.include?("version")
+        build_info = " (#{BuildMetadata.built_at} commit #{BuildMetadata.git_commit_sha})"
+      end
+      Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
     end
-    map %w(-v --version) => :version
+    map %w[-v --version] => :version
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
@@ -378,6 +432,8 @@ module Bundler
       Viz.new(options.dup).run
     end
 
+    old_gem = instance_method(:gem)
+
     desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
     method_option :exe, :type => :boolean, :default => false, :aliases => ["--bin", "-b"], :desc => "Generate a binary executable for your library."
     method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
@@ -389,9 +445,29 @@ module Bundler
     method_option :test, :type => :string, :lazy_default => "rspec", :aliases => "-t", :banner => "rspec",
                          :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config gem.test rspec`."
     def gem(name)
-      require "bundler/cli/gem"
-      Gem.new(options, name, self).run
     end
+
+    commands["gem"].tap do |gem_command|
+      def gem_command.run(instance, args = [])
+        arity = 1 # name
+
+        require "bundler/cli/gem"
+        cmd_args = args + [instance]
+        cmd_args.unshift(instance.options)
+
+        cmd = begin
+          Gem.new(*cmd_args)
+        rescue ArgumentError => e
+          instance.class.handle_argument_error(self, e, args, arity)
+        end
+
+        cmd.run
+      end
+    end
+
+    undef_method(:gem)
+    define_method(:gem, old_gem)
+    private :gem
 
     def self.source_root
       File.expand_path(File.join(File.dirname(__FILE__), "templates"))
@@ -415,14 +491,19 @@ module Bundler
       Platform.new(options).run
     end
 
-    desc "inject GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
-    def inject(name, version, *gems)
+    desc "inject GEM VERSION", "Add the named gem, with version requirements, to the resolved Gemfile"
+    method_option "source", :type => :string, :banner =>
+     "Install gem from the given source"
+    method_option "group", :type => :string, :banner =>
+     "Install gem into a bundler group"
+    def inject(name, version)
+      SharedHelpers.major_deprecation "The `inject` command has been replaced by the `add` command"
       require "bundler/cli/inject"
-      Inject.new(options, name, version, gems).run
+      Inject.new(options.dup, name, version).run
     end
 
     desc "lock", "Creates a lockfile without installing"
-    method_option "update", :type => :array, :lazy_default => [], :banner =>
+    method_option "update", :type => :array, :lazy_default => true, :banner =>
       "ignore the existing lockfile, update all gems by default, or update list of given gems"
     method_option "local", :type => :boolean, :default => false, :banner =>
       "do not attempt to fetch remote gemspecs and use the local gem cache only"
@@ -433,7 +514,19 @@ module Bundler
     method_option "full-index", :type => :boolean, :default => false, :banner =>
       "Fall back to using the single-file index of all gems"
     method_option "add-platform", :type => :array, :default => [], :banner =>
-      "add a new platform to the lockfile"
+      "Add a new platform to the lockfile"
+    method_option "remove-platform", :type => :array, :default => [], :banner =>
+      "Remove a platform from the lockfile"
+    method_option "patch", :type => :boolean, :banner =>
+      "If updating, prefer updating only to next patch version"
+    method_option "minor", :type => :boolean, :banner =>
+      "If updating, prefer updating only to next minor version"
+    method_option "major", :type => :boolean, :banner =>
+      "If updating, prefer updating to next major version (default)"
+    method_option "strict", :type => :boolean, :banner =>
+      "If updating, do not allow any gem to be updated past latest --patch | --minor | --major"
+    method_option "conservative", :type => :boolean, :banner =>
+      "If updating, use bundle install conservative update behavior and do not allow shared dependencies to be updated"
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run
@@ -441,10 +534,37 @@ module Bundler
 
     desc "env", "Print information about the environment Bundler is running under"
     def env
-      Env.new.write($stdout)
+      Env.write($stdout)
     end
 
-    if Bundler.settings[:plugins]
+    desc "doctor [OPTIONS]", "Checks the bundle for common problems"
+    long_desc <<-D
+      Doctor scans the OS dependencies of each of the gems requested in the Gemfile. If
+      missing dependencies are detected, Bundler prints them and exits status 1.
+      Otherwise, Bundler prints a success message and exits with a status of 0.
+    D
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
+    method_option "quiet", :type => :boolean, :banner =>
+        "Only output warnings and errors."
+    def doctor
+      require "bundler/cli/doctor"
+      Doctor.new(options).run
+    end
+
+    desc "issue", "Learn how to report an issue in Bundler"
+    def issue
+      require "bundler/cli/issue"
+      Issue.new.run
+    end
+
+    desc "pristine [GEMS...]", "Restores installed gems to pristine condition from files located in the gem cache. Gem installed from a git repository will be issued `git checkout --force`."
+    def pristine(*gems)
+      require "bundler/cli/pristine"
+      Pristine.new(gems).run
+    end
+
+    if Bundler.feature_flag.plugins?
       require "bundler/cli/plugin"
       desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
       subcommand "plugin", Plugin
@@ -454,21 +574,23 @@ module Bundler
     # into the corresponding `bundle help #{command}` call
     def self.reformatted_help_args(args)
       bundler_commands = all_commands.keys
-      help_flags = %w(--help -h)
-      exec_commands = %w(e ex exe exec)
+      help_flags = %w[--help -h]
+      exec_commands = %w[e ex exe exec]
       help_used = args.index {|a| help_flags.include? a }
       exec_used = args.index {|a| exec_commands.include? a }
       command = args.find {|a| bundler_commands.include? a }
       if exec_used && help_used
         if exec_used + help_used == 1
-          %w(help exec)
+          %w[help exec]
         else
           args
         end
-      elsif command.nil?
-        abort("Could not find command \"#{args.join(" ")}\".")
-      else
+      elsif help_used
+        args = args.dup
+        args.delete_at(help_used)
         ["help", command || args].flatten.compact
+      else
+        args
       end
     end
 
@@ -493,5 +615,37 @@ module Bundler
         Bundler.reset!
       end
     end
+
+    def print_command
+      return unless ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] || Bundler.ui.debug?
+      _, _, config = @_initializer
+      current_command = config[:current_command].name
+      return if %w[exec version check platform show help].include?(current_command)
+      command = ["bundle", current_command] + args
+      command << Thor::Options.to_switches(options)
+      command.reject!(&:empty?)
+      Bundler.ui.info "Running `#{command * " "}` with bundler #{Bundler::VERSION}"
+    end
+
+    def self.warn_on_outdated_bundler
+      return if Bundler.settings[:disable_version_check]
+
+      latest = Fetcher::CompactIndex.
+               new(nil, Source::Rubygems::Remote.new(URI("https://rubygems.org")), nil).
+               send(:compact_index_client).
+               instance_variable_get(:@cache).
+               dependencies("bundler").
+               map {|d| Gem::Version.new(d.first) }.
+               max
+      return unless latest
+
+      current = Gem::Version.new(VERSION)
+      return if current >= latest
+
+      Bundler.ui.warn "The latest bundler is #{latest}, but you are currently running #{current}.\nTo update, run `gem install bundler#{" --pre" if latest.prerelease?}`"
+    rescue
+      nil
+    end
+    private_class_method :warn_on_outdated_bundler
   end
 end

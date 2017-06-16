@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle install with a mirror configured" do
+RSpec.describe "bundle install with a mirror configured" do
   describe "when the mirror does not match the gem source" do
     before :each do
       gemfile <<-G
@@ -15,7 +14,7 @@ describe "bundle install with a mirror configured" do
     it "installs from the normal location" do
       bundle :install
       expect(out).to include("Fetching source index from file:#{gem_repo1}")
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
   end
 
@@ -34,7 +33,7 @@ describe "bundle install with a mirror configured" do
       bundle :install
       expect(out).to include("Fetching source index from file:#{gem_repo1}")
       expect(out).not_to include("Fetching source index from file:#{gem_repo2}")
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
   end
 end

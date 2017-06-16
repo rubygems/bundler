@@ -1,12 +1,11 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::Fetcher::Index do
+RSpec.describe Bundler::Fetcher::Index do
   let(:downloader)  { nil }
   let(:remote)      { nil }
   let(:display_uri) { "http://sample_uri.com" }
   let(:rubygems)    { double(:rubygems) }
-  let(:gem_names)   { %w(foo bar) }
+  let(:gem_names)   { %w[foo bar] }
 
   subject { described_class.new(downloader, remote, display_uri) }
 
@@ -19,6 +18,11 @@ describe Bundler::Fetcher::Index do
 
   context "error handling" do
     shared_examples_for "the error is properly handled" do
+      let(:remote_uri) { URI("http://remote-uri.org") }
+      before do
+        allow(subject).to receive(:remote_uri).and_return(remote_uri)
+      end
+
       context "when certificate verify failed" do
         let(:error_message) { "certificate verify failed" }
 
@@ -30,25 +34,18 @@ describe Bundler::Fetcher::Index do
 
       context "when a 401 response occurs" do
         let(:error_message) { "401" }
-        let(:remote_uri) { double(:remote_uri, :to_s => "http://remote_uri.org") }
-
-        before { allow(subject).to receive(:remote_uri).and_return(remote_uri) }
 
         it "should raise a Bundler::Fetcher::AuthenticationRequiredError" do
           expect { subject.specs(gem_names) }.to raise_error(Bundler::Fetcher::AuthenticationRequiredError,
-            %r{Authentication is required for http://remote_uri.org})
+            %r{Authentication is required for http://remote-uri.org})
         end
       end
 
       context "when a 403 response occurs" do
-        let(:error_message)     { "403" }
-        let(:remote_uri)        { double(:remote_uri) }
-        let(:remote_uri_string) { "http://remote_uri.org" }
+        let(:error_message) { "403" }
 
         before do
-          allow(subject).to receive(:remote_uri).and_return(remote_uri)
           allow(remote_uri).to receive(:userinfo).and_return(userinfo)
-          allow(remote_uri).to receive(:to_s).and_return(remote_uri_string)
         end
 
         context "and there was userinfo" do
@@ -56,7 +53,7 @@ describe Bundler::Fetcher::Index do
 
           it "should raise a Bundler::Fetcher::BadAuthenticationError" do
             expect { subject.specs(gem_names) }.to raise_error(Bundler::Fetcher::BadAuthenticationError,
-              %r{Bad username or password for http://remote_uri.org})
+              %r{Bad username or password for http://remote-uri.org})
           end
         end
 
@@ -65,7 +62,7 @@ describe Bundler::Fetcher::Index do
 
           it "should raise a Bundler::Fetcher::AuthenticationRequiredError" do
             expect { subject.specs(gem_names) }.to raise_error(Bundler::Fetcher::AuthenticationRequiredError,
-              %r{Authentication is required for http://remote_uri.org})
+              %r{Authentication is required for http://remote-uri.org})
           end
         end
       end

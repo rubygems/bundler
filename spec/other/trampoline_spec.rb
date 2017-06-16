@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundler version trampolining" do
+RSpec.describe "bundler version trampolining" do
   before do
-    ENV["BUNDLE_DISABLE_POSTIT"] = nil
+    ENV["BUNDLE_TRAMPOLINE_DISABLE"] = nil
+    ENV["BUNDLE_TRAMPOLINE_FORCE"] = "true"
     FileUtils.rm_rf(system_gem_path)
     FileUtils.cp_r(base_system_gems, system_gem_path)
   end
@@ -58,13 +58,31 @@ describe "bundler version trampolining" do
     end
   end
 
+  context "without BUNDLE_TRAMPOLINE_FORCE" do
+    before { ENV["BUNDLE_TRAMPOLINE_FORCE"] = nil }
+
+    context "when the version is >= 2" do
+      let(:version) { "2.7182818285" }
+      before do
+        simulate_bundler_version version do
+          install_gemfile! ""
+        end
+      end
+
+      it "trampolines automatically", :realworld => true do
+        bundle "--version"
+        expect(err).to include("Installing locked Bundler version #{version}...")
+      end
+    end
+  end
+
   context "installing missing bundler versions", :realworld => true do
     before do
       ENV["BUNDLER_VERSION"] = "1.12.3"
       if Bundler::RubygemsIntegration.provides?("< 2.6.4")
         # necessary since we intall with 2.6.4 but the specs can run against
         # older versions that match againt the "gem" invocation
-        %w(bundle bundler).each do |exe|
+        %w[bundle bundler].each do |exe|
           system_gem_path.join("bin", exe).open("a") do |f|
             f << %(\ngem "bundler", ">= 0.a"\n)
           end
@@ -81,12 +99,27 @@ describe "bundler version trampolining" do
 
     it "fails gracefully when installing the bundler fails" do
       ENV["BUNDLER_VERSION"] = "9999"
-      bundle "--version", :expect_err => true
+      bundle "--version"
       expect(err).to start_with(<<-E.strip)
+Installing locked Bundler version 9999...
 Installing the inferred bundler version (= 9999) failed.
-If you'd like to update to the current bundler version (1.12.5) in this project, run `bundle update --bundler`.
+If you'd like to update to the current bundler version (#{Bundler::VERSION}) in this project, run `bundle update --bundler`.
 The error was:
       E
+    end
+
+    it "displays installing message before install is started" do
+      expect(system_gem_path.join("gems", "bundler-1.12.3")).not_to exist
+      bundle! "--version"
+      expect(err).to include("Installing locked Bundler version #{ENV["BUNDLER_VERSION"]}...")
+    end
+
+    it "doesn't display installing message if locked version is installed" do
+      expect(system_gem_path.join("gems", "bundler-1.12.3")).not_to exist
+      bundle! "--version"
+      expect(system_gem_path.join("gems", "bundler-1.12.3")).to exist
+      bundle! "--version"
+      expect(err).not_to include("Installing locked Bundler version = #{ENV["BUNDLER_VERSION"]}...")
     end
   end
 
@@ -99,7 +132,7 @@ The error was:
 
     it "updates to the specified version" do
       # HACK: since no released bundler version actually supports this feature!
-      bundle "update --bundler=1.12.0", :expect_err => true
+      bundle "update --bundler=1.12.0"
       expect(out).to include("Unknown switches '--bundler=1.12.0'")
     end
 
@@ -131,7 +164,30 @@ The error was:
         puts Bundler::VERSION
       R
       expect(err).to be_empty
-      expect(out).to eq("1.12.0")
+      expect(out).to include("1.12.0")
+    end
+  end
+
+  context "warnings" do
+    before do
+      simulate_bundler_version("1.12.0") do
+        install_gemfile ""
+      end
+    end
+
+    it "warns user if Bundler is outdated and is < 1.13.0.rc.1" do
+      ENV["BUNDLER_VERSION"] = "1.12.0"
+      bundle! "install"
+      expect(out).to include(<<-WARN.strip)
+You're running Bundler #{Bundler::VERSION} but this project uses #{ENV["BUNDLER_VERSION"]}. To update, run `bundle update --bundler`.
+      WARN
+    end
+  end
+
+  context "with --verbose" do
+    it "prints the running command" do
+      bundle! "config", :verbose => true, :env => { "BUNDLE_POSTIT_TRAMPOLINING_VERSION" => Bundler::VERSION }
+      expect(out).to start_with("Running `bundle config --verbose` with bundler #{Bundler::VERSION}")
     end
   end
 end

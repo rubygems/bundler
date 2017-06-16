@@ -6,8 +6,14 @@ module Spec
   module Rubygems
     DEPS = begin
       deps = {
-        "fakeweb artifice rack compact_index" => nil,
-        "sinatra" => "1.2.7",
+        # rack 2.x requires Ruby version >= 2.2.2.
+        # artifice doesn't support rack 2.x now.
+        # TODO: revert to `< 2` once https://github.com/rack/rack/issues/1168 is
+        # addressed
+        "rack" => "1.6.6",
+        "artifice" => "~> 0.6.0",
+        "compact_index" => "~> 0.11.0",
+        "sinatra" => "~> 1.4.7",
         # Rake version has to be consistent for tests to pass
         "rake" => "10.0.2",
         # 3.0.0 breaks 1.9.2 specs
@@ -33,28 +39,25 @@ module Spec
         FileUtils.rm_rf(Path.base_system_gems)
         FileUtils.mkdir_p(Path.base_system_gems)
         puts "installing gems for the tests to use..."
-        DEPS.each {|n, v| install_gem(n, v) }
+        install_gems(DEPS)
         File.open(manifest_path, "w") {|f| f << manifest.join }
       end
 
       ENV["HOME"] = Path.home.to_s
+      ENV["TMPDIR"] = Path.tmpdir.to_s
 
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
     end
 
-    def self.install_gem(name, version = nil)
-      cmd = "gem install #{name} --no-rdoc --no-ri"
-      cmd += " --version #{version}" if version
-      system(cmd) || raise("Installing gem #{name} for the tests to use failed!")
-    end
-
-    def gem_command(command, args = "", options = {})
-      if command == :exec && !options[:no_quote]
-        args = args.gsub(/(?=")/, "\\")
-        args = %("#{args}")
-      end
-      lib = File.join(File.dirname(__FILE__), "..", "..", "lib")
-      `#{Gem.ruby} -I#{lib} -rubygems -S gem --backtrace #{command} #{args}`.strip
+    def self.install_gems(gems)
+      reqs, no_reqs = gems.partition {|_, req| !req.nil? && !req.split(" ").empty? }
+      reqs = reqs.sort_by {|name, _| name == "rack" ? 0 : 1 } # TODO: remove when we drop ruby 1.8.7 support
+      no_reqs.map!(&:first)
+      reqs.map! {|name, req| "'#{name}:#{req}'" }
+      deps = reqs.concat(no_reqs).join(" ")
+      cmd = "gem install #{deps} --no-rdoc --no-ri --conservative"
+      puts cmd
+      system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
     end
   end
 end

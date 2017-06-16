@@ -1,4 +1,4 @@
-module BundlerVendoredPostIt
+module BundlerVendoredPostIt::PostIt
   class Installer
     def initialize(bundler_version)
       @bundler_version = bundler_version

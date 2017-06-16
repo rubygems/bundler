@@ -3,26 +3,73 @@ require "uri"
 
 module Bundler
   class Settings
-    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check disable_shared_gems ignore_messages gem.mit gem.coc silence_root_warning no_install plugins).freeze
-    NUMBER_KEYS = %w(retry timeout redirect ssl_verify_mode).freeze
-    DEFAULT_CONFIG = { :retry => 3, :timeout => 10, :redirect => 5 }.freeze
+    autoload :Mirror,  "bundler/mirror"
+    autoload :Mirrors, "bundler/mirror"
+
+    BOOL_KEYS = %w[
+      allow_offline_install
+      auto_install
+      cache_all
+      cache_all_platforms
+      disable_checksum_validation
+      disable_exec_load
+      disable_local_branch_check
+      disable_shared_gems
+      disable_version_check
+      error_on_stderr
+      force_ruby_platform
+      frozen
+      gem.coc
+      gem.mit
+      ignore_messages
+      init_gems_rb
+      major_deprecations
+      no_install
+      no_prune
+      only_update_to_newer_versions
+      plugins
+      silence_root_warning
+      update_requires_all_flag
+    ].freeze
+
+    NUMBER_KEYS = %w[
+      redirect
+      retry
+      ssl_verify_mode
+      timeout
+    ].freeze
+
+    DEFAULT_CONFIG = {
+      :redirect => 5,
+      :retry => 3,
+      :timeout => 10,
+    }.freeze
+
+    attr_accessor :cli_flags_given
 
     def initialize(root = nil)
-      @root          = root
-      @local_config  = load_config(local_config_file)
-      @global_config = load_config(global_config_file)
+      @root            = root
+      @local_config    = load_config(local_config_file)
+      @global_config   = load_config(global_config_file)
+      @cli_flags_given = false
+      @temporary       = {}
     end
 
     def [](name)
       key = key_for(name)
-      value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
+      value = @temporary.fetch(name) do
+              @local_config.fetch(key) do
+              ENV.fetch(key) do
+              @global_config.fetch(key) do
+              DEFAULT_CONFIG.fetch(name) do
+                nil
+              end end end end end
 
-      case
-      when value.nil?
+      if value.nil?
         nil
-      when is_bool(name) || value == "false"
+      elsif is_bool(name) || value == "false"
         to_bool(value)
-      when is_num(name)
+      elsif is_num(name)
         value.to_i
       else
         value
@@ -31,10 +78,35 @@ module Bundler
 
     def []=(key, value)
       local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
+
+      if cli_flags_given
+        command = if value.nil?
+          "bundle config --delete #{key}"
+        else
+          "bundle config #{key} #{Array(value).join(":")}"
+        end
+
+        Bundler::SharedHelpers.major_deprecation \
+          "flags passed to commands " \
+          "will no longer be automatically remembered. Instead please set flags " \
+          "you want remembered between commands using `bundle config " \
+          "<setting name> <setting value>`, i.e. `#{command}`"
+      end
+
       set_key(key, value, @local_config, local_config_file)
     end
-
     alias_method :set_local, :[]=
+
+    def temporary(update)
+      existing = Hash[update.map {|k, _| [k, @temporary[k]] }]
+      @temporary.update(update)
+      return unless block_given?
+      begin
+        yield
+      ensure
+        existing.each {|k, v| v.nil? ? @temporary.delete(k) : @temporary[k] = v }
+      end
+    end
 
     def delete(key)
       @local_config.delete(key_for(key))
@@ -73,7 +145,7 @@ module Bundler
 
     def gem_mirrors
       all.inject(Mirrors.new) do |mirrors, k|
-        mirrors.parse(k, self[k]) if k =~ /^mirror\./
+        mirrors.parse(k, self[k]) if k.start_with?("mirror.")
         mirrors
       end
     end
@@ -146,11 +218,7 @@ module Bundler
     end
 
     def app_cache_path
-      @app_cache_path ||= begin
-        path = self[:cache_path] || "vendor/cache"
-        raise InvalidOption, "Cache path must be relative to the bundle path" if path.start_with?("/")
-        path
-      end
+      @app_cache_path ||= self[:cache_path] || "vendor/cache"
     end
 
   private
@@ -162,14 +230,14 @@ module Bundler
     end
 
     def parent_setting_for(name)
-      split_specfic_setting_for(name)[0]
+      split_specific_setting_for(name)[0]
     end
 
-    def specfic_gem_for(name)
-      split_specfic_setting_for(name)[1]
+    def specific_gem_for(name)
+      split_specific_setting_for(name)[1]
     end
 
-    def split_specfic_setting_for(name)
+    def split_specific_setting_for(name)
       name.split(".")
     end
 
@@ -178,7 +246,12 @@ module Bundler
     end
 
     def to_bool(value)
-      !(value.nil? || value == "" || value =~ /^(false|f|no|n|0)$/i || value == false)
+      case value
+      when nil, /\A(false|f|no|n|0|)\z/i, false
+        false
+      else
+        true
+      end
     end
 
     def is_num(value)
@@ -213,7 +286,11 @@ module Bundler
       if ENV["BUNDLE_CONFIG"] && !ENV["BUNDLE_CONFIG"].empty?
         Pathname.new(ENV["BUNDLE_CONFIG"])
       else
-        Bundler.user_bundle_path.join("config")
+        begin
+          Bundler.user_bundle_path.join("config")
+        rescue PermissionError, GenericSystemCallError
+          nil
+        end
       end
     end
 
@@ -236,24 +313,43 @@ module Bundler
     }xo
 
     def load_config(config_file)
-      SharedHelpers.filesystem_access(config_file, :read) do
-        valid_file = config_file && config_file.exist? && !config_file.size.zero?
-        return {} if ignore_config? || !valid_file
+      return {} if !config_file || ignore_config?
+      SharedHelpers.filesystem_access(config_file, :read) do |file|
+        valid_file = file.exist? && !file.size.zero?
+        return {} unless valid_file
         require "bundler/yaml_serializer"
-        YAMLSerializer.load config_file.read
+        YAMLSerializer.load file.read
       end
     end
+
+    PER_URI_OPTIONS = %w[
+      fallback_timeout
+    ].freeze
+
+    NORMALIZE_URI_OPTIONS_PATTERN =
+      /
+        \A
+        (\w+\.)? # optional prefix key
+        (https?.*?) # URI
+        (\.#{Regexp.union(PER_URI_OPTIONS)})? # optional suffix key
+        \z
+      /ix
 
     # TODO: duplicates Rubygems#normalize_uri
     # TODO: is this the correct place to validate mirror URIs?
     def self.normalize_uri(uri)
       uri = uri.to_s
-      uri = "#{uri}/" unless uri =~ %r{/\Z}
+      if uri =~ NORMALIZE_URI_OPTIONS_PATTERN
+        prefix = $1
+        uri = $2
+        suffix = $3
+      end
+      uri = "#{uri}/" unless uri.end_with?("/")
       uri = URI(uri)
       unless uri.absolute?
-        raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
+        raise ArgumentError, format("Gem sources must be absolute. You provided '%s'.", uri)
       end
-      uri
+      "#{prefix}#{uri}#{suffix}"
     end
   end
 end

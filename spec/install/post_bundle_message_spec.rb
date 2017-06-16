@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "post bundle message" do
+RSpec.describe "post bundle message" do
   before :each do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -14,7 +13,7 @@ describe "post bundle message" do
     G
   end
 
-  let(:bundle_show_message)       { "Use `bundle show [gemname]` to see where a bundled gem is installed." }
+  let(:bundle_show_message)       { "Use `bundle info [gemname]` to see where a bundled gem is installed." }
   let(:bundle_deployment_message) { "Bundled gems are installed into ./vendor" }
   let(:bundle_complete_message)   { "Bundle complete!" }
   let(:bundle_updated_message)    { "Bundle updated!" }
@@ -81,6 +80,20 @@ describe "post bundle message" do
         expect(out).to include("Gems in the groups emo, obama and test were not installed")
         expect(out).to include(bundle_complete_message)
       end
+
+      it "with an absolute --path inside the cwd" do
+        bundle "install --path #{bundled_app}/cache"
+        expect(out).to include("Bundled gems are installed into ./cache")
+        expect(out).to_not include("Gems in the group")
+        expect(out).to include(bundle_complete_message)
+      end
+
+      it "with an absolute --path outside the cwd" do
+        bundle "install --path #{bundled_app}_cache"
+        expect(out).to include("Bundled gems are installed into #{bundled_app}_cache")
+        expect(out).to_not include("Gems in the group")
+        expect(out).to include(bundle_complete_message)
+      end
     end
 
     describe "with misspelled or non-existent gem name" do
@@ -90,7 +103,22 @@ describe "post bundle message" do
           gem "rack"
           gem "not-a-gem", :group => :development
         G
-        expect(out).to include("Could not find gem 'not-a-gem' in any of the gem sources listed in your Gemfile or available on this machine.")
+        expect(out).to include("Could not find gem 'not-a-gem' in any of the gem sources listed in your Gemfile.")
+      end
+
+      it "should report a helpful error message with reference to cache if available" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+        bundle :cache
+        expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+          gem "not-a-gem", :group => :development
+        G
+        expect(out).to include("Could not find gem 'not-a-gem' in any of the gem sources listed in your Gemfile or in gems cached in vendor/cache.")
       end
     end
   end

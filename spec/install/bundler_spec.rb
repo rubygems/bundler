@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle install" do
+RSpec.describe "bundle install" do
   describe "with bundler dependencies" do
     before(:each) do
       build_repo2 do
@@ -19,7 +18,7 @@ describe "bundle install" do
         gem "rails", "3.0"
       G
 
-      should_be_installed "bundler #{Bundler::VERSION}"
+      expect(the_bundle).to include_gems "bundler #{Bundler::VERSION}"
     end
 
     it "are not added if not already present" do
@@ -27,7 +26,7 @@ describe "bundle install" do
         source "file://#{gem_repo1}"
         gem "rack"
       G
-      should_not_be_installed "bundler #{Bundler::VERSION}"
+      expect(the_bundle).not_to include_gems "bundler #{Bundler::VERSION}"
     end
 
     it "causes a conflict if explicitly requesting a different version" do
@@ -44,17 +43,14 @@ describe "bundle install" do
           In Gemfile:
             bundler (= 0.9.2)
 
-            rails (= 3.0) was resolved to 3.0, which depends on
-              bundler (>= 0.9.0.pre)
-
           Current Bundler version:
             bundler (#{Bundler::VERSION})
         This Gemfile requires a different version of Bundler.
         Perhaps you need to update Bundler by running `gem install bundler`?
 
-        Could not find gem 'bundler (= 0.9.2)', which is required by gem 'rails (= 3.0)', in any of the sources.
+        Could not find gem 'bundler (= 0.9.2)' in any of the sources
         E
-      expect(out).to include(nice_error)
+      expect(out).to eq(nice_error)
     end
 
     it "works for gems with multiple versions in its dependencies" do
@@ -71,7 +67,7 @@ describe "bundle install" do
         gem "rack"
       G
 
-      should_be_installed "multiple_versioned_deps 1.0.0"
+      expect(the_bundle).to include_gems "multiple_versioned_deps 1.0.0"
     end
 
     it "includes bundler in the bundle when it's a child dependency" do
@@ -112,7 +108,7 @@ describe "bundle install" do
             rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
       E
-      expect(out).to eq(nice_error)
+      expect(out).to include(nice_error)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -132,7 +128,7 @@ describe "bundle install" do
             rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
       E
-      expect(out).to eq(nice_error)
+      expect(out).to include(nice_error)
     end
 
     it "can install dependencies with newer bundler version" do

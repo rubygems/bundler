@@ -8,6 +8,10 @@ module Bundler
         super
         @gemspec = options["gemspec"]
       end
+
+      def as_path_source
+        Path.new(options)
+      end
     end
   end
 end

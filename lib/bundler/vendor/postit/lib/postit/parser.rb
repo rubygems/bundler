@@ -1,6 +1,6 @@
 require 'rubygems'
 
-module BundlerVendoredPostIt
+module BundlerVendoredPostIt::PostIt
   class Parser
     def initialize(file)
       @file = file

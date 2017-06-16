@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "Bundler.with_env helpers" do
+RSpec.describe "Bundler.with_env helpers" do
   describe "Bundler.original_env" do
     before do
       gemfile ""
@@ -38,13 +37,21 @@ describe "Bundler.with_env helpers" do
       RB
       path = `getconf PATH`.strip + File::PATH_SEPARATOR + File.dirname(Gem.ruby)
       with_path_as(path) do
-        bundle!("exec ruby #{bundled_app("exe.rb")} 2", :expect_err => true)
+        bundle!("exec ruby #{bundled_app("exe.rb")} 2")
       end
       expect(err).to eq <<-EOS.strip
 2 false
 1 true
 0 true
       EOS
+    end
+
+    it "removes variables that bundler added" do
+      system_gems :bundler
+      original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")')
+      code = 'puts Bundler.original_env.to_a.map {|e| e.join("=") }.sort.join("\n")'
+      bundle!("exec ruby -e #{code.inspect}", :system_bundler => true)
+      expect(out).to eq original
     end
   end
 
@@ -78,7 +85,7 @@ describe "Bundler.with_env helpers" do
     it "should restore the original MANPATH" do
       code = "print Bundler.clean_env['MANPATH']"
       ENV["MANPATH"] = "/foo"
-      ENV["BUNDLE_ORIG_MANPATH"] = "/foo-original"
+      ENV["BUNDLER_ORIG_MANPATH"] = "/foo-original"
       result = bundle("exec ruby -e #{code.inspect}")
       expect(result).to eq("/foo-original")
     end
@@ -116,14 +123,14 @@ describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.clean_system" do
+  describe "Bundler.clean_system", :ruby => ">= 1.9" do
     it "runs system inside with_clean_env" do
       Bundler.clean_system(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
       expect($?.exitstatus).to eq(42)
     end
   end
 
-  describe "Bundler.clean_exec" do
+  describe "Bundler.clean_exec", :ruby => ">= 1.9" do
     it "runs exec inside with_clean_env" do
       pid = Kernel.fork do
         Bundler.clean_exec(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))

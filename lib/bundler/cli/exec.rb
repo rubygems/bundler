@@ -5,6 +5,8 @@ module Bundler
   class CLI::Exec
     attr_reader :options, :args, :cmd
 
+    RESERVED_SIGNALS = %w[SEGV BUS ILL FPE VTALRM KILL STOP].freeze
+
     def initialize(options, args)
       @options = options
       @cmd = args.shift
@@ -21,9 +23,15 @@ module Bundler
       validate_cmd!
       SharedHelpers.set_bundle_environment
       if bin_path = Bundler.which(cmd)
-        return kernel_load(bin_path, *args) if ruby_shebang?(bin_path)
+        if !Bundler.settings[:disable_exec_load] && ruby_shebang?(bin_path)
+          return kernel_load(bin_path, *args)
+        end
         # First, try to exec directly to something in PATH
-        kernel_exec([bin_path, cmd], *args)
+        if Bundler.current_ruby.jruby_18?
+          kernel_exec(bin_path, *args)
+        else
+          kernel_exec([bin_path, cmd], *args)
+        end
       else
         # exec using the given command
         kernel_exec(cmd, *args)
@@ -57,9 +65,12 @@ module Bundler
       args.pop if args.last.is_a?(Hash)
       ARGV.replace(args)
       $0 = file
+      Process.setproctitle(process_title(file, args)) if Process.respond_to?(:setproctitle)
       ui = Bundler.ui
       Bundler.ui = nil
       require "bundler/setup"
+      signals = Signal.list.keys - RESERVED_SIGNALS
+      signals.each {|s| trap(s, "DEFAULT") }
       Kernel.load(file)
     rescue SystemExit
       raise
@@ -70,11 +81,22 @@ module Bundler
       abort "#{e.class}: #{e.message}\n  #{backtrace.join("\n  ")}"
     end
 
+    def process_title(file, args)
+      "#{file} #{args.join(" ")}".strip
+    end
+
     def ruby_shebang?(file)
       possibilities = [
         "#!/usr/bin/env ruby\n",
+        "#!/usr/bin/env jruby\n",
         "#!#{Gem.ruby}\n",
       ]
+
+      if File.zero?(file)
+        Bundler.ui.warn "#{file} is empty"
+        return false
+      end
+
       first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }
       possibilities.any? {|shebang| first_line.start_with?(shebang) }
     end

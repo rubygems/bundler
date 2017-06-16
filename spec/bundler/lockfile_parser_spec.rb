@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/lockfile_parser"
 
-describe Bundler::LockfileParser do
+RSpec.describe Bundler::LockfileParser do
   let(:lockfile_contents) { strip_whitespace(<<-L) }
     GIT
       remote: https://github.com/alloy/peiji-san.git
@@ -60,7 +59,7 @@ describe Bundler::LockfileParser do
 
       it "returns the same as > 1.0" do
         expect(subject).to contain_exactly(
-          described_class::BUNDLED, described_class::RUBY
+          described_class::BUNDLED, described_class::RUBY, described_class::PLUGIN
         )
       end
     end
@@ -70,7 +69,7 @@ describe Bundler::LockfileParser do
 
       it "returns the same as for the release version" do
         expect(subject).to contain_exactly(
-          described_class::RUBY
+          described_class::RUBY, described_class::PLUGIN
         )
       end
     end

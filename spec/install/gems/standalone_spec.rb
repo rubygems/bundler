@@ -1,11 +1,10 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-shared_examples "bundle install --standalone" do
+RSpec.shared_examples "bundle install --standalone" do
   shared_examples "common functionality" do
     it "still makes the gems available to normal bundler" do
       args = expected_gems.map {|k, v| "#{k} #{v}" }
-      should_be_installed(*args)
+      expect(the_bundle).to include_gems(*args)
     end
 
     it "generates a bundle/bundler/setup.rb" do
@@ -198,7 +197,7 @@ shared_examples "bundle install --standalone" do
       bundle "install --standalone --path path/to/bundle"
 
       Dir.chdir(bundled_app) do
-        ruby <<-RUBY, :no_lib => true, :expect_err => false
+        ruby <<-RUBY, :no_lib => true
           $:.unshift File.expand_path("path/to/bundle")
           require "bundler/setup"
 
@@ -279,22 +278,35 @@ shared_examples "bundle install --standalone" do
     it "creates stubs that can be executed from anywhere" do
       require "tmpdir"
       Dir.chdir(Dir.tmpdir) do
-        expect(`#{bundled_app("bin/rails")} -v`.chomp).to eql "2.3.2"
+        sys_exec!(%(#{bundled_app("bin/rails")} -v))
+        expect(out).to eq("2.3.2")
       end
+    end
+
+    it "creates stubs that can be symlinked" do
+      pending "File.symlink is unsupported on Windows" if Bundler::WINDOWS
+
+      symlink_dir = tmp("symlink")
+      FileUtils.mkdir_p(symlink_dir)
+      symlink = File.join(symlink_dir, "rails")
+
+      File.symlink(bundled_app("bin/rails"), symlink)
+      sys_exec!("#{symlink} -v")
+      expect(out).to eq("2.3.2")
     end
 
     it "creates stubs with the correct load path" do
       extension_line = File.read(bundled_app("bin/rails")).each_line.find {|line| line.include? "$:.unshift" }.strip
-      expect(extension_line).to eq "$:.unshift File.expand_path '../../bundle', __FILE__"
+      expect(extension_line).to eq %($:.unshift File.expand_path "../../bundle", path.realpath)
     end
   end
 end
 
-describe "bundle install --standalone" do
+RSpec.describe "bundle install --standalone" do
   include_examples("bundle install --standalone")
 end
 
-describe "bundle install --standalone run in a subdirectory" do
+RSpec.describe "bundle install --standalone run in a subdirectory" do
   before do
     subdir = bundled_app("bob")
     FileUtils.mkdir_p(subdir)

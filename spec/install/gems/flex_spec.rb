@@ -1,15 +1,14 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle flex_install" do
+RSpec.describe "bundle flex_install" do
   it "installs the gems as expected" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem 'rack'
     G
 
-    should_be_installed "rack 1.0.0"
-    should_be_locked
+    expect(the_bundle).to include_gems "rack 1.0.0"
+    expect(the_bundle).to be_locked
   end
 
   it "installs even when the lockfile is invalid" do
@@ -18,8 +17,8 @@ describe "bundle flex_install" do
       gem 'rack'
     G
 
-    should_be_installed "rack 1.0.0"
-    should_be_locked
+    expect(the_bundle).to include_gems "rack 1.0.0"
+    expect(the_bundle).to be_locked
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -27,8 +26,8 @@ describe "bundle flex_install" do
     G
 
     bundle :install
-    should_be_installed "rack 1.0.0"
-    should_be_locked
+    expect(the_bundle).to include_gems "rack 1.0.0"
+    expect(the_bundle).to be_locked
   end
 
   it "keeps child dependencies at the same version" do
@@ -39,7 +38,7 @@ describe "bundle flex_install" do
       gem "rack-obama"
     G
 
-    should_be_installed "rack 1.0.0", "rack-obama 1.0.0"
+    expect(the_bundle).to include_gems "rack 1.0.0", "rack-obama 1.0.0"
 
     update_repo2
     install_gemfile <<-G
@@ -47,7 +46,7 @@ describe "bundle flex_install" do
       gem "rack-obama", "1.0"
     G
 
-    should_be_installed "rack 1.0.0", "rack-obama 1.0.0"
+    expect(the_bundle).to include_gems "rack 1.0.0", "rack-obama 1.0.0"
   end
 
   describe "adding new gems" do
@@ -67,7 +66,7 @@ describe "bundle flex_install" do
         gem 'activesupport', '2.3.5'
       G
 
-      should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+      expect(the_bundle).to include_gems "rack 1.0.0", "activesupport 2.3.5"
     end
 
     it "keeps child dependencies pinned" do
@@ -86,7 +85,7 @@ describe "bundle flex_install" do
         gem "thin"
       G
 
-      should_be_installed "rack 1.0.0", "rack-obama 1.0", "thin 1.0"
+      expect(the_bundle).to include_gems "rack 1.0.0", "rack-obama 1.0", "thin 1.0"
     end
   end
 
@@ -106,8 +105,8 @@ describe "bundle flex_install" do
         gem 'rack'
       G
 
-      should_be_installed "rack 1.0.0"
-      should_not_be_installed "activesupport 2.3.5"
+      expect(the_bundle).to include_gems "rack 1.0.0"
+      expect(the_bundle).not_to include_gems "activesupport 2.3.5"
 
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -115,7 +114,7 @@ describe "bundle flex_install" do
         gem 'activesupport', '2.3.2'
       G
 
-      should_be_installed "rack 1.0.0", "activesupport 2.3.2"
+      expect(the_bundle).to include_gems "rack 1.0.0", "activesupport 2.3.2"
     end
 
     it "removes top level dependencies when removed from the Gemfile while leaving other dependencies intact" do
@@ -133,7 +132,7 @@ describe "bundle flex_install" do
         gem 'rack'
       G
 
-      should_not_be_installed "activesupport 2.3.5"
+      expect(the_bundle).not_to include_gems "activesupport 2.3.5"
     end
 
     it "removes child dependencies" do
@@ -144,7 +143,7 @@ describe "bundle flex_install" do
         gem 'activesupport'
       G
 
-      should_be_installed "rack 1.0.0", "rack-obama 1.0.0", "activesupport 2.3.5"
+      expect(the_bundle).to include_gems "rack 1.0.0", "rack-obama 1.0.0", "activesupport 2.3.5"
 
       update_repo2
       install_gemfile <<-G
@@ -152,8 +151,8 @@ describe "bundle flex_install" do
         gem 'activesupport'
       G
 
-      should_be_installed "activesupport 2.3.5"
-      should_not_be_installed "rack-obama", "rack"
+      expect(the_bundle).to include_gems "activesupport 2.3.5"
+      expect(the_bundle).not_to include_gems "rack-obama", "rack"
     end
   end
 
@@ -165,7 +164,7 @@ describe "bundle flex_install" do
         gem "rack_middleware"
       G
 
-      should_be_installed "rack_middleware 1.0", "rack 0.9.1"
+      expect(the_bundle).to include_gems "rack_middleware 1.0", "rack 0.9.1"
 
       build_repo2
       update_repo2 do
@@ -186,7 +185,7 @@ describe "bundle flex_install" do
 
     it "does not install gems whose dependencies are not met" do
       bundle :install
-      ruby <<-RUBY, :expect_err => true
+      ruby <<-RUBY
         require 'bundler/setup'
       RUBY
       expect(err).to match(/could not find gem 'rack-obama/i)

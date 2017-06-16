@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/source/rubygems/remote"
 
-describe Bundler::Source::Rubygems::Remote do
+RSpec.describe Bundler::Source::Rubygems::Remote do
   def remote(uri)
     Bundler::Source::Rubygems::Remote.new(uri)
   end

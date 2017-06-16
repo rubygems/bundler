@@ -25,18 +25,14 @@ module Bundler
       # Installs the plugin from Definition object created by limited parsing of
       # Gemfile searching for plugins to be installed
       #
-      # @param [Definition] definiton object
-      # @return [Hash] map of plugin names to thier paths
+      # @param [Definition] definition object
+      # @return [Hash] map of names to their specs they are installed with
       def install_definition(definition)
-        plugins = definition.dependencies.map(&:name)
-
         def definition.lock(*); end
         definition.resolve_remotely!
         specs = definition.specs
 
-        paths = install_from_specs specs
-
-        Hash[paths.select {|name, _| plugins.include? name }]
+        install_from_specs specs
       end
 
     private
@@ -66,7 +62,7 @@ module Bundler
       # @param [Array] version of the gem to install
       # @param [String, Array<String>] source(s) to resolve the gem
       #
-      # @return [String] the path where the plugin was installed
+      # @return [Hash] map of names to the specs of plugins installed
       def install_rubygems(names, version, sources)
         deps = names.map {|name| Dependency.new name, version }
 
@@ -82,14 +78,14 @@ module Bundler
       #
       # @param specs to install
       #
-      # @return [Hash] map of names to path where the plugin was installed
+      # @return [Hash] map of names to the specs
       def install_from_specs(specs)
         paths = {}
 
         specs.each do |spec|
           spec.source.install spec
 
-          paths[spec.name] = spec.full_gem_path
+          paths[spec.name] = spec
         end
 
         paths

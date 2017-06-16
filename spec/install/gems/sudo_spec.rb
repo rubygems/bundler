@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "when using sudo", :sudo => true do
+RSpec.describe "when using sudo", :sudo => true do
   describe "and BUNDLE_PATH is writable" do
     context "but BUNDLE_PATH/build_info is not writable" do
       before do
@@ -18,7 +17,7 @@ describe "when using sudo", :sudo => true do
 
         expect(out).to_not match(/an error occurred/i)
         expect(system_gem_path("cache/rack-1.0.0.gem")).to exist
-        should_be_installed "rack 1.0"
+        expect(the_bundle).to include_gems "rack 1.0"
       end
     end
   end
@@ -37,7 +36,7 @@ describe "when using sudo", :sudo => true do
 
       expect(system_gem_path("gems/rack-1.0.0")).to exist
       expect(system_gem_path("gems/rack-1.0.0").stat.uid).to eq(0)
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
 
     it "installs rake and a gem dependent on rake in the same session" do
@@ -63,7 +62,7 @@ describe "when using sudo", :sudo => true do
 
       expect(bundle_path.join("gems/rack-1.0.0")).to exist
       expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
 
     it "installs when BUNDLE_PATH does not exist" do
@@ -80,10 +79,10 @@ describe "when using sudo", :sudo => true do
 
       expect(bundle_path.join("gems/rack-1.0.0")).to exist
       expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
 
-    it "installs extensions/ compiled by Rubygems 2.2", :rubygems => "2.2" do
+    it "installs extensions/ compiled by RubyGems 2.2", :rubygems => "2.2" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "very_simple_binary"
@@ -107,7 +106,7 @@ describe "when using sudo", :sudo => true do
       G
 
       expect(default_bundle_path("gems/rack-1.0.0")).to exist
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
 
     it "cleans up the tmpdirs generated" do
@@ -139,7 +138,7 @@ describe "when using sudo", :sudo => true do
 
       bundle :install, :env => { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil }
       expect(gem_home.join("bin/rackup")).to exist
-      should_be_installed "rack 1.0", :env => { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil }
+      expect(the_bundle).to include_gems "rack 1.0", :env => { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil }
     end
   end
 

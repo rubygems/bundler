@@ -21,10 +21,14 @@ module Bundler
       #   must not be specified, or the engine version
       #   specified must match the version.
 
-      @versions           = Array(versions)
+      @versions = Array(versions).map do |v|
+        op, v = Gem::Requirement.parse(v)
+        op == "=" ? v.to_s : "#{op} #{v}"
+      end
+
       @gem_version        = Gem::Requirement.create(@versions.first).requirements.first.last
-      @input_engine       = engine
-      @engine             = engine || "ruby"
+      @input_engine       = engine && engine.to_s
+      @engine             = engine && engine.to_s || "ruby"
       @engine_versions    = (engine_version && Array(engine_version)) || @versions
       @engine_gem_version = Gem::Requirement.create(@engine_versions.first).requirements.first.last
       @patchlevel         = patchlevel
@@ -42,7 +46,7 @@ module Bundler
     PATTERN = /
       ruby\s
       ([\d.]+) # ruby version
-      (?:p(\d+))? # optional patchlevel
+      (?:p(-?\d+))? # optional patchlevel
       (?:\s\((\S+)\s(.+)\))? # optional engine info
     /xo
 
@@ -115,7 +119,9 @@ module Bundler
                             else
                               raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
       end
-      @ruby_version ||= RubyVersion.new(ruby_version, RUBY_PATCHLEVEL.to_s, ruby_engine, ruby_engine_version)
+      patchlevel = RUBY_PATCHLEVEL.to_s
+
+      @ruby_version ||= RubyVersion.new(ruby_version, patchlevel, ruby_engine, ruby_engine_version)
     end
 
     def to_gem_version_with_patchlevel
@@ -124,6 +130,11 @@ module Bundler
       rescue ArgumentError
         @gem_version
       end
+    end
+
+    def exact?
+      return @exact if defined?(@exact)
+      @exact = versions.all? {|v| Gem::Requirement.create(v).exact? }
     end
 
   private

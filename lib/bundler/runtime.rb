@@ -2,10 +2,17 @@
 require "digest/sha1"
 
 module Bundler
-  class Runtime < Environment
+  class Runtime
     include SharedHelpers
 
+    def initialize(root, definition)
+      @root = root
+      @definition = definition
+    end
+
     def setup(*groups)
+      @definition.ensure_equivalent_gemfile_and_lockfile if Bundler.settings[:frozen]
+
       groups.map!(&:to_sym)
 
       # Has to happen first
@@ -19,21 +26,10 @@ module Bundler
       # Activate the specs
       load_paths = specs.map do |spec|
         unless spec.loaded_from
-          raise GemNotFound, "#{spec.full_name} is missing. Run `bundle` to get it."
+          raise GemNotFound, "#{spec.full_name} is missing. Run `bundle install` to get it."
         end
 
-        if (activated_spec = Bundler.rubygems.loaded_specs(spec.name)) && activated_spec.version != spec.version
-          e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
-                                 "but your Gemfile requires #{spec.name} #{spec.version}. Prepending " \
-                                 "`bundle exec` to your command may solve this."
-          e.name = spec.name
-          if e.respond_to?(:requirement=)
-            e.requirement = Gem::Requirement.new(spec.version.to_s)
-          else
-            e.version_requirement = Gem::Requirement.new(spec.version.to_s)
-          end
-          raise e
-        end
+        check_for_activated_spec!(spec)
 
         Bundler.rubygems.mark_loaded(spec)
         spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
@@ -107,6 +103,25 @@ module Bundler
       end
     end
 
+    def self.definition_method(meth)
+      define_method(meth) do
+        raise ArgumentError, "no definition when calling Runtime##{meth}" unless @definition
+        @definition.send(meth)
+      end
+    end
+    private_class_method :definition_method
+
+    definition_method :requested_specs
+    definition_method :specs
+    definition_method :dependencies
+    definition_method :current_dependencies
+    definition_method :requires
+
+    def lock(opts = {})
+      return if @definition.nothing_changed? && !@definition.unlocking?
+      @definition.lock(Bundler.default_lockfile, opts[:preserve_unknown_sections])
+    end
+
     alias_method :gems, :specs
 
     def cache(custom_path = nil)
@@ -117,7 +132,8 @@ module Bundler
 
       Bundler.ui.info "Updating files in #{Bundler.settings.app_cache_path}"
 
-      specs.each do |spec|
+      specs_to_cache = Bundler.settings[:cache_all_platforms] ? @definition.resolve.materialized_for_all_platforms : specs
+      specs_to_cache.each do |spec|
         next if spec.name == "bundler"
         next if spec.source.is_a?(Source::Gemspec)
         spec.source.send(:fetch_gem, spec) if Bundler.settings[:cache_all_platforms] && spec.source.respond_to?(:fetch_gem, true)
@@ -246,9 +262,6 @@ module Bundler
     end
 
     def setup_manpath
-      # Store original MANPATH for restoration later in with_clean_env()
-      ENV["BUNDLE_ORIG_MANPATH"] = ENV["MANPATH"]
-
       # Add man/ subdirectories from activated bundles to MANPATH for man(1)
       manuals = $LOAD_PATH.map do |path|
         man_subdir = path.sub(/lib$/, "man")
@@ -256,7 +269,7 @@ module Bundler
       end.compact
 
       return if manuals.empty?
-      ENV["MANPATH"] = manuals.concat(
+      Bundler::SharedHelpers.set_env "MANPATH", manuals.concat(
         ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
       ).uniq.join(File::PATH_SEPARATOR)
     end
@@ -277,6 +290,28 @@ module Bundler
       end
 
       output
+    end
+
+    def check_for_activated_spec!(spec)
+      return unless activated_spec = Bundler.rubygems.loaded_specs(spec.name)
+      return if activated_spec.version == spec.version
+
+      suggestion = if Bundler.rubygems.spec_default_gem?(activated_spec)
+        "Since #{spec.name} is a default gem, you can either remove your dependency on it" \
+        " or try updating to a newer version of bundler that supports #{spec.name} as a default gem."
+      else
+        "Prepending `bundle exec` to your command may solve this."
+      end
+
+      e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
+                             "but your Gemfile requires #{spec.name} #{spec.version}. #{suggestion}"
+      e.name = spec.name
+      if e.respond_to?(:requirement=)
+        e.requirement = Gem::Requirement.new(spec.version.to_s)
+      else
+        e.version_requirement = Gem::Requirement.new(spec.version.to_s)
+      end
+      raise e
     end
   end
 end

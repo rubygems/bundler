@@ -39,15 +39,15 @@ def gemfile(install = false, options = {}, &gemfile)
   def Bundler.root
     Bundler::SharedHelpers.pwd.expand_path
   end
-  ENV["BUNDLE_GEMFILE"] ||= "Gemfile"
+  Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", "Gemfile"
 
-  Bundler::Plugin.gemfile_install(&gemfile) if Bundler.settings[:plugins]
+  Bundler::Plugin.gemfile_install(&gemfile) if Bundler.feature_flag.plugins?
   builder = Bundler::Dsl.new
   builder.instance_eval(&gemfile)
 
   definition = builder.to_definition(nil, true)
   def definition.lock(*); end
-  definition.validate_ruby!
+  definition.validate_runtime!
 
   missing_specs = proc do
     begin
@@ -60,8 +60,8 @@ def gemfile(install = false, options = {}, &gemfile)
 
   Bundler.ui = ui if install
   if install || missing_specs.call
-    Bundler::Installer.install(Bundler.root, definition, :system => true)
-    Bundler::Installer.post_install_messages.each do |name, message|
+    installer = Bundler::Installer.install(Bundler.root, definition, :system => true, :inline => true)
+    installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post-install message from #{name}:\n#{message}"
     end
   end

@@ -2,7 +2,14 @@
 module Bundler
   module UI
     class Silent
+      attr_writer :shell
+
+      def initialize
+        @warnings = []
+      end
+
       def add_color(string, color)
+        string
       end
 
       def info(message, newline = nil)
@@ -12,6 +19,7 @@ module Bundler
       end
 
       def warn(message, newline = nil)
+        @warnings |= [message]
       end
 
       def error(message, newline = nil)
@@ -31,17 +39,29 @@ module Bundler
       def ask(message)
       end
 
+      def yes?(msg)
+        raise "Cannot ask yes? with a silent shell"
+      end
+
+      def no?
+        raise "Cannot ask no? with a silent shell"
+      end
+
       def level=(name)
       end
 
       def level(name = nil)
       end
 
-      def trace(message, newline = nil)
+      def trace(message, newline = nil, force = false)
       end
 
       def silence
         yield
+      end
+
+      def unprinted_warnings
+        @warnings
       end
     end
   end

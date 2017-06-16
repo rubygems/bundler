@@ -1,7 +1,9 @@
 # frozen_string_literal: true
+require "shellwords"
+require "tempfile"
 module Bundler
   class Source
-    class Git < Path
+    class Git
       class GitNotInstalledError < GitError
         def initialize
           msg = String.new
@@ -80,22 +82,29 @@ module Bundler
         end
 
         def version
+          git("--version").match(/(git version\s*)?((\.?\d+)+).*/)[2]
+        end
+
+        def full_version
           git("--version").sub("git version", "").strip
         end
 
         def checkout
-          if path.exist?
-            return if has_revision_cached?
-            Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
-            in_path do
-              git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*")
-            end
-          else
-            Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+          return if path.exist? && has_revision_cached?
+          extra_ref = "#{Shellwords.shellescape(ref)}:#{Shellwords.shellescape(ref)}" if ref && ref.start_with?("refs/")
+
+          Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+
+          unless path.exist?
             SharedHelpers.filesystem_access(path.dirname) do |p|
               FileUtils.mkdir_p(p)
             end
             git_retry %(clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet)
+            return unless extra_ref
+          end
+
+          in_path do
+            git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*" #{extra_ref})
           end
         end
 
@@ -110,7 +119,7 @@ module Bundler
                 FileUtils.rm_rf(p)
               end
               git_retry %(clone --no-checkout --quiet "#{path}" "#{destination}")
-              File.chmod(((File.stat(destination).mode | 0777) & ~File.umask), destination)
+              File.chmod(((File.stat(destination).mode | 0o777) & ~File.umask), destination)
             rescue Errno::EEXIST => e
               file_path = e.message[%r{.*?(/.*)}, 1]
               raise GitError, "Bundler could not install a gem because it needs to " \
@@ -123,7 +132,11 @@ module Bundler
             git_retry %(fetch --force --quiet --tags "#{path}")
             git "reset --hard #{@revision}"
 
-            git_retry "submodule update --init --recursive" if submodules
+            if submodules
+              git_retry "submodule update --init --recursive"
+            elsif Gem::Version.create(version) >= Gem::Version.create("2.9.0")
+              git_retry "submodule deinit --all --force"
+            end
           end
         end
 
@@ -139,7 +152,7 @@ module Bundler
         end
 
         def git_retry(command)
-          Bundler::Retry.new("git #{command}", GitNotAllowedError).attempts do
+          Bundler::Retry.new("`git #{command}`", GitNotAllowedError).attempts do
             git(command)
           end
         end
@@ -148,7 +161,9 @@ module Bundler
           command_with_no_credentials = URICredentialsFilter.credential_filtered_string(command, uri)
           raise GitNotAllowedError.new(command_with_no_credentials) unless allow?
 
-          out = SharedHelpers.with_clean_git_env { `git #{command}` }
+          out = SharedHelpers.with_clean_git_env do
+            capture_and_filter_stderr(uri) { `git #{command}` }
+          end
 
           stdout_with_no_credentials = URICredentialsFilter.credential_filtered_string(out, uri)
           raise GitCommandError.new(command_with_no_credentials, path, error_msg) if check_errors && !$?.success?
@@ -169,7 +184,7 @@ module Bundler
 
         def find_local_revision
           allowed_in_path do
-            git("rev-parse --verify #{ref}", true).strip
+            git("rev-parse --verify #{Shellwords.shellescape(ref)}", true).strip
           end
         end
 
@@ -211,6 +226,28 @@ module Bundler
         def allowed_in_path
           return in_path { yield } if allow?
           raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+        end
+
+        # TODO: Replace this with Open3 when upgrading to bundler 2
+        # Similar to #git_null, as Open3 is not cross-platform,
+        # a temporary way is to use Tempfile to capture the stderr.
+        # When replacing this using Open3, make sure git_null is
+        # also replaced by Open3, so stdout and stderr all got handled properly.
+        def capture_and_filter_stderr(uri)
+          return_value, captured_err = ""
+          backup_stderr = STDERR.dup
+          begin
+            Tempfile.open("captured_stderr") do |f|
+              STDERR.reopen(f)
+              return_value = yield
+              f.rewind
+              captured_err = f.read
+            end
+          ensure
+            STDERR.reopen backup_stderr
+          end
+          $stderr.puts URICredentialsFilter.credential_filtered_string(captured_err, uri) if uri && !captured_err.empty?
+          return_value
         end
       end
     end

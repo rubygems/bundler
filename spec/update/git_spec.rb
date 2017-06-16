@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle update" do
+RSpec.describe "bundle update" do
   describe "git sources" do
     it "floats on a branch when :branch is used" do
       build_git "foo", "1.0"
@@ -19,7 +18,7 @@ describe "bundle update" do
 
       bundle "update"
 
-      should_be_installed "foo 1.1"
+      expect(the_bundle).to include_gems "foo 1.1"
     end
 
     it "updates correctly when you have like craziness" do
@@ -34,7 +33,7 @@ describe "bundle update" do
 
       bundle "update rails"
       expect(out).to include("Using activesupport 3.0 from #{lib_path("rails")} (at master@#{revision_for(lib_path("rails"))[0..6]})")
-      should_be_installed "rails 3.0", "activesupport 3.0"
+      expect(the_bundle).to include_gems "rails 3.0", "activesupport 3.0"
     end
 
     it "floats on a branch when :branch is used and the source is specified in the update" do
@@ -53,7 +52,7 @@ describe "bundle update" do
 
       bundle "update --source foo"
 
-      should_be_installed "foo 1.1"
+      expect(the_bundle).to include_gems "foo 1.1"
     end
 
     it "floats on master when updating all gems that are pinned to the source even if you have child dependencies" do
@@ -73,7 +72,7 @@ describe "bundle update" do
 
       bundle "update foo"
 
-      should_be_installed "foo 1.1"
+      expect(the_bundle).to include_gems "foo 1.1"
     end
 
     it "notices when you change the repo url in the Gemfile" do
@@ -90,7 +89,7 @@ describe "bundle update" do
         gem "foo", "1.0", :git => "#{lib_path("foo_two")}"
       G
 
-      expect(err).to be_empty
+      expect(err).to lack_errors
       expect(out).to include("Fetching #{lib_path}/foo_two")
       expect(out).to include("Bundle complete!")
     end
@@ -132,7 +131,7 @@ describe "bundle update" do
         end
 
         Dir.chdir(lib_path("has_submodule-1.0")) do
-          sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0", :expect_err => true
+          sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0"
           `git commit -m "submodulator"`
         end
       end
@@ -147,7 +146,7 @@ describe "bundle update" do
         run "require 'submodule'"
         expect(out).to eq("GEM")
 
-        install_gemfile <<-G, :expect_err => true
+        install_gemfile <<-G
           git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
@@ -157,9 +156,8 @@ describe "bundle update" do
         expect(out).to eq("GIT")
       end
 
-      it "it unlocks the source when submodules are removed from git source" do
-        pending "This would require actually removing the submodule from the clone"
-        install_gemfile <<-G, :expect_err => true
+      it "unlocks the source when submodules are removed from git source", :git => ">= 2.9.0" do
+        install_gemfile <<-G
           git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
@@ -188,7 +186,7 @@ describe "bundle update" do
 
       lib_path("foo-1.0").join(".git").rmtree
 
-      bundle :update, :expect_err => true
+      bundle :update
       expect(out).to include(lib_path("foo-1.0").to_s)
     end
 
@@ -269,7 +267,7 @@ describe "bundle update" do
       update_git "foo", "2.0", :path => @git.path
 
       bundle "update --source foo"
-      should_be_installed "foo 2.0"
+      expect(the_bundle).to include_gems "foo 2.0"
     end
 
     it "leaves all other gems frozen" do
@@ -277,7 +275,7 @@ describe "bundle update" do
       update_git "foo", :path => @git.path
 
       bundle "update --source foo"
-      should_be_installed "rack 1.0"
+      expect(the_bundle).to include_gems "rack 1.0"
     end
   end
 

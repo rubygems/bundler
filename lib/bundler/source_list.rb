@@ -2,11 +2,13 @@
 module Bundler
   class SourceList
     attr_reader :path_sources,
-      :git_sources
+      :git_sources,
+      :plugin_sources
 
     def initialize
       @path_sources       = []
       @git_sources        = []
+      @plugin_sources     = []
       @rubygems_aggregate = Source::Rubygems.new
       @rubygems_sources   = []
     end
@@ -20,11 +22,17 @@ module Bundler
     end
 
     def add_git_source(options = {})
-      add_source_to_list Source::Git.new(options), git_sources
+      add_source_to_list(Source::Git.new(options), git_sources).tap do |source|
+        warn_on_git_protocol(source)
+      end
     end
 
     def add_rubygems_source(options = {})
       add_source_to_list Source::Rubygems.new(options), @rubygems_sources
+    end
+
+    def add_plugin_source(source, options = {})
+      add_source_to_list Plugin.source(source).new(options), @plugin_sources
     end
 
     def add_rubygems_remote(uri)
@@ -41,7 +49,7 @@ module Bundler
     end
 
     def all_sources
-      path_sources + git_sources + rubygems_sources
+      path_sources + git_sources + plugin_sources + rubygems_sources
     end
 
     def get(source)
@@ -49,14 +57,14 @@ module Bundler
     end
 
     def lock_sources
-      lock_sources = (path_sources + git_sources).sort_by(&:to_s)
+      lock_sources = (path_sources + git_sources + plugin_sources).sort_by(&:to_s)
       lock_sources << combine_rubygems_sources
     end
 
     def replace_sources!(replacement_sources)
       return true if replacement_sources.empty?
 
-      [path_sources, git_sources].each do |source_list|
+      [path_sources, git_sources, plugin_sources].each do |source_list|
         source_list.map! do |source|
           replacement_sources.find {|s| s == source } || source
         end
@@ -92,15 +100,27 @@ module Bundler
 
     def source_list_for(source)
       case source
-      when Source::Git      then git_sources
-      when Source::Path     then path_sources
-      when Source::Rubygems then rubygems_sources
+      when Source::Git          then git_sources
+      when Source::Path         then path_sources
+      when Source::Rubygems     then rubygems_sources
+      when Plugin::API::Source  then plugin_sources
       else raise ArgumentError, "Invalid source: #{source.inspect}"
       end
     end
 
     def combine_rubygems_sources
       Source::Rubygems.new("remotes" => rubygems_remotes)
+    end
+
+    def warn_on_git_protocol(source)
+      return if Bundler.settings["git.allow_insecure"]
+
+      if source.uri =~ /^git\:/
+        Bundler.ui.warn "The git source `#{source.uri}` uses the `git` protocol, " \
+          "which transmits data without encryption. Disable this warning with " \
+          "`bundle config git.allow_insecure true`, or switch to the `https` " \
+          "protocol to keep your data secure."
+      end
     end
   end
 end

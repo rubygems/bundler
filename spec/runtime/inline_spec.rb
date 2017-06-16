@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundler/inline#gemfile" do
+RSpec.describe "bundler/inline#gemfile" do
   def script(code, options = {})
     requires = ["bundler/inline"]
     requires.unshift File.expand_path("../../support/artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
@@ -61,7 +60,7 @@ describe "bundler/inline#gemfile" do
     expect(out).to eq("two")
     expect(exitstatus).to be_zero if exitstatus
 
-    script <<-RUBY, :expect_err => true
+    script <<-RUBY
       gemfile do
         path "#{lib_path}"
         gem "eleven"
@@ -85,13 +84,15 @@ describe "bundler/inline#gemfile" do
 
     script <<-RUBY, :artifice => "endpoint"
       gemfile(true) do
-        source "https://rubygems.org"
+        source "https://notaserver.com"
         gem "activesupport", :require => true
       end
     RUBY
 
     expect(out).to include("Installing activesupport")
-    expect(err).to eq("")
+    err.gsub! %r{.*lib/sinatra/base\.rb:\d+: warning: constant ::Fixnum is deprecated$}, ""
+    err.strip!
+    expect(err).to lack_errors
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -104,17 +105,17 @@ describe "bundler/inline#gemfile" do
         end
       end
       gemfile(true, :ui => MyBundlerUI.new) do
-        source "https://rubygems.org"
+        source "https://notaserver.com"
         gem "activesupport", :require => true
       end
     RUBY
 
-    expect(out).to eq("CONFIRMED!")
+    expect(out).to eq("CONFIRMED!\nCONFIRMED!")
     expect(exitstatus).to be_zero if exitstatus
   end
 
   it "raises an exception if passed unknown arguments" do
-    script <<-RUBY, :expect_err => true
+    script <<-RUBY
       gemfile(true, :arglebargle => true) do
         path "#{lib_path}"
         gem "two"
@@ -170,6 +171,81 @@ describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to eq("1.0.0\n2.0.0")
+    expect(err).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
+
+  it "allows calling gemfile twice" do
+    script <<-RUBY
+      gemfile do
+        path "#{lib_path}" do
+          gem "two"
+        end
+      end
+
+      gemfile do
+        path "#{lib_path}" do
+          gem "four"
+        end
+      end
+    RUBY
+
+    expect(out).to eq("two\nfour")
+    expect(err).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
+
+  it "installs inline gems when a Gemfile.lock is present" do
+    gemfile <<-G
+      source "https://notaserver.com"
+      gem "rake"
+    G
+
+    lockfile <<-G
+      GEM
+        remote: https://rubygems.org/
+        specs:
+          rake (11.3.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rake
+
+      BUNDLED WITH
+         1.13.6
+    G
+
+    in_app_root do
+      script <<-RUBY
+        gemfile do
+          source "file://#{gem_repo1}"
+          gem "rack"
+        end
+
+        puts RACK
+      RUBY
+    end
+
+    expect(err).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
+
+  it "installs inline gems when BUNDLE_GEMFILE is set to an empty string" do
+    ENV["BUNDLE_GEMFILE"] = ""
+
+    in_app_root do
+      script <<-RUBY
+        gemfile do
+          source "file://#{gem_repo1}"
+          gem "rack"
+        end
+
+        puts RACK
+      RUBY
+    end
+
     expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end

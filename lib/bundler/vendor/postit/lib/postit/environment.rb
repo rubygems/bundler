@@ -1,6 +1,6 @@
-require 'postit/parser'
+require 'bundler/vendor/postit/lib/postit/parser'
 
-module BundlerVendoredPostIt
+module BundlerVendoredPostIt::PostIt
   class Environment
     def initialize(argv)
       @argv = argv
@@ -31,7 +31,7 @@ module BundlerVendoredPostIt
     end
 
     def lockfile_version
-      BundlerVendoredPostIt::Parser.new(lockfile).parse
+      BundlerVendoredPostIt::PostIt::Parser.new(lockfile).parse
     end
 
     def bundler_version

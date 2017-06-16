@@ -3,17 +3,20 @@ require "fileutils"
 require "pathname"
 require "rbconfig"
 require "thread"
+require "tmpdir"
+
+require "bundler/errors"
 require "bundler/environment_preserver"
-require "bundler/gem_remote_fetcher"
+require "bundler/plugin"
 require "bundler/rubygems_ext"
 require "bundler/rubygems_integration"
 require "bundler/version"
 require "bundler/constants"
 require "bundler/current_ruby"
-require "bundler/errors"
+require "bundler/build_metadata"
 
 module Bundler
-  environment_preserver = EnvironmentPreserver.new(ENV, %w(PATH GEM_PATH))
+  environment_preserver = EnvironmentPreserver.new(ENV, EnvironmentPreserver::BUNDLER_KEYS)
   ORIGINAL_ENV = environment_preserver.restore
   ENV.replace(environment_preserver.backup)
   SUDO_MUTEX = Mutex.new
@@ -24,36 +27,36 @@ module Bundler
   autoload :Deprecate,              "bundler/deprecate"
   autoload :Dsl,                    "bundler/dsl"
   autoload :EndpointSpecification,  "bundler/endpoint_specification"
-  autoload :Environment,            "bundler/environment"
   autoload :Env,                    "bundler/env"
   autoload :Fetcher,                "bundler/fetcher"
+  autoload :FeatureFlag,            "bundler/feature_flag"
   autoload :GemHelper,              "bundler/gem_helper"
   autoload :GemHelpers,             "bundler/gem_helpers"
+  autoload :GemRemoteFetcher,       "bundler/gem_remote_fetcher"
+  autoload :GemVersionPromoter,     "bundler/gem_version_promoter"
   autoload :Graph,                  "bundler/graph"
   autoload :Index,                  "bundler/index"
-  autoload :Installer,              "bundler/installer"
   autoload :Injector,               "bundler/injector"
+  autoload :Installer,              "bundler/installer"
   autoload :LazySpecification,      "bundler/lazy_specification"
   autoload :LockfileParser,         "bundler/lockfile_parser"
   autoload :MatchPlatform,          "bundler/match_platform"
-  autoload :Mirror,                 "bundler/mirror"
-  autoload :Mirrors,                "bundler/mirror"
-  autoload :Plugin,                 "bundler/plugin"
   autoload :RemoteSpecification,    "bundler/remote_specification"
   autoload :Resolver,               "bundler/resolver"
   autoload :Retry,                  "bundler/retry"
-  autoload :RubyVersion,            "bundler/ruby_version"
   autoload :RubyDsl,                "bundler/ruby_dsl"
+  autoload :RubyGemsGemInstaller,   "bundler/rubygems_gem_installer"
+  autoload :RubyVersion,            "bundler/ruby_version"
   autoload :Runtime,                "bundler/runtime"
   autoload :Settings,               "bundler/settings"
   autoload :SharedHelpers,          "bundler/shared_helpers"
-  autoload :SpecSet,                "bundler/spec_set"
-  autoload :StubSpecification,      "bundler/stub_specification"
   autoload :Source,                 "bundler/source"
   autoload :SourceList,             "bundler/source_list"
-  autoload :RubyGemsGemInstaller,   "bundler/rubygems_gem_installer"
+  autoload :SpecSet,                "bundler/spec_set"
+  autoload :StubSpecification,      "bundler/stub_specification"
   autoload :UI,                     "bundler/ui"
   autoload :URICredentialsFilter,   "bundler/uri_credentials_filter"
+  autoload :VersionRanges,          "bundler/version_ranges"
 
   class << self
     attr_writer :bundle_path
@@ -88,9 +91,11 @@ module Bundler
 
     def setup(*groups)
       # Return if all groups are already loaded
-      return @setup if defined?(@setup)
+      return @setup if defined?(@setup) && @setup
 
-      definition.validate_ruby!
+      definition.validate_runtime!
+
+      SharedHelpers.print_major_deprecations!
 
       if groups.empty?
         # Load all groups, but only once
@@ -109,7 +114,8 @@ module Bundler
     end
 
     def environment
-      Bundler::Environment.new(root, definition)
+      SharedHelpers.major_deprecation "Bundler.environment has been removed in favor of Bundler.load"
+      load
     end
 
     # Returns an instance of Bundler::Definition for given Gemfile and lockfile
@@ -121,27 +127,62 @@ module Bundler
       @definition = nil if unlock
       @definition ||= begin
         configure
-        upgrade_lockfile
         Definition.build(default_gemfile, default_lockfile, unlock)
       end
     end
 
     def locked_gems
-      return @locked_gems if defined?(@locked_gems)
-      if Bundler.default_lockfile.exist?
-        lock = Bundler.read_file(Bundler.default_lockfile)
-        @locked_gems = LockfileParser.new(lock)
-      else
-        @locked_gems = nil
-      end
+      @locked_gems ||=
+        if defined?(@definition) && @definition
+          definition.locked_gems
+        elsif Bundler.default_lockfile.file?
+          lock = Bundler.read_file(Bundler.default_lockfile)
+          LockfileParser.new(lock)
+        end
     end
 
     def ruby_scope
       "#{Bundler.rubygems.ruby_engine}/#{Bundler.rubygems.config_map[:ruby_version]}"
     end
 
+    def user_home
+      @user_home ||= begin
+        home = Bundler.rubygems.user_home
+
+        warning = if home.nil?
+          "Your home directory is not set."
+        elsif !File.directory?(home)
+          "`#{home}` is not a directory."
+        elsif !File.writable?(home)
+          "`#{home}` is not writable."
+        end
+
+        if warning
+          user_home = tmp_home_path(Etc.getlogin, warning)
+          Bundler.ui.warn "#{warning}\nBundler will use `#{user_home}' as your home directory temporarily.\n"
+          user_home
+        else
+          Pathname.new(home)
+        end
+      end
+    end
+
+    def tmp_home_path(login, warning)
+      login ||= "unknown"
+      path = Pathname.new(Dir.tmpdir).join("bundler", "home")
+      SharedHelpers.filesystem_access(path) do |tmp_home_path|
+        unless tmp_home_path.exist?
+          tmp_home_path.mkpath
+          tmp_home_path.chmod(0o777)
+        end
+        tmp_home_path.join(login).tap(&:mkpath)
+      end
+    rescue => e
+      raise e.exception("#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}")
+    end
+
     def user_bundle_path
-      Pathname.new(Bundler.rubygems.user_home).join(".bundle")
+      Pathname.new(user_home).join(".bundle")
     end
 
     def home
@@ -193,6 +234,14 @@ module Bundler
 
     def rm_rf(path)
       FileUtils.remove_entry_secure(path) if path && File.exist?(path)
+    rescue ArgumentError
+      message = <<EOF
+It is a security vulnerability to allow your home directory to be world-writable, and bundler can not continue.
+You should probably consider fixing this issue by running `chmod o-w ~` on *nix.
+Please refer to http://ruby-doc.org/stdlib-2.1.2/libdoc/fileutils/rdoc/FileUtils.html#method-c-remove_entry_secure for details.
+EOF
+      File.world_writable?(path) ? Bundler.ui.warn(message) : raise
+      raise PathError, "Please fix the world-writable issue with your #{path} directory"
     end
 
     def settings
@@ -209,10 +258,11 @@ module Bundler
     # @deprecated Use `original_env` instead
     # @return [Hash] Environment with all bundler-related variables removed
     def clean_env
+      Bundler::SharedHelpers.major_deprecation("`Bundler.clean_env` has weird edge cases, use `.original_env` instead")
       env = original_env
 
-      if env.key?("BUNDLE_ORIG_MANPATH")
-        env["MANPATH"] = env["BUNDLE_ORIG_MANPATH"]
+      if env.key?("BUNDLER_ORIG_MANPATH")
+        env["MANPATH"] = env["BUNDLER_ORIG_MANPATH"]
       end
 
       env.delete_if {|k, _| k[0, 7] == "BUNDLE_" }
@@ -246,6 +296,11 @@ module Bundler
       with_clean_env { Kernel.exec(*args) }
     end
 
+    def local_platform
+      return Gem::Platform::RUBY if settings[:force_ruby_platform]
+      Gem::Platform.local
+    end
+
     def default_gemfile
       SharedHelpers.default_gemfile
     end
@@ -259,9 +314,9 @@ module Bundler
     end
 
     def system_bindir
-      # Gem.bindir doesn't always return the location that Rubygems will install
-      # system binaries. If you put '-n foo' in your .gemrc, Rubygems will
-      # install binstubs there instead. Unfortunately, Rubygems doesn't expose
+      # Gem.bindir doesn't always return the location that RubyGems will install
+      # system binaries. If you put '-n foo' in your .gemrc, RubyGems will
+      # install binstubs there instead. Unfortunately, RubyGems doesn't expose
       # that directory at all, so rather than parse .gemrc ourselves, we allow
       # the directory to be set as well, via `bundle config bindir foo`.
       Bundler.settings[:system_bindir] || Bundler.rubygems.gem_bindir
@@ -273,7 +328,7 @@ module Bundler
       sudo_present = which "sudo" if settings.allow_sudo?
 
       if sudo_present
-        # the bundle path and subdirectories need to be writable for Rubygems
+        # the bundle path and subdirectories need to be writable for RubyGems
         # to be able to unpack and install gems without exploding
         path = bundle_path
         path = path.parent until path.exist?
@@ -317,16 +372,22 @@ module Bundler
     def sudo(str)
       SUDO_MUTEX.synchronize do
         prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
-        Your user account isn't allowed to install to the system Rubygems.
+        Your user account isn't allowed to install to the system RubyGems.
         You can cancel this installation and run:
 
             bundle install --path vendor/bundle
 
         to install the gems into ./vendor/bundle/, or you can enter your password
-        and install the bundled gems to Rubygems using sudo.
+        and install the bundled gems to RubyGems using sudo.
 
         Password:
         PROMPT
+
+        unless @prompted_for_sudo ||= system(%(sudo -k -p "#{prompt}" true))
+          raise SudoNotPermittedError,
+            "Bundler requires sudo access to install at the moment. " \
+            "Try installing again, granting Bundler sudo access when prompted, or installing into a different path."
+        end
 
         `sudo -p "#{prompt}" #{str}`
       end
@@ -353,20 +414,20 @@ module Bundler
 
     def load_gemspec_uncached(file, validate = false)
       path = Pathname.new(file)
-      # Eval the gemspec from its parent directory, because some gemspecs
-      # depend on "./" relative paths.
-      SharedHelpers.chdir(path.dirname.to_s) do
-        contents = path.read
-        spec = if contents[0..2] == "---" # YAML header
-          eval_yaml_gemspec(path, contents)
-        else
+      contents = path.read
+      spec = if contents.start_with?("---") # YAML header
+        eval_yaml_gemspec(path, contents)
+      else
+        # Eval the gemspec from its parent directory, because some gemspecs
+        # depend on "./" relative paths.
+        SharedHelpers.chdir(path.dirname.to_s) do
           eval_gemspec(path, contents)
         end
-        return unless spec
-        spec.loaded_from = path.expand_path.to_s
-        Bundler.rubygems.validate(spec) if validate
-        spec
       end
+      return unless spec
+      spec.loaded_from = path.expand_path.to_s
+      Bundler.rubygems.validate(spec) if validate
+      spec
     end
 
     def clear_gemspec_cache
@@ -378,10 +439,33 @@ module Bundler
       @git_present = Bundler.which("git") || Bundler.which("git.exe")
     end
 
+    def feature_flag
+      @feature_flag ||= FeatureFlag.new(VERSION)
+    end
+
     def reset!
+      reset_paths!
+      Plugin.reset!
+      reset_rubygems!
+    end
+
+    def reset_paths!
       @root = nil
       @settings = nil
       @definition = nil
+      @setup = nil
+      @load = nil
+      @locked_gems = nil
+      @bundle_path = nil
+      @bin_path = nil
+      @user_home = nil
+    end
+
+    def reset_rubygems!
+      return unless defined?(@rubygems) && @rubygems
+      rubygems.undo_replacements
+      rubygems.reset
+      @rubygems = nil
     end
 
   private
@@ -397,31 +481,33 @@ module Bundler
     def eval_gemspec(path, contents)
       eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
     rescue ScriptError, StandardError => e
-      original_line = e.backtrace.find {|line| line.include?(path.to_s) }
-      msg = String.new
-      msg << "There was a #{e.class} while loading #{path.basename}: \n#{e.message}"
-      msg << " from\n  #{original_line}" if original_line
-      msg << "\n"
+      msg = "There was an error while loading `#{path.basename}`: #{e.message}"
 
       if e.is_a?(LoadError) && RUBY_VERSION >= "1.9"
-        msg << "\nDoes it try to require a relative path? That's been removed in Ruby 1.9."
+        msg += "\nDoes it try to require a relative path? That's been removed in Ruby 1.9"
       end
 
-      raise GemspecError, msg
+      raise GemspecError, Dsl::DSLError.new(msg, path, e.backtrace, contents)
     end
 
     def configure_gem_home_and_path
-      blank_home = ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
+      configure_gem_path
+      configure_gem_home
+      bundle_path
+    end
+
+    def configure_gem_path(env = ENV, settings = self.settings)
+      blank_home = env["GEM_HOME"].nil? || env["GEM_HOME"].empty?
       if settings[:disable_shared_gems]
-        ENV["GEM_PATH"] = ""
+        # this needs to be empty string to cause
+        # PathSupport.split_gem_path to only load up the
+        # Bundler --path setting as the GEM_PATH.
+        env["GEM_PATH"] = ""
       elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
         paths = possibles.flatten.compact.uniq.reject(&:empty?)
-        ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
+        env["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
       end
-
-      configure_gem_home
-      bundle_path
     end
 
     def configure_gem_home
@@ -432,15 +518,8 @@ module Bundler
         nil
       end
 
-      ENV["GEM_HOME"] = File.expand_path(bundle_path, root)
+      Bundler::SharedHelpers.set_env "GEM_HOME", File.expand_path(bundle_path, root)
       Bundler.rubygems.clear_paths
-    end
-
-    def upgrade_lockfile
-      lockfile = default_lockfile
-      return unless lockfile.exist? && lockfile.read(3) == "---"
-      Bundler.ui.warn "Detected Gemfile.lock generated by 0.9, deleting..."
-      lockfile.rmtree
     end
 
     # @param env [Hash]

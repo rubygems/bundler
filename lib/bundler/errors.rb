@@ -3,6 +3,16 @@ module Bundler
   class BundlerError < StandardError
     def self.status_code(code)
       define_method(:status_code) { code }
+      if match = BundlerError.all_errors.find {|_k, v| v == code }
+        error, _ = match
+        raise ArgumentError,
+          "Trying to register #{self} for status code #{code} but #{error} is already registered"
+      end
+      BundlerError.all_errors[self] = code
+    end
+
+    def self.all_errors
+      @all_errors ||= {}
     end
   end
 
@@ -30,13 +40,21 @@ module Bundler
   class GemspecError < BundlerError; status_code(14); end
   class InvalidOption < BundlerError; status_code(15); end
   class ProductionError < BundlerError; status_code(16); end
-  class HTTPError < BundlerError; status_code(17); end
+  class HTTPError < BundlerError
+    status_code(17)
+    def filter_uri(uri)
+      URICredentialsFilter.credential_filtered_uri(uri)
+    end
+  end
   class RubyVersionMismatch < BundlerError; status_code(18); end
   class SecurityError < BundlerError; status_code(19); end
   class LockfileError < BundlerError; status_code(20); end
   class CyclicDependencyError < BundlerError; status_code(21); end
   class GemfileLockNotFound < BundlerError; status_code(22); end
-  class PluginError < BundlerError; status_code(23); end
+  class PluginError < BundlerError; status_code(29); end
+  class SudoNotPermittedError < BundlerError; status_code(30); end
+  class ThreadCreationError < BundlerError; status_code(33); end
+  class APIResponseMismatchError < BundlerError; status_code(34); end
   class GemfileEvalError < GemfileError; end
   class MarshalError < StandardError; end
 
@@ -115,5 +133,25 @@ module Bundler
     end
 
     status_code(28)
+  end
+
+  class NoSpaceOnDeviceError < PermissionError
+    def message
+      "There was an error while trying to #{action} `#{@path}`. " \
+      "There was insufficient space remaining on the device."
+    end
+
+    status_code(31)
+  end
+
+  class GenericSystemCallError < BundlerError
+    attr_reader :underlying_error
+
+    def initialize(underlying_error, message)
+      @underlying_error = underlying_error
+      super("#{message}\nThe underlying system error is #{@underlying_error.class}: #{@underlying_error}")
+    end
+
+    status_code(32)
   end
 end

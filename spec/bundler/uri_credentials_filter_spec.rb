@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::URICredentialsFilter do
+RSpec.describe Bundler::URICredentialsFilter do
   subject { described_class }
 
   describe "#credential_filtered_uri" do
@@ -98,7 +97,8 @@ describe Bundler::URICredentialsFilter do
 
       it "returns the string without the sensitive credentials" do
         expect(subject.credential_filtered_string(str_to_filter, uri)).to eq(
-          "This is a git message containing a uri https://x-oauth-basic@github.com/company/private-repo!")
+          "This is a git message containing a uri https://x-oauth-basic@github.com/company/private-repo!"
+        )
       end
     end
 

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
 require "bundler/cli"
 
-describe "bundle executable" do
+RSpec.describe "bundle executable" do
   it "returns non-zero exit status when passed unrecognized options" do
     bundle "--invalid_argument"
     expect(exitstatus).to_not be_zero if exitstatus
@@ -14,7 +13,7 @@ describe "bundle executable" do
   end
 
   it "looks for a binary and executes it if it's named bundler-<task>" do
-    File.open(tmp("bundler-testtasks"), "w", 0755) do |f|
+    File.open(tmp("bundler-testtasks"), "w", 0o755) do |f|
       f.puts "#!/usr/bin/env ruby\nputs 'Hello, world'\n"
     end
 
@@ -35,7 +34,7 @@ describe "bundle executable" do
 
       bundle :install, :env => { "BUNDLE_GEMFILE" => "" }
 
-      should_be_installed "rack 1.0.0"
+      expect(the_bundle).to include_gems "rack 1.0.0"
     end
   end
 
@@ -53,5 +52,82 @@ describe "bundle executable" do
       bundle :install, :env => { "RUBYGEMS_GEMDEPS" => "" }
       expect(out).not_to include("RUBYGEMS_GEMDEPS")
     end
+  end
+
+  context "with --verbose" do
+    it "prints the running command" do
+      bundle! "config", :verbose => true
+      expect(out).to start_with("Running `bundle config --verbose` with bundler #{Bundler::VERSION}")
+    end
+  end
+
+  describe "printing the outdated warning" do
+    shared_examples_for "no warning" do
+      it "prints no warning" do
+        bundle "fail"
+        expect(err + out).to eq("Could not find command \"fail\".")
+      end
+    end
+
+    let(:bundler_version) { "1.1" }
+    let(:latest_version) { nil }
+    before do
+      simulate_bundler_version(bundler_version)
+      if latest_version
+        info_path = home(".bundle/cache/compact_index/rubygems.org.443.29b0360b937aa4d161703e6160654e47/info/bundler")
+        info_path.parent.mkpath
+        info_path.open("w") {|f| f.write "#{latest_version}\n" }
+      end
+    end
+
+    context "when there is no latest version" do
+      include_examples "no warning"
+    end
+
+    context "when the latest version is equal to the current version" do
+      let(:latest_version) { bundler_version }
+      include_examples "no warning"
+    end
+
+    context "when the latest version is less than the current version" do
+      let(:latest_version) { "0.9" }
+      include_examples "no warning"
+    end
+
+    context "when the latest version is greater than the current version" do
+      let(:latest_version) { "2.0" }
+      it "prints the version warning" do
+        bundle "fail"
+        expect(err + out).to eq(<<-EOS.strip)
+The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
+To update, run `gem install bundler`
+Could not find command "fail".
+        EOS
+      end
+
+      context "and disable_version_check is set" do
+        before { bundle! "config disable_version_check true" }
+        include_examples "no warning"
+      end
+
+      context "and is a pre-release" do
+        let(:latest_version) { "2.0.0.pre.4" }
+        it "prints the version warning" do
+          bundle "fail"
+          expect(err + out).to eq(<<-EOS.strip)
+The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
+To update, run `gem install bundler --pre`
+Could not find command "fail".
+          EOS
+        end
+      end
+    end
+  end
+end
+
+RSpec.describe "bundler executable" do
+  it "shows the bundler version just as the `bundle` executable does" do
+    bundler "--version"
+    expect(out).to eq("Bundler version #{Bundler::VERSION}")
   end
 end

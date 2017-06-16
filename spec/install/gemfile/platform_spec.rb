@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle install across platforms" do
+RSpec.describe "bundle install across platforms" do
   it "maintains the same lockfile if all gems are compatible across platforms" do
     lockfile <<-G
       GEM
@@ -22,7 +21,7 @@ describe "bundle install across platforms" do
       gem "rack"
     G
 
-    should_be_installed "rack 0.9.1"
+    expect(the_bundle).to include_gems "rack 0.9.1"
   end
 
   it "pulls in the correct platform specific gem" do
@@ -48,7 +47,7 @@ describe "bundle install across platforms" do
       gem "platform_specific"
     G
 
-    should_be_installed "platform_specific 1.0 JAVA"
+    expect(the_bundle).to include_gems "platform_specific 1.0 JAVA"
   end
 
   it "works with gems that have different dependencies" do
@@ -59,7 +58,7 @@ describe "bundle install across platforms" do
       gem "nokogiri"
     G
 
-    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
 
     simulate_new_machine
 
@@ -70,8 +69,8 @@ describe "bundle install across platforms" do
       gem "nokogiri"
     G
 
-    should_be_installed "nokogiri 1.4.2"
-    should_not_be_installed "weakling"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2"
+    expect(the_bundle).not_to include_gems "weakling"
   end
 
   it "works the other way with gems that have different dependencies" do
@@ -85,7 +84,33 @@ describe "bundle install across platforms" do
     simulate_platform "java"
     bundle "install"
 
-    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
+  end
+
+  it "works with gems that have extra platform-specific runtime dependencies" do
+    simulate_platform x64_mac
+
+    update_repo2 do
+      build_gem "facter", "2.4.6"
+      build_gem "facter", "2.4.6" do |s|
+        s.platform = "universal-darwin"
+        s.add_runtime_dependency "CFPropertyList"
+      end
+      build_gem "CFPropertyList"
+    end
+
+    install_gemfile! <<-G
+      source "file://#{gem_repo2}"
+
+      gem "facter"
+    G
+
+    expect(out).to include "Unable to use the platform-specific (universal-darwin) version of facter (2.4.6) " \
+      "because it has different dependencies from the ruby version. " \
+      "To use the platform-specific version of the gem, run `bundle config specific_platform true` and install again."
+
+    expect(the_bundle).to include_gem "facter 2.4.6"
+    expect(the_bundle).not_to include_gem "CFPropertyList"
   end
 
   it "fetches gems again after changing the version of Ruby" do
@@ -105,7 +130,7 @@ describe "bundle install across platforms" do
   end
 end
 
-describe "bundle install with platform conditionals" do
+RSpec.describe "bundle install with platform conditionals" do
   it "installs gems tagged w/ the current platforms" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -115,7 +140,7 @@ describe "bundle install with platform conditionals" do
       end
     G
 
-    should_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2"
   end
 
   it "does not install gems tagged w/ another platforms" do
@@ -127,8 +152,8 @@ describe "bundle install with platform conditionals" do
       end
     G
 
-    should_be_installed "rack 1.0"
-    should_not_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "rack 1.0"
+    expect(the_bundle).not_to include_gems "nokogiri 1.4.2"
   end
 
   it "installs gems tagged w/ the current platforms inline" do
@@ -136,7 +161,7 @@ describe "bundle install with platform conditionals" do
       source "file://#{gem_repo1}"
       gem "nokogiri", :platforms => :#{local_tag}
     G
-    should_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2"
   end
 
   it "does not install gems tagged w/ another platforms inline" do
@@ -145,8 +170,8 @@ describe "bundle install with platform conditionals" do
       gem "rack"
       gem "nokogiri", :platforms => :#{not_local_tag}
     G
-    should_be_installed "rack 1.0"
-    should_not_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "rack 1.0"
+    expect(the_bundle).not_to include_gems "nokogiri 1.4.2"
   end
 
   it "installs gems tagged w/ the current platform inline" do
@@ -154,7 +179,7 @@ describe "bundle install with platform conditionals" do
       source "file://#{gem_repo1}"
       gem "nokogiri", :platform => :#{local_tag}
     G
-    should_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).to include_gems "nokogiri 1.4.2"
   end
 
   it "doesn't install gems tagged w/ another platform inline" do
@@ -162,7 +187,7 @@ describe "bundle install with platform conditionals" do
       source "file://#{gem_repo1}"
       gem "nokogiri", :platform => :#{not_local_tag}
     G
-    should_not_be_installed "nokogiri 1.4.2"
+    expect(the_bundle).not_to include_gems "nokogiri 1.4.2"
   end
 
   it "does not blow up on sources with all platform-excluded specs" do
@@ -184,7 +209,7 @@ describe "bundle install with platform conditionals" do
 
     gemfile <<-G
       source "file://#{gem_repo1}"
-      gem "some_gem", platform: :rbx
+      gem "some_gem", :platform => :rbx
     G
 
     bundle "install --local"
@@ -204,9 +229,26 @@ describe "bundle install with platform conditionals" do
     bundle "install --local"
     expect(out).not_to match(/Could not find gem 'some_gem/)
   end
+
+  it "prints a helpful warning when a dependency is unused on any platform" do
+    simulate_platform "ruby"
+    simulate_ruby_engine "ruby"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", :platform => [:mingw, :mswin, :x64_mingw, :jruby]
+    G
+
+    bundle! "install"
+
+    expect(out).to include <<-O.strip
+The dependency #{Gem::Dependency.new("rack", ">= 0")} will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.
+    O
+  end
 end
 
-describe "when a gem has no architecture" do
+RSpec.describe "when a gem has no architecture" do
   it "still installs correctly" do
     simulate_platform mswin
 
@@ -216,7 +258,7 @@ describe "when a gem has no architecture" do
       gem "rcov"
     G
 
-    bundle :install, :fakeweb => "windows"
-    should_be_installed "rcov 1.0.0"
+    bundle :install, :artifice => "windows"
+    expect(the_bundle).to include_gems "rcov 1.0.0"
   end
 end

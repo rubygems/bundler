@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe Bundler::Fetcher::Downloader do
+RSpec.describe Bundler::Fetcher::Downloader do
   let(:connection)     { double(:connection) }
   let(:redirect_limit) { 5 }
   let(:uri)            { URI("http://www.uri-to-fetch.com/api/v2/endpoint") }
@@ -31,7 +30,7 @@ describe Bundler::Fetcher::Downloader do
       let(:http_response) { Net::HTTPSuccess.new("1.1", 200, "Success") }
 
       it "should log the HTTP response code and message to debug" do
-        expect(Bundler).to receive_message_chain(:ui, :debug).with("HTTP 200 Success")
+        expect(Bundler).to receive_message_chain(:ui, :debug).with("HTTP 200 Success #{uri}")
         subject.fetch(uri, options, counter)
       end
     end
@@ -222,7 +221,19 @@ describe Bundler::Fetcher::Downloader do
 
         it "should raise a Bundler::HTTPError" do
           expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
-            "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint")
+            "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint (other error about network)")
+        end
+
+        context "when the there are credentials provided in the request" do
+          let(:uri) { URI("http://username:password@www.uri-to-fetch.com/api/v2/endpoint") }
+          before do
+            allow(net_http_get).to receive(:basic_auth).with("username", "password")
+          end
+
+          it "should raise a Bundler::HTTPError that doesn't contain the password" do
+            expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
+              "Network error while fetching http://username@www.uri-to-fetch.com/api/v2/endpoint (other error about network)")
+          end
         end
       end
 
@@ -231,7 +242,7 @@ describe Bundler::Fetcher::Downloader do
 
         it "should raise a Bundler::Fetcher::HTTPError" do
           expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
-            "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint")
+            "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint (#{message})")
         end
       end
     end

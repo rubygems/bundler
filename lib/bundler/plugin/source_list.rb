@@ -19,6 +19,10 @@ module Bundler
       def add_rubygems_source(options = {})
         add_source_to_list Plugin::Installer::Rubygems.new(options), @rubygems_sources
       end
+
+      def all_sources
+        path_sources + git_sources + rubygems_sources
+      end
     end
   end
 end

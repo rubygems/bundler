@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle clean" do
+RSpec.describe "bundle clean" do
   def should_have_gems(*gems)
     gems.each do |g|
       expect(vendored_gems("gems/#{g}")).to exist
@@ -37,7 +36,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("Removing foo (1.0)")
+    expect(out).to include("Removing foo (1.0)")
 
     should_have_gems "thin-1.0", "rack-1.0.0"
     should_not_have_gems "foo-1.0"
@@ -65,7 +64,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("Removing rack (0.9.1)")
+    expect(out).to include("Removing rack (0.9.1)")
 
     should_have_gems "foo-1.0", "rack-1.0.0"
     should_not_have_gems "rack-0.9.1"
@@ -93,7 +92,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("Removing rack (1.0.0)")
+    expect(out).to include("Removing rack (1.0.0)")
 
     should_have_gems "foo-1.0", "rack-0.9.1"
     should_not_have_gems "rack-1.0.0"
@@ -116,7 +115,7 @@ describe "bundle clean" do
     bundle "install --without test_group"
     bundle :clean
 
-    expect(out).to eq("Removing rack (1.0.0)")
+    expect(out).to include("Removing rack (1.0.0)")
 
     should_have_gems "foo-1.0"
     should_not_have_gems "rack-1.0.0"
@@ -171,7 +170,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("Removing foo (#{revision[0..11]})")
+    expect(out).to include("Removing foo (#{revision[0..11]})")
 
     expect(vendored_gems("gems/rack-1.0.0")).to exist
     expect(vendored_gems("bundler/gems/foo-#{revision[0..11]}")).not_to exist
@@ -204,7 +203,7 @@ describe "bundle clean" do
     bundle "update"
     bundle :clean
 
-    expect(out).to eq("Removing foo-bar (#{revision[0..11]})")
+    expect(out).to include("Removing foo-bar (#{revision[0..11]})")
 
     expect(vendored_gems("gems/rack-1.0.0")).to exist
     expect(vendored_gems("bundler/gems/foo-bar-#{revision[0..11]}")).not_to exist
@@ -228,7 +227,7 @@ describe "bundle clean" do
 
     bundle "install --path vendor/bundle"
     bundle :clean
-    expect(out).to eq("")
+    expect(out).to include("")
 
     expect(vendored_gems("bundler/gems/rails-#{revision[0..11]}")).to exist
   end
@@ -252,7 +251,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("")
+    expect(out).to include("")
     expect(vendored_gems("bundler/gems/foo-#{revision[0..11]}")).to exist
     digest = Digest::SHA1.hexdigest(git_path.to_s)
     expect(vendored_gems("cache/bundler/git/foo-#{digest}")).to_not exist
@@ -452,7 +451,7 @@ describe "bundle clean" do
     bundle :install
     bundle "clean --force"
 
-    expect(out).to eq("Removing foo (1.0)")
+    expect(out).to include("Removing foo (1.0)")
     sys_exec "gem list"
     expect(out).not_to include("foo (1.0)")
     expect(out).to include("rack (1.0.0)")
@@ -460,7 +459,7 @@ describe "bundle clean" do
 
   describe "when missing permissions" do
     after do
-      FileUtils.chmod(0755, default_bundle_path("cache"))
+      FileUtils.chmod(0o755, default_bundle_path("cache"))
     end
     it "returns a helpful error message" do
       gemfile <<-G
@@ -479,7 +478,7 @@ describe "bundle clean" do
       bundle :install
 
       system_cache_path = default_bundle_path("cache")
-      FileUtils.chmod(0500, system_cache_path)
+      FileUtils.chmod(0o500, system_cache_path)
 
       bundle :clean, :force => true
 
@@ -567,7 +566,7 @@ describe "bundle clean" do
     expect(exitstatus).to eq(0) if exitstatus
   end
 
-  it "doesn't remove gems in dry-run mode" do
+  it "doesn't remove gems in dry-run mode with path set" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -587,8 +586,38 @@ describe "bundle clean" do
 
     bundle "clean --dry-run"
 
-    expect(out).not_to eq("Removing foo (1.0)")
-    expect(out).to eq("Would have removed foo (1.0)")
+    expect(out).not_to include("Removing foo (1.0)")
+    expect(out).to include("Would have removed foo (1.0)")
+
+    should_have_gems "thin-1.0", "rack-1.0.0", "foo-1.0"
+
+    expect(vendored_gems("bin/rackup")).to exist
+  end
+
+  it "doesn't remove gems in dry-run mode with no path set" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "foo"
+    G
+
+    bundle "install --path vendor/bundle --no-clean"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+    G
+
+    bundle :install
+
+    bundle "configuration --delete path"
+
+    bundle "clean --dry-run"
+
+    expect(out).not_to include("Removing foo (1.0)")
+    expect(out).to include("Would have removed foo (1.0)")
 
     should_have_gems "thin-1.0", "rack-1.0.0", "foo-1.0"
 
@@ -616,8 +645,8 @@ describe "bundle clean" do
 
     bundle "clean"
 
-    expect(out).to eq("Removing foo (1.0)")
-    expect(out).not_to eq("Would have removed foo (1.0)")
+    expect(out).to include("Removing foo (1.0)")
+    expect(out).not_to include("Would have removed foo (1.0)")
 
     should_have_gems "thin-1.0", "rack-1.0.0"
     should_not_have_gems "foo-1.0"

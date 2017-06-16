@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-describe "bundle platform" do
+RSpec.describe "bundle platform" do
   context "without flags" do
     it "returns all the output" do
       gemfile <<-G
@@ -494,7 +493,7 @@ G
       end
 
       bundle "update"
-      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+      expect(the_bundle).to include_gems "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
     it "updates fine with any engine" do
@@ -511,7 +510,7 @@ G
         end
 
         bundle "update"
-        should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+        expect(the_bundle).to include_gems "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
       end
     end
 
@@ -929,7 +928,7 @@ G
         #{ruby_version_correct}
       G
 
-      bundle "console" do |input|
+      bundle "console" do |input, _, _|
         input.puts("puts RACK")
         input.puts("exit")
       end
@@ -947,7 +946,7 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        bundle "console" do |input|
+        bundle "console" do |input, _, _|
           input.puts("puts RACK")
           input.puts("exit")
         end

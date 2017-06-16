@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require "uri"
 require "rubygems/user_interaction"
-require "rubygems/spec_fetcher"
 
 module Bundler
   class Source
@@ -134,13 +133,15 @@ module Bundler
 
           installed_spec = nil
           Bundler.rubygems.preserve_paths do
-            installed_spec = Bundler::RubyGemsGemInstaller.new(
+            installed_spec = Bundler::RubyGemsGemInstaller.at(
               path,
               :install_dir         => install_path.to_s,
               :bin_dir             => bin_path.to_s,
               :ignore_dependencies => true,
               :wrappers            => true,
-              :env_shebang         => true
+              :env_shebang         => true,
+              :build_args          => opts[:build_args],
+              :bundler_expected_checksum => spec.respond_to?(:checksum) && spec.checksum
             ).install
           end
           spec.full_gem_path = installed_spec.full_gem_path
@@ -288,9 +289,15 @@ module Bundler
           idx = Index.new
           have_bundler = false
           Bundler.rubygems.all_specs.reverse_each do |spec|
-            next if spec.name == "bundler" && spec.version.to_s != VERSION
-            have_bundler = true if spec.name == "bundler"
+            if spec.name == "bundler"
+              next unless spec.version.to_s == VERSION
+              have_bundler = true
+            end
             spec.source = self
+            if Bundler.rubygems.spec_missing_extensions?(spec, false)
+              Bundler.ui.debug "Source #{self} is ignoring #{spec} because it is missing extensions"
+              next
+            end
             idx << spec
           end
 
@@ -321,6 +328,10 @@ module Bundler
             next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
             s ||= Bundler.rubygems.spec_from_gem(gemfile)
             s.source = self
+            if Bundler.rubygems.spec_missing_extensions?(s, false)
+              Bundler.ui.debug "Source #{self} is ignoring #{s} because it is missing extensions"
+              next
+            end
             idx << s
           end
         end
@@ -401,6 +412,7 @@ module Bundler
         return false unless spec.remote
         uri = spec.remote.uri
         spec.fetch_platform
+        Bundler.ui.confirm("Fetching #{version_message(spec)}")
 
         download_path = requires_sudo? ? Bundler.tmp(spec.full_name) : rubygems_dir
         gem_path = "#{rubygems_dir}/cache/#{spec.full_name}.gem"

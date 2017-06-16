@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "bundler/shared_helpers"
+require "shellwords"
 
 module Spec
   module Builders
@@ -17,7 +18,7 @@ module Spec
 
     def build_repo1
       build_repo gem_repo1 do
-        build_gem "rack", %w(0.9.1 1.0.0) do |s|
+        build_gem "rack", %w[0.9.1 1.0.0] do |s|
           s.executables = "rackup"
           s.post_install_message = "Rack's post install message"
         end
@@ -56,7 +57,7 @@ module Spec
         build_gem "activeresource", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activesupport", %w(1.2.3 2.3.2 2.3.5)
+        build_gem "activesupport", %w[1.2.3 2.3.2 2.3.5]
 
         build_gem "activemerchant" do |s|
           s.add_dependency "activesupport", ">= 2.0.0"
@@ -79,8 +80,8 @@ module Spec
         end
 
         build_gem "platform_specific" do |s|
-          s.platform = Gem::Platform.local
-          s.write "lib/platform_specific.rb", "PLATFORM_SPECIFIC = '1.0.0 #{Gem::Platform.local}'"
+          s.platform = Bundler.local_platform
+          s.write "lib/platform_specific.rb", "PLATFORM_SPECIFIC = '1.0.0 #{Bundler.local_platform}'"
         end
 
         build_gem "platform_specific" do |s|
@@ -204,7 +205,7 @@ module Spec
             else
               specs = Gem.source_index.find_name('')
             end
-            specs.each do |gem|
+            specs.sort_by(&:name).each do |gem|
               puts gem.full_name
             end
           Y
@@ -255,7 +256,7 @@ module Spec
         end
 
         # Capistrano did this (at least until version 2.5.10)
-        # Rubygems 2.2 doesn't allow the specifying of a dependency twice
+        # RubyGems 2.2 doesn't allow the specifying of a dependency twice
         # See https://github.com/rubygems/rubygems/commit/03dbac93a3396a80db258d9bc63500333c25bd2f
         build_gem "double_deps", "1.0", :skip_validation => true do |s|
           s.add_dependency "net-ssh", ">= 1.0.0"
@@ -368,14 +369,19 @@ module Spec
     end
 
     def update_repo(path)
+      if path == gem_repo1 && caller.first.split(" ").last == "`build_repo`"
+        raise "Updating gem_repo1 is unsupported -- use gem_repo2 instead"
+      end
       return unless block_given?
       @_build_path = "#{path}/gems"
+      @_build_repo = File.basename(path)
       yield
       with_gem_path_as Path.base_system_gems do
-        Dir.chdir(path) { gem_command :generate_index }
+        Dir.chdir(path) { gem_command! :generate_index }
       end
     ensure
       @_build_path = nil
+      @_build_repo = nil
     end
 
     def build_index(&block)
@@ -390,6 +396,8 @@ module Spec
           s.name     = name
           s.version  = Gem::Version.new(v)
           s.platform = platform
+          s.authors  = ["no one in particular"]
+          s.summary  = "a gemspec used only for testing"
           DepBuilder.run(s, &block) if block_given?
         end
       end
@@ -415,8 +423,9 @@ module Spec
     end
 
     def update_git(name, *args, &block)
+      opts = args.last.is_a?(Hash) ? args.last : {}
       spec = build_with(GitUpdater, name, args, &block)
-      GitReader.new lib_path(spec.full_name)
+      GitReader.new(opts[:path] || lib_path(spec.full_name))
     end
 
     def build_plugin(name, *args, &blk)
@@ -427,11 +436,13 @@ module Spec
 
     def build_with(builder, name, args, &blk)
       @_build_path ||= nil
+      @_build_repo ||= nil
       options  = args.last.is_a?(Hash) ? args.pop : {}
       versions = args.last || "1.0"
       spec     = nil
 
       options[:path] ||= @_build_path
+      options[:source] ||= @_build_repo
 
       Array(versions).each do |version|
         spec = builder.new(self, name, version)
@@ -495,6 +506,10 @@ module Spec
         @spec.add_runtime_dependency(name, requirements)
       end
 
+      def development(name, requirements)
+        @spec.add_development_dependency(name, requirements)
+      end
+
       def required_ruby_version=(*reqs)
         @spec.required_ruby_version = *reqs
       end
@@ -531,8 +546,13 @@ module Spec
         @spec.executables = Array(val)
         @spec.executables.each do |file|
           executable = "#{@spec.bindir}/#{file}"
+          shebang = if Bundler.current_ruby.jruby?
+            "#!/usr/bin/env jruby\n"
+          else
+            "#!/usr/bin/env ruby\n"
+          end
           @spec.files << executable
-          write executable, "#!/usr/bin/env ruby\nrequire '#{@name}' ; puts #{@name.upcase}"
+          write executable, "#{shebang}require '#{@name}' ; puts #{Builders.constantize(@name)}"
         end
       end
 
@@ -576,7 +596,12 @@ module Spec
           @files["#{name}.gemspec"] = @spec.to_ruby
         end
 
-        @files = _default_files.merge(@files) unless options[:no_default]
+        unless options[:no_default]
+          gem_source = options[:source] || "path@#{path}"
+          @files = _default_files.
+                   merge("lib/#{name}/source.rb" => "#{Builders.constantize(name)}_SOURCE = #{gem_source.to_s.dump}").
+                   merge(@files)
+        end
 
         @spec.authors = ["no one"]
 
@@ -590,7 +615,10 @@ module Spec
       end
 
       def _default_files
-        @_default_files ||= { "lib/#{name}.rb" => "#{Builders.constantize(name)} = '#{version}'" }
+        @_default_files ||= begin
+          platform_string = " #{@spec.platform}" unless @spec.platform == Gem::Platform::RUBY
+          { "lib/#{name}.rb" => "#{Builders.constantize(name)} = '#{version}#{platform_string}'" }
+        end
       end
 
       def _default_path
@@ -601,7 +629,8 @@ module Spec
     class GitBuilder < LibBuilder
       def _build(options)
         path = options[:path] || _default_path
-        super(options.merge(:path => path))
+        source = options[:source] || "git@#{path}"
+        super(options.merge(:path => path, :source => source))
         Dir.chdir(path) do
           `git init`
           `git add *`
@@ -629,20 +658,23 @@ module Spec
 
       def _build(options)
         libpath = options[:path] || _default_path
+        update_gemspec = options[:gemspec] || false
+        source = options[:source] || "git@#{libpath}"
 
         Dir.chdir(libpath) do
           silently "git checkout master"
 
           if branch = options[:branch]
             raise "You can't specify `master` as the branch" if branch == "master"
+            escaped_branch = Shellwords.shellescape(branch)
 
-            if `git branch | grep #{branch}`.empty?
-              silently("git branch #{branch}")
+            if `git branch | grep #{escaped_branch}`.empty?
+              silently("git branch #{escaped_branch}")
             end
 
-            silently("git checkout #{branch}")
+            silently("git checkout #{escaped_branch}")
           elsif tag = options[:tag]
-            `git tag #{tag}`
+            `git tag #{Shellwords.shellescape(tag)}`
           elsif options[:remote]
             silently("git remote add origin file://#{options[:remote]}")
           elsif options[:push]
@@ -653,7 +685,7 @@ module Spec
           _default_files.keys.each do |path|
             _default_files[path] += "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
-          super(options.merge(:path => libpath, :gemspec => false))
+          super(options.merge(:path => libpath, :gemspec => update_gemspec, :source => source))
           `git add *`
           `git commit -m "BUMP"`
         end
