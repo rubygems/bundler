@@ -45,7 +45,10 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
       end
 
       context "when OpenSSL is FIPS-enabled", :ruby => ">= 2.0.0" do
-        before { stub_const("OpenSSL::OPENSSL_FIPS", true) }
+        before do
+          Bundler::SharedHelpers.remove_instance_variable(:@md5_available)
+          stub_const("OpenSSL::OPENSSL_FIPS", true)
+        end
 
         context "when FIPS-mode is active" do
           before do
