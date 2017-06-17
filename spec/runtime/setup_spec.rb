@@ -740,6 +740,44 @@ end
     expect(err).to lack_errors
   end
 
+  describe "$MANPATH" do
+    before do
+      build_repo4 do
+        build_gem "with_man" do |s|
+          s.write("man/man1/page.1", "MANPAGE")
+        end
+      end
+    end
+
+    context "when the user has one set" do
+      before { ENV["MANPATH"] = "/foo:" }
+
+      it "adds the gem's man dir to the MANPATH" do
+        install_gemfile! <<-G
+          source "file:#{gem_repo4}"
+          gem "with_man"
+        G
+
+        run! "puts ENV['MANPATH']"
+        expect(out).to eq("#{system_gem_path("gems/with_man-1.0/man")}:/foo")
+      end
+    end
+
+    context "when the user does not have one set" do
+      before { ENV.delete("MANPATH") }
+
+      it "adds the gem's man dir to the MANPATH" do
+        install_gemfile! <<-G
+          source "file:#{gem_repo4}"
+          gem "with_man"
+        G
+
+        run! "puts ENV['MANPATH']"
+        expect(out).to eq(system_gem_path("gems/with_man-1.0/man").to_s)
+      end
+    end
+  end
+
   it "should prepend gemspec require paths to $LOAD_PATH in order" do
     update_repo2 do
       build_gem("requirepaths") do |s|
