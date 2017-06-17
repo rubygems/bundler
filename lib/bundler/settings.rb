@@ -22,6 +22,7 @@ module Bundler
       frozen
       gem.coc
       gem.mit
+      global_gem_cache
       ignore_messages
       init_gems_rb
       major_deprecations
