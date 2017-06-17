@@ -9,6 +9,7 @@ module Bundler
       BUNDLER_VERSION
       GEM_HOME
       GEM_PATH
+      MANPATH
       PATH
       RUBYLIB
       RUBYOPT
