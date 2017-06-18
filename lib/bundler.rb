@@ -181,6 +181,12 @@ module Bundler
       raise e.exception("#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}")
     end
 
+    def xdg_home(type, alt)
+      xdg_path = Pathname.new(ENV.fetch("XDG_#{type}_HOME", alt)).join("bundler")
+      xdg_path.mkpath unless xdg_path.exist?
+      xdg_path
+    end
+
     def user_bundle_path
       Pathname.new(user_home).join(".bundle")
     end
@@ -202,7 +208,12 @@ module Bundler
     end
 
     def user_cache
-      user_bundle_path.join("cache")
+      legacy_path = user_bundle_path.join("cache")
+      if legacy_path.exist?
+        legacy_path
+      else
+        xdg_home("CACHE", user_home.join(".cache"))
+      end
     end
 
     def root
