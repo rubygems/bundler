@@ -145,7 +145,7 @@ module Bundler
         conflicting_groups = options[:without] & options[:with]
         unless conflicting_groups.empty?
           Bundler.ui.error "You can't list a group in both, --with and --without." \
-          "The offending groups are: #{conflicting_groups.join(", ")}."
+          " The offending groups are: #{conflicting_groups.join(", ")}."
           exit 1
         end
       end
