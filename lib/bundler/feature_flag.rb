@@ -14,6 +14,7 @@ module Bundler
 
     (1..10).each {|v| define_method("bundler_#{v}_mode?") { major_version >= v } }
 
+    settings_flag(:allow_bundler_dependency_conflicts) { bundler_2_mode? }
     settings_flag(:allow_offline_install) { bundler_2_mode? }
     settings_flag(:error_on_stderr) { bundler_2_mode? }
     settings_flag(:init_gems_rb) { bundler_2_mode? }
