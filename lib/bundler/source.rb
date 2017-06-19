@@ -60,5 +60,13 @@ module Bundler
     def earlier_version?(spec_version, locked_spec_version)
       Gem::Version.new(spec_version) < Gem::Version.new(locked_spec_version)
     end
+
+    def print_using_message(message)
+      if !message.include?("(was ") && Bundler.feature_flag.suppress_install_using_messages?
+        Bundler.ui.debug message
+      else
+        Bundler.ui.info message
+      end
+    end
   end
 end

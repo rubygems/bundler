@@ -106,7 +106,7 @@ module Bundler
         end
 
         if installed?(spec) && !force
-          Bundler.ui.info "Using #{version_message(spec)}"
+          print_using_message "Using #{version_message(spec)}"
           return nil # no post-install message
         end
 

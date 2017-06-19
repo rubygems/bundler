@@ -169,7 +169,7 @@ module Bundler
       def install(spec, options = {})
         force = options[:force]
 
-        Bundler.ui.info "Using #{version_message(spec)} from #{self}"
+        print_using_message "Using #{version_message(spec)} from #{self}"
 
         if requires_checkout? && !@copied && !force
           Bundler.ui.debug "  * Checking out revision: #{ref}"
