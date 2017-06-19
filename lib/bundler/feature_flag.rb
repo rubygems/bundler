@@ -20,6 +20,7 @@ module Bundler
     settings_flag(:only_update_to_newer_versions) { bundler_2_mode? }
     settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }
     settings_flag(:prefer_gems_rb) { bundler_2_mode? }
+    settings_flag(:unlock_source_unlocks_spec) { !bundler_2_mode? }
     settings_flag(:update_requires_all_flag) { bundler_2_mode? }
 
     def initialize(bundler_version)

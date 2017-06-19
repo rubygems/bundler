@@ -216,6 +216,21 @@ RSpec.describe "bundle update" do
       bundle "update --source activesupport"
       expect(the_bundle).to include_gems "activesupport 3.0"
     end
+
+    context "with unlock_source_unlocks_spec set to false" do
+      before { bundle! "config unlock_source_unlocks_spec false" }
+
+      it "should not update gems not included in the source that happen to have the same name" do
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport"
+        G
+        update_repo2 { build_gem "activesupport", "3.0" }
+
+        bundle "update --source activesupport"
+        expect(the_bundle).not_to include_gems "activesupport 3.0"
+      end
+    end
   end
 
   context "when there is a child dependency that is also in the gemfile" do
