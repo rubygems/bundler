@@ -621,10 +621,16 @@ module Bundler
     def print_command
       return unless ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] || Bundler.ui.debug?
       _, _, config = @_initializer
-      current_command = config[:current_command].name
-      return if %w[exec version check platform show help].include?(current_command)
-      command = ["bundle", current_command] + args
-      command << Thor::Options.to_switches(options)
+      current_command = config[:current_command]
+      command_name = current_command.name
+      return if %w[exec version check platform show help].include?(command_name)
+      command = ["bundle", command_name] + args
+      options_to_print = options.dup
+      options_to_print.delete_if do |k, v|
+        next unless o = current_command.options[k]
+        o.default == v
+      end
+      command << Thor::Options.to_switches(options_to_print.sort_by(&:first)).strip
       command.reject!(&:empty?)
       Bundler.ui.info "Running `#{command * " "}` with bundler #{Bundler::VERSION}"
     end
