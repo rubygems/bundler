@@ -207,7 +207,7 @@ RSpec.describe "The library itself" do
         if Bundler.rubygems.provides?(">= 2.4")
           # older rubygems have weird warnings, and we won't actually be using them
           # to build the gem for releases anyways
-          expect(err).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
+          expect(last_command.stderr).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
         end
       ensure
         # clean up the .gem generated
@@ -233,8 +233,7 @@ RSpec.describe "The library itself" do
         end
       end
 
-      expect(@err.split("\n")).to be_well_formed
-      expect(@out.split("\n")).to be_well_formed
+      expect(last_command.stdboth.split("\n")).to be_well_formed
     end
   end
 end

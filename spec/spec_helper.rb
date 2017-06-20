@@ -111,14 +111,14 @@ RSpec.configure do |config|
     reset!
     system_gems []
     in_app_root
-    @all_output = String.new
+    @command_executions = []
   end
 
   config.after :each do |example|
-    @all_output.strip!
-    if example.exception && !@all_output.empty?
-      warn @all_output unless config.formatters.grep(RSpec::Core::Formatters::DocumentationFormatter).empty?
-      message = example.exception.message + "\n\nCommands:\n#{@all_output}"
+    all_output = @command_executions.map(&:to_s_verbose).join("\n\n")
+    if example.exception && !all_output.empty?
+      warn all_output unless config.formatters.grep(RSpec::Core::Formatters::DocumentationFormatter).empty?
+      message = example.exception.message + "\n\nCommands:\n#{all_output}"
       (class << example.exception; self; end).send(:define_method, :message) do
         message
       end
