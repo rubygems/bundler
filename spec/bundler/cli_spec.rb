@@ -62,7 +62,7 @@ RSpec.describe "bundle executable" do
 
     it "doesn't print defaults" do
       install_gemfile! "", :verbose => true
-      expect(out).to start_with("Running `bundle install --verbose --retry 0 --no-color` with bundler #{Bundler::VERSION}")
+      expect(out).to start_with("Running `bundle install --no-color --retry 0 --verbose` with bundler #{Bundler::VERSION}")
     end
   end
 

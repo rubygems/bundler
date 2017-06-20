@@ -630,7 +630,7 @@ module Bundler
         next unless o = current_command.options[k]
         o.default == v
       end
-      command << Thor::Options.to_switches(options_to_print).strip
+      command << Thor::Options.to_switches(options_to_print.sort_by(&:first)).strip
       command.reject!(&:empty?)
       Bundler.ui.info "Running `#{command * " "}` with bundler #{Bundler::VERSION}"
     end
