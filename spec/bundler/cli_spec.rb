@@ -60,6 +60,11 @@ RSpec.describe "bundle executable" do
       bundle! "config", :verbose => true
       expect(out).to start_with("Running `bundle config --verbose` with bundler #{Bundler::VERSION}")
     end
+
+    it "doesn't print defaults" do
+      install_gemfile! "", :verbose => true
+      expect(out).to start_with("Running `bundle install --no-color --retry 0 --verbose` with bundler #{Bundler::VERSION}")
+    end
   end
 
   describe "printing the outdated warning" do
