@@ -395,11 +395,12 @@ module Bundler
       Open.new(options, name).run
     end
 
-    desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
-    def console(group = nil)
-      # TODO: Remove for 2.0
-      require "bundler/cli/console"
-      Console.new(options, group).run
+    if Bundler.feature_flag.console_command?
+      desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
+      def console(group = nil)
+        require "bundler/cli/console"
+        Console.new(options, group).run
+      end
     end
 
     desc "version", "Prints the bundler's version information"
