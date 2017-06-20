@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe "major deprecations" do
-  let(:warnings) { out } # change to err in 2.0
+RSpec.describe "major deprecations", :bundler => "< 2" do
+  let(:warnings) { last_command.bundler_err } # change to err in 2.0
   let(:warnings_without_version_messages) { warnings.gsub(/#{Spec::Matchers::MAJOR_DEPRECATION}Bundler will only support ruby(gems)? >= .*/, "") }
 
   context "in a .99 version" do

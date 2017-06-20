@@ -69,8 +69,8 @@ RSpec.describe "bundle executable" do
   describe "printing the outdated warning" do
     shared_examples_for "no warning" do
       it "prints no warning" do
-        bundle "fail"
-        expect(err + out).to eq("Could not find command \"fail\".")
+        bundle! "fail"
+        expect(last_command.stdboth).to eq("Could not find command \"fail\".")
       end
     end
 
@@ -103,10 +103,9 @@ RSpec.describe "bundle executable" do
       let(:latest_version) { "2.0" }
       it "prints the version warning" do
         bundle "fail"
-        expect(err + out).to eq(<<-EOS.strip)
+        expect(last_command.bundler_err).to start_with(<<-EOS.strip)
 The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
 To update, run `gem install bundler`
-Could not find command "fail".
         EOS
       end
 
@@ -119,10 +118,9 @@ Could not find command "fail".
         let(:latest_version) { "2.0.0.pre.4" }
         it "prints the version warning" do
           bundle "fail"
-          expect(err + out).to eq(<<-EOS.strip)
+          expect(last_command.bundler_err).to start_with(<<-EOS.strip)
 The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
 To update, run `gem install bundler --pre`
-Could not find command "fail".
           EOS
         end
       end

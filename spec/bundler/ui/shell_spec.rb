@@ -34,8 +34,13 @@ RSpec.describe Bundler::UI::Shell do
 
   describe "#error" do
     before { subject.level = "error" }
-    it "prints to stdout" do
+
+    it "prints to stdout", :bundler => "<= 2" do
       expect { subject.error("error!!!") }.to output("error!!!\n").to_stdout
+    end
+
+    it "prints to stderr", :bundler => "2" do
+      expect { subject.error("error!!!") }.to output("error!!!\n").to_stderr
     end
 
     context "when stderr flag is enabled" do
