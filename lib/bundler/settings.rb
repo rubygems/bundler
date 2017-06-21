@@ -43,6 +43,7 @@ module Bundler
       no_install
       no_prune
       only_update_to_newer_versions
+      path_relative_to_cwd
       path.system
       plugins
       prefer_gems_rb

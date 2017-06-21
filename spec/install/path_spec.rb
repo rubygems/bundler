@@ -49,6 +49,18 @@ RSpec.describe "bundle install" do
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
+
+    context "with path_relative_to_cwd set to true" do
+      before { bundle! "config path_relative_to_cwd true" }
+
+      it "installs the bundle relatively to current working directory" do
+        Dir.chdir(bundled_app.parent) do
+          bundle "install --gemfile='#{bundled_app}/Gemfile' --path vendor/bundle"
+          expect(out).to include("installed into ./vendor/bundle")
+          expect(Dir.exist?("vendor/bundle")).to be true
+        end
+      end
+    end
   end
 
   describe "when BUNDLE_PATH or the global path config is set" do
