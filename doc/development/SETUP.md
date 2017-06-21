@@ -20,9 +20,7 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
 4. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
 
-      $ alias dbundle='BUNDLE_TRAMPOLINE_DISABLE=1 ruby -I /path/to/bundler/lib /path/to/bundler/exe/bundle'
-
-   The `BUNDLE_TRAMPOLINE_DISABLE` environment variable ensures that the version of Bundler in `/path/to/bundler/lib` will be used. Without that environment setting, Bundler will automatically download, install, and run the version of Bundler listed in `Gemfile.lock`. With that set up, you can test changes you've made to Bundler by running `dbundle`, without interfering with the regular `bundle` command.
+      `$ alias dbundle='ruby -I /path/to/bundler/lib /path/to/bundler/exe/bundle'`
 
 ## Debugging with `pry`
 

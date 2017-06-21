@@ -299,13 +299,6 @@ begin
     lib.vendor_lib = "lib/bundler/vendor/thor"
   end
 
-  Automatiek::RakeTask.new("postit") do |lib|
-    lib.download = { :github => "https://github.com/bundler/postit" }
-    lib.namespace = "PostIt"
-    lib.prefix = "BundlerVendoredPostIt"
-    lib.vendor_lib = "lib/bundler/vendor/postit"
-  end
-
   Automatiek::RakeTask.new("net-http-persistent") do |lib|
     lib.download = { :github => "https://github.com/drbrain/net-http-persistent" }
     lib.namespace = "Net::HTTP::Persistent"
@@ -326,7 +319,6 @@ rescue LoadError
   namespace :vendor do
     task(:molinillo) { abort "Install the automatiek gem to be able to vendor gems." }
     task(:thor) { abort "Install the automatiek gem to be able to vendor gems." }
-    task(:postit) { abort "Install the automatiek gem to be able to vendor gems." }
     task("net-http-persistent") { abort "Install the automatiek gem to be able to vendor gems." }
   end
 end
