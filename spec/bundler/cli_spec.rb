@@ -69,7 +69,7 @@ RSpec.describe "bundle executable" do
   describe "printing the outdated warning" do
     shared_examples_for "no warning" do
       it "prints no warning" do
-        bundle! "fail"
+        bundle "fail"
         expect(last_command.stdboth).to eq("Could not find command \"fail\".")
       end
     end

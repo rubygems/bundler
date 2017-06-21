@@ -171,8 +171,8 @@ RSpec.shared_examples "bundle install --standalone" do
         RUBY
       end
 
-      expect(out).to eq("2.3.2")
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(last_command.stdout).to eq("2.3.2")
+      expect(last_command.stderr).to eq("ZOMG LOAD ERROR")
     end
 
     it "allows --without to limit the groups used in a standalone" do
@@ -189,8 +189,8 @@ RSpec.shared_examples "bundle install --standalone" do
         RUBY
       end
 
-      expect(out).to eq("2.3.2")
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(last_command.stdout).to eq("2.3.2")
+      expect(last_command.stderr).to eq("ZOMG LOAD ERROR")
     end
 
     it "allows --path to change the location of the standalone bundle" do
@@ -206,7 +206,7 @@ RSpec.shared_examples "bundle install --standalone" do
         RUBY
       end
 
-      expect(out).to eq("2.3.2")
+      expect(last_command.stdout).to eq("2.3.2")
     end
 
     it "allows remembered --without to limit the groups used in a standalone" do
@@ -224,8 +224,8 @@ RSpec.shared_examples "bundle install --standalone" do
         RUBY
       end
 
-      expect(out).to eq("2.3.2")
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(last_command.stdout).to eq("2.3.2")
+      expect(last_command.stderr).to eq("ZOMG LOAD ERROR")
     end
   end
 

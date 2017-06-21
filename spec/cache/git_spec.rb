@@ -52,14 +52,14 @@ end
     it "runs twice without exploding" do
       build_git "foo"
 
-      install_gemfile <<-G
+      install_gemfile! <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
-      bundle "#{cmd} --all"
+      bundle! "#{cmd} --all"
+      bundle! "#{cmd} --all"
 
-      expect(err).to lack_errors
+      expect(last_command.stdout).to include "Updating files in vendor/cache"
       FileUtils.rm_rf lib_path("foo-1.0")
       expect(the_bundle).to include_gems "foo 1.0"
     end

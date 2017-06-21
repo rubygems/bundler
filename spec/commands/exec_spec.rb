@@ -225,7 +225,7 @@ RSpec.describe "bundle exec" do
     [true, false].each do |l|
       bundle! "config disable_exec_load #{l}"
       bundle "exec rackup"
-      expect(err).to include "can't find executable rackup for gem rack. rack is not currently included in the bundle, perhaps you meant to add it to your Gemfile?"
+      expect(last_command.stderr).to include "can't find executable rackup for gem rack. rack is not currently included in the bundle, perhaps you meant to add it to your Gemfile?"
     end
   end
 
@@ -239,7 +239,7 @@ RSpec.describe "bundle exec" do
     [true, false].each do |l|
       bundle! "config disable_exec_load #{l}"
       bundle "exec rackup"
-      expect(err).to include "rack is not part of the bundle. Add it to your Gemfile."
+      expect(last_command.stderr).to include "rack is not part of the bundle. Add it to your Gemfile."
     end
   end
 
@@ -519,8 +519,8 @@ RSpec.describe "bundle exec" do
       it "like a normally executed executable" do
         subject
         expect(exitstatus).to eq(exit_code) if exitstatus
-        expect(err).to eq(expected_err)
-        expect(out).to eq(expected)
+        expect(last_command.stderr).to eq(expected_err)
+        expect(last_command.stdout).to eq(expected)
       end
     end
 
@@ -730,7 +730,7 @@ __FILE__: #{path.to_s.inspect}
 
         # sanity check that we get the newer, custom version without bundler
         sys_exec("#{Gem.ruby} #{file}")
-        expect(err).to include("custom openssl should not be loaded")
+        expect(last_command.stderr).to include("custom openssl should not be loaded")
       end
     end
   end
