@@ -619,7 +619,7 @@ module Bundler
     end
 
     def print_command
-      return unless ENV["BUNDLE_POSTIT_TRAMPOLINING_VERSION"] || Bundler.ui.debug?
+      return unless Bundler.ui.debug?
       _, _, config = @_initializer
       current_command = config[:current_command]
       command_name = current_command.name

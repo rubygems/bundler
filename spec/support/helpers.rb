@@ -12,7 +12,6 @@ module Spec
       end
       FileUtils.mkdir_p(home)
       FileUtils.mkdir_p(tmpdir)
-      ENV["BUNDLE_TRAMPOLINE_DISABLE"] = "1"
       Bundler.reset!
       Bundler.ui = nil
       Bundler.ui # force it to initialize
