@@ -62,7 +62,7 @@ module Bundler
           begin
             @revision ||= find_local_revision
           rescue GitCommandError
-            raise MissingGitRevisionError.new(ref, uri)
+            raise MissingGitRevisionError.new(ref, URICredentialsFilter.credential_filtered_uri(uri))
           end
 
           @revision
