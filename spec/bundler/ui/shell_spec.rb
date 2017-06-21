@@ -21,8 +21,19 @@ RSpec.describe Bundler::UI::Shell do
 
   describe "#warn" do
     before { subject.level = "warn" }
-    it "prints to stdout" do
+    it "prints to stdout", :bundler => "< 2" do
       expect { subject.warn("warning") }.to output("warning\n").to_stdout
+    end
+
+    it "prints to stderr", :bundler => "2" do
+      expect { subject.warn("warning") }.to output("warning\n").to_stderr
+    end
+
+    context "when stderr flag is enabled" do
+      before { Bundler.settings.temporary(:error_on_stderr => true) }
+      it "prints to stderr" do
+        expect { subject.warn("warning!") }.to output("warning!\n").to_stderr
+      end
     end
   end
 
@@ -35,7 +46,7 @@ RSpec.describe Bundler::UI::Shell do
   describe "#error" do
     before { subject.level = "error" }
 
-    it "prints to stdout", :bundler => "<= 2" do
+    it "prints to stdout", :bundler => "< 2" do
       expect { subject.error("error!!!") }.to output("error!!!\n").to_stdout
     end
 
