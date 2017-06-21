@@ -275,7 +275,7 @@ RSpec.describe "bundle install with git sources" do
 
     it "does not download random non-head refs" do
       Dir.chdir(lib_path("foo-1.0")) do
-        `git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1`
+        sys_exec!("git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1")
       end
 
       install_gemfile! <<-G
@@ -285,10 +285,10 @@ RSpec.describe "bundle install with git sources" do
       G
 
       # ensure we also git fetch after cloning
-      bundle! :update
+      bundle! :update, :all => bundle_update_requires_all?
 
       Dir.chdir(Dir[system_gem_path("cache/bundler/git/foo-*")].first) do
-        @out = sys_exec("git ls-remote .")
+        sys_exec("git ls-remote .")
       end
 
       expect(out).not_to include("refs/bundler/1")
@@ -790,14 +790,14 @@ RSpec.describe "bundle install with git sources" do
       s.write "lib/forced.rb", "FORCED = '1.1'"
     end
 
-    bundle "update"
+    bundle "update", :all => bundle_update_requires_all?
     expect(the_bundle).to include_gems "forced 1.1"
 
     Dir.chdir(lib_path("forced-1.0")) do
       `git reset --hard HEAD^`
     end
 
-    bundle "update"
+    bundle "update", :all => bundle_update_requires_all?
     expect(the_bundle).to include_gems "forced 1.0"
   end
 
@@ -1176,7 +1176,7 @@ RSpec.describe "bundle install with git sources" do
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      expect(out).to end_with(<<-M.strip)
+      expect(last_command.bundler_err).to end_with(<<-M.strip)
 An error occurred while installing foo (1.0), and Bundler cannot continue.
 
 In Gemfile:
@@ -1260,9 +1260,10 @@ In Gemfile:
       G
 
       with_path_as("") do
-        bundle "update"
+        bundle "update", :all => bundle_update_requires_all?
       end
-      expect(out).to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")
+      expect(last_command.bundler_err).
+        to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")
     end
 
     it "installs a packaged git gem successfully" do
@@ -1276,15 +1277,14 @@ In Gemfile:
       bundle "package --all"
       simulate_new_machine
 
-      bundle "install", :env => { "PATH" => "" }
+      bundle! "install", :env => { "PATH" => "" }
       expect(out).to_not include("You need to install git to be able to use gems from git repositories.")
-      expect(exitstatus).to be_zero if exitstatus
     end
   end
 
   describe "when the git source is overridden with a local git repo" do
     before do
-      bundle "config --global local.foo #{lib_path("foo")}"
+      bundle! "config --global local.foo #{lib_path("foo")}"
     end
 
     describe "and git output is colorized" do
@@ -1319,9 +1319,8 @@ In Gemfile:
         G
 
         bundle :install
-        expect(out).to_not include("password1")
-        expect(err).to_not include("password1")
-        expect(out).to include("Fetching https://user1@github.com/company/private-repo")
+        expect(last_command.stdboth).to_not include("password1")
+        expect(last_command.stdout).to include("Fetching https://user1@github.com/company/private-repo")
       end
     end
 
@@ -1336,9 +1335,8 @@ In Gemfile:
         G
 
         bundle :install
-        expect(out).to_not include("oauth_token")
-        expect(err).to_not include("oauth_token")
-        expect(out).to include("Fetching https://x-oauth-basic@github.com/company/private-repo")
+        expect(last_command.stdboth).to_not include("oauth_token")
+        expect(last_command.stdout).to include("Fetching https://x-oauth-basic@github.com/company/private-repo")
       end
     end
   end

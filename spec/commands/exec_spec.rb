@@ -539,7 +539,7 @@ RSpec.describe "bundle exec" do
       end
     end
 
-    context "the executable is empty" do
+    context "the executable is empty", :bundler => "< 2" do
       let(:executable) { "" }
 
       let(:exit_code) { 0 }
@@ -554,13 +554,32 @@ RSpec.describe "bundle exec" do
       end
     end
 
-    context "the executable raises" do
+    context "the executable is empty", :bundler => "2" do
+      let(:executable) { "" }
+
+      let(:exit_code) { 0 }
+      let(:expected_err) { "#{path} is empty" }
+      let(:expected) { "" }
+      it_behaves_like "it runs"
+    end
+
+    context "the executable raises", :bundler => "< 2" do
       let(:executable) { super() << "\nraise 'ERROR'" }
       let(:exit_code) { 1 }
       let(:expected) { super() << "\nbundler: failed to load command: #{path} (#{path})" }
       let(:expected_err) do
         "RuntimeError: ERROR\n  #{path}:10" +
           (Bundler.current_ruby.ruby_18? ? "" : ":in `<top (required)>'")
+      end
+      it_behaves_like "it runs"
+    end
+
+    context "the executable raises", :bundler => "2" do
+      let(:executable) { super() << "\nraise 'ERROR'" }
+      let(:exit_code) { 1 }
+      let(:expected_err) do
+        "bundler: failed to load command: #{path} (#{path})" \
+        "\nRuntimeError: ERROR\n  #{path}:10:in `<top (required)>'"
       end
       it_behaves_like "it runs"
     end

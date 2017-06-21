@@ -363,8 +363,8 @@ RSpec.describe "bundle install with groups" do
 
     it "does not hit the remote a second time" do
       FileUtils.rm_rf gem_repo2
-      bundle! "install --without rack"
-      expect(out).not_to include "Fetching"
+      bundle! "install --without rack", :verbose => true
+      expect(last_command.stdboth).not_to match(/fetching/i)
     end
   end
 end

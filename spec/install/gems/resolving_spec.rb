@@ -140,9 +140,6 @@ RSpec.describe "bundle install with install-time dependencies" do
           expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
 
           nice_error = strip_whitespace(<<-E).strip
-            Fetching gem metadata from http://localgemserver.test/.
-            Fetching version metadata from http://localgemserver.test/
-            Resolving dependencies...
             Bundler could not find compatible versions for gem "ruby\0":
               In Gemfile:
                 ruby\0 (#{error_message_requirement})
@@ -152,7 +149,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
             Could not find gem 'ruby\0 (> 9000)', which is required by gem 'require_ruby', in any of the sources.
           E
-          expect(out).to eq(nice_error)
+          expect(last_command.bundler_err).to end_with(nice_error)
         end
       end
 

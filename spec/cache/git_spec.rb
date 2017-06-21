@@ -81,14 +81,14 @@ end
       ref = git.ref_for("master", 11)
       expect(ref).not_to eq(old_ref)
 
-      bundle "update"
-      bundle "#{cmd} --all"
+      bundle! "update", :all => bundle_update_requires_all?
+      bundle! "#{cmd} --all"
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      run "require 'foo'"
+      run! "require 'foo'"
       expect(out).to eq("CACHE")
     end
 

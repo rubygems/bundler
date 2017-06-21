@@ -210,7 +210,6 @@ RSpec.describe "bundle check" do
     3.times do
       bundle :check
       expect(out).to eq(last_out)
-      expect(err).to lack_errors
     end
   end
 
@@ -329,9 +328,8 @@ RSpec.describe "bundle check" do
     context "is newer" do
       it "does not change the lock but warns" do
         lockfile lock_with(Bundler::VERSION.succ)
-        bundle :check
-        expect(out).to include("the running version of Bundler (#{Bundler::VERSION}) is older than the version that created the lockfile (#{Bundler::VERSION.succ})")
-        expect(err).to lack_errors
+        bundle! :check
+        expect(last_command.bundler_err).to include("the running version of Bundler (#{Bundler::VERSION}) is older than the version that created the lockfile (#{Bundler::VERSION.succ})")
         lockfile_should_be lock_with(Bundler::VERSION.succ)
       end
     end

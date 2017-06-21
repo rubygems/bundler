@@ -11,7 +11,7 @@ RSpec.describe "bundle update" do
     G
   end
 
-  describe "with no arguments" do
+  describe "with no arguments", :bundler => "< 2" do
     it "updates the entire bundle" do
       update_repo2 do
         build_gem "activesupport", "3.0"
@@ -30,6 +30,29 @@ RSpec.describe "bundle update" do
         exit!
       G
       bundle "update"
+      expect(bundled_app("Gemfile.lock")).to exist
+    end
+  end
+
+  describe "with --all", :bundler => "2" do
+    it "updates the entire bundle" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+      end
+
+      bundle! "update", :all => true
+      expect(out).to include("Bundle updated!")
+      expect(the_bundle).to include_gems "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+    end
+
+    it "doesn't delete the Gemfile.lock file if something goes wrong" do
+      gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport"
+        gem "rack-obama"
+        exit!
+      G
+      bundle "update", :all => true
       expect(bundled_app("Gemfile.lock")).to exist
     end
   end
@@ -122,7 +145,7 @@ RSpec.describe "bundle update" do
           end
         end
 
-        bundle! "update"
+        bundle! "update", :all => bundle_update_requires_all?
 
         expect(the_bundle).to include_gems("a 1.0", "b 1.0", "c 2.0")
       end
@@ -133,8 +156,8 @@ RSpec.describe "bundle update" do
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)
 
-      bundle "update --local"
-      expect(out).not_to match(/Fetching source index/)
+      bundle "update --local --all"
+      expect(out).not_to include("Fetching source index")
     end
   end
 
@@ -176,8 +199,8 @@ RSpec.describe "bundle update" do
 
   describe "in a frozen bundle" do
     it "should fail loudly" do
-      bundle "install --deployment"
-      bundle "update"
+      bundle! "install --deployment"
+      bundle "update", :all => bundle_update_requires_all?
 
       expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
       expect(out).to match(/freeze \nby running `bundle install --no-deployment`./m)
@@ -185,36 +208,34 @@ RSpec.describe "bundle update" do
     end
 
     it "should suggest different command when frozen is set globally" do
-      bundler "config --global frozen 1"
-      bundle "update"
+      bundle! "config --global frozen 1"
+      bundle "update", :all => bundle_update_requires_all?
       expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
       expect(out).to match(/freeze \nby running `bundle config --delete frozen`./m)
     end
   end
 
   describe "with --source option" do
-    it "should not update gems not included in the source that happen to have the same name" do
-      pending("Allowed to fail to preserve backwards-compatibility")
-
-      install_gemfile <<-G
+    it "should not update gems not included in the source that happen to have the same name", :bundler => "< 2" do
+      install_gemfile! <<-G
         source "file://#{gem_repo2}"
         gem "activesupport"
       G
       update_repo2 { build_gem "activesupport", "3.0" }
 
-      bundle "update --source activesupport"
-      expect(the_bundle).not_to include_gems "activesupport 3.0"
+      bundle! "update --source activesupport"
+      expect(the_bundle).to include_gem "activesupport 3.0"
     end
 
-    it "should update gems not included in the source that happen to have the same name" do
-      install_gemfile <<-G
+    it "should not update gems not included in the source that happen to have the same name", :bundler => "2" do
+      install_gemfile! <<-G
         source "file://#{gem_repo2}"
         gem "activesupport"
       G
       update_repo2 { build_gem "activesupport", "3.0" }
 
-      bundle "update --source activesupport"
-      expect(the_bundle).to include_gems "activesupport 3.0"
+      bundle! "update --source activesupport"
+      expect(the_bundle).not_to include_gem "activesupport 3.0"
     end
 
     context "with unlock_source_unlocks_spec set to false" do
@@ -249,7 +270,7 @@ RSpec.describe "bundle update" do
       G
     end
 
-    it "should not update the child dependencies of a gem that has the same name as the source" do
+    it "should not update the child dependencies of a gem that has the same name as the source", :bundler => "< 2" do
       update_repo2 do
         build_gem "fred", "2.0"
         build_gem "harry", "2.0" do |s|
@@ -260,6 +281,18 @@ RSpec.describe "bundle update" do
       bundle "update --source harry"
       expect(the_bundle).to include_gems "harry 2.0"
       expect(the_bundle).to include_gems "fred 1.0"
+    end
+
+    it "should not update the child dependencies of a gem that has the same name as the source", :bundler => "2" do
+      update_repo2 do
+        build_gem "fred", "2.0"
+        build_gem "harry", "2.0" do |s|
+          s.add_dependency "fred"
+        end
+      end
+
+      bundle "update --source harry"
+      expect(the_bundle).to include_gems "harry 1.0", "fred 1.0"
     end
   end
 
@@ -282,7 +315,7 @@ RSpec.describe "bundle update" do
       G
     end
 
-    it "should not update the child dependencies of a gem that has the same name as the source" do
+    it "should not update the child dependencies of a gem that has the same name as the source", :bundler => "< 2" do
       update_repo2 do
         build_gem "george", "2.0"
         build_gem "harry", "2.0" do |s|
@@ -294,6 +327,18 @@ RSpec.describe "bundle update" do
       expect(the_bundle).to include_gems "harry 2.0"
       expect(the_bundle).to include_gems "fred 1.0"
       expect(the_bundle).to include_gems "george 1.0"
+    end
+
+    it "should not update the child dependencies of a gem that has the same name as the source", :bundler => "2" do
+      update_repo2 do
+        build_gem "george", "2.0"
+        build_gem "harry", "2.0" do |s|
+          s.add_dependency "george"
+        end
+      end
+
+      bundle "update --source harry"
+      expect(the_bundle).to include_gems "harry 1.0", "fred 1.0", "george 1.0"
     end
   end
 end
@@ -349,7 +394,7 @@ RSpec.describe "bundle update without a Gemfile.lock" do
       gem "rack", "1.0"
     G
 
-    bundle "update"
+    bundle "update", :all => bundle_update_requires_all?
 
     expect(the_bundle).to include_gems "rack 1.0.0"
   end
@@ -369,16 +414,11 @@ RSpec.describe "bundle update when a gem depends on a newer version of bundler" 
     G
   end
 
-  it "should not explode" do
-    bundle "update"
-    expect(err).to lack_errors
-  end
-
   it "should explain that bundler conflicted" do
-    bundle "update"
-    expect(out).not_to match(/in snapshot/i)
-    expect(out).to match(/current Bundler version/i)
-    expect(out).to match(/perhaps you need to update bundler/i)
+    bundle "update", :all => bundle_update_requires_all?
+    expect(last_command.stdboth).not_to match(/in snapshot/i)
+    expect(last_command.bundler_err).to match(/current Bundler version/i).
+      and match(/perhaps you need to update bundler/i)
   end
 end
 
@@ -391,14 +431,14 @@ RSpec.describe "bundle update" do
       gem "activesupport"
     G
 
-    bundle "update"
+    bundle "update", :all => bundle_update_requires_all?
     expect(out).to include("Using activesupport 2.3.5")
 
     update_repo2 do
       build_gem "activesupport", "3.0"
     end
 
-    bundle "update"
+    bundle "update", :all => bundle_update_requires_all?
     expect(out).to include("Installing activesupport 3.0 (was 2.3.5)")
   end
 
@@ -560,13 +600,13 @@ RSpec.describe "bundle update conservative" do
 
     context "patch preferred" do
       it "single gem updates dependent gem to minor" do
-        bundle "update --patch foo"
+        bundle! "update --patch foo"
 
         expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.0"
       end
 
       it "update all" do
-        bundle "update --patch"
+        bundle! "update --patch", :all => bundle_update_requires_all?
 
         expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.1"
       end
@@ -574,7 +614,7 @@ RSpec.describe "bundle update conservative" do
 
     context "minor preferred" do
       it "single gem updates dependent gem to major" do
-        bundle "update --minor foo"
+        bundle! "update --minor foo"
 
         expect(the_bundle).to include_gems "foo 1.5.1", "bar 3.0.0", "qux 1.0.0"
       end
@@ -582,13 +622,13 @@ RSpec.describe "bundle update conservative" do
 
     context "strict" do
       it "patch preferred" do
-        bundle "update --patch foo bar --strict"
+        bundle! "update --patch foo bar --strict"
 
         expect(the_bundle).to include_gems "foo 1.4.4", "bar 2.0.5", "qux 1.0.0"
       end
 
       it "minor preferred" do
-        bundle "update --minor --strict"
+        bundle! "update --minor --strict", :all => bundle_update_requires_all?
 
         expect(the_bundle).to include_gems "foo 1.5.0", "bar 2.1.1", "qux 1.1.0"
       end
@@ -685,9 +725,9 @@ RSpec.describe "bundle update conservative" do
     end
 
     it "raises if too many flags are provided" do
-      bundle "update --patch --minor"
+      bundle "update --patch --minor", :all => bundle_update_requires_all?
 
-      expect(out).to eq "Provide only one of the following options: minor, patch"
+      expect(last_command.bundler_err).to eq "Provide only one of the following options: minor, patch"
     end
   end
 end

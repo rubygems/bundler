@@ -785,22 +785,22 @@ RSpec.describe "bundle gem" do
 
     it "fails gracefully with a ." do
       bundle "gem foo.gemspec"
-      expect(out).to end_with("Invalid gem name foo.gemspec -- `Foo.gemspec` is an invalid constant name")
+      expect(last_command.bundler_err).to end_with("Invalid gem name foo.gemspec -- `Foo.gemspec` is an invalid constant name")
     end
 
     it "fails gracefully with a ^" do
       bundle "gem ^"
-      expect(out).to end_with("Invalid gem name ^ -- `^` is an invalid constant name")
+      expect(last_command.bundler_err).to end_with("Invalid gem name ^ -- `^` is an invalid constant name")
     end
 
     it "fails gracefully with a space" do
       bundle "gem 'foo bar'"
-      expect(out).to end_with("Invalid gem name foo bar -- `Foo bar` is an invalid constant name")
+      expect(last_command.bundler_err).to end_with("Invalid gem name foo bar -- `Foo bar` is an invalid constant name")
     end
 
     it "fails gracefully when multiple names are passed" do
       bundle "gem foo bar baz"
-      expect(out).to eq(<<-E.strip)
+      expect(last_command.bundler_err).to eq(<<-E.strip)
 ERROR: "bundle gem" was called with arguments ["foo", "bar", "baz"]
 Usage: "bundle gem GEM [OPTIONS]"
       E
@@ -890,8 +890,8 @@ Usage: "bundle gem GEM [OPTIONS]"
       in_app_root do
         FileUtils.touch("conflict-foobar")
       end
-      output = bundle "gem conflict-foobar"
-      expect(output).to include("Errno::EEXIST")
+      bundle "gem conflict-foobar"
+      expect(last_command.bundler_err).to include("Errno::EEXIST")
       expect(exitstatus).to eql(32) if exitstatus
     end
   end
@@ -901,8 +901,8 @@ Usage: "bundle gem GEM [OPTIONS]"
       in_app_root do
         FileUtils.mkdir_p("conflict-foobar/Gemfile")
       end
-      output = bundle "gem conflict-foobar"
-      expect(output).to include("Errno::EISDIR")
+      bundle "gem conflict-foobar"
+      expect(last_command.bundler_err).to include("Errno::EISDIR")
       expect(exitstatus).to eql(32) if exitstatus
     end
   end
