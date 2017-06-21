@@ -1266,7 +1266,7 @@ end
       let(:default_gems) do
         ruby!(<<-RUBY).split("\n")
           if Gem::Specification.is_a?(Enumerable)
-            puts Gem::Specification.select(&:default_gem?).map(&:name)
+            puts Gem::Specification.select(&:default_gem?).map(&:name).-(%w[bundler])
           end
         RUBY
       end
