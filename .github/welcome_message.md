@@ -1,0 +1,7 @@
+Thanks for opening a pull request and helping make Bundler better! Someone from the Bundler team will take a look at your pull request shortly and leave any feedback. Please make sure that your PR has tests for any changed or added functionality.
+
+We use Travis CI to test and make sure your change works functionally and uses acceptable conventions, you can review the current progress of Travis CI in the PR status window below.
+
+If you have any questions or concerns that you wish to ask, feel free to leave a comment in this PR or join our #bundler channel on [Slack](http://slack.bundler.io/).
+
+You can review the [CONTRIBUTING](https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md) guide for more information.
