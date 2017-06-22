@@ -76,7 +76,7 @@ module Bundler
     end
 
     def materialize(deps, missing_specs = nil)
-      materialized = self.for(deps, [], false, true, missing_specs).to_a
+      materialized = self.for(deps, [], false, true, !missing_specs).to_a
       deps = materialized.map(&:name).uniq
       materialized.map! do |s|
         next s unless s.is_a?(LazySpecification)
