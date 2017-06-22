@@ -78,7 +78,7 @@ RSpec.describe "The library itself" do
 
     File.readlines(filename).each_with_index do |line, number|
       next unless word_found = pattern.match(line)
-      failing_line_message << "#{filename} has '#{word_found}' on line #{number + 1}. Avoid using these kinds of weak modifiers."
+      failing_line_message << "#{filename}:#{number.succ} has '#{word_found}'. Avoid using these kinds of weak modifiers."
     end
 
     failing_line_message unless failing_line_message.empty?
@@ -90,7 +90,7 @@ RSpec.describe "The library itself" do
 
     File.readlines(filename).each_with_index do |line, number|
       next unless word_found = specific_pronouns.match(line)
-      failing_line_message << "#{filename} has '#{word_found}' on line #{number + 1}. Use more generic pronouns in documentation."
+      failing_line_message << "#{filename}:#{number.succ} has '#{word_found}'. Use more generic pronouns in documentation."
     end
 
     failing_line_message unless failing_line_message.empty?
@@ -107,7 +107,7 @@ RSpec.describe "The library itself" do
   it "has no malformed whitespace" do
     exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE|vcr_cassettes/
     error_messages = []
-    Dir.chdir(File.expand_path("../..", __FILE__)) do
+    Dir.chdir(root) do
       `git ls-files -z`.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_tab_characters(filename)
@@ -118,9 +118,9 @@ RSpec.describe "The library itself" do
   end
 
   it "does not include any leftover debugging or development mechanisms" do
-    exempt = %r{quality_spec.rb|support/helpers|vcr_cassettes}
+    exempt = %r{quality_spec.rb|support/helpers|vcr_cassettes|\.md|\.ronn}
     error_messages = []
-    Dir.chdir(File.expand_path("../", __FILE__)) do
+    Dir.chdir(root) do
       `git ls-files -z`.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_debugging_mechanisms(filename)
@@ -131,8 +131,8 @@ RSpec.describe "The library itself" do
 
   it "does not include any unresolved merge conflicts" do
     error_messages = []
-    exempt = %r{lock/lockfile_spec|quality_spec|vcr_cassettes}
-    Dir.chdir(File.expand_path("../", __FILE__)) do
+    exempt = %r{lock/lockfile_spec|quality_spec|vcr_cassettes|\.ronn|lockfile_parser\.rb}
+    Dir.chdir(root) do
       `git ls-files -z`.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_git_merge_conflicts(filename)
@@ -144,8 +144,8 @@ RSpec.describe "The library itself" do
   it "maintains language quality of the documentation" do
     included = /ronn/
     error_messages = []
-    Dir.chdir(File.expand_path("../../man", __FILE__)) do
-      `git ls-files -z`.split("\x0").each do |filename|
+    Dir.chdir(root) do
+      `git ls-files -z -- man`.split("\x0").each do |filename|
         next unless filename =~ included
         error_messages << check_for_expendable_words(filename)
         error_messages << check_for_specific_pronouns(filename)
@@ -157,8 +157,8 @@ RSpec.describe "The library itself" do
   it "maintains language quality of sentences used in source code" do
     error_messages = []
     exempt = /vendor/
-    Dir.chdir(File.expand_path("../../lib", __FILE__)) do
-      `git ls-files -z`.split("\x0").each do |filename|
+    Dir.chdir(root) do
+      `git ls-files -z -- lib`.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_expendable_words(filename)
         error_messages << check_for_specific_pronouns(filename)
@@ -180,14 +180,14 @@ RSpec.describe "The library itself" do
     Bundler::Settings::BOOL_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::BOOL_KEYS" }
     Bundler::Settings::NUMBER_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::NUMBER_KEYS" }
 
-    Dir.chdir(File.expand_path("../../lib", __FILE__)) do
+    Dir.chdir(root) do
       key_pattern = /([a-z\._-]+)/i
-      `git ls-files -z`.split("\x0").each do |filename|
+      `git ls-files -z -- lib`.split("\x0").each do |filename|
         File.readlines(filename).each_with_index do |line, number|
-          line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `lib/#{filename}:#{number.succ}`" }
+          line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `#{filename}:#{number.succ}`" }
         end
       end
-      documented_settings = File.read("../man/bundle-config.ronn").scan(/^\* `#{key_pattern}`/).flatten
+      documented_settings = File.read("man/bundle-config.ronn").scan(/^\* `#{key_pattern}`/).flatten
     end
 
     documented_settings.each {|s| all_settings.delete(s) }
@@ -216,19 +216,19 @@ RSpec.describe "The library itself" do
   end
 
   it "does not contain any warnings" do
-    Dir.chdir(root.join("lib")) do
+    Dir.chdir(root) do
       exclusions = %w[
-        bundler/capistrano.rb
-        bundler/gem_tasks.rb
-        bundler/vlad.rb
-        bundler/templates/gems.rb
+        lib/bundler/capistrano.rb
+        lib/bundler/gem_tasks.rb
+        lib/bundler/vlad.rb
+        lib/bundler/templates/gems.rb
       ]
-      lib_files = `git ls-files -z`.split("\x0").grep(/\.rb$/) - exclusions
-      lib_files.reject! {|f| f.start_with?("bundler/vendor") }
+      lib_files = `git ls-files -z -- lib`.split("\x0").grep(/\.rb$/) - exclusions
+      lib_files.reject! {|f| f.start_with?("lib/bundler/vendor") }
       lib_files.map! {|f| f.chomp(".rb") }
-      sys_exec!("ruby -w -I.") do |input, _, _|
+      sys_exec!("ruby -w -Ilib") do |input, _, _|
         lib_files.each do |f|
-          input.puts "require '#{f}'"
+          input.puts "require '#{f.sub(%r{\Alib/}, "")}'"
         end
       end
 
