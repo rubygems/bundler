@@ -55,9 +55,9 @@ RSpec.describe "bundle install" do
 
       it "installs the bundle relatively to current working directory" do
         Dir.chdir(bundled_app.parent) do
-          bundle "install --gemfile='#{bundled_app}/Gemfile' --path vendor/bundle"
+          bundle! "install --gemfile='#{bundled_app}/Gemfile' --path vendor/bundle"
           expect(out).to include("installed into ./vendor/bundle")
-          expect(Dir.exist?("vendor/bundle")).to be true
+          expect(bundled_app("../vendor/bundle")).to be_directory
         end
       end
     end
