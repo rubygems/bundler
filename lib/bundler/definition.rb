@@ -167,8 +167,7 @@ module Bundler
                              "to a different version of #{locked_gem} that hasn't been removed in order to install."
         end
         unless specs["bundler"].any?
-          local = Bundler.settings[:frozen] ? rubygems_index : index
-          bundler = local.search(Gem::Dependency.new("bundler", VERSION)).last
+          bundler = rubygems_index.search(Gem::Dependency.new("bundler", VERSION)).last
           specs["bundler"] = bundler if bundler
         end
 
@@ -194,9 +193,9 @@ module Bundler
       missing
     end
 
-    def missing_dependencies?
+    def missing_specs?
       missing = []
-      resolve.materialize(current_dependencies, missing)
+      resolve.materialize(requested_dependencies, missing)
       return false if missing.empty?
       Bundler.ui.debug "The definition is missing #{missing.map(&:full_name)}"
       true

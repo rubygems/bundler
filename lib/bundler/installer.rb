@@ -231,7 +231,7 @@ module Bundler
 
     def resolve_if_needed(options)
       if !options["update"] && !options[:inline] && !options["force"] && Bundler.default_lockfile.file?
-        return if @definition.nothing_changed? && !@definition.missing_dependencies?
+        return if @definition.nothing_changed? && !@definition.missing_specs?
       end
 
       options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
