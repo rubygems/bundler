@@ -67,15 +67,7 @@ module Bundler
                 nil
               end end end end end
 
-      if value.nil?
-        nil
-      elsif is_bool(name) || value == "false"
-        to_bool(value)
-      elsif is_num(name)
-        value.to_i
-      else
-        value
-      end
+      converted_value(value, name)
     end
 
     def []=(key, value)
@@ -167,15 +159,15 @@ module Bundler
 
       locations = []
       if @local_config.key?(key)
-        locations << "Set for your local app (#{local_config_file}): #{@local_config[key].inspect}"
+        locations << "Set for your local app (#{local_config_file}): #{converted_value(@local_config[key], exposed_key).inspect}"
       end
 
       if value = ENV[key]
-        locations << "Set via #{key}: #{value.inspect}"
+        locations << "Set via #{key}: #{converted_value(value, exposed_key).inspect}"
       end
 
       if @global_config.key?(key)
-        locations << "Set for the current user (#{global_config_file}): #{@global_config[key].inspect}"
+        locations << "Set for the current user (#{global_config_file}): #{converted_value(@global_config[key], exposed_key).inspect}"
       end
 
       return ["You have not configured a value for `#{exposed_key}`"] if locations.empty?
@@ -282,6 +274,18 @@ module Bundler
       end
 
       value
+    end
+
+    def converted_value(value, key)
+      if value.nil?
+        nil
+      elsif is_bool(key) || value == "false"
+        to_bool(value)
+      elsif is_num(key)
+        value.to_i
+      else
+        value
+      end
     end
 
     def global_config_file
