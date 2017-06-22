@@ -25,6 +25,7 @@ module Bundler
       disable_version_check
       error_on_stderr
       force_ruby_platform
+      forget_cli_options
       frozen
       gem.coc
       gem.mit
@@ -54,25 +55,27 @@ module Bundler
       timeout
     ].freeze
 
+    ARRAY_KEYS = %w[
+      with
+      without
+    ].freeze
+
     DEFAULT_CONFIG = {
       :redirect => 5,
       :retry => 3,
       :timeout => 10,
     }.freeze
 
-    attr_accessor :cli_flags_given
-
     def initialize(root = nil)
       @root            = root
       @local_config    = load_config(local_config_file)
       @global_config   = load_config(global_config_file)
-      @cli_flags_given = false
       @temporary       = {}
     end
 
     def [](name)
       key = key_for(name)
-      value = @temporary.fetch(name) do
+      value = @temporary.fetch(key) do
               @local_config.fetch(key) do
               ENV.fetch(key) do
               @global_config.fetch(key) do
@@ -83,10 +86,11 @@ module Bundler
       converted_value(value, name)
     end
 
-    def []=(key, value)
-      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
-
-      if cli_flags_given
+    def set_command_option(key, value)
+      if Bundler.feature_flag.forget_cli_options?
+        temporary(key => value)
+        value
+      else
         command = if value.nil?
           "bundle config --delete #{key}"
         else
@@ -98,20 +102,32 @@ module Bundler
           "will no longer be automatically remembered. Instead please set flags " \
           "you want remembered between commands using `bundle config " \
           "<setting name> <setting value>`, i.e. `#{command}`"
+
+        set_local(key, value)
       end
+    end
+
+    def set_command_option_if_given(key, value)
+      return if value.nil?
+      set_command_option(key, value)
+    end
+
+    def set_local(key, value)
+      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
 
       set_key(key, value, @local_config, local_config_file)
     end
-    alias_method :set_local, :[]=
 
     def temporary(update)
-      existing = Hash[update.map {|k, _| [k, @temporary[k]] }]
-      @temporary.update(update)
+      existing = Hash[update.map {|k, _| [k, @temporary[key_for(k)]] }]
+      update.each do |k, v|
+        set_key(k, v, @temporary, nil)
+      end
       return unless block_given?
       begin
         yield
       ensure
-        existing.each {|k, v| v.nil? ? @temporary.delete(k) : @temporary[k] = v }
+        existing.each {|k, v| set_key(k, v, @temporary, nil) }
       end
     end
 
@@ -126,7 +142,7 @@ module Bundler
     def all
       env_keys = ENV.keys.grep(/\ABUNDLE_.+/)
 
-      keys = @global_config.keys | @local_config.keys | env_keys
+      keys = @temporary.keys | @global_config.keys | @local_config.keys | env_keys
 
       keys.map do |key|
         key.sub(/^BUNDLE_/, "").gsub(/__/, ".").downcase
@@ -187,22 +203,6 @@ module Bundler
       locations
     end
 
-    def without=(array)
-      set_array(:without, array)
-    end
-
-    def with=(array)
-      set_array(:with, array)
-    end
-
-    def without
-      get_array(:without)
-    end
-
-    def with
-      get_array(:with)
-    end
-
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     def path
       key  = key_for(:path)
@@ -261,28 +261,37 @@ module Bundler
       end
     end
 
-    def is_num(value)
-      NUMBER_KEYS.include?(value.to_s)
+    def is_num(key)
+      NUMBER_KEYS.include?(key.to_s)
     end
 
-    def get_array(key)
-      self[key] ? self[key].split(":").map(&:to_sym) : []
+    def is_array(key)
+      ARRAY_KEYS.include?(key.to_s)
     end
 
-    def set_array(key, array)
-      self[key] = (array.empty? ? nil : array.join(":")) if array
+    def to_array(value)
+      return [] unless value
+      value.split(":").map(&:to_sym)
+    end
+
+    def array_to_s(array)
+      array.empty? ? nil : array.join(":")
     end
 
     def set_key(key, value, hash, file)
+      value = array_to_s(value) if is_array(key)
+
       key = key_for(key)
 
       unless hash[key] == value
         hash[key] = value
         hash.delete(key) if value.nil?
-        SharedHelpers.filesystem_access(file) do |p|
-          FileUtils.mkdir_p(p.dirname)
-          require "bundler/yaml_serializer"
-          p.open("w") {|f| f.write(YAMLSerializer.dump(hash)) }
+        if file
+          SharedHelpers.filesystem_access(file) do |p|
+            FileUtils.mkdir_p(p.dirname)
+            require "bundler/yaml_serializer"
+            p.open("w") {|f| f.write(YAMLSerializer.dump(hash)) }
+          end
         end
       end
 
@@ -290,14 +299,16 @@ module Bundler
     end
 
     def converted_value(value, key)
-      if value.nil?
+      if is_array(key)
+        to_array(value)
+      elsif value.nil?
         nil
       elsif is_bool(key) || value == "false"
         to_bool(value)
       elsif is_num(key)
         value.to_i
       else
-        value
+        value.to_s
       end
     end
 

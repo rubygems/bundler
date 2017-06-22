@@ -71,6 +71,9 @@ The options that can be configured are:
 * `without`:
    A space-separated list of groups referencing gems to skip during installation.
 
+* `with`:
+  A space-separated list of groups referencing gems to include during installation.
+
 ## BUILD OPTIONS
 
 You can use `bundle config` to give bundler the flags to pass to the gem
@@ -253,6 +256,8 @@ learn more about their operation in [bundle install(1)][bundle-install].
    and disallow passing no options to `bundle update`.
 * `user_agent` (`BUNDLE_USER_AGENT`):
    The custom user agent fragment Bundler includes in API requests.
+* `with` (`BUNDLE_WITH`):
+   A `:`-separated list of groups whose gems bundler should install.
 * `without` (`BUNDLE_WITHOUT`):
    A `:`-separated list of groups whose gems bundler should not install.
 

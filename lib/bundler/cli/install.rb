@@ -46,9 +46,9 @@ module Bundler
         options[:local] = true if Bundler.app_cache.exist?
 
         if Bundler.feature_flag.deployment_means_frozen?
-          Bundler.settings.temporary(:deployment => true)
+          Bundler.settings.set_command_option :deployment, true
         else
-          Bundler.settings[:frozen] ||= true
+          Bundler.settings.set_command_option :frozen, true
         end
       end
 
@@ -152,28 +152,24 @@ module Bundler
     end
 
     def check_trust_policy
-      if options["trust-policy"]
-        unless Bundler.rubygems.security_policies.keys.include?(options["trust-policy"])
-          Bundler.ui.error "RubyGems doesn't know about trust policy '#{options["trust-policy"]}'. " \
-            "The known policies are: #{Bundler.rubygems.security_policies.keys.join(", ")}."
-          exit 1
-        end
-        Bundler.settings["trust-policy"] = options["trust-policy"]
-      else
-        Bundler.settings["trust-policy"] = nil if Bundler.settings["trust-policy"]
+      trust_policy = options["trust-policy"]
+      unless Bundler.rubygems.security_policies.keys.unshift(nil).include?(trust_policy)
+        raise InvalidOption, "RubyGems doesn't know about trust policy '#{trust_policy}'. " \
+          "The known policies are: #{Bundler.rubygems.security_policies.keys.join(", ")}."
       end
+      Bundler.settings.set_command_option_if_given :"trust-policy", trust_policy
     end
 
     def normalize_groups
-      Bundler.settings.with    = [] if options[:with] && options[:with].empty?
-      Bundler.settings.without = [] if options[:without] && options[:without].empty?
+      Bundler.settings.set_command_option_if_given :with, options[:with]
+      Bundler.settings.set_command_option_if_given :without, options[:without]
 
       with = options.fetch("with", [])
-      with |= Bundler.settings.with.map(&:to_s)
+      with |= Bundler.settings[:with].map(&:to_s)
       with -= options[:without] if options[:without]
 
       without = options.fetch("without", [])
-      without |= Bundler.settings.without.map(&:to_s)
+      without |= Bundler.settings[:without].map(&:to_s)
       without -= options[:with] if options[:with]
 
       options[:with]    = with
@@ -181,29 +177,30 @@ module Bundler
     end
 
     def normalize_settings
-      Bundler.settings[:path]                = nil if options[:system]
-      Bundler.settings[:path]                = "vendor/bundle" if options[:deployment]
-      Bundler.settings[:path]                = options["path"] if options["path"]
-      Bundler.settings[:path]              ||= "bundle" if options["standalone"]
+      Bundler.settings.delete(:path) if options[:system]
+      Bundler.settings.set_command_option :path, "vendor/bundle" if options[:deployment]
+      Bundler.settings.set_command_option_if_given :path, options["path"]
+      Bundler.settings.set_command_option :path, "bundle" if options["standalone"] && Bundler.settings[:path].nil?
 
-      Bundler.settings[:bin]                 = options["binstubs"] if options["binstubs"]
-      Bundler.settings[:bin]                 = nil if options["binstubs"] && options["binstubs"].empty?
+      bin_option = options["binstubs"]
+      bin_option = nil if bin_option && bin_option.empty?
+      Bundler.settings.set_command_option :bin, bin_option if options["binstubs"]
 
-      Bundler.settings[:shebang]             = options["shebang"] if options["shebang"]
+      Bundler.settings.set_command_option_if_given :shebang, options["shebang"]
 
-      Bundler.settings[:jobs]                = options["jobs"] if options["jobs"]
+      Bundler.settings.set_command_option_if_given :jobs, options["jobs"]
 
-      Bundler.settings[:no_prune]            = true if options["no-prune"]
+      Bundler.settings.set_command_option_if_given :no_prune, options["no-prune"]
 
-      Bundler.settings[:no_install]          = true if options["no-install"]
+      Bundler.settings.set_command_option_if_given :no_install, options["no-install"]
 
-      Bundler.settings[:clean]               = options["clean"] if options["clean"]
+      Bundler.settings.set_command_option_if_given :clean, options["clean"]
 
-      Bundler.settings.without               = options[:without] unless Bundler.settings.without == options[:without]
-      Bundler.settings.with                  = options[:with] unless Bundler.settings.with == options[:with]
+      Bundler.settings.set_command_option :without, options[:without] unless Bundler.settings[:without] == options[:without]
+      Bundler.settings.set_command_option :with,    options[:with]    unless Bundler.settings[:with]    == options[:with]
 
       disable_shared_gems = Bundler.settings[:path] ? true : nil
-      Bundler.settings[:disable_shared_gems] = disable_shared_gems unless Bundler.settings[:disable_shared_gems] == disable_shared_gems
+      Bundler.settings.set_command_option :disable_shared_gems, disable_shared_gems unless Bundler.settings[:disable_shared_gems] == disable_shared_gems
     end
 
     def warn_ambiguous_gems

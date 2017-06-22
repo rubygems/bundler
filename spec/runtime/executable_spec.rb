@@ -100,13 +100,13 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "allows you to stop installing binstubs" do
-    bundle "install --binstubs bin/"
+    bundle! "install --binstubs bin/"
     bundled_app("bin/rackup").rmtree
-    bundle "install --binstubs \"\""
+    bundle! "install --binstubs \"\""
 
     expect(bundled_app("bin/rackup")).not_to exist
 
-    bundle "config bin"
+    bundle! "config bin"
     expect(out).to include("You have not configured a value for `bin`")
   end
 

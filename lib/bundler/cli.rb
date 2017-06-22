@@ -30,7 +30,7 @@ module Bundler
         Bundler.reset_paths!
       end
 
-      Bundler.settings[:retry] = options[:retry] if options[:retry]
+      Bundler.settings.set_command_option_if_given :retry, options[:retry]
 
       current_cmd = args.last[:current_command].name
       auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
@@ -38,7 +38,6 @@ module Bundler
       raise InvalidOption, e.message
     ensure
       self.options ||= {}
-      Bundler.settings.cli_flags_given = !options.empty?
       unprinted_warnings = Bundler.ui.unprinted_warnings
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]

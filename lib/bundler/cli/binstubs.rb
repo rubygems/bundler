@@ -12,9 +12,10 @@ module Bundler
 
     def run
       Bundler.definition.validate_runtime!
-      Bundler.settings[:bin] = options["path"] if options["path"]
-      Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
-      Bundler.settings[:shebang] = options["shebang"] if options["shebang"]
+      path_option = options["path"]
+      path_option = nil if path_option && path_option.empty?
+      Bundler.settings.set_command_option :bin, path_option if options["path"]
+      Bundler.settings.set_command_option_if_given :shebang, options["shebang"]
       installer = Installer.new(Bundler.root, Bundler.definition)
 
       if gems.empty?

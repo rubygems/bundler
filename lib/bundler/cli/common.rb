@@ -15,12 +15,12 @@ module Bundler
     end
 
     def self.output_without_groups_message
-      return unless Bundler.settings.without.any?
+      return if Bundler.settings[:without].empty?
       Bundler.ui.confirm without_groups_message
     end
 
     def self.without_groups_message
-      groups = Bundler.settings.without
+      groups = Bundler.settings[:without]
       group_list = [groups[0...-1].join(", "), groups[-1..-1]].
         reject {|s| s.to_s.empty? }.join(" and ")
       group_str = (groups.size == 1) ? "group" : "groups"
