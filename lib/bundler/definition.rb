@@ -593,6 +593,9 @@ module Bundler
 
       # order here matters, since Index#== is checking source.specs.include?(locked_index)
       locked_index != source.specs
+    rescue PathError, GitError => e
+      Bundler.ui.debug "Assuming that #{source} has not changed since fetching its specs errored (#{e})"
+      false
     end
 
     # Get all locals and override their matching sources.
@@ -770,7 +773,19 @@ module Bundler
 
         # Path sources have special logic
         if s.source.instance_of?(Source::Path) || s.source.instance_of?(Source::Gemspec)
-          other = s.source.specs[s].first
+          other_sources_specs = begin
+            s.source.specs
+          rescue PathError, GitError
+            # if we won't need the source (according to the lockfile),
+            # don't error if the path/git source isn't available
+            next if @locked_specs.
+                    for(requested_dependencies, [], false, true, false).
+                    none? {|locked_spec| locked_spec.source == s.source }
+
+            raise
+          end
+
+          other = other_sources_specs[s].first
 
           # If the spec is no longer in the path source, unlock it. This
           # commonly happens if the version changed in the gemspec
