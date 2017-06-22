@@ -5,11 +5,7 @@ module Bundler
 
     class Molinillo::VersionConflict
       def printable_dep(dep)
-        if dep.is_a?(Bundler::Dependency)
-          DepProxy.new(dep, dep.platforms.join(", ")).to_s.strip
-        else
-          dep.to_s
-        end
+        SharedHelpers.pretty_dependency(dep)
       end
 
       def message

@@ -211,7 +211,8 @@ module Bundler
           next unless dep.name == "bundler".freeze
           next if dep.requirement.satisfied_by?(bundler_version)
 
-          Bundler.ui.warn "#{spec.name} (#{spec.version}) has dependency #{dep}" \
+          Bundler.ui.warn "#{spec.name} (#{spec.version}) has dependency" \
+            " #{SharedHelpers.pretty_dependency(dep)}" \
             ", which is unsatisfied by the current bundler version #{VERSION}" \
             ", so the dependency is being ignored"
         end
