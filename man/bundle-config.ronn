@@ -234,6 +234,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `update_requires_all_flag` (`BUNDLE_UPDATE_REQUIRES_ALL_FLAG`)
    Require passing `--all` to `bundle update` when everything should be updated,
    and disallow passing no options to `bundle update`.
+* `allow_bundler_dependency_conflicts` (`BUNDLE_ALLOW_BUNDLER_DEPENDENCY_CONFLICTS`):
+   Allow resolving to specifications that have dependencies on `bundler` that
+   are incompatible with the running Bundler version.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.

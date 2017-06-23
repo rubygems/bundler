@@ -5,11 +5,7 @@ module Bundler
 
     class Molinillo::VersionConflict
       def printable_dep(dep)
-        if dep.is_a?(Bundler::Dependency)
-          DepProxy.new(dep, dep.platforms.join(", ")).to_s.strip
-        else
-          dep.to_s
-        end
+        SharedHelpers.pretty_dependency(dep)
       end
 
       def message
@@ -79,6 +75,7 @@ module Bundler
       include GemHelpers
 
       attr_reader :activated
+      attr_accessor :ignores_bundler_dependencies
 
       def initialize(a)
         super
@@ -88,6 +85,7 @@ module Bundler
         @specs        = Hash.new do |specs, platform|
           specs[platform] = select_best_platform_match(self, platform)
         end
+        @ignores_bundler_dependencies = true
       end
 
       def initialize_copy(o)
@@ -151,6 +149,7 @@ module Bundler
           if spec = @specs[platform]
             spec.dependencies.each do |dep|
               next if dep.type == :development
+              next if @ignores_bundler_dependencies && dep.name == "bundler".freeze
               dependencies[platform] << DepProxy.new(dep, platform)
             end
           end
@@ -206,6 +205,7 @@ module Bundler
       additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, d) }
       @platforms = platforms
       @gem_version_promoter = gem_version_promoter
+      @allow_bundler_dependency_conflicts = Bundler.feature_flag.allow_bundler_dependency_conflicts?
     end
 
     def start(requirements)
@@ -281,7 +281,9 @@ module Bundler
           end
           nested.reduce([]) do |groups, (version, specs)|
             next groups if locked_requirement && !locked_requirement.satisfied_by?(version)
-            groups << SpecGroup.new(specs)
+            spec_group = SpecGroup.new(specs)
+            spec_group.ignores_bundler_dependencies = @allow_bundler_dependency_conflicts
+            groups << spec_group
           end
         else
           []

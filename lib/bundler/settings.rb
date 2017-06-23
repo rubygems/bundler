@@ -7,6 +7,7 @@ module Bundler
     autoload :Mirrors, "bundler/mirror"
 
     BOOL_KEYS = %w[
+      allow_bundler_dependency_conflicts
       allow_offline_install
       auto_install
       cache_all
