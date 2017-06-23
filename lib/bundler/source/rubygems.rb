@@ -105,7 +105,7 @@ module Bundler
           end
         end
 
-        if installed?(spec) && (!force || spec.name.eql?("bundler"))
+        if installed?(spec) && !force
           Bundler.ui.info "Using #{version_message(spec)}"
           return nil # no post-install message
         end
@@ -305,14 +305,9 @@ module Bundler
       end
 
       def installed_specs
-        @installed_specs ||= begin
-          idx = Index.new
-          have_bundler = false
+        @installed_specs ||= Index.build do |idx|
           Bundler.rubygems.all_specs.reverse_each do |spec|
-            if spec.name == "bundler"
-              next unless spec.version.to_s == VERSION
-              have_bundler = true
-            end
+            next if spec.name == "bundler"
             spec.source = self
             if Bundler.rubygems.spec_missing_extensions?(spec, false)
               Bundler.ui.debug "Source #{self} is ignoring #{spec} because it is missing extensions"
@@ -320,23 +315,6 @@ module Bundler
             end
             idx << spec
           end
-
-          # Always have bundler locally
-          unless have_bundler
-            # We're running bundler directly from the source
-            # so, let's create a fake gemspec for it (it's a path)
-            # gemspec
-            bundler = Gem::Specification.new do |s|
-              s.name     = "bundler"
-              s.version  = VERSION
-              s.platform = Gem::Platform::RUBY
-              s.source   = self
-              s.authors  = ["bundler team"]
-              s.loaded_from = File.expand_path("..", __FILE__)
-            end
-            idx << bundler
-          end
-          idx
         end
       end
 
@@ -354,9 +332,9 @@ module Bundler
             end
             idx << s
           end
-        end
 
-        idx
+          idx
+        end
       end
 
       def api_fetchers

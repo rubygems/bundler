@@ -167,8 +167,8 @@ module Bundler
                              "to a different version of #{locked_gem} that hasn't been removed in order to install."
         end
         unless specs["bundler"].any?
-          bundler = rubygems_index.search(Gem::Dependency.new("bundler", VERSION)).last
-          specs["bundler"] = bundler if bundler
+          bundler = sources.metadata_source.specs.search(Gem::Dependency.new("bundler", VERSION)).last
+          specs["bundler"] = bundler
         end
 
         specs
@@ -285,16 +285,6 @@ module Bundler
       end
     end
     private :double_check_for_index
-
-    # used when frozen is enabled so we can find the bundler
-    # spec, even if (say) a git gem is not checked out.
-    def rubygems_index
-      @rubygems_index ||= Index.build do |idx|
-        sources.rubygems_sources.each do |rubygems|
-          idx.add_source rubygems.specs
-        end
-      end
-    end
 
     def has_rubygems_remotes?
       sources.rubygems_sources.any? {|s| s.remotes.any? }
@@ -935,7 +925,7 @@ module Bundler
       # specs will be available later when the resolver knows where to
       # look for that gemspec (or its dependencies)
       default = sources.default_source
-      source_requirements = { :default => default }
+      source_requirements = { :default => default, "bundler" => sources.metadata_source }
       default = nil unless Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
       dependencies.each do |dep|
         next unless source = dep.source || default
