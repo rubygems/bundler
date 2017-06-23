@@ -8,7 +8,7 @@ module Bundler
 
     def run
       if File.exist?(gemfile)
-        Bundler.ui.error "#{gemfile} already exists at #{SharedHelpers.pwd}/#{gemfile}"
+        Bundler.ui.error "#{gemfile} already exists at #{File.expand_path(gemfile)}"
         exit 1
       end
 
@@ -35,7 +35,11 @@ module Bundler
   private
 
     def gemfile
-      @gemfile ||= Bundler.feature_flag.init_gems_rb? ? "gems.rb" : "Gemfile"
+      @gemfile ||= begin
+        Bundler.default_gemfile
+      rescue GemfileNotFound
+        Bundler.feature_flag.init_gems_rb? ? "gems.rb" : "Gemfile"
+      end
     end
   end
 end

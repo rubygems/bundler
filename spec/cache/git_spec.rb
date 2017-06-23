@@ -52,14 +52,14 @@ end
     it "runs twice without exploding" do
       build_git "foo"
 
-      install_gemfile <<-G
+      install_gemfile! <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
-      bundle "#{cmd} --all"
+      bundle! "#{cmd} --all"
+      bundle! "#{cmd} --all"
 
-      expect(err).to lack_errors
+      expect(last_command.stdout).to include "Updating files in vendor/cache"
       FileUtils.rm_rf lib_path("foo-1.0")
       expect(the_bundle).to include_gems "foo 1.0"
     end
@@ -81,14 +81,14 @@ end
       ref = git.ref_for("master", 11)
       expect(ref).not_to eq(old_ref)
 
-      bundle "update"
-      bundle "#{cmd} --all"
+      bundle! "update", :all => bundle_update_requires_all?
+      bundle! "#{cmd} --all"
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      run "require 'foo'"
+      run! "require 'foo'"
       expect(out).to eq("CACHE")
     end
 

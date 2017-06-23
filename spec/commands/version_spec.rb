@@ -17,10 +17,8 @@ RSpec.describe "bundle version" do
 
   context "with version" do
     it "outputs the version with build metadata" do
-      date = Bundler::BuildMetadata.built_at
-      git_commit_sha = Bundler::BuildMetadata.git_commit_sha
       bundle! "version"
-      expect(out).to eq("Bundler version #{Bundler::VERSION} (#{date} commit #{git_commit_sha})")
+      expect(out).to match(/\ABundler version #{Regexp.escape(Bundler::VERSION)} \(\d{4}-\d{2}-\d{2} commit [a-fA-F0-9]{7,}\)\z/)
     end
   end
 end

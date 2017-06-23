@@ -57,11 +57,11 @@ RSpec.describe "bundle install from an existing gemspec" do
   it "should raise if there are no gemspecs available" do
     build_lib("foo", :path => tmp.join("foo"), :gemspec => false)
 
-    error = install_gemfile(<<-G)
+    install_gemfile(<<-G)
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}'
     G
-    expect(error).to match(/There are no gemspecs at #{tmp.join('foo')}/)
+    expect(last_command.bundler_err).to match(/There are no gemspecs at #{tmp.join('foo')}/)
   end
 
   it "should raise if there are too many gemspecs available" do
@@ -69,11 +69,11 @@ RSpec.describe "bundle install from an existing gemspec" do
       s.write("foo2.gemspec", build_spec("foo", "4.0").first.to_ruby)
     end
 
-    error = install_gemfile(<<-G)
+    install_gemfile(<<-G)
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}'
     G
-    expect(error).to match(/There are multiple gemspecs at #{tmp.join('foo')}/)
+    expect(last_command.bundler_err).to match(/There are multiple gemspecs at #{tmp.join('foo')}/)
   end
 
   it "should pick a specific gemspec" do
@@ -188,7 +188,7 @@ RSpec.describe "bundle install from an existing gemspec" do
     install_gemfile <<-G
       gemspec :path => '#{tmp.join("foo")}'
     G
-    expect(@err).not_to match(/ahh/)
+    expect(last_command.stdboth).not_to include("ahh")
   end
 
   it "allows the gemspec to activate other gems" do

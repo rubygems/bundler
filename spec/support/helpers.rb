@@ -20,21 +20,37 @@ module Spec
     def self.bang(method)
       define_method("#{method}!") do |*args, &blk|
         send(method, *args, &blk).tap do
-          if exitstatus && exitstatus != 0
-            error = out + "\n" + err
-            error.strip!
+          unless last_command.success?
             raise RuntimeError,
-              "Invoking #{method}!(#{args.map(&:inspect).join(", ")}) failed:\n#{error}",
+              "Invoking #{method}!(#{args.map(&:inspect).join(", ")}) failed:\n#{last_command.stdboth}",
               caller.drop_while {|bt| bt.start_with?(__FILE__) }
           end
         end
       end
     end
 
-    attr_reader :out, :err, :exitstatus
-
     def the_bundle(*args)
       TheBundle.new(*args)
+    end
+
+    def last_command
+      @command_executions.last || raise("There is no last command")
+    end
+
+    def out
+      last_command.stdboth
+    end
+
+    def err
+      last_command.stderr
+    end
+
+    def exitstatus
+      last_command.exitstatus
+    end
+
+    def bundle_update_requires_all?
+      !Bundler::VERSION.start_with?("1.")
     end
 
     def in_app_root(&blk)
@@ -53,7 +69,7 @@ module Spec
       opts = args.last.is_a?(Hash) ? args.pop : {}
       groups = args.map(&:inspect).join(", ")
       setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
-      @out = ruby(setup + cmd, opts)
+      ruby(setup + cmd, opts)
     end
     bang :run
 
@@ -173,24 +189,20 @@ module Spec
     bang :gem_command
 
     def sys_exec(cmd)
+      command_execution = CommandExecution.new(cmd.to_s, Dir.pwd)
+
       Open3.popen3(cmd.to_s) do |stdin, stdout, stderr, wait_thr|
         yield stdin, stdout, wait_thr if block_given?
         stdin.close
 
-        @exitstatus = wait_thr && wait_thr.value.exitstatus
-        @out = Thread.new { stdout.read }.value.strip
-        @err = Thread.new { stderr.read }.value.strip
+        command_execution.exitstatus = wait_thr && wait_thr.value.exitstatus
+        command_execution.stdout = Thread.new { stdout.read }.value.strip
+        command_execution.stderr = Thread.new { stderr.read }.value.strip
       end
 
-      (@all_output ||= String.new) << [
-        "$ #{cmd.to_s.strip}",
-        out,
-        err,
-        @exitstatus ? "# $? => #{@exitstatus}" : "",
-        "\n",
-      ].reject(&:empty?).join("\n")
+      (@command_executions ||= []) << command_execution
 
-      @out
+      command_execution.stdout
     end
     bang :sys_exec
 

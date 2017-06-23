@@ -2,6 +2,7 @@ language: ruby
 script: rake spec:travis
 before_script:
   - travis_retry rake spec:travis:deps
+  - travis_retry rake spec:travis:sub_version
   - travis_retry rake man:build
   - travis_retry rake spec:rubygems:clone_rubygems_$RGV
 
@@ -43,6 +44,8 @@ env:
 
 matrix:
   include:
+    - rvm: 2.4.1
+      env: RGV=v2.6.8 BUNDLER_SPEC_SUB_VERSION=2.0.0
     # Ruby 2.4, Rubygems 2.6.8 and up
     # Ruby 2.3, Rubygems 2.5.1 and up
     - rvm: 2.2.6

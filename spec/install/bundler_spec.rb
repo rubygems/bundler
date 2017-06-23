@@ -37,8 +37,6 @@ RSpec.describe "bundle install" do
       G
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
-        Fetching source index from file:#{gem_repo2}/
-        Resolving dependencies...
         Bundler could not find compatible versions for gem "bundler":
           In Gemfile:
             bundler (= 0.9.2)
@@ -50,7 +48,7 @@ RSpec.describe "bundle install" do
 
         Could not find gem 'bundler (= 0.9.2)' in any of the sources
         E
-      expect(out).to eq(nice_error)
+      expect(last_command.bundler_err).to include(nice_error)
     end
 
     it "works for gems with multiple versions in its dependencies" do
@@ -98,8 +96,6 @@ RSpec.describe "bundle install" do
       G
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
-        Fetching source index from file:#{gem_repo2}/
-        Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             activemerchant was resolved to 1.0, which depends on
@@ -108,7 +104,7 @@ RSpec.describe "bundle install" do
             rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
       E
-      expect(out).to include(nice_error)
+      expect(last_command.bundler_err).to include(nice_error)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -119,8 +115,6 @@ RSpec.describe "bundle install" do
       G
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
-        Fetching source index from file:#{gem_repo2}/
-        Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             activesupport (= 2.3.5)
@@ -128,7 +122,7 @@ RSpec.describe "bundle install" do
             rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
       E
-      expect(out).to include(nice_error)
+      expect(last_command.bundler_err).to include(nice_error)
     end
 
     it "can install dependencies with newer bundler version" do

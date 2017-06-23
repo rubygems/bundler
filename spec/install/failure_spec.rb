@@ -18,7 +18,7 @@ RSpec.describe "bundle install" do
         source "file:#{gem_repo2}"
         gem "rails"
       G
-      expect(out).to end_with(<<-M.strip)
+      expect(last_command.bundler_err).to end_with(<<-M.strip)
 An error occurred while installing activesupport (2.3.2), and Bundler cannot continue.
 Make sure that `gem install activesupport -v '2.3.2'` succeeds before bundling.
 

@@ -183,7 +183,7 @@ RSpec.describe "bundle cache" do
 
     it "adds and removes when gems are updated" do
       update_repo2
-      bundle "update"
+      bundle "update", :all => bundle_update_requires_all?
       expect(cached_gem("rack-1.2")).to exist
       expect(cached_gem("rack-1.0.0")).not_to exist
     end

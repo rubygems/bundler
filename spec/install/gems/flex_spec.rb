@@ -193,8 +193,6 @@ RSpec.describe "bundle flex_install" do
 
     it "suggests bundle update when the Gemfile requires different versions than the lock" do
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
-        Fetching source index from file:#{gem_repo2}/
-        Resolving dependencies...
         Bundler could not find compatible versions for gem "rack":
           In snapshot (Gemfile.lock):
             rack (= 0.9.1)
@@ -211,7 +209,7 @@ RSpec.describe "bundle flex_install" do
       E
 
       bundle :install, :retry => 0
-      expect(out).to eq(nice_error)
+      expect(last_command.bundler_err).to end_with(nice_error)
     end
   end
 

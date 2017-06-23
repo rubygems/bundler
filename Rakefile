@@ -234,6 +234,18 @@ begin
         raise "Spec run failed, please review the log for more information"
       end
     end
+
+    namespace :travis do
+      task :sub_version do
+        next unless version = ENV["BUNDLER_SPEC_SUB_VERSION"]
+        version_file = File.expand_path("../lib/bundler/version.rb", __FILE__)
+        contents = File.read(version_file)
+        unless contents.sub!(/(^\s+VERSION\s*=\s*)"#{Gem::Version::VERSION_PATTERN}"/, %(\\1"#{version}"))
+          abort("Failed to change bundler version")
+        end
+        File.open(version_file, "w") {|f| f << contents }
+      end
+    end
   end
 
 rescue LoadError

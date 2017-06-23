@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe "major deprecations" do
-  let(:warnings) { out } # change to err in 2.0
+RSpec.describe "major deprecations", :bundler => "< 2" do
+  let(:warnings) { last_command.bundler_err } # change to err in 2.0
   let(:warnings_without_version_messages) { warnings.gsub(/#{Spec::Matchers::MAJOR_DEPRECATION}Bundler will only support ruby(gems)? >= .*/, "") }
 
   context "in a .99 version" do
@@ -34,7 +34,7 @@ RSpec.describe "major deprecations" do
   describe "bundle_ruby" do
     it "prints a deprecation" do
       bundle_ruby
-      out.gsub! "\nruby #{RUBY_VERSION}", ""
+      warnings.gsub! "\nruby #{RUBY_VERSION}", ""
       expect(warnings).to have_major_deprecation "the bundle_ruby executable has been removed in favor of `bundle platform --ruby`"
     end
   end
@@ -255,14 +255,14 @@ The :bitbucket git source is deprecated, and will be removed in Bundler 2.0. Add
 
   context "bundle list" do
     it "prints a deprecation warning" do
-      install_gemfile <<-G
+      install_gemfile! <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
 
-      bundle :list
+      bundle! :list
 
-      out.gsub!(/gems included.*?\[DEPRECATED/im, "[DEPRECATED")
+      warnings.gsub!(/gems included.*?\[DEPRECATED/im, "[DEPRECATED")
 
       expect(warnings).to have_major_deprecation("use `bundle show` instead of `bundle list`")
     end

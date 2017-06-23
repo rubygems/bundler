@@ -162,7 +162,7 @@ RSpec.describe "bundle package" do
         gem 'rack'
       D
 
-      bundle "package --no-install"
+      bundle! "package --no-install"
 
       expect(the_bundle).not_to include_gems "rack 1.0.0"
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
@@ -174,8 +174,8 @@ RSpec.describe "bundle package" do
         gem 'rack'
       D
 
-      bundle "package --no-install"
-      bundle "install"
+      bundle! "package --no-install"
+      bundle! "install"
 
       expect(the_bundle).to include_gems "rack 1.0.0"
     end

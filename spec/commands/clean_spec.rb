@@ -80,7 +80,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle! "install --path vendor/bundle --no-clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -88,9 +88,9 @@ RSpec.describe "bundle clean" do
       gem "rack", "0.9.1"
       gem "foo"
     G
-    bundle "install"
+    bundle! "update rack"
 
-    bundle :clean
+    bundle! :clean
 
     expect(out).to include("Removing rack (1.0.0)")
 
@@ -195,13 +195,13 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    bundle! "install --path vendor/bundle"
 
     update_git "foo", :path => lib_path("foo-bar")
     revision2 = revision_for(lib_path("foo-bar"))
 
-    bundle "update"
-    bundle :clean
+    bundle! "update", :all => bundle_update_requires_all?
+    bundle! :clean
 
     expect(out).to include("Removing foo-bar (#{revision[0..11]})")
 
@@ -366,13 +366,13 @@ RSpec.describe "bundle clean" do
 
       gem "foo"
     G
-    bundle "install --path vendor/bundle --clean"
+    bundle! "install --path vendor/bundle --clean"
 
     update_repo2 do
       build_gem "foo", "1.0.1"
     end
 
-    bundle "update"
+    bundle! "update", :all => bundle_update_requires_all?
 
     should_have_gems "foo-1.0.1"
     should_not_have_gems "foo-1.0"
@@ -405,13 +405,13 @@ RSpec.describe "bundle clean" do
 
       gem "foo"
     G
-    bundle "install --path vendor/bundle"
+    bundle! "install --path vendor/bundle"
 
     update_repo2 do
       build_gem "foo", "1.0.1"
     end
 
-    bundle :update
+    bundle! :update, :all => bundle_update_requires_all?
     should_have_gems "foo-1.0", "foo-1.0.1"
   end
 
@@ -423,14 +423,14 @@ RSpec.describe "bundle clean" do
 
       gem "foo"
     G
-    bundle "install"
+    bundle! "install"
 
     update_repo2 do
       build_gem "foo", "1.0.1"
     end
-    bundle :update
+    bundle! :update, :all => bundle_update_requires_all?
 
-    sys_exec "gem list"
+    sys_exec! "gem list"
     expect(out).to include("foo (1.0.1, 1.0)")
   end
 

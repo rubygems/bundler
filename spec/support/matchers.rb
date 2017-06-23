@@ -140,8 +140,8 @@ module Spec
           rescue => e
             next "#{name} is not installed:\n#{indent(e)}"
           end
-          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
-          actual_version, actual_platform = out.strip.split(/\s+/, 2)
+          last_command.stdout.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
+          actual_version, actual_platform = last_command.stdout.strip.split(/\s+/, 2)
           unless Gem::Version.new(actual_version) == Gem::Version.new(version)
             next "#{name} was expected to be at version #{version} but was #{actual_version}"
           end
@@ -155,8 +155,8 @@ module Spec
           rescue
             next "#{name} does not have a source defined:\n#{indent(e)}"
           end
-          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
-          unless out.strip == source
+          last_command.stdout.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
+          unless last_command.stdout.strip == source
             next "Expected #{name} (#{version}) to be installed from `#{source}`, was actually from `#{out}`"
           end
         end.compact
@@ -181,9 +181,9 @@ module Spec
           rescue => e
             next "checking for #{name} failed:\n#{e}"
           end
-          next if out == "WIN"
+          next if last_command.stdout == "WIN"
           next "expected #{name} to not be installed, but it was" if version.nil?
-          if Gem::Version.new(out) == Gem::Version.new(version)
+          if Gem::Version.new(last_command.stdout) == Gem::Version.new(version)
             next "expected #{name} (#{version}) not to be installed, but it was"
           end
         end.compact

@@ -60,7 +60,7 @@ RSpec.describe "compact index api" do
     # can't use `include_gems` here since the `require` will conflict on a
     # case-insensitive FS
     run! "Bundler.require; puts Gem.loaded_specs.values_at('rack', 'Rack').map(&:full_name)"
-    expect(out).to eq("rack-1.0\nRack-0.1")
+    expect(last_command.stdout).to eq("rack-1.0\nRack-0.1")
   end
 
   it "should handle multiple gem dependencies on the same gem" do
@@ -248,7 +248,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         gem "rack"
       G
 
-      bundle "update --full-index", :artifice => "compact_index"
+      bundle! "update --full-index", :artifice => "compact_index", :all => bundle_update_requires_all?
       expect(out).to include("Fetching source index from #{source_uri}")
       expect(the_bundle).to include_gems "rack 1.0.0"
     end

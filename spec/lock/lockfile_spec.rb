@@ -74,6 +74,8 @@ RSpec.describe "the lockfile format" do
   end
 
   it "does not update the lockfile's bundler version if nothing changed during bundle install" do
+    version = "#{Bundler::VERSION.split(".").first}.0.0.0.a"
+
     lockfile <<-L
       GEM
         remote: file:#{gem_repo1}/
@@ -87,7 +89,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         1.10.0
+         #{version}
     L
 
     install_gemfile <<-G
@@ -109,7 +111,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         1.10.0
+         #{version}
     G
   end
 
@@ -1304,7 +1306,7 @@ RSpec.describe "the lockfile format" do
       it "preserves Gemfile.lock \\n line endings" do
         update_repo2
 
-        expect { bundle "update" }.to change { File.mtime(bundled_app("Gemfile.lock")) }
+        expect { bundle "update", :all => true }.to change { File.mtime(bundled_app("Gemfile.lock")) }
         expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
         expect(the_bundle).to include_gems "rack 1.2"
       end
@@ -1315,7 +1317,7 @@ RSpec.describe "the lockfile format" do
         File.open(bundled_app("Gemfile.lock"), "wb") {|f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
-        expect { bundle "update" }.to change { File.mtime(bundled_app("Gemfile.lock")) }
+        expect { bundle "update", :all => true }.to change { File.mtime(bundled_app("Gemfile.lock")) }
         expect(File.read(bundled_app("Gemfile.lock"))).to match("\r\n")
         expect(the_bundle).to include_gems "rack 1.2"
       end
@@ -1369,12 +1371,12 @@ RSpec.describe "the lockfile format" do
          #{Bundler::VERSION}
     L
 
-    error = install_gemfile(<<-G)
+    install_gemfile(<<-G)
       source "file://#{gem_repo1}"
       gem "rack"
     G
 
-    expect(error).to match(/your Gemfile.lock contains merge conflicts/i)
-    expect(error).to match(/git checkout HEAD -- Gemfile.lock/i)
+    expect(last_command.bundler_err).to match(/your Gemfile.lock contains merge conflicts/i)
+    expect(last_command.bundler_err).to match(/git checkout HEAD -- Gemfile.lock/i)
   end
 end
