@@ -172,10 +172,10 @@ module Bundler
               "the path method, like: \n\n" \
               "    path 'dir/containing/rails' do\n" \
               "      gem 'rails'\n" \
-              "    end"
+              "    end\n\n"
 
         raise DeprecatedError, msg if Bundler.feature_flag.disable_multisource?
-        SharedHelpers.major_deprecation(msg)
+        SharedHelpers.major_deprecation(msg.strip)
       end
 
       source_options = normalize_hash(options).merge(
@@ -446,10 +446,14 @@ repo_name ||= user_name
       return if source_list.rubygems_primary_remotes.empty? && source_list.global_rubygems_source.nil?
 
       if Bundler.feature_flag.disable_multisource?
-        raise GemfileError, "Warning: this Gemfile contains multiple primary sources. " \
+        msg = "This Gemfile contains multiple primary sources. " \
           "Each source after the first must include a block to indicate which gems " \
-          "should come from that source. To downgrade this error to a warning, run " \
-          "`bundle config --delete disable_multisource`"
+          "should come from that source"
+        unless Bundler.feature_flag.bundler_2_mode?
+          msg += ". To downgrade this error to a warning, run " \
+            "`bundle config --delete disable_multisource`"
+        end
+        raise GemfileEvalError, msg
       else
         Bundler::SharedHelpers.major_deprecation "Your Gemfile contains multiple primary sources. " \
           "Using `source` more than once without a block is a security risk, and " \

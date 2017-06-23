@@ -52,8 +52,9 @@ RSpec.describe "bundler/inline#gemfile" do
   it "requires the gems" do
     script <<-RUBY
       gemfile do
-        path "#{lib_path}"
-        gem "two"
+        path "#{lib_path}" do
+          gem "two"
+        end
       end
     RUBY
 
@@ -62,8 +63,9 @@ RSpec.describe "bundler/inline#gemfile" do
 
     script <<-RUBY
       gemfile do
-        path "#{lib_path}"
-        gem "eleven"
+        path "#{lib_path}" do
+          gem "eleven"
+        end
       end
 
       puts "success"
@@ -132,8 +134,9 @@ RSpec.describe "bundler/inline#gemfile" do
       require 'bundler'
       options = { :ui => Bundler::UI::Shell.new }
       gemfile(false, options) do
-        path "#{lib_path}"
-        gem "two"
+        path "#{lib_path}" do
+          gem "two"
+        end
       end
       puts "OKAY" if options.key?(:ui)
     RUBY

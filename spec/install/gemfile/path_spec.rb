@@ -1,12 +1,24 @@
 # frozen_string_literal: true
 
 RSpec.describe "bundle install with explicit source paths" do
-  it "fetches gems" do
+  it "fetches gems with a global path source", :bundler => "< 2" do
     build_lib "foo"
 
     install_gemfile <<-G
       path "#{lib_path("foo-1.0")}"
       gem 'foo'
+    G
+
+    expect(the_bundle).to include_gems("foo 1.0")
+  end
+
+  it "fetches gems" do
+    build_lib "foo"
+
+    install_gemfile <<-G
+      path "#{lib_path("foo-1.0")}" do
+        gem 'foo'
+      end
     G
 
     expect(the_bundle).to include_gems("foo 1.0")

@@ -86,7 +86,7 @@ RSpec.describe "bundle lock" do
   it "does not fetch remote specs when using the --local option" do
     bundle "lock --update --local"
 
-    expect(out).to include("sources listed in your Gemfile")
+    expect(out).to match(/sources listed in your Gemfile|installed locally/)
   end
 
   it "writes to a custom location using --lockfile" do

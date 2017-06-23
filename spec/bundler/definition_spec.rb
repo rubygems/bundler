@@ -31,7 +31,7 @@ RSpec.describe Bundler::Definition do
   end
 
   describe "detects changes" do
-    it "for a path gem with changes" do
+    it "for a path gem with changes", :bundler => "< 2" do
       build_lib "foo", "1.0", :path => lib_path("foo")
 
       install_gemfile <<-G
@@ -57,6 +57,44 @@ RSpec.describe Bundler::Definition do
           remote: file:#{gem_repo1}/
           specs:
             rack (1.0.0)
+
+        PLATFORMS
+          ruby
+
+        DEPENDENCIES
+          foo!
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      G
+    end
+
+    it "for a path gem with changes", :bundler => "2" do
+      build_lib "foo", "1.0", :path => lib_path("foo")
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :path => "#{lib_path("foo")}"
+      G
+
+      build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+        s.add_dependency "rack", "1.0"
+      end
+
+      bundle :install, :env => { "DEBUG" => 1 }
+
+      expect(out).to match(/re-resolving dependencies/)
+      lockfile_should_be <<-G
+        GEM
+          remote: file:#{gem_repo1}/
+          specs:
+            rack (1.0.0)
+
+        PATH
+          remote: #{lib_path("foo")}
+          specs:
+            foo (1.0)
+              rack (= 1.0)
 
         PLATFORMS
           ruby

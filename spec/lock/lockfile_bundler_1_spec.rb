@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "the lockfile format", :bundler => "2" do
+RSpec.describe "the lockfile format", :bundler => "< 2" do
   include Bundler::GemHelpers
 
   it "generates a simple lockfile for a single source, gem" do
@@ -360,28 +360,19 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
   end
 
-  it "generates a lockfile without credentials for a configured source" do
+  it "generates a lockfile wihout credentials for a configured source" do
     bundle "config http://localgemserver.test/ user:pass"
 
     install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
-      source "http://localgemserver.test/" do
+      source "http://localgemserver.test/"
+      source "http://user:pass@othergemserver.test/"
 
-      end
-
-      source "http://user:pass@othergemserver.test/" do
-        gem "rack-obama", ">= 1.0"
-      end
+      gem "rack-obama", ">= 1.0"
     G
 
     lockfile_should_be <<-G
       GEM
-        specs:
-
-      GEM
         remote: http://localgemserver.test/
-        specs:
-
-      GEM
         remote: http://user:pass@othergemserver.test/
         specs:
           rack (1.0.0)
@@ -392,7 +383,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
         #{generic_local_platform}
 
       DEPENDENCIES
-        rack-obama (>= 1.0)!
+        rack-obama (>= 1.0)
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -503,14 +494,14 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
 
     lockfile_should_be <<-G
-      GEM
-        specs:
-
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for("master")}
         specs:
           foo (1.0)
+
+      GEM
+        specs:
 
       PLATFORMS
         #{generic_local_platform}
@@ -532,15 +523,15 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
 
     lockfile_should_be <<-G
-      GEM
-        specs:
-
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for("omg")}
         branch: omg
         specs:
           foo (1.0)
+
+      GEM
+        specs:
 
       PLATFORMS
         #{generic_local_platform}
@@ -562,15 +553,15 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
 
     lockfile_should_be <<-G
-      GEM
-        specs:
-
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for("omg")}
         tag: omg
         specs:
           foo (1.0)
+
+      GEM
+        specs:
 
       PLATFORMS
         #{generic_local_platform}
@@ -591,13 +582,13 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
 
     lockfile_should_be <<-G
-      GEM
-        specs:
-
       PATH
         remote: #{lib_path("foo-1.0")}
         specs:
           foo (1.0)
+
+      GEM
+        specs:
 
       PLATFORMS
         #{generic_local_platform}
@@ -621,13 +612,13 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     bundle! "install --local"
 
     lockfile_should_be <<-G
-      GEM
-        specs:
-
       PATH
         remote: #{lib_path("foo-1.0")}
         specs:
           foo (1.0)
+
+      GEM
+        specs:
 
       PLATFORMS
         #{generic_local_platform}
@@ -653,11 +644,6 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
 
     lockfile_should_be <<-G
-      GEM
-        remote: file:#{gem_repo1}/
-        specs:
-          rack (1.0.0)
-
       GIT
         remote: #{lib_path("bar-1.0")}
         revision: #{bar.ref_for("master")}
@@ -668,6 +654,11 @@ RSpec.describe "the lockfile format", :bundler => "2" do
         remote: #{lib_path("foo-1.0")}
         specs:
           foo (1.0)
+
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
 
       PLATFORMS
         #{generic_local_platform}
@@ -838,25 +829,24 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     build_lib "foo", :path => bundled_app("foo")
 
     install_gemfile <<-G
-      path "foo" do
-        gem "foo"
-      end
+      path "foo"
+      gem "foo"
     G
 
     lockfile_should_be <<-G
-      GEM
-        specs:
-
       PATH
         remote: foo
         specs:
           foo (1.0)
 
+      GEM
+        specs:
+
       PLATFORMS
         #{generic_local_platform}
 
       DEPENDENCIES
-        foo!
+        foo
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -867,25 +857,24 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     build_lib "foo", :path => bundled_app(File.join("..", "foo"))
 
     install_gemfile <<-G
-      path "../foo" do
-        gem "foo"
-      end
+      path "../foo"
+      gem "foo"
     G
 
     lockfile_should_be <<-G
-      GEM
-        specs:
-
       PATH
         remote: ../foo
         specs:
           foo (1.0)
 
+      GEM
+        specs:
+
       PLATFORMS
         #{generic_local_platform}
 
       DEPENDENCIES
-        foo!
+        foo
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -896,25 +885,24 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     build_lib "foo", :path => bundled_app("foo")
 
     install_gemfile <<-G
-      path File.expand_path("../foo", __FILE__) do
-        gem "foo"
-      end
+      path File.expand_path("../foo", __FILE__)
+      gem "foo"
     G
 
     lockfile_should_be <<-G
-      GEM
-        specs:
-
       PATH
         remote: foo
         specs:
           foo (1.0)
 
+      GEM
+        specs:
+
       PLATFORMS
         #{generic_local_platform}
 
       DEPENDENCIES
-        foo!
+        foo
 
       BUNDLED WITH
          #{Bundler::VERSION}
@@ -929,13 +917,13 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
 
     lockfile_should_be <<-G
-      GEM
-        specs:
-
       PATH
         remote: ../foo
         specs:
           foo (1.0)
+
+      GEM
+        specs:
 
       PLATFORMS
         #{generic_local_platform}
@@ -1215,23 +1203,23 @@ RSpec.describe "the lockfile format", :bundler => "2" do
 
     # Create a Gemfile.lock that has duplicate GIT sections
     lockfile <<-L
+      GIT
+        remote: #{lib_path("omg")}
+        revision: #{revision}
+        branch: master
+        specs:
+          omg (1.0)
+
+      GIT
+        remote: #{lib_path("omg")}
+        revision: #{revision}
+        branch: master
+        specs:
+          omg (1.0)
+
       GEM
         remote: file:#{gem_repo1}/
         specs:
-
-      GIT
-        remote: #{lib_path("omg")}
-        revision: #{revision}
-        branch: master
-        specs:
-          omg (1.0)
-
-      GIT
-        remote: #{lib_path("omg")}
-        revision: #{revision}
-        branch: master
-        specs:
-          omg (1.0)
 
       PLATFORMS
         #{local}
@@ -1249,16 +1237,16 @@ RSpec.describe "the lockfile format", :bundler => "2" do
 
     # Confirm that duplicate specs do not appear
     expect(File.read(bundled_app("Gemfile.lock"))).to eq(strip_whitespace(<<-L))
-      GEM
-        remote: file:#{gem_repo1}/
-        specs:
-
       GIT
         remote: #{lib_path("omg")}
         revision: #{revision}
         branch: master
         specs:
           omg (1.0)
+
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
 
       PLATFORMS
         #{local}

@@ -93,15 +93,14 @@ RSpec.describe "install with --deployment or --frozen" do
   end
 
   it "works with sources given by a block" do
-    install_gemfile <<-G
+    install_gemfile! <<-G
       source "file://#{gem_repo1}" do
         gem "rack"
       end
     G
 
-    bundle "install --deployment"
+    bundle! "install --deployment"
 
-    expect(exitstatus).to eq(0) if exitstatus
     expect(the_bundle).to include_gems "rack 1.0"
   end
 

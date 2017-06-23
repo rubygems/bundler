@@ -539,7 +539,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       expect(out).not_to include("#{user}:#{password}")
     end
 
-    it "strips http basic auth creds when warning about ambiguous sources" do
+    it "strips http basic auth creds when warning about ambiguous sources", :bundler => "< 2" do
       gemfile <<-G
         source "#{basic_auth_source_uri}"
         source "file://#{gem_repo1}"

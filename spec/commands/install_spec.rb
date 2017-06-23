@@ -280,7 +280,7 @@ RSpec.describe "bundle install with gem sources" do
       end
     end
 
-    it "finds gems in multiple sources" do
+    it "finds gems in multiple sources", :bundler => "< 2" do
       build_repo2
       update_repo2
 
@@ -314,9 +314,9 @@ RSpec.describe "bundle install with gem sources" do
     it "gracefully handles error when rubygems server is unavailable" do
       install_gemfile <<-G, :artifice => nil
         source "file://#{gem_repo1}"
-        source "http://localhost:9384"
-
-        gem 'foo'
+        source "http://localhost:9384" do
+          gem 'foo'
+        end
       G
 
       bundle :install, :artifice => nil

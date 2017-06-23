@@ -326,7 +326,7 @@ RSpec.describe "real source plugins" do
       expect(the_bundle).to include_gems("ma-gitp-gem 1.0")
     end
 
-    it "writes to lock file" do
+    it "writes to lock file", :bundler => "< 2" do
       revision = revision_for(lib_path("ma-gitp-gem-1.0"))
       bundle "install"
 
@@ -341,6 +341,33 @@ RSpec.describe "real source plugins" do
         GEM
           remote: file:#{gem_repo2}/
           specs:
+
+        PLATFORMS
+          #{generic_local_platform}
+
+        DEPENDENCIES
+          ma-gitp-gem!
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      G
+    end
+
+    it "writes to lock file", :bundler => "2" do
+      revision = revision_for(lib_path("ma-gitp-gem-1.0"))
+      bundle "install"
+
+      lockfile_should_be <<-G
+        GEM
+          remote: file:#{gem_repo2}/
+          specs:
+
+        PLUGIN SOURCE
+          remote: file://#{lib_path("ma-gitp-gem-1.0")}
+          type: gitp
+          revision: #{revision}
+          specs:
+            ma-gitp-gem (1.0)
 
         PLATFORMS
           #{generic_local_platform}

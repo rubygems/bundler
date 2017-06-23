@@ -41,7 +41,7 @@ module Bundler
 
     def global_rubygems_source=(uri)
       if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
-        @global_rubygems_source ||= Source::Rubygems.new("remotes" => uri)
+        @global_rubygems_source ||= rubygems_aggregate_class.new("remotes" => uri)
       end
       add_rubygems_remote(uri)
     end
@@ -77,7 +77,7 @@ module Bundler
 
     def lock_sources
       if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
-        [rubygems_sources, git_sources, path_sources, plugin_sources].map do |sources|
+        [[default_source], @rubygems_sources, git_sources, path_sources, plugin_sources].map do |sources|
           sources.sort_by(&:to_s)
         end.flatten(1)
       else
@@ -86,6 +86,7 @@ module Bundler
       end
     end
 
+    # Returns true if there are changes
     def replace_sources!(replacement_sources)
       return true if replacement_sources.empty?
 
@@ -95,13 +96,14 @@ module Bundler
         end
       end
 
-      replacement_rubygems =
+      replacement_rubygems = !Bundler.feature_flag.lockfile_uses_separate_rubygems_sources? &&
         replacement_sources.detect {|s| s.is_a?(Source::Rubygems) }
       @rubygems_aggregate = replacement_rubygems if replacement_rubygems
 
-      # Return true if there were changes
-      lock_sources.to_set != replacement_sources.to_set ||
-        rubygems_remotes.to_set != replacement_rubygems.remotes.to_set
+      return true if lock_sources.to_set != replacement_sources.to_set
+      return true if replacement_rubygems && rubygems_remotes.to_set != replacement_rubygems.remotes.to_set
+
+      false
     end
 
     def cached!
