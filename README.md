@@ -2,6 +2,7 @@
 [![Build Status](https://img.shields.io/travis/bundler/bundler/master.svg?style=flat)](https://travis-ci.org/bundler/bundler)
 [![Code Climate](https://img.shields.io/codeclimate/github/bundler/bundler.svg?style=flat)](https://codeclimate.com/github/bundler/bundler)
 [![Inline docs ](http://inch-ci.org/github/bundler/bundler.svg?style=flat)](http://inch-ci.org/github/bundler/bundler)
+[![Slack       ](http://bundler-slackin.herokuapp.com/badge.svg)](http://bundler-slackin.herokuapp.com)
 
 # Bundler: a gem to bundle gems
 
