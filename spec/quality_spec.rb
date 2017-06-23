@@ -169,6 +169,7 @@ RSpec.describe "The library itself" do
 
   it "documents all used settings" do
     exemptions = %w[
+      default_cli_command
       gem.coc
       gem.mit
       warned_version
