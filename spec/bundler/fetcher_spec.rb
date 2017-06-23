@@ -70,6 +70,21 @@ RSpec.describe Bundler::Fetcher do
         expect(fetcher.send(:connection).override_headers["X-Gemfile-Source"]).to be_nil
       end
     end
+
+    context "when there are proxy environment variable(s) set" do
+      it "consider http_proxy" do
+        with_env_vars("HTTP_PROXY" => "http://proxy-example3.com") do
+          expect(fetcher.http_proxy).to match("http://proxy-example3.com")
+        end
+      end
+      it "consider no_proxy" do
+        with_env_vars("HTTP_PROXY" => "http://proxy-example4.com", "NO_PROXY" => ".example.com,.example.net") do
+          expect(
+            fetcher.send(:connection).no_proxy
+          ).to eq([".example.com", ".example.net"])
+        end
+      end
+    end
   end
 
   describe "#user_agent" do
