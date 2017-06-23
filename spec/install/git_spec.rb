@@ -36,8 +36,8 @@ RSpec.describe "bundle install" do
       expect(the_bundle).to include_gems "foo 2.0", :source => "git@#{lib_path("foo")}"
     end
 
-    it "should check out git repos that are missing but not being installed" do
-      build_git "foo"
+    it "should allows git repos that are missing but not being installed" do
+      revision = build_git("foo").ref_for("HEAD")
 
       gemfile <<-G
         gem "foo", :git => "file://#{lib_path("foo-1.0")}", :group => :development
@@ -46,6 +46,7 @@ RSpec.describe "bundle install" do
       lockfile <<-L
         GIT
           remote: file://#{lib_path("foo-1.0")}
+          revision: #{revision}
           specs:
             foo (1.0)
 
@@ -56,10 +57,9 @@ RSpec.describe "bundle install" do
           foo!
       L
 
-      bundle "install --path=vendor/bundle --without development"
+      bundle! "install --path=vendor/bundle --without development"
 
       expect(out).to include("Bundle complete!")
-      expect(vendored_gems("bundler/gems/foo-1.0-#{revision_for(lib_path("foo-1.0"))[0..11]}")).to be_directory
     end
   end
 end

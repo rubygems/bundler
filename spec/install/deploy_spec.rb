@@ -135,6 +135,35 @@ RSpec.describe "install with --deployment or --frozen" do
       expect(out).not_to include("You have changed in the Gemfile")
     end
 
+    it "works if a path gem is missing but is in a without group" do
+      build_lib "path_gem"
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gem "rake"
+        gem "path_gem", :path => "#{lib_path("path_gem-1.0")}", :group => :development
+      G
+      expect(the_bundle).to include_gems "path_gem 1.0"
+      FileUtils.rm_r lib_path("path_gem-1.0")
+
+      bundle! :install, :path => ".bundle", :without => "development", :deployment => true, :env => { :DEBUG => "1" }
+      run! "puts :WIN"
+      expect(out).to eq("WIN")
+    end
+
+    it "explodes if a path gem is missing" do
+      build_lib "path_gem"
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+        gem "rake"
+        gem "path_gem", :path => "#{lib_path("path_gem-1.0")}", :group => :development
+      G
+      expect(the_bundle).to include_gems "path_gem 1.0"
+      FileUtils.rm_r lib_path("path_gem-1.0")
+
+      bundle :install, :path => ".bundle", :deployment => true
+      expect(out).to include("The path `#{lib_path("path_gem-1.0")}` does not exist.")
+    end
+
     it "can have --frozen set via an environment variable" do
       gemfile <<-G
         source "file://#{gem_repo1}"
