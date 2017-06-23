@@ -414,11 +414,18 @@ RSpec.describe "bundle update when a gem depends on a newer version of bundler" 
     G
   end
 
-  it "should explain that bundler conflicted" do
+  it "should explain that bundler conflicted", :bundler => "< 2" do
     bundle "update", :all => bundle_update_requires_all?
     expect(last_command.stdboth).not_to match(/in snapshot/i)
     expect(last_command.bundler_err).to match(/current Bundler version/i).
       and match(/perhaps you need to update bundler/i)
+  end
+
+  it "should warn that the newer version of Bundler would conflict", :bundler => "2" do
+    bundle! "update", :all => true
+    expect(last_command.bundler_err).to include("rails (3.0.1) has dependency bundler").
+      and include("so the dependency is being ignored")
+    expect(the_bundle).to include_gem "rails 3.0.1"
   end
 end
 
