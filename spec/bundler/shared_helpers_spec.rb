@@ -101,7 +101,7 @@ RSpec.describe Bundler::SharedHelpers do
       context "currently in directory with a Gemfile" do
         before { File.new("Gemfile", "w") }
 
-        it "returns path of the bundle gemfile" do
+        it "returns path of the bundle Gemfile" do
           expect(subject.in_bundle?).to eq("#{bundled_app}/Gemfile")
         end
       end
@@ -118,6 +118,14 @@ RSpec.describe Bundler::SharedHelpers do
 
       it "returns ENV['BUNDLE_GEMFILE']" do
         expect(subject.in_bundle?).to eq("/path/Gemfile")
+      end
+    end
+
+    context "ENV['BUNDLE_GEMFILE'] is set without an absolute path" do
+      before { ENV["BUNDLE_GEMFILE"] = "Gemfile" }
+
+      it "returns path of the bundle Gemfile" do
+        expect(subject.in_bundle?).to eq("#{bundled_app}/Gemfile")
       end
     end
 
