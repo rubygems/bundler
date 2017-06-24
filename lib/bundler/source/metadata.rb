@@ -33,7 +33,7 @@ module Bundler
         {}
       end
 
-      def install(spec, opts)
+      def install(spec, _opts = {})
         Bundler.ui.info "Using #{version_message(spec)}"
         nil
       end
@@ -49,6 +49,10 @@ module Bundler
 
       def hash
         self.class.hash
+      end
+
+      def version_message(spec)
+        "#{spec.name} #{spec.version}"
       end
     end
   end

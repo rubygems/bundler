@@ -172,7 +172,7 @@ RSpec.describe "real source plugins" do
       end
 
       it "installs" do
-        bundle "install"
+        bundle! "install"
 
         expect(the_bundle).to include_gems("a-path-gem 1.0")
       end

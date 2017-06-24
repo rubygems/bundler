@@ -134,7 +134,7 @@ module Bundler
       if options.key?("type")
         options["type"] = options["type"].to_s
         unless Plugin.source?(options["type"])
-          raise "No sources available for #{options["type"]}"
+          raise InvalidOption, "No plugin sources available for #{options["type"]}"
         end
 
         unless block_given?
