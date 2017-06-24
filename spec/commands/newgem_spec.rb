@@ -214,12 +214,10 @@ RSpec.describe "bundle gem" do
     end
 
     Dir.chdir(bundled_app("newgem")) do
-      bundle "exec rake build"
+      bundle! "exec rake build"
     end
 
-    expect(exitstatus).to be_zero if exitstatus
-    expect(out).not_to include("ERROR")
-    expect(err).not_to include("ERROR")
+    expect(last_command.stdboth).not_to include("ERROR")
   end
 
   context "gem naming with relative paths" do

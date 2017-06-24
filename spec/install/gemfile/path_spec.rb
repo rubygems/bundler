@@ -281,8 +281,9 @@ RSpec.describe "bundle install with explicit source paths" do
     end
 
     install_gemfile <<-G
-      path "#{lib_path("foo-1.0")}"
-      gem 'foo'
+      path "#{lib_path("foo-1.0")}" do
+        gem 'foo'
+      end
     G
     expect(the_bundle).to include_gems "foo 1.0"
 

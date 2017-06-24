@@ -63,7 +63,7 @@ RSpec.describe "real source plugins" do
       expect(the_bundle).to include_gems("a-path-gem 1.0")
     end
 
-    it "writes to lock file" do
+    it "writes to lock file", :bundler => "< 2" do
       bundle "install"
 
       lockfile_should_be <<-G
@@ -76,6 +76,31 @@ RSpec.describe "real source plugins" do
         GEM
           remote: file:#{gem_repo2}/
           specs:
+
+        PLATFORMS
+          #{generic_local_platform}
+
+        DEPENDENCIES
+          a-path-gem!
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      G
+    end
+
+    it "writes to lock file", :bundler => "2" do
+      bundle "install"
+
+      lockfile_should_be <<-G
+        GEM
+          remote: file:#{gem_repo2}/
+          specs:
+
+        PLUGIN SOURCE
+          remote: #{lib_path("a-path-gem-1.0")}
+          type: mpath
+          specs:
+            a-path-gem (1.0)
 
         PLATFORMS
           #{generic_local_platform}

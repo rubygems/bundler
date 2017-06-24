@@ -925,7 +925,7 @@ module Bundler
       # specs will be available later when the resolver knows where to
       # look for that gemspec (or its dependencies)
       default = sources.default_source
-      source_requirements = { :default => default, "bundler" => sources.metadata_source }
+      source_requirements = { :default => default }
       default = nil unless Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
       dependencies.each do |dep|
         next unless source = dep.source || default
@@ -934,6 +934,7 @@ module Bundler
       metadata_dependencies.each do |dep|
         source_requirements[dep.name] = sources.metadata_source
       end
+      source_requirements["bundler"] = sources.metadata_source # needs to come last to override
       source_requirements
     end
 

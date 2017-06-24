@@ -22,6 +22,8 @@ module Bundler
           elsif local_spec = Bundler.rubygems.find_name("bundler").find {|s| s.version.to_s == VERSION }
             idx << local_spec
           end
+
+          idx.each {|s| s.source = self }
         end
       end
 

@@ -28,7 +28,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
         bundle "config major_deprecations true"
       end
 
-      it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first" do
+      it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first", :bundler => "< 2" do
         bundle :install
 
         expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
@@ -58,7 +58,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
         bundle "config major_deprecations true"
       end
 
-      it "warns about ambiguous gems, but installs anyway" do
+      it "warns about ambiguous gems, but installs anyway", :bundler => "< 2" do
         bundle :install
 
         expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
@@ -249,7 +249,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
             G
           end
 
-          it "installs from the other source and warns about ambiguous gems" do
+          it "installs from the other source and warns about ambiguous gems", :bundler => "< 2" do
             bundle "config major_deprecations true"
             bundle :install
             expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
@@ -277,7 +277,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
             G
           end
 
-          it "installs the dependency from the pinned source without warning" do
+          it "installs the dependency from the pinned source without warning", :bundler => "< 2" do
             bundle :install
 
             expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")

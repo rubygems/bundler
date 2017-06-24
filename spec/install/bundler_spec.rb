@@ -131,7 +131,7 @@ RSpec.describe "bundle install" do
         gem "rails", "3.0"
       G
 
-      simulate_bundler_version "10.0.0"
+      simulate_bundler_version "99999999.99.1"
 
       bundle "check"
       expect(out).to include("The Gemfile's dependencies are satisfied")
