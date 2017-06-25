@@ -269,21 +269,51 @@ RSpec.describe "Bundler.setup" do
     expect(bundled_app("Gemfile.lock")).to exist
   end
 
-  it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "rack"
-    G
+  describe "$BUNDLE_GEMFILE" do
+    context "user provides an absolute path" do
+      it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
 
-    gemfile bundled_app("4realz"), <<-G
-      source "file://#{gem_repo1}"
-      gem "activesupport", "2.3.5"
-    G
+        gemfile bundled_app("4realz"), <<-G
+          source "file://#{gem_repo1}"
+          gem "activesupport", "2.3.5"
+        G
 
-    ENV["BUNDLE_GEMFILE"] = bundled_app("4realz").to_s
-    bundle :install
+        ENV["BUNDLE_GEMFILE"] = bundled_app("4realz").to_s
+        bundle :install
 
-    expect(the_bundle).to include_gems "activesupport 2.3.5"
+        expect(the_bundle).to include_gems "activesupport 2.3.5"
+      end
+    end
+
+    context "an absolute path is not provided" do
+      it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+        G
+
+        bundle "install"
+        bundle "install --deployment"
+
+        ENV["BUNDLE_GEMFILE"] = "Gemfile"
+        ruby <<-R
+          require 'rubygems'
+          require 'bundler'
+
+          begin
+            Bundler.setup
+            puts "WIN"
+          rescue ArgumentError => e
+            puts "FAIL"
+          end
+        R
+
+        expect(out).to eq("WIN")
+      end
+    end
   end
 
   it "prioritizes gems in BUNDLE_PATH over gems in GEM_HOME" do
