@@ -43,6 +43,10 @@ module Spec
       generic_local_platform
     end
 
+    def specific_local_platform
+      Bundler.local_platform
+    end
+
     def not_local
       all_platforms.find {|p| p != generic_local_platform }
     end

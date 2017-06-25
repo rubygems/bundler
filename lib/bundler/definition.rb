@@ -492,7 +492,7 @@ module Bundler
 
     def add_current_platform
       current_platform = Bundler.local_platform
-      add_platform(current_platform) if Bundler.settings[:specific_platform]
+      add_platform(current_platform) if Bundler.feature_flag.specific_platform?
       add_platform(generic(current_platform))
     end
 
