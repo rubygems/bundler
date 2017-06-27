@@ -16,12 +16,16 @@ module Spec
     def resolve(args = [])
       @platforms ||= ["ruby"]
       deps = []
+      default_source = instance_double("Bundler::Source::Rubygems", :specs => @index)
+      source_requirements = { :default => default_source }
       @deps.each do |d|
         @platforms.each do |p|
+          source_requirements[d.name] = d.source = default_source
           deps << Bundler::DepProxy.new(d, p)
         end
       end
-      Bundler::Resolver.resolve(deps, @index, *args)
+      source_requirements ||= {}
+      Bundler::Resolver.resolve(deps, @index, source_requirements, *args)
     end
 
     def should_resolve_as(specs)
@@ -62,7 +66,7 @@ module Spec
         s.level = opts.first
         s.strict = opts.include?(:strict)
       end
-      should_resolve_and_include specs, [{}, @base, search]
+      should_resolve_and_include specs, [@base, search]
     end
 
     def an_awesome_index

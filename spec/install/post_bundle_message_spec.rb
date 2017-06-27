@@ -97,13 +97,25 @@ RSpec.describe "post bundle message" do
     end
 
     describe "with misspelled or non-existent gem name" do
-      it "should report a helpful error message" do
+      it "should report a helpful error message", :bundler => "< 2" do
         install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "rack"
           gem "not-a-gem", :group => :development
         G
         expect(out).to include("Could not find gem 'not-a-gem' in any of the gem sources listed in your Gemfile.")
+      end
+
+      it "should report a helpful error message", :bundler => "2" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+          gem "not-a-gem", :group => :development
+        G
+        expect(out).to include <<-EOS.strip
+Could not find gem 'not-a-gem' in rubygems repository file:#{gem_repo1}/ or installed locally.
+The source does not contain any versions of 'not-a-gem'
+        EOS
       end
 
       it "should report a helpful error message with reference to cache if available" do
@@ -118,7 +130,8 @@ RSpec.describe "post bundle message" do
           gem "rack"
           gem "not-a-gem", :group => :development
         G
-        expect(out).to include("Could not find gem 'not-a-gem' in any of the gem sources listed in your Gemfile or in gems cached in vendor/cache.")
+        expect(out).to include("Could not find gem 'not-a-gem' in").
+          and include("or in gems cached in vendor/cache.")
       end
     end
   end

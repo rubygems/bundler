@@ -254,7 +254,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     end
   end
 
-  it "fetches again when more dependencies are found in subsequent sources" do
+  it "fetches again when more dependencies are found in subsequent sources", :bundler => "< 2" do
     build_repo2 do
       build_gem "back_deps" do |s|
         s.add_dependency "foo"
@@ -269,7 +269,26 @@ The checksum of /versions does not match the checksum provided by the server! So
     G
 
     bundle! :install, :artifice => "compact_index_extra"
-    expect(the_bundle).to include_gems "back_deps 1.0"
+    expect(the_bundle).to include_gems "back_deps 1.0", "foo 1.0"
+  end
+
+  it "fetches again when more dependencies are found in subsequent sources with source blocks" do
+    build_repo2 do
+      build_gem "back_deps" do |s|
+        s.add_dependency "foo"
+      end
+      FileUtils.rm_rf Dir[gem_repo2("gems/foo-*.gem")]
+    end
+
+    gemfile <<-G
+      source "#{source_uri}"
+      source "#{source_uri}/extra" do
+        gem "back_deps"
+      end
+    G
+
+    bundle! :install, :artifice => "compact_index_extra"
+    expect(the_bundle).to include_gems "back_deps 1.0", "foo 1.0"
   end
 
   it "fetches gem versions even when those gems are already installed" do
@@ -295,7 +314,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     expect(the_bundle).to include_gems "rack 1.2"
   end
 
-  it "considers all possible versions of dependencies from all api gem sources" do
+  it "considers all possible versions of dependencies from all api gem sources", :bundler => "< 2" do
     # In this scenario, the gem "somegem" only exists in repo4.  It depends on specific version of activesupport that
     # exists only in repo1.  There happens also be a version of activesupport in repo4, but not the one that version 1.0.0
     # of somegem wants. This test makes sure that bundler actually finds version 1.2.3 of active support in the other
@@ -319,6 +338,31 @@ The checksum of /versions does not match the checksum provided by the server! So
     expect(the_bundle).to include_gems "activesupport 1.2.3"
   end
 
+  it "considers all possible versions of dependencies from all api gem sources when using blocks", :bundler => "< 2" do
+    # In this scenario, the gem "somegem" only exists in repo4.  It depends on specific version of activesupport that
+    # exists only in repo1.  There happens also be a version of activesupport in repo4, but not the one that version 1.0.0
+    # of somegem wants. This test makes sure that bundler actually finds version 1.2.3 of active support in the other
+    # repo and installs it.
+    build_repo4 do
+      build_gem "activesupport", "1.2.0"
+      build_gem "somegem", "1.0.0" do |s|
+        s.add_dependency "activesupport", "1.2.3" # This version exists only in repo1
+      end
+    end
+
+    gemfile <<-G
+      source "#{source_uri}"
+      source "#{source_uri}/extra" do
+        gem 'somegem', '1.0.0'
+      end
+    G
+
+    bundle! :install, :artifice => "compact_index_extra_api"
+
+    expect(the_bundle).to include_gems "somegem 1.0.0"
+    expect(the_bundle).to include_gems "activesupport 1.2.3"
+  end
+
   it "prints API output properly with back deps" do
     build_repo2 do
       build_gem "back_deps" do |s|
@@ -329,8 +373,9 @@ The checksum of /versions does not match the checksum provided by the server! So
 
     gemfile <<-G
       source "#{source_uri}"
-      source "#{source_uri}/extra"
-      gem "back_deps"
+      source "#{source_uri}/extra" do
+        gem "back_deps"
+      end
     G
 
     bundle! :install, :artifice => "compact_index_extra"
@@ -355,12 +400,37 @@ The checksum of /versions does not match the checksum provided by the server! So
 
     gemfile <<-G
       source "#{source_uri}"
-      source "#{source_uri}/extra"
-      gem "back_deps"
+      source "#{source_uri}/extra" do
+        gem "back_deps"
+      end
     G
 
     bundle! :install, :artifice => "compact_index_extra_missing"
     expect(the_bundle).to include_gems "back_deps 1.0"
+  end
+
+  it "does not fetch every spec if the index of gems is large when doing back deps & everything is the compact index" do
+    build_repo4 do
+      build_gem "back_deps" do |s|
+        s.add_dependency "foo"
+      end
+      build_gem "missing"
+      # need to hit the limit
+      1.upto(Bundler::Source::Rubygems::API_REQUEST_LIMIT) do |i|
+        build_gem "gem#{i}"
+      end
+
+      FileUtils.rm_rf Dir[gem_repo4("gems/foo-*.gem")]
+    end
+
+    install_gemfile! <<-G, :artifice => "compact_index_extra_api_missing"
+      source "#{source_uri}"
+      source "#{source_uri}/extra" do
+        gem "back_deps"
+      end
+    G
+
+    expect(the_bundle).to include_gem "back_deps 1.0"
   end
 
   it "uses the endpoint if all sources support it" do
@@ -374,7 +444,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     expect(the_bundle).to include_gems "foo 1.0"
   end
 
-  it "fetches again when more dependencies are found in subsequent sources using --deployment" do
+  it "fetches again when more dependencies are found in subsequent sources using --deployment", :bundler => "< 2" do
     build_repo2 do
       build_gem "back_deps" do |s|
         s.add_dependency "foo"
@@ -386,6 +456,27 @@ The checksum of /versions does not match the checksum provided by the server! So
       source "#{source_uri}"
       source "#{source_uri}/extra"
       gem "back_deps"
+    G
+
+    bundle! :install, :artifice => "compact_index_extra"
+
+    bundle "install --deployment", :artifice => "compact_index_extra"
+    expect(the_bundle).to include_gems "back_deps 1.0"
+  end
+
+  it "fetches again when more dependencies are found in subsequent sources using --deployment with blocks" do
+    build_repo2 do
+      build_gem "back_deps" do |s|
+        s.add_dependency "foo"
+      end
+      FileUtils.rm_rf Dir[gem_repo2("gems/foo-*.gem")]
+    end
+
+    gemfile <<-G
+      source "#{source_uri}"
+      source "#{source_uri}/extra" do
+        gem "back_deps"
+      end
     G
 
     bundle! :install, :artifice => "compact_index_extra"
@@ -515,7 +606,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       expect(out).not_to include("#{user}:#{password}")
     end
 
-    it "strips http basic auth creds when warning about ambiguous sources" do
+    it "strips http basic auth creds when warning about ambiguous sources", :bundler => "< 2" do
       gemfile <<-G
         source "#{basic_auth_source_uri}"
         source "file://#{gem_repo1}"

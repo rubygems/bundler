@@ -92,7 +92,7 @@ RSpec.describe "bundle add" do
 
   it "shows error message when gem cannot be found" do
     bundle "add 'werk_it'"
-    expect(out).to match("Could not find gem 'werk_it' in any of the gem sources listed in your Gemfile.")
+    expect(out).to match("Could not find gem 'werk_it' in")
 
     bundle "add 'werk_it' -s='file://#{gem_repo2}'"
     expect(out).to match("Could not find gem 'werk_it' in rubygems repository")

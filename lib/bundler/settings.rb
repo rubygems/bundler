@@ -15,6 +15,7 @@ module Bundler
       disable_checksum_validation
       disable_exec_load
       disable_local_branch_check
+      disable_multisource
       disable_shared_gems
       disable_version_check
       error_on_stderr
@@ -25,6 +26,7 @@ module Bundler
       global_gem_cache
       ignore_messages
       init_gems_rb
+      lockfile_uses_separate_rubygems_sources
       major_deprecations
       no_install
       no_prune
@@ -113,7 +115,7 @@ module Bundler
     end
 
     def all
-      env_keys = ENV.keys.select {|k| k =~ /BUNDLE_.*/ }
+      env_keys = ENV.keys.grep(/\ABUNDLE_.+/)
 
       keys = @global_config.keys | @local_config.keys | env_keys
 

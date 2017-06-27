@@ -167,8 +167,8 @@ module Bundler
                              "to a different version of #{locked_gem} that hasn't been removed in order to install."
         end
         unless specs["bundler"].any?
-          bundler = rubygems_index.search(Gem::Dependency.new("bundler", VERSION)).last
-          specs["bundler"] = bundler if bundler
+          bundler = sources.metadata_source.specs.search(Gem::Dependency.new("bundler", VERSION)).last
+          specs["bundler"] = bundler
         end
 
         specs
@@ -255,20 +255,36 @@ module Bundler
           dependency_names -= pinned_spec_names(source.specs)
           dependency_names.concat(source.unmet_deps).uniq!
         end
-        idx << Gem::Specification.new("ruby\0", RubyVersion.system.to_gem_version_with_patchlevel)
-        idx << Gem::Specification.new("rubygems\0", Gem::VERSION)
+
+        double_check_for_index(idx, dependency_names)
       end
     end
 
-    # used when frozen is enabled so we can find the bundler
-    # spec, even if (say) a git gem is not checked out.
-    def rubygems_index
-      @rubygems_index ||= Index.build do |idx|
-        sources.rubygems_sources.each do |rubygems|
-          idx.add_source rubygems.specs
+    # Suppose the gem Foo depends on the gem Bar.  Foo exists in Source A.  Bar has some versions that exist in both
+    # sources A and B.  At this point, the API request will have found all the versions of Bar in source A,
+    # but will not have found any versions of Bar from source B, which is a problem if the requested version
+    # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
+    # each spec we found, we add all possible versions from all sources to the index.
+    def double_check_for_index(idx, dependency_names)
+      loop do
+        idxcount = idx.size
+        sources.all_sources.each do |source|
+          names = :names # do this so we only have to traverse to get dependency_names from the index once
+          unmet_dependency_names = proc do
+            break names unless names == :names
+            names = if idx.size > Source::Rubygems::API_REQUEST_LIMIT
+              new_names = idx.dependency_names_if_available
+              new_names && dependency_names.+(new_names).uniq
+            else
+              dependency_names.+(idx.dependency_names).uniq
+            end
+          end
+          source.double_check_for(unmet_dependency_names, :override_dupes)
         end
+        break if idxcount == idx.size
       end
     end
+    private :double_check_for_index
 
     def has_rubygems_remotes?
       sources.rubygems_sources.any? {|s| s.remotes.any? }
@@ -640,7 +656,9 @@ module Bundler
       end
     end
 
-    def converge_sources
+    def converge_rubygems_sources
+      return false if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+
       changes = false
 
       # Get the RubyGems sources from the Gemfile.lock
@@ -655,6 +673,14 @@ module Bundler
           changes |= locked_gem.replace_remotes(actual_remotes)
         end
       end
+
+      changes
+    end
+
+    def converge_sources
+      changes = false
+
+      changes |= converge_rubygems_sources
 
       # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
       # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent
@@ -829,17 +855,21 @@ module Bundler
     # the metadata dependencies here
     def expanded_dependencies
       @expanded_dependencies ||= begin
+        expand_dependencies(dependencies + metadata_dependencies, @remote)
+      end
+    end
+
+    def metadata_dependencies
+      @metadata_dependencies ||= begin
         ruby_versions = concat_ruby_version_requirements(@ruby_version)
         if ruby_versions.empty? || !@ruby_version.exact?
           concat_ruby_version_requirements(RubyVersion.system)
           concat_ruby_version_requirements(locked_ruby_version_object) unless @unlock[:ruby]
         end
-
-        metadata_dependencies = [
+        [
           Dependency.new("ruby\0", ruby_versions),
           Dependency.new("rubygems\0", Gem::VERSION),
         ]
-        expand_dependencies(dependencies + metadata_dependencies, @remote)
       end
     end
 
@@ -894,11 +924,17 @@ module Bundler
       # Record the specs available in each gem's source, so that those
       # specs will be available later when the resolver knows where to
       # look for that gemspec (or its dependencies)
-      source_requirements = {}
+      default = sources.default_source
+      source_requirements = { :default => default }
+      default = nil unless Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
       dependencies.each do |dep|
-        next unless dep.source
-        source_requirements[dep.name] = dep.source.specs
+        next unless source = dep.source || default
+        source_requirements[dep.name] = source
       end
+      metadata_dependencies.each do |dep|
+        source_requirements[dep.name] = sources.metadata_source
+      end
+      source_requirements["bundler"] = sources.metadata_source # needs to come last to override
       source_requirements
     end
 

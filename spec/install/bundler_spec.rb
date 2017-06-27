@@ -46,7 +46,7 @@ RSpec.describe "bundle install" do
         This Gemfile requires a different version of Bundler.
         Perhaps you need to update Bundler by running `gem install bundler`?
 
-        Could not find gem 'bundler (= 0.9.2)' in any of the sources
+        Could not find gem 'bundler (= 0.9.2)' in any
         E
       expect(last_command.bundler_err).to include(nice_error)
     end
@@ -131,7 +131,7 @@ RSpec.describe "bundle install" do
         gem "rails", "3.0"
       G
 
-      simulate_bundler_version "10.0.0"
+      simulate_bundler_version "99999999.99.1"
 
       bundle "check"
       expect(out).to include("The Gemfile's dependencies are satisfied")

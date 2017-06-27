@@ -134,7 +134,7 @@ module Bundler
       if options.key?("type")
         options["type"] = options["type"].to_s
         unless Plugin.source?(options["type"])
-          raise "No sources available for #{options["type"]}"
+          raise InvalidOption, "No plugin sources available for #{options["type"]}"
         end
 
         unless block_given?
@@ -147,7 +147,7 @@ module Bundler
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
         check_primary_source_safety(@sources)
-        @sources.add_rubygems_remote(source)
+        @sources.global_rubygems_source = source
       end
     end
 
@@ -165,6 +165,19 @@ module Bundler
     end
 
     def path(path, options = {}, &blk)
+      unless block_given?
+        msg = "You can no longer specify a path source by itself. Instead, \n" \
+              "either use the :path option on a gem, or specify the gems that \n" \
+              "bundler should find in the path source by passing a block to \n" \
+              "the path method, like: \n\n" \
+              "    path 'dir/containing/rails' do\n" \
+              "      gem 'rails'\n" \
+              "    end\n\n"
+
+        raise DeprecatedError, msg if Bundler.feature_flag.disable_multisource?
+        SharedHelpers.major_deprecation(msg.strip)
+      end
+
       source_options = normalize_hash(options).merge(
         "path" => Pathname.new(path),
         "root_path" => gemfile_root,
@@ -429,15 +442,18 @@ repo_name ||= user_name
       end
     end
 
-    def check_primary_source_safety(source)
-      return unless source.rubygems_primary_remotes.any?
+    def check_primary_source_safety(source_list)
+      return if source_list.rubygems_primary_remotes.empty? && source_list.global_rubygems_source.nil?
 
-      # TODO: 2.0 upgrade from setting to default
-      if Bundler.settings[:disable_multisource]
-        raise GemfileError, "Warning: this Gemfile contains multiple primary sources. " \
+      if Bundler.feature_flag.disable_multisource?
+        msg = "This Gemfile contains multiple primary sources. " \
           "Each source after the first must include a block to indicate which gems " \
-          "should come from that source. To downgrade this error to a warning, run " \
-          "`bundle config --delete disable_multisource`"
+          "should come from that source"
+        unless Bundler.feature_flag.bundler_2_mode?
+          msg += ". To downgrade this error to a warning, run " \
+            "`bundle config --delete disable_multisource`"
+        end
+        raise GemfileEvalError, msg
       else
         Bundler::SharedHelpers.major_deprecation "Your Gemfile contains multiple primary sources. " \
           "Using `source` more than once without a block is a security risk, and " \

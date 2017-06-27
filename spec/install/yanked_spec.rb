@@ -37,7 +37,7 @@ RSpec.context "when installing a bundle that includes yanked gems" do
     G
 
     expect(out).not_to include("Your bundle is locked to foo (10.0.0)")
-    expect(out).to include("Could not find gem 'foo (= 10.0.0)' in any of the gem sources")
+    expect(out).to include("Could not find gem 'foo (= 10.0.0)' in")
   end
 end
 

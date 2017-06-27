@@ -293,6 +293,13 @@ module Bundler
         def bundler_plugin_api_source?
           true
         end
+
+        # @private
+        # This API on source might not be stable, and for now we expect plugins
+        # to download all specs in `#specs`, so we implement the method for
+        # compatibility purposes and leave it undocumented (and don't support)
+        # overriding it)
+        def double_check_for(*); end
       end
     end
   end

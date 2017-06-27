@@ -131,7 +131,7 @@ RSpec.describe "The library itself" do
 
   it "does not include any unresolved merge conflicts" do
     error_messages = []
-    exempt = %r{lock/lockfile_spec|quality_spec|vcr_cassettes|\.ronn|lockfile_parser\.rb}
+    exempt = %r{lock/lockfile_(bundler_1_)?spec|quality_spec|vcr_cassettes|\.ronn|lockfile_parser\.rb}
     Dir.chdir(root) do
       `git ls-files -z`.split("\x0").each do |filename|
         next if filename =~ exempt
@@ -172,6 +172,7 @@ RSpec.describe "The library itself" do
       default_cli_command
       gem.coc
       gem.mit
+      lockfile_uses_separate_rubygems_sources
       warned_version
     ]
 

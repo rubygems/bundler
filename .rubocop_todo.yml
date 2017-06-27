@@ -73,6 +73,7 @@ Lint/AmbiguousBlockAssociation:
     - 'spec/commands/install_spec.rb'
     - 'spec/install/gems/flex_spec.rb'
     - 'spec/lock/lockfile_spec.rb'
+    - 'spec/lock/lockfile_bundler_1_spec.rb'
     - 'spec/other/major_deprecation_spec.rb'
     - 'spec/runtime/setup_spec.rb'
     - 'spec/support/helpers.rb'
