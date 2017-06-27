@@ -20,6 +20,8 @@ module Bundler
         #
         def cache_slug
           @cache_slug ||= begin
+            return nil unless SharedHelpers.md5_available?
+
             cache_uri = original_uri || uri
 
             uri_parts = [cache_uri.host, cache_uri.user, cache_uri.port, cache_uri.path]

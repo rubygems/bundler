@@ -187,6 +187,19 @@ module Bundler
       msg
     end
 
+    def md5_available?
+      return @md5_available if defined?(@md5_available)
+      @md5_available = begin
+        require "openssl"
+        OpenSSL::Digest::MD5.digest("")
+        true
+      rescue LoadError
+        true
+      rescue OpenSSL::Digest::DigestError
+        false
+      end
+    end
+
   private
 
     def find_gemfile(order_matters = false)
