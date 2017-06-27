@@ -28,7 +28,7 @@ module Bundler
     def default_gemfile
       gemfile = find_gemfile(:order_matters)
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
-      Pathname.new(gemfile).untaint
+      Pathname.new(gemfile).untaint.expand_path
     end
 
     def default_lockfile
