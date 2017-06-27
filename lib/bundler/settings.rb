@@ -34,6 +34,7 @@ module Bundler
       plugins
       prefer_gems_rb
       silence_root_warning
+      skip_default_git_sources
       unlock_source_unlocks_spec
       update_requires_all_flag
     ].freeze
