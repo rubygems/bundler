@@ -324,6 +324,30 @@ RSpec.describe "bundle install with gem sources" do
       expect(out).not_to include("file://")
     end
 
+    it "fails gracefully when downloading an invalid specification from the full index", :rubygems => "2.5" do
+      build_repo2 do
+        build_gem "ajp-rails", "0.0.0", :gemspec => false, :skip_validation => true do |s|
+          bad_deps = [["ruby-ajp", ">= 0.2.0"], ["rails", ">= 0.14"]]
+          s.
+            instance_variable_get(:@spec).
+            instance_variable_set(:@dependencies, bad_deps)
+
+          raise "failed to set bad deps" unless s.dependencies == bad_deps
+        end
+        build_gem "ruby-ajp", "1.0.0"
+      end
+
+      install_gemfile <<-G, :full_index => true
+        source "file://#{gem_repo2}"
+
+        gem "ajp-rails", "0.0.0"
+      G
+
+      expect(last_command.stdboth).not_to match(/Error Report/i)
+      expect(last_command.bundler_err).to include("An error occurred while installing ajp-rails (0.0.0), and Bundler cannot continue.").
+        and include("Make sure that `gem install ajp-rails -v '0.0.0'` succeeds before bundling.")
+    end
+
     it "doesn't blow up when the local .bundle/config is empty" do
       FileUtils.mkdir_p(bundled_app(".bundle"))
       FileUtils.touch(bundled_app(".bundle/config"))
