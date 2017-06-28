@@ -9,11 +9,11 @@ Certain operating systems such as MacOS and Ubuntu have versions of Ruby that re
     ERROR:  While executing gem ... (Gem::FilePermissionError)
       You don't have write permissions for the /Library/Ruby/Gems/2.0.0 directory.
 
-There are multiple ways to solve this issue. You can install bundler with elevated privilges using `sudo` or `su`.
+There are multiple ways to solve this issue. You can install bundler with elevated privileges using `sudo` or `su`.
 
     sudo gem install bundler
 
-If you cannot elevated your privileges or do not want to globally install Bundler, you can use the `--user-install` option.
+If you cannot elevate your privileges or do not want to globally install Bundler, you can use the `--user-install` option.
 
     gem install bundler --user-install
 
