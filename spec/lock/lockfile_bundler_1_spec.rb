@@ -189,6 +189,7 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
 
       PLATFORMS
         #{generic_local_platform}
+        #{specific_local_platform}
 
       DEPENDENCIES
         rack
@@ -299,6 +300,7 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
 
       PLATFORMS
         #{generic_local_platform}
+        #{specific_local_platform}
 
       DEPENDENCIES
         rack
