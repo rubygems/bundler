@@ -4,7 +4,7 @@ Triaging is the work of processing tickets that have been opened by users. Commo
 
 We've created an [issues guide](ISSUES.md) to walk users through the process of how to report an issue with the Bundler project. We also have a [troubleshooting guide](../TROUBLESHOOTING.md) to diagnose common problems.
 
-Not every ticket will be a bug in Bundler's code, but open tickets usually mean that the there is something we could improve to help that user. Sometimes that means writing additional documentation or making error messages clearer.
+Not every ticket will be a bug in Bundler's code, but open tickets usually mean that there is something we could improve to help that user. Sometimes that means writing additional documentation or making error messages clearer.
 
 ## Triaging existing issues
 

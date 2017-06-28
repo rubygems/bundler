@@ -1,6 +1,6 @@
 # Contributing to Bundler
 
-Welcome to Bundler! We are so happy that you're here. We know it can be daunting to joining a new open source project, so here's a quick overview of what you can expect from this documentation.
+Welcome to Bundler! We are so happy that you're here. We know joining a new open source project can be daunting, so here's a quick overview of what you can expect from this documentation.
 
 Bundler welcomes contributions from *everyone*. While contributing, please follow the project [code of conduct](http://bundler.io/conduct.html), so that everyone can be included.
 

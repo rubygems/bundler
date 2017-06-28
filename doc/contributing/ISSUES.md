@@ -12,7 +12,7 @@ Detailed information about each Bundler command, including help with common prob
 
 ## Reporting unresolved problems
 
-Check our [troubleshooting common issues guide](../TROUBLESHOOTING.md) and see if your issues is resolved using the steps provided.
+Check our [troubleshooting common issues guide](../TROUBLESHOOTING.md) and see if your issue is resolved using the steps provided.
 
 Hopefully the troubleshooting steps above resolved your problem! If things still aren't working the way you expect them to, please let us know so that we can diagnose and hopefully fix the problem you're having.
 

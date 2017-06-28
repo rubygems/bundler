@@ -1,6 +1,6 @@
 # Contributing to Bundler
 
-Welcome to Bundler! We are so happy that you're here. We know it can be daunting to joining a new open source project, so here's a quick overview of what you can expect from this documentation.
+Welcome to Bundler! We are so happy that you're here. We know joining a new open source project can be daunting, so here's a quick overview of what you can expect from this documentation.
 
 *Something missing?* Send us a [pull request](../development/PULL_REQUESTS.md)!
 
