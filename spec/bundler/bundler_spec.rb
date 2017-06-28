@@ -208,4 +208,66 @@ EOF
       expect(Bundler.tmp_home_path("USER", "")).to eq(Pathname("/TMP/bundler/home/USER"))
     end
   end
+
+  context "user cache dir" do
+    let(:home_path)         { "/home/oggy" }
+    let(:xdg_cache_default) { "#{home_path}/.cache" }
+    let(:xdg_cache_custom)  { "#{home_path}/User/cache" }
+    let(:fallback_dir)      { "#{xdg_cache_default}/bundler" }
+    let(:cache_dir)         { "#{xdg_cache_custom}/bundler" }
+    let(:legacy_cache_dir)  { "#{home_path}/.bundle/cache" }
+
+    describe "#xdg_home" do
+      before do
+        allow(Bundler.rubygems).to receive(:user_home).and_return(home_path)
+        allow(File).to receive(:writable?).with(home_path).and_return(true)
+        allow(File).to receive(:directory?).with(home_path).and_return(true)
+        allow(File).to receive(:directory?).with(fallback_dir).and_return(true)
+        allow(File).to receive(:directory?).with(cache_dir).and_return(true)
+      end
+
+      before(:each) do
+        ENV.delete("XDG_CACHE_HOME")
+      end
+
+      it "should use the value of XDG_CACHE_HOME" do
+        ENV["XDG_CACHE_HOME"] = xdg_cache_custom
+        expect(Bundler.xdg_home("CACHE", fallback_dir)).to eq(Pathname(cache_dir))
+      end
+
+      it "should fall back to the alternative directory" do
+        expect(Bundler.xdg_home("CACHE", xdg_cache_default)).to eq(Pathname(fallback_dir))
+      end
+    end
+
+    describe "#user_cache" do
+      before do
+        allow(Bundler.rubygems).to receive(:user_home).and_return(home_path)
+        allow(File).to receive(:writable?).with(home_path).and_return(true)
+        allow(File).to receive(:directory?).with(home_path).and_return(true)
+      end
+
+      before(:each) do
+        ENV.delete("XDG_CACHE_HOME")
+      end
+
+      it "should use ~/.bundle/cache if it exists" do
+        allow(FileTest).to receive(:exist?).with(legacy_cache_dir).and_return(true)
+        expect(Bundler.user_cache).to eq(Pathname(legacy_cache_dir))
+      end
+
+      it "should use XDG_CACHE_HOME if set" do
+        allow(FileTest).to receive(:exist?).with(legacy_cache_dir).and_return(false)
+        allow(FileTest).to receive(:exist?).with(cache_dir).and_return(true)
+        ENV["XDG_CACHE_HOME"] = xdg_cache_custom
+        expect(Bundler.user_cache).to eq(Pathname(cache_dir))
+      end
+
+      it "should use ~/.cache/bundler as default cache path" do
+        allow(FileTest).to receive(:exist?).with(legacy_cache_dir).and_return(false)
+        allow(FileTest).to receive(:exist?).with(fallback_dir).and_return(true)
+        expect(Bundler.user_cache).to eq(Pathname(fallback_dir))
+      end
+    end
+  end
 end
