@@ -5,7 +5,7 @@ To make reviewing this PR a bit easier, please fill out answers to the following
 
 The problem was...
 
-### Was was your diagnosis of the problem?
+### What was your diagnosis of the problem?
 
 My diagnosis was...
 
