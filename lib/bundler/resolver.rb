@@ -26,6 +26,9 @@ module Bundler
           end.min_by(&:size)
           trees.reject! {|t| !maximal.include?(t.last) } if maximal
 
+          trees = trees.sort_by {|t| t.flatten.map(&:to_s) }
+          trees.uniq! {|t| t.flatten.map {|dep| [dep.name, dep.requirement] } }
+
           o << trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
             t = String.new
             depth = 2
@@ -379,8 +382,21 @@ module Bundler
           amount_constrained(dependency),
           conflicts[name] ? 0 : 1,
           activated.vertex_named(name).payload ? 0 : search_for(dependency).count,
+          self.class.platform_sort_key(dependency.__platform),
         ]
       end
+    end
+
+    # Sort platforms from most general to most specific
+    def self.sort_platforms(platforms)
+      platforms.sort_by do |platform|
+        platform_sort_key(platform)
+      end
+    end
+
+    def self.platform_sort_key(platform)
+      return ["", "", ""] if Gem::Platform::RUBY == platform
+      platform.to_a.map {|part| part || "" }
     end
 
   private
@@ -432,7 +448,7 @@ module Bundler
         elsif source = @source_requirements[name]
           specs = source.specs[name]
           versions_with_platforms = specs.map {|s| [s.version, s.platform] }
-          message = String.new("Could not find gem '#{requirement}' in #{source}#{cache_message}.\n")
+          message = String.new("Could not find gem '#{SharedHelpers.pretty_dependency(requirement)}' in #{source}#{cache_message}.\n")
           message << if versions_with_platforms.any?
                        "The source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
                      else

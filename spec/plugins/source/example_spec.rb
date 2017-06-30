@@ -103,7 +103,7 @@ RSpec.describe "real source plugins" do
             a-path-gem (1.0)
 
         PLATFORMS
-          #{generic_local_platform}
+          #{lockfile_platforms}
 
         DEPENDENCIES
           a-path-gem!
@@ -395,7 +395,7 @@ RSpec.describe "real source plugins" do
             ma-gitp-gem (1.0)
 
         PLATFORMS
-          #{generic_local_platform}
+          #{lockfile_platforms}
 
         DEPENDENCIES
           ma-gitp-gem!

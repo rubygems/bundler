@@ -401,7 +401,7 @@ RSpec.describe "bundle install with gem sources" do
            specs:
 
          PLATFORMS
-           ruby
+           #{lockfile_platforms}
 
          DEPENDENCIES
 
@@ -425,7 +425,7 @@ RSpec.describe "bundle install with gem sources" do
            specs:
 
          PLATFORMS
-           ruby
+           #{lockfile_platforms}
 
          DEPENDENCIES
 

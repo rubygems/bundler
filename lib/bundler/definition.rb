@@ -861,7 +861,7 @@ module Bundler
             "To add those platforms to the bundle, " \
             "run `bundle lock --add-platform #{mapped_platforms.join " "}`."
         end
-        platforms.each do |p|
+        Resolver.sort_platforms(platforms).each do |p|
           deps << DepProxy.new(dep, p) if remote || p == generic_local_platform
         end
       end
