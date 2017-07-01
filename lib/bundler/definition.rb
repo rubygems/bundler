@@ -362,51 +362,8 @@ module Bundler
     end
 
     def to_lock
-      out = String.new
-
-      sources.lock_sources.each do |source|
-        # Add the source header
-        out << source.to_lock
-        # Find all specs for this source
-        resolve.
-          select {|s| source.can_lock?(s) }.
-          # This needs to be sorted by full name so that
-          # gems with the same name, but different platform
-          # are ordered consistently
-          sort_by(&:full_name).
-          each do |spec|
-            next if spec.name == "bundler"
-            out << spec.to_lock
-          end
-        out << "\n"
-      end
-
-      out << "PLATFORMS\n"
-
-      platforms.map(&:to_s).sort.each do |p|
-        out << "  #{p}\n"
-      end
-
-      out << "\n"
-      out << "DEPENDENCIES\n"
-
-      handled = []
-      dependencies.sort_by(&:to_s).each do |dep|
-        next if handled.include?(dep.name)
-        out << dep.to_lock
-        handled << dep.name
-      end
-
-      if locked_ruby_version
-        out << "\nRUBY VERSION\n"
-        out << "   #{locked_ruby_version}\n"
-      end
-
-      # Record the version of Bundler that was used to create the lockfile
-      out << "\nBUNDLED WITH\n"
-      out << "   #{locked_bundler_version}\n"
-
-      out
+      require "bundler/lockfile_generator"
+      LockfileGenerator.generate(self)
     end
 
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
