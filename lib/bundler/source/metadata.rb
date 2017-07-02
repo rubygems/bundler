@@ -36,7 +36,7 @@ module Bundler
       end
 
       def install(spec, _opts = {})
-        Bundler.ui.info "Using #{version_message(spec)}"
+        print_using_message "Using #{version_message(spec)}"
         nil
       end
 

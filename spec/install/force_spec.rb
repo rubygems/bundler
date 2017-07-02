@@ -17,7 +17,6 @@ RSpec.describe "bundle install" do
       bundle "install --force"
 
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to include "Using bundler"
       expect(out).to include "Installing rack 1.0.0"
       expect(rack_lib.open(&:read)).to eq("RACK = '1.0.0'\n")
       expect(the_bundle).to include_gems "rack 1.0.0"
@@ -27,7 +26,6 @@ RSpec.describe "bundle install" do
       bundle "install --force"
 
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to include "Using bundler"
       expect(out).to include "Installing rack 1.0.0"
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
@@ -48,8 +46,6 @@ RSpec.describe "bundle install" do
         foo_lib.open("w") {|f| f.write("blah blah blah") }
         bundle! "install --force"
 
-        expect(out).to include "Using bundler"
-        expect(out).to include "Using foo 1.0 from #{lib_path("foo-1.0")} (at master@#{ref[0, 7]})"
         expect(foo_lib.open(&:read)).to eq("FOO = '1.0'\n")
         expect(the_bundle).to include_gems "foo 1.0"
       end
@@ -57,8 +53,6 @@ RSpec.describe "bundle install" do
       it "works on first bundle install" do
         bundle! "install --force"
 
-        expect(out).to include "Using bundler"
-        expect(out).to include "Using foo 1.0 from #{lib_path("foo-1.0")} (at master@#{ref[0, 7]})"
         expect(the_bundle).to include_gems "foo 1.0"
       end
     end

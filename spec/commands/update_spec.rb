@@ -430,7 +430,7 @@ RSpec.describe "bundle update when a gem depends on a newer version of bundler" 
 end
 
 RSpec.describe "bundle update" do
-  it "shows the previous version of the gem when updated from rubygems source" do
+  it "shows the previous version of the gem when updated from rubygems source", :bundler => "< 2" do
     build_repo2
 
     install_gemfile <<-G
@@ -464,7 +464,7 @@ RSpec.describe "bundle update" do
         gem "foo"
       G
 
-      bundle! "update"
+      bundle! "update", :all => bundle_update_requires_all?
       out.gsub!(/RubyGems [\d\.]+ is not threadsafe.*\n?/, "")
       expect(out).to include "Resolving dependencies...\nBundle updated!"
 
@@ -472,7 +472,7 @@ RSpec.describe "bundle update" do
         build_gem "foo", "2.0"
       end
 
-      bundle! "update"
+      bundle! "update", :all => bundle_update_requires_all?
       out.gsub!(/RubyGems [\d\.]+ is not threadsafe.*\n?/, "")
       expect(out).to include strip_whitespace(<<-EOS).strip
         Resolving dependencies...

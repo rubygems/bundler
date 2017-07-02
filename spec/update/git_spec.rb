@@ -27,12 +27,11 @@ RSpec.describe "bundle update" do
         s.add_dependency "activesupport", "= 3.0"
       end
 
-      install_gemfile <<-G
+      install_gemfile! <<-G
         gem "rails", :git => "#{lib_path("rails")}"
       G
 
-      bundle "update rails"
-      expect(out).to include("Using activesupport 3.0 from #{lib_path("rails")} (at master@#{revision_for(lib_path("rails"))[0..6]})")
+      bundle! "update rails"
       expect(the_bundle).to include_gems "rails 3.0", "activesupport 3.0"
     end
 

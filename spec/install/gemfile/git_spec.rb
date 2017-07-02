@@ -397,9 +397,8 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
-      bundle :install
-      expect(out).to match(/at #{lib_path('local-rack')}/)
+      bundle! %(config local.rack #{lib_path("local-rack")})
+      bundle! :install
 
       run "require 'rack'"
       expect(out).to eq("LOCAL")

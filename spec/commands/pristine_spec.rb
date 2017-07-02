@@ -116,7 +116,6 @@ RSpec.describe "bundle pristine" do
       foo_changes_txt = Pathname.new(foo.full_gem_path).join("lib/changes.txt")
       FileUtils.touch(foo_changes_txt)
       expect(foo_changes_txt).to be_file
-      foo_ref = Spec::Builders::GitReader.new(lib_path("foo")).ref_for("HEAD", 6)
 
       bar = Bundler.definition.specs["bar"].first
       bar_changes_txt = Pathname.new(bar.full_gem_path).join("lib/changes.txt")
@@ -130,11 +129,9 @@ RSpec.describe "bundle pristine" do
 
       bundle! "pristine foo bar weakling"
 
-      expect(out).to eq(strip_whitespace(<<-EOS).strip)
-        Cannot pristine bar (1.0). Gem is sourced from local path.
-        Using foo 1.0 from #{lib_path("foo")} (at master@#{foo_ref})
-        Installing weakling 1.0
-      EOS
+      expect(out).to include("Cannot pristine bar (1.0). Gem is sourced from local path.").
+        and include("Installing weakling 1.0")
+
       expect(weakling_changes_txt).not_to be_file
       expect(foo_changes_txt).not_to be_file
       expect(bar_changes_txt).to be_file

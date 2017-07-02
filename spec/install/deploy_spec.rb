@@ -312,15 +312,13 @@ You have deleted from the Gemfile:
       expect(bundled_app("vendor/cache/foo")).to be_directory
 
       bundle! "install --local"
-      expect(out).to include("Using foo 1.0 from source at")
-      expect(out).to include("vendor/cache/foo")
+      expect(out).to include("Updating files in vendor/cache")
 
       simulate_new_machine
       bundle! "install --deployment --verbose"
       expect(out).not_to include("You are trying to install in deployment mode after changing your Gemfile")
       expect(out).not_to include("You have added to the Gemfile")
       expect(out).not_to include("You have deleted from the Gemfile")
-      expect(out).to include("Using foo 1.0 from source at")
       expect(out).to include("vendor/cache/foo")
       expect(the_bundle).to include_gems "foo 1.0"
     end
