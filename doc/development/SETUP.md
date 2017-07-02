@@ -20,7 +20,7 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
 4. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
 
-      `$ alias dbundle='ruby -I /path/to/bundler/lib /path/to/bundler/exe/bundle'`
+      `$ alias dbundle='/path/to/bundler/repo/bin/bundle'`
 
 ## Debugging with `pry`
 
