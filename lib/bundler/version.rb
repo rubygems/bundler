@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# frozen_string_literal: false
 
 # Ruby 1.9.3 and old RubyGems don't play nice with frozen version strings
 # rubocop:disable MutableConstant
