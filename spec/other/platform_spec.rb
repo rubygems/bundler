@@ -908,7 +908,7 @@ G
     end
   end
 
-  context "bundle console" do
+  context "bundle console", :bundler => "< 2" do
     before do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
