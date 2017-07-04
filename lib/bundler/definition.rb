@@ -847,11 +847,12 @@ module Bundler
     end
 
     def expand_dependencies(dependencies, remote = false)
+      sorted_platforms = Resolver.sort_platforms(@platforms)
       deps = []
       dependencies.each do |dep|
         dep = Dependency.new(dep, ">= 0") unless dep.respond_to?(:name)
         next if !remote && !dep.current_platform?
-        platforms = dep.gem_platforms(@platforms)
+        platforms = dep.gem_platforms(sorted_platforms)
         if platforms.empty?
           mapped_platforms = dep.platforms.map {|p| Dependency::PLATFORM_MAP[p] }
           Bundler.ui.warn \
@@ -861,7 +862,7 @@ module Bundler
             "To add those platforms to the bundle, " \
             "run `bundle lock --add-platform #{mapped_platforms.join " "}`."
         end
-        Resolver.sort_platforms(platforms).each do |p|
+        platforms.each do |p|
           deps << DepProxy.new(dep, p) if remote || p == generic_local_platform
         end
       end
