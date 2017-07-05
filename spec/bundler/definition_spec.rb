@@ -97,7 +97,7 @@ RSpec.describe Bundler::Definition do
               rack (= 1.0)
 
         PLATFORMS
-          ruby
+          #{lockfile_platforms}
 
         DEPENDENCIES
           foo!
@@ -171,7 +171,7 @@ RSpec.describe Bundler::Definition do
               rack (= 1.0)
 
         PLATFORMS
-          ruby
+          #{lockfile_platforms}
 
         DEPENDENCIES
           foo!
@@ -197,7 +197,7 @@ RSpec.describe Bundler::Definition do
             foo (1.0)
 
         PLATFORMS
-          ruby
+          #{lockfile_platforms}
 
         DEPENDENCIES
           foo

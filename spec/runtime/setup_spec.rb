@@ -1092,7 +1092,7 @@ end
             rack (1.0.0)
 
         PLATFORMS
-          #{generic_local_platform}
+          #{lockfile_platforms}
 
         DEPENDENCIES
           rack
@@ -1150,7 +1150,7 @@ end
             rack (1.0.0)
 
         PLATFORMS
-          #{generic_local_platform}
+          #{lockfile_platforms}
 
         DEPENDENCIES
           rack

@@ -520,7 +520,7 @@ RSpec.describe "bundle update --ruby" do
          specs:
 
        PLATFORMS
-         ruby
+         #{lockfile_platforms}
 
        DEPENDENCIES
 
@@ -546,7 +546,7 @@ RSpec.describe "bundle update --ruby" do
          specs:
 
        PLATFORMS
-         ruby
+         #{lockfile_platforms}
 
        DEPENDENCIES
 
@@ -590,7 +590,7 @@ RSpec.describe "bundle update --ruby" do
          specs:
 
        PLATFORMS
-         ruby
+         #{lockfile_platforms}
 
        DEPENDENCIES
 

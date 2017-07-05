@@ -299,7 +299,7 @@ RSpec.describe "bundle flex_install" do
         specs:
 
       PLATFORMS
-        ruby
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack

@@ -43,7 +43,7 @@ RSpec.describe "bundle lock" do
           with_license (1.0)
 
       PLATFORMS
-        #{local}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo
@@ -58,7 +58,7 @@ RSpec.describe "bundle lock" do
   it "prints a lockfile when there is no existing lockfile with --print" do
     bundle "lock --print"
 
-    expect(out).to include(@lockfile)
+    expect(out).to eq(@lockfile)
   end
 
   it "prints a lockfile when there is an existing lockfile with --print" do
@@ -166,13 +166,13 @@ RSpec.describe "bundle lock" do
     bundle! "lock --add-platform java x86-mingw32"
 
     lockfile = Bundler::LockfileParser.new(read_lockfile)
-    expect(lockfile.platforms).to eq([java, local, mingw])
+    expect(lockfile.platforms).to match_array(local_platforms.unshift(java, mingw).uniq)
   end
 
   it "supports adding the `ruby` platform" do
     bundle! "lock --add-platform ruby"
     lockfile = Bundler::LockfileParser.new(read_lockfile)
-    expect(lockfile.platforms).to eq([local, "ruby"].uniq)
+    expect(lockfile.platforms).to match_array(local_platforms.unshift("ruby").uniq)
   end
 
   it "warns when adding an unknown platform" do
@@ -184,17 +184,17 @@ RSpec.describe "bundle lock" do
     bundle! "lock --add-platform java x86-mingw32"
 
     lockfile = Bundler::LockfileParser.new(read_lockfile)
-    expect(lockfile.platforms).to eq([java, local, mingw])
+    expect(lockfile.platforms).to match_array(local_platforms.unshift(java, mingw).uniq)
 
     bundle! "lock --remove-platform java"
 
     lockfile = Bundler::LockfileParser.new(read_lockfile)
-    expect(lockfile.platforms).to eq([local, mingw])
+    expect(lockfile.platforms).to match_array(local_platforms.unshift(mingw).uniq)
   end
 
   it "errors when removing all platforms" do
-    bundle "lock --remove-platform #{local}"
-    expect(out).to include("Removing all platforms from the bundle is not allowed")
+    bundle "lock --remove-platform #{local_platforms.join(" ")}"
+    expect(last_command.bundler_err).to include("Removing all platforms from the bundle is not allowed")
   end
 
   # from https://github.com/bundler/bundler/issues/4896

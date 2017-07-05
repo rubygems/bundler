@@ -354,7 +354,7 @@ RSpec.describe "bundle update" do
             foo (2.0)
 
         PLATFORMS
-          ruby
+          #{lockfile_platforms}
 
         DEPENDENCIES
           foo!

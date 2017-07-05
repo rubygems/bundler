@@ -36,5 +36,10 @@ module Spec
       return true unless exitstatus
       exitstatus == 0
     end
+
+    def failure?
+      return true unless exitstatus
+      exitstatus > 0
+    end
   end
 end

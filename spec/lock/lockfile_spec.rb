@@ -17,7 +17,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -40,7 +40,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         omg!
@@ -63,7 +63,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -83,7 +83,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -105,7 +105,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -123,7 +123,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -142,7 +142,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack (> 0)
@@ -179,7 +179,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
 
     warning_message = "the running version of Bundler (9999999.0.0) is older " \
                       "than the version that created the lockfile (9999999.1.0)"
-    expect(out.scan(warning_message).size).to eq(1)
+    expect(last_command.bundler_err).to include warning_message
 
     lockfile_should_be <<-G
       GEM
@@ -188,7 +188,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -206,7 +206,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -221,8 +221,8 @@ RSpec.describe "the lockfile format", :bundler => "2" do
       gem "rack"
     G
 
-    expect(exitstatus > 0) if exitstatus
-    expect(out).to include("You must use Bundler 9999999 or greater with this lockfile.")
+    expect(last_command).to be_failure
+    expect(last_command.bundler_err).to include("You must use Bundler 9999999 or greater with this lockfile.")
   end
 
   it "shows a friendly error when running with a new bundler 2 lockfile" do
@@ -259,7 +259,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
       end
     G
 
-    expect(exitstatus > 0) if exitstatus
+    expect(last_command).to be_failure
     expect(out).to include("You must use Bundler 9999999 or greater with this lockfile.")
   end
 
@@ -298,7 +298,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -324,7 +324,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
             rack
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack-obama
@@ -350,7 +350,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
             rack
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -389,7 +389,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
             rack
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack-obama (>= 1.0)!
@@ -414,7 +414,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           net-ssh (1.0)
 
       PLATFORMS
-        ruby
+        #{lockfile_platforms}
 
       DEPENDENCIES
         net-sftp
@@ -444,7 +444,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
         specs:
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -472,7 +472,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -517,7 +517,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
          #{Bundler::VERSION}
     L
 
-    bundle "install"
+    bundle! "install"
     expect(the_bundle).to include_gems "rack 1.0.0"
   end
 
@@ -541,7 +541,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -571,7 +571,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -601,7 +601,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -628,7 +628,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -658,7 +658,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -698,7 +698,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         bar!
@@ -733,7 +733,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
             rack
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         actionpack
@@ -774,7 +774,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rake (10.0.2)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rails
@@ -800,7 +800,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           net-ssh (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         double_deps
@@ -826,7 +826,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
             rack
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -852,7 +852,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
             rack
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -881,7 +881,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -910,7 +910,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -939,7 +939,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -966,7 +966,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           foo (1.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         foo!
@@ -999,8 +999,6 @@ RSpec.describe "the lockfile format", :bundler => "2" do
       gem "rack"
     G
 
-    platforms = ["java", generic_local_platform.to_s].sort
-
     lockfile_should_be <<-G
       GEM
         remote: file:#{gem_repo1}/
@@ -1008,8 +1006,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        #{platforms[0]}
-        #{platforms[1]}
+        #{lockfile_platforms "java", generic_local_platform, specific_local_platform}
 
       DEPENDENCIES
         rack
@@ -1020,25 +1017,29 @@ RSpec.describe "the lockfile format", :bundler => "2" do
   end
 
   it "persists the spec's platform to the lockfile" do
-    build_gem "platform_specific", "1.0.0", :to_system => true do |s|
-      s.platform = Gem::Platform.new("universal-java-16")
+    build_repo2 do
+      build_gem "platform_specific", "1.0" do |s|
+        s.platform = Gem::Platform.new("universal-java-16")
+      end
     end
 
     simulate_platform "universal-java-16"
 
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
+    install_gemfile! <<-G
+      source "file://#{gem_repo2}"
       gem "platform_specific"
     G
 
     lockfile_should_be <<-G
       GEM
-        remote: file:#{gem_repo1}/
+        remote: file:#{gem_repo2}/
         specs:
           platform_specific (1.0-java)
+          platform_specific (1.0-universal-java-16)
 
       PLATFORMS
         java
+        universal-java-16
 
       DEPENDENCIES
         platform_specific
@@ -1068,7 +1069,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        ruby
+        #{lockfile_platforms}
 
       DEPENDENCIES
         activesupport
@@ -1093,7 +1094,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        ruby
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -1117,7 +1118,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        ruby
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack (= 1.0)
@@ -1141,7 +1142,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (1.0.0)
 
       PLATFORMS
-        ruby
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack (= 1.0)
@@ -1186,7 +1187,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (0.9.1)
 
       PLATFORMS
-        ruby
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack (> 0.9, < 1.0)
@@ -1210,7 +1211,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack (0.9.1)
 
       PLATFORMS
-        ruby
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack (> 0.9, < 1.0)
@@ -1262,7 +1263,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           omg (1.0)
 
       PLATFORMS
-        #{local}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         omg!
@@ -1289,7 +1290,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           omg (1.0)
 
       PLATFORMS
-        #{local}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         omg!
@@ -1307,7 +1308,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
           rack_middleware (1.0)
 
       PLATFORMS
-        #{local}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack_middleware
@@ -1402,7 +1403,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
       >>>>>>>
 
       PLATFORMS
-        ruby
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack

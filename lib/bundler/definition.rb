@@ -492,7 +492,7 @@ module Bundler
 
     def add_current_platform
       current_platform = Bundler.local_platform
-      add_platform(current_platform) if Bundler.settings[:specific_platform]
+      add_platform(current_platform) if Bundler.feature_flag.specific_platform?
       add_platform(generic(current_platform))
     end
 
@@ -847,11 +847,12 @@ module Bundler
     end
 
     def expand_dependencies(dependencies, remote = false)
+      sorted_platforms = Resolver.sort_platforms(@platforms)
       deps = []
       dependencies.each do |dep|
         dep = Dependency.new(dep, ">= 0") unless dep.respond_to?(:name)
         next if !remote && !dep.current_platform?
-        platforms = dep.gem_platforms(@platforms)
+        platforms = dep.gem_platforms(sorted_platforms)
         if platforms.empty?
           mapped_platforms = dep.platforms.map {|p| Dependency::PLATFORM_MAP[p] }
           Bundler.ui.warn \
