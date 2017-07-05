@@ -301,5 +301,33 @@ RSpec.describe "bundle install with gem sources" do
       bundle "install --no-cache"
       expect(bundled_app("vendor/cache").children).to be_empty
     end
+
+    context "when install_caches_by_default is set to false" do
+      before { bundle! "config install_caches_by_default false" }
+
+      it "does not update the cache if --cache is not passed" do
+        create_file "gems.rb", <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+        bundled_app("vendor/cache").mkpath
+        expect(bundled_app("vendor/cache").children).to be_empty
+
+        bundle! "install"
+        expect(bundled_app("vendor/cache").children).to be_empty
+      end
+
+      it "updates the cache if --cache is passed" do
+        create_file "gems.rb", <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+        bundled_app("vendor/cache").mkpath
+        expect(bundled_app("vendor/cache").children).to be_empty
+
+        bundle! "install --cache"
+        expect(bundled_app("vendor/cache").children).not_to be_empty
+      end
+    end
   end
 end

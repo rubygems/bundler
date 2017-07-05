@@ -174,11 +174,25 @@ RSpec.describe "bundle cache" do
       expect(cached_gem("activesupport-2.3.2")).to exist
     end
 
-    it "re-caches during install" do
+    it "re-caches during install with --cache", :bundler => "< 2" do
+      cached_gem("rack-1.0.0").rmtree
+      bundle! :install, :cache => true
+      expect(out).to include("Updating files in vendor/cache")
+      expect(cached_gem("rack-1.0.0")).to exist
+    end
+
+    it "re-caches during install", :bundler => "< 2" do
       cached_gem("rack-1.0.0").rmtree
       bundle :install
       expect(out).to include("Updating files in vendor/cache")
       expect(cached_gem("rack-1.0.0")).to exist
+    end
+
+    it "does not re-cache during install", :bundler => "2" do
+      cached_gem("rack-1.0.0").rmtree
+      bundle! :install
+      expect(out).not_to include("Updating files in vendor/cache")
+      expect(cached_gem("rack-1.0.0")).not_to exist
     end
 
     it "adds and removes when gems are updated" do
@@ -189,7 +203,7 @@ RSpec.describe "bundle cache" do
     end
 
     it "adds new gems and dependencies" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :cache => true
         source "file://#{gem_repo2}"
         gem "rails"
       G
@@ -198,7 +212,7 @@ RSpec.describe "bundle cache" do
     end
 
     it "removes .gems for removed gems and dependencies" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :cache => true
         source "file://#{gem_repo2}"
         gem "rack"
       G
@@ -210,7 +224,7 @@ RSpec.describe "bundle cache" do
     it "removes .gems when gem changes to git source" do
       build_git "rack"
 
-      install_gemfile <<-G
+      install_gemfile <<-G, :cache => true
         source "file://#{gem_repo2}"
         gem "rack", :git => "#{lib_path("rack-1.0")}"
         gem "actionpack"
@@ -232,7 +246,7 @@ RSpec.describe "bundle cache" do
       end
 
       simulate_new_machine
-      install_gemfile <<-G
+      install_gemfile <<-G, :cache => true
         source "file://#{gem_repo1}"
         gem "platform_specific"
       G
@@ -248,7 +262,7 @@ RSpec.describe "bundle cache" do
         :rubygems_version => "1.3.2"
       simulate_new_machine
 
-      bundle :install
+      bundle :install, :cache => true
       expect(cached_gem("rack-1.0.0")).to exist
     end
 
@@ -264,7 +278,7 @@ RSpec.describe "bundle cache" do
         gem "rack"
       G
       bundle "cache"
-      bundle "install"
+      bundle "install", :cache => true
       expect(out).not_to match(/removing/i)
     end
 
