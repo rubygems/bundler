@@ -324,16 +324,20 @@ module Bundler
       Outdated.new(options, gems).run
     end
 
-    desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
-    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
-    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not only the current one"
-    method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
-    def cache
-      require "bundler/cli/cache"
-      Cache.new(options).run
+    if Bundler.feature_flag.cache_command_is_package?
+      map %w[cache] => :package
+    else
+      desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
+      method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
+      method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not only the current one"
+      method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
+      def cache
+        require "bundler/cli/cache"
+        Cache.new(options).run
+      end
     end
 
-    desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
+    desc "#{Bundler.feature_flag.cache_command_is_package? ? :cache : :package} [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not only the current one"
     method_option "cache-path", :type => :string, :banner =>
