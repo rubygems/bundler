@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "fileutils"
+require "bundler/vendored_fileutils"
 
 RSpec.describe "bundle pristine" do
   before :each do

@@ -1,9 +1,8 @@
 # frozen_string_literal: true
-require "fileutils"
+require "bundler/vendored_fileutils"
 require "pathname"
 require "rbconfig"
 require "thread"
-require "tmpdir"
 
 require "bundler/errors"
 require "bundler/environment_preserver"
@@ -169,6 +168,7 @@ module Bundler
 
     def tmp_home_path(login, warning)
       login ||= "unknown"
+      Kernel.send(:require, "tmpdir")
       path = Pathname.new(Dir.tmpdir).join("bundler", "home")
       SharedHelpers.filesystem_access(path) do |tmp_home_path|
         unless tmp_home_path.exist?
@@ -229,6 +229,7 @@ module Bundler
     end
 
     def tmp(name = Process.pid.to_s)
+      Kernel.send(:require, "tmpdir")
       Pathname.new(Dir.mktmpdir(["bundler", name]))
     end
 

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "fileutils"
+require "bundler/vendored_fileutils"
 require "stringio"
-require "tmpdir"
 require "zlib"
 
 module Bundler
@@ -22,6 +21,7 @@ module Bundler
 
       def initialize(fetcher)
         @fetcher = fetcher
+        require "tmpdir"
       end
 
       def update(local_path, remote_path, retrying = nil)
