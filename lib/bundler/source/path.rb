@@ -63,7 +63,7 @@ module Bundler
 
       def eql?(other)
         return unless other.class == self.class
-        expand(@original_path) == expand(other.original_path) &&
+        expanded_original_path == other.expanded_original_path &&
           version == other.version
       end
 
@@ -115,6 +115,10 @@ module Bundler
 
       def is_a_path?
         instance_of?(Path)
+      end
+
+      def expanded_original_path
+        @expanded_original_path ||= expand(original_path)
       end
 
     private

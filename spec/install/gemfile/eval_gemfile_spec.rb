@@ -42,6 +42,13 @@ RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
       bundle! :install
       expect(the_bundle).to include_gem("a 1.0")
     end
+
+    # Make sure that we are properly comparing path based gems between the
+    # parsed lockfile and the evaluated gemfile.
+    it "bundles with --deployment" do
+      bundle! :install
+      bundle! "install --deployment"
+    end
   end
 
   context "Gemfile uses gemspec paths after eval-ing a Gemfile" do
