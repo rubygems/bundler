@@ -38,6 +38,7 @@ module Bundler
     settings_flag(:only_update_to_newer_versions) { bundler_2_mode? }
     settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }
     settings_flag(:prefer_gems_rb) { bundler_2_mode? }
+    settings_flag(:setup_makes_kernel_gem_public) { !bundler_2_mode? }
     settings_flag(:skip_default_git_sources) { bundler_2_mode? }
     settings_flag(:specific_platform) { bundler_2_mode? }
     settings_flag(:suppress_install_using_messages) { bundler_2_mode? }

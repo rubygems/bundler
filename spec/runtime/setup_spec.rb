@@ -1338,17 +1338,51 @@ end
   end
 
   describe "after setup" do
-    it "allows calling #gem on random objects" do
+    it "allows calling #gem on random objects", :bundler => "< 2" do
       install_gemfile <<-G
         source "file:#{gem_repo1}"
         gem "rack"
       G
+
       ruby! <<-RUBY
         require "bundler/setup"
         Object.new.gem "rack"
         puts Gem.loaded_specs["rack"].full_name
       RUBY
+
       expect(out).to eq("rack-1.0.0")
+    end
+
+    it "keeps Kernel#gem private", :bundler => "2" do
+      install_gemfile! <<-G
+        source "file:#{gem_repo1}"
+        gem "rack"
+      G
+
+      ruby <<-RUBY
+        require "bundler/setup"
+        Object.new.gem "rack"
+        puts "FAIL"
+      RUBY
+
+      expect(last_command.stdboth).not_to include "FAIL"
+      expect(last_command.stderr).to include "private method `gem'"
+    end
+
+    it "keeps Kernel#require private" do
+      install_gemfile! <<-G
+        source "file:#{gem_repo1}"
+        gem "rack"
+      G
+
+      ruby <<-RUBY
+        require "bundler/setup"
+        Object.new.require "rack"
+        puts "FAIL"
+      RUBY
+
+      expect(last_command.stdboth).not_to include "FAIL"
+      expect(last_command.stderr).to include "private method `require'"
     end
   end
 end

@@ -393,9 +393,8 @@ module Bundler
           raise e
         end
 
-        # TODO: delete this in 2.0, it's a backwards compatibility shim
-        # see https://github.com/bundler/bundler/issues/5102
-        kernel_class.send(:public, :gem)
+        # backwards compatibility shim, see https://github.com/bundler/bundler/issues/5102
+        kernel_class.send(:public, :gem) if Bundler.feature_flag.setup_makes_kernel_gem_public?
       end
     end
 
