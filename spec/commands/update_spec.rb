@@ -430,7 +430,7 @@ RSpec.describe "bundle update when a gem depends on a newer version of bundler" 
 end
 
 RSpec.describe "bundle update" do
-  it "shows the previous version of the gem when updated from rubygems source" do
+  it "shows the previous version of the gem when updated from rubygems source", :bundler => "< 2" do
     build_repo2
 
     install_gemfile <<-G
@@ -447,6 +447,40 @@ RSpec.describe "bundle update" do
 
     bundle "update", :all => bundle_update_requires_all?
     expect(out).to include("Installing activesupport 3.0 (was 2.3.5)")
+  end
+
+  context "with suppress_install_using_messages set" do
+    before { bundle! "config suppress_install_using_messages true" }
+
+    it "only prints `Using` for versions that have changed" do
+      build_repo4 do
+        build_gem "bar"
+        build_gem "foo"
+      end
+
+      install_gemfile! <<-G
+        source "file://#{gem_repo4}"
+        gem "bar"
+        gem "foo"
+      G
+
+      bundle! "update", :all => bundle_update_requires_all?
+      out.gsub!(/RubyGems [\d\.]+ is not threadsafe.*\n?/, "")
+      expect(out).to include "Resolving dependencies...\nBundle updated!"
+
+      update_repo4 do
+        build_gem "foo", "2.0"
+      end
+
+      bundle! "update", :all => bundle_update_requires_all?
+      out.gsub!(/RubyGems [\d\.]+ is not threadsafe.*\n?/, "")
+      expect(out).to include strip_whitespace(<<-EOS).strip
+        Resolving dependencies...
+        Fetching foo 2.0 (was 1.0)
+        Installing foo 2.0 (was 1.0)
+        Bundle updated
+      EOS
+    end
   end
 
   it "shows error message when Gemfile.lock is not preset and gem is specified" do

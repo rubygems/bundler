@@ -20,8 +20,9 @@ RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
         eval_gemfile 'Gemfile-other'
       G
       expect(out).to include("Resolving dependencies")
-      expect(out).to include("Using gunks 0.0.1 from source at `gems/gunks`")
       expect(out).to include("Bundle complete")
+
+      expect(the_bundle).to include_gem "gunks 0.0.1", :source => "path@#{bundled_app("gems", "gunks")}"
     end
   end
 
@@ -52,8 +53,9 @@ RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
         gemspec :path => 'gems/gunks'
       G
       expect(out).to include("Resolving dependencies")
-      expect(out).to include("Using gunks 0.0.1 from source at `gems/gunks`")
       expect(out).to include("Bundle complete")
+
+      expect(the_bundle).to include_gem "gunks 0.0.1", :source => "path@#{bundled_app("gems", "gunks")}"
     end
   end
 end

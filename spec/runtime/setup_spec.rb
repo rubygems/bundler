@@ -529,8 +529,7 @@ RSpec.describe "Bundler.setup" do
       G
 
       bundle %(config local.rack #{lib_path("local-rack")})
-      bundle :install
-      expect(out).to match(/at #{lib_path('local-rack')}/)
+      bundle! :install
 
       FileUtils.rm_rf(lib_path("local-rack"))
       run "require 'rack'"
@@ -548,8 +547,7 @@ RSpec.describe "Bundler.setup" do
       G
 
       bundle %(config local.rack #{lib_path("local-rack")})
-      bundle :install
-      expect(out).to match(/at #{lib_path('local-rack')}/)
+      bundle! :install
 
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -571,8 +569,7 @@ RSpec.describe "Bundler.setup" do
       G
 
       bundle %(config local.rack #{lib_path("local-rack")})
-      bundle :install
-      expect(out).to match(/at #{lib_path('local-rack')}/)
+      bundle! :install
 
       gemfile <<-G
         source "file://#{gem_repo1}"
