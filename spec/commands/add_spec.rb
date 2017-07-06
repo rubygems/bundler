@@ -81,7 +81,7 @@ RSpec.describe "bundle add" do
 
   it "using combination of short form options works like long form" do
     bundle "add 'foo' -s='file://#{gem_repo2}' -g='development' -v='~>1.0'"
-    expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "~> 1.0", :group => \[:development\], :source => "file:\/\/#{gem_repo2}"})
+    expect(bundled_app("Gemfile").read).to include %(gem "foo", "~> 1.0", :group => [:development], :source => "file://#{gem_repo2}")
     expect(the_bundle).to include_gems "foo 1.1"
   end
 

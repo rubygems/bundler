@@ -138,6 +138,8 @@ learn more about their operation in [bundle install(1)][bundle-install].
    `bundle install`.
 * `console` (`BUNDLE_CONSOLE`):
    The console that `bundle console` starts. Defaults to `irb`.
+* `deployment` (`BUNDLE_DEPLOYMENT`):
+   Disallow changes to the `Gemfile`.
 * `disable_checksum_validation` (`BUNDLE_DISABLE_CHECKSUM_VALIDATION`):
    Allow installing gems even if they do not match the checksum provided by
    RubyGems.

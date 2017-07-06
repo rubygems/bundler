@@ -32,17 +32,19 @@ module Bundler
 
       check_trust_policy
 
-      if options[:deployment] || options[:frozen]
+      if options[:deployment] || options[:frozen] || Bundler.frozen?
         unless Bundler.default_lockfile.exist?
-          flag = options[:deployment] ? "--deployment" : "--frozen"
-          raise ProductionError, "The #{flag} flag requires a #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}. Please make " \
+          flag   = "--deployment flag" if options[:deployment]
+          flag ||= "--frozen flag"     if options[:frozen]
+          flag ||= "deployment setting"
+          raise ProductionError, "The #{flag} requires a #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}. Please make " \
                                  "sure you have checked your #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} into version control " \
                                  "before deploying."
         end
 
         options[:local] = true if Bundler.app_cache.exist?
 
-        Bundler.settings[:frozen] = "1"
+        Bundler.settings[:frozen] = true unless Bundler.feature_flag.deployment_means_frozen?
       end
 
       # When install is called with --no-deployment, disable deployment mode
@@ -66,7 +68,7 @@ module Bundler
       definition.validate_runtime!
 
       installer = Installer.install(Bundler.root, definition, options)
-      Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]
+      Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.frozen?
 
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
       Bundler::CLI::Common.output_without_groups_message
@@ -175,7 +177,7 @@ module Bundler
 
     def normalize_settings
       Bundler.settings[:path]                = nil if options[:system]
-      Bundler.settings[:path]                = "vendor/bundle" if options[:deployment]
+      Bundler.settings[:path]                = "vendor/bundle" if options[:deployment] && !Bundler.feature_flag.deployment_means_frozen?
       Bundler.settings[:path]                = options["path"] if options["path"]
       Bundler.settings[:path]              ||= "bundle" if options["standalone"]
 

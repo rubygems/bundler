@@ -214,7 +214,7 @@ module Bundler
     end
 
     def check_for_deployment_mode
-      if Bundler.settings[:frozen]
+      if Bundler.frozen?
         raise ProductionError, "You are trying to check outdated gems in " \
           "deployment mode. Run `bundle outdated` elsewhere.\n" \
           "\nIf this is a development machine, remove the " \
