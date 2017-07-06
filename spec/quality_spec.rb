@@ -191,7 +191,7 @@ RSpec.describe "The library itself" do
           line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `#{filename}:#{number.succ}`" }
         end
       end
-      documented_settings = File.read("man/bundle-config.ronn").scan(/^\* `#{key_pattern}`/).flatten
+      documented_settings = File.read("man/bundle-config.ronn")[/LIST OF AVAILABLE KEYS.*/m].scan(/^\* `#{key_pattern}`/).flatten
     end
 
     documented_settings.each {|s| all_settings.delete(s) }
@@ -201,6 +201,8 @@ RSpec.describe "The library itself" do
     end
 
     expect(error_messages.sort).to be_well_formed
+
+    expect(documented_settings).to be_sorted
   end
 
   it "can still be built" do
