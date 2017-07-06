@@ -198,9 +198,10 @@ module Bundler
       stale_gemspec_files  = gemspec_files - spec_gemspec_paths
       stale_extension_dirs = extension_dirs - spec_extension_dirs
 
+      stale_extension_dirs.collect {|dir| FileUtils.rm_rf(dir) } unless dry_run
+
       removed_stale_gem_dirs = stale_gem_dirs.collect {|dir| remove_dir(dir, dry_run) }
       removed_stale_git_dirs = stale_git_dirs.collect {|dir| remove_dir(dir, dry_run) }
-      removed_extension_dirs = stale_extension_dirs.collect {|dir| remove_dir(dir, dry_run) }
       output = removed_stale_gem_dirs + removed_stale_git_dirs
 
       unless dry_run
