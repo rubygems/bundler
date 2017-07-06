@@ -194,7 +194,7 @@ module Bundler
       end
     end
 
-    desc "update [OPTIONS]", "update the current environment"
+    desc "update [OPTIONS]", "Update the current environment"
     long_desc <<-D
       Update will install the newest versions of the gems listed in the Gemfile. Use
       update when you have changed the Gemfile, or if you want to get the newest
@@ -291,7 +291,7 @@ module Bundler
       Add.new(options.dup, gem_name).run
     end
 
-    desc "outdated GEM [OPTIONS]", "list installed gems with newer versions available"
+    desc "outdated GEM [OPTIONS]", "List installed gems with newer versions available"
     long_desc <<-D
       Outdated lists the names and versions of gems that have a newer version available
       in the given source. Calling outdated with [GEM [GEM]] will only check for newer
@@ -375,7 +375,7 @@ module Bundler
       Exec.new(options, args).run
     end
 
-    desc "config NAME [VALUE]", "retrieve or set a configuration value"
+    desc "config NAME [VALUE]", "Retrieve or set a configuration value"
     long_desc <<-D
       Retrieves or sets a configuration value. If only one parameter is provided, retrieve the value. If two parameters are provided, replace the
       existing value with the newly provided one.
@@ -580,7 +580,7 @@ module Bundler
 
     if Bundler.feature_flag.plugins?
       require "bundler/cli/plugin"
-      desc "plugin SUBCOMMAND ...ARGS", "manage the bundler plugins"
+      desc "plugin SUBCOMMAND ...ARGS", "Manage the bundler plugins"
       subcommand "plugin", Plugin
     end
 
