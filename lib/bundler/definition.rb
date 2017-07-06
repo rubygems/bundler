@@ -362,7 +362,6 @@ module Bundler
     end
 
     def to_lock
-      require "bundler/lockfile_generator"
       LockfileGenerator.generate(self)
     end
 

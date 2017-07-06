@@ -141,6 +141,15 @@ module Spec
     end
 
     define_compound_matcher :include_gems, [be_an_instance_of(Spec::TheBundle)] do |*names|
+      define_method :run do |*args|
+        opts = names.last.is_a?(Hash) ? names.pop : {}
+        if opts.delete(:as_if) { false }
+          run_as_if!(*args)
+        else
+          run!(*args)
+        end
+      end
+
       match do
         opts = names.last.is_a?(Hash) ? names.pop : {}
         source = opts.delete(:source)

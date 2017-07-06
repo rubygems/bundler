@@ -12,6 +12,7 @@ module Spec
       end
       FileUtils.mkdir_p(home)
       FileUtils.mkdir_p(tmpdir)
+      Bundler.rubygems
       Bundler.reset!
       Bundler.ui = nil
       Bundler.ui # force it to initialize
@@ -140,6 +141,83 @@ module Spec
       sys_exec(cmd) {|i, o, thr| yield i, o, thr if block_given? }
     end
     bang :bundle
+
+    def bundle_command(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      exe = options.delete(:exe) { bundle_exe }
+      env = options.delete(:env) { {} }
+      args += options.map do |k, v|
+        v == true ? ["--#{k}"] : ["--#{k}", v.to_s] if v
+      end.compact.flatten(1)
+      args = args.flatten.map(&:to_s)
+
+      as_if_running("#{exe} #{args.join(" ")}") do
+        ENV.update(env)
+
+        ARGV.replace args.flatten.map(&:to_s)
+        load exe.to_s
+      end
+    end
+    bang :bundle_command
+
+    def as_if
+      argv = ARGV.dup
+      env = ENV.to_h.dup
+      load_path = $LOAD_PATH.map(&:dup)
+      loaded_features = $LOADED_FEATURES.map(&:dup)
+      object_constants = ::Object.constants.to_set
+
+      yield
+    ensure
+      ARGV.replace argv
+      ENV.clear
+      ENV.update env
+      $LOAD_PATH.replace load_path
+      bundler_loaded_features = $LOADED_FEATURES.select {|lf| lf.start_with? bundler_path.to_s }
+      $LOADED_FEATURES.replace loaded_features.concat(bundler_loaded_features)
+      ::Object.constants.each do |const|
+        next if object_constants.include?(const)
+        ::Object.send(:remove_const, const)
+      end
+    end
+
+    def as_if_running(cmd)
+      as_if do
+        command_execution = Spec::CommandExecution.new(cmd.to_s, Dir.pwd)
+        command_execution.stdout = capture(:stdout) do
+          command_execution.stderr = capture(:stderr) do
+            begin
+              load root.join("spec", "support", "hax.rb")
+              Bundler.preserve_env!
+
+              yield
+            rescue SystemExit => exception
+              command_execution.exitstatus = exception.status
+            rescue
+              raise
+            else
+              command_execution.exitstatus = 0
+            ensure
+              BundlerSpecOriginal.reset!
+              Bundler.reset!
+            end
+          end.strip
+        end.strip
+
+        (@command_executions ||= []) << command_execution
+
+        command_execution.stdout
+      end
+    end
+
+    def run_as_if(cmd, *args)
+      cmd = strip_whitespace(cmd)
+      as_if_running("ruby -e #{cmd.inspect}") do
+        _opts = args.last.is_a?(Hash) ? args.pop : {}
+        Bundler.setup(*args.map(&:to_s))
+        eval(cmd)
+      end
+    end
 
     def bundler(cmd, options = {})
       options["bundle_bin"] = File.expand_path("../../../exe/bundler", __FILE__)

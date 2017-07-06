@@ -115,12 +115,16 @@ module Bundler
       "https://github.com/bundler/bundler/search?q=" \
         "#{CGI.escape(message)}&type=Issues"
     end
+
+    def handle_error(error)
+      log_error(error)
+      exit exit_status(error)
+    end
   end
 
   def self.with_friendly_errors
     yield
   rescue Exception => e
-    FriendlyErrors.log_error(e)
-    exit FriendlyErrors.exit_status(e)
+    FriendlyErrors.handle_error(e)
   end
 end

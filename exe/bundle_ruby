@@ -9,7 +9,7 @@ require "bundler/ruby_dsl"
 require "bundler/shared_helpers"
 
 module Bundler
-  class Dsl
+  class BundleRubyDsl
     include RubyDsl
 
     attr_accessor :ruby_version
@@ -44,7 +44,7 @@ end
 
 Bundler::SharedHelpers.major_deprecation("the bundle_ruby executable has been removed in favor of `bundle platform --ruby`")
 
-dsl = Bundler::Dsl.new
+dsl = Bundler::BundleRubyDsl.new
 begin
   dsl.eval_gemfile(Bundler::SharedHelpers.default_gemfile)
   ruby_version = dsl.ruby_version

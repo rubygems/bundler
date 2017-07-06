@@ -93,6 +93,10 @@ module Spec
       tmp "tmpdir", *args
     end
 
+    def bundle_exe(exe = "bundle")
+      root.join("exe", exe)
+    end
+
     extend self
   end
 end

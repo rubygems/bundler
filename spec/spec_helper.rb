@@ -23,6 +23,7 @@ if File.expand_path(__FILE__) =~ %r{([^\w/\.])}
 end
 
 require "bundler"
+require "bundler/cli"
 
 # Require the correct version of popen for the current platform
 if RbConfig::CONFIG["host_os"] =~ /mingw|mswin/

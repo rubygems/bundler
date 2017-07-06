@@ -1,15 +1,18 @@
 # frozen_string_literal: true
 require "bundler/cli"
+require "bundler/friendly_errors"
 
 RSpec.describe "bundle executable" do
   it "returns non-zero exit status when passed unrecognized options" do
-    bundle "--invalid_argument"
-    expect(exitstatus).to_not be_zero if exitstatus
+    bundle_command "--invalid_argument"
+    expect(last_command).to be_failure
+    expect(last_command.bundler_err).to eq "Unknown switches '--invalid_argument'"
   end
 
   it "returns non-zero exit status when passed unrecognized task" do
-    bundle "unrecognized-task"
-    expect(exitstatus).to_not be_zero if exitstatus
+    bundle_command "unrecognized-task"
+    expect(last_command).to be_failure
+    expect(last_command.bundler_err).to eq 'Could not find command "unrecognized-task".'
   end
 
   it "looks for a binary and executes it if it's named bundler-<task>" do
@@ -17,51 +20,21 @@ RSpec.describe "bundle executable" do
       f.puts "#!/usr/bin/env ruby\nputs 'Hello, world'\n"
     end
 
+    expect(Kernel).to receive(:exec).with(tmp("bundler-testtasks").to_s)
     with_path_added(tmp) do
-      bundle "testtasks"
-    end
-
-    expect(exitstatus).to be_zero if exitstatus
-    expect(out).to eq("Hello, world")
-  end
-
-  context "when ENV['BUNDLE_GEMFILE'] is set to an empty string" do
-    it "ignores it" do
-      gemfile bundled_app("Gemfile"), <<-G
-        source "file://#{gem_repo1}"
-        gem 'rack'
-      G
-
-      bundle :install, :env => { "BUNDLE_GEMFILE" => "" }
-
-      expect(the_bundle).to include_gems "rack 1.0.0"
-    end
-  end
-
-  context "when ENV['RUBYGEMS_GEMDEPS'] is set" do
-    it "displays a warning" do
-      gemfile bundled_app("Gemfile"), <<-G
-        source "file://#{gem_repo1}"
-        gem 'rack'
-      G
-
-      bundle :install, :env => { "RUBYGEMS_GEMDEPS" => "foo" }
-      expect(out).to include("RUBYGEMS_GEMDEPS")
-      expect(out).to include("conflict with Bundler")
-
-      bundle :install, :env => { "RUBYGEMS_GEMDEPS" => "" }
-      expect(out).not_to include("RUBYGEMS_GEMDEPS")
+      bundle_command! "testtasks"
     end
   end
 
   context "with --verbose" do
     it "prints the running command" do
-      bundle! "config", :verbose => true
+      bundle_command! :config, :verbose => true
       expect(last_command.stdout).to start_with("Running `bundle config --verbose` with bundler #{Bundler::VERSION}")
     end
 
     it "doesn't print defaults" do
-      install_gemfile! "", :verbose => true
+      gemfile ""
+      bundle_command! :install, :verbose => true, :retry => 0, :"no-color" => true
       expect(last_command.stdout).to start_with("Running `bundle install --no-color --retry 0 --verbose` with bundler #{Bundler::VERSION}")
     end
   end
@@ -69,7 +42,7 @@ RSpec.describe "bundle executable" do
   describe "printing the outdated warning" do
     shared_examples_for "no warning" do
       it "prints no warning" do
-        bundle "fail"
+        bundle_command "fail"
         expect(last_command.stdboth).to eq("Could not find command \"fail\".")
       end
     end
@@ -102,7 +75,7 @@ RSpec.describe "bundle executable" do
     context "when the latest version is greater than the current version" do
       let(:latest_version) { "2.0" }
       it "prints the version warning" do
-        bundle "fail"
+        bundle_command "fail"
         expect(last_command.stdout).to start_with(<<-EOS.strip)
 The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
 To update, run `gem install bundler`
@@ -130,7 +103,7 @@ end
 
 RSpec.describe "bundler executable" do
   it "shows the bundler version just as the `bundle` executable does" do
-    bundler "--version"
+    bundle_command "--version", :exe => bundle_exe("bundler")
     expect(out).to eq("Bundler version #{Bundler::VERSION}")
   end
 end

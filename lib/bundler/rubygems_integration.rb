@@ -505,7 +505,7 @@ module Bundler
       replace_bin_path(specs, specs_by_name)
       replace_refresh
 
-      Gem.clear_paths
+      clear_paths
     end
 
     # This backports the correct segment generation code from RubyGems 1.4+

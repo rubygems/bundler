@@ -15,9 +15,14 @@ require "bundler/current_ruby"
 require "bundler/build_metadata"
 
 module Bundler
-  environment_preserver = EnvironmentPreserver.new(ENV, EnvironmentPreserver::BUNDLER_KEYS)
-  ORIGINAL_ENV = environment_preserver.restore
-  ENV.replace(environment_preserver.backup)
+  ORIGINAL_ENV = {} # rubocop:disable Style/MutableConstant
+  def self.preserve_env!
+    environment_preserver = EnvironmentPreserver.new(ENV, EnvironmentPreserver::BUNDLER_KEYS)
+    ORIGINAL_ENV.replace environment_preserver.restore
+    ENV.replace(environment_preserver.backup)
+  end
+  preserve_env!
+
   SUDO_MUTEX = Mutex.new
 
   autoload :Definition,             "bundler/definition"
@@ -38,6 +43,7 @@ module Bundler
   autoload :Injector,               "bundler/injector"
   autoload :Installer,              "bundler/installer"
   autoload :LazySpecification,      "bundler/lazy_specification"
+  autoload :LockfileGenerator,      "bundler/lockfile_generator"
   autoload :LockfileParser,         "bundler/lockfile_parser"
   autoload :MatchPlatform,          "bundler/match_platform"
   autoload :RemoteSpecification,    "bundler/remote_specification"
@@ -451,14 +457,14 @@ EOF
     end
 
     def reset_paths!
-      @root = nil
-      @settings = nil
+      @bin_path = nil
+      @bundle_path = nil
       @definition = nil
-      @setup = nil
       @load = nil
       @locked_gems = nil
-      @bundle_path = nil
-      @bin_path = nil
+      @root = nil
+      @settings = nil
+      @setup = nil
       @user_home = nil
     end
 
@@ -466,6 +472,7 @@ EOF
       return unless defined?(@rubygems) && @rubygems
       rubygems.undo_replacements
       rubygems.reset
+      rubygems.clear_paths
       @rubygems = nil
     end
 
