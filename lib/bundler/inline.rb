@@ -51,12 +51,7 @@ def gemfile(install = false, options = {}, &gemfile)
   definition.validate_runtime!
 
   missing_specs = proc do
-    begin
-      !definition.missing_specs.empty?
-    rescue Bundler::GemNotFound, Bundler::GitError
-      definition.instance_variable_set(:@index, nil)
-      true
-    end
+    definition.missing_specs?
   end
 
   Bundler.ui = ui if install
