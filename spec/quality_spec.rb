@@ -174,6 +174,7 @@ RSpec.describe "The library itself" do
       default_cli_command
       gem.coc
       gem.mit
+      inline
       lockfile_uses_separate_rubygems_sources
       warned_version
     ]

@@ -252,4 +252,19 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
+
+  it "installs inline gems when BUNDLE_BIN is set" do
+    ENV["BUNDLE_BIN"] = "/usr/local/bundle/bin"
+
+    script <<-RUBY
+      gemfile do
+        source "file://#{gem_repo1}"
+        gem "rack" # has the rackup executable
+      end
+
+      puts RACK
+    RUBY
+    expect(last_command).to be_success
+    expect(last_command.stdout).to eq "1.0.0"
+  end
 end
