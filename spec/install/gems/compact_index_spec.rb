@@ -768,6 +768,27 @@ The checksum of /versions does not match the checksum provided by the server! So
     end
   end
 
+  it "performs partial update with a non-empty range" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'rack', '0.9.1'
+    G
+
+    # Initial install creates the cached versions file
+    bundle! :install, :artifice => "compact_index"
+
+    # Update the Gemfile so we can check subsequent install was successful
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'rack', '1.0.0'
+    G
+
+    # Second install should make only a partial request to /versions
+    bundle! :install, :artifice => "compact_index_partial_update"
+
+    expect(the_bundle).to include_gems "rack 1.0.0"
+  end
+
   it "performs partial update while local cache is updated by another process" do
     gemfile <<-G
       source "#{source_uri}"
