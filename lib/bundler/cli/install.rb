@@ -54,7 +54,7 @@ module Bundler
 
       # When install is called with --no-deployment, disable deployment mode
       if options[:deployment] == false
-        Bundler.settings.delete(:frozen)
+        Bundler.settings.set_command_option :frozen, nil
         options[:system] = true
       end
 
@@ -177,7 +177,7 @@ module Bundler
     end
 
     def normalize_settings
-      Bundler.settings.delete(:path) if options[:system]
+      Bundler.settings.set_command_option :path, nil if options[:system]
       Bundler.settings.set_command_option :path, "vendor/bundle" if options[:deployment]
       Bundler.settings.set_command_option_if_given :path, options["path"]
       Bundler.settings.set_command_option :path, "bundle" if options["standalone"] && Bundler.settings[:path].nil?

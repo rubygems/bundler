@@ -131,10 +131,6 @@ module Bundler
       end
     end
 
-    def delete(key)
-      @local_config.delete(key_for(key))
-    end
-
     def set_global(key, value)
       set_key(key, value, @global_config, global_config_file)
     end
