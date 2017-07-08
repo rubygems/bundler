@@ -214,13 +214,19 @@ module Bundler
     end
 
     def check_for_deployment_mode
-      if Bundler.frozen?
-        raise ProductionError, "You are trying to check outdated gems in " \
-          "deployment mode. Run `bundle outdated` elsewhere.\n" \
-          "\nIf this is a development machine, remove the " \
-          "#{Bundler.default_gemfile} freeze" \
-          "\nby running `bundle install --no-deployment`."
+      return unless Bundler.frozen?
+      suggested_command = if Bundler.settings.locations("frozen")[:global]
+        "bundle config --delete frozen"
+      elsif Bundler.settings.locations("deployment").keys.&([:global, :local]).any?
+        "bundle config --delete deployment"
+      else
+        "bundle install --no-deployment"
       end
+      raise ProductionError, "You are trying to check outdated gems in " \
+        "deployment mode. Run `bundle outdated` elsewhere.\n" \
+        "\nIf this is a development machine, remove the " \
+        "#{Bundler.default_gemfile} freeze" \
+        "\nby running `#{suggested_command}`."
     end
 
     def update_present_via_semver_portions(current_spec, active_spec, options)

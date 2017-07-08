@@ -44,7 +44,11 @@ module Bundler
 
         options[:local] = true if Bundler.app_cache.exist?
 
-        Bundler.settings[:frozen] = true unless Bundler.feature_flag.deployment_means_frozen?
+        if Bundler.feature_flag.deployment_means_frozen?
+          Bundler.settings.temporary(:deployment => true)
+        else
+          Bundler.settings[:frozen] ||= true
+        end
       end
 
       # When install is called with --no-deployment, disable deployment mode
@@ -177,7 +181,7 @@ module Bundler
 
     def normalize_settings
       Bundler.settings[:path]                = nil if options[:system]
-      Bundler.settings[:path]                = "vendor/bundle" if options[:deployment] && !Bundler.feature_flag.deployment_means_frozen?
+      Bundler.settings[:path]                = "vendor/bundle" if options[:deployment]
       Bundler.settings[:path]                = options["path"] if options["path"]
       Bundler.settings[:path]              ||= "bundle" if options["standalone"]
 
