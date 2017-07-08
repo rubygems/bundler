@@ -68,23 +68,25 @@ module Bundler
     def run(options)
       create_bundle_path
 
-      if Bundler.settings[:frozen]
-        @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
+      ProcessLock.lock do
+        if Bundler.settings[:frozen]
+          @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
+        end
+
+        if @definition.dependencies.empty?
+          Bundler.ui.warn "The Gemfile specifies no dependencies"
+          lock
+          return
+        end
+
+        resolve_if_needed(options)
+        ensure_specs_are_compatible!
+        warn_on_incompatible_bundler_deps
+        install(options)
+
+        lock unless Bundler.settings[:frozen]
+        Standalone.new(options[:standalone], @definition).generate if options[:standalone]
       end
-
-      if @definition.dependencies.empty?
-        Bundler.ui.warn "The Gemfile specifies no dependencies"
-        lock
-        return
-      end
-
-      resolve_if_needed(options)
-      ensure_specs_are_compatible!
-      warn_on_incompatible_bundler_deps
-      install(options)
-
-      lock unless Bundler.settings[:frozen]
-      Standalone.new(options[:standalone], @definition).generate if options[:standalone]
     end
 
     def generate_bundler_executable_stubs(spec, options = {})
