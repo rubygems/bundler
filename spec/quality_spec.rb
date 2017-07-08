@@ -195,6 +195,7 @@ RSpec.describe "The library itself" do
     exemptions = %w(
       gem.coc
       gem.mit
+      inline
       warned_version
     )
 
