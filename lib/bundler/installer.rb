@@ -247,7 +247,7 @@ module Bundler
     end
 
     def resolve_if_needed(options)
-      if !options["update"] && !options[:inline] && !options["force"] && Bundler.default_lockfile.file?
+      if !options["update"] && !options["force"] && !Bundler.settings[:inline] && Bundler.default_lockfile.file?
         return if @definition.nothing_changed? && !@definition.missing_specs?
       end
 
