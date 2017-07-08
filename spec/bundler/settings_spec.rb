@@ -170,7 +170,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
   describe "#pretty_values_for" do
     it "prints the converted value rather than the raw string" do
       bool_key = described_class::BOOL_KEYS.first
-      settings[bool_key] = false
+      settings.set_local(bool_key, "false")
       expect(subject.pretty_values_for(bool_key)).to eq [
         "Set for your local app (#{bundled_app("config")}): false",
       ]
