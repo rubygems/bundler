@@ -253,18 +253,18 @@ The :bitbucket git source is deprecated, and will be removed in Bundler 2.0. Add
     end
   end
 
-  context "bundle list" do
+  context "bundle show" do
     it "prints a deprecation warning" do
       install_gemfile! <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
 
-      bundle! :list
+      bundle! :show
 
       warnings.gsub!(/gems included.*?\[DEPRECATED/im, "[DEPRECATED")
 
-      expect(warnings).to have_major_deprecation("use `bundle show` instead of `bundle list`")
+      expect(warnings).to have_major_deprecation("use `bundle list` instead of `bundle show`")
     end
   end
 
