@@ -60,8 +60,6 @@ module Bundler
   autoload :VersionRanges,          "bundler/version_ranges"
 
   class << self
-    attr_writer :bundle_path
-
     def configure
       @configured ||= configure_gem_home_and_path
     end
