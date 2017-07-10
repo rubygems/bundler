@@ -18,7 +18,7 @@ module Bundler
       install
 
       # TODO: move cache contents here now that all bundles are locked
-      custom_path = Pathname.new(options[:path]) if options[:path]
+      custom_path = Bundler.settings[:path] if options[:path]
       Bundler.load.cache(custom_path)
     end
 

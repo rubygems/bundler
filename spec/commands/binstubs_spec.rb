@@ -150,8 +150,8 @@ RSpec.describe "bundle binstubs <gem>" do
         gem "rails"
       G
 
-      bundle "binstubs rack --path exec"
-      bundle :install
+      bundle! "binstubs rack", forgotten_command_line_options([:path, :bin] => "exec")
+      bundle! :install
 
       expect(bundled_app("exec/rails")).to exist
     end
@@ -159,15 +159,16 @@ RSpec.describe "bundle binstubs <gem>" do
 
   context "after installing with --standalone" do
     before do
-      install_gemfile <<-G
+      install_gemfile! <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
-      bundle "install --standalone"
+      forgotten_command_line_options(:path => "bundle")
+      bundle! "install", :standalone => true
     end
 
     it "includes the standalone path" do
-      bundle "binstubs rack --standalone"
+      bundle! "binstubs rack", :standalone => true
       standalone_line = File.read(bundled_app("bin/rackup")).each_line.find {|line| line.include? "$:.unshift" }.strip
       expect(standalone_line).to eq %($:.unshift File.expand_path "../../bundle", path.realpath)
     end

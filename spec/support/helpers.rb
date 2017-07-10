@@ -51,7 +51,7 @@ module Spec
     end
 
     def bundle_update_requires_all?
-      !Bundler::VERSION.start_with?("1.")
+      Bundler::VERSION.start_with?("1.") ? nil : true
     end
 
     def in_app_root(&blk)
@@ -99,7 +99,8 @@ module Spec
       with_sudo = options.delete(:sudo)
       sudo = with_sudo == :preserve_env ? "sudo -E" : "sudo" if with_sudo
 
-      options["no-color"] = true unless options.key?("no-color") || cmd.to_s =~ /\A(e|ex|exe|exec|conf|confi|config)(\s|\z)/
+      no_color = options.delete("no-color") { cmd.to_s !~ /\A(e|ex|exe|exec|conf|confi|config)(\s|\z)/ }
+      options["no-color"] = true if no_color
 
       bundle_bin = options.delete("bundle_bin") || File.expand_path("../../../exe/bundle", __FILE__)
 
@@ -134,13 +135,40 @@ module Spec
       env = env.map {|k, v| "#{k}='#{v}'" }.join(" ")
 
       args = options.map do |k, v|
-        v == true ? " --#{k}" : " --#{k} #{v}" if v
+        case v
+        when nil
+          next
+        when true
+          " --#{k}"
+        when false
+          " --no-#{k}"
+        else
+          " --#{k} #{v}"
+        end
       end.join
 
       cmd = "#{env} #{sudo} #{Gem.ruby} #{load_path_str} #{requires_str} #{bundle_bin} #{cmd}#{args}"
       sys_exec(cmd) {|i, o, thr| yield i, o, thr if block_given? }
     end
     bang :bundle
+
+    def forgotten_command_line_options(options)
+      remembered = Bundler::VERSION.split(".", 2).first == "1"
+      options = options.map do |k, v|
+        k = Array(k)[remembered ? 0 : -1]
+        v = '""' if v && v.to_s.empty?
+        [k, v]
+      end
+      return Hash[options] if remembered
+      options.each do |k, v|
+        if v.nil?
+          bundle! "config --delete #{k}"
+        else
+          bundle! "config --local #{k} #{v}"
+        end
+      end
+      {}
+    end
 
     def bundler(cmd, options = {})
       options["bundle_bin"] = File.expand_path("../../../exe/bundler", __FILE__)

@@ -146,8 +146,8 @@ The source does not contain any versions of 'not-a-gem'
     end
 
     it "with --without one group" do
-      bundle "install --without emo"
-      bundle :install
+      bundle! :install, forgotten_command_line_options(:without => "emo")
+      bundle! :install
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the group emo were not installed")
       expect(out).to include(bundle_complete_message)
@@ -155,15 +155,15 @@ The source does not contain any versions of 'not-a-gem'
     end
 
     it "with --without two groups" do
-      bundle "install --without emo test"
-      bundle :install
+      bundle! :install, forgotten_command_line_options(:without => "emo test")
+      bundle! :install
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo and test were not installed")
       expect(out).to include(bundle_complete_message)
     end
 
     it "with --without more groups" do
-      bundle "install --without emo obama test"
+      bundle! :install, forgotten_command_line_options(:without => "emo obama test")
       bundle :install
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo, obama and test were not installed")
@@ -179,21 +179,21 @@ The source does not contain any versions of 'not-a-gem'
     end
 
     it "with --without one group" do
-      bundle! :install, :without => :emo
+      bundle! :install, forgotten_command_line_options(:without => "emo")
       bundle! :update, :all => bundle_update_requires_all?
       expect(out).to include("Gems in the group emo were not installed")
       expect(out).to include(bundle_updated_message)
     end
 
     it "with --without two groups" do
-      bundle! "install --without emo test"
+      bundle! :install, forgotten_command_line_options(:without => "emo test")
       bundle! :update, :all => bundle_update_requires_all?
       expect(out).to include("Gems in the groups emo and test were not installed")
       expect(out).to include(bundle_updated_message)
     end
 
     it "with --without more groups" do
-      bundle! "install --without emo obama test"
+      bundle! :install, forgotten_command_line_options(:without => "emo obama test")
       bundle! :update, :all => bundle_update_requires_all?
       expect(out).to include("Gems in the groups emo, obama and test were not installed")
       expect(out).to include(bundle_updated_message)

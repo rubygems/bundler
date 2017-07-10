@@ -116,7 +116,7 @@ RSpec.describe "Running bin/* commands" do
       gem "activesupport"
     G
 
-    bundle "install --binstubs"
+    bundle! :install, forgotten_command_line_options([:binstubs, :bin] => "bin")
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -135,7 +135,7 @@ RSpec.describe "Running bin/* commands" do
       gem "rack"
     G
 
-    bundle "install --binstubs bin/"
+    bundle! :install, forgotten_command_line_options([:binstubs, :bin] => "bin")
 
     File.open(bundled_app("bin/rackup"), "wb") do |file|
       file.print "OMG"

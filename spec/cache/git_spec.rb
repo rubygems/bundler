@@ -100,7 +100,7 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle! cmd, forgotten_command_line_options([:all, :cache_all] => true)
 
       update_git "foo" do |s|
         s.write "lib/foo.rb", "puts :CACHE"
@@ -187,8 +187,8 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
-      bundle "#{cmd}"
+      bundle cmd, forgotten_command_line_options([:all, :cache_all] => true)
+      bundle cmd
 
       expect(out).not_to include("Your Gemfile contains path and git dependencies.")
     end
@@ -204,7 +204,7 @@ end
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
-      bundle "#{cmd} --all"
+      bundle cmd, forgotten_command_line_options([:all, :cache_all] => true)
 
       ref = git.ref_for("master", 11)
       gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read

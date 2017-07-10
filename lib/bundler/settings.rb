@@ -172,6 +172,7 @@ module Bundler
     def locations(key)
       key = key_for(key)
       locations = {}
+      locations[:temporary] = @temporary[key] if @temporary.key?(key)
       locations[:local]  = @local_config[key] if @local_config.key?(key)
       locations[:env]    = ENV[key] if ENV[key]
       locations[:global] = @global_config[key] if @global_config.key?(key)
@@ -183,6 +184,11 @@ module Bundler
       key = key_for(exposed_key)
 
       locations = []
+
+      if @temporary.key?(key)
+        locations << "Set for the current command: #{converted_value(@temporary[key], exposed_key).inspect}"
+      end
+
       if @local_config.key?(key)
         locations << "Set for your local app (#{local_config_file}): #{converted_value(@local_config[key], exposed_key).inspect}"
       end
@@ -271,7 +277,8 @@ module Bundler
     end
 
     def array_to_s(array)
-      array.empty? ? nil : array.join(":")
+      array = Array(array)
+      array.empty? ? nil : array.join(":").tr(" ", ":")
     end
 
     def set_key(key, value, hash, file)

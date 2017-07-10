@@ -86,7 +86,7 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "installs gems in the default group" do
-        bundle :install, :without => "emo"
+        bundle! :install, forgotten_command_line_options(:without => "emo")
         expect(the_bundle).to include_gems "rack 1.0.0", :groups => [:default]
       end
 
@@ -96,20 +96,20 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "does not install gems from the previously excluded group" do
-        bundle :install, :without => "emo"
+        bundle :install, forgotten_command_line_options(:without => "emo")
         expect(the_bundle).not_to include_gems "activesupport 2.3.5"
         bundle :install
         expect(the_bundle).not_to include_gems "activesupport 2.3.5"
       end
 
       it "does not say it installed gems from the excluded group" do
-        bundle :install, :without => "emo"
+        bundle! :install, forgotten_command_line_options(:without => "emo")
         expect(out).not_to include("activesupport")
       end
 
       it "allows Bundler.setup for specific groups" do
-        bundle :install, :without => "emo"
-        run("require 'rack'; puts RACK", :default)
+        bundle :install, forgotten_command_line_options(:without => "emo")
+        run!("require 'rack'; puts RACK", :default)
         expect(out).to eq("1.0.0")
       end
 
@@ -122,15 +122,15 @@ RSpec.describe "bundle install with groups" do
           end
         G
 
-        bundle :install, :without => "emo"
+        bundle :install, forgotten_command_line_options(:without => "emo")
         expect(the_bundle).to include_gems "activesupport 2.3.2", :groups => [:default]
       end
 
       it "still works on a different machine and excludes gems" do
-        bundle :install, :without => "emo"
+        bundle :install, forgotten_command_line_options(:without => "emo")
 
         simulate_new_machine
-        bundle :install, :without => "emo"
+        bundle :install, forgotten_command_line_options(:without => "emo")
 
         expect(the_bundle).to include_gems "rack 1.0.0", :groups => [:default]
         expect(the_bundle).not_to include_gems "activesupport 2.3.5", :groups => [:default]
@@ -149,14 +149,14 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "clears without when passed an empty list" do
-        bundle :install, :without => "emo"
+        bundle :install, forgotten_command_line_options(:without => "emo")
 
-        bundle 'install --without ""'
+        bundle :install, forgotten_command_line_options(:without => "")
         expect(the_bundle).to include_gems "activesupport 2.3.5"
       end
 
       it "doesn't clear without when nothing is passed" do
-        bundle :install, :without => "emo"
+        bundle :install, forgotten_command_line_options(:without => "emo")
 
         bundle :install
         expect(the_bundle).not_to include_gems "activesupport 2.3.5"
@@ -168,12 +168,12 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "does install gems from the optional group when requested" do
-        bundle :install, :with => "debugging"
+        bundle :install, forgotten_command_line_options(:with => "debugging")
         expect(the_bundle).to include_gems "thin 1.0"
       end
 
       it "does install gems from the previously requested group" do
-        bundle :install, :with => "debugging"
+        bundle :install, forgotten_command_line_options(:with => "debugging")
         expect(the_bundle).to include_gems "thin 1.0"
         bundle :install
         expect(the_bundle).to include_gems "thin 1.0"
@@ -187,8 +187,8 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "clears with when passed an empty list" do
-        bundle :install, :with => "debugging"
-        bundle 'install --with ""'
+        bundle :install, forgotten_command_line_options(:with => "debugging")
+        bundle :install, forgotten_command_line_options(:with => "")
         expect(the_bundle).not_to include_gems "thin 1.0"
       end
 
@@ -210,7 +210,7 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "can add and remove a group at the same time" do
-        bundle :install, :with => "debugging", :without => "emo"
+        bundle :install, forgotten_command_line_options(:with => "debugging", :without => "emo")
         expect(the_bundle).to include_gems "thin 1.0"
         expect(the_bundle).not_to include_gems "activesupport 2.3.5"
       end
@@ -238,12 +238,12 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "installs gems in the default group" do
-        bundle :install, :without => "emo lolercoaster"
+        bundle! :install, forgotten_command_line_options(:without => "emo lolercoaster")
         expect(the_bundle).to include_gems "rack 1.0.0"
       end
 
       it "installs the gem if any of its groups are installed" do
-        bundle "install --without emo"
+        bundle! :install, forgotten_command_line_options(:without => "emo")
         expect(the_bundle).to include_gems "rack 1.0.0", "activesupport 2.3.5"
       end
 
@@ -299,12 +299,12 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "installs gems in the default group" do
-        bundle :install, :without => "emo lolercoaster"
+        bundle! :install, forgotten_command_line_options(:without => "emo lolercoaster")
         expect(the_bundle).to include_gems "rack 1.0.0"
       end
 
       it "installs the gem if any of its groups are installed" do
-        bundle "install --without emo"
+        bundle! :install, forgotten_command_line_options(:without => "emo")
         expect(the_bundle).to include_gems "rack 1.0.0", "activesupport 2.3.5"
       end
     end
@@ -339,7 +339,7 @@ RSpec.describe "bundle install with groups" do
     before(:each) do
       build_repo2
       system_gems "rack-0.9.1" do
-        install_gemfile <<-G, :without => :rack
+        install_gemfile <<-G, forgotten_command_line_options(:without => "rack")
           source "file://#{gem_repo2}"
           gem "rack"
 

@@ -174,7 +174,7 @@ The checksum of /versions does not match the checksum provided by the server! So
   end
 
   it "falls back when the user's home directory does not exist or is not writable" do
-    ENV["HOME"] = nil
+    ENV["HOME"] = tmp("missing_home").to_s
 
     gemfile <<-G
       source "#{source_uri}"

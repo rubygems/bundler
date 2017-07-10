@@ -78,8 +78,8 @@ module Bundler
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
       Bundler::CLI::Common.output_without_groups_message
 
-      if Bundler.settings[:path]
-        absolute_path = File.expand_path(Bundler.settings[:path])
+      if path = Bundler.settings[:path]
+        absolute_path = File.expand_path(path)
         relative_path = absolute_path.sub(File.expand_path(".") + File::SEPARATOR, "." + File::SEPARATOR)
         Bundler.ui.confirm "Bundled gems are installed into #{relative_path}."
       else
