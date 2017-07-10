@@ -255,7 +255,7 @@ RSpec.shared_examples "bundle install --standalone" do
     end
   end
 
-  describe "with --binstubs" do
+  describe "with --binstubs", :bundler => "< 2" do
     before do
       gemfile <<-G
         source "file://#{gem_repo1}"

@@ -272,7 +272,7 @@ RSpec.describe "bundle install from an existing gemspec" do
           s.add_dependency "activesupport", ">= 1.0.1"
         end
 
-        bundle "install --deployment"
+        bundle :install, forgotten_command_line_options([:deployment, :frozen] => true)
 
         expect(out).to include("changed")
       end

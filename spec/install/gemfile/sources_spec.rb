@@ -107,9 +107,8 @@ RSpec.describe "bundle install with gems on multiple sources" do
         expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
         expect(bundled_app("vendor/cache/rack-obama-1.0.gem")).to exist
 
-        bundle! "install --deployment"
+        bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true)
 
-        expect(exitstatus).to eq(0) if exitstatus
         expect(the_bundle).to include_gems("rack-obama 1.0.0", "rack 1.0.0")
       end
     end
@@ -498,7 +497,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
           rack
       L
 
-      bundle "install --path ../gems/system"
+      bundle! :install, forgotten_command_line_options(:path => "../gems/system")
 
       # 4. Then we add some new versions...
       update_repo4 do
@@ -517,8 +516,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
       G
 
       # 6. Which should update foo to 0.2, but not the (locked) bar 0.1
-      expect(the_bundle).to include_gems("foo 0.2")
-      expect(the_bundle).to include_gems("bar 0.1")
+      expect(the_bundle).to include_gems("foo 0.2", "bar 0.1")
     end
   end
 

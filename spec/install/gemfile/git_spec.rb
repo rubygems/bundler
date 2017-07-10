@@ -1022,8 +1022,7 @@ RSpec.describe "bundle install with git sources" do
 
       simulate_new_machine
 
-      bundle "install --deployment"
-      expect(exitstatus).to eq(0) if exitstatus
+      bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true)
     end
   end
 

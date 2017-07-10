@@ -66,6 +66,7 @@ module Bundler
     end
 
     def generate_executable_stubs
+      return if Bundler.feature_flag.forget_cli_options?
       return if Bundler.settings[:inline]
       if Bundler.settings[:bin] && standalone
         installer.generate_standalone_bundler_executable_stubs(spec)

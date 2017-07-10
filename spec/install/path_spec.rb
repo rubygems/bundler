@@ -23,7 +23,7 @@ RSpec.describe "bundle install" do
       dir.mkpath
 
       Dir.chdir(dir) do
-        bundle "install --path vendor/bundle"
+        bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
         expect(out).to include("installed into ./vendor/bundle")
       end
 
@@ -31,11 +31,11 @@ RSpec.describe "bundle install" do
     end
 
     it "prints a warning to let the user know what has happened with bundle --path vendor/bundle" do
-      bundle "install --path vendor/bundle"
+      bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
       expect(out).to include("gems are installed into ./vendor")
     end
 
-    it "disallows --path vendor/bundle --system" do
+    it "disallows --path vendor/bundle --system", :bundler => "< 2" do
       bundle "install --path vendor/bundle --system"
       expect(out).to include("Please choose only one option.")
       expect(exitstatus).to eq(15) if exitstatus
@@ -170,7 +170,7 @@ RSpec.describe "bundle install" do
         gem "rack"
       G
 
-      bundle "install --path bundle"
+      bundle :install, forgotten_command_line_options(:path => "bundle")
       expect(out).to match(/file already exists/)
     end
   end

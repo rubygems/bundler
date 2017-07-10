@@ -8,29 +8,31 @@ RSpec.describe "install with --deployment or --frozen" do
     G
   end
 
-  it "fails without a lockfile and says that --deployment requires a lock" do
-    bundle "install --deployment"
-    expect(out).to include("The --deployment flag requires a Gemfile.lock")
-  end
+  context "with CLI flags", :bundler => "< 2" do
+    it "fails without a lockfile and says that --deployment requires a lock" do
+      bundle "install --deployment"
+      expect(out).to include("The --deployment flag requires a Gemfile.lock")
+    end
 
-  it "fails without a lockfile and says that --frozen requires a lock" do
-    bundle "install --frozen"
-    expect(out).to include("The --frozen flag requires a Gemfile.lock")
-  end
+    it "fails without a lockfile and says that --frozen requires a lock" do
+      bundle "install --frozen"
+      expect(out).to include("The --frozen flag requires a Gemfile.lock")
+    end
 
-  it "disallows --deployment --system" do
-    bundle "install --deployment --system"
-    expect(out).to include("You have specified both --deployment")
-    expect(out).to include("Please choose only one option")
-    expect(exitstatus).to eq(15) if exitstatus
-  end
+    it "disallows --deployment --system" do
+      bundle "install --deployment --system"
+      expect(out).to include("You have specified both --deployment")
+      expect(out).to include("Please choose only one option")
+      expect(exitstatus).to eq(15) if exitstatus
+    end
 
-  it "disallows --deployment --path --system" do
-    bundle "install --deployment --path . --system"
-    expect(out).to include("You have specified both --path")
-    expect(out).to include("as well as --system")
-    expect(out).to include("Please choose only one option")
-    expect(exitstatus).to eq(15) if exitstatus
+    it "disallows --deployment --path --system" do
+      bundle "install --deployment --path . --system"
+      expect(out).to include("You have specified both --path")
+      expect(out).to include("as well as --system")
+      expect(out).to include("Please choose only one option")
+      expect(exitstatus).to eq(15) if exitstatus
+    end
   end
 
   it "works after you try to deploy without a lock" do
@@ -60,15 +62,13 @@ RSpec.describe "install with --deployment or --frozen" do
       end
     G
     bundle :install
-    bundle "install --deployment --without test"
-    expect(exitstatus).to eq(0) if exitstatus
+    bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true, :without => "test")
   end
 
   it "works when you bundle exec bundle" do
     bundle :install
     bundle "install --deployment"
-    bundle "exec bundle check"
-    expect(exitstatus).to eq(0) if exitstatus
+    bundle! "exec bundle check"
   end
 
   it "works when using path gems from the same path and the version is specified" do
@@ -90,9 +90,7 @@ RSpec.describe "install with --deployment or --frozen" do
       gem "rack-obama", ">= 1.0"
     G
 
-    bundle "install --deployment", :artifice => "endpoint_strict_basic_authentication"
-
-    expect(exitstatus).to eq(0) if exitstatus
+    bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true).merge(:artifice => "endpoint_strict_basic_authentication")
   end
 
   it "works with sources given by a block" do
@@ -102,7 +100,7 @@ RSpec.describe "install with --deployment or --frozen" do
       end
     G
 
-    bundle! "install --deployment"
+    bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true)
 
     expect(the_bundle).to include_gems "rack 1.0"
   end

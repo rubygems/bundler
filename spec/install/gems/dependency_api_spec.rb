@@ -60,7 +60,7 @@ RSpec.describe "gemcutter's dependency API" do
     G
     bundle :install, :artifice => "endpoint"
 
-    bundle "install --deployment", :artifice => "endpoint"
+    bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true, :path => "vendor/bundle").merge(:artifice => "endpoint")
     expect(out).to include("Fetching gem metadata from #{source_uri}")
     expect(the_bundle).to include_gems "rack 1.0.0"
   end
@@ -109,9 +109,8 @@ RSpec.describe "gemcutter's dependency API" do
     G
 
     bundle "install", :artifice => "endpoint"
-    bundle "install --deployment", :artifice => "endpoint"
+    bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true).merge(:artifice => "endpoint")
 
-    expect(exitstatus).to eq(0) if exitstatus
     expect(the_bundle).to include_gems("foo 1.0")
   end
 
@@ -497,7 +496,7 @@ RSpec.describe "gemcutter's dependency API" do
     expect(the_bundle).to include_gems "rails 2.3.2"
   end
 
-  it "installs the binstubs" do
+  it "installs the binstubs", :bundler => "< 2" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"
@@ -509,7 +508,7 @@ RSpec.describe "gemcutter's dependency API" do
     expect(out).to eq("1.0.0")
   end
 
-  it "installs the bins when using --path and uses autoclean" do
+  it "installs the bins when using --path and uses autoclean", :bundler => "< 2" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"
@@ -520,7 +519,7 @@ RSpec.describe "gemcutter's dependency API" do
     expect(vendored_gems("bin/rackup")).to exist
   end
 
-  it "installs the bins when using --path and uses bundle clean" do
+  it "installs the bins when using --path and uses bundle clean", :bundler => "< 2" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"

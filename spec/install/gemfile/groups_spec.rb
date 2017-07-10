@@ -193,19 +193,19 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "does remove groups from without when passed at with" do
-        bundle :install, :without => "emo"
-        bundle :install, :with => "emo"
+        bundle :install, forgotten_command_line_options(:without => "emo")
+        bundle :install, forgotten_command_line_options(:with => "emo")
         expect(the_bundle).to include_gems "activesupport 2.3.5"
       end
 
       it "does remove groups from with when passed at without" do
-        bundle :install, :with => "debugging"
-        bundle :install, :without => "debugging"
+        bundle :install, forgotten_command_line_options(:with => "debugging")
+        bundle :install, forgotten_command_line_options(:without => "debugging")
         expect(the_bundle).not_to include_gems "thin 1.0"
       end
 
       it "errors out when passing a group to with and without" do
-        bundle :install, :with => "emo debugging", :without => "emo"
+        bundle :install, forgotten_command_line_options(:with => "emo debugging", :without => "emo")
         expect(out).to include("The offending groups are: emo")
       end
 
@@ -216,12 +216,12 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "does have no effect when listing a not optional group in with" do
-        bundle :install, :with => "emo"
+        bundle :install, forgotten_command_line_options(:with => "emo")
         expect(the_bundle).to include_gems "activesupport 2.3.5"
       end
 
       it "does have no effect when listing an optional group in without" do
-        bundle :install, :without => "debugging"
+        bundle :install, forgotten_command_line_options(:without => "debugging")
         expect(the_bundle).not_to include_gems "thin 1.0"
       end
     end
@@ -264,22 +264,22 @@ RSpec.describe "bundle install with groups" do
         end
 
         it "installs the gem w/ option --without emo" do
-          bundle "install --without emo"
+          bundle :install, forgotten_command_line_options(:without => "emo")
           expect(the_bundle).to include_gems "activesupport 2.3.5"
         end
 
         it "installs the gem w/ option --without lolercoaster" do
-          bundle "install --without lolercoaster"
+          bundle :install, forgotten_command_line_options(:without => "lolercoaster")
           expect(the_bundle).to include_gems "activesupport 2.3.5"
         end
 
         it "does not install the gem w/ option --without emo lolercoaster" do
-          bundle "install --without emo lolercoaster"
+          bundle :install, forgotten_command_line_options(:without => "emo lolercoaster")
           expect(the_bundle).not_to include_gems "activesupport 2.3.5"
         end
 
         it "does not install the gem w/ option --without 'emo lolercoaster'" do
-          bundle "install --without 'emo lolercoaster'"
+          bundle :install, forgotten_command_line_options(:without => "'emo lolercoaster'")
           expect(the_bundle).not_to include_gems "activesupport 2.3.5"
         end
       end
@@ -363,7 +363,7 @@ RSpec.describe "bundle install with groups" do
 
     it "does not hit the remote a second time" do
       FileUtils.rm_rf gem_repo2
-      bundle! "install --without rack", :verbose => true
+      bundle! :install, forgotten_command_line_options(:without => "rack").merge(:verbose => true)
       expect(last_command.stdboth).not_to match(/fetching/i)
     end
   end

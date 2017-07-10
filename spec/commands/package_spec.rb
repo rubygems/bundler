@@ -141,7 +141,7 @@ RSpec.describe "bundle package" do
     end
   end
 
-  context "with --path" do
+  context "with --path", :bundler => "< 2" do
     it "sets root directory for gems" do
       gemfile <<-D
         source "file://#{gem_repo1}"

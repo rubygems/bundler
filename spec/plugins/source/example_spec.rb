@@ -152,8 +152,8 @@ RSpec.describe "real source plugins" do
       end
 
       it "copies repository to vendor cache and uses it even when installed with bundle --path" do
-        bundle "install --path vendor/bundle"
-        bundle "cache --all"
+        bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
+        bundle! :cache, forgotten_command_line_options([:all, :cache_all] => true)
 
         expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}")).to exist
 
@@ -162,8 +162,8 @@ RSpec.describe "real source plugins" do
       end
 
       it "bundler package copies repository to vendor cache" do
-        bundle "install --path vendor/bundle"
-        bundle "package --all"
+        bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
+        bundle! :package, forgotten_command_line_options([:all, :cache_all] => true)
 
         expect(bundled_app("vendor/cache/a-path-gem-1.0-#{uri_hash}")).to exist
 
