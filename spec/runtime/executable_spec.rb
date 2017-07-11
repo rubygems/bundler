@@ -152,9 +152,7 @@ RSpec.describe "Running bin/* commands" do
       gem "rack"
     G
 
-    File.open(bundled_app("bin/rackup"), "wb") do |file|
-      file.print "OMG"
-    end
+    create_file("bin/rackup", "OMG")
 
     bundle! "binstubs rack"
 
