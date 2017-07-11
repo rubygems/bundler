@@ -11,6 +11,9 @@ module Spec
         # TODO: revert to `< 2` once https://github.com/rack/rack/issues/1168 is
         # addressed
         "rack" => "1.6.6",
+        # rack-test 0.7.0 dropped 1.8.7 support
+        # https://github.com/rack-test/rack-test/issues/193#issuecomment-314230318
+        "rack-test" => "< 0.7.0",
         "artifice" => "~> 0.6.0",
         "compact_index" => "~> 0.11.0",
         "sinatra" => "~> 1.4.7",
