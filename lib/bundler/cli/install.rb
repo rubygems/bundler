@@ -14,14 +14,6 @@ module Bundler
 
       warn_if_root
 
-      [:with, :without].each do |option|
-        if options[option]
-          options[option] = options[option].join(":").tr(" ", ":").split(":")
-        end
-      end
-
-      check_for_group_conflicts
-
       normalize_groups
 
       Bundler::SharedHelpers.set_env "RB_USER_INSTALL", "1" if Bundler::FREEBSD
@@ -131,8 +123,8 @@ module Bundler
       "#{count} #{count == 1 ? "gem" : "gems"} now installed"
     end
 
-    def check_for_group_conflicts
-      conflicting_groups = Bundler.settings[:without] & Bundler.settings[:with]
+    def check_for_group_conflicts_in_cli_options
+      conflicting_groups = Array(options[:without]) & Array(options[:with])
       return if conflicting_groups.empty?
       raise InvalidOption, "You can't list a group in both with and without." \
         " The offending groups are: #{conflicting_groups.join(", ")}."
@@ -157,14 +149,19 @@ module Bundler
     end
 
     def normalize_groups
+      options[:with] &&= options[:with].join(":").tr(" ", ":").split(":")
+      options[:without] &&= options[:without].join(":").tr(" ", ":").split(":")
+
+      check_for_group_conflicts_in_cli_options
+
       Bundler.settings.set_command_option_if_given :with, options[:with]
       Bundler.settings.set_command_option_if_given :without, options[:without]
 
-      with = options.fetch("with", [])
+      with = options.fetch(:with, [])
       with |= Bundler.settings[:with].map(&:to_s)
       with -= options[:without] if options[:without]
 
-      without = options.fetch("without", [])
+      without = options.fetch(:without, [])
       without |= Bundler.settings[:without].map(&:to_s)
       without -= options[:with] if options[:with]
 

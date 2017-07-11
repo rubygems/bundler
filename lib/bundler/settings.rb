@@ -278,7 +278,8 @@ module Bundler
 
     def array_to_s(array)
       array = Array(array)
-      array.empty? ? nil : array.join(":").tr(" ", ":")
+      return nil if array.empty?
+      array.join(":").tr(" ", ":")
     end
 
     def set_key(key, value, hash, file)
