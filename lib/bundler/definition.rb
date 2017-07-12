@@ -102,7 +102,7 @@ module Bundler
       end
       @unlocking ||= @unlock[:ruby] ||= (!@locked_ruby_version ^ !@ruby_version)
 
-      add_current_platform unless Bundler.settings[:frozen]
+      add_current_platform unless Bundler.frozen?
 
       converge_path_sources_to_gemspec_sources
       @path_changes = converge_paths
@@ -234,7 +234,10 @@ module Bundler
     def resolve
       @resolve ||= begin
         last_resolve = converge_locked_specs
-        if Bundler.settings[:frozen] || (!unlocking? && nothing_changed?)
+        if Bundler.frozen?
+          Bundler.ui.debug "Frozen, using resolution from the lockfile"
+          last_resolve
+        elsif !unlocking? && nothing_changed?
           Bundler.ui.debug("Found no changes, using resolution from the lockfile")
           last_resolve
         else
@@ -319,10 +322,10 @@ module Bundler
         end
       end
 
-      preserve_unknown_sections ||= !updating_major && (Bundler.settings[:frozen] || !unlocking?)
+      preserve_unknown_sections ||= !updating_major && (Bundler.frozen? || !unlocking?)
       return if lockfiles_equal?(@lockfile_contents, contents, preserve_unknown_sections)
 
-      if Bundler.settings[:frozen]
+      if Bundler.frozen?
         Bundler.ui.error "Cannot write a changed lockfile while frozen."
         return
       end
@@ -373,8 +376,13 @@ module Bundler
              "updated #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} to version control."
 
       unless explicit_flag
-
-        suggested_command = Bundler.settings.locations("frozen")[:global] == "1" ? "bundle config --delete frozen" : "bundle install --no-deployment"
+        suggested_command = if Bundler.settings.locations("frozen")[:global]
+          "bundle config --delete frozen"
+        elsif Bundler.settings.locations("deployment").keys.&([:global, :local]).any?
+          "bundle config --delete deployment"
+        else
+          "bundle install --no-deployment"
+        end
         msg << "\n\nIf this is a development machine, remove the #{Bundler.default_gemfile} " \
                "freeze \nby running `#{suggested_command}`."
       end
@@ -660,7 +668,7 @@ module Bundler
     end
 
     def converge_dependencies
-      frozen = Bundler.settings[:frozen]
+      frozen = Bundler.frozen?
       (@dependencies + @locked_deps.values).each do |dep|
         locked_source = @locked_deps[dep.name]
         # This is to make sure that if bundler is installing in deployment mode and

@@ -30,6 +30,7 @@ module Bundler
     settings_flag(:allow_offline_install) { bundler_2_mode? }
     settings_flag(:cache_command_is_package) { bundler_2_mode? }
     settings_flag(:console_command) { !bundler_2_mode? }
+    settings_flag(:deployment_means_frozen) { bundler_2_mode? }
     settings_flag(:disable_multisource) { bundler_2_mode? }
     settings_flag(:error_on_stderr) { bundler_2_mode? }
     settings_flag(:global_gem_cache) { bundler_2_mode? }

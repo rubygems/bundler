@@ -137,6 +137,22 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
 
       expect(Bundler.settings[:no_install]).to eq true
     end
+
+    it "returns the return value of the block" do
+      ret = Bundler.settings.temporary({}) { :ret }
+      expect(ret).to eq :ret
+    end
+
+    context "when called without a block" do
+      it "leaves the setting changed" do
+        Bundler.settings.temporary(:foo => :random)
+        expect(Bundler.settings[:foo]).to eq :random
+      end
+
+      it "returns nil" do
+        expect(Bundler.settings.temporary(:foo => :bar)).to be_nil
+      end
+    end
   end
 
   describe "#set_global" do

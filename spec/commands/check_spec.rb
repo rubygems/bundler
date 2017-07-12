@@ -214,17 +214,17 @@ RSpec.describe "bundle check" do
   end
 
   it "fails when there's no lock file and frozen is set" do
-    gemfile <<-G
+    install_gemfile! <<-G
       source "file://#{gem_repo1}"
       gem "foo"
     G
 
-    bundle "install"
-    bundle "install --deployment"
+    bundle! "config deployment true"
+    bundle! :install
     FileUtils.rm(bundled_app("Gemfile.lock"))
 
     bundle :check
-    expect(exitstatus).not_to eq(0) if exitstatus
+    expect(last_command).to be_failure
   end
 
   context "--path" do

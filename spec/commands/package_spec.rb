@@ -205,6 +205,7 @@ RSpec.describe "bundle package" do
     subject { bundle "package --frozen" }
 
     it "tries to install with frozen" do
+      bundle! "config deployment true"
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
@@ -216,7 +217,7 @@ RSpec.describe "bundle package" do
       expect(out).to include("You have added to the Gemfile")
       expect(out).to include("* rack-obama")
       bundle "env"
-      expect(out).to include("frozen")
+      expect(out).to include("frozen").or include("deployment")
     end
   end
 end

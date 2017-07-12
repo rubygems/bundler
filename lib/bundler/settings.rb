@@ -14,6 +14,8 @@ module Bundler
       cache_all_platforms
       cache_command_is_package
       console_command
+      deployment
+      deployment_means_frozen
       disable_checksum_validation
       disable_exec_load
       disable_local_branch_check

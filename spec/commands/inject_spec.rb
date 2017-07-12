@@ -79,7 +79,11 @@ Usage: "bundle inject GEM VERSION"
   context "when frozen" do
     before do
       bundle "install"
-      bundle "config --local frozen 1"
+      if Bundler.feature_flag.bundler_2_mode?
+        bundle! "config --local deployment true"
+      else
+        bundle! "config --local frozen true"
+      end
     end
 
     it "injects anyway" do
@@ -96,7 +100,7 @@ Usage: "bundle inject GEM VERSION"
     it "restores frozen afterwards" do
       bundle "inject 'rack-obama' '> 0'"
       config = YAML.load(bundled_app(".bundle/config").read)
-      expect(config["BUNDLE_FROZEN"]).to eq("1")
+      expect(config["BUNDLE_DEPLOYMENT"] || config["BUNDLE_FROZEN"]).to eq("true")
     end
 
     it "doesn't allow Gemfile changes" do

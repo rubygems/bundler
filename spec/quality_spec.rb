@@ -172,6 +172,7 @@ RSpec.describe "The library itself" do
       cache_command_is_package
       console_command
       default_cli_command
+      deployment_means_frozen
       gem.coc
       gem.mit
       inline
