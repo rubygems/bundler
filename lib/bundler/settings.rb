@@ -6,6 +6,7 @@ module Bundler
   class Settings
     autoload :Mirror,  "bundler/mirror"
     autoload :Mirrors, "bundler/mirror"
+    autoload :Validator, "bundler/settings/validator"
 
     BOOL_KEYS = %w[
       allow_bundler_dependency_conflicts
@@ -230,6 +231,15 @@ module Bundler
       @app_cache_path ||= self[:cache_path] || "vendor/cache"
     end
 
+    def validate!
+      all.each do |raw_key|
+        [@local_config, ENV, @global_config].each do |settings|
+          value = converted_value(settings[key_for(raw_key)], raw_key)
+          Validator.validate(raw_key, value, settings.to_h.dup)
+        end
+      end
+    end
+
   private
 
     def key_for(key)
@@ -282,24 +292,25 @@ module Bundler
       array.join(":").tr(" ", ":")
     end
 
-    def set_key(key, value, hash, file)
-      value = array_to_s(value) if is_array(key)
+    def set_key(raw_key, value, hash, file)
+      raw_key = raw_key.to_s
+      value = array_to_s(value) if is_array(raw_key)
 
-      key = key_for(key)
+      key = key_for(raw_key)
 
-      unless hash[key] == value
-        hash[key] = value
-        hash.delete(key) if value.nil?
-        if file
-          SharedHelpers.filesystem_access(file) do |p|
-            FileUtils.mkdir_p(p.dirname)
-            require "bundler/yaml_serializer"
-            p.open("w") {|f| f.write(YAMLSerializer.dump(hash)) }
-          end
-        end
+      return if hash[key] == value
+
+      hash[key] = value
+      hash.delete(key) if value.nil?
+
+      Validator.validate(raw_key, converted_value(value, raw_key), hash)
+
+      return unless file
+      SharedHelpers.filesystem_access(file) do |p|
+        FileUtils.mkdir_p(p.dirname)
+        require "bundler/yaml_serializer"
+        p.open("w") {|f| f.write(YAMLSerializer.dump(hash)) }
       end
-
-      value
     end
 
     def converted_value(value, key)

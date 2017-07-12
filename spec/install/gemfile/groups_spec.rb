@@ -192,7 +192,7 @@ RSpec.describe "bundle install with groups" do
         expect(the_bundle).not_to include_gems "thin 1.0"
       end
 
-      it "does remove groups from without when passed at with" do
+      it "does remove groups from without when passed at --with", :bundler => "< 2" do
         bundle :install, forgotten_command_line_options(:without => "emo")
         bundle :install, forgotten_command_line_options(:with => "emo")
         expect(the_bundle).to include_gems "activesupport 2.3.5"
@@ -211,12 +211,12 @@ RSpec.describe "bundle install with groups" do
       end
 
       it "allows the BUNDLE_WITH setting to override BUNDLE_WITHOUT" do
-        bundle! "config --local with debugging"
+        ENV["BUNDLE_WITH"] = "debugging"
 
         bundle! :install
         expect(the_bundle).to include_gem "thin 1.0"
 
-        bundle! "config --local without debugging"
+        ENV["BUNDLE_WITHOUT"] = "debugging"
         expect(the_bundle).to include_gem "thin 1.0"
 
         bundle! :install

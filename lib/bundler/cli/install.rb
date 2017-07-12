@@ -154,8 +154,8 @@ module Bundler
 
       check_for_group_conflicts_in_cli_options
 
-      Bundler.settings.set_command_option_if_given :with, options[:with]
-      Bundler.settings.set_command_option_if_given :without, options[:without]
+      Bundler.settings.set_command_option :with, nil if options[:with] == []
+      Bundler.settings.set_command_option :without, nil if options[:without] == []
 
       with = options.fetch(:with, [])
       with |= Bundler.settings[:with].map(&:to_s)
@@ -189,8 +189,13 @@ module Bundler
 
       Bundler.settings.set_command_option_if_given :clean, options["clean"]
 
-      Bundler.settings.set_command_option :without, options[:without] unless Bundler.settings[:without] == options[:without]
-      Bundler.settings.set_command_option :with,    options[:with]    unless Bundler.settings[:with]    == options[:with]
+      unless Bundler.settings[:without] == options[:without] && Bundler.settings[:with] == options[:with]
+        # need to nil them out first to get around validation for backwards compatibility
+        Bundler.settings.set_command_option :without, nil
+        Bundler.settings.set_command_option :with,    nil
+        Bundler.settings.set_command_option :without, options[:without] - options[:with]
+        Bundler.settings.set_command_option :with,    options[:with]
+      end
 
       disable_shared_gems = Bundler.settings[:path] ? true : nil
       Bundler.settings.set_command_option :disable_shared_gems, disable_shared_gems unless Bundler.settings[:disable_shared_gems] == disable_shared_gems
