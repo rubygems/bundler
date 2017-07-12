@@ -163,7 +163,7 @@ RSpec.describe "install with --deployment or --frozen" do
       expect(out).to include("The path `#{lib_path("path_gem-1.0")}` does not exist.")
     end
 
-    it "can have --frozen set via an environment variable" do
+    it "can have --frozen set via an environment variable", :bundler => "< 2" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
@@ -171,6 +171,22 @@ RSpec.describe "install with --deployment or --frozen" do
       G
 
       ENV["BUNDLE_FROZEN"] = "1"
+      bundle "install"
+      expect(out).to include("deployment mode")
+      expect(out).to include("You have added to the Gemfile")
+      expect(out).to include("* rack-obama")
+      expect(out).not_to include("You have deleted from the Gemfile")
+      expect(out).not_to include("You have changed in the Gemfile")
+    end
+
+    it "can have --deployment set via an environment variable" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rack-obama"
+      G
+
+      ENV["BUNDLE_DEPLOYMENT"] = "true"
       bundle "install"
       expect(out).to include("deployment mode")
       expect(out).to include("You have added to the Gemfile")
@@ -187,6 +203,7 @@ RSpec.describe "install with --deployment or --frozen" do
       G
 
       ENV["BUNDLE_FROZEN"] = "false"
+      ENV["BUNDLE_DEPLOYMENT"] = "false"
       bundle "install"
       expect(out).not_to include("deployment mode")
       expect(out).not_to include("You have added to the Gemfile")
@@ -277,7 +294,9 @@ RSpec.describe "install with --deployment or --frozen" do
     end
 
     it "remembers that the bundle is frozen at runtime" do
-      bundle "install --deployment"
+      bundle! :lock
+
+      bundle! "config deployment true"
 
       gemfile <<-G
         source "file://#{gem_repo1}"

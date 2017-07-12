@@ -198,7 +198,7 @@ RSpec.describe "bundle update" do
   end
 
   describe "in a frozen bundle" do
-    it "should fail loudly" do
+    it "should fail loudly", :bundler => "< 2" do
       bundle! "install --deployment"
       bundle "update", :all => bundle_update_requires_all?
 
@@ -207,11 +207,18 @@ RSpec.describe "bundle update" do
       expect(exitstatus).not_to eq(0) if exitstatus
     end
 
-    it "should suggest different command when frozen is set globally" do
+    it "should suggest different command when frozen is set globally", :bundler => "< 2" do
       bundle! "config --global frozen 1"
       bundle "update", :all => bundle_update_requires_all?
-      expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
-      expect(out).to match(/freeze \nby running `bundle config --delete frozen`./m)
+      expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m).
+        and match(/freeze \nby running `bundle config --delete frozen`./m)
+    end
+
+    it "should suggest different command when frozen is set globally", :bundler => "2" do
+      bundle! "config --global deployment true"
+      bundle "update", :all => bundle_update_requires_all?
+      expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m).
+        and match(/freeze \nby running `bundle config --delete deployment`./m)
     end
   end
 

@@ -131,6 +131,12 @@ module Bundler
       end
     end
 
+    def frozen?
+      frozen = settings[:deployment]
+      frozen ||= settings[:frozen] unless feature_flag.deployment_means_frozen?
+      frozen
+    end
+
     def locked_gems
       @locked_gems ||=
         if defined?(@definition) && @definition
