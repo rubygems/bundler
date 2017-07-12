@@ -41,6 +41,8 @@ Gem::Specification.new do |s|
   # we don't check in man pages, but we need to ship them because
   # we use them to generate the long-form help for each command.
   s.files += Dir.glob("man/**/*")
+  # Include the CHANGELOG.md, LICENSE.md, README.md manually
+  s.files += %w[CHANGELOG.md LICENSE.md README.md]
 
   s.bindir        = "exe"
   s.executables   = %w[bundle bundler]
