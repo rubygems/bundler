@@ -139,7 +139,8 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `console` (`BUNDLE_CONSOLE`):
    The console that `bundle console` starts. Defaults to `irb`.
 * `deployment` (`BUNDLE_DEPLOYMENT`):
-   Disallow changes to the `Gemfile`.
+   Disallow changes to the `Gemfile`. When the `Gemfile` is changed and the
+   lockfile has not been updated, running Bundler commands will be blocked.
 * `disable_checksum_validation` (`BUNDLE_DISABLE_CHECKSUM_VALIDATION`):
    Allow installing gems even if they do not match the checksum provided by
    RubyGems.
@@ -164,8 +165,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
    Ignore the current machine's platform and install only `ruby` platform gems.
    As a result, gems with native extensions will be compiled from source.
 * `frozen` (`BUNDLE_FROZEN`):
-   Disallow changes to the `Gemfile`. Defaults to `true` when `--deployment`
-   is used.
+   Disallow changes to the `Gemfile`. When the `Gemfile` is changed and the
+   lockfile has not been updated, running Bundler commands will be blocked.
+   Defaults to `true` when `--deployment` is used.
 * `gem.push_key` (`BUNDLE_GEM__PUSH_KEY`):
    Sets the `--key` parameter for `gem push` when using the `rake release`
    command with a private gemstash server.
