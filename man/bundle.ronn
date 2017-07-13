@@ -102,4 +102,4 @@ and execute it, passing down any extra arguments to it.
 These commands are obsolete and should no longer be used
 
 * `bundle cache(1)`
-* `bundle list(1)`
+* `bundle show(1)`

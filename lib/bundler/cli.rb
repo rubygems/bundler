@@ -245,11 +245,11 @@ module Bundler
     method_option "outdated", :type => :boolean,
                               :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
-      Bundler::SharedHelpers.major_deprecation("use `bundle show` instead of `bundle list`") if ARGV[0] == "list"
+      Bundler::SharedHelpers.major_deprecation("use `bundle list` instead of `bundle show`") if ARGV[0] == "show"
       require "bundler/cli/show"
       Show.new(options, gem_name).run
     end
-    # TODO: 2.0 remove `bundle list`
+    # TODO: 2.0 remove `bundle show`
     map %w[list] => "show"
 
     desc "info GEM [OPTIONS]", "Show information for the given gem"
