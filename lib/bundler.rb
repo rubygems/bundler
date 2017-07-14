@@ -75,7 +75,11 @@ module Bundler
 
     # Returns absolute path of where gems are installed on the filesystem.
     def bundle_path
-      @bundle_path ||= Pathname.new(settings.path).expand_path(root)
+      @bundle_path ||= Pathname.new(configured_bundle_path.path).expand_path(root)
+    end
+
+    def configured_bundle_path
+      @configured_bundle_path ||= settings.path.tap(&:validate!)
     end
 
     # Returns absolute location of where binstubs are installed to.
@@ -329,6 +333,10 @@ EOF
       Bundler.settings[:system_bindir] || Bundler.rubygems.gem_bindir
     end
 
+    def use_system_gems?
+      configured_bundle_path.use_system_gems?
+    end
+
     def requires_sudo?
       return @requires_sudo if defined?(@requires_sudo_ran)
 
@@ -457,14 +465,15 @@ EOF
     end
 
     def reset_paths!
-      @root = nil
-      @settings = nil
+      @bin_path = nil
+      @bundle_path = nil
+      @configured_bundle_path = nil
       @definition = nil
-      @setup = nil
       @load = nil
       @locked_gems = nil
-      @bundle_path = nil
-      @bin_path = nil
+      @root = nil
+      @settings = nil
+      @setup = nil
       @user_home = nil
     end
 
@@ -503,14 +512,14 @@ EOF
       bundle_path
     end
 
-    def configure_gem_path(env = ENV, settings = self.settings)
+    def configure_gem_path(env = ENV)
       blank_home = env["GEM_HOME"].nil? || env["GEM_HOME"].empty?
-      if settings[:disable_shared_gems]
+      if !use_system_gems?
         # this needs to be empty string to cause
         # PathSupport.split_gem_path to only load up the
         # Bundler --path setting as the GEM_PATH.
         env["GEM_PATH"] = ""
-      elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s
+      elsif blank_home
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
         paths = possibles.flatten.compact.uniq.reject(&:empty?)
         env["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)

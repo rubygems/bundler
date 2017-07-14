@@ -83,14 +83,14 @@ RSpec.describe "post bundle message" do
 
       it "with an absolute --path inside the cwd" do
         bundle! :install, forgotten_command_line_options(:path => bundled_app("cache"))
-        expect(out).to include("Bundled gems are installed into ./cache")
+        expect(out).to include("Bundled gems are installed into `./cache`")
         expect(out).to_not include("Gems in the group")
         expect(out).to include(bundle_complete_message)
       end
 
       it "with an absolute --path outside the cwd" do
         bundle! :install, forgotten_command_line_options(:path => tmp("not_bundled_app"))
-        expect(out).to include("Bundled gems are installed into #{tmp("not_bundled_app")}")
+        expect(out).to include("Bundled gems are installed into `#{tmp("not_bundled_app")}`")
         expect(out).to_not include("Gems in the group")
         expect(out).to include(bundle_complete_message)
       end

@@ -16,7 +16,7 @@ module Bundler
   protected
 
     def require_path_or_force
-      if !Bundler.settings[:path] && !options[:force]
+      if Bundler.use_system_gems? && !options[:force]
         raise InvalidOption, "Cleaning all the gems on your system is dangerous! " \
           "If you're sure you want to remove every system gem not in this " \
           "bundle, run `bundle clean --force`."

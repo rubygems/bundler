@@ -28,7 +28,7 @@ module Bundler
           trees.reject! {|t| !maximal.include?(t.last) } if maximal
 
           trees = trees.sort_by {|t| t.flatten.map(&:to_s) }
-          trees.uniq! {|t| t.flatten.map {|dep| [dep.name, dep.requirement] } }
+          trees.uniq! {|t| t.flatten.map {|dep| [dep.name, dep.requirement.to_s] } }
 
           o << trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
             t = String.new

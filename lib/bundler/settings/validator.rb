@@ -54,10 +54,10 @@ module Bundler
         rules_to_validate.each {|rule| rule.validate(key, value, settings) }
       end
 
-      rule %w[path disable_shared_gems], "path and disable_shared_gems are mutually exclusive" do |key, value, settings|
+      rule %w[path path.system], "path and path.system are mutually exclusive" do |key, value, settings|
         if key == "path" && value
-          set(settings, :disabled_shared_gems, nil)
-        elsif key == "disable_shared_gems" && value
+          set(settings, "path.system", nil)
+        elsif key == "path.system" && value
           set(settings, :path, nil)
         end
       end

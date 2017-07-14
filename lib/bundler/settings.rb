@@ -16,6 +16,7 @@ module Bundler
       cache_all_platforms
       cache_command_is_package
       console_command
+      default_install_uses_path
       deployment
       deployment_means_frozen
       disable_checksum_validation
@@ -38,6 +39,7 @@ module Bundler
       no_install
       no_prune
       only_update_to_newer_versions
+      path.system
       plugins
       prefer_gems_rb
       setup_makes_kernel_gem_public
@@ -206,21 +208,56 @@ module Bundler
       locations
     end
 
-    # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
+    # for legacy reasons, the ruby scope isnt appended when the setting comes from ENV or the global config,
+    # nor do we respect :disable_shared_gems
     def path
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
-      return path if path && !@local_config.key?(key)
+      if path && !@temporary.key?(key) && !@local_config.key?(key)
+        return Path.new(path, false, false, false)
+      end
 
-      if path = self[:path]
-        "#{path}/#{Bundler.ruby_scope}"
-      else
-        Bundler.rubygems.gem_dir
+      system_path = self["path.system"] || (self[:disable_shared_gems] == false)
+      Path.new(self[:path], true, system_path, Bundler.feature_flag.default_install_uses_path?)
+    end
+
+    Path = Struct.new(:explicit_path, :append_ruby_scope, :system_path, :default_install_uses_path) do
+      def path
+        path = base_path
+        path = File.join(path, Bundler.ruby_scope) if append_ruby_scope && !use_system_gems?
+        path
+      end
+
+      def use_system_gems?
+        return true if system_path
+        return false if explicit_path
+        !default_install_uses_path
+      end
+
+      def base_path
+        path = explicit_path
+        path ||= ".bundle" if default_install_uses_path
+        path ||= Bundler.rubygems.gem_dir
+        path
+      end
+
+      def validate!
+        return unless explicit_path && system_path
+        path = Bundler.settings.pretty_values_for(:path)
+        path.unshift(nil, "path:") unless path.empty?
+        system_path = Bundler.settings.pretty_values_for("path.system")
+        system_path.unshift(nil, "path.system:") unless system_path.empty?
+        disable_shared_gems = Bundler.settings.pretty_values_for(:disable_shared_gems)
+        disable_shared_gems.unshift(nil, "disable_shared_gems:") unless disable_shared_gems.empty?
+        raise InvalidOption,
+          "Using a custom path while using system gems is unsupported.\n#{path.join("\n")}\n#{system_path.join("\n")}\n#{disable_shared_gems.join("\n")}"
       end
     end
 
     def allow_sudo?
-      !@local_config.key?(key_for(:path))
+      key = key_for(:path)
+      path_configured = @temporary.key?(key) || @local_config.key?(key)
+      !path_configured
     end
 
     def ignore_config?
