@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   class CLI::Cache
     attr_reader :options

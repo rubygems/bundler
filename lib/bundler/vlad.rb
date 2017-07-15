@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Vlad task for Bundler.
 #
 # Add "require 'bundler/vlad'" in your Vlad deploy.rb, and

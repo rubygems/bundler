@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/settings"
 
 RSpec.describe Bundler::Env do

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # We forcibly require OpenSSL, because net/http/persistent will only autoload
 # it. On some Rubies, autoload fails but explicit require succeeds.
 begin

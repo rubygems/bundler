@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   class Injector
     def self.inject(new_deps, options = {})

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/lockfile_parser"
 
 RSpec.describe Bundler::LockfileParser do

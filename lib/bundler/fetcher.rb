@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/vendored_persistent"
 require "cgi"
 require "securerandom"

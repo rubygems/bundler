@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "net/http"
 require "bundler/compact_index_client"
 require "bundler/compact_index_client/updater"

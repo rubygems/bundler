@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/mirror"
 
 RSpec.describe Bundler::Settings::Mirror do

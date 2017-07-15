@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "net/http"
 if RUBY_VERSION < "1.9"
   begin

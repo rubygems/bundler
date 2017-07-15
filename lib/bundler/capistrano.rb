@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Capistrano task for Bundler.
 #
 # Add "require 'bundler/capistrano'" in your Capistrano deploy.rb, and
