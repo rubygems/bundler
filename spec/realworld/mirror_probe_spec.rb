@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "thread"
 
 RSpec.describe "fetching dependencies with a not available mirror", :realworld => true do

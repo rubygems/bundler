@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/worker"
 
 RSpec.describe Bundler::Worker do

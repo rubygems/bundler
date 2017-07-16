@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 directory ".git/hooks"
 
 file ".git/hooks/pre-commit" => [__FILE__] do |t|

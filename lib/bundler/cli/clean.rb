@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   class CLI::Clean
     attr_reader :options

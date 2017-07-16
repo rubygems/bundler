@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/ruby_dsl"
 
 RSpec.describe Bundler::RubyDsl do

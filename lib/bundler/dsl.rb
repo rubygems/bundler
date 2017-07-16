@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/dependency"
 require "bundler/ruby_dsl"
 

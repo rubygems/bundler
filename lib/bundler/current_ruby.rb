@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   # Returns current version of Ruby
   #

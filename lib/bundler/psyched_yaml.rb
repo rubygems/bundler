@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Psych could be a gem, so try to ask for it
 begin
   gem "psych"

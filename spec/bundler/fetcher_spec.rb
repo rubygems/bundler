@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/fetcher"
 
 RSpec.describe Bundler::Fetcher do

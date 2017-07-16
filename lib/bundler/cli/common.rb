@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   module CLI::Common
     def self.output_post_install_messages(messages)

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   class FeatureFlag
     def self.settings_flag(flag, &default)

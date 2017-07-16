@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Spec
   module Indexes
     def dep(name, reqs = nil)

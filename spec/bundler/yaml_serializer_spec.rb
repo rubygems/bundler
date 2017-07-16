@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/yaml_serializer"
 
 RSpec.describe Bundler::YAMLSerializer do

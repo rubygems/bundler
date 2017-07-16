@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "forwardable"
 require "support/the_bundle"
 module Spec

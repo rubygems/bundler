@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/installer/gem_installer"
 
 RSpec.describe Bundler::GemInstaller do

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   class EnvironmentPreserver
     INTENTIONALLY_NIL = "BUNDLER_ENVIRONMENT_PRESERVER_INTENTIONALLY_NIL".freeze

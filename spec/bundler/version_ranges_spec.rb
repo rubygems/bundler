@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/version_ranges"
 
 RSpec.describe Bundler::VersionRanges do
