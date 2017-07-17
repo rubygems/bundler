@@ -68,17 +68,17 @@ namespace :release do
     end
     prs.compact!
 
+    BUNDLER_SPEC.version = version
+
+    branch = version.split(".", 3)[0, 2].push("stable").join("-")
+    sh("git", "checkout", branch)
+
     version_file = "lib/bundler/version.rb"
     version_contents = File.read(version_file)
     unless version_contents.sub!(/^(\s*VERSION = )"#{Gem::Version::VERSION_PATTERN}"/, "\\1#{version.to_s.dump}")
       abort "failed to update #{version_file}, is it in the expected format?"
     end
     File.open(version_file, "w") {|f| f.write(version_contents) }
-
-    BUNDLER_SPEC.version = version
-
-    branch = version.split(".", 3)[0, 2].push("stable").join("-")
-    sh("git", "checkout", branch)
 
     commits = `git log --oneline origin/master --`.split("\n").map {|l| l.split(/\s/, 2) }.reverse
     commits.select! {|_sha, message| message =~ /(Auto merge of|Merge pull request) ##{Regexp.union(*prs)}/ }
