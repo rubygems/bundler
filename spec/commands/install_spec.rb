@@ -345,8 +345,9 @@ RSpec.describe "bundle install with gem sources" do
         gem "ajp-rails", "0.0.0"
       G
 
-      expect(last_command.stdboth).not_to match(/Error Report/i)
-      expect(last_command.bundler_err).to include("An error occurred while installing ajp-rails (0.0.0), and Bundler cannot continue.").
+      expect(out).not_to match(/Error Report/i)
+      expect(err).not_to match(/Error Report/i)
+      expect(out).to include("An error occurred while installing ajp-rails (0.0.0), and Bundler cannot continue.").
         and include("Make sure that `gem install ajp-rails -v '0.0.0'` succeeds before bundling.")
     end
 
