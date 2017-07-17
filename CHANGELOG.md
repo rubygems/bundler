@@ -1,3 +1,21 @@
+## 1.15.2 (2017-07-17)
+
+Features:
+
+  - new gemfiles created by bundler will include an explicit `github` git source that uses `https` (@segiddins)
+
+Bugfixes:
+
+  - inline gemfiles work when `BUNDLE_BIN` is set (#5847, @segiddins)
+  - avoid using the old dependency API when there are no changes to the compact index files (#5373, @greysteil)
+  - fail gracefully when the full index serves gemspecs with invalid dependencies (#5797, @segiddins)
+  - support installing gemfiles that use `eval_gemfile`, `:path` gems with relative paths, and `--deployment` simultaneously (@NickLaMuro)
+  - `bundle config` will print settings as the type they are interpreted as (@segiddins)
+  - respect the `no_proxy` environment variable when making network requests (#5781, @jakauppila)
+  - commands invoked with `--verbose` will not have default flags printed (@segiddins)
+  - allow `bundle viz` to work when another gem has a requirable `grapviz` file (#5707, @segiddins)
+  - ensure bundler puts activated gems on the `$LOAD_PATH` in a consistent order (#5696, @segiddins)
+
 ## 1.15.1 (2017-06-02)
 
 Bugfixes:
