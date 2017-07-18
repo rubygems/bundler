@@ -24,7 +24,7 @@ module Bundler
         if Bundler.feature_flag.update_requires_all_flag?
           raise InvalidOption, "To update everything, pass the `--all` flag."
         end
-        SharedHelpers.major_deprecation "Pass --all to `bundle update` to update everything"
+        SharedHelpers.major_deprecation 2, "Pass --all to `bundle update` to update everything"
       elsif !full_update && options[:all]
         raise InvalidOption, "Cannot specify --all along with specific options."
       end

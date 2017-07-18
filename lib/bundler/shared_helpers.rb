@@ -5,6 +5,7 @@ require "bundler/compatibility_guard"
 require "pathname"
 require "rubygems"
 
+require "bundler/version"
 require "bundler/constants"
 require "bundler/rubygems_integration"
 require "bundler/current_ruby"
@@ -138,20 +139,34 @@ module Bundler
       namespace.const_get(constant_name)
     end
 
-    def major_deprecation(message)
+    def major_deprecation(major_version, message)
+      if Bundler.bundler_major_version >= major_version
+        require "bundler/errors"
+        raise DeprecatedError, "[REMOVED FROM #{major_version}.0] #{message}"
+      end
+
       return unless prints_major_deprecations?
       @major_deprecation_ui ||= Bundler::UI::Shell.new("no-color" => true)
       ui = Bundler.ui.is_a?(@major_deprecation_ui.class) ? Bundler.ui : @major_deprecation_ui
-      ui.warn("[DEPRECATED FOR #{Bundler::VERSION.split(".").first.to_i + 1}.0] #{message}")
+      ui.warn("[DEPRECATED FOR #{major_version}.0] #{message}")
     end
 
     def print_major_deprecations!
-      deprecate_gemfile(find_gemfile) if find_gemfile(:order_matters) == find_file("Gemfile")
+      multiple_gemfiles = search_up(".") do |dir|
+        gemfiles = gemfile_names.select {|gf| File.file? File.expand_path(gf, dir) }
+        next if gemfiles.empty?
+        break false if gemfiles.size == 1
+      end
+      if multiple_gemfiles && Bundler.bundler_major_version == 1
+        Bundler::SharedHelpers.major_deprecation 2, \
+          "gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock."
+      end
+
       if RUBY_VERSION < "2"
-        major_deprecation("Bundler will only support ruby >= 2.0, you are running #{RUBY_VERSION}")
+        major_deprecation(2, "Bundler will only support ruby >= 2.0, you are running #{RUBY_VERSION}")
       end
       return if Bundler.rubygems.provides?(">= 2")
-      major_deprecation("Bundler will only support rubygems >= 2.0, you are running #{Bundler.rubygems.version}")
+      major_deprecation(2, "Bundler will only support rubygems >= 2.0, you are running #{Bundler.rubygems.version}")
     end
 
     def trap(signal, override = false, &block)
@@ -328,12 +343,6 @@ module Bundler
       require "bundler/deprecate"
       return false if Bundler::Deprecate.skip
       true
-    end
-
-    def deprecate_gemfile(gemfile)
-      return unless gemfile && File.basename(gemfile) == "Gemfile"
-      Bundler::SharedHelpers.major_deprecation \
-        "gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock."
     end
 
     extend self

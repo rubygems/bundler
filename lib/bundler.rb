@@ -119,7 +119,7 @@ module Bundler
     end
 
     def environment
-      SharedHelpers.major_deprecation "Bundler.environment has been removed in favor of Bundler.load"
+      SharedHelpers.major_deprecation 2, "Bundler.environment has been removed in favor of Bundler.load"
       load
     end
 
@@ -267,7 +267,7 @@ EOF
     # @deprecated Use `original_env` instead
     # @return [Hash] Environment with all bundler-related variables removed
     def clean_env
-      Bundler::SharedHelpers.major_deprecation("`Bundler.clean_env` has weird edge cases, use `.original_env` instead")
+      Bundler::SharedHelpers.major_deprecation(2, "`Bundler.clean_env` has weird edge cases, use `.original_env` instead")
       env = original_env
 
       if env.key?("BUNDLER_ORIG_MANPATH")
@@ -464,6 +464,7 @@ EOF
 
     def reset_paths!
       @bin_path = nil
+      @bundler_major_version = nil
       @bundle_path = nil
       @configured = nil
       @configured_bundle_path = nil

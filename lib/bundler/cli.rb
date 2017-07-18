@@ -253,7 +253,7 @@ module Bundler
     method_option "outdated", :type => :boolean,
                               :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
-      Bundler::SharedHelpers.major_deprecation("use `bundle list` instead of `bundle show`") if ARGV[0] == "show"
+      Bundler::SharedHelpers.major_deprecation(2, "use `bundle list` instead of `bundle show`") if ARGV[0] == "show"
       require "bundler/cli/show"
       Show.new(options, gem_name).run
     end
@@ -536,7 +536,7 @@ module Bundler
     method_option "group", :type => :string, :banner =>
      "Install gem into a bundler group"
     def inject(name, version)
-      SharedHelpers.major_deprecation "The `inject` command has been replaced by the `add` command"
+      SharedHelpers.major_deprecation 2, "The `inject` command has been replaced by the `add` command"
       require "bundler/cli/inject"
       Inject.new(options.dup, name, version).run
     end
