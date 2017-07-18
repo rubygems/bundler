@@ -287,6 +287,7 @@ Style/InverseMethods:
     - 'lib/bundler/dsl.rb'
     - 'lib/bundler/index.rb'
     - 'lib/bundler/resolver.rb'
+    - 'lib/bundler/resolver/spec_group.rb'
 
 # Offense count: 6
 Style/MethodMissing:
