@@ -91,8 +91,10 @@ RSpec.describe "bundle install with install-time dependencies" do
 
         bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
 
-        expect(err).to include(" net_b")
-        expect(err).to include(" net_build_extensions (1.0)")
+        expect(err).to include(" net_b").
+          and include("Starting resolution").
+          and include("Finished resolution").
+          and include("Attempting to activate")
       end
     end
   end
