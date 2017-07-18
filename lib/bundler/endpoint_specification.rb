@@ -72,6 +72,8 @@ module Bundler
         @remote_specification.post_install_message
       elsif _local_specification
         _local_specification.post_install_message
+      else
+        super
       end
     end
 
@@ -81,6 +83,8 @@ module Bundler
         @remote_specification.extensions
       elsif _local_specification
         _local_specification.extensions
+      else
+        super
       end
     end
 
