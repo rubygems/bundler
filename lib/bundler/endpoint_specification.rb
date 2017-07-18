@@ -81,6 +81,8 @@ module Bundler
         @remote_specification.extensions
       elsif _local_specification
         _local_specification.extensions
+      else
+        []
       end
     end
 
