@@ -60,7 +60,7 @@ RSpec.describe "gemcutter's dependency API" do
     G
     bundle :install, :artifice => "endpoint"
 
-    bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true, :path => "vendor/bundle").merge(:artifice => "endpoint")
+    bundle! :install, forgotten_command_line_options(:deployment => true, :path => "vendor/bundle").merge(:artifice => "endpoint")
     expect(out).to include("Fetching gem metadata from #{source_uri}")
     expect(the_bundle).to include_gems "rack 1.0.0"
   end
@@ -109,7 +109,7 @@ RSpec.describe "gemcutter's dependency API" do
     G
 
     bundle "install", :artifice => "endpoint"
-    bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true).merge(:artifice => "endpoint")
+    bundle! :install, forgotten_command_line_options(:deployment => true).merge(:artifice => "endpoint")
 
     expect(the_bundle).to include_gems("foo 1.0")
   end

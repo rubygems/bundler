@@ -250,7 +250,7 @@ RSpec.describe "bundle install with gem sources" do
       simulate_new_machine
       FileUtils.rm_rf gem_repo2
 
-      bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true, :path => "vendor/bundle")
+      bundle! :install, forgotten_command_line_options(:deployment => true, :path => "vendor/bundle")
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
 

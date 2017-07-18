@@ -1022,7 +1022,7 @@ RSpec.describe "bundle install with git sources" do
 
       simulate_new_machine
 
-      bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true)
+      bundle! :install, forgotten_command_line_options(:deployment => true)
     end
   end
 

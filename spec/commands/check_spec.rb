@@ -231,7 +231,7 @@ RSpec.describe "bundle check" do
       gem "foo"
     G
 
-    bundle! "install", forgotten_command_line_options([:deployment, :frozen] => true)
+    bundle! "install", forgotten_command_line_options(:deployment => true)
     FileUtils.rm(bundled_app("Gemfile.lock"))
 
     bundle :check

@@ -47,7 +47,7 @@ RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
     # parsed lockfile and the evaluated gemfile.
     it "bundles with --deployment" do
       bundle! :install
-      bundle! :install, forgotten_command_line_options([:deployment, :frozen] => true)
+      bundle! :install, forgotten_command_line_options(:deployment => true)
     end
   end
 
