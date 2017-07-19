@@ -22,9 +22,6 @@ RSpec.describe "parallel", :realworld => true, :sometimes => true do
 
     bundle "show faker"
     expect(out).to match(/faker/)
-
-    bundle "config jobs"
-    expect(out).to match(/: "4"/)
   end
 
   it "updates" do
@@ -54,9 +51,6 @@ RSpec.describe "parallel", :realworld => true, :sometimes => true do
 
     bundle "show faker"
     expect(out).to match(/faker/)
-
-    bundle "config jobs"
-    expect(out).to match(/: "4"/)
   end
 
   it "works with --standalone" do

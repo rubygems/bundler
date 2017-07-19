@@ -1239,7 +1239,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
       gem "omg", :git => "#{lib_path("omg")}", :branch => 'master'
     G
 
-    bundle "install --path vendor"
+    bundle! :install, forgotten_command_line_options(:path => "vendor")
     expect(the_bundle).to include_gems "omg 1.0"
 
     # Create a Gemfile.lock that has duplicate GIT sections

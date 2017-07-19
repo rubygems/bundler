@@ -20,7 +20,7 @@ RSpec.describe "bundle install" do
     end
   end
 
-  describe "when multiple gems contain the same exe" do
+  describe "when multiple gems contain the same exe", :bundler => "< 2" do
     before do
       build_repo2 do
         build_gem "fake", "14" do |s|

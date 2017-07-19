@@ -60,8 +60,6 @@ module Bundler
   autoload :VersionRanges,          "bundler/version_ranges"
 
   class << self
-    attr_writer :bundle_path
-
     def configure
       @configured ||= configure_gem_home_and_path
     end
@@ -233,7 +231,7 @@ module Bundler
 
     def app_cache(custom_path = nil)
       path = custom_path || root
-      path.join(settings.app_cache_path)
+      Pathname.new(path).join(settings.app_cache_path)
     end
 
     def tmp(name = Process.pid.to_s)

@@ -57,7 +57,7 @@ RSpec.describe "bundle install" do
           foo!
       L
 
-      bundle! "install --path=vendor/bundle --without development"
+      bundle! :install, forgotten_command_line_options(:path => "vendor/bundle", :without => "development")
 
       expect(out).to include("Bundle complete!")
     end

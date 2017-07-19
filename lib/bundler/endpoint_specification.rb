@@ -15,6 +15,9 @@ module Bundler
       @platform     = platform
       @dependencies = dependencies.map {|dep, reqs| build_dependency(dep, reqs) }
 
+      @loaded_from          = nil
+      @remote_specification = nil
+
       parse_metadata(metadata)
     end
 

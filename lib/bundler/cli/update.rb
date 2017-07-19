@@ -56,7 +56,7 @@ module Bundler
       opts["update"] = true
       opts["local"] = options[:local]
 
-      Bundler.settings[:jobs] = opts["jobs"] if opts["jobs"]
+      Bundler.settings.set_command_option_if_given :jobs, opts["jobs"]
 
       Bundler.definition.validate_runtime!
       installer = Installer.install Bundler.root, Bundler.definition, opts

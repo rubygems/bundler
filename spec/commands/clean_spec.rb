@@ -25,16 +25,16 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle! "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
     G
-    bundle "install"
+    bundle! "install"
 
-    bundle :clean
+    bundle! :clean
 
     expect(out).to include("Removing foo (1.0)")
 
@@ -52,7 +52,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -80,7 +80,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle! "install --path vendor/bundle --no-clean"
+    bundle! "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -111,8 +111,8 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
-    bundle "install --without test_group"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
+    bundle "install", forgotten_command_line_options(:without => "test_group")
     bundle :clean
 
     expect(out).to include("Removing rack (1.0.0)")
@@ -137,7 +137,7 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
 
     bundle :clean
 
@@ -159,7 +159,7 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -195,7 +195,7 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle! "install --path vendor/bundle"
+    bundle! "install", forgotten_command_line_options(:path => "vendor/bundle")
 
     update_git "foo", :path => lib_path("foo-bar")
     revision2 = revision_for(lib_path("foo-bar"))
@@ -225,7 +225,7 @@ RSpec.describe "bundle clean" do
       gem "activesupport", :git => "#{lib_path("rails")}", :ref => '#{revision}'
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
     bundle :clean
     expect(out).to include("")
 
@@ -247,7 +247,7 @@ RSpec.describe "bundle clean" do
         end
       end
     G
-    bundle "install --path vendor/bundle --without test"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :without => "test")
 
     bundle :clean
 
@@ -268,7 +268,7 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle --without development"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :without => "development")
 
     bundle :clean
     expect(exitstatus).to eq(0) if exitstatus
@@ -283,7 +283,7 @@ RSpec.describe "bundle clean" do
 
     bundle :clean
 
-    expect(exitstatus).to eq(1) if exitstatus
+    expect(exitstatus).to eq(15) if exitstatus
     expect(out).to include("--force")
   end
 
@@ -296,7 +296,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -338,14 +338,14 @@ RSpec.describe "bundle clean" do
     expect(out).to include("thin (1.0)")
   end
 
-  it "--clean should override the bundle setting on install" do
+  it "--clean should override the bundle setting on install", :bundler => "< 2" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "rack"
     G
-    bundle "install --path vendor/bundle --clean"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => true)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -358,7 +358,7 @@ RSpec.describe "bundle clean" do
     should_not_have_gems "thin-1.0"
   end
 
-  it "--clean should override the bundle setting on update" do
+  it "--clean should override the bundle setting on update", :bundler => "< 2" do
     build_repo2
 
     gemfile <<-G
@@ -366,7 +366,7 @@ RSpec.describe "bundle clean" do
 
       gem "foo"
     G
-    bundle! "install --path vendor/bundle --clean"
+    bundle! "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => true)
 
     update_repo2 do
       build_gem "foo", "1.0.1"
@@ -385,7 +385,7 @@ RSpec.describe "bundle clean" do
       gem "thin"
       gem "rack"
     G
-    bundle "install --path vendor/bundle"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -405,7 +405,7 @@ RSpec.describe "bundle clean" do
 
       gem "foo"
     G
-    bundle! "install --path vendor/bundle"
+    bundle! "install", forgotten_command_line_options(:path => "vendor/bundle")
 
     update_repo2 do
       build_gem "foo", "1.0.1"
@@ -501,7 +501,7 @@ RSpec.describe "bundle clean" do
       gem "foo", :git => "#{lib_path("foo-1.0")}"
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
 
     # mimic 7 length git revisions in Gemfile.lock
     gemfile_lock = File.read(bundled_app("Gemfile.lock")).split("\n")
@@ -512,7 +512,7 @@ RSpec.describe "bundle clean" do
       file.print gemfile_lock.join("\n")
     end
 
-    bundle "install --path vendor/bundle"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
 
     bundle :clean
 
@@ -560,10 +560,8 @@ RSpec.describe "bundle clean" do
       gem "bar", "1.0", :path => "#{relative_path}"
     G
 
-    bundle "install --path vendor/bundle"
-    bundle :clean
-
-    expect(exitstatus).to eq(0) if exitstatus
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
+    bundle! :clean
   end
 
   it "doesn't remove gems in dry-run mode with path set" do
@@ -574,7 +572,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -602,7 +600,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -632,7 +630,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
     bundle "config dry_run false"
 
     gemfile <<-G
@@ -662,7 +660,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -689,7 +687,7 @@ RSpec.describe "bundle clean" do
       gem "very_simple_git_binary", :git => "#{lib_path("very_simple_git_binary-1.0")}", :ref => "#{revision}"
     G
 
-    bundle! "install --path vendor/bundle"
+    bundle! "install", forgotten_command_line_options(:path => "vendor/bundle")
     expect(vendored_gems("bundler/gems/extensions")).to exist
     expect(vendored_gems("bundler/gems/very_simple_git_binary-1.0-#{revision[0..11]}")).to exist
 

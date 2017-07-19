@@ -30,7 +30,7 @@ module Bundler
         Bundler.reset_paths!
       end
 
-      Bundler.settings[:retry] = options[:retry] if options[:retry]
+      Bundler.settings.set_command_option_if_given :retry, options[:retry]
 
       current_cmd = args.last[:current_command].name
       auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
@@ -38,7 +38,6 @@ module Bundler
       raise InvalidOption, e.message
     ensure
       self.options ||= {}
-      Bundler.settings.cli_flags_given = !options.empty?
       unprinted_warnings = Bundler.ui.unprinted_warnings
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
@@ -51,6 +50,11 @@ module Bundler
           "To remove this warning, unset RUBYGEMS_GEMDEPS.", :wrap => true
         )
       end
+    end
+
+    def self.deprecated_option(*args, &blk)
+      return if Bundler.feature_flag.forget_cli_options?
+      method_option(*args, &blk)
     end
 
     check_unknown_options!(:except => [:config, :exec])
@@ -113,7 +117,7 @@ module Bundler
       Gemfile to a gem with a gemspec, the --gemspec option will automatically add each
       dependency listed in the gemspec file to the newly created Gemfile.
     D
-    method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
+    deprecated_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
     def init
       require "bundler/cli/init"
       Init.new(options.dup).run
@@ -130,7 +134,7 @@ module Bundler
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME).#{" Bundler will remember this value for future installs on this machine" unless Bundler.feature_flag.forget_cli_options?}"
     map "c" => "check"
     def check
       require "bundler/cli/check"
@@ -148,13 +152,13 @@ module Bundler
 
       If the bundle has already been installed, bundler will tell you so and then exit.
     D
-    method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
+    deprecated_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
-    method_option "clean", :type => :boolean, :banner =>
+    deprecated_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
-    method_option "deployment", :type => :boolean, :banner =>
+    deprecated_option "deployment", :type => :boolean, :banner =>
       "Install using defaults tuned for deployment environments"
-    method_option "frozen", :type => :boolean, :banner =>
+    deprecated_option "frozen", :type => :boolean, :banner =>
       "Do not allow the Gemfile.lock to be updated after this install"
     method_option "full-index", :type => :boolean, :banner =>
       "Fall back to using the single-file index of all gems"
@@ -164,28 +168,29 @@ module Bundler
       "Specify the number of jobs to run in parallel"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
-    method_option "no-cache", :type => :boolean, :banner =>
+    deprecated_option "no-cache", :type => :boolean, :banner =>
       "Don't update the existing gem cache."
-    method_option "force", :type => :boolean, :banner =>
+    method_option "redownload", :type => :boolean, :aliases =>
+      [Bundler.feature_flag.forget_cli_options? ? nil : "--force"].compact, :banner =>
       "Force downloading every gem."
-    method_option "no-prune", :type => :boolean, :banner =>
+    deprecated_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
-    method_option "path", :type => :string, :banner =>
+    deprecated_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
-    method_option "shebang", :type => :string, :banner =>
+    deprecated_option "shebang", :type => :string, :banner =>
       "Specify a different shebang executable name than the default (usually 'ruby')"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
       "Make a bundle that can work without the Bundler runtime"
-    method_option "system", :type => :boolean, :banner =>
+    deprecated_option "system", :type => :boolean, :banner =>
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policy_keys.join("|")
-    method_option "without", :type => :array, :banner =>
+    deprecated_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
-    method_option "with", :type => :array, :banner =>
+    deprecated_option "with", :type => :array, :banner =>
       "Include gems that are part of the specified named group."
     map "i" => "install"
     def install

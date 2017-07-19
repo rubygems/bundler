@@ -153,7 +153,7 @@ module Bundler
         end
 
         def git_retry(command)
-          Bundler::Retry.new("`git #{command}`", GitNotAllowedError).attempts do
+          Bundler::Retry.new("`git #{URICredentialsFilter.credential_filtered_string(command, uri)}`", GitNotAllowedError).attempts do
             git(command)
           end
         end
