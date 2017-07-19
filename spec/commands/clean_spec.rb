@@ -739,7 +739,7 @@ RSpec.describe "bundle clean" do
 
     bundle "install --path vendor/bundle"
 
-    expect(vendored_gems("extensions/x86_64-linux/2.3.0-static/c_extension-1.0")).to exist
+    expect(vendored_gems.join("extensions", Gem::Platform.local.to_s, Gem::ConfigMap[:ruby_version] + "-static", "c_extension-1.0")).to exist
 
     gemfile <<-G
       source "file://#{gem_repo2}"
