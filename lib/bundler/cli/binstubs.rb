@@ -31,9 +31,8 @@ module Bundler
           )
         end
 
-        if spec.name == "bundler"
-          Bundler.ui.warn "Sorry, Bundler can only be run via RubyGems."
-        elsif options[:standalone]
+        if options[:standalone]
+          next Bundler.ui.warn("Sorry, Bundler can only be run via RubyGems.") if gem_name == "bundler"
           installer.generate_standalone_bundler_executable_stubs(spec)
         else
           installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
