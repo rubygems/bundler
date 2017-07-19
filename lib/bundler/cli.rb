@@ -154,7 +154,7 @@ module Bundler
     D
     deprecated_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
-    method_option "clean", :type => :boolean, :banner =>
+    deprecated_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
     deprecated_option "deployment", :type => :boolean, :banner =>
       "Install using defaults tuned for deployment environments"

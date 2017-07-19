@@ -338,7 +338,7 @@ RSpec.describe "bundle clean" do
     expect(out).to include("thin (1.0)")
   end
 
-  it "--clean should override the bundle setting on install" do
+  it "--clean should override the bundle setting on install", :bundler => "< 2" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -358,7 +358,7 @@ RSpec.describe "bundle clean" do
     should_not_have_gems "thin-1.0"
   end
 
-  it "--clean should override the bundle setting on update" do
+  it "--clean should override the bundle setting on update", :bundler => "< 2" do
     build_repo2
 
     gemfile <<-G
