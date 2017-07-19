@@ -170,7 +170,8 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     deprecated_option "no-cache", :type => :boolean, :banner =>
       "Don't update the existing gem cache."
-    method_option "force", :type => :boolean, :banner =>
+    method_option "redownload", :type => :boolean, :aliases =>
+      [Bundler.feature_flag.forget_cli_options? ? nil : "--force"].compact, :banner =>
       "Force downloading every gem."
     method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."

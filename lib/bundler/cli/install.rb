@@ -194,6 +194,8 @@ module Bundler
 
       disable_shared_gems = Bundler.settings[:path] ? true : nil
       Bundler.settings.set_command_option :disable_shared_gems, disable_shared_gems unless Bundler.settings[:disable_shared_gems] == disable_shared_gems
+
+      options[:force] = options[:redownload]
     end
 
     def warn_ambiguous_gems
