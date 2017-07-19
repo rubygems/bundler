@@ -80,9 +80,14 @@ module Bundler
           return
         end
 
-        resolve_if_needed(options)
-        ensure_specs_are_compatible!
-        warn_on_incompatible_bundler_deps
+        if resolve_if_needed(options)
+          ensure_specs_are_compatible!
+          warn_on_incompatible_bundler_deps
+          load_plugins
+          options.delete(:jobs)
+        else
+          options[:jobs] = 1 # to avoid the overhead of Bundler::Worker
+        end
         install(options)
 
         lock unless Bundler.frozen?
@@ -166,10 +171,14 @@ module Bundler
     # that said, it's a rare situation (other than rake), and parallel
     # installation is SO MUCH FASTER. so we let people opt in.
     def install(options)
-      load_plugins
       force = options["force"]
-      jobs = 1
-      jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?
+      jobs = options.delete(:jobs) do
+        if can_install_in_parallel?
+          [Bundler.settings[:jobs].to_i - 1, 1].max
+        else
+          1
+        end
+      end
       install_in_parallel jobs, options[:standalone], force
     end
 
@@ -249,12 +258,14 @@ module Bundler
         "because a file already exists at that path. Either remove or rename the file so the directory can be created."
     end
 
+    # returns whether or not a re-resolve was needed
     def resolve_if_needed(options)
       if !options["update"] && !options["force"] && !Bundler.settings[:inline] && Bundler.default_lockfile.file?
-        return if @definition.nothing_changed? && !@definition.missing_specs?
+        return false if @definition.nothing_changed? && !@definition.missing_specs?
       end
 
       options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
+      true
     end
 
     def lock(opts = {})

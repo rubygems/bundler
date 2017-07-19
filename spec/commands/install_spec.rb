@@ -496,7 +496,7 @@ RSpec.describe "bundle install with gem sources" do
     before do
       gemfile <<-G
         source 'https://rubygems.org/'
-        gem 'bundler'
+        gem "."
       G
     end
 
