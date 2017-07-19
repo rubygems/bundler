@@ -47,7 +47,7 @@ RSpec.describe "bundle init" do
     end
   end
 
-  context "given --gemspec option" do
+  context "given --gemspec option", :bundler => "< 2" do
     let(:spec_file) { tmp.join("test.gemspec") }
 
     it "should generate from an existing gemspec" do
@@ -116,7 +116,7 @@ RSpec.describe "bundle init" do
       end
     end
 
-    context "given --gemspec option" do
+    context "given --gemspec option", :bundler => "< 2" do
       let(:spec_file) { tmp.join("test.gemspec") }
 
       before do

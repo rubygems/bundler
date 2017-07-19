@@ -117,7 +117,7 @@ module Bundler
       Gemfile to a gem with a gemspec, the --gemspec option will automatically add each
       dependency listed in the gemspec file to the newly created Gemfile.
     D
-    method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
+    deprecated_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
     def init
       require "bundler/cli/init"
       Init.new(options.dup).run
