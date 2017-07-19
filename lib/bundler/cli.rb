@@ -173,7 +173,7 @@ module Bundler
     method_option "redownload", :type => :boolean, :aliases =>
       [Bundler.feature_flag.forget_cli_options? ? nil : "--force"].compact, :banner =>
       "Force downloading every gem."
-    method_option "no-prune", :type => :boolean, :banner =>
+    deprecated_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
     deprecated_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
