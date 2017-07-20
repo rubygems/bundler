@@ -156,6 +156,7 @@ RSpec.describe Bundler::YAMLSerializer do
         "a_joke" => {
           "my-stand" => "I can totally keep secrets",
           "but" => "The people I tell them to can't :P",
+          "wouldn't it be funny if this string were empty?" => "",
         },
         "more" => {
           "first" => [
@@ -166,6 +167,7 @@ RSpec.describe Bundler::YAMLSerializer do
             "What did the sea say to the sand?",
             "Nothing, it simply waved.",
           ],
+          "array with empty string" => [""],
         },
         "sales" => {
           "item" => "A Parachute",
