@@ -57,8 +57,9 @@ RSpec.describe "bundle executable" do
 
   context "with --verbose" do
     it "prints the running command" do
-      bundle! "config", :verbose => true
-      expect(out).to start_with("Running `bundle config --verbose` with bundler #{Bundler::VERSION}")
+      gemfile ""
+      bundle! "info bundler", :verbose => true
+      expect(out).to start_with("Running `bundle info bundler --no-color --verbose` with bundler #{Bundler::VERSION}")
     end
 
     it "doesn't print defaults" do
@@ -114,6 +115,16 @@ Could not find command "fail".
       context "and disable_version_check is set" do
         before { bundle! "config disable_version_check true" }
         include_examples "no warning"
+      end
+
+      context "running a parseable command" do
+        it "prints no warning" do
+          bundle! "config --parseable foo"
+          expect(last_command.stdboth).to eq ""
+
+          bundle "platform --ruby"
+          expect(last_command.stdboth).to eq "Could not locate Gemfile"
+        end
       end
 
       context "and is a pre-release" do
