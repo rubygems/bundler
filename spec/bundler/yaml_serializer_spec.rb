@@ -166,6 +166,7 @@ RSpec.describe Bundler::YAMLSerializer do
             "What did the sea say to the sand?",
             "Nothing, it simply waved.",
           ],
+          "array with empty string" => [""],
         },
         "sales" => {
           "item" => "A Parachute",
