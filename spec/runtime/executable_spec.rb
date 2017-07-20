@@ -78,7 +78,7 @@ RSpec.describe "Running bin/* commands" do
     expect(out).to eq("1.0")
   end
 
-  it "don't bundle da bundla" do
+  it "creates a bundle binstub" do
     build_gem "bundler", Bundler::VERSION, :to_system => true do |s|
       s.executables = "bundle"
     end
@@ -88,9 +88,9 @@ RSpec.describe "Running bin/* commands" do
       gem "bundler"
     G
 
-    bundle "binstubs bundler"
+    bundle! "binstubs bundler"
 
-    expect(bundled_app("bin/bundle")).not_to exist
+    expect(bundled_app("bin/bundle")).to exist
   end
 
   it "does not generate bin stubs if the option was not specified" do

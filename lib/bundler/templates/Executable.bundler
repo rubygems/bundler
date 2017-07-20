@@ -57,10 +57,23 @@ m = Module.new do
   end
 
   def activate_bundler(bundler_version)
-    gem "bundler", bundler_version
-  rescue StandardError, LoadError => e
-    warn "Activating bundler (#{bundler_version}) failed:\n#{e.message}\n\nTo install the version of bundler this project requires, run `gem install bundler -v '#{bundler_version}'`"
+    gem_error = activation_error_handling do
+      gem "bundler", bundler_version
+    end
+    return if gem_error.nil?
+    require_error = activation_error_handling do
+      require "bundler/version"
+    end
+    return if require_error.nil? && Gem::Requirement.new(bundler_version).satisfied_by?(Gem::Version.new(Bundler::VERSION))
+    warn "Activating bundler (#{bundler_version}) failed:\n#{gem_error.message}\n\nTo install the version of bundler this project requires, run `gem install bundler -v '#{bundler_version}'`"
     exit 42
+  end
+
+  def activation_error_handling
+    yield
+    nil
+  rescue StandardError, LoadError => e
+    e
   end
 end
 
