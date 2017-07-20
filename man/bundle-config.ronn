@@ -288,6 +288,7 @@ revision in the `Gemfile.lock` to the local git repo revision. This
 requires the same attention as git submodules. Before pushing to
 the remote, you need to ensure the local override was pushed, otherwise
 you may point to a commit that only exists in your local machine.
+You'll also need to CGI escape your usernames and passwords as well.
 
 Bundler does many checks to ensure a developer won't work with
 invalid references. Particularly, we force a developer to specify
