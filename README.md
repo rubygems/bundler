@@ -12,29 +12,15 @@ It does this by managing the gems that the application depends on. Given a list 
 
 ### Installation and usage
 
-To install:
+To install (or update to the latest version):
 
 ```
 gem install bundler
 ```
 
-To update:
+To install a prerelease version (if one is available), run `gem install bundler --pre`. To uninstall Bundler, run `gem uninstall bundler`.
 
-- Run `gem install bundler` again
-
-To install prereleases:
-
-```
-gem install bundler --pre
-```
-
-To uninstall:
-
-```
-gem uninstall bundler
-```
-
-Bundler is most commonly used to manage your application's dependencies. To use it for this:
+Bundler is most commonly used to manage your application's dependencies. For example, these commands will allow you to use Bundler to manage the `rspec` gem for your application:
 
 ```
 bundle init
