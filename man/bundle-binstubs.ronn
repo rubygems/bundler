@@ -7,15 +7,15 @@ bundle-binstubs(1) -- Install the binstubs of the listed gems
 
 ## DESCRIPTION
 
-Binstubs are scripts that wrap aroung executables. Bundler creates a 
-small Ruby file (a binstub) that loads Bundler, runs the command, 
+Binstubs are scripts that wrap aroung executables. Bundler creates a
+small Ruby file (a binstub) that loads Bundler, runs the command,
 and puts it into `bin/`. Binstubs are a shortcut—or alternative—
-to always using `bundle exec`, with the additional benefit of linking 
-the binstub inside of an application to the exact version of the gem the
-application needs.
+to always using `bundle exec`. This gives you a file that can by run
+directly, and one that will always run the correct gem version
+used by the application.
 
-For example, if you run `bundle binstubs rspec-core`, Bundler will create 
-the file `bin/rspec`. That file will contain just enough code to load Bundler, 
+For example, if you run `bundle binstubs rspec-core`, Bundler will create
+the file `bin/rspec`. That file will contain enough code to load Bundler,
 tell it to load the bundled gems, and then run rspec.
 
 This command generates binstubs for executables in `GEM_NAME`.
