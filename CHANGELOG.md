@@ -1,3 +1,10 @@
+## 1.15.3 (2017-07-21)
+
+Bugfixes:
+
+  - ensure that empty strings passed to `bundle config` are serialized & parsed properly (#5881, @segiddins)
+  - avoid printing an outdated version warning when running a parseable command (@segiddins)
+
 ## 1.15.2 (2017-07-17)
 
 Features:
