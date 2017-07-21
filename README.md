@@ -18,6 +18,22 @@ To install:
 gem install bundler
 ```
 
+To update:
+
+- Run `gem install bundler` again
+
+To install prereleases:
+
+```
+gem install bundler --pre
+```
+
+To uninstall:
+
+```
+gem uninstall bundler
+```
+
 Bundler is most commonly used to manage your application's dependencies. To use it for this:
 
 ```
