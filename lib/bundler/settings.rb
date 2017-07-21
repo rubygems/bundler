@@ -236,7 +236,7 @@ module Bundler
 
       def base_path
         path = explicit_path
-        path ||= ".bundle" if default_install_uses_path
+        path ||= ".bundle" unless use_system_gems?
         path ||= Bundler.rubygems.gem_dir
         path
       end

@@ -196,6 +196,8 @@ module Bundler
         Bundler.settings.set_command_option :without, options[:without] - options[:with]
         Bundler.settings.set_command_option :with,    options[:with]
       end
+
+      options[:force] = options[:redownload]
     end
 
     def warn_ambiguous_gems

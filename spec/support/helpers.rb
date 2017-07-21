@@ -360,16 +360,19 @@ module Spec
     end
 
     def system_gems(*gems)
+      opts = gems.last.is_a?(Hash) ? gems.last : {}
+      path = opts.fetch(:path, system_gem_path)
+      path = ruby!("require 'bundler'; puts Bundler.bundle_path") if path == :bundle_path
       gems = gems.flatten
 
-      FileUtils.rm_rf(system_gem_path)
-      FileUtils.mkdir_p(system_gem_path)
+      FileUtils.rm_rf(path)
+      FileUtils.mkdir_p(path)
 
       Gem.clear_paths
 
       env_backup = ENV.to_hash
-      ENV["GEM_HOME"] = system_gem_path.to_s
-      ENV["GEM_PATH"] = system_gem_path.to_s
+      ENV["GEM_HOME"] = path.to_s
+      ENV["GEM_PATH"] = path.to_s
       ENV["BUNDLER_ORIG_GEM_PATH"] = nil
 
       install_gems(*gems)
