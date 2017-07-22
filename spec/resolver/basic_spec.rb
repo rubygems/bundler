@@ -44,6 +44,12 @@ RSpec.describe "Resolving" do
     should_resolve_as %w[activesupport-3.0.5 i18n-0.4.2 builder-2.1.2 activerecord-3.0.5 activemodel-3.0.5]
   end
 
+  it "resolves a gem specified with a pre-release version" do
+    dep "activesupport", "~> 3.0.0.beta"
+    dep "activemerchant"
+    should_resolve_as %w[activemerchant-2.3.5 activesupport-3.0.0.beta1]
+  end
+
   it "raises an exception if a child dependency is not resolved" do
     @index = a_unresovable_child_index
     dep "chef_app_error"
