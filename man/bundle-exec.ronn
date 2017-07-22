@@ -63,6 +63,13 @@ It also modifies Rubygems:
   making system executables work
 * Add all gems in the bundle into Gem.loaded_specs
 
+Finally, `bundle exec` also implicitly modifies `Gemfile.lock` if the lockfile
+and the Gemfile do not match. Bundler needs the Gemfile to determine things
+such as a gem's groups, `autorequire`, and platforms, etc., and that
+information isn't stored in the lockfile. The Gemfile and lockfile must be
+synced in order to `bundle exec` successfully, so `bundle exec`
+updates the lockfile beforehand.
+
 ### Loading
 
 By default, when attempting to `bundle exec` to a file with a ruby shebang,
