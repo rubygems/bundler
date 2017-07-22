@@ -75,6 +75,9 @@ module Spec
         gem "rack", %w[0.8 0.9 0.9.1 0.9.2 1.0 1.1]
         gem "rack-mount", %w[0.4 0.5 0.5.1 0.5.2 0.6]
 
+        # --- Pre-release support
+        gem "rubygems\0", ["1.3.2"]
+
         # --- Rails
         versions "1.2.3 2.2.3 2.3.5 3.0.0.beta 3.0.0.beta1" do |version|
           gem "activesupport", version
