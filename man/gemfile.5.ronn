@@ -69,6 +69,22 @@ the Ruby version that the engine is compatible with.
 Each application _may_ specify a Ruby engine. If an engine is specified, an
 engine version _must_ also be specified.
 
+What exactly is an Engine?
+  - A Ruby engine is an implementation of the Ruby language.
+
+  - For background: the reference or original implementation of the Ruby
+    programming language is called
+    [Matz's Ruby Interpreter](https://en.wikipedia.org/wiki/Ruby_MRI), or  MRI
+    for short. This is named after Ruby creator Yukihiro Matsumoto,
+    also known as Matz. MRI is also known as CRuby, because it is written in C.
+    MRI is the most widely used Ruby engine.
+
+  - [Other implementations](https://www.ruby-lang.org/en/about/) of Ruby exist.
+    Some of the more well-known implementations include
+    [Rubinius](https://rubinius.com/), and [JRuby](http://jruby.org/).
+    Rubinius is an alternative implementation of Ruby written in Ruby.
+    JRuby is an implementation of Ruby on the JVM, short for Java Virtual Machine.
+
 ### ENGINE VERSION
 
 Each application _may_ specify a Ruby engine version. If an engine version is
@@ -287,7 +303,17 @@ Git repositories support a number of additional options.
   * `branch`, `tag`, and `ref`:
     You `MUST` only specify at most one of these options. The default
     is `:branch => "master"`
+  * For example:
+
+      git "https://github.com/rails/rails.git", :branch => "5-0-stable" do
+
+      git "https://github.com/rails/rails.git", :tag => "v5.0.0" do
+
+      git "https://github.com/rails/rails.git", :ref => "4aded" do
+
   * `submodules`:
+    For reference, a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
+    lets you have another git repository within a subfolder of your repository.
     Specify `:submodules => true` to cause bundler to expand any
     submodules included in the git repository
 
@@ -438,6 +464,11 @@ software is installed or some other conditions are met.
     end
 
 ## GEMSPEC
+
+The [.gemspec](http://guides.rubygems.org/specification-reference/) file is where
+ you provide metadata about your gem to Rubygems. Some required Gemspec
+ attributes include the name, description, and homepage of your gem. This is
+ also where you specify the dependencies your gem needs to run.
 
 If you wish to use Bundler to help install dependencies for a gem while it is
 being developed, use the `gemspec` method to pull in the dependencies listed in
