@@ -467,6 +467,7 @@ EOF
     def reset_paths!
       @bin_path = nil
       @bundle_path = nil
+      @configured = nil
       @configured_bundle_path = nil
       @definition = nil
       @load = nil
