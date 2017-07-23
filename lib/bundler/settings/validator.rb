@@ -12,7 +12,7 @@ module Bundler
           @validate = validate
         end
 
-        def validate(key, value, settings)
+        def validate!(key, value, settings)
           instance_exec(key, value, settings, &@validate)
         end
 
@@ -34,7 +34,7 @@ module Bundler
         end
 
         def k(key)
-          Bundler.settings.send(:key_for, key)
+          Bundler.settings.key_for(key)
         end
       end
 
@@ -49,9 +49,9 @@ module Bundler
       end
       private_class_method :rule
 
-      def self.validate(key, value, settings)
+      def self.validate!(key, value, settings)
         rules_to_validate = rules[key]
-        rules_to_validate.each {|rule| rule.validate(key, value, settings) }
+        rules_to_validate.each {|rule| rule.validate!(key, value, settings) }
       end
 
       rule %w[path path.system], "path and path.system are mutually exclusive" do |key, value, settings|

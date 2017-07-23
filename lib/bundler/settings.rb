@@ -277,13 +277,13 @@ module Bundler
       end
     end
 
-  private
-
     def key_for(key)
       key = Settings.normalize_uri(key).to_s if key.is_a?(String) && /https?:/ =~ key
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end
+
+  private
 
     def parent_setting_for(name)
       split_specific_setting_for(name)[0]
