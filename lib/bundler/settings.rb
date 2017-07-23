@@ -272,7 +272,7 @@ module Bundler
       all.each do |raw_key|
         [@local_config, ENV, @global_config].each do |settings|
           value = converted_value(settings[key_for(raw_key)], raw_key)
-          Validator.validate(raw_key, value, settings.to_hash.dup)
+          Validator.validate!(raw_key, value, settings.to_hash.dup)
         end
       end
     end
@@ -340,7 +340,7 @@ module Bundler
       hash[key] = value
       hash.delete(key) if value.nil?
 
-      Validator.validate(raw_key, converted_value(value, raw_key), hash)
+      Validator.validate!(raw_key, converted_value(value, raw_key), hash)
 
       return unless file
       SharedHelpers.filesystem_access(file) do |p|
