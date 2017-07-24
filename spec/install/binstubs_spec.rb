@@ -38,7 +38,7 @@ RSpec.describe "bundle install" do
     it "prints a deprecation notice" do
       bundle "config major_deprecations true"
       gembin("rackup")
-      expect(out).to include("Bundler is using a binstub that was created for a different gem.")
+      expect(out).to include("Bundler is using a binstub that was created for a different gem (rack).")
     end
 
     it "loads the correct spec's executable" do

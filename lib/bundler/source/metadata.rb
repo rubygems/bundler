@@ -14,6 +14,8 @@ module Bundler
             s.platform = Gem::Platform::RUBY
             s.source   = self
             s.authors  = ["bundler team"]
+            s.bindir   = "exe"
+            s.executables = %w[bundle]
             # can't point to the actual gemspec or else the require paths will be wrong
             s.loaded_from = File.expand_path("..", __FILE__)
           end

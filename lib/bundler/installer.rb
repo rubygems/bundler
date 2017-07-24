@@ -114,14 +114,17 @@ module Bundler
 
       # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = bin_path = Bundler.bin_path
-      template = template = File.read(File.expand_path("../templates/Executable", __FILE__))
       relative_gemfile_path = relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
       ruby_command = ruby_command = Thor::Util.ruby_command
+      template_path = File.expand_path("../templates/Executable", __FILE__)
+      if spec.name == "bundler"
+        template_path += ".bundler"
+        spec.executables = %(bundle)
+      end
+      template = File.read(template_path)
 
       exists = []
       spec.executables.each do |executable|
-        next if executable == "bundle"
-
         binstub_path = "#{bin_path}/#{executable}"
         if File.exist?(binstub_path) && !options[:force]
           exists << executable
