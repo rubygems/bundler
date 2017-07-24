@@ -71,7 +71,7 @@ module Bundler
 
         conflicting = with & without
         if conflicting.any?
-          fail!(key, value, "`#{other_key}` is current set to #{other_setting}", "the `#{conflicting.join("`, `")}` groups conflict")
+          fail!(key, value, "`#{other_key}` is current set to #{other_setting.inspect}", "the `#{conflicting.join("`, `")}` groups conflict")
         end
       end
     end
