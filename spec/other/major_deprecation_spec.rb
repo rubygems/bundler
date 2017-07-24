@@ -132,10 +132,12 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
     end
 
     it "should print a Gemfile deprecation warning" do
-      install_gemfile <<-G
+      create_file "gems.rb"
+      install_gemfile! <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
+      expect(the_bundle).to include_gem "rack 1.0"
 
       expect(warnings).to have_major_deprecation a_string_including("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
     end
@@ -156,7 +158,8 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
 
   context "when Bundler.setup is run in a ruby script" do
     it "should print a single deprecation warning" do
-      install_gemfile <<-G
+      create_file "gems.rb"
+      install_gemfile! <<-G
         source "file://#{gem_repo1}"
         gem "rack", :group => :test
       G
@@ -171,7 +174,7 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
         Bundler.setup
       RUBY
 
-      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
+      expect(warnings_without_version_messages).to have_major_deprecation("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
     end
   end
 
