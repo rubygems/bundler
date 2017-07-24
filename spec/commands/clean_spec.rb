@@ -467,8 +467,9 @@ RSpec.describe "bundle clean" do
 
   describe "when missing permissions" do
     before { ENV["BUNDLE_PATH__SYSTEM"] = "true" }
+    let(:system_cache_path) { system_gem_path("cache") }
     after do
-      FileUtils.chmod(0o755, default_bundle_path("cache"))
+      FileUtils.chmod(0o755, system_cache_path)
     end
     it "returns a helpful error message" do
       gemfile <<-G
@@ -486,7 +487,6 @@ RSpec.describe "bundle clean" do
       G
       bundle :install
 
-      system_cache_path = default_bundle_path("cache")
       FileUtils.chmod(0o500, system_cache_path)
 
       bundle :clean, :force => true

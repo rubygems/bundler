@@ -287,7 +287,7 @@ RSpec.describe "bundle install with git sources" do
       # ensure we also git fetch after cloning
       bundle! :update, :all => bundle_update_requires_all?
 
-      Dir.chdir(Dir[system_gem_path("cache/bundler/git/foo-*")].first) do
+      Dir.chdir(Dir[default_bundle_path("cache/bundler/git/foo-*")].first) do
         sys_exec("git ls-remote .")
       end
 
@@ -893,6 +893,7 @@ RSpec.describe "bundle install with git sources" do
   it "prints a friendly error if a file blocks the git repo" do
     build_git "foo"
 
+    FileUtils.mkdir_p(default_bundle_path)
     FileUtils.touch(default_bundle_path("bundler"))
 
     install_gemfile <<-G
@@ -1118,7 +1119,7 @@ RSpec.describe "bundle install with git sources" do
       run! <<-R
         puts $:.grep(/ext/)
       R
-      expect(out).to eq(Pathname.glob(system_gem_path("bundler/gems/extensions/**/foo-1.0-*")).first.to_s)
+      expect(out).to eq(Pathname.glob(default_bundle_path("bundler/gems/extensions/**/foo-1.0-*")).first.to_s)
     end
 
     it "does not use old extension after ref changes" do

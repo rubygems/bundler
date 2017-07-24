@@ -29,13 +29,23 @@ RSpec.describe "bundle install with gem sources" do
       expect(bundled_app("Gemfile.lock")).to exist
     end
 
-    it "does not create ./.bundle by default" do
+    it "does not create ./.bundle by default", :bundler => "< 2" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
 
-      bundle :install # can't use install_gemfile since it sets retry
+      bundle! :install # can't use install_gemfile since it sets retry
+      expect(bundled_app(".bundle")).not_to exist
+    end
+
+    it "does not create ./.bundle by default when installing to system gems" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle! :install, :env => { "BUNDLE_PATH__SYSTEM" => true } # can't use install_gemfile since it sets retry
       expect(bundled_app(".bundle")).not_to exist
     end
 
@@ -166,7 +176,7 @@ RSpec.describe "bundle install with gem sources" do
     end
 
     it "does not reinstall any gem that is already available locally" do
-      system_gems "activesupport-2.3.2"
+      system_gems "activesupport-2.3.2", :path => :bundle_path
 
       build_repo2 do
         build_gem "activesupport", "2.3.2" do |s|
@@ -183,7 +193,7 @@ RSpec.describe "bundle install with gem sources" do
     end
 
     it "works when the gemfile specifies gems that only exist in the system" do
-      build_gem "foo", :to_system => true
+      build_gem "foo", :to_bundle => true
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
@@ -194,7 +204,7 @@ RSpec.describe "bundle install with gem sources" do
     end
 
     it "prioritizes local gems over remote gems" do
-      build_gem "rack", "1.0.0", :to_system => true do |s|
+      build_gem "rack", "1.0.0", :to_bundle => true do |s|
         s.add_dependency "activesupport", "2.3.5"
       end
 

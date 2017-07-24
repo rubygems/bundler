@@ -362,11 +362,24 @@ module Spec
     def system_gems(*gems)
       opts = gems.last.is_a?(Hash) ? gems.last : {}
       path = opts.fetch(:path, system_gem_path)
-      path = ruby!("require 'bundler'; puts Bundler.bundle_path") if path == :bundle_path
+      if path == :bundle_path
+        path = ruby!(<<-RUBY)
+          require "bundler"
+          begin
+            puts Bundler.bundle_path
+          rescue Bundler::GemfileNotFound
+            ENV["BUNDLE_GEMFILE"] = "Gemfile"
+            retry
+          end
+
+        RUBY
+      end
       gems = gems.flatten
 
-      FileUtils.rm_rf(path)
-      FileUtils.mkdir_p(path)
+      unless opts[:keep_path]
+        FileUtils.rm_rf(path)
+        FileUtils.mkdir_p(path)
+      end
 
       Gem.clear_paths
 
@@ -426,7 +439,7 @@ module Spec
 
     def simulate_new_machine
       system_gems []
-      FileUtils.rm_rf default_bundle_path
+      FileUtils.rm_rf system_gem_path
       FileUtils.rm_rf bundled_app(".bundle")
     end
 

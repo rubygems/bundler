@@ -2,8 +2,10 @@
 
 RSpec.describe "bundle install from an existing gemspec" do
   before(:each) do
-    build_gem "bar", :to_system => true
-    build_gem "bar-dev", :to_system => true
+    build_repo2 do
+      build_gem "bar"
+      build_gem "bar-dev"
+    end
   end
 
   it "should install runtime and development dependencies" do
@@ -39,8 +41,10 @@ RSpec.describe "bundle install from an existing gemspec" do
   end
 
   it "should handle a list of requirements" do
-    build_gem "baz", "1.0", :to_system => true
-    build_gem "baz", "1.1", :to_system => true
+    update_repo2 do
+      build_gem "baz", "1.0"
+      build_gem "baz", "1.1"
+    end
 
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("Gemfile", "source :rubygems\ngemspec")
@@ -169,7 +173,7 @@ RSpec.describe "bundle install from an existing gemspec" do
       s.add_dependency "platform_specific"
     end
 
-    install_gem "platform_specific-1.0-java"
+    system_gems "platform_specific-1.0-java", :path => :bundle_path, :keep_path => true
 
     install_gemfile! <<-G
       gemspec :path => '#{tmp.join("foo")}'
@@ -192,6 +196,7 @@ RSpec.describe "bundle install from an existing gemspec" do
   end
 
   it "allows the gemspec to activate other gems" do
+    ENV["BUNDLE_PATH__SYSTEM"] = "true"
     # see https://github.com/bundler/bundler/issues/5409
     #
     # issue was caused by rubygems having an unresolved gem during a require,
@@ -216,10 +221,10 @@ RSpec.describe "bundle install from an existing gemspec" do
       s.version = "1.0.0"
       s.add_dependency "bar", "= 1.0.0"
     end
-    build_gem "deps", :to_system => true do |s|
+    build_gem "deps", :to_bundle => true do |s|
       s.add_dependency "foo", "= 0.0.1"
     end
-    build_gem "foo", "0.0.1", :to_system => true
+    build_gem "foo", "0.0.1", :to_bundle => true
 
     install_gemfile <<-G
       source "file://#{gem_repo2}"
@@ -235,7 +240,7 @@ RSpec.describe "bundle install from an existing gemspec" do
       s.version = "1.0.0"
       s.add_dependency "bar", "= 1.0.0"
     end
-    build_repo2 do
+    update_repo2 do
       build_gem "deps" do |s|
         s.add_dependency "foo", "= 0.0.1"
       end

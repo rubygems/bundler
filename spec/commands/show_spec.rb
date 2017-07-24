@@ -31,12 +31,12 @@ RSpec.describe "bundle show" do
     end
 
     it "warns if path no longer exists on disk" do
-      FileUtils.rm_rf("#{system_gem_path}/gems/rails-2.3.2")
+      FileUtils.rm_rf(default_bundle_path("gems", "rails-2.3.2"))
 
       bundle "show rails"
 
-      expect(out).to match(/has been deleted/i)
-      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
+      expect(out).to match(/has been deleted/i).
+        and include(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
     it "prints the path to the running bundler" do

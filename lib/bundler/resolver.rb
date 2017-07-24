@@ -453,7 +453,7 @@ module Bundler
           message << if versions_with_platforms.any?
                        "The source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
                      else
-                       "The source does not contain any versions of '#{requirement}'"
+                       "The source does not contain any versions of '#{name}'"
                      end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \

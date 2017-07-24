@@ -191,8 +191,6 @@ RSpec.describe "bundle gem" do
   end
 
   it "generates a valid gemspec" do
-    system_gems ["rake-10.0.2"]
-
     in_app_root
     bundle "gem newgem --bin"
 
@@ -214,6 +212,7 @@ RSpec.describe "bundle gem" do
     end
 
     Dir.chdir(bundled_app("newgem")) do
+      system_gems ["rake-10.0.2"], :path => :bundle_path
       bundle! "exec rake build"
     end
 

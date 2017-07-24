@@ -56,7 +56,7 @@ RSpec.describe "bundle update" do
 
     it "floats on master when updating all gems that are pinned to the source even if you have child dependencies" do
       build_git "foo", :path => lib_path("foo")
-      build_gem "bar", :to_system => true do |s|
+      build_gem "bar", :to_bundle => true do |s|
         s.add_dependency "foo"
       end
 
@@ -117,7 +117,7 @@ RSpec.describe "bundle update" do
 
     describe "with submodules" do
       before :each do
-        build_gem "submodule", :to_system => true do |s|
+        build_gem "submodule", :to_bundle => true do |s|
           s.write "lib/submodule.rb", "puts 'GEM'"
         end
 
