@@ -26,8 +26,15 @@ RSpec.describe "bundle install with git sources" do
       expect(out).to eq("WIN")
     end
 
-    it "caches the git repo" do
-      expect(Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"].size).to eq(1)
+    it "caches the git repo", :bundler => "< 2" do
+      expect(Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"]).to have_attributes :size => 1
+    end
+
+    it "caches the git repo globally" do
+      simulate_new_machine
+      bundle! "config global_gem_cache true"
+      bundle! :install
+      expect(Dir["#{home}/.bundle/cache/git/foo-1.0-*"]).to have_attributes :size => 1
     end
 
     it "caches the evaluated gemspec" do
@@ -278,6 +285,8 @@ RSpec.describe "bundle install with git sources" do
         sys_exec!("git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1")
       end
 
+      bundle! "config global_gem_cache true"
+
       install_gemfile! <<-G
         git "#{lib_path("foo-1.0")}" do
           gem "foo"
@@ -287,7 +296,7 @@ RSpec.describe "bundle install with git sources" do
       # ensure we also git fetch after cloning
       bundle! :update, :all => bundle_update_requires_all?
 
-      Dir.chdir(Dir[default_bundle_path("cache/bundler/git/foo-*")].first) do
+      Dir.chdir(Dir[home(".bundle/cache/git/foo-*")].first) do
         sys_exec("git ls-remote .")
       end
 

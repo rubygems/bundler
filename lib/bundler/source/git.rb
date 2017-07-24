@@ -211,11 +211,11 @@ module Bundler
         @cache_path ||= begin
           git_scope = "#{base_name}-#{uri_hash}"
 
-          if Bundler.requires_sudo?
-            Bundler.user_bundle_path.join("cache/git", git_scope)
+          if Bundler.requires_sudo? || Bundler.feature_flag.global_gem_cache?
+            Bundler.user_cache
           else
-            Bundler.cache.join("git", git_scope)
-          end
+            Bundler.bundle_path.join("cache", "bundler")
+          end.join("git", git_scope)
         end
       end
 

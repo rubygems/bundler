@@ -142,7 +142,8 @@ RSpec.describe "bundle clean" do
     bundle :clean
 
     digest = Digest::SHA1.hexdigest(git_path.to_s)
-    expect(vendored_gems("cache/bundler/git/foo-1.0-#{digest}")).to exist
+    cache_path = Bundler::VERSION.start_with?("1.") ? vendored_gems("cache/bundler/git/foo-1.0-#{digest}") : home(".bundle/cache/git/foo-1.0-#{digest}")
+    expect(cache_path).to exist
   end
 
   it "removes unused git gems" do
@@ -671,7 +672,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
+    bundle! "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -680,8 +681,8 @@ RSpec.describe "bundle clean" do
       gem "weakling"
     G
 
-    bundle "config auto_install 1"
-    bundle :clean
+    bundle! "config auto_install 1"
+    bundle! :clean
     expect(out).to include("Installing weakling 0.0.3")
     should_have_gems "thin-1.0", "rack-1.0.0", "weakling-0.0.3"
     should_not_have_gems "foo-1.0"
