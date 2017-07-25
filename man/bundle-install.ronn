@@ -5,24 +5,24 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
 
 `bundle install` [--binstubs[=DIRECTORY]]
                  [--clean]
+                 [--deployment]
+                 [--force]
+                 [--frozen]
                  [--full-index]
                  [--gemfile=GEMFILE]
                  [--jobs=NUMBER]
                  [--local]
-                 [--deployment]
-                 [--force]
-                 [--frozen]
                  [--no-cache]
                  [--no-prune]
                  [--path PATH]
-                 [--system]
                  [--quiet]
                  [--retry=NUMBER]
                  [--shebang]
                  [--standalone[=GROUP[ GROUP...]]]
+                 [--system]
                  [--trust-policy=POLICY]
-                 [--without=GROUP[ GROUP...]]
                  [--with=GROUP[ GROUP...]]
+                 [--without=GROUP[ GROUP...]]
 
 ## DESCRIPTION
 
@@ -43,7 +43,7 @@ update process below under [CONSERVATIVE UPDATING][].
 
 ## OPTIONS
 
-To apply any of `--deployment`, `--path`, `--binstubs`, or `--without` every
+To apply any of `--binstubs`, `--deployment`, `--path`, or `--without` every
 time `bundle install` is run, use `bundle config` (see bundle-config(1)).
 
 * `--binstubs[=<directory>]`:
@@ -58,6 +58,19 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   On finishing the installation Bundler is going to remove any gems not present
   in the current Gemfile(5). Don't worry, gems currently in use will not be
   removed.
+
+* `--deployment`:
+  In [deployment mode][DEPLOYMENT MODE], Bundler will 'roll-out' the bundle for
+  production or CI use. Please check carefully if you want to have this option
+  enabled in your development environment.
+
+* `--force`:
+  Force download every gem, even if the required versions are already available
+  locally.
+
+* `--frozen`:
+  Do not allow the Gemfile.lock to be updated after this install. Exits
+  non-zero if there are going to be changes to the Gemfile.lock.
 
 * `--full-index`:
   Bundler will not call Rubygems' API endpoint (default) but download and cache
@@ -80,23 +93,6 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   gems already present in Rubygems' cache or in `vendor/cache`. Note that if a
   appropriate platform-specific gem exists on `rubygems.org` it will not be
   found.
-
-* `--deployment`:
-  In [deployment mode][DEPLOYMENT MODE], Bundler will 'roll-out' the bundle for
-  production or CI use. Please check carefully if you want to have this option
-  enabled in your development environment.
-
-* `--force`:
-  Force download every gem, even if the required versions are already available
-  locally.
-
-* `--frozen`:
-  Do not allow the Gemfile.lock to be updated after this install. Exits
-  non-zero if there are going to be changes to the Gemfile.lock.
-
-* `--system`:
-  Installs the gems specified in the bundle to the system's Rubygems location.
-  This overrides any previous configuration of `--path`.
 
 * `--no-cache`:
   Do not update the cache in `vendor/cache` with the newly bundled gems. This
@@ -134,22 +130,26 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   in the manner required. Using this option implicitly sets `path`, which is a
   [remembered option][REMEMBERED OPTIONS].
 
+* `--system`:
+  Installs the gems specified in the bundle to the system's Rubygems location.
+  This overrides any previous configuration of `--path`.
+
 * `--trust-policy=[<policy>]`:
   Apply the Rubygems security policy <policy>, where policy is one of
   `HighSecurity`, `MediumSecurity`, `LowSecurity`, `AlmostNoSecurity`, or
   `NoSecurity`. For more details, please see the Rubygems signing documentation
   linked below in [SEE ALSO][].
 
-* `--without=<list>`:
-  A space-separated list of groups referencing gems to skip during installation.
-  If a group is given that is in the remembered list of groups given
-  to --with, it is removed from that list.
-
 * `--with=<list>`:
   A space-separated list of groups referencing gems to install. If an
   optional group is given it is installed. If a group is given that is
   in the remembered list of groups given to --without, it is removed
   from that list.
+
+* `--without=<list>`:
+  A space-separated list of groups referencing gems to skip during installation.
+  If a group is given that is in the remembered list of groups given
+  to --with, it is removed from that list.
 
 ## DEPLOYMENT MODE
 
@@ -365,5 +365,5 @@ does not work, run [bundle update(1)][bundle-update].
 
 ## SEE ALSO
 
-* Gem install docs: http://guides.rubygems.org/rubygems-basics/#installing-gems
-* Rubygems signing docs: http://guides.rubygems.org/security/
+* [Gem install docs](http://guides.rubygems.org/rubygems-basics/#installing-gems)
+* [Rubygems signing docs](http://guides.rubygems.org/security/)
