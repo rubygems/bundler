@@ -169,6 +169,10 @@ module Bundler
 
     def requirement_satisfied_by?(requirement, activated, spec)
       return false unless requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
+      if spec.version.prerelease? && !requirement.prerelease? && search_for(requirement).any? {|sg| !sg.version.prerelease? }
+        vertex = activated.vertex_named(spec.name)
+        return false if vertex.requirements.none?(&:prerelease?)
+      end
       spec.activate_platform!(requirement.__platform) if !@platforms || @platforms.include?(requirement.__platform)
       true
     end
