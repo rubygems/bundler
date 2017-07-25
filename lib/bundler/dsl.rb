@@ -345,6 +345,9 @@ repo_name ||= user_name
       if name =~ /\s/
         raise GemfileError, %('#{name}' is not a valid gem name because it contains whitespace)
       end
+      if name.empty?
+        raise GemfileError, %(an empty gem name is not valid)
+      end
 
       normalize_hash(opts)
 

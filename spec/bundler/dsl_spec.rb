@@ -110,6 +110,11 @@ RSpec.describe Bundler::Dsl do
         to raise_error(Bundler::GemfileError, /is not a valid platform/)
     end
 
+    it "rejects empty gem name" do
+      expect { subject.gem("") }.
+        to raise_error(Bundler::GemfileError, /an empty gem name is not valid/)
+    end
+
     it "rejects with a leading space in the name" do
       expect { subject.gem(" foo") }.
         to raise_error(Bundler::GemfileError, /' foo' is not a valid gem name because it contains whitespace/)

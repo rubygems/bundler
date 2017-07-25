@@ -268,6 +268,11 @@ Style/IfInsideElse:
     - 'lib/bundler/cli/install.rb'
 
 # Offense count: 1
+Style/IfUnlessModifier:
+  Exclude:
+    - 'lib/bundler/dsl.rb'
+
+# Offense count: 1
 Style/IfUnlessModifierOfIfUnless:
   Exclude:
     - 'spec/support/helpers.rb'
