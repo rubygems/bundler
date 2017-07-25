@@ -70,19 +70,19 @@ module Bundler
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
       Bundler::CLI::Common.output_without_groups_message
 
-      if path = Bundler.settings[:path]
-        absolute_path = File.expand_path(path)
-        relative_path = absolute_path.sub(File.expand_path(".") + File::SEPARATOR, "." + File::SEPARATOR)
-        Bundler.ui.confirm "Bundled gems are installed into #{relative_path}."
-      else
+      if Bundler.use_system_gems?
         Bundler.ui.confirm "Use `bundle info [gemname]` to see where a bundled gem is installed."
+      else
+        absolute_path = File.expand_path(Bundler.configured_bundle_path.base_path)
+        relative_path = absolute_path.sub(File.expand_path(".") + File::SEPARATOR, "." + File::SEPARATOR)
+        Bundler.ui.confirm "Bundled gems are installed into `#{relative_path}`"
       end
 
       Bundler::CLI::Common.output_post_install_messages installer.post_install_messages
 
       warn_ambiguous_gems
 
-      if Bundler.settings[:clean] && Bundler.settings[:path]
+      if Bundler.settings[:clean] && !Bundler.use_system_gems?
         require "bundler/cli/clean"
         Bundler::CLI::Clean.new(options).run
       end
@@ -154,8 +154,8 @@ module Bundler
 
       check_for_group_conflicts_in_cli_options
 
-      Bundler.settings.set_command_option_if_given :with, options[:with]
-      Bundler.settings.set_command_option_if_given :without, options[:without]
+      Bundler.settings.set_command_option :with, nil if options[:with] == []
+      Bundler.settings.set_command_option :without, nil if options[:without] == []
 
       with = options.fetch(:with, [])
       with |= Bundler.settings[:with].map(&:to_s)
@@ -189,11 +189,13 @@ module Bundler
 
       Bundler.settings.set_command_option_if_given :clean, options["clean"]
 
-      Bundler.settings.set_command_option :without, options[:without] unless Bundler.settings[:without] == options[:without]
-      Bundler.settings.set_command_option :with,    options[:with]    unless Bundler.settings[:with]    == options[:with]
-
-      disable_shared_gems = Bundler.settings[:path] ? true : nil
-      Bundler.settings.set_command_option :disable_shared_gems, disable_shared_gems unless Bundler.settings[:disable_shared_gems] == disable_shared_gems
+      unless Bundler.settings[:without] == options[:without] && Bundler.settings[:with] == options[:with]
+        # need to nil them out first to get around validation for backwards compatibility
+        Bundler.settings.set_command_option :without, nil
+        Bundler.settings.set_command_option :with,    nil
+        Bundler.settings.set_command_option :without, options[:without] - options[:with]
+        Bundler.settings.set_command_option :with,    options[:with]
+      end
 
       options[:force] = options[:redownload]
     end

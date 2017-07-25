@@ -3,7 +3,7 @@
 RSpec.describe "bundle exec" do
   let(:system_gems_to_install) { %w[rack-1.0.0 rack-0.9.1] }
   before :each do
-    system_gems(system_gems_to_install)
+    system_gems(system_gems_to_install, :path => :bundle_path)
   end
 
   it "activates the correct gem" do

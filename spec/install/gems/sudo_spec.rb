@@ -4,6 +4,7 @@ RSpec.describe "when using sudo", :sudo => true do
   describe "and BUNDLE_PATH is writable" do
     context "but BUNDLE_PATH/build_info is not writable" do
       before do
+        bundle! "config path.system true"
         subdir = system_gem_path("cache")
         subdir.mkpath
         sudo "chmod u-w #{subdir}"
@@ -24,6 +25,7 @@ RSpec.describe "when using sudo", :sudo => true do
 
   describe "and GEM_HOME is owned by root" do
     before :each do
+      bundle! "config path.system true"
       chown_system_gems_to_root
     end
 
@@ -127,6 +129,7 @@ RSpec.describe "when using sudo", :sudo => true do
 
   describe "and GEM_HOME is not writable" do
     it "installs" do
+      bundle! "config path.system true"
       gem_home = tmp("sudo_gem_home")
       sudo "mkdir -p #{gem_home}"
       sudo "chmod ugo-w #{gem_home}"

@@ -26,7 +26,7 @@ RSpec.describe "bundle install with :allow_offline_install" do
 
   context "with cached data locally" do
     it "will install from the compact index" do
-      system_gems ["rack-1.0.0"]
+      system_gems ["rack-1.0.0"], :path => :bundle_path
 
       install_gemfile! <<-G, :artifice => "compact_index"
         source "http://testgemserver.local"

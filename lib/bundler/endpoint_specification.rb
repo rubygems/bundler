@@ -10,6 +10,7 @@ module Bundler
     attr_accessor :source, :remote, :dependencies
 
     def initialize(name, version, platform, dependencies, metadata = nil)
+      super()
       @name         = name
       @version      = Gem::Version.create version
       @platform     = platform

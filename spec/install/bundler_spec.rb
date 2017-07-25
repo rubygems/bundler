@@ -125,15 +125,29 @@ RSpec.describe "bundle install" do
       expect(last_command.bundler_err).to include(nice_error)
     end
 
-    it "can install dependencies with newer bundler version" do
-      install_gemfile <<-G
+    it "can install dependencies with newer bundler version with system gems" do
+      bundle! "config path.system true"
+      install_gemfile! <<-G
         source "file://#{gem_repo2}"
         gem "rails", "3.0"
       G
 
       simulate_bundler_version "99999999.99.1"
 
-      bundle "check"
+      bundle! "check"
+      expect(out).to include("The Gemfile's dependencies are satisfied")
+    end
+
+    it "can install dependencies with newer bundler version with a local path" do
+      bundle! "config path .bundle"
+      install_gemfile! <<-G
+        source "file://#{gem_repo2}"
+        gem "rails", "3.0"
+      G
+
+      simulate_bundler_version "99999999.99.1"
+
+      bundle! "check"
       expect(out).to include("The Gemfile's dependencies are satisfied")
     end
 

@@ -314,7 +314,7 @@ RSpec.describe "Bundler.require" do
 
     describe "a gem with different requires for different envs" do
       before(:each) do
-        build_gem "multi_gem", :to_system => true do |s|
+        build_gem "multi_gem", :to_bundle => true do |s|
           s.write "lib/one.rb", "puts 'ONE'"
           s.write "lib/two.rb", "puts 'TWO'"
         end
@@ -355,7 +355,7 @@ RSpec.describe "Bundler.require" do
 
     describe "with busted gems" do
       it "should be busted" do
-        build_gem "busted_require", :to_system => true do |s|
+        build_gem "busted_require", :to_bundle => true do |s|
           s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
         end
 

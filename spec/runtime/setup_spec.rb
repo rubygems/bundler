@@ -116,7 +116,7 @@ RSpec.describe "Bundler.setup" do
         tmp("rubygems/lib").to_s,
         root.join("../lib").expand_path.to_s,
       ] - without_bundler_load_path
-      lp.map! {|p| p.sub(/^#{system_gem_path}/, "") }
+      lp.map! {|p| p.sub(/^#{Regexp.union system_gem_path.to_s, default_bundle_path.to_s}/i, "") }
     end
 
     it "puts loaded gems after -I and RUBYLIB" do
@@ -787,7 +787,7 @@ end
         G
 
         run! "puts ENV['MANPATH']"
-        expect(out).to eq("#{system_gem_path("gems/with_man-1.0/man")}:/foo")
+        expect(out).to eq("#{default_bundle_path("gems/with_man-1.0/man")}:/foo")
       end
     end
 
@@ -801,7 +801,7 @@ end
         G
 
         run! "puts ENV['MANPATH']"
-        expect(out).to eq(system_gem_path("gems/with_man-1.0/man").to_s)
+        expect(out).to eq(default_bundle_path("gems/with_man-1.0/man").to_s)
       end
     end
   end
@@ -995,6 +995,7 @@ end
 
   describe "with system gems in the bundle" do
     before :each do
+      bundle! "config path.system true"
       system_gems "rack-1.0.0"
 
       install_gemfile <<-G
@@ -1008,7 +1009,6 @@ end
       run "puts Gem.path"
       paths = out.split("\n")
       expect(paths).to include(system_gem_path.to_s)
-      expect(paths).to include(default_bundle_path.to_s)
     end
   end
 
@@ -1309,6 +1309,8 @@ end
             build_gem g, "999999"
           end
         end
+
+        default_gems.reject! {|g| exemptions.include?(g) }
 
         install_gemfile! <<-G
           source "file:#{gem_repo4}"

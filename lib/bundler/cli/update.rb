@@ -62,7 +62,7 @@ module Bundler
       installer = Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.app_cache.exist?
 
-      if Bundler.settings[:clean] && Bundler.settings[:path]
+      if Bundler.settings[:clean] && !Bundler.use_system_gems?
         require "bundler/cli/clean"
         Bundler::CLI::Clean.new(options).run
       end

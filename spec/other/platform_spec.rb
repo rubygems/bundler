@@ -595,7 +595,7 @@ G
     end
 
     it "prints path if ruby version is correct" do
-      gemfile <<-G
+      install_gemfile! <<-G
         source "file://#{gem_repo1}"
         gem "rails"
 
@@ -608,7 +608,7 @@ G
 
     it "prints path if ruby version is correct for any engine" do
       simulate_ruby_engine "jruby" do
-        gemfile <<-G
+        install_gemfile! <<-G
           source "file://#{gem_repo1}"
           gem "rails"
 
@@ -676,11 +676,10 @@ G
 
   context "bundle cache" do
     before do
-      gemfile <<-G
+      install_gemfile <<-G
+        source "file:#{gem_repo1}"
         gem 'rack'
       G
-
-      system_gems "rack-1.0.0"
     end
 
     it "copies the .gem file to vendor/cache when ruby version matches" do
@@ -696,13 +695,14 @@ G
 
     it "copies the .gem file to vendor/cache when ruby version matches for any engine" do
       simulate_ruby_engine "jruby" do
-        gemfile <<-G
+        install_gemfile! <<-G
+          source "file:#{gem_repo1}"
           gem 'rack'
 
           #{ruby_version_correct_engineless}
         G
 
-        bundle :cache
+        bundle! :cache
         expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
       end
     end
@@ -757,11 +757,10 @@ G
 
   context "bundle pack" do
     before do
-      gemfile <<-G
+      install_gemfile! <<-G
+        source "file:#{gem_repo1}"
         gem 'rack'
       G
-
-      system_gems "rack-1.0.0"
     end
 
     it "copies the .gem file to vendor/cache when ruby version matches" do
@@ -777,7 +776,8 @@ G
 
     it "copies the .gem file to vendor/cache when ruby version matches any engine" do
       simulate_ruby_engine "jruby" do
-        gemfile <<-G
+        install_gemfile! <<-G
+          source "file:#{gem_repo1}"
           gem 'rack'
 
           #{ruby_version_correct_engineless}
@@ -839,7 +839,7 @@ G
   context "bundle exec" do
     before do
       ENV["BUNDLER_FORCE_TTY"] = "true"
-      system_gems "rack-1.0.0", "rack-0.9.1"
+      system_gems "rack-1.0.0", "rack-0.9.1", :path => :bundle_path
     end
 
     it "activates the correct gem when ruby version matches" do
@@ -855,6 +855,7 @@ G
 
     it "activates the correct gem when ruby version matches any engine" do
       simulate_ruby_engine "jruby" do
+        system_gems "rack-1.0.0", "rack-0.9.1", :path => :bundle_path
         gemfile <<-G
           gem "rack", "0.9.1"
 
@@ -1179,6 +1180,7 @@ G
 
     it "returns list of outdated gems when the ruby version matches for any engine" do
       simulate_ruby_engine "jruby" do
+        bundle! :install
         update_repo2 do
           build_gem "activesupport", "3.0"
           update_git "foo", :path => lib_path("foo")

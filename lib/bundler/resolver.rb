@@ -28,7 +28,7 @@ module Bundler
           trees.reject! {|t| !maximal.include?(t.last) } if maximal
 
           trees = trees.sort_by {|t| t.flatten.map(&:to_s) }
-          trees.uniq! {|t| t.flatten.map {|dep| [dep.name, dep.requirement] } }
+          trees.uniq! {|t| t.flatten.map {|dep| [dep.name, dep.requirement.to_s] } }
 
           o << trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
             t = String.new
@@ -453,7 +453,7 @@ module Bundler
           message << if versions_with_platforms.any?
                        "The source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
                      else
-                       "The source does not contain any versions of '#{requirement}'"
+                       "The source does not contain any versions of '#{name}'"
                      end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \

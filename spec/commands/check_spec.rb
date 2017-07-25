@@ -137,8 +137,6 @@ RSpec.describe "bundle check" do
   end
 
   it "ignores missing gems restricted to other platforms" do
-    system_gems "rack-1.0.0"
-
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
@@ -146,6 +144,8 @@ RSpec.describe "bundle check" do
         gem "activesupport"
       end
     G
+
+    system_gems "rack-1.0.0", :path => :bundle_path
 
     lockfile <<-G
       GEM
@@ -168,8 +168,6 @@ RSpec.describe "bundle check" do
   end
 
   it "works with env conditionals" do
-    system_gems "rack-1.0.0"
-
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
@@ -177,6 +175,8 @@ RSpec.describe "bundle check" do
         gem "activesupport"
       end
     G
+
+    system_gems "rack-1.0.0", :path => :bundle_path
 
     lockfile <<-G
       GEM

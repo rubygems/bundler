@@ -830,7 +830,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         and include("The checksum for the downloaded `rack-1.0.0.gem` does not match the checksum given by the server.").
         and include("This means the contents of the downloaded gem is different from what was uploaded to the server, and could be a potential security issue.").
         and include("To resolve this issue:").
-        and include("1. delete the downloaded gem located at: `#{system_gem_path}/gems/rack-1.0.0/rack-1.0.0.gem`").
+        and include("1. delete the downloaded gem located at: `#{default_bundle_path}/gems/rack-1.0.0/rack-1.0.0.gem`").
         and include("2. run `bundle install`").
         and include("If you wish to continue installing the downloaded gem, and are certain it does not pose a security issue despite the mismatching checksum, do the following:").
         and include("1. run `bundle config disable_checksum_validation true` to turn off checksum verification").

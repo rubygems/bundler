@@ -377,7 +377,6 @@ module Bundler
         return false unless spec.remote
 
         spec.fetch_platform
-        Bundler.ui.confirm("Fetching #{version_message(spec)}")
 
         download_path = requires_sudo? ? Bundler.tmp(spec.full_name) : rubygems_dir
         gem_path = "#{rubygems_dir}/cache/#{spec.full_name}.gem"
@@ -443,6 +442,7 @@ module Bundler
           end
         else
           uri = spec.remote.uri
+          Bundler.ui.confirm("Fetching #{version_message(spec)}")
           Bundler.rubygems.download_gem(spec, uri, download_path)
           cache_globally(spec, local_path)
         end

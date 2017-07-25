@@ -141,6 +141,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
    `bundle install`.
 * `console` (`BUNDLE_CONSOLE`):
    The console that `bundle console` starts. Defaults to `irb`.
+* `default_install_uses_path` (`BUNDLE_DEFAULT_INSTALL_USES_PATH`):
+   Whether a `bundle install` without an explicit `--path` argument defaults
+   to installing gems in `.bundle`.
 * `deployment` (`BUNDLE_DEPLOYMENT`):
    Disallow changes to the `Gemfile`. When the `Gemfile` is changed and the
    lockfile has not been updated, running Bundler commands will be blocked.
@@ -205,6 +208,8 @@ learn more about their operation in [bundle install(1)][bundle-install].
    of `$GEM_HOME` or `$GEM_PATH` values. Bundle gems not found in this location
    will be installed by `bundle install`. Defaults to `Gem.dir`. When --deployment
    is used, defaults to vendor/bundle.
+* `path.system` (`BUNDLE_PATH__SYSTEM`):
+   Whether Bundler will install gems into the default system path (`Gem.dir`).
 * `plugins` (`BUNDLE_PLUGINS`):
    Enable Bundler's experimental plugin system.
 * `prefer_gems_rb` (`BUNDLE_PREFER_GEMS_RB`)

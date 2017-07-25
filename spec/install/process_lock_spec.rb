@@ -2,6 +2,8 @@
 
 RSpec.describe "process lock spec" do
   describe "when an install operation is already holding a process lock" do
+    before { FileUtils.mkdir_p(default_bundle_path) }
+
     it "will not run a second concurrent bundle install until the lock is released" do
       thread = Thread.new do
         Bundler::ProcessLock.lock(default_bundle_path) do

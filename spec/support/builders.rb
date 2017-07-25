@@ -718,18 +718,21 @@ module Spec
     class GemBuilder < LibBuilder
       def _build(opts)
         lib_path = super(opts.merge(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default]))
+        destination = opts[:path] || _default_path
         Dir.chdir(lib_path) do
-          destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)
 
           @spec.authors = ["that guy"] if !@spec.authors || @spec.authors.empty?
 
           Bundler.rubygems.build(@spec, opts[:skip_validation])
-          if opts[:to_system]
-            `gem install --ignore-dependencies --no-ri --no-rdoc #{@spec.full_name}.gem`
-          else
-            FileUtils.mv("#{@spec.full_name}.gem", opts[:path] || _default_path)
-          end
+        end
+        gem_path = File.expand_path("#{@spec.full_name}.gem", lib_path)
+        if opts[:to_system]
+          @context.system_gems gem_path, :keep_path => true
+        elsif opts[:to_bundle]
+          @context.system_gems gem_path, :path => :bundle_path, :keep_path => true
+        else
+          FileUtils.mv(gem_path, destination)
         end
       end
 

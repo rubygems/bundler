@@ -394,7 +394,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
     context "with an existing lockfile" do
       before do
-        system_gems "rack-0.9.1", "rack-1.0.0"
+        system_gems "rack-0.9.1", "rack-1.0.0", :path => :bundle_path
 
         lockfile <<-L
           GEM

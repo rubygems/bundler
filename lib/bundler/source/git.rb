@@ -172,13 +172,11 @@ module Bundler
 
         print_using_message "Using #{version_message(spec)} from #{self}"
 
-        if requires_checkout? && !@copied && !force
+        if (requires_checkout? && !@copied) || force
           Bundler.ui.debug "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
           serialize_gemspecs_in(install_path)
           @copied = true
-        elsif force
-          git_proxy.copy_to(install_path, submodules)
         end
 
         generate_bin_options = { :disable_extensions => !Bundler.rubygems.spec_missing_extensions?(spec), :build_args => options[:build_args] }

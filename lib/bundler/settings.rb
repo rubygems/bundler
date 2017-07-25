@@ -6,6 +6,7 @@ module Bundler
   class Settings
     autoload :Mirror,  "bundler/mirror"
     autoload :Mirrors, "bundler/mirror"
+    autoload :Validator, "bundler/settings/validator"
 
     BOOL_KEYS = %w[
       allow_bundler_dependency_conflicts
@@ -15,6 +16,7 @@ module Bundler
       cache_all_platforms
       cache_command_is_package
       console_command
+      default_install_uses_path
       deployment
       deployment_means_frozen
       disable_checksum_validation
@@ -37,6 +39,7 @@ module Bundler
       no_install
       no_prune
       only_update_to_newer_versions
+      path.system
       plugins
       prefer_gems_rb
       setup_makes_kernel_gem_public
@@ -205,21 +208,56 @@ module Bundler
       locations
     end
 
-    # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
+    # for legacy reasons, the ruby scope isnt appended when the setting comes from ENV or the global config,
+    # nor do we respect :disable_shared_gems
     def path
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
-      return path if path && !@local_config.key?(key)
+      if path && !@temporary.key?(key) && !@local_config.key?(key)
+        return Path.new(path, false, false, false)
+      end
 
-      if path = self[:path]
-        "#{path}/#{Bundler.ruby_scope}"
-      else
-        Bundler.rubygems.gem_dir
+      system_path = self["path.system"] || (self[:disable_shared_gems] == false)
+      Path.new(self[:path], true, system_path, Bundler.feature_flag.default_install_uses_path?)
+    end
+
+    Path = Struct.new(:explicit_path, :append_ruby_scope, :system_path, :default_install_uses_path) do
+      def path
+        path = base_path
+        path = File.join(path, Bundler.ruby_scope) if append_ruby_scope && !use_system_gems?
+        path
+      end
+
+      def use_system_gems?
+        return true if system_path
+        return false if explicit_path
+        !default_install_uses_path
+      end
+
+      def base_path
+        path = explicit_path
+        path ||= ".bundle" unless use_system_gems?
+        path ||= Bundler.rubygems.gem_dir
+        path
+      end
+
+      def validate!
+        return unless explicit_path && system_path
+        path = Bundler.settings.pretty_values_for(:path)
+        path.unshift(nil, "path:") unless path.empty?
+        system_path = Bundler.settings.pretty_values_for("path.system")
+        system_path.unshift(nil, "path.system:") unless system_path.empty?
+        disable_shared_gems = Bundler.settings.pretty_values_for(:disable_shared_gems)
+        disable_shared_gems.unshift(nil, "disable_shared_gems:") unless disable_shared_gems.empty?
+        raise InvalidOption,
+          "Using a custom path while using system gems is unsupported.\n#{path.join("\n")}\n#{system_path.join("\n")}\n#{disable_shared_gems.join("\n")}"
       end
     end
 
     def allow_sudo?
-      !@local_config.key?(key_for(:path))
+      key = key_for(:path)
+      path_configured = @temporary.key?(key) || @local_config.key?(key)
+      !path_configured
     end
 
     def ignore_config?
@@ -230,13 +268,22 @@ module Bundler
       @app_cache_path ||= self[:cache_path] || "vendor/cache"
     end
 
-  private
+    def validate!
+      all.each do |raw_key|
+        [@local_config, ENV, @global_config].each do |settings|
+          value = converted_value(settings[key_for(raw_key)], raw_key)
+          Validator.validate!(raw_key, value, settings.to_hash.dup)
+        end
+      end
+    end
 
     def key_for(key)
       key = Settings.normalize_uri(key).to_s if key.is_a?(String) && /https?:/ =~ key
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end
+
+  private
 
     def parent_setting_for(name)
       split_specific_setting_for(name)[0]
@@ -282,24 +329,25 @@ module Bundler
       array.join(":").tr(" ", ":")
     end
 
-    def set_key(key, value, hash, file)
-      value = array_to_s(value) if is_array(key)
+    def set_key(raw_key, value, hash, file)
+      raw_key = raw_key.to_s
+      value = array_to_s(value) if is_array(raw_key)
 
-      key = key_for(key)
+      key = key_for(raw_key)
 
-      unless hash[key] == value
-        hash[key] = value
-        hash.delete(key) if value.nil?
-        if file
-          SharedHelpers.filesystem_access(file) do |p|
-            FileUtils.mkdir_p(p.dirname)
-            require "bundler/yaml_serializer"
-            p.open("w") {|f| f.write(YAMLSerializer.dump(hash)) }
-          end
-        end
+      return if hash[key] == value
+
+      hash[key] = value
+      hash.delete(key) if value.nil?
+
+      Validator.validate!(raw_key, converted_value(value, raw_key), hash)
+
+      return unless file
+      SharedHelpers.filesystem_access(file) do |p|
+        FileUtils.mkdir_p(p.dirname)
+        require "bundler/yaml_serializer"
+        p.open("w") {|f| f.write(YAMLSerializer.dump(hash)) }
       end
-
-      value
     end
 
     def converted_value(value, key)

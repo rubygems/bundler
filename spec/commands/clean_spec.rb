@@ -275,6 +275,7 @@ RSpec.describe "bundle clean" do
   end
 
   it "displays an error when used without --path" do
+    bundle! "config path.system true"
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -318,24 +319,27 @@ RSpec.describe "bundle clean" do
   end
 
   it "does not call clean automatically when using system gems" do
-    gemfile <<-G
+    bundle! "config path.system true"
+
+    bundle! :config
+
+    install_gemfile! <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "rack"
     G
-    bundle :install
 
-    gemfile <<-G
+    bundle! "info thin"
+
+    install_gemfile! <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
-    bundle :install
 
-    sys_exec "gem list"
-    expect(out).to include("rack (1.0.0)")
-    expect(out).to include("thin (1.0)")
+    sys_exec! "gem list"
+    expect(out).to include("rack (1.0.0)").and include("thin (1.0)")
   end
 
   it "--clean should override the bundle setting on install", :bundler => "< 2" do
@@ -416,6 +420,8 @@ RSpec.describe "bundle clean" do
   end
 
   it "does not clean on bundle update when using --system" do
+    bundle! "config path.system true"
+
     build_repo2
 
     gemfile <<-G
@@ -435,6 +441,8 @@ RSpec.describe "bundle clean" do
   end
 
   it "cleans system gems when --force is used" do
+    bundle! "config path.system true"
+
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -458,8 +466,10 @@ RSpec.describe "bundle clean" do
   end
 
   describe "when missing permissions" do
+    before { ENV["BUNDLE_PATH__SYSTEM"] = "true" }
+    let(:system_cache_path) { system_gem_path("cache") }
     after do
-      FileUtils.chmod(0o755, default_bundle_path("cache"))
+      FileUtils.chmod(0o755, system_cache_path)
     end
     it "returns a helpful error message" do
       gemfile <<-G
@@ -477,7 +487,6 @@ RSpec.describe "bundle clean" do
       G
       bundle :install
 
-      system_cache_path = default_bundle_path("cache")
       FileUtils.chmod(0o500, system_cache_path)
 
       bundle :clean, :force => true
@@ -522,6 +531,8 @@ RSpec.describe "bundle clean" do
   end
 
   it "when using --force on system gems, it doesn't remove binaries" do
+    bundle! "config path.system true"
+
     build_repo2
     update_repo2 do
       build_gem "bindir" do |s|

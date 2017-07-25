@@ -155,7 +155,7 @@ module Bundler
       # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = Bundler.bin_path
       unless path = Bundler.settings[:path]
-        raise "Can't standalone without a path set"
+        raise "Can't standalone without an explicit path set"
       end
       standalone_path = standalone_path = Bundler.root.join(path).relative_path_from(bin_path)
       template = File.read(File.expand_path("../templates/Executable.standalone", __FILE__))
@@ -260,7 +260,7 @@ module Bundler
         Bundler.mkdir_p(p)
       end unless Bundler.bundle_path.exist?
     rescue Errno::EEXIST
-      raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " \
+      raise PathError, "Could not install to path `#{Bundler.bundle_path}` " \
         "because a file already exists at that path. Either remove or rename the file so the directory can be created."
     end
 

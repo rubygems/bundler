@@ -24,7 +24,7 @@ RSpec.describe "bundle install" do
 
       Dir.chdir(dir) do
         bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
-        expect(out).to include("installed into ./vendor/bundle")
+        expect(out).to include("installed into `./vendor/bundle`")
       end
 
       dir.rmtree
@@ -32,7 +32,7 @@ RSpec.describe "bundle install" do
 
     it "prints a warning to let the user know what has happened with bundle --path vendor/bundle" do
       bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
-      expect(out).to include("gems are installed into ./vendor")
+      expect(out).to include("gems are installed into `./vendor/bundle`")
     end
 
     it "disallows --path vendor/bundle --system", :bundler => "< 2" do
