@@ -245,7 +245,7 @@ Bundler could not find compatible versions for gem "a":
         # the strict option removes the version required to match, so a version conflict results
         expect do
           should_conservative_resolve_and_include [:patch, :strict], [], %w[foo-1.4.3 bar-2.1.1]
-        end.to raise_error Bundler::VersionConflict, /#{Regexp.escape("Could not find gem 'bar (~> 2.1.0)'")}/
+        end.to raise_error Bundler::VersionConflict, a_string_including("Could not find gem 'bar (~> 2.1.0)'")
       end
 
       it "could revert to a previous version level minor" do
@@ -256,7 +256,7 @@ Bundler could not find compatible versions for gem "a":
         # the strict option removes the version required to match, so a version conflict results
         expect do
           should_conservative_resolve_and_include [:minor, :strict], [], %w[foo-1.4.3 bar-2.1.1]
-        end.to raise_error Bundler::VersionConflict, /#{Regexp.escape("Could not find gem 'bar (~> 2.0.0)'")}/
+        end.to raise_error Bundler::VersionConflict, a_string_including("Could not find gem 'bar (~> 2.0.0)'")
       end
     end
   end
