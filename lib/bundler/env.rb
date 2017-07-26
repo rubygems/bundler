@@ -31,9 +31,18 @@ module Bundler
       return out unless SharedHelpers.in_bundle?
 
       if print_gemfile
+        gemfiles = [Bundler.default_gemfile]
+        begin
+          gemfiles = Bundler.definition.gemfiles
+        rescue GemfileNotFound
+          nil
+        end
+
         out << "\n## Gemfile\n"
-        out << "\n### #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}\n\n"
-        out << "```ruby\n" << read_file(Bundler.default_gemfile).chomp << "\n```\n"
+        gemfiles.each do |gemfile|
+          out << "\n### #{Pathname.new(gemfile).relative_path_from(SharedHelpers.pwd)}\n\n"
+          out << "```ruby\n" << read_file(gemfile).chomp << "\n```\n"
+        end
 
         out << "\n### #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}\n\n"
         out << "```\n" << read_file(Bundler.default_lockfile).chomp << "\n```\n"
