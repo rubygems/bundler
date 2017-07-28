@@ -67,6 +67,7 @@ configuration file using the following names:
   on this option. If this option is unspecified, an interactive prompt will be
   displayed and the answer will be saved in Bundler's global config for future
   `bundle gem` use.
+  If no option is specified, the default testing framework is RSpec.
 
 * `-e`, `--edit[=EDITOR]`:
   Open the resulting GEM_NAME.gemspec in EDITOR, or the default editor if not

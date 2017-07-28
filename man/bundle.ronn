@@ -18,7 +18,10 @@ started, and Gemfile(5) for more information on the `Gemfile` format.
 * `--no-color`:
   Print all output without color
 
-* `--verbose`:
+* `--retry`, `-r`:
+  Specify the number of times you wish to attempt network commands
+
+* `--verbose`, `-V`:
   Print out additional logging information
 
 ## BUNDLE COMMANDS
