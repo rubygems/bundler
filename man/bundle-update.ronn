@@ -28,7 +28,7 @@ gem.
 
 ## OPTIONS
 
-* `--group=<name>`:
+* `--group=<name>`, `-g=[<name>]`:
   Only update the gems in the specified group. For instance, you can update all gems
   in the development group with `bundle update --group development`. You can also
   call `bundle update rails --group test` to update the rails gem and all gems in
@@ -51,7 +51,7 @@ gem.
 * `--full-index`:
   Fall back to using the single-file index of all gems.
 
-* `--jobs=[<number>]`:
+* `--jobs=[<number>]`, `-j[<number>]`:
   Specify the number of jobs to run in parallel. The default is `1`.
 
 * `--retry=[<number>]`:

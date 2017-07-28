@@ -84,7 +84,7 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   root and will try to find `Gemfile.lock` and `vendor/cache` relative
   to this location.
 
-* `--jobs=[<number>]`:
+* `--jobs=[<number>]`, `-j[<number>]`:
   The maximum number of parallel download and install jobs. The default
   is `1`.
 

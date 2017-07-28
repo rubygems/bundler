@@ -37,7 +37,7 @@ are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
 * `--strict`:
   Only list newer versions allowed by your Gemfile requirements.
 
-* `--parseable`:
+* `--parseable`, `--porcelain`:
    Use minimal formatting for more parseable output.
 
 * `--group`:
