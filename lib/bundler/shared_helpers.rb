@@ -203,6 +203,14 @@ module Bundler
 
   private
 
+    def validate_bundle_path
+      if Bundler.bundle_path.to_s.match(File::PATH_SEPARATOR)
+        puts 'WARNING: Your bundle path contains a ":", which can cause problems.'
+        puts 'Please change your bundle path path to not include ":".'
+        exit(1)
+      end
+    end
+
     def find_gemfile(order_matters = false)
       given = ENV["BUNDLE_GEMFILE"]
       return given if given && !given.empty?
@@ -270,6 +278,7 @@ module Bundler
     end
 
     def set_path
+      validate_bundle_path
       paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
       paths.unshift "#{Bundler.bundle_path}/bin"
       Bundler::SharedHelpers.set_env "PATH", paths.uniq.join(File::PATH_SEPARATOR)
