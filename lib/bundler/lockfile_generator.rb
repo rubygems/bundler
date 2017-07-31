@@ -19,6 +19,7 @@ module Bundler
       add_sources
       add_platforms
       add_dependencies
+      add_section("OPTIONAL GROUPS", definition.optional_groups)
       add_locked_ruby_version
       add_bundled_with
 
