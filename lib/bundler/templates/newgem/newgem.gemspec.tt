@@ -1,6 +1,7 @@
 <%- if RUBY_VERSION < "2.0.0" -%>
 # coding: utf-8
 <%- end -%>
+
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "<%= config[:namespaced_path] %>/version"
