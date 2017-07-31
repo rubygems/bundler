@@ -123,12 +123,6 @@ module Bundler
       end
     end
 
-    def to_lock
-      out = super
-      out << "!" if source
-      out << "\n"
-    end
-
     def specific?
       super
     rescue NoMethodError

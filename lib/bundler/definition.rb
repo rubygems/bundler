@@ -16,6 +16,7 @@ module Bundler
       :platforms,
       :requires,
       :ruby_version,
+      :optional_groups,
       :lockfile,
       :gemfiles
     )
@@ -32,6 +33,13 @@ module Bundler
       gemfile = Pathname.new(gemfile).expand_path
 
       raise GemfileNotFound, "#{gemfile} not found" unless gemfile.file?
+
+      if lockfile && File.exist?(lockfile)
+        # parsed_lockfile = LockfileParser.new(Bundler.read_file(lockfile))
+        # use_lockfile = parsed_lockfile.gemfile_checksums.reduce do |file, checksum|
+        #   p file, checksum
+        # end
+      end
 
       Dsl.evaluate(gemfile, lockfile, unlock)
     end

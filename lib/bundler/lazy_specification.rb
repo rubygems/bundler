@@ -62,7 +62,7 @@ module Bundler
 
       dependencies.sort_by(&:to_s).uniq.each do |dep|
         next if dep.type == :development
-        out << "    #{dep.to_lock}\n"
+        out << "    #{dep.to_lock(true)}\n"
       end
 
       out
