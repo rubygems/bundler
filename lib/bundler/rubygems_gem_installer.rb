@@ -18,6 +18,28 @@ module Bundler
       super && validate_bundler_checksum(options[:bundler_expected_checksum])
     end
 
+    def build_extensions
+      extension_cache_path = options[:bundler_extension_cache_path]
+      return super unless extension_cache_path
+
+      extension_dir = Pathname.new(spec.extension_dir)
+      build_complete = SharedHelpers.filesystem_access(extension_cache_path.join("gem.build_complete"), :read, &:file?)
+      if build_complete && !options[:force]
+        SharedHelpers.filesystem_access(extension_dir.parent, &:mkpath)
+        SharedHelpers.filesystem_access(extension_cache_path) do
+          FileUtils.cp_r extension_cache_path, spec.extension_dir
+        end
+      else
+        super
+        if extension_dir.directory? # not made for gems without extensions
+          SharedHelpers.filesystem_access(extension_cache_path.parent, &:mkpath)
+          SharedHelpers.filesystem_access(extension_cache_path) do
+            FileUtils.cp_r extension_dir, extension_cache_path
+          end
+        end
+      end
+    end
+
   private
 
     def validate_bundler_checksum(checksum)
