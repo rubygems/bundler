@@ -423,7 +423,12 @@ module Bundler
       if ARGV.include?("version")
         build_info = " (#{BuildMetadata.built_at} commit #{BuildMetadata.git_commit_sha})"
       end
-      Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
+
+      if Bundler.feature_flag.print_only_version_number?
+        Bundler.ui.info "#{Bundler::VERSION}#{build_info}"
+      else
+        Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
+      end
     end
     map %w[-v --version] => :version
 
