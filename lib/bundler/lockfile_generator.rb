@@ -29,6 +29,10 @@ module Bundler
 
   private
 
+    def static?
+      definition.static_gemfile?
+    end
+
     def add_sources
       definition.send(:sources).lock_sources.each_with_index do |source, idx|
         out << "\n" unless idx.zero?
@@ -62,6 +66,7 @@ module Bundler
       handled = []
       definition.dependencies.sort_by(&:to_s).each do |dep|
         next if handled.include?(dep.name)
+        handled << dep.name
         out << "  #{dep.name}"
         unless dep.requirement.none?
           reqs = dep.requirement.requirements.map {|o, v| "#{o} #{v}" }.sort.reverse
@@ -69,16 +74,18 @@ module Bundler
         end
         out << "!" if dep.source
         out << "\n"
+        next unless static?
         add_value(dep.options_to_lock, 4)
-        handled << dep.name
       end
     end
 
     def add_optional_groups
+      return unless static?
       add_section("OPTIONAL GROUPS", definition.optional_groups)
     end
 
     def add_gemfiles
+      return unless static?
       return unless SharedHelpers.md5_available?
       gemfiles = {}
       definition.gemfiles.each do |file|

@@ -21,6 +21,12 @@ module Bundler
       :gemfiles
     )
 
+    attr_writer :static_gemfile
+
+    def static_gemfile?
+      @static_gemfile
+    end
+
     # Given a gemfile and lockfile creates a Bundler definition
     #
     # @param gemfile [Pathname] Path to Gemfile
@@ -49,11 +55,12 @@ module Bundler
           aggregate = sources.delete(parsed_lockfile.aggregate_source)
           sources = SourceList.from_sources(sources)
           aggregate.remotes.each {|r| sources.global_rubygems_source = r } if aggregate
-          return Definition.new(parsed_lockfile, parsed_lockfile.dependencies.values, sources, {}, parsed_lockfile.ruby_version, parsed_lockfile.optional_groups, parsed_lockfile.gemfiles.keys)
+          definition = Definition.new(parsed_lockfile, parsed_lockfile.dependencies.values, sources, {}, parsed_lockfile.ruby_version, parsed_lockfile.optional_groups, parsed_lockfile.gemfiles.keys)
+          definition.static_gemfile = true
         end
       end
 
-      Dsl.evaluate(gemfile, parsed_lockfile, unlock)
+      definition || Dsl.evaluate(gemfile, parsed_lockfile, unlock)
     end
 
     #
@@ -85,6 +92,7 @@ module Bundler
       @specs           = nil
       @ruby_version    = ruby_version
       @gemfiles        = gemfiles
+      @static_gemfile  = false
 
       @locked_gems            = lockfile
       @lockfile               = lockfile && lockfile.lockfile
