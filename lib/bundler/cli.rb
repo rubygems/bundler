@@ -677,8 +677,17 @@ module Bundler
 
       current = Gem::Version.new(VERSION)
       return if current >= latest
+      latest_installed = Bundler.rubygems.find_name("bundler").map(&:version).max
 
-      Bundler.ui.warn "The latest bundler is #{latest}, but you are currently running #{current}.\nTo update, run `gem install bundler#{" --pre" if latest.prerelease?}`"
+      installation = "To install the latest version, run `gem install bundler#{" --pre" if latest.prerelease?}`"
+      if latest_installed && latest_installed > current
+        suggestion = "To update to the most recent installed version, run `bundle update --bundler`"
+        suggestion = "#{installation}\n#{suggestion}" if latest_installed > latest
+      else
+        suggestion = installation
+      end
+
+      Bundler.ui.warn "The latest bundler is #{latest}, but you are currently running #{current}.\n#{suggestion}"
     rescue
       nil
     end
