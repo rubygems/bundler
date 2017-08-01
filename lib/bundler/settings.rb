@@ -42,6 +42,7 @@ module Bundler
       path.system
       plugins
       prefer_gems_rb
+      print_only_version_number
       setup_makes_kernel_gem_public
       silence_root_warning
       skip_default_git_sources

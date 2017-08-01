@@ -146,8 +146,13 @@ To update, run `gem install bundler --pre`
 end
 
 RSpec.describe "bundler executable" do
-  it "shows the bundler version just as the `bundle` executable does" do
+  it "shows the bundler version just as the `bundle` executable does", :bundler => "< 2" do
     bundler "--version"
     expect(out).to eq("Bundler version #{Bundler::VERSION}")
+  end
+
+  it "shows the bundler version just as the `bundle` executable does", :bundler => "2" do
+    bundler "--version"
+    expect(out).to eq(Bundler::VERSION)
   end
 end
