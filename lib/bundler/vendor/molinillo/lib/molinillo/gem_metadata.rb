@@ -2,5 +2,5 @@
 
 module Bundler::Molinillo
   # The version of Bundler::Molinillo.
-  VERSION = '0.6.0'.freeze
+  VERSION = '0.6.1'.freeze
 end

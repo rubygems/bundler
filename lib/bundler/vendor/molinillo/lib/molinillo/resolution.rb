@@ -688,8 +688,7 @@ module Bundler::Molinillo
       # @return [void]
       def attempt_to_filter_existing_spec(vertex)
         filtered_set = filtered_possibility_set(vertex)
-        if !filtered_set.possibilities.empty? &&
-            (vertex.payload.dependencies == dependencies_for(possibility.latest_version))
+        if !filtered_set.possibilities.empty?
           activated.set_payload(name, filtered_set)
           new_requirements = requirements.dup
           push_state_for_requirements(new_requirements, false)
@@ -705,18 +704,7 @@ module Bundler::Molinillo
       # @param [Object] existing vertex
       # @return [PossibilitySet] filtered possibility set
       def filtered_possibility_set(vertex)
-        # Note: we can't just look at the intersection of `vertex.payload.possibilities`
-        # and `possibility.possibilities`, because if one of our requirements contains
-        # a prerelease version the associated prerelease versions will only appear in
-        # one set (but may match all requirements)
-        filtered_old_values = vertex.payload.possibilities.select do |poss|
-          requirement_satisfied_by?(requirement, activated, poss)
-        end
-        filtered_new_values = possibility.possibilities.select do |poss|
-          vertex.requirements.uniq.all? { |req| requirement_satisfied_by?(req, activated, poss) }
-        end
-
-        PossibilitySet.new(vertex.payload.dependencies, filtered_old_values | filtered_new_values)
+        PossibilitySet.new(vertex.payload.dependencies, vertex.payload.possibilities & possibility.possibilities)
       end
 
       # @param [String] requirement_name the spec name to search for
