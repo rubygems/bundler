@@ -14,6 +14,7 @@ module Bundler
     end
 
     def ==(other)
+      return if other.nil?
       dep == other.dep && __platform == other.__platform
     end
 
