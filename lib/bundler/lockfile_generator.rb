@@ -20,6 +20,7 @@ module Bundler
       add_platforms
       add_dependencies
       add_section("OPTIONAL GROUPS", definition.optional_groups)
+      add_gemfiles
       add_locked_ruby_version
       add_bundled_with
 
@@ -61,9 +62,29 @@ module Bundler
       handled = []
       definition.dependencies.sort_by(&:to_s).each do |dep|
         next if handled.include?(dep.name)
-        out << dep.to_lock
+        out << "  #{dep.name}"
+        unless dep.requirement.none?
+          reqs = dep.requirement.requirements.map {|o, v| "#{o} #{v}" }.sort.reverse
+          out << " (#{reqs.join(", ")})"
+        end
+        out << "!" if dep.source
+        out << "\n"
+        add_value(dep.options_to_lock, 4)
         handled << dep.name
       end
+    end
+
+    def add_gemfiles
+      return unless SharedHelpers.md5_available?
+      gemfiles = {}
+      definition.gemfiles.each do |file|
+        md5 = Digest::MD5.file(file).hexdigest
+        if file.to_s.start_with?(Bundler.root.to_s)
+          file = file.relative_path_from(Bundler.root)
+        end
+        gemfiles[file] = "md5 #{md5}"
+      end
+      add_section("GEMFILE CHECKSUMS", gemfiles)
     end
 
     def add_locked_ruby_version
@@ -77,17 +98,24 @@ module Bundler
 
     def add_section(name, value)
       out << "\n#{name}\n"
+      add_value(value, 2)
+    end
+
+    def add_value(value, indentation)
+      indent = " " * indentation
       case value
       when Array
         value.map(&:to_s).sort.each do |val|
-          out << "  #{val}\n"
+          out << "#{indent}#{val}\n"
         end
       when Hash
         value.to_a.sort_by {|k, _| k.to_s }.each do |key, val|
-          out << "  #{key}: #{val}\n"
+          Array(val).sort.each do |v|
+            out << "#{indent}#{key}: #{v}\n"
+          end
         end
       when String
-        out << "   #{value}\n"
+        out << "#{indent} #{value}\n"
       else
         raise ArgumentError, "#{value.inspect} can't be serialized in a lockfile"
       end

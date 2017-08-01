@@ -18,6 +18,15 @@ module Bundler
       @metadata_source        = Source::Metadata.new
     end
 
+    def self.from_sources(sources)
+      source_list = new
+      sources.each do |source|
+        list = source_list.send(:source_list_for, source)
+        source_list.send(:add_source_to_list, source, list)
+      end
+      source_list
+    end
+
     def add_path_source(options = {})
       if options["gemspec"]
         add_source_to_list Source::Gemspec.new(options), path_sources

@@ -34,14 +34,27 @@ module Bundler
 
       raise GemfileNotFound, "#{gemfile} not found" unless gemfile.file?
 
+      parsed_lockfile = nil
       if lockfile && File.exist?(lockfile)
-        # parsed_lockfile = LockfileParser.new(Bundler.read_file(lockfile))
-        # use_lockfile = parsed_lockfile.gemfile_checksums.reduce do |file, checksum|
-        #   p file, checksum
-        # end
+        parsed_lockfile = LockfileParser.new(Bundler.read_file(lockfile))
+        changed_gemfiles = parsed_lockfile.gemfiles.values.reject(&:unchanged?)
+        if !changed_gemfiles.empty?
+          warn "skipping lf since #{changed_gemfiles} changed"
+        elsif unlock != {}
+          warn "skipping lf since unlocking"
+        elsif parsed_lockfile.gemfiles.empty?
+          warn "skipping lf since no locked gemfiles"
+        else
+          sources = parsed_lockfile.sources.dup
+          aggregate = sources.delete(parsed_lockfile.aggregate_source)
+          sources = SourceList.from_sources(sources)
+          aggregate.remotes.each {|r| sources.global_rubygems_source = r } if aggregate
+          # warn "using lockfile"
+          return Definition.new(parsed_lockfile, parsed_lockfile.dependencies.values, sources, {}, parsed_lockfile.ruby_version, parsed_lockfile.optional_groups, parsed_lockfile.gemfiles.keys)
+        end
       end
 
-      Dsl.evaluate(gemfile, lockfile, unlock)
+      Dsl.evaluate(gemfile, parsed_lockfile, unlock)
     end
 
     #
@@ -74,18 +87,15 @@ module Bundler
       @ruby_version    = ruby_version
       @gemfiles        = gemfiles
 
-      @lockfile               = lockfile
-      @lockfile_contents      = String.new
-      @locked_bundler_version = nil
-      @locked_ruby_version    = nil
+      @locked_gems            = lockfile
+      @lockfile               = lockfile && lockfile.lockfile
+      @lockfile_contents      = lockfile && lockfile.lockfile_contents || String.new
+      @locked_bundler_version = lockfile && lockfile.bundler_version
+      @locked_ruby_version    = lockfile && lockfile.ruby_version
+      @locked_platforms       = lockfile && lockfile.platforms || []
 
-      if lockfile && File.exist?(lockfile)
-        @lockfile_contents = Bundler.read_file(lockfile)
-        @locked_gems = LockfileParser.new(@lockfile_contents)
-        @locked_platforms = @locked_gems.platforms
+      if lockfile
         @platforms = @locked_platforms.dup
-        @locked_bundler_version = @locked_gems.bundler_version
-        @locked_ruby_version = @locked_gems.ruby_version
 
         if unlock != true
           @locked_deps    = @locked_gems.dependencies
@@ -104,7 +114,6 @@ module Bundler
         @locked_deps    = {}
         @locked_specs   = SpecSet.new([])
         @locked_sources = []
-        @locked_platforms = []
       end
 
       @unlock[:gems] ||= []
