@@ -34,14 +34,16 @@ module Bundler
       @ruby_version         = nil
       @gemspecs             = []
       @gemfile              = nil
+      @gemfiles             = []
       add_git_sources
     end
 
     def eval_gemfile(gemfile, contents = nil)
-      expanded_gemfile_path = Pathname.new(gemfile).expand_path
+      expanded_gemfile_path = Pathname.new(gemfile).expand_path(@gemfile && @gemfile.parent)
       original_gemfile = @gemfile
       @gemfile = expanded_gemfile_path
-      contents ||= Bundler.read_file(gemfile.to_s)
+      @gemfiles << expanded_gemfile_path
+      contents ||= Bundler.read_file(@gemfile.to_s)
       instance_eval(contents.dup.untaint, gemfile.to_s, 1)
     rescue Exception => e
       message = "There was an error " \
@@ -213,7 +215,7 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups)
+      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups, @gemfiles)
     end
 
     def group(*args, &blk)

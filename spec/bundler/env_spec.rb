@@ -82,6 +82,54 @@ RSpec.describe Bundler::Env do
       end
     end
 
+    context "when eval_gemfile is used" do
+      it "prints all gemfiles" do
+        create_file "other/Gemfile-other", "gem 'rack'"
+        create_file "other/Gemfile", "eval_gemfile 'Gemfile-other'"
+        create_file "Gemfile-alt", <<-G
+          source "file:#{gem_repo1}"
+          eval_gemfile "other/Gemfile"
+        G
+        gemfile "eval_gemfile #{File.expand_path("Gemfile-alt").dump}"
+
+        output = described_class.report(:print_gemspecs => true)
+        expect(output).to include(strip_whitespace(<<-ENV))
+          ## Gemfile
+
+          ### Gemfile
+
+          ```ruby
+          eval_gemfile #{File.expand_path("Gemfile-alt").dump}
+          ```
+
+          ### Gemfile-alt
+
+          ```ruby
+          source "file:#{gem_repo1}"
+          eval_gemfile "other/Gemfile"
+          ```
+
+          ### other/Gemfile
+
+          ```ruby
+          eval_gemfile 'Gemfile-other'
+          ```
+
+          ### other/Gemfile-other
+
+          ```ruby
+          gem 'rack'
+          ```
+
+          ### Gemfile.lock
+
+          ```
+          <No #{bundled_app("Gemfile.lock")} found>
+          ```
+        ENV
+      end
+    end
+
     context "when the git version is OS specific" do
       it "includes OS specific information with the version number" do
         expect(git_proxy_stub).to receive(:git).with("--version").

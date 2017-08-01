@@ -15,7 +15,9 @@ module Bundler
       :locked_gems,
       :platforms,
       :requires,
-      :ruby_version
+      :ruby_version,
+      :lockfile,
+      :gemfiles
     )
 
     # Given a gemfile and lockfile creates a Bundler definition
@@ -52,7 +54,7 @@ module Bundler
     #   to be updated or true if all gems should be updated
     # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
     # @param optional_groups [Array(String)] A list of optional groups
-    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [], gemfiles = [])
       @unlocking = unlock == true || !unlock.empty?
 
       @dependencies    = dependencies
@@ -62,6 +64,7 @@ module Bundler
       @remote          = false
       @specs           = nil
       @ruby_version    = ruby_version
+      @gemfiles        = gemfiles
 
       @lockfile               = lockfile
       @lockfile_contents      = String.new
