@@ -62,7 +62,12 @@ module Bundler
 
       dependencies.sort_by(&:to_s).uniq.each do |dep|
         next if dep.type == :development
-        out << "    #{dep.to_lock(true)}\n"
+        out << "      #{dep.name}"
+        unless dep.requirement.none?
+          reqs = dep.requirement.requirements.map {|o, v| "#{o} #{v}" }.sort.reverse
+          out << " (#{reqs.join(", ")})"
+        end
+        out << "\n"
       end
 
       out

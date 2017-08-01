@@ -84,11 +84,21 @@ module Bundler
       @autorequire    = nil
       @groups         = Array(options["group"] || :default).map(&:to_sym)
       @source         = options["source"]
-      @platforms      = Array(options["platforms"])
+      @platforms      = Array(options["platforms"]).map(&:to_sym)
       @env            = options["env"]
       @should_include = options.fetch("should_include", true)
 
       @autorequire = Array(options["require"] || []) if options.key?("require")
+    end
+
+    def options_to_lock
+      {
+        "env" => @env,
+        "group" => @groups,
+        "platforms" => @platforms,
+        "require" => @autorequire,
+        "source" => @source,
+      }.reject {|_, v| Array(v).empty? }
     end
 
     # Returns the platforms this dependency is valid for, in the same order as

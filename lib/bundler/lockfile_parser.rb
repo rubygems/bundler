@@ -12,7 +12,20 @@
 
 module Bundler
   class LockfileParser
-    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version, :ruby_version
+    LockedGemfile = Struct.new(:path, :checksum, :digest) do
+      def unchanged?
+        return unless path.file?
+        calculate_checksum == checksum
+      end
+
+      def calculate_checksum
+        case digest
+        when "md5" then SharedHelpers.md5_available? && Digest::MD5.file(path).hexdigest
+        end.to_s
+      end
+    end
+
+    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version, :ruby_version, :optional_groups, :gemfiles, :lockfile_contents, :lockfile
 
     BUNDLED      = "BUNDLED WITH".freeze
     DEPENDENCIES = "DEPENDENCIES".freeze
@@ -22,8 +35,10 @@ module Bundler
     GEM          = "GEM".freeze
     PATH         = "PATH".freeze
     PLUGIN       = "PLUGIN SOURCE".freeze
+    GROUPS       = "OPTIONAL GROUPS".freeze
+    GEMFILES     = "GEMFILE CHECKSUMS".freeze
     SPECS        = "  specs:".freeze
-    OPTIONS      = /^  ([a-z]+): (.*)$/i
+    OPTIONS      = /^ {2}+([a-z]+): (.*)$/i
     SOURCE       = [GIT, GEM, PATH, PLUGIN].freeze
 
     SECTIONS_BY_VERSION_INTRODUCED = {
@@ -33,6 +48,7 @@ module Bundler
       Gem::Version.create("1.10".dup) => [BUNDLED].freeze,
       Gem::Version.create("1.12".dup) => [RUBY].freeze,
       Gem::Version.create("1.13".dup) => [PLUGIN].freeze,
+      Gem::Version.create("2.0".dup) => [GROUPS, GEMFILES].freeze,
     }.freeze
 
     KNOWN_SECTIONS = SECTIONS_BY_VERSION_INTRODUCED.values.flatten.freeze
@@ -58,12 +74,16 @@ module Bundler
       attributes
     end
 
-    def initialize(lockfile)
+    def initialize(lockfile, path = nil)
       @platforms    = []
       @sources      = []
       @dependencies = {}
       @state        = nil
       @specs        = {}
+      @gemfiles     = {}
+      @optional_groups = []
+      @lockfile_contents = lockfile
+      @lockfile = path
 
       @rubygems_aggregate = Source::Rubygems.new
 
@@ -72,24 +92,34 @@ module Bundler
           "Run `git checkout HEAD -- #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}` first to get a clean lock."
       end
 
-      lockfile.split(/(?:\r?\n)+/).each do |line|
-        if SOURCE.include?(line)
+      lockfile.split(/(?:\r?\n)/).each do |line|
+        case line
+        when DEPENDENCIES
+          @state = :dependency
+        when PLATFORMS
+          @state = :platform
+        when RUBY
+          @state = :ruby
+        when BUNDLED
+          @state = :bundled_with
+        when GROUPS
+          @state = :optional_group
+        when GEMFILES
+          @state = :gemfile
+        when ""
+          send("finalize_#{@state}") if @state
+        when *SOURCE # rubocop:disable Performance/CaseWhenSplat
           @state = :source
           parse_source(line)
-        elsif line == DEPENDENCIES
-          @state = :dependency
-        elsif line == PLATFORMS
-          @state = :platform
-        elsif line == RUBY
-          @state = :ruby
-        elsif line == BUNDLED
-          @state = :bundled_with
-        elsif line =~ /^[^\s]/
+        when /^[^\s]/
           @state = nil
-        elsif @state
-          send("parse_#{@state}", line)
+        else
+          send("parse_#{@state}", line) if @state
         end
+        # puts "#{@state.to_s.rjust(15)} => #{line}"
       end
+      send("finalize_#{@state}") if @state
+
       @sources << @rubygems_aggregate unless Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
       @specs = @specs.values.sort_by(&:identifier)
       warn_for_outdated_bundler_version
@@ -113,6 +143,16 @@ module Bundler
                "upgrade to the latest version of Bundler by running `gem " \
                "install bundler#{prerelease_text}`.\n"
         end
+      end
+    end
+
+    def aggregate_source
+      return @aggregate_source unless Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      pinned_sources = @dependencies.values.map(&:source).uniq
+      @sources.find do |s|
+        next unless s.is_a?(Source::Rubygems)
+        next if pinned_sources.include?(s)
+        true
       end
     end
 
@@ -155,25 +195,29 @@ module Bundler
           @current_source = Plugin.source_from_lock(@opts)
           @sources << @current_source
         end
+        @opts = {}
       when OPTIONS
-        value = $2
-        value = true if value == "true"
-        value = false if value == "false"
-
-        key = $1
-
-        if @opts[key]
-          @opts[key] = Array(@opts[key])
-          @opts[key] << value
-        else
-          @opts[key] = value
-        end
+        parse_opts($1, $2)
       when *SOURCE
         @current_source = nil
         @opts = {}
         @type = line
       else
         parse_spec(line)
+      end
+    end
+
+    def finalize_source; end
+
+    def parse_opts(key, value)
+      value = true if value == "true"
+      value = false if value == "false"
+
+      if @opts[key]
+        @opts[key] = Array(@opts[key])
+        @opts[key] << value
+      else
+        @opts[key] = value
       end
     end
 
@@ -188,6 +232,10 @@ module Bundler
     /xo
 
     def parse_dependency(line)
+      return parse_opts($1, $2) if line =~ OPTIONS
+
+      finalize_dependency
+
       return unless line =~ NAME_VERSION
       spaces = $1
       return unless spaces.size == 2
@@ -195,11 +243,16 @@ module Bundler
       version = $3
       pinned = $5
 
-      version = version.split(",").map(&:strip) if version
+      @dep_name = name
+      @dep_version = version && version.split(",").map(&:strip)
+      @dep_pinned = pinned
+    end
 
-      dep = Bundler::Dependency.new(name, version)
+    def finalize_dependency
+      return unless defined?(@dep_name) && @dep_name
+      dep = Bundler::Dependency.new(@dep_name, @dep_version, @opts)
 
-      if pinned && dep.name != "bundler"
+      if @dep_pinned && dep.name != "bundler"
         spec = @specs.find {|_, v| v.name == dep.name }
         dep.source = spec.last.source if spec
 
@@ -207,11 +260,12 @@ module Bundler
         # to use in the case that there are no gemspecs present. A fake
         # gemspec is created based on the version set on the dependency
         # TODO: Use the version from the spec instead of from the dependency
-        if version && version.size == 1 && version.first =~ /^\s*= (.+)\s*$/ && dep.source.is_a?(Bundler::Source::Path)
-          dep.source.name    = name
+        if @dep_version && @dep_version.size == 1 && @dep_version.first =~ /^\s*= (.+)\s*$/ && dep.source.is_a?(Bundler::Source::Path)
+          dep.source.name    = @dep_name
           dep.source.version = $1
         end
       end
+      @opts = {}
 
       @dependencies[dep.name] = dep
     end
@@ -239,9 +293,13 @@ module Bundler
       end
     end
 
+    def finalize_spec; end
+
     def parse_platform(line)
       @platforms << Gem::Platform.new($1) if line =~ /^  (.*)$/
     end
+
+    def finalize_platform; end
 
     def parse_bundled_with(line)
       line = line.strip
@@ -249,8 +307,32 @@ module Bundler
       @bundler_version = Gem::Version.create(line)
     end
 
+    def finalize_bundled_with; end
+
     def parse_ruby(line)
       @ruby_version = line.strip
+    end
+
+    def finalize_ruby; end
+
+    def parse_optional_group(line)
+      @optional_groups << line.strip
+    end
+
+    def finalize_optional_group; end
+
+    def parse_gemfile(line)
+      return unless line =~ OPTIONS
+      parse_opts($1, $2)
+    end
+
+    def finalize_gemfile
+      @opts.each do |file, checksum|
+        digest, sum = checksum.split(" ", 2)
+        file = Pathname(file).expand_path(Bundler.root)
+        @gemfiles[file] = LockedGemfile.new(file, sum, digest)
+      end
+      @opts = {}
     end
   end
 end
