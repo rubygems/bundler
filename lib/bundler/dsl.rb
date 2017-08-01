@@ -35,6 +35,7 @@ module Bundler
       @gemspecs             = []
       @gemfile              = nil
       @gemfiles             = []
+      @dynamic              = true
       add_git_sources
     end
 
@@ -215,7 +216,9 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups, @gemfiles)
+      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups, @gemfiles).tap do |definition|
+        definition.static_gemfile = !@dynamic
+      end
     end
 
     def group(*args, &blk)
@@ -259,6 +262,10 @@ module Bundler
 
     def plugin(*args)
       # Pass on
+    end
+
+    def _static_gemfile!(static = true)
+      @dynamic = !static
     end
 
     def method_missing(name, *args)
