@@ -39,17 +39,16 @@ module Bundler
         parsed_lockfile = LockfileParser.new(Bundler.read_file(lockfile))
         changed_gemfiles = parsed_lockfile.gemfiles.values.reject(&:unchanged?)
         if !changed_gemfiles.empty?
-          warn "skipping lf since #{changed_gemfiles} changed"
+          nil
         elsif unlock != {}
-          warn "skipping lf since unlocking"
+          nil
         elsif parsed_lockfile.gemfiles.empty?
-          warn "skipping lf since no locked gemfiles"
+          nil
         else
           sources = parsed_lockfile.sources.dup
           aggregate = sources.delete(parsed_lockfile.aggregate_source)
           sources = SourceList.from_sources(sources)
           aggregate.remotes.each {|r| sources.global_rubygems_source = r } if aggregate
-          # warn "using lockfile"
           return Definition.new(parsed_lockfile, parsed_lockfile.dependencies.values, sources, {}, parsed_lockfile.ruby_version, parsed_lockfile.optional_groups, parsed_lockfile.gemfiles.keys)
         end
       end

@@ -116,7 +116,6 @@ module Bundler
         else
           send("parse_#{@state}", line) if @state
         end
-        # puts "#{@state.to_s.rjust(15)} => #{line}"
       end
       send("finalize_#{@state}") if @state
 

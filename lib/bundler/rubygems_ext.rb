@@ -150,22 +150,6 @@ module Gem
       instance_variables.reject {|p| ["@source", "@groups", "@all_sources"].include?(p.to_s) }
     end
 
-    def to_lock(single_line = false)
-      out = String.new("  #{name}")
-      unless requirement.none?
-        reqs = requirement.requirements.map {|o, v| "#{o} #{v}" }.sort.reverse
-        out << " (#{reqs.join(", ")})"
-      end
-      return out if single_line
-      out << "!" if source
-      out << "\n"
-      if groups && groups.any?
-        p groups
-        out << "    groups: " << groups.sort_by(&:to_s).join(":") << "\n"
-      end
-      out
-    end
-
     # Backport of performance enhancement added to RubyGems 1.4
     def matches_spec?(spec)
       # name can be a Regexp, so use ===

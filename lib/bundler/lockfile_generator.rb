@@ -19,7 +19,7 @@ module Bundler
       add_sources
       add_platforms
       add_dependencies
-      add_section("OPTIONAL GROUPS", definition.optional_groups)
+      add_optional_groups
       add_gemfiles
       add_locked_ruby_version
       add_bundled_with
@@ -72,6 +72,10 @@ module Bundler
         add_value(dep.options_to_lock, 4)
         handled << dep.name
       end
+    end
+
+    def add_optional_groups
+      add_section("OPTIONAL GROUPS", definition.optional_groups)
     end
 
     def add_gemfiles
