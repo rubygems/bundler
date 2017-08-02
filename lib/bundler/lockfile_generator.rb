@@ -89,6 +89,7 @@ module Bundler
       return unless SharedHelpers.md5_available?
       gemfiles = {}
       definition.gemfiles.each do |file|
+        return nil unless file.file?
         md5 = Digest::MD5.file(file).hexdigest
         if file.to_s.start_with?(Bundler.root.to_s)
           file = file.relative_path_from(Bundler.root)

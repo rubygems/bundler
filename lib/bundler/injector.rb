@@ -32,7 +32,7 @@ module Bundler
         builder.eval_gemfile("injected gems", build_gem_lines(false)) if @new_deps.any?
 
         # resolve to see if the new deps broke anything
-        @definition = builder.to_definition(lockfile_path, {})
+        @definition = builder.to_definition(Bundler.locked_gems, {})
         @definition.resolve_remotely!
 
         # since nothing broke, we can add those gems to the gemfile
