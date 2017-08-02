@@ -586,7 +586,7 @@ G
     end
   end
 
-  context "bundle show" do
+  context "bundle info" do
     before do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
@@ -602,7 +602,7 @@ G
         #{ruby_version_correct}
       G
 
-      bundle "show rails"
+      bundle "info rails --path"
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
@@ -615,12 +615,12 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        bundle "show rails"
+        bundle "info rails --path"
         expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
       end
     end
 
-    it "fails if ruby version doesn't match" do
+    it "fails if ruby version doesn't match", :bundler => "< 2" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rails"
@@ -632,7 +632,7 @@ G
       should_be_ruby_version_incorrect
     end
 
-    it "fails if engine doesn't match" do
+    it "fails if engine doesn't match", :bundler => "< 2" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rails"
@@ -644,7 +644,7 @@ G
       should_be_engine_incorrect
     end
 
-    it "fails if engine version doesn't match" do
+    it "fails if engine version doesn't match", :bundler => "< 2" do
       simulate_ruby_engine "jruby" do
         gemfile <<-G
           source "file://#{gem_repo1}"
@@ -658,7 +658,7 @@ G
       end
     end
 
-    it "fails when patchlevel doesn't match" do
+    it "fails when patchlevel doesn't match", :bundler => "< 2" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"

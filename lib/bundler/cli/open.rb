@@ -18,7 +18,7 @@ module Bundler
       path = spec.full_gem_path
       Dir.chdir(path) do
         command = Shellwords.split(editor) + [path]
-        Bundler.with_clean_env do
+        Bundler.with_original_env do
           system(*command)
         end || Bundler.ui.info("Could not run '#{command.join(" ")}'")
       end

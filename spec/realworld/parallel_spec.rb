@@ -17,10 +17,10 @@ RSpec.describe "parallel", :realworld => true, :sometimes => true do
       expect(out).to include("is not threadsafe")
     end
 
-    bundle "show activesupport"
+    bundle "info activesupport --path"
     expect(out).to match(/activesupport/)
 
-    bundle "show faker"
+    bundle "info faker --path"
     expect(out).to match(/faker/)
   end
 
@@ -46,10 +46,10 @@ RSpec.describe "parallel", :realworld => true, :sometimes => true do
       expect(out).to include("is not threadsafe")
     end
 
-    bundle "show activesupport"
+    bundle "info activesupport --path"
     expect(out).to match(/activesupport-3\.2\.\d+/)
 
-    bundle "show faker"
+    bundle "info faker --path"
     expect(out).to match(/faker/)
   end
 

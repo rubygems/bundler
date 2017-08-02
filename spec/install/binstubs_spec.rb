@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle install" do
+RSpec.describe "bundle install", :bundler => "< 2" do
   describe "when system_bindir is set" do
     # On OS X, Gem.bindir defaults to /usr/bin, so system_bindir is useful if
     # you want to avoid sudo installs for system gems with OS X's default ruby
@@ -33,12 +33,6 @@ RSpec.describe "bundle install" do
         gem "fake"
         gem "rack"
       G
-    end
-
-    it "prints a deprecation notice" do
-      bundle "config major_deprecations true"
-      gembin("rackup")
-      expect(out).to include("Bundler is using a binstub that was created for a different gem (rack).")
     end
 
     it "loads the correct spec's executable" do

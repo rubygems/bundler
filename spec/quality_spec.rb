@@ -229,6 +229,7 @@ RSpec.describe "The library itself" do
     Dir.chdir(root) do
       exclusions = %w[
         lib/bundler/capistrano.rb
+        lib/bundler/deployment.rb
         lib/bundler/gem_tasks.rb
         lib/bundler/vlad.rb
         lib/bundler/templates/gems.rb
