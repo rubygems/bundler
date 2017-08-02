@@ -45,7 +45,23 @@ module Bundler
       @gemfile = expanded_gemfile_path
       @gemfiles << expanded_gemfile_path
       contents ||= Bundler.read_file(@gemfile.to_s)
-      instance_eval(contents.dup.untaint, gemfile.to_s, 1)
+      if gemfile.to_s.end_with?(".json")
+        require "json"
+        json = JSON.parse(contents)
+        json["dependencies"].each do |dep, opts|
+          next unless dep =~ /^(.+?) \((.+)\)$/
+          _, name, reqs = *Regexp.last_match
+          reqs = reqs.split(", ")
+          gem(name, *reqs, opts)
+        end
+        json["sources"].each do |name, options|
+          raise "unsupported source #{name}" unless name == "Rubygems"
+          options["remotes"].each {|r| source r }
+        end
+        Array(json["eval_gemfile"]).each {|gf| eval_gemfile gf }
+      else
+        instance_eval(contents.dup.untaint, gemfile.to_s, 1)
+      end
     rescue Exception => e
       message = "There was an error " \
         "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \

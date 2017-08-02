@@ -27,6 +27,18 @@ module Bundler
       @static_gemfile
     end
 
+    def to_json
+      require "json"
+      JSON.pretty_generate(
+        "dependencies" => Hash[dependencies.map {|d| [d.to_s, d.options_to_lock] }.sort_by(&:first)],
+        "sources" => sources.lock_sources.map {|s| [s.class.name.split("::").last, s.options] },
+        "ruby_version" => ruby_version,
+        "optional_groups" => optional_groups,
+      )
+    end
+
+    def self.from_json; end
+
     # Given a gemfile and lockfile creates a Bundler definition
     #
     # @param gemfile [Pathname] Path to Gemfile
