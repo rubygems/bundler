@@ -10,15 +10,21 @@ Bundler makes sure Ruby applications run the same code on every machine.
 
 It does this by managing the gems that the application depends on. Given a list of gems, it can automatically download and install those gems, as well as any other gems needed by the gems that are listed. Before installing gems, it checks the versions of every gem to make sure that they are compatible, and can all be loaded at the same time. After the gems have been installed, Bundler can help you update some or all of them when new versions become available. Finally, it records the exact versions that have been installed, so that others can install the exact same gems.
 
+To see what has changed in recent versions of Bundler, see the [CHANGELOG](CHANGELOG.md).
+
 ### Installation and usage
 
-To install (or update to the latest version):
+[Visit the Bundler site](http://bundler.io) to access the complete documentation.
+To install:
 
 ```
 gem install bundler
 ```
 
-To install a prerelease version (if one is available), run `gem install bundler --pre`. To uninstall Bundler, run `gem uninstall bundler`.
+To install a pre-release version (if one is available), run:
+```
+gem install bundler --pre.
+```
 
 Bundler is most commonly used to manage your application's dependencies. For example, these commands will allow you to use Bundler to manage the `rspec` gem for your application:
 
@@ -29,30 +35,31 @@ bundle install
 bundle exec rspec
 ```
 
-See [bundler.io](http://bundler.io) for the full documentation.
-
-### Troubleshooting
-
-For help with common problems, see [TROUBLESHOOTING](doc/TROUBLESHOOTING.md).
-
-Still stuck? Try [filing an issue](doc/contributing/ISSUES.md).
-
-### Other questions
-
-To see what has changed in recent versions of Bundler, see the [CHANGELOG](CHANGELOG.md).
-
-To get in touch with the Bundler core team and other Bundler users, please see [getting help](doc/contributing/GETTING_HELP.md).
-
 ### Contributing
 
-If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [our documentation section](doc/README.md).
+While some Bundler contributors are compensated by Ruby Together, the project maintainers make decisions independent of Ruby Together. As a project, we welcome contributions regardless of the author’s affiliation with Ruby Together. So if you'd like to contribute to Bundler, that's awesome, and we <3 you!
 
-While some Bundler contributors are compensated by Ruby Together, the project maintainers make decisions independent of Ruby Together. As a project, we welcome contributions regardless of the author’s affiliation with Ruby Together.
+We have a [guide with recommended first steps](doc/contributing/README.md) that we suggest anyone interested in contributing to Bundler review first. Once you’ve completed those steps, feel free to get started contributing in any of the following ways:
 
-### Supporting
+- Adding new sections or making edits to the [documentation website](http://bundler.io) and [man pages](http://bundler.io/man/bundle.1.html)
+- Fixing typos
+- [Triage existing issues](doc/contributing/BUG_TRIAGE.md)
+- [Opening new issues](doc/contributing/ISSUES.md) (suggest feature requests, report new bugs)
+- [Reviewing pull requests](https://github.com/bundler/bundler/pulls)
+- [Backfilling unit tests](https://github.com/bundler/bundler/tree/master/spec/bundler) for modules that [lack coverage](https://codeclimate.com/github/bundler/bundler/coverage)
+
+### Get support
+
+- **Troubleshooting**. If you have either `rubygems-bundler` or `open_gem` installed, please try removing them before filing an issue. For help with common problems, check out the [troubleshooting guide](doc/TROUBLESHOOTING.md).
+- **Reporting a bug**. If you’ve tried the troubleshooting guide and something is still not working, you can file an issue. Run `bundle-report-bug` to get all of the information you need to report a bug.
+- **Security issues**. For security-related issues, do not open a public ticket. Please send an email to [team@bundler.io](mailto:team@bundler.io) and we will respond within 48 hours.
+
+### Fund this project
 
 <a href="https://rubytogether.org/"><img src="https://rubytogether.org/images/rubies.svg" width="150"></a><br>
-<a href="https://rubytogether.org/">Ruby Together</a> pays some Bundler maintainers for their ongoing work. As a grassroots initiative committed to supporting the critical Ruby infrastructure you rely on, Ruby Together is funded entirely by the Ruby community. Contribute today <a href="https://rubytogether.org/developers">as an individual</a> or (better yet) <a href="https://rubytogether.org/companies">as a company</a> to ensure that Bundler, RubyGems, and other shared tooling is around for years to come.
+<a href="https://rubytogether.org/">Ruby Together</a> pays some Bundler maintainers for their ongoing work. As a grassroots initiative committed to supporting the critical Ruby infrastructure you rely on, Ruby Together is funded entirely by the Ruby community.
+
+Contribute today <a href="https://rubytogether.org/developers">as an individual</a> or (better yet) <a href="https://rubytogether.org/companies">as a company</a> to ensure that Bundler, RubyGems, and other shared tooling is around for years to come!
 
 ### Code of Conduct
 
