@@ -75,4 +75,4 @@ configuration file using the following names:
 
 ## SEE ALSO
 
-* bundle-config(1)
+* [bundle-config](http://bundler.io/v1.14/bundle_config.html)
