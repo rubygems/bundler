@@ -221,7 +221,7 @@ module Bundler
 
       def extension_cache_path(spec)
         return unless Bundler.feature_flag.global_gem_cache?
-        cache_path.join("extensions", Bundler.ruby_scope, spec.full_name)
+        cache_path.join("extensions", Bundler.ruby_scope, extension_dir_name)
       end
 
       def app_cache_dirname
