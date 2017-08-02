@@ -1231,7 +1231,7 @@ end
         if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7") || ENV["RGV"] == "master"
           []
         else
-          %w[io-console openssl]
+          %w[io-console openssl etc fileutils]
         end << "bundler"
       end
 
