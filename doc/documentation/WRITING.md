@@ -49,6 +49,6 @@ If you make more changes to `bundle-cookies.ronn`, you'll need to run the `rake 
 We have tests for our documentation! The most important test file to run before you make your pull request is the one for the `help` command and another for documentation quality.
 
 ```
-$ rspec ./spec/commands/help_spec.rb
-$ rspec ./spec/quality_spec.rb
+$ bin/rspec ./spec/commands/help_spec.rb
+$ bin/rspec ./spec/quality_spec.rb
 ```
