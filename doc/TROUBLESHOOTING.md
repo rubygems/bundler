@@ -41,6 +41,9 @@ list](http://bundler.io/compatibility.html), and make sure that the version of B
 
 If these instructions don't work, or you can't find any appropriate instructions, you can try these troubleshooting steps:
 
+    # Update to the latest version of bundler
+    `gem install bundler`
+
     # Remove user-specific gems and git repos
     rm -rf ~/.bundle/ ~/.gem/bundler/ ~/.gems/cache/bundler/
 

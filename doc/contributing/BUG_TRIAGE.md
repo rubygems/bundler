@@ -16,6 +16,12 @@ When you're looking at a ticket, here are the main questions to ask:
   * Which operating systems (OS X, Windows, Ubuntu, CentOS, etc.) manifest this bug?
   * Which rubies (MRI, JRuby, Rubinius, etc.) and which versions (1.8.7, 1.9.3, etc.) have this bug?
 
+Strategies for triaging a ticket:
+  * Be sure to ask the user to output the entirety of their `bundle env`. Sometimes users forget to post all of their `bundle env` output in the issue.
+  * After seeing the output of the user's `bundle env`, try to replicate the user's problem in your current environment. Only portions of the code base is changed in each release, so there's a good chance your version of bundler might have the same bug.
+  * If you're having trouble replicating their issue with your current environment, slowly try to incorporate the user's environment setup. As in, this is where you begin matching their environment. For example, try switching to the user's version of Ruby, RubyGems, RVM, et cetera, step by step.
+  * Is the user running the latest version of bundler? If not, ask them to update by running `gem install bundler`. There's a chance that the newest version of bundler has already solved their problem.
+
 If you can't reproduce the issue, chances are good that the bug has been fixed already (hurrah!). That's a good time to post to the ticket explaining what you did and how it worked.
 
 If you can reproduce an issue, you're well on your way to fixing it. :)
