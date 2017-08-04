@@ -48,6 +48,7 @@ module Bundler
     settings_flag(:unlock_source_unlocks_spec) { !bundler_2_mode? }
     settings_flag(:update_requires_all_flag) { bundler_2_mode? }
     settings_flag(:default_install_uses_path) { bundler_2_mode? }
+    settings_flag(:list_command) { bundler_2_mode? }
 
     settings_option(:default_cli_command) { bundler_2_mode? ? :cli_help : :install }
 
