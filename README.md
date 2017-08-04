@@ -10,11 +10,10 @@ Bundler makes sure Ruby applications run the same code on every machine.
 
 It does this by managing the gems that the application depends on. Given a list of gems, it can automatically download and install those gems, as well as any other gems needed by the gems that are listed. Before installing gems, it checks the versions of every gem to make sure that they are compatible, and can all be loaded at the same time. After the gems have been installed, Bundler can help you update some or all of them when new versions become available. Finally, it records the exact versions that have been installed, so that others can install the exact same gems.
 
-To see what has changed in recent versions of Bundler, see the [CHANGELOG](CHANGELOG.md).
+To see what has changed in recent versions of Bundler, see the [CHANGELOG](CHANGELOG.md), or [visit the Bundler site](http://bundler.io) to access the complete documentation.
 
 ### Installation and usage
 
-[Visit the Bundler site](http://bundler.io) to access the complete documentation.
 To install:
 
 ```
@@ -37,11 +36,11 @@ bundle exec rspec
 
 ### Contributing
 
-While some Bundler contributors are compensated by Ruby Together, the project maintainers make decisions independent of Ruby Together. As a project, we welcome contributions regardless of the author’s affiliation with Ruby Together. So if you'd like to contribute to Bundler, that's awesome, and we <3 you!
+While some Bundler contributors are compensated by Ruby Together, the project maintainers make decisions independent of Ruby Together. As a project, we welcome contributions regardless of your affiliation with Ruby Together. So if you'd like to contribute to Bundler, that's awesome, and we <3 you!
 
-We have a [guide with recommended first steps](doc/contributing/README.md) that we suggest anyone interested in contributing to Bundler review first. Once you’ve completed those steps, feel free to get started contributing in any of the following ways:
+We have a [guide with recommended first steps](doc/contributing/README.md) that we suggest anyone interested in contributing to Bundler review first. Once you’ve completed those steps, feel free to start contributing in any of the following ways:
 
-- Adding new sections or making edits to the [documentation website](http://bundler.io) and [man pages](http://bundler.io/man/bundle.1.html)
+- Adding new sections or making edits to the [documentation website](https://github.com/bundler/bundler-site) and [man pages](https://github.com/bundler/bundler/tree/master/man)
 - Fixing typos
 - [Triage existing issues](doc/contributing/BUG_TRIAGE.md)
 - [Opening new issues](doc/contributing/ISSUES.md) (suggest feature requests, report new bugs)
