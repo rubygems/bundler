@@ -189,7 +189,7 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `ignore_messages` (`BUNDLE_IGNORE_MESSAGES`): When set, no post install
    messages will be printed. To silence a single gem, use dot notation like
    `ignore_messages.httparty true`.
-* `init_gems_rb` (`BUNDLE_NEW_GEMFILE_NAME`)
+* `init_gems_rb` (`BUNDLE_INIT_GEMS_RB`)
    Generate a `gems.rb` instead of a `Gemfile` when running `bundle init`.
 * `jobs` (`BUNDLE_JOBS`):
    The number of gems Bundler can install in parallel. Defaults to 1.
