@@ -8,6 +8,13 @@ RSpec.describe "bundle list", :bundler => "2" do
     G
   end
 
+  context "with name-only option" do
+    it "prints only the name of the gems in the bundle" do
+      bundle "list --name-only"
+      expect(out).to eq "rack"
+    end
+  end
+
   context "when no gems are in the gemfile" do
     before do
       install_gemfile <<-G

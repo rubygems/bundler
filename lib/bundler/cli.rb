@@ -263,10 +263,11 @@ module Bundler
     # TODO: 2.0 remove `bundle show`
 
     if Bundler.feature_flag.list_command?
-      desc "list", "list all gems in the bundle"
+      desc "list", "List all gems in the bundle"
+      method_option "name-only", :type => :boolean, :banner => "print only the gem names"
       def list
         require "bundler/cli/list"
-        List.new.run
+        List.new(options).run
       end
 
       map %w[ls] => "list"
