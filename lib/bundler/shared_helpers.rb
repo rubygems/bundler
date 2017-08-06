@@ -204,11 +204,11 @@ module Bundler
   private
 
     def validate_bundle_path
-      if Bundler.bundle_path.to_s.match(File::PATH_SEPARATOR)
-        puts 'WARNING: Your bundle path contains a ":", which can cause problems.'
-        puts 'Please change your bundle path path to not include ":".'
-        exit(1)
-      end
+      return unless Bundler.bundle_path.to_s.match(File::PATH_SEPARATOR)
+      puts "WARNING: Your bundle path contains a '#{File::PATH_SEPARATOR}', " \
+        "which is the path separator for your system."
+      puts "Please change your bundle path path to not include '#{File::PATH_SEPARATOR}'."
+      exit(1)
     end
 
     def find_gemfile(order_matters = false)

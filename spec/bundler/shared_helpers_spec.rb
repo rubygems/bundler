@@ -262,13 +262,27 @@ RSpec.describe Bundler::SharedHelpers do
     end
 
     it "exits if bundle path contains the path seperator" do
-      File::PATH_SEPARATOR = ':'
+      stub_const("File::PATH_SEPARATOR", ":".freeze)
       allow(Bundler).to receive(:bundle_path) { "so:me/dir/bin" }
-      expect(subject.send(:validate_bundle_path)).to raise_error(SystemExit)
+      begin
+        expect(subject.send(:validate_bundle_path)).to raise_exception(SystemExit).
+          and output("WARNING: Your bundle path contains a ':', which is the" \
+                     " path separator for your system. Please change your" \
+                     " bundle path path to not include ':'.")
+      rescue SystemExit => e
+        expect(e.status).to eq(1)
+      end
 
-      File::PATH_SEPARATOR = '^'
+      stub_const("File::PATH_SEPARATOR", "^".freeze)
       allow(Bundler).to receive(:bundle_path) { "so^me/dir/bin" }
-      expect(subject.send(:validate_bundle_path)).to raise_error(SystemExit)
+      begin
+        expect(subject.send(:validate_bundle_path)).to raise_exception(SystemExit).
+          and output("WARNING: Your bundle path contains a '^', which is the" \
+                     " path separator for your system. Please change your" \
+                     " bundle path path to not include '^'.")
+      rescue SystemExit => e
+        expect(e.status).to eq(1)
+      end
     end
 
     context "ENV['PATH'] does not exist" do
