@@ -9,6 +9,9 @@ module Bundler
 
     def run
       CLI::Common.ensure_all_gems_in_lockfile!(@gems)
+      definition = Bundler.definition
+      definition.validate_runtime!
+      installer = Bundler::Installer.new(Bundler.root, definition)
 
       Bundler.load.specs.each do |spec|
         next if spec.name == "bundler" # Source::Rubygems doesn't install bundler
@@ -26,14 +29,15 @@ module Bundler
           end
 
           FileUtils.rm_rf spec.full_gem_path
-          source.install(spec, :force => true)
         when Source::Git
           source.remote!
           FileUtils.rm_rf spec.full_gem_path
-          source.install(spec, :force => true)
         else
           Bundler.ui.warn("Cannot pristine #{gem_name}. Gem is sourced from local path.")
+          next
         end
+
+        Bundler::GemInstaller.new(spec, installer, false, 0, true).install_from_spec
       end
     end
   end
