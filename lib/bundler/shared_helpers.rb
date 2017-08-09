@@ -205,13 +205,13 @@ module Bundler
 
     def validate_bundle_path
       return unless Bundler.bundle_path.to_s.match(File::PATH_SEPARATOR)
-      message = "WARNING: Your bundle path contains a '#{File::PATH_SEPARATOR}', " \
+      message = "Your bundle path contains a '#{File::PATH_SEPARATOR}', " \
                 "which is the path separator for your system. Bundler cannot " \
                 "function correctly when the Bundle path contains the " \
                 "system's PATH separator. Please change your " \
                 "bundle path to not include '#{File::PATH_SEPARATOR}'." \
                 "\nYour current bundle path is '#{Bundler.bundle_path}'."
-      raise Bundler::BundlerError, message
+      raise Bundler::PathError, message
     end
 
     def find_gemfile(order_matters = false)

@@ -265,8 +265,8 @@ RSpec.describe Bundler::SharedHelpers do
       stub_const("File::PATH_SEPARATOR", ":".freeze)
       allow(Bundler).to receive(:bundle_path) { "so:me/dir/bin" }
       expect { subject.send(:validate_bundle_path) }.to raise_error(
-        Bundler::BundlerError,
-        "WARNING: Your bundle path contains a ':', which is the " \
+        Bundler::PathError,
+        "Your bundle path contains a ':', which is the " \
         "path separator for your system. Bundler cannot " \
         "function correctly when the Bundle path contains the " \
         "system's PATH separator. Please change your " \
