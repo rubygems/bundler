@@ -27,3 +27,5 @@ Just like Bundler, we have a grand plan (really, a wish list of sorts) for Bundl
 ## Translations
 
 We don't currently have any translations, but please reach out to us if you would like to help get this going.
+
+Please feel free to reach out to [@arbonap](https://github.com/arbonap) if you'd like to help localize Bundler in Spanish.
