@@ -27,7 +27,7 @@ module Bundler
 
     def warn_old_tls_version_rubygems_connection(uri, connection)
       return unless connection.use_ssl?
-      return unless (uri.hostname || "").end_with?("rubygems.org")
+      return unless (uri.host || "").end_with?("rubygems.org")
 
       socket = connection.instance_variable_get(:@socket)
       socket_io = socket.io
