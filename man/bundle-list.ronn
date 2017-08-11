@@ -1,0 +1,15 @@
+bundle-list(1) -- List all the gems in the bundle
+=========================================================================
+
+## SYNOPSIS
+
+`bundle list` [--name-only]
+
+## DESCRIPTION
+
+Prints a list of all the gems in the bundle including their version.
+
+## OPTIONS
+
+* `--name-only`:
+  Print only the name of each gem.

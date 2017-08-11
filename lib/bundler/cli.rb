@@ -261,7 +261,19 @@ module Bundler
       Show.new(options, gem_name).run
     end
     # TODO: 2.0 remove `bundle show`
-    map %w[list] => "show"
+
+    if Bundler.feature_flag.list_command?
+      desc "list", "List all gems in the bundle"
+      method_option "name-only", :type => :boolean, :banner => "print only the gem names"
+      def list
+        require "bundler/cli/list"
+        List.new(options).run
+      end
+
+      map %w[ls] => "list"
+    else
+      map %w[list] => "show"
+    end
 
     desc "info GEM [OPTIONS]", "Show information for the given gem"
     method_option "path", :type => :boolean, :banner => "Print full path to gem"
