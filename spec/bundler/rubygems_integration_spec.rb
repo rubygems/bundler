@@ -53,6 +53,31 @@ RSpec.describe Bundler::RubygemsIntegration do
     end
   end
 
+  describe "#download_gem", :rubygems => ">= 2.0" do
+    let(:bundler_retry) { double(Bundler::Retry) }
+    let(:retry) { double("Bundler::Retry") }
+    let(:uri) {  URI.parse("https://foo.bar") }
+    let(:path) { Gem.path.first }
+    let(:spec) do
+      spec = Bundler::RemoteSpecification.new("Foo", Gem::Version.new("2.5.2"),
+        Gem::Platform::RUBY, nil)
+      spec.remote = Bundler::Source::Rubygems::Remote.new(uri.to_s)
+      spec
+    end
+    let(:fetcher) { double("gem_remote_fetcher") }
+
+    it "succesfully downloads gem with retries" do
+      expect(Bundler.rubygems).to receive(:gem_remote_fetcher).and_return(fetcher)
+      expect(fetcher).to receive(:headers=).with("X-Gemfile-Source" => "https://foo.bar")
+      expect(Bundler::Retry).to receive(:new).with("download gem from #{uri}/").
+        and_return(bundler_retry)
+      expect(bundler_retry).to receive(:attempts).and_yield
+      expect(fetcher).to receive(:download).with(spec, uri, path)
+
+      Bundler.rubygems.download_gem(spec, uri, path)
+    end
+  end
+
   describe "#fetch_all_remote_specs", :rubygems => ">= 2.0" do
     let(:uri) { URI("https://example.com") }
     let(:fetcher) { double("gem_remote_fetcher") }
