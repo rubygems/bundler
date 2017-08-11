@@ -37,10 +37,13 @@ module Bundler
       case ssl_version
       when /TLSv([\d\.]+)/
         version = Gem::Version.new($1)
-        if version < Gem::Version.new("1.1")
-          Bundler.ui.warn "Your Ruby version does not support TLSv1.1 or newer" \
-            ", which will be required to connect to https://#{uri.hostname}" \
-            " by January 2018."
+        if version < Gem::Version.new("1.2")
+          Bundler.ui.warn \
+            "Warning: Your Ruby version is compiled against a copy of OpenSSL that is very old. " \
+            "Starting in January 2018, RubyGems.org will refuse connection requests from these " \
+            "very old versions of OpenSSL. If you will need to continue installing gems after " \
+            "January 2018, please follow this guide to upgrade: http://ruby.to/tls-outdated.",
+            :wrap => true
         end
       end
     end

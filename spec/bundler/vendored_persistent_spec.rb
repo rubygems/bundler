@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "spec_helper"
 require "bundler/vendored_persistent"
 
@@ -27,9 +28,9 @@ RSpec.describe Bundler::PersistentHTTP do
       end
     end
 
-    shared_examples_for "does warn" do |expected|
+    shared_examples_for "does warn" do |*expected|
       it "warns" do
-        expect(Bundler.ui).to receive(:warn).with(expected)
+        expect(Bundler.ui).to receive(:warn).with(*expected)
         subject.warn_old_tls_version_rubygems_connection(URI(uri), connection)
       end
     end
@@ -62,7 +63,10 @@ RSpec.describe Bundler::PersistentHTTP do
     context "with an outdated TLS version" do
       let(:tls_version) { "TLSv1" }
       include_examples "does warn",
-        "Your Ruby version does not support TLSv1.1 or newer, which will be required to connect to https://index.rubygems.org by January 2018."
+        "Warning: Your Ruby version is compiled against a copy of OpenSSL that is very old. " \
+        "Starting in January 2018, RubyGems.org will refuse connection requests from these very old versions of OpenSSL. " \
+        "If you will need to continue installing gems after January 2018, please follow this guide to upgrade: http://ruby.to/tls-outdated.",
+        :wrap => true
     end
   end
 end
