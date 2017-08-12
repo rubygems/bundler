@@ -4,10 +4,10 @@ RSpec.describe "bundler compatibility guard" do
   context "when the bundler version is 2+" do
     before { simulate_bundler_version "2.0.a" }
 
-    context "when running on Ruby < 2", :ruby => "< 2.a" do
+    context "when running on Ruby < 2", :ruby => "< 2.3" do
       it "raises a friendly error" do
         bundle :version
-        expect(err).to eq("Bundler 2 requires Ruby 2+. Either install bundler 1 or update to a supported Ruby version.")
+        expect(err).to eq("Bundler 2 requires Ruby 2.3 or later. Either install bundler 1 or update to a supported Ruby version.")
       end
     end
 
@@ -16,7 +16,7 @@ RSpec.describe "bundler compatibility guard" do
 
       it "raises a friendly error" do
         bundle :version
-        expect(err).to eq("Bundler 2 requires RubyGems 2+. Either install bundler 1 or update to a supported RubyGems version.")
+        expect(err).to eq("Bundler 2 requires RubyGems 2.5 or later. Either install bundler 1 or update to a supported RubyGems version.")
       end
     end
   end
