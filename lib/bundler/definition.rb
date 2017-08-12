@@ -410,8 +410,8 @@ module Bundler
 
       # Check if it is possible that the source is only changed thing
       if (new_deps.empty? && deleted_deps.empty?) && (!new_sources.empty? && !deleted_sources.empty?)
-        new_sources.reject! {|source| source.is_a_path? && source.path.exist? }
-        deleted_sources.reject! {|source| source.is_a_path? && source.path.exist? }
+        new_sources.reject! {|source| (source.path? && source.path.exist?) || equivalent_rubygems_remotes?(source) }
+        deleted_sources.reject! {|source| (source.path? && source.path.exist?) || equivalent_rubygems_remotes?(source) }
       end
 
       if @locked_sources != gemfile_sources
@@ -639,7 +639,7 @@ module Bundler
       if !locked_gem_sources.empty? && !actual_remotes.empty?
         locked_gem_sources.each do |locked_gem|
           # Merge the remotes from the Gemfile into the Gemfile.lock
-          changes |= locked_gem.replace_remotes(actual_remotes)
+          changes |= locked_gem.replace_remotes(actual_remotes, Bundler.settings[:allow_deployment_source_credential_changes])
         end
       end
 
@@ -966,6 +966,12 @@ module Bundler
         requirements[name] = DepProxy.new(dep, locked_spec.platform)
         requirements
       end.values
+    end
+
+    def equivalent_rubygems_remotes?(source)
+      return false unless source.is_a?(Source::Rubygems)
+
+      Bundler.settings[:allow_deployment_source_credential_changes] && source.equivalent_remotes?(sources.rubygems_remotes)
     end
   end
 end

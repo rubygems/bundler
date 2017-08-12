@@ -219,13 +219,21 @@ module Bundler
         @remotes.unshift(uri) unless @remotes.include?(uri)
       end
 
-      def replace_remotes(other_remotes)
+      def equivalent_remotes?(other_remotes)
+        other_remotes.map(&method(:remove_auth)) == @remotes.map(&method(:remove_auth))
+      end
+
+      def replace_remotes(other_remotes, allow_equivalent = false)
         return false if other_remotes == @remotes
+
+        equivalent = allow_equivalent && equivalent_remotes?(other_remotes)
 
         @remotes = []
         other_remotes.reverse_each do |r|
           add_remote r.to_s
         end
+
+        !equivalent
       end
 
       def unmet_deps
@@ -297,12 +305,16 @@ module Bundler
       end
 
       def suppress_configured_credentials(remote)
-        remote_nouser = remote.dup.tap {|uri| uri.user = uri.password = nil }.to_s
+        remote_nouser = remove_auth(remote)
         if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
           remote_nouser
         else
           remote
         end
+      end
+
+      def remove_auth(remote)
+        remote.dup.tap {|uri| uri.user = uri.password = nil }.to_s
       end
 
       def installed_specs

@@ -10,6 +10,7 @@ module Bundler
 
     BOOL_KEYS = %w[
       allow_bundler_dependency_conflicts
+      allow_deployment_source_credential_changes
       allow_offline_install
       auto_install
       cache_all

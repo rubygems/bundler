@@ -100,6 +100,9 @@ Style/TrailingCommaInArguments:
 Performance/FlatMap:
   Enabled: false
 
+Security/YAMLLoad:
+  Enabled: false
+
 # Metrics
 
 # We've chosen to use Rubocop only for style, and not for complexity or quality checks.
