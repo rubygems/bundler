@@ -204,7 +204,7 @@ module Bundler
   private
 
     def validate_bundle_path
-      return unless Bundler.bundle_path.to_s.match(File::PATH_SEPARATOR)
+      return unless Bundler.bundle_path.to_s.include?(File::PATH_SEPARATOR)
       message = "Your bundle path contains a '#{File::PATH_SEPARATOR}', " \
                 "which is the path separator for your system. Bundler cannot " \
                 "function correctly when the Bundle path contains the " \
