@@ -261,6 +261,20 @@ RSpec.describe Bundler::SharedHelpers do
       subject.set_bundle_environment
     end
 
+    it "exits if bundle path contains the path seperator" do
+      stub_const("File::PATH_SEPARATOR", ":".freeze)
+      allow(Bundler).to receive(:bundle_path) { Pathname.new("so:me/dir/bin") }
+      expect { subject.send(:validate_bundle_path) }.to raise_error(
+        Bundler::PathError,
+        "Your bundle path contains a ':', which is the " \
+        "path separator for your system. Bundler cannot " \
+        "function correctly when the Bundle path contains the " \
+        "system's PATH separator. Please change your " \
+        "bundle path to not include ':'.\nYour current bundle " \
+        "path is '#{Bundler.bundle_path}'."
+      )
+    end
+
     context "ENV['PATH'] does not exist" do
       before { ENV.delete("PATH") }
 
