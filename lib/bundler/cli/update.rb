@@ -67,6 +67,21 @@ module Bundler
         Bundler::CLI::Clean.new(options).run
       end
 
+      if locked_gems = Bundler.definition.locked_gems
+        gems.each do |name|
+          locked_version = locked_gems.specs.find {|s| s.name == name }.version
+          new_version = Bundler.definition.specs[name].first
+          new_version &&= new_version.version
+          if !new_version
+            Bundler.ui.warn "Bundler attempted to update #{name} but it was removed from the bundle"
+          elsif new_version < locked_version
+            Bundler.ui.warn "Bundler attempted to update #{name} but its version regressed from #{locked_version} to #{new_version}"
+          elsif new_version == locked_version
+            Bundler.ui.warn "Bundler attempted to update #{name} but its version stayed the same"
+          end
+        end
+      end
+
       Bundler.ui.confirm "Bundle updated!"
       Bundler::CLI::Common.output_without_groups_message
       Bundler::CLI::Common.output_post_install_messages installer.post_install_messages

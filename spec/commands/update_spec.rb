@@ -373,6 +373,24 @@ RSpec.describe "bundle update in more complicated situations" do
     expect(the_bundle).to include_gems "thin 2.0", "rack 1.2", "rack-obama 1.0"
   end
 
+  it "will warn when some explicitly updated gems are not updated" do
+    install_gemfile! <<-G
+      source "file:#{gem_repo2}"
+
+      gem "thin"
+      gem "rack-obama"
+    G
+
+    update_repo2 do
+      build_gem("thin", "2.0") {|s| s.add_dependency "rack" }
+      build_gem "rack", "10.0"
+    end
+
+    bundle! "update thin rack-obama"
+    expect(last_command.stdboth).to include "Bundler attempted to update rack-obama but its version stayed the same"
+    expect(the_bundle).to include_gems "thin 2.0", "rack 10.0", "rack-obama 1.0"
+  end
+
   it "will update only from pinned source" do
     install_gemfile <<-G
       source "file://#{gem_repo2}"
