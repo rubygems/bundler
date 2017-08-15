@@ -66,7 +66,7 @@ RSpec.describe Bundler::RubygemsIntegration do
     end
     let(:fetcher) { double("gem_remote_fetcher") }
 
-    it "succesfully downloads gem with retries" do
+    it "successfully downloads gem with retries" do
       expect(Bundler.rubygems).to receive(:gem_remote_fetcher).and_return(fetcher)
       expect(fetcher).to receive(:headers=).with("X-Gemfile-Source" => "https://foo.bar")
       expect(Bundler::Retry).to receive(:new).with("download gem from #{uri}/").

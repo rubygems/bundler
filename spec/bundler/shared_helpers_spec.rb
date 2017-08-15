@@ -261,7 +261,7 @@ RSpec.describe Bundler::SharedHelpers do
       subject.set_bundle_environment
     end
 
-    it "exits if bundle path contains the path seperator" do
+    it "exits if bundle path contains the path separator" do
       stub_const("File::PATH_SEPARATOR", ":".freeze)
       allow(Bundler).to receive(:bundle_path) { Pathname.new("so:me/dir/bin") }
       expect { subject.send(:validate_bundle_path) }.to raise_error(
