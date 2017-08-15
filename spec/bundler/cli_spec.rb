@@ -112,7 +112,7 @@ RSpec.describe "bundle executable" do
         bundle "fail"
         expect(last_command.stdout).to start_with(<<-EOS.strip)
 The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
-To update, run `gem install bundler`
+To install the latest version, run `gem install bundler`
         EOS
       end
 
@@ -137,7 +137,7 @@ To update, run `gem install bundler`
           bundle "fail"
           expect(last_command.stdout).to start_with(<<-EOS.strip)
 The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
-To update, run `gem install bundler --pre`
+To install the latest version, run `gem install bundler --pre`
           EOS
         end
       end
