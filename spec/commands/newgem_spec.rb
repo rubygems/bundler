@@ -892,19 +892,19 @@ Usage: "bundle gem GEM [OPTIONS]"
         FileUtils.touch("conflict-foobar")
       end
       output = bundle "gem conflict-foobar"
-      expect(output).to include("Errno::EEXIST")
+      expect(output).to include("Errno::ENOTDIR")
       expect(exitstatus).to eql(32) if exitstatus
     end
   end
 
   context "on conflicts with a previously created directory" do
-    it "should fail gracefully" do
+    it "should succeed" do
       in_app_root do
         FileUtils.mkdir_p("conflict-foobar/Gemfile")
       end
-      output = bundle "gem conflict-foobar"
-      expect(output).to include("Errno::EISDIR")
-      expect(exitstatus).to eql(32) if exitstatus
+      bundle! "gem conflict-foobar"
+      expect(out).to include("file_clash  conflict-foobar/Gemfile").
+        and include "Initializing git repo in #{bundled_app("conflict-foobar")}"
     end
   end
 end
