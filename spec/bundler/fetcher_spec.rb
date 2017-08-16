@@ -85,6 +85,47 @@ RSpec.describe Bundler::Fetcher do
         end
       end
     end
+
+    context "when no ssl configuration is set" do
+      it "no cert" do
+        expect(fetcher.send(:connection).cert).to be_nil
+        expect(fetcher.send(:connection).key).to be_nil
+      end
+    end
+
+    context "when bunder ssl ssl configuration is set" do
+      before do
+        allow(Bundler.settings).to receive(:[]).and_return(nil)
+        allow(Bundler.settings).to receive(:[]).with(:ssl_client_cert).and_return("/cert")
+        expect(File).to receive(:read).with("/cert").and_return("")
+        expect(OpenSSL::X509::Certificate).to receive(:new).and_return("cert")
+        expect(OpenSSL::PKey::RSA).to receive(:new).and_return("key")
+      end
+      it "use bundler configuration" do
+        expect(fetcher.send(:connection).cert).to eq("cert")
+        expect(fetcher.send(:connection).key).to eq("key")
+      end
+    end
+
+    context "when gem ssl configuration is set" do
+      before do
+        allow(Bundler.rubygems.configuration).to receive_messages(
+          :http_proxy => nil,
+          :ssl_client_cert => "cert",
+          :ssl_ca_cert => "ca"
+        )
+        expect(File).to receive(:read).and_return("")
+        expect(OpenSSL::X509::Certificate).to receive(:new).and_return("cert")
+        expect(OpenSSL::PKey::RSA).to receive(:new).and_return("key")
+        store = double("ca store")
+        expect(store).to receive(:add_file)
+        expect(OpenSSL::X509::Store).to receive(:new).and_return(store)
+      end
+      it "use gem configuration" do
+        expect(fetcher.send(:connection).cert).to eq("cert")
+        expect(fetcher.send(:connection).key).to eq("key")
+      end
+    end
   end
 
   describe "#user_agent" do
