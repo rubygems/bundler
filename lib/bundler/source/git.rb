@@ -209,19 +209,12 @@ module Bundler
       # When using local git repos, this is set to the local repo.
       def cache_path
         @cache_path ||= begin
-          git_scope = "#{base_name}-#{uri_hash}"
-
           if Bundler.requires_sudo? || Bundler.feature_flag.global_gem_cache?
             Bundler.user_cache
           else
             Bundler.bundle_path.join("cache", "bundler")
           end.join("git", git_scope)
         end
-      end
-
-      def extension_cache_path(spec)
-        return unless Bundler.feature_flag.global_gem_cache?
-        cache_path.join("extensions", Bundler.ruby_scope, extension_dir_name)
       end
 
       def app_cache_dirname
@@ -322,6 +315,14 @@ module Bundler
           stub.full_gem_path = Pathname.new(file).dirname.expand_path(root).to_s.untaint
           StubSpecification.from_stub(stub)
         end
+      end
+
+      def git_scope
+        "#{base_name}-#{uri_hash}"
+      end
+
+      def extension_cache_slug(_)
+        extension_dir_name
       end
     end
   end

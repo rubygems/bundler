@@ -244,10 +244,6 @@ module Bundler
 
         Bundler.ui.warn "The validation message from RubyGems was:\n  #{e.message}"
       end
-
-      def extension_cache_path(spec)
-        nil
-      end
     end
   end
 end

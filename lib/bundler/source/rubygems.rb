@@ -500,9 +500,9 @@ module Bundler
         Bundler.user_cache.join("gems", cache_slug, spec.file_name)
       end
 
-      def extension_cache_path(spec)
-        return unless download_path = download_cache_path(spec)
-        download_path.parent.join("extensions", Bundler.ruby_scope, spec.full_name)
+      def extension_cache_slug(spec)
+        return unless remote = spec.remote
+        remote.cache_slug
       end
     end
   end
