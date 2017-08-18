@@ -12,6 +12,7 @@ RSpec.describe "bundle pristine" do
     build_repo2 do
       build_gem "weakling"
       build_gem "baz-dev", "1.0.0"
+      build_gem "very_simple_binary", &:add_c_extension
       build_git "foo", :path => lib_path("foo")
       build_lib "bar", :path => lib_path("bar")
     end
@@ -19,6 +20,7 @@ RSpec.describe "bundle pristine" do
     install_gemfile! <<-G
       source "file://#{gem_repo2}"
       gem "weakling"
+      gem "very_simple_binary"
       gem "foo", :git => "#{lib_path("foo")}"
       gem "bar", :path => "#{lib_path("bar")}"
 
@@ -97,6 +99,23 @@ RSpec.describe "bundle pristine" do
       bundle "pristine"
       expect(out).to include("Cannot pristine #{spec.name} (#{spec.version}#{spec.git_version}). Gem is sourced from local path.")
       expect(changes_txt).to be_file
+    end
+  end
+
+  context "when a build config exists for one of the gems" do
+    let(:very_simple_binary) { Bundler.definition.specs["very_simple_binary"].first }
+    let(:c_ext_dir)          { Pathname.new(very_simple_binary.full_gem_path).join("ext") }
+    let(:build_opt)          { "--with-ext-lib=#{c_ext_dir}" }
+    before { bundle "config build.very_simple_binary -- #{build_opt}" }
+
+    # This just verifies that the generated Makefile from the c_ext gem makes
+    # use of the build_args from the bundle config
+    it "applies the config when installing the gem" do
+      bundle! "pristine"
+
+      makefile_contents = File.read(c_ext_dir.join("Makefile").to_s)
+      expect(makefile_contents).to match(/libpath =.*#{c_ext_dir}/)
+      expect(makefile_contents).to match(/LIBPATH =.*-L#{c_ext_dir}/)
     end
   end
 end
