@@ -563,10 +563,17 @@ module Spec
         write "ext/extconf.rb", <<-RUBY
           require "mkmf"
 
+
           # exit 1 unless with_config("simple")
 
           extension_name = "very_simple_binary_c"
-          dir_config extension_name
+          if extra_lib_dir = with_config("ext-lib")
+            # add extra libpath if --with-ext-lib is
+            # passed in as a build_arg
+            dir_config extension_name, nil, extra_lib_dir
+          else
+            dir_config extension_name
+          end
           create_makefile extension_name
         RUBY
         write "ext/very_simple_binary.c", <<-C
