@@ -28,55 +28,59 @@ module Bundler
       def update(local_path, remote_path, retrying = nil)
         headers = {}
 
-        Dir.mktmpdir("bundler-compact-index-") do |local_temp_dir|
-          local_temp_path = Pathname.new(local_temp_dir).join(local_path.basename)
+        Bundler::SharedHelpers.filesystem_access(Dir.tmpdir, :write) do
+          validate_permissions_on_home
 
-          # first try to fetch any new bytes on the existing file
-          if retrying.nil? && local_path.file?
-            FileUtils.cp local_path, local_temp_path
-            headers["If-None-Match"] = etag_for(local_temp_path)
-            headers["Range"] =
-              if local_temp_path.size.nonzero?
-                # Subtract a byte to ensure the range won't be empty.
-                # Avoids 416 (Range Not Satisfiable) responses.
-                "bytes=#{local_temp_path.size - 1}-"
-              else
-                "bytes=#{local_temp_path.size}-"
-              end
-          else
-            # Fastly ignores Range when Accept-Encoding: gzip is set
-            headers["Accept-Encoding"] = "gzip"
-          end
+          Dir.mktmpdir("bundler-compact-index-") do |local_temp_dir|
+            local_temp_path = Pathname.new(local_temp_dir).join(local_path.basename)
 
-          response = @fetcher.call(remote_path, headers)
-          return nil if response.is_a?(Net::HTTPNotModified)
-
-          content = response.body
-          if response["Content-Encoding"] == "gzip"
-            content = Zlib::GzipReader.new(StringIO.new(content)).read
-          end
-
-          SharedHelpers.filesystem_access(local_temp_path) do
-            if response.is_a?(Net::HTTPPartialContent) && local_temp_path.size.nonzero?
-              local_temp_path.open("a") {|f| f << slice_body(content, 1..-1) }
+            # first try to fetch any new bytes on the existing file
+            if retrying.nil? && local_path.file?
+              FileUtils.cp local_path, local_temp_path
+              headers["If-None-Match"] = etag_for(local_temp_path)
+              headers["Range"] =
+                if local_temp_path.size.nonzero?
+                  # Subtract a byte to ensure the range won't be empty.
+                  # Avoids 416 (Range Not Satisfiable) responses.
+                  "bytes=#{local_temp_path.size - 1}-"
+                else
+                  "bytes=#{local_temp_path.size}-"
+                end
             else
-              local_temp_path.open("w") {|f| f << content }
+              # Fastly ignores Range when Accept-Encoding: gzip is set
+              headers["Accept-Encoding"] = "gzip"
             end
-          end
 
-          response_etag = (response["ETag"] || "").gsub(%r{\AW/}, "")
-          if etag_for(local_temp_path) == response_etag
-            SharedHelpers.filesystem_access(local_path) do
-              FileUtils.mv(local_temp_path, local_path)
+            response = @fetcher.call(remote_path, headers)
+            return nil if response.is_a?(Net::HTTPNotModified)
+
+            content = response.body
+            if response["Content-Encoding"] == "gzip"
+              content = Zlib::GzipReader.new(StringIO.new(content)).read
             end
-            return nil
-          end
 
-          if retrying
-            raise MisMatchedChecksumError.new(remote_path, response_etag, etag_for(local_temp_path))
-          end
+            SharedHelpers.filesystem_access(local_temp_path) do
+              if response.is_a?(Net::HTTPPartialContent) && local_temp_path.size.nonzero?
+                local_temp_path.open("a") {|f| f << slice_body(content, 1..-1) }
+              else
+                local_temp_path.open("w") {|f| f << content }
+              end
+            end
 
-          update(local_path, remote_path, :retrying)
+            response_etag = (response["ETag"] || "").gsub(%r{\AW/}, "")
+            if etag_for(local_temp_path) == response_etag
+              SharedHelpers.filesystem_access(local_path) do
+                FileUtils.mv(local_temp_path, local_path)
+              end
+              return nil
+            end
+
+            if retrying
+              raise MisMatchedChecksumError.new(remote_path, response_etag, etag_for(local_temp_path))
+            end
+
+            update(local_path, remote_path, :retrying)
+          end
         end
       end
 
@@ -101,6 +105,16 @@ module Bundler
         SharedHelpers.filesystem_access(path, :read) do
           Digest::MD5.hexdigest(IO.read(path))
         end
+      end
+
+    private
+
+      def validate_permissions_on_home
+        return if File.stat(ENV["HOME"]).writable?
+        raise Bundler::PermissionError,
+          "Bundler does not have write access to $HOME. Bundler must " \
+          "have write access to $HOME to function properly. " \
+          "$HOME is currently #{ENV["HOME"]}"
       end
     end
   end
