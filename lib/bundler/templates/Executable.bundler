@@ -24,9 +24,17 @@ m = Module.new do
   def cli_arg_version
     return unless invoked_as_script? # don't want to hijack other binstubs
     return unless "update".start_with?(ARGV.first || " ") # must be running `bundle update`
-    return unless update = ARGV.find {|a| a.start_with?("--bundler") } # must have a --bundler arg
-    return unless update =~ /--bundler(?:=(.+))?/
-    $1 || ">= 0.a"
+    bundler_version = nil
+    update_index = nil
+    ARGV.each_with_index do |a, i|
+      if update_index && update_index.succ == i && a =~ Gem::Version::ANCHORED_VERSION_PATTERN
+        bundler_version = a
+      end
+      next unless a =~ /\A--bundler(?:[= ](#{Gem::Version::VERSION_PATTERN}))?\z/
+      bundler_version = $1 || ">= 0.a"
+      update_index = i
+    end
+    bundler_version
   end
 
   def gemfile
