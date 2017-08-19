@@ -66,6 +66,9 @@ m = Module.new do
   end
 
   def activate_bundler(bundler_version)
+    if Gem::Version.correct?(bundler_version) && Gem::Version.new(bundler_version).release < Gem::Version.new("2.0")
+      bundler_version = "< 2"
+    end
     gem_error = activation_error_handling do
       gem "bundler", bundler_version
     end
