@@ -11,7 +11,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "print Bundler.original_env['PATH']"
       path = `getconf PATH`.strip + "#{File::PATH_SEPARATOR}/foo"
       with_path_as(path) do
-        result = bundle("exec ruby -e #{code.dump}")
+        result = bundle("exec '#{Gem.ruby}' -e #{code.dump}")
         expect(result).to eq(path)
       end
     end
@@ -20,7 +20,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "print Bundler.original_env['GEM_PATH']"
       gem_path = ENV["GEM_PATH"] + ":/foo"
       with_gem_path_as(gem_path) do
-        result = bundle("exec ruby -e #{code.inspect}")
+        result = bundle("exec '#{Gem.ruby}' -e #{code.inspect}")
         expect(result).to eq(gem_path)
       end
     end
@@ -33,11 +33,11 @@ RSpec.describe "Bundler.with_env helpers" do
         if count == 2
           ENV["PATH"] = "#{ENV["PATH"]}:/foo"
         end
-        exec("ruby", __FILE__, (count - 1).to_s)
+        exec(Gem.ruby, __FILE__, (count - 1).to_s)
       RB
       path = `getconf PATH`.strip + File::PATH_SEPARATOR + File.dirname(Gem.ruby)
       with_path_as(path) do
-        bundle!("exec ruby #{bundled_app("exe.rb")} 2")
+        bundle!("exec '#{Gem.ruby}' #{bundled_app("exe.rb")} 2")
       end
       expect(err).to eq <<-EOS.strip
 2 false
@@ -50,7 +50,7 @@ RSpec.describe "Bundler.with_env helpers" do
       system_gems :bundler
       original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")')
       code = 'puts Bundler.original_env.to_a.map {|e| e.join("=") }.sort.join("\n")'
-      bundle!("exec ruby -e #{code.inspect}", :system_bundler => true)
+      bundle!("exec '#{Gem.ruby}' -e #{code.inspect}", :system_bundler => true)
       expect(out).to eq original
     end
   end
@@ -64,21 +64,21 @@ RSpec.describe "Bundler.with_env helpers" do
     it "should delete BUNDLE_PATH" do
       code = "print Bundler.clean_env.has_key?('BUNDLE_PATH')"
       ENV["BUNDLE_PATH"] = "./foo"
-      result = bundle("exec ruby -e #{code.inspect}")
+      result = bundle("exec '#{Gem.ruby}' -e #{code.inspect}")
       expect(result).to eq("false")
     end
 
     it "should remove '-rbundler/setup' from RUBYOPT" do
       code = "print Bundler.clean_env['RUBYOPT']"
       ENV["RUBYOPT"] = "-W2 -rbundler/setup"
-      result = bundle("exec ruby -e #{code.inspect}")
+      result = bundle("exec '#{Gem.ruby}' -e #{code.inspect}")
       expect(result).not_to include("-rbundler/setup")
     end
 
     it "should clean up RUBYLIB" do
       code = "print Bundler.clean_env['RUBYLIB']"
       ENV["RUBYLIB"] = File.expand_path("../../../lib", __FILE__) + File::PATH_SEPARATOR + "/foo"
-      result = bundle("exec ruby -e #{code.inspect}")
+      result = bundle("exec '#{Gem.ruby}' -e #{code.inspect}")
       expect(result).to eq("/foo")
     end
 
@@ -86,7 +86,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "print Bundler.clean_env['MANPATH']"
       ENV["MANPATH"] = "/foo"
       ENV["BUNDLER_ORIG_MANPATH"] = "/foo-original"
-      result = bundle("exec ruby -e #{code.inspect}")
+      result = bundle("exec '#{Gem.ruby}' -e #{code.inspect}")
       expect(result).to eq("/foo-original")
     end
   end
