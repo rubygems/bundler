@@ -168,7 +168,7 @@ end
       expect(the_bundle).to include_gems "has_submodule 1.0"
     end
 
-    it "displays warning message when detecting git repo in Gemfile" do
+    it "displays warning message when detecting git repo in Gemfile", :bundler => "< 2" do
       build_git "foo"
 
       install_gemfile <<-G
