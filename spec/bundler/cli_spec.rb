@@ -120,10 +120,10 @@ Could not find command "fail".
       context "running a parseable command" do
         it "prints no warning" do
           bundle! "config --parseable foo"
-          expect(last_command.stdboth).to eq ""
+          expect(out).to eq ""
 
           bundle "platform --ruby"
-          expect(last_command.stdboth).to eq "Could not locate Gemfile"
+          expect(out).to eq "Could not locate Gemfile"
         end
       end
 
