@@ -1,3 +1,12 @@
+## 1.15.4 (2017-08-19)
+
+Bugfixes:
+
+  - handle file conflicts gracefully in `bundle gem` (@rafaelfranca, @segiddins)
+  - bundler will fail gracefully when the bundle path contains the system path separator (#5485, ajwann)
+  - failed gem downloads will be retried consistently across different RubyGems versions (@shayonj)
+  - `bundle pristine` will respect build options while re-building native extensions (@NickLaMuro)
+
 ## 1.15.3 (2017-07-21)
 
 Bugfixes:
