@@ -73,5 +73,18 @@ module Bundler
         Bundler.ui.info message
       end
     end
+
+    def extension_cache_path(spec)
+      return unless Bundler.feature_flag.global_gem_cache?
+      return unless source_slug = extension_cache_slug(spec)
+      Bundler.user_cache.join(
+        "extensions", Gem::Platform.local.to_s, Bundler.ruby_scope,
+        source_slug, spec.full_name
+      )
+    end
+
+    def extension_cache_slug(_)
+      nil
+    end
   end
 end

@@ -148,7 +148,8 @@ module Bundler
               :wrappers            => true,
               :env_shebang         => true,
               :build_args          => opts[:build_args],
-              :bundler_expected_checksum => spec.respond_to?(:checksum) && spec.checksum
+              :bundler_expected_checksum => spec.respond_to?(:checksum) && spec.checksum,
+              :bundler_extension_cache_path => extension_cache_path(spec)
             ).install
           end
           spec.full_gem_path = installed_spec.full_gem_path
@@ -497,6 +498,11 @@ module Bundler
         return unless cache_slug = remote.cache_slug
 
         Bundler.user_cache.join("gems", cache_slug, spec.file_name)
+      end
+
+      def extension_cache_slug(spec)
+        return unless remote = spec.remote
+        remote.cache_slug
       end
     end
   end

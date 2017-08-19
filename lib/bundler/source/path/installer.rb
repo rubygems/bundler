@@ -7,6 +7,7 @@ module Bundler
         attr_reader :spec
 
         def initialize(spec, options = {})
+          @options            = options
           @spec               = spec
           @gem_dir            = Bundler.rubygems.path(spec.full_gem_path)
           @wrappers           = true

@@ -93,6 +93,11 @@ module Bundler
       end.flatten(1)
     end
 
+    def spec_extension_dir(spec)
+      return unless spec.respond_to?(:extension_dir)
+      spec.extension_dir
+    end
+
     def stub_set_spec(stub, spec)
       stub.instance_variable_set(:@spec, spec)
     end

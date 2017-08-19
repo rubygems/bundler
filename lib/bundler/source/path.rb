@@ -227,7 +227,8 @@ module Bundler
           spec,
           :env_shebang => false,
           :disable_extensions => options[:disable_extensions],
-          :build_args => options[:build_args]
+          :build_args => options[:build_args],
+          :bundler_extension_cache_path => extension_cache_path(spec)
         )
         installer.post_install
       rescue Gem::InvalidSpecificationException => e
