@@ -34,7 +34,6 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
     let(:remote_path) { double(:remote_path) }
 
     it "Errno::EACCES is raised" do
-      allow(Dir).to receive(:tmpdir) { "/tmp" }
       allow(Dir).to receive(:mktmpdir) { raise Errno::EACCES }
 
       expect do
