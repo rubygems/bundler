@@ -118,7 +118,7 @@ RSpec.describe "real source plugins" do
       run <<-RUBY
         puts Bundler.rubygems.find_name('a-path-gem').first.full_gem_path
       RUBY
-      expect(out).to eq(bundle("show a-path-gem"))
+      expect(out).to eq(bundle("info a-path-gem --path"))
     end
 
     it "installs the gem executables" do

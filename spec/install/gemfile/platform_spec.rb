@@ -199,7 +199,7 @@ RSpec.describe "bundle install with platform conditionals" do
       end
     G
 
-    bundle :show
+    bundle :list
     expect(exitstatus).to eq(0) if exitstatus
   end
 

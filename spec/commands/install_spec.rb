@@ -389,10 +389,10 @@ RSpec.describe "bundle install with gem sources" do
     context "and using an unsupported Ruby version" do
       it "prints an error" do
         install_gemfile <<-G
-          ::RUBY_VERSION = '1.8.7'
-          ruby '~> 2.1'
+          ::RUBY_VERSION = '2.0.1'
+          ruby '~> 2.2'
         G
-        expect(out).to include("Your Ruby version is 1.8.7, but your Gemfile specified ~> 2.1")
+        expect(out).to include("Your Ruby version is 2.0.1, but your Gemfile specified ~> 2.2")
       end
     end
 

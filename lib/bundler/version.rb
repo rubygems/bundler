@@ -21,4 +21,8 @@ module Bundler
   end
   private_class_method :overwrite_loaded_gem_version
   overwrite_loaded_gem_version
+
+  def self.bundler_major_version
+    @bundler_major_version ||= VERSION.split(".").first.to_i
+  end
 end
