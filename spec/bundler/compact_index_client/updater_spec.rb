@@ -42,21 +42,4 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
       end.to raise_error(Bundler::PermissionError)
     end
   end
-
-  context "when bundler doesn't have permissions on $HOME" do
-    let(:response) { double(:response, :body => "") }
-    let(:local_path) { Pathname("/tmp/localpath") }
-    let(:remote_path) { double(:remote_path) }
-    let(:home_file_stat) { File::Stat.new("/") }
-
-    it "Bundler::PermissionError is raised" do
-      allow(Dir).to receive(:tmpdir) { "/tmp" }
-      allow(File).to receive(:stat).with(anything) { home_file_stat }
-      allow(home_file_stat).to receive(:writable?) { false }
-
-      expect do
-        updater.update(local_path, remote_path)
-      end.to raise_error(Bundler::PermissionError)
-    end
-  end
 end

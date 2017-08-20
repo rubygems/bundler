@@ -29,8 +29,6 @@ module Bundler
         headers = {}
 
         Bundler::SharedHelpers.filesystem_access(Dir.tmpdir, :write) do
-          validate_permissions_on_home
-
           Dir.mktmpdir("bundler-compact-index-") do |local_temp_dir|
             local_temp_path = Pathname.new(local_temp_dir).join(local_path.basename)
 
@@ -105,16 +103,6 @@ module Bundler
         SharedHelpers.filesystem_access(path, :read) do
           Digest::MD5.hexdigest(IO.read(path))
         end
-      end
-
-    private
-
-      def validate_permissions_on_home
-        return if File.stat(ENV["HOME"]).writable?
-        raise Bundler::PermissionError,
-          "Bundler does not have write access to $HOME. Bundler must " \
-          "have write access to $HOME to function properly. " \
-          "$HOME is currently #{ENV["HOME"]}"
       end
     end
   end
