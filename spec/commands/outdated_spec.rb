@@ -191,6 +191,8 @@ RSpec.describe "bundle outdated" do
         build_gem "activesupport", "2.3.4"
       end
 
+      bundle! "config clean false"
+
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport", "2.3.4"

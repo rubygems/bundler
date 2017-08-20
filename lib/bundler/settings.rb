@@ -12,6 +12,7 @@ module Bundler
       allow_bundler_dependency_conflicts
       allow_deployment_source_credential_changes
       allow_offline_install
+      auto_clean_without_path
       auto_install
       cache_all
       cache_all_platforms

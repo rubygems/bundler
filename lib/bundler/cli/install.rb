@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "bundler/cli/common"
-
 module Bundler
   class CLI::Install
     attr_reader :options
@@ -82,7 +80,7 @@ module Bundler
 
       warn_ambiguous_gems
 
-      if Bundler.settings[:clean] && !Bundler.use_system_gems?
+      if CLI::Common.clean_after_install?
         require "bundler/cli/clean"
         Bundler::CLI::Clean.new(options).run
       end

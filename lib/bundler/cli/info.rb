@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "bundler/cli/common"
-
 module Bundler
   class CLI::Info
     attr_reader :gem_name, :options

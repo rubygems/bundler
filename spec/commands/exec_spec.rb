@@ -617,7 +617,7 @@ RSpec.describe "bundle exec" do
       let(:exit_code) { Bundler::GemNotFound.new.status_code }
       let(:expected) { <<-EOS.strip }
 \e[31mCould not find gem 'rack (= 2)' in locally installed gems.
-The source contains 'rack' at: 0.9.1, 1.0.0\e[0m
+The source contains 'rack' at: 1.0.0\e[0m
 \e[33mRun `bundle install` to install missing gems.\e[0m
       EOS
 
