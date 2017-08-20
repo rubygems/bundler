@@ -494,7 +494,7 @@ EOF
     end
 
     def eval_gemspec(path, contents)
-      eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
+      eval(contents, TOPLEVEL_BINDING.dup, path.expand_path.to_s)
     rescue ScriptError, StandardError => e
       msg = "There was an error while loading `#{path.basename}`: #{e.message}"
 
