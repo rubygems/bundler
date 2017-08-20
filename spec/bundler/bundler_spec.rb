@@ -102,6 +102,24 @@ RSpec.describe Bundler do
         subject
       end
     end
+
+    context "with gemspec containing local variables" do
+      before do
+        File.open(app_gemspec_path, "wb") do |f|
+          f.write strip_whitespace(<<-GEMSPEC)
+            must_not_leak = true
+            Gem::Specification.new do |gem|
+              gem.name = "leak check"
+            end
+          GEMSPEC
+        end
+      end
+
+      it "should not pollute the TOPLEVEL_BINDING" do
+        subject
+        expect(TOPLEVEL_BINDING.local_variables).to_not include(:must_not_leak)
+      end
+    end
   end
 
   describe "#which" do
