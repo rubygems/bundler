@@ -117,7 +117,7 @@ RSpec.describe Bundler do
 
       it "should not pollute the TOPLEVEL_BINDING" do
         subject
-        expect(TOPLEVEL_BINDING.local_variables).to_not include(:must_not_leak)
+        expect(TOPLEVEL_BINDING.eval("local_variables")).to_not include(:must_not_leak)
       end
     end
   end
