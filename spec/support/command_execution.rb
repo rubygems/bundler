@@ -8,7 +8,18 @@ module Spec
     include RSpec::Matchers::Composable
 
     def to_s
-      "$ #{command.strip}"
+      c = Shellwords.shellsplit(command.strip).map {|s| s.include?("\n") ? " \\\n  <<EOS\n#{s.gsub(/^/, "  ").chomp}\nEOS" : Shellwords.shellescape(s) }
+      c = c.reduce("") do |acc, elem|
+        concat = acc + " " + elem
+
+        last_line = concat.match(/.*\z/)[0]
+        if last_line.size >= 100
+          acc + " \\\n  " + elem
+        else
+          concat
+        end
+      end
+      "$ #{c.strip}"
     end
     alias_method :inspect, :to_s
 
