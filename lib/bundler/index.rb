@@ -112,6 +112,7 @@ module Bundler
         spec_sets.values.each(&blk)
       end
       sources.each {|s| s.each(&blk) }
+      self
     end
 
     # returns a list of the dependencies
