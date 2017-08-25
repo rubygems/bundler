@@ -799,7 +799,7 @@ RSpec.describe "bundle gem" do
       bundle "gem foo bar baz"
       expect(last_command.bundler_err).to eq(<<-E.strip)
 ERROR: "bundle gem" was called with arguments ["foo", "bar", "baz"]
-Usage: "bundle gem GEM [OPTIONS]"
+Usage: "bundle gem NAME [OPTIONS]"
       E
     end
   end
