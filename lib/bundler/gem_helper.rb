@@ -118,7 +118,11 @@ module Bundler
     end
 
     def gem_push_host
-      allowed_push_host || "rubygems.org"
+      env_rubygems_host = ENV["RUBYGEMS_HOST"]
+      env_rubygems_host = nil if
+        env_rubygems_host && env_rubygems_host.empty?
+
+      allowed_push_host || env_rubygems_host || "rubygems.org"
     end
 
     def perform_git_push(options = "")
