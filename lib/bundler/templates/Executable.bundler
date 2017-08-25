@@ -70,7 +70,8 @@ m = Module.new do
   def load_bundler!
     ENV["BUNDLE_GEMFILE"] ||= gemfile
 
-    activate_bundler(bundler_version)
+    # must dup string for RG < 1.8 compatibility
+    activate_bundler(bundler_version.dup)
   end
 
   def activate_bundler(bundler_version)
