@@ -791,24 +791,25 @@ module Bundler::Molinillo
       end
 
       # Build an array of PossibilitySets, with each element representing a group of
-      # dependency versions that all have the same sub-dependency version constraints.
+      # dependency versions that all have the same sub-dependency version constraints
+      # and are contiguous.
       # @param [Array] an array of possibilities
       # @return [Array] an array of possibility sets
       def group_possibilities(possibilities)
         possibility_sets = []
-        possibility_sets_index = {}
+        current_possibility_set = nil
 
         possibilities.reverse_each do |possibility|
           dependencies = dependencies_for(possibility)
-          if index = possibility_sets_index[dependencies]
-            possibility_sets[index].possibilities.unshift(possibility)
+          if current_possibility_set && current_possibility_set.dependencies == dependencies
+            current_possibility_set.possibilities.unshift(possibility)
           else
-            possibility_sets << PossibilitySet.new(dependencies, [possibility])
-            possibility_sets_index[dependencies] = possibility_sets.count - 1
+            possibility_sets.unshift(PossibilitySet.new(dependencies, [possibility]))
+            current_possibility_set = possibility_sets.first
           end
         end
 
-        possibility_sets.reverse
+        possibility_sets
       end
 
       # Pushes a new {DependencyState}.
