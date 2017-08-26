@@ -263,20 +263,29 @@ RSpec.describe "bundle binstubs <gem>" do
     end
   end
 
-  context "after installing with --standalone" do
+  context "with --standalone option" do
     before do
-      install_gemfile! <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
-      forgotten_command_line_options(:path => "bundle")
-      bundle! "install", :standalone => true
     end
 
-    it "includes the standalone path" do
-      bundle! "binstubs rack", :standalone => true
-      standalone_line = File.read(bundled_app("bin/rackup")).each_line.find {|line| line.include? "$:.unshift" }.strip
-      expect(standalone_line).to eq %($:.unshift File.expand_path "../../bundle", path.realpath)
+    it "generates a standalone binstub" do
+      bundle! "binstubs rack --standalone"
+      expect(bundled_app("bin/rackup")).to exist
+    end
+
+    it "generates a binstub that does not depend on rubygems or bundler" do
+      bundle! "binstubs rack --standalone"
+      expect(File.read(bundled_app("bin/rackup"))).to_not include("Gem.bin_path")
+    end
+
+    context "when specified --path option" do
+      it "generates a standalone binstub at the given path" do
+        bundle! "binstubs rack --standalone --path foo"
+        expect(bundled_app("foo/rackup")).to exist
+      end
     end
   end
 
