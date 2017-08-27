@@ -107,19 +107,21 @@ RSpec.describe "bundle binstubs <gem>" do
         end
 
         it "runs the correct version of bundler when the version is older" do
-          lockfile lockfile.gsub(system_bundler_version, "1.0")
+          simulate_bundler_version "55"
+          lockfile lockfile.gsub(system_bundler_version, "44.0")
           sys_exec "#{bundled_app("bin/bundle")} install"
           expect(exitstatus).to eq(42) if exitstatus
-          expect(last_command.stderr).to include("Activating bundler (1.0) failed:").
-            and include("To install the version of bundler this project requires, run `gem install bundler -v '1.0'`")
+          expect(last_command.stderr).to include("Activating bundler (44.0) failed:").
+            and include("To install the version of bundler this project requires, run `gem install bundler -v '44.0'`")
         end
 
         it "runs the correct version of bundler when the version is a pre-release" do
-          lockfile lockfile.gsub(system_bundler_version, "1.12.0.a")
+          simulate_bundler_version "55"
+          lockfile lockfile.gsub(system_bundler_version, "2.12.0.a")
           sys_exec "#{bundled_app("bin/bundle")} install"
           expect(exitstatus).to eq(42) if exitstatus
-          expect(last_command.stderr).to include("Activating bundler (1.12.0.a) failed:").
-            and include("To install the version of bundler this project requires, run `gem install bundler -v '1.12.0.a'`")
+          expect(last_command.stderr).to include("Activating bundler (2.12.0.a) failed:").
+            and include("To install the version of bundler this project requires, run `gem install bundler -v '2.12.0.a'`")
         end
       end
 
