@@ -45,7 +45,8 @@ module Bundler
         end
 
         Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby],
-                           :lock_shared_dependencies => options[:conservative])
+                           :lock_shared_dependencies => options[:conservative],
+                           :bundler => options[:bundler])
       end
 
       Bundler::CLI::Common.configure_gem_version_promoter(Bundler.definition, options)

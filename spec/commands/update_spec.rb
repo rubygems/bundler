@@ -629,6 +629,27 @@ RSpec.describe "bundle update --ruby" do
   end
 end
 
+RSpec.describe "bundle update --bundler" do
+  it "updates the bundler version in the lockfile without re-resolving" do
+    build_repo4 do
+      build_gem "rack", "1.0"
+    end
+
+    install_gemfile! <<-G
+      source "file:#{gem_repo4}"
+      gem "rack"
+    G
+    lockfile lockfile.sub(Bundler::VERSION, "1.0.0")
+
+    FileUtils.rm_r gem_repo4
+
+    bundle! :update, :bundler => true, :verbose => true
+    expect(the_bundle).to include_gem "rack 1.0"
+
+    expect(the_bundle.locked_gems.bundler_version).to eq v(Bundler::VERSION)
+  end
+end
+
 # these specs are slow and focus on integration and therefore are not exhaustive. unit specs elsewhere handle that.
 RSpec.describe "bundle update conservative" do
   context "patch and minor options" do
