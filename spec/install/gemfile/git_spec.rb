@@ -1282,7 +1282,7 @@ In Gemfile:
           gem 'foo'
         end
       G
-      bundle "package --all"
+      bundle :package, forgotten_command_line_options([:all, :cache_all] => true)
       simulate_new_machine
 
       bundle! "install", :env => { "PATH" => "" }
