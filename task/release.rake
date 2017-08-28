@@ -4,9 +4,48 @@ require "bundler/gem_tasks"
 task :build => ["build_metadata", "man:build", "generate_files"] do
   Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
 end
-task :release => ["man:require", "man:build", "build_metadata"]
+task :release => ["man:require", "man:build", "release:verify_github", "build_metadata"]
 
 namespace :release do
+  def gh_api_post(opts)
+    gem "netrc", "~> 0.11.0"
+    require "netrc"
+    require "net/http"
+    require "json"
+    _username, token = Netrc.read["api.github.com"]
+
+    host = opts.fetch(:host) { "https://api.github.com/" }
+    path = opts.fetch(:path)
+    uri = URI.join(host, path)
+    uri.query = [uri.query, "access_token=#{token}"].compact.join("&")
+    headers = {
+      "Content-Type" => "application/json",
+      "Accept" => "application/vnd.github.v3+json",
+      "Authorization" => "token #{token}",
+    }.merge(opts.fetch(:headers, {}))
+    body = opts.fetch(:body) { nil }
+
+    response = if body
+      Net::HTTP.post(uri, body.to_json, headers)
+    else
+      Net::HTTP.get_response(uri)
+    end
+
+    if response.code.to_i >= 400
+      raise "#{uri}\n#{response.inspect}\n#{begin
+                                              JSON.parse(response.body)
+                                            rescue
+                                              response.body
+                                            end}"
+    end
+    JSON.parse(response.body)
+  end
+
+  task :verify_github do
+    require "pp"
+    gh_api_post :path => "/user"
+  end
+
   def confirm(prompt = "")
     loop do
       print(prompt)
@@ -37,6 +76,46 @@ namespace :release do
     end
 
     parsed_response
+  end
+
+  def release_notes(version)
+    title_token = "## "
+    current_verison_title = "#{title_token}#{version}"
+    current_minor_title = "#{title_token}#{version.segments[0, 2].join(".")}"
+    text = File.open("CHANGELOG.md", "r:UTF-8", &:read)
+    lines = text.split("\n")
+
+    current_version_index = lines.find_index {|line| line.strip =~ /^#{current_verison_title}($|\b)/ }
+    unless current_version_index
+      raise "Update the changelog for the last version (#{version})"
+    end
+    current_version_index += 1
+    previous_version_lines = lines[current_version_index.succ...-1]
+    previous_version_index = current_version_index + (
+      previous_version_lines.find_index {|line| line.start_with?(title_token) && !line.start_with?(current_minor_title) } ||
+      lines.count
+    )
+
+    relevant = lines[current_version_index..previous_version_index]
+
+    relevant.join("\n").strip
+  end
+
+  task :github, :version do |_t, args|
+    version = Gem::Version.new(args.version)
+    tag = "v#{version}"
+
+    gh_api_post :path => "/repos/bundler/bundler/releases",
+                :body => {
+                  :tag_name => tag,
+                  :name => tag,
+                  :body => release_notes(version),
+                  :prerelease => version.prerelease?,
+                }
+  end
+
+  task :release do |args|
+    Rake::Task["release:github"].invoke(args.version)
   end
 
   desc "Make a patch release with the PRs from master in the patch milestone"
