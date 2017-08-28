@@ -262,15 +262,15 @@ RSpec.describe Bundler::SharedHelpers do
     end
 
     it "exits if bundle path contains the path separator" do
-      stub_const("File::PATH_SEPARATOR", ":".freeze)
+      allow(Gem).to receive(:path_separator).and_return(":")
       allow(Bundler).to receive(:bundle_path) { Pathname.new("so:me/dir/bin") }
       expect { subject.send(:validate_bundle_path) }.to raise_error(
         Bundler::PathError,
-        "Your bundle path contains a ':', which is the " \
+        "Your bundle path contains text matching \":\", which is the " \
         "path separator for your system. Bundler cannot " \
         "function correctly when the Bundle path contains the " \
         "system's PATH separator. Please change your " \
-        "bundle path to not include ':'.\nYour current bundle " \
+        "bundle path to not match \":\".\nYour current bundle " \
         "path is '#{Bundler.bundle_path}'."
       )
     end
