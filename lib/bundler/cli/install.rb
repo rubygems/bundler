@@ -168,9 +168,11 @@ module Bundler
     end
 
     def normalize_settings
+      path = Bundler.feature_flag.path_relative_to_cwd? ? File.expand_path(options["path"]) : options["path"] if options["path"]
+
       Bundler.settings.set_command_option :path, nil if options[:system]
       Bundler.settings.set_command_option :path, "vendor/bundle" if options[:deployment]
-      Bundler.settings.set_command_option :path, Bundler.feature_flag.path_relative_to_cwd? ? File.expand_path(options["path"]) : options["path"] if options["path"]
+      Bundler.settings.set_command_option_if_given :path, path
       Bundler.settings.set_command_option :path, "bundle" if options["standalone"] && Bundler.settings[:path].nil?
 
       bin_option = options["binstubs"]
