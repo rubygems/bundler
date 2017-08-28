@@ -22,7 +22,7 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
@@ -40,7 +40,7 @@ end
       G
 
       bundle "install --path vendor/bundle"
-      bundle "#{cmd} --all"
+      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
@@ -56,8 +56,8 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle! "#{cmd} --all"
-      bundle! "#{cmd} --all"
+      bundle! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
+      bundle! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
       expect(last_command.stdout).to include "Updating files in vendor/cache"
       FileUtils.rm_rf lib_path("foo-1.0")
@@ -72,7 +72,7 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd} --all"
+      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
       update_git "foo" do |s|
         s.write "lib/foo.rb", "puts :CACHE"
@@ -82,7 +82,7 @@ end
       expect(ref).not_to eq(old_ref)
 
       bundle! "update", :all => bundle_update_requires_all?
-      bundle! "#{cmd} --all"
+      bundle! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
@@ -129,7 +129,7 @@ end
 
       bundle %(config local.foo #{lib_path("foo-1.0")})
       bundle "install"
-      bundle "#{cmd} --all"
+      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
       expect(bundled_app("vendor/cache/foo-invalid-#{ref}")).to exist
 
@@ -161,7 +161,7 @@ end
       G
 
       ref = git.ref_for("master", 11)
-      bundle "#{cmd} --all"
+      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
       expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist

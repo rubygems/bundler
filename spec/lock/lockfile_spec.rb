@@ -647,8 +647,8 @@ RSpec.describe "the lockfile format", :bundler => "2" do
       gem "foo", :path => "#{lib_path("foo-1.0")}"
     G
 
-    bundle! "package --all"
-    bundle! "install --local"
+    bundle! :package, forgotten_command_line_options([:all, :cache_all] => true)
+    bundle! :install, :local => true
 
     lockfile_should_be <<-G
       GEM

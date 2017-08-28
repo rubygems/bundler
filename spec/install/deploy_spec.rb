@@ -405,7 +405,7 @@ You have deleted from the Gemfile:
 
       bundle! :install
       expect(the_bundle).to include_gems "foo 1.0"
-      bundle! "package --all"
+      bundle! :package, forgotten_command_line_options([:all, :cache_all] => true)
       expect(bundled_app("vendor/cache/foo")).to be_directory
 
       bundle! "install --local"
