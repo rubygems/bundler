@@ -261,7 +261,7 @@ RSpec.describe Bundler::SharedHelpers do
       subject.set_bundle_environment
     end
 
-    it "exits if bundle path contains the path separator" do
+    it "exits if bundle path contains the unix-like path separator" do
       allow(Gem).to receive(:path_separator).and_return(":")
       allow(Bundler).to receive(:bundle_path) { Pathname.new("so:me/dir/bin") }
       expect { subject.send(:validate_bundle_path) }.to raise_error(
@@ -272,6 +272,35 @@ RSpec.describe Bundler::SharedHelpers do
         "system's PATH separator. Please change your " \
         "bundle path to not match \":\".\nYour current bundle " \
         "path is '#{Bundler.bundle_path}'."
+      )
+    end
+
+    it "does not exit if bundle path is the jruby/warbler standard uri path" do
+      allow(Gem).to receive(:path_separator).and_return(
+        /(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/
+      )
+      allow(Bundler).to receive(:bundle_path) { Pathname.new("uri:classloader:/WEB-INF/gems") }
+      expect { subject.send(:validate_bundle_path) }.not_to raise_error(Bundler::PathError)
+    end
+
+    it "exits if bundle path contains another directory with the jruby uri path separator" do
+      allow(Gem).to receive(:path_separator).and_return(
+        /(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/
+      )
+      allow(Bundler).to receive(:bundle_path) {
+        Pathname.new("uri:classloader:/WEB-INF/gems:other/dir")
+      }
+
+      expect { subject.send(:validate_bundle_path) }.to raise_error(
+        Bundler::PathError,
+        "Your bundle path contains text matching " \
+        "/(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/, which is the " \
+        "path separator for your system. Bundler cannot " \
+        "function correctly when the Bundle path contains the " \
+        "system's PATH separator. Please change your " \
+        "bundle path to not match " \
+        "/(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/." \
+        "\nYour current bundle path is '#{Bundler.bundle_path}'."
       )
     end
 
