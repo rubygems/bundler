@@ -238,7 +238,7 @@ module Bundler
           Bundler.settings[:ssl_client_cert]
         raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
-        con = Bundler::Persistent::Net::HTTP::Persistent.new "bundler", :ENV
+        con = PersistentHTTP.new "bundler", :ENV
         if gem_proxy = Bundler.rubygems.configuration[:http_proxy]
           con.proxy = URI.parse(gem_proxy) if gem_proxy != :no_proxy
         end
@@ -277,7 +277,7 @@ module Bundler
       Timeout::Error, EOFError, SocketError, Errno::ENETDOWN, Errno::ENETUNREACH,
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
-      Bundler::Persistent::Net::HTTP::Persistent::Error, Zlib::BufError, Errno::EHOSTUNREACH
+      PersistentHTTP::Error, Zlib::BufError, Errno::EHOSTUNREACH
     ].freeze
 
     def bundler_cert_store
