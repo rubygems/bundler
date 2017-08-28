@@ -218,6 +218,7 @@ RSpec.describe "bundle exec" do
   end
 
   it "raises a helpful error when exec'ing to something outside of the bundle", :rubygems => ">= 2.5.2" do
+    bundle! "config clean false" # want to keep the rackup binstub
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
       gem "with_license"
