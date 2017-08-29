@@ -2,18 +2,15 @@
 
 module Bundler
   class CLI::Config
-    attr_reader :name, :options, :scope, :thor
-    attr_accessor :args
+    attr_reader :name, :value, :options, :scope, :thor
 
-    def initialize(options, args, thor)
+    def initialize(options, name, value, thor)
       @options = options
-      @args = args
+      @name = name
+      value = Array(value)
+      @value = value.empty? ? nil : value.join(" ")
       @thor = thor
-      @name = peek = args.shift
-      @scope = "global"
-      return unless peek && peek.start_with?("--")
-      @name = args.shift
-      @scope = peek[2..-1]
+      validate_scope!
     end
 
     def run
@@ -22,18 +19,17 @@ module Bundler
         return
       end
 
-      unless valid_scope?(scope)
-        Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
-        exit 1
-      end
-
-      if scope == "delete"
-        Bundler.settings.set_local(name, nil)
-        Bundler.settings.set_global(name, nil)
+      if options[:delete]
+        if !@explicit_scope || scope != "global"
+          Bundler.settings.set_local(name, nil)
+        end
+        if !@explicit_scope || scope != "local"
+          Bundler.settings.set_global(name, nil)
+        end
         return
       end
 
-      if args.empty?
+      if value.nil?
         if options[:parseable]
           if value = Bundler.settings[name]
             Bundler.ui.info("#{name}=#{value}")
@@ -75,11 +71,11 @@ module Bundler
     end
 
     def new_value
-      pathname = Pathname.new(args.join(" "))
+      pathname = Pathname.new(value)
       if name.start_with?("local.") && pathname.directory?
         pathname.expand_path.to_s
       else
-        args.join(" ")
+        value
       end
     end
 
@@ -88,17 +84,17 @@ module Bundler
       if @options[:parseable]
         "#{name}=#{new_value}" if new_value
       elsif scope == "global"
-        if locations[:local]
+        if !locations[:local].nil?
           "Your application has set #{name} to #{locations[:local].inspect}. " \
             "This will override the global value you are currently setting"
         elsif locations[:env]
           "You have a bundler environment variable for #{name} set to " \
             "#{locations[:env].inspect}. This will take precedence over the global value you are setting"
-        elsif locations[:global] && locations[:global] != args.join(" ")
+        elsif !locations[:global].nil? && locations[:global] != value
           "You are replacing the current global value of #{name}, which is currently " \
             "#{locations[:global].inspect}"
         end
-      elsif scope == "local" && locations[:local] != args.join(" ")
+      elsif scope == "local" && !locations[:local].nil? && locations[:local] != value
         "You are replacing the current local value of #{name}, which is currently " \
           "#{locations[:local].inspect}"
       end
@@ -112,8 +108,20 @@ module Bundler
       end
     end
 
-    def valid_scope?(scope)
-      %w[delete local global].include?(scope)
+    def validate_scope!
+      @explicit_scope = true
+      scopes = %w[global local]
+      scopes.reject! {|s| options[s].nil? }
+      case scopes.size
+      when 0
+        @scope = "global"
+        @explicit_scope = false
+      when 1
+        @scope = scopes.first
+      else
+        raise InvalidOption,
+          "The options #{scopes.join " and "} were specified. Please only use one of the switches at a time."
+      end
     end
   end
 end
