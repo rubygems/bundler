@@ -26,6 +26,18 @@ RSpec.describe "bundle executable" do
     expect(out).to eq("Hello, world")
   end
 
+  context "with no arguments" do
+    it "prints a concise help message", :bundler => "2" do
+      bundle! ""
+      expect(last_command.stderr).to be_empty
+      expect(last_command.stdout).to include("Bundler version #{Bundler::VERSION}").
+        and include("\n\nBundler commands:\n\n").
+        and include("\n\n  Primary commands:\n").
+        and include("\n\n  Utilities:\n").
+        and include("\n\nOptions:\n")
+    end
+  end
+
   context "when ENV['BUNDLE_GEMFILE'] is set to an empty string" do
     it "ignores it" do
       gemfile bundled_app("Gemfile"), <<-G
@@ -107,7 +119,7 @@ RSpec.describe "bundle executable" do
     end
 
     context "when the latest version is greater than the current version" do
-      let(:latest_version) { "2.0" }
+      let(:latest_version) { "222.0" }
       it "prints the version warning" do
         bundle "fail"
         expect(last_command.stdout).to start_with(<<-EOS.strip)
@@ -132,7 +144,7 @@ To install the latest version, run `gem install bundler`
       end
 
       context "and is a pre-release" do
-        let(:latest_version) { "2.0.0.pre.4" }
+        let(:latest_version) { "222.0.0.pre.4" }
         it "prints the version warning" do
           bundle "fail"
           expect(last_command.stdout).to start_with(<<-EOS.strip)

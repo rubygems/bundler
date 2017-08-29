@@ -7,6 +7,8 @@ module Bundler
   class CLI < Thor
     require "bundler/cli/common"
 
+    package_name "Bundler"
+
     AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
     PARSEABLE_COMMANDS = %w[
       check config help exec platform show version
@@ -71,7 +73,26 @@ module Bundler
     def cli_help
       version
       Bundler.ui.info "\n"
-      self.class.help(shell)
+
+      primary_commands = ["install", "update",
+                          Bundler.feature_flag.cache_command_is_package? ? "cache" : "package",
+                          "exec", "config", "help"]
+
+      list = self.class.printable_commands(true)
+      by_name = list.group_by {|name, _message| name.match(/^bundle (\w+)/)[1] }
+      utilities = by_name.keys.sort - primary_commands
+      primary_commands.map! {|name| (by_name[name] || raise("no primary command #{name}")).first }
+      utilities.map! {|name| by_name[name].first }
+
+      shell.say "Bundler commands:\n\n"
+
+      shell.say "  Primary commands:\n"
+      shell.print_table(primary_commands, :indent => 4, :truncate => true)
+      shell.say
+      shell.say "  Utilities:\n"
+      shell.print_table(utilities, :indent => 4, :truncate => true)
+      shell.say
+      self.class.send(:class_options_help, shell)
     end
     default_task(Bundler.feature_flag.default_cli_command)
 
@@ -437,11 +458,12 @@ module Bundler
 
     desc "version", "Prints the bundler's version information"
     def version
-      if ARGV.include?("version")
+      cli_help = current_command.name == "cli_help"
+      if cli_help || ARGV.include?("version")
         build_info = " (#{BuildMetadata.built_at} commit #{BuildMetadata.git_commit_sha})"
       end
 
-      if Bundler.feature_flag.print_only_version_number?
+      if !cli_help && Bundler.feature_flag.print_only_version_number?
         Bundler.ui.info "#{Bundler::VERSION}#{build_info}"
       else
         Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
@@ -463,7 +485,7 @@ module Bundler
       end
     end
 
-    desc "viz [OPTIONS]", "Generates a visual dependency graph"
+    desc "viz [OPTIONS]", "Generates a visual dependency graph", :hide => true
     long_desc <<-D
       Viz generates a PNG file of the current Gemfile as a dependency graph.
       Viz requires the ruby-graphviz gem (and its dependencies).
@@ -481,7 +503,7 @@ module Bundler
 
     old_gem = instance_method(:gem)
 
-    desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
+    desc "gem NAME [OPTIONS]", "Creates a skeleton for creating a rubygem"
     method_option :exe, :type => :boolean, :default => false, :aliases => ["--bin", "-b"], :desc => "Generate a binary executable for your library."
     method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
     method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "EDITOR",
@@ -520,7 +542,7 @@ module Bundler
       File.expand_path(File.join(File.dirname(__FILE__), "templates"))
     end
 
-    desc "clean [OPTIONS]", "Cleans up unused gems in your bundler directory"
+    desc "clean [OPTIONS]", "Cleans up unused gems in your bundler directory", :hide => true
     method_option "dry-run", :type => :boolean, :default => false, :banner =>
       "Only print out changes, do not clean gems"
     method_option "force", :type => :boolean, :default => false, :banner =>
@@ -538,7 +560,7 @@ module Bundler
       Platform.new(options).run
     end
 
-    desc "inject GEM VERSION", "Add the named gem, with version requirements, to the resolved Gemfile"
+    desc "inject GEM VERSION", "Add the named gem, with version requirements, to the resolved Gemfile", :hide => true
     method_option "source", :type => :string, :banner =>
      "Install gem from the given source"
     method_option "group", :type => :string, :banner =>
@@ -618,7 +640,7 @@ module Bundler
 
     if Bundler.feature_flag.plugins?
       require "bundler/cli/plugin"
-      desc "plugin SUBCOMMAND ...ARGS", "Manage the bundler plugins"
+      desc "plugin", "Manage the bundler plugins"
       subcommand "plugin", Plugin
     end
 
@@ -668,16 +690,20 @@ module Bundler
       end
     end
 
+    def current_command
+      _, _, config = @_initializer
+      config[:current_command]
+    end
+
     def print_command
       return unless Bundler.ui.debug?
-      _, _, config = @_initializer
-      current_command = config[:current_command]
-      command_name = current_command.name
+      cmd = current_command
+      command_name = cmd.name
       return if PARSEABLE_COMMANDS.include?(command_name)
       command = ["bundle", command_name] + args
       options_to_print = options.dup
       options_to_print.delete_if do |k, v|
-        next unless o = current_command.options[k]
+        next unless o = cmd.options[k]
         o.default == v
       end
       command << Thor::Options.to_switches(options_to_print.sort_by(&:first)).strip
@@ -688,8 +714,6 @@ module Bundler
     def warn_on_outdated_bundler
       return if Bundler.settings[:disable_version_check]
 
-      _, _, config = @_initializer
-      current_command = config[:current_command]
       command_name = current_command.name
       return if PARSEABLE_COMMANDS.include?(command_name)
 
@@ -708,8 +732,8 @@ module Bundler
 
       installation = "To install the latest version, run `gem install bundler#{" --pre" if latest.prerelease?}`"
       if latest_installed && latest_installed > current
-        suggestion = "To update to the most recent installed version, run `bundle update --bundler`"
-        suggestion = "#{installation}\n#{suggestion}" if latest_installed > latest
+        suggestion = "To update to the most recent installed version (#{latest_installed}), run `bundle update --bundler`"
+        suggestion = "#{installation}\n#{suggestion}" if latest_installed < latest
       else
         suggestion = installation
       end
