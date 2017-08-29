@@ -603,7 +603,12 @@ module Bundler
       Issue.new.run
     end
 
-    desc "pristine [GEMS...]", "Restores installed gems to pristine condition from files located in the gem cache. Gem installed from a git repository will be issued `git checkout --force`."
+    desc "pristine [GEMS...]", "Restores installed gems to pristine condition"
+    long_desc <<-D
+      Restores installed gems to pristine condition from files located in the
+      gem cache. Gems installed from a git repository will be issued `git
+      checkout --force`.
+    D
     def pristine(*gems)
       require "bundler/cli/pristine"
       Pristine.new(gems).run
