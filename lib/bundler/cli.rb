@@ -730,8 +730,8 @@ module Bundler
 
       installation = "To install the latest version, run `gem install bundler#{" --pre" if latest.prerelease?}`"
       if latest_installed && latest_installed > current
-        suggestion = "To update to the most recent installed version, run `bundle update --bundler`"
-        suggestion = "#{installation}\n#{suggestion}" if latest_installed > latest
+        suggestion = "To update to the most recent installed version (#{latest_installed}), run `bundle update --bundler`"
+        suggestion = "#{installation}\n#{suggestion}" if latest_installed < latest
       else
         suggestion = installation
       end

@@ -107,7 +107,7 @@ RSpec.describe "bundle executable" do
     end
 
     context "when the latest version is greater than the current version" do
-      let(:latest_version) { "2.0" }
+      let(:latest_version) { "222.0" }
       it "prints the version warning" do
         bundle "fail"
         expect(last_command.stdout).to start_with(<<-EOS.strip)
@@ -132,7 +132,7 @@ To install the latest version, run `gem install bundler`
       end
 
       context "and is a pre-release" do
-        let(:latest_version) { "2.0.0.pre.4" }
+        let(:latest_version) { "222.0.0.pre.4" }
         it "prints the version warning" do
           bundle "fail"
           expect(last_command.stdout).to start_with(<<-EOS.strip)
