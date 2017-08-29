@@ -309,7 +309,6 @@ RSpec.describe Bundler::SharedHelpers do
       end
     end
 
-
     context "ENV['PATH'] does not exist" do
       before { ENV.delete("PATH") }
 
