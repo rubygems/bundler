@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "bundler/cli/common"
 require "shellwords"
 
 module Bundler

@@ -90,5 +90,13 @@ module Bundler
     def self.patch_level_options(options)
       [:major, :minor, :patch].select {|v| options.keys.include?(v.to_s) }
     end
+
+    def self.clean_after_install?
+      clean = Bundler.settings[:clean]
+      return clean unless clean.nil?
+      clean ||= Bundler.feature_flag.auto_clean_without_path? && Bundler.settings[:path].nil?
+      clean &&= !Bundler.use_system_gems?
+      clean
+    end
   end
 end

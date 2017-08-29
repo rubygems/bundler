@@ -383,6 +383,30 @@ RSpec.describe "bundle clean" do
     should_not_have_gems "foo-1.0"
   end
 
+  it "automatically cleans when path has not been set", :bundler => "2" do
+    build_repo2
+
+    install_gemfile! <<-G
+      source "file://#{gem_repo2}"
+
+      gem "foo"
+    G
+
+    update_repo2 do
+      build_gem "foo", "1.0.1"
+    end
+
+    bundle! "update", :all => true
+
+    files = Pathname.glob(bundled_app(".bundle", Bundler.ruby_scope, "*", "*"))
+    files.map! {|f| f.to_s.sub(bundled_app(".bundle", Bundler.ruby_scope).to_s, "") }
+    expect(files.sort).to eq %w[
+      /cache/foo-1.0.1.gem
+      /gems/foo-1.0.1
+      /specifications/foo-1.0.1.gemspec
+    ]
+  end
+
   it "does not clean automatically on --path" do
     gemfile <<-G
       source "file://#{gem_repo1}"

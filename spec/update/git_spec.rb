@@ -117,8 +117,10 @@ RSpec.describe "bundle update" do
 
     describe "with submodules" do
       before :each do
-        build_gem "submodule", :to_bundle => true do |s|
-          s.write "lib/submodule.rb", "puts 'GEM'"
+        build_repo4 do
+          build_gem "submodule" do |s|
+            s.write "lib/submodule.rb", "puts 'GEM'"
+          end
         end
 
         build_git "submodule", "1.0" do |s|
@@ -137,6 +139,7 @@ RSpec.describe "bundle update" do
 
       it "it unlocks the source when submodules are added to a git source" do
         install_gemfile <<-G
+          source "file:#{gem_repo4}"
           git "#{lib_path("has_submodule-1.0")}" do
             gem "has_submodule"
           end
@@ -146,6 +149,7 @@ RSpec.describe "bundle update" do
         expect(out).to eq("GEM")
 
         install_gemfile <<-G
+          source "file:#{gem_repo4}"
           git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
@@ -156,22 +160,24 @@ RSpec.describe "bundle update" do
       end
 
       it "unlocks the source when submodules are removed from git source", :git => ">= 2.9.0" do
-        install_gemfile <<-G
+        install_gemfile! <<-G
+          source "file:#{gem_repo4}"
           git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
         G
 
-        run "require 'submodule'"
+        run! "require 'submodule'"
         expect(out).to eq("GIT")
 
-        install_gemfile <<-G
+        install_gemfile! <<-G
+          source "file:#{gem_repo4}"
           git "#{lib_path("has_submodule-1.0")}" do
             gem "has_submodule"
           end
         G
 
-        run "require 'submodule'"
+        run! "require 'submodule'"
         expect(out).to eq("GEM")
       end
     end

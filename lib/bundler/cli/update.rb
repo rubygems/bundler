@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "bundler/cli/common"
-
 module Bundler
   class CLI::Update
     attr_reader :options, :gems
@@ -63,7 +61,7 @@ module Bundler
       installer = Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.app_cache.exist?
 
-      if Bundler.settings[:clean] && !Bundler.use_system_gems?
+      if CLI::Common.clean_after_install?
         require "bundler/cli/clean"
         Bundler::CLI::Clean.new(options).run
       end
