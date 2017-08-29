@@ -262,7 +262,11 @@ RSpec.describe Bundler::SharedHelpers do
     end
 
     it "exits if bundle path contains the unix-like path separator" do
-      allow(Gem).to receive(:path_separator).and_return(":")
+      if Gem.respond_to?(:path_separator)
+        allow(Gem).to receive(:path_separator).and_return(":")
+      else
+        stub_const("File::PATH_SEPARATOR", ":".freeze)
+      end
       allow(Bundler).to receive(:bundle_path) { Pathname.new("so:me/dir/bin") }
       expect { subject.send(:validate_bundle_path) }.to raise_error(
         Bundler::PathError,
@@ -275,7 +279,7 @@ RSpec.describe Bundler::SharedHelpers do
       )
     end
 
-    it "does not exit if bundle path is the jruby/warbler standard uri path" do
+    it "does not exit if bundle path is the jruby/warbler standard uri path", :ruby => "> 1.8.7" do
       allow(Gem).to receive(:path_separator).and_return(
         /(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/
       )
@@ -283,7 +287,7 @@ RSpec.describe Bundler::SharedHelpers do
       expect { subject.send(:validate_bundle_path) }.not_to raise_error(Bundler::PathError)
     end
 
-    it "exits if bundle path contains another directory with the jruby uri path separator" do
+    it "exits if bundle path contains another directory with the jruby uri path separator", :ruby => "> 1.8.7" do
       allow(Gem).to receive(:path_separator).and_return(
         /(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/
       )
