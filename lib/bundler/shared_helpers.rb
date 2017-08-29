@@ -223,11 +223,11 @@ module Bundler
     def validate_bundle_path
       path_separator = Gem.respond_to?(:path_separator) ? Gem.path_separator : File::PATH_SEPARATOR
       return unless Bundler.bundle_path.to_s.split(path_separator).size > 1
-      message = "Your bundle path contains text matching #{Gem.path_separator.inspect}, " \
+      message = "Your bundle path contains text matching #{path_separator.inspect}, " \
                 "which is the path separator for your system. Bundler cannot " \
                 "function correctly when the Bundle path contains the " \
                 "system's PATH separator. Please change your " \
-                "bundle path to not match #{Gem.path_separator.inspect}." \
+                "bundle path to not match #{path_separator.inspect}." \
                 "\nYour current bundle path is '#{Bundler.bundle_path}'."
       raise Bundler::PathError, message
     end
