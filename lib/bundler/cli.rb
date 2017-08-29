@@ -74,12 +74,14 @@ module Bundler
       version
       Bundler.ui.info "\n"
 
-      primary_commands = %w[install update package exec config help]
+      primary_commands = ["install", "update",
+                          Bundler.feature_flag.cache_command_is_package? ? "cache" : "package",
+                          "exec", "config", "help"]
 
       list = self.class.printable_commands(true)
       by_name = list.group_by {|name, _message| name.match(/^bundle (\w+)/)[1] }
       utilities = by_name.keys.sort - primary_commands
-      primary_commands.map! {|name| by_name[name].first }
+      primary_commands.map! {|name| (by_name[name] || raise("no primary command #{name}")).first }
       utilities.map! {|name| by_name[name].first }
 
       shell.say "Bundler commands:\n\n"

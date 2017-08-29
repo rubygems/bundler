@@ -26,6 +26,18 @@ RSpec.describe "bundle executable" do
     expect(out).to eq("Hello, world")
   end
 
+  context "with no arguments" do
+    it "prints a concise help message", :bundler => "2" do
+      bundle! ""
+      expect(last_command.stderr).to be_empty
+      expect(last_command.stdout).to include("Bundler version #{Bundler::VERSION}").
+        and include("\n\nBundler commands:\n\n").
+        and include("\n\n  Primary commands:\n").
+        and include("\n\n  Utilities:\n").
+        and include("\n\nOptions:\n")
+    end
+  end
+
   context "when ENV['BUNDLE_GEMFILE'] is set to an empty string" do
     it "ignores it" do
       gemfile bundled_app("Gemfile"), <<-G
