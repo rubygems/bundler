@@ -76,7 +76,9 @@ RSpec.shared_examples "bundle install --standalone" do
     end
 
     it "generates a bundle/bundler/setup.rb with the proper paths", :rubygems => "2.4" do
-      extension_line = File.read(bundled_app("bundle/bundler/setup.rb")).each_line.find {|line| line.include? "/extensions/" }.strip
+      expected_path = (Bundler.feature_flag.path_relative_to_cwd? ? Pathname.pwd : bundled_app).
+                      join("bundle/bundler/setup.rb")
+      extension_line = File.read(expected_path).each_line.find {|line| line.include? "/extensions/" }.strip
       expect(extension_line).to start_with '$:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/extensions/'
       expect(extension_line).to end_with '/very_simple_binary-1.0"'
     end
