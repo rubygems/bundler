@@ -98,5 +98,22 @@ module Bundler
       clean &&= !Bundler.use_system_gems?
       clean
     end
+
+    def self.set_path(path, if_given = false)
+      return if if_given && path.nil?
+
+      path = Pathname.new(path)
+      if path.relative? && Bundler.feature_flag.path_relative_to_cwd?
+        path = path.expand_path
+        root = Bundler.root
+        path = begin
+                 path.relative_path_from(root)
+               rescue ArgumentError
+                 path
+               end
+      end
+
+      Bundler.settings.set_command_option :path, path.to_s
+    end
   end
 end

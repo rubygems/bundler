@@ -250,6 +250,15 @@ module Bundler
         path
       end
 
+      def base_path_relative_to_pwd
+        expanded_base_path = Pathname.new(base_path).expand_path(Bundler.root)
+        relative_path = expanded_base_path.relative_path_from(Pathname.pwd)
+        relative_path = Pathname.new(File.join(".", relative_path)) unless relative_path.to_s.start_with?("..")
+        relative_path
+      rescue ArgumentError
+        expanded_base_path
+      end
+
       def validate!
         return unless explicit_path && system_path
         path = Bundler.settings.pretty_values_for(:path)

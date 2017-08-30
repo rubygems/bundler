@@ -24,7 +24,7 @@ RSpec.describe "bundle install" do
 
       Dir.chdir(dir) do
         bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
-        expect(out).to include("installed into `./vendor/bundle`")
+        expect(out).to include("installed into `../vendor/bundle`")
       end
 
       dir.rmtree
@@ -53,11 +53,30 @@ RSpec.describe "bundle install" do
     context "with path_relative_to_cwd set to true" do
       before { bundle! "config path_relative_to_cwd true" }
 
-      it "installs the bundle relatively to current working directory" do
+      it "installs the bundle relatively to current working directory", :bundler => "< 2" do
         Dir.chdir(bundled_app.parent) do
           bundle! "install --gemfile='#{bundled_app}/Gemfile' --path vendor/bundle"
-          expect(out).to include("installed into ./vendor/bundle")
+          expect(out).to include("installed into `./vendor/bundle`")
           expect(bundled_app("../vendor/bundle")).to be_directory
+        end
+        expect(the_bundle).to include_gems "rack 1.0.0"
+      end
+
+      it "installs the standalone bundle relative to the cwd" do
+        Dir.chdir(bundled_app.parent) do
+          bundle! :install, :gemfile => bundled_app("Gemfile"), :standalone => true
+          expect(out).to include("installed into `./bundle`")
+          expect(bundled_app("../bundle")).to be_directory
+          expect(bundled_app("../bundle/ruby")).to be_directory
+        end
+
+        bundle! "config --delete path"
+
+        Dir.chdir(bundled_app("subdir").tap(&:mkpath)) do
+          bundle! :install, :gemfile => bundled_app("Gemfile"), :standalone => true
+          expect(out).to include("installed into `./bundle`")
+          expect(bundled_app("subdir/bundle")).to be_directory
+          expect(bundled_app("subdir/bundle/ruby")).to be_directory
         end
       end
     end
