@@ -283,13 +283,13 @@ RSpec.describe Bundler::SharedHelpers do
       # In versions of jruby that supported ruby 1.8, the path separator was the standard File::PATH_SEPARATOR
       let(:regex) { Regexp.new("(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):") }
       it "does not exit if bundle path is the standard uri path" do
-        allow(Gem).to receive(:path_separator).and_return(regex)
+        allow(Bundler.rubygems).to receive(:path_separator).and_return(regex)
         allow(Bundler).to receive(:bundle_path) { Pathname.new("uri:classloader:/WEB-INF/gems") }
         expect { subject.send(:validate_bundle_path) }.not_to raise_error
       end
 
       it "exits if bundle path contains another directory" do
-        allow(Gem).to receive(:path_separator).and_return(regex)
+        allow(Bundler.rubygems).to receive(:path_separator).and_return(regex)
         allow(Bundler).to receive(:bundle_path) {
           Pathname.new("uri:classloader:/WEB-INF/gems:other/dir")
         }
