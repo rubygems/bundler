@@ -251,9 +251,14 @@ module Bundler
       end
 
       def base_path_relative_to_pwd
-        expanded_base_path = Pathname.new(base_path).expand_path(Bundler.root)
+        base_path = Pathname.new(self.base_path)
+        expanded_base_path = base_path.expand_path(Bundler.root)
         relative_path = expanded_base_path.relative_path_from(Pathname.pwd)
-        relative_path = Pathname.new(File.join(".", relative_path)) unless relative_path.to_s.start_with?("..")
+        if relative_path.to_s.start_with?("..")
+          relative_path = base_path if base_path.absolute?
+        else
+          relative_path = Pathname.new(File.join(".", relative_path))
+        end
         relative_path
       rescue ArgumentError
         expanded_base_path
