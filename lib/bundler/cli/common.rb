@@ -100,7 +100,10 @@ module Bundler
     end
 
     def self.set_path(path, if_given = false)
-      return if if_given && path.nil?
+      if path.nil?
+        Bundler.settings.set_command_option :path, nil unless if_given
+        return
+      end
 
       path = Pathname.new(path)
       if path.relative? && Bundler.feature_flag.path_relative_to_cwd?
