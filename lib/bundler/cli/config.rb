@@ -31,8 +31,8 @@ module Bundler
 
     desc "set NAME VALUE", "Sets the given value for the given key"
     scope_options
-    def set(name, *value)
-      Base.new(options, name, value, self).run
+    def set(name, value, *value_)
+      Base.new(options, name, value_.unshift(value), self).run
     end
 
     desc "unset NAME", "Unsets the value for the given key"
