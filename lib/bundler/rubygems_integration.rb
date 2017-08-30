@@ -208,6 +208,10 @@ module Bundler
       Gem.bin_path(gem, bin, ver)
     end
 
+    def path_separator
+      File::PATH_SEPARATOR
+    end
+
     def preserve_paths
       # this is a no-op outside of RubyGems 1.8
       yield
@@ -787,6 +791,10 @@ module Bundler
 
       def install_with_build_args(args)
         yield
+      end
+
+      def path_separator
+        Gem.path_separator
       end
     end
 
