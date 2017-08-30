@@ -221,7 +221,7 @@ module Bundler
   private
 
     def validate_bundle_path
-      path_separator = Gem.respond_to?(:path_separator) ? Gem.path_separator : File::PATH_SEPARATOR
+      path_separator = Bundler.rubygems.path_separator
       return unless Bundler.bundle_path.to_s.split(path_separator).size > 1
       message = "Your bundle path contains text matching #{path_separator.inspect}, " \
                 "which is the path separator for your system. Bundler cannot " \
