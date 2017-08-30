@@ -279,8 +279,13 @@ RSpec.describe Bundler::SharedHelpers do
       )
     end
 
-    context "with a jruby path_separator regex", :ruby => "1.9" do # In versions of jruby that supported ruby 1.8, the path separator was the standard File::PATH_SEPARATOR
-      let(:regex) { /(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/ }
+    context "with a jruby path_separator regex", :ruby => "1.9" do
+      # In versions of jruby that supported ruby 1.8, the path separator was the standard File::PATH_SEPARATOR
+      let(:regex) {
+        # If this is stated as a literal regex we get a syntax error when simply loading this file,
+        # even if the expression is never evaluated
+        eval("/(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/")
+      }
       it "does not exit if bundle path is the standard uri path" do
         allow(Gem).to receive(:path_separator).and_return(regex)
         allow(Bundler).to receive(:bundle_path) { Pathname.new("uri:classloader:/WEB-INF/gems") }
