@@ -65,3 +65,8 @@ machine and check in the gems. For instance, you can run
 `bundle package` on an identical staging box during your
 staging process, and check in the `vendor/cache` before
 deploying to production.
+
+By default, [bundle package(1)][bundle-package] fetches and also
+installs the gems to the default location. To package the
+dependencies to `vendor/cache` without installing them to the
+local install location, you can run `bundle package --no-install`.
