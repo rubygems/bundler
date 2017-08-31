@@ -196,8 +196,10 @@ module Bundler
         else
           [jobs.pred, 1].max
         end
-      else
+      elsif auto_config_jobs
         processor_count
+      else
+        1
       end
     end
 
