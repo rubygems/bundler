@@ -38,6 +38,7 @@ module Bundler
       @platforms = platforms
       @gem_version_promoter = gem_version_promoter
       @allow_bundler_dependency_conflicts = Bundler.feature_flag.allow_bundler_dependency_conflicts?
+      @use_gvp = Bundler.feature_flag.use_gem_version_promoter_for_major_updates? || !@gem_version_promoter.major?
     end
 
     def start(requirements)
@@ -123,7 +124,7 @@ module Bundler
         end
         # GVP handles major itself, but it's still a bit risky to trust it with it
         # until we get it settled with new behavior. For 2.x it can take over all cases.
-        if @gem_version_promoter.major?
+        if !@use_gvp
           spec_groups
         else
           @gem_version_promoter.sort_versions(dependency, spec_groups)

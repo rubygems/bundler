@@ -53,6 +53,7 @@ module Bundler
       suppress_install_using_messages
       unlock_source_unlocks_spec
       update_requires_all_flag
+      use_gem_version_promoter_for_major_updates
     ].freeze
 
     NUMBER_KEYS = %w[
