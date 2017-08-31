@@ -169,6 +169,7 @@ RSpec.describe "The library itself" do
 
   it "documents all used settings" do
     exemptions = %w[
+      auto_config_jobs
       cache_command_is_package
       console_command
       default_cli_command
