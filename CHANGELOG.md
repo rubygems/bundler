@@ -1,3 +1,46 @@
+## 1.16.0.pre.1 (2017-09-04)
+
+Features:
+
+  - allow using non-branch symbolic refs in a git source (#4845, @segiddins)
+  - allow absolute paths in the `cache path` setting (#5627, @mal)
+  - gems created via `bundle gem` with rspec have `--require spec_helper` in their `.rspec` file (@koic)
+  - `bundle env` includes `Gem.ruby` and the `bundle` binstub shebang when they don't match (#5616, @segiddins)
+  - allow passing gem names to `bundle pristine` (@segiddins)
+  - `bundle version` and `bundle env` include the commit and build date for the bundler gem (#5049, @segiddins)
+  - add the `--shebang` option to `bundle binstubs` (#4070, @segiddins, @Zorbash)
+  - gemfiles are `eval`ed one fewer time when running `bundle install` (#4952, #3096, #4417, @segiddins)
+  - the `fileutils` gem is now vendored so different versions of the gem can be activated (@segiddins)
+  - speed up no-op installations (#5842, @segiddins)
+  - default to keeping the lockfile in the default gem template (@deivid-rodriguez)
+  - add a special bundler binstub that ensures the correct version of bundler is activated (#5876, @segiddins)
+  - speed up dependency resolution and ensure that all resolvable gemfiles can be installed (@segiddins, @greysteil)
+  - add a `bundle list` command that prints the gems in use (#4754, @colby-swandale)
+  - allow adding credentials to a gem source during deployment when `allow_deployment_source_credential_changes` is set (@adrian-gomez)
+  - making an outdated (and insecure) TLS connection to rubygems.org will print a warning (@segiddins)
+
+Bugfixes:
+
+  - allow configuring a mirror fallback timeout without a trailing slash (#4830, @segiddins)
+  - fix handling of mirrors for file: urls that contain upper-case characters (@segiddins)
+  - list the correct gem host for `rake release` when `allowed_push_host` has been set (@mdeering)
+  - ensure `Bundler.original_env` preserves all env keys that bundler sets (#5700, @segiddins)
+  - ensure `bundle pristine` removes files added to a git gem (@segiddins)
+  - load plugin files from path gems before gem installation (#5429, @segiddins)
+  - ensure gems containing manpages are properly set up (#5730, @segiddins)
+  - avoid fetching remote specs when all effected gems are in groups that are not being installed (@segiddins)
+  - allow `BUNDLE_GEMFILE` to be a relative path (#5712, @gxespino)
+  - show a more helpful error message when a gem fails to install due to a corrupted lockfile (#5846, @segiddins)
+  - add a process lock to allow multiple concurrent `bundle install`s (#5851, @stefansedich)
+  - ensure that specifications always return an array for `#extensions` (@greysteil)
+  - print a helpful error message when using a gem in the Gemfile with an empty name (@colby-swandale)
+  - ensure that all gemfiles are included in `bundle env` (@segiddins)
+  - use ssl client cert and ca cert settings from gem configuration as fallbacks (@stan3)
+  - avoid global namespace pollution when loading gems (#5958, @shyouhei)
+  - avoid running a complete re-resolve on `bundle update --bundler` (@segiddins)
+  - allow `bundle binstubs --standalone` to work without `path` being set (@colby-swandale)
+  - fix support for bundle paths that include jars or wars on jruby (#5975, @torcido)
+
 ## 1.15.4 (2017-08-19)
 
 Bugfixes:
