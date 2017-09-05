@@ -1,8 +1,8 @@
 language: ruby
 script: rake spec:travis
 before_script:
+  - travis_retry rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
   - travis_retry rake spec:travis:deps
-  - travis_retry rake override_version
   - travis_retry rake man:build
   - travis_retry rake spec:rubygems:clone_rubygems_$RGV
 

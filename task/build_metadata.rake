@@ -4,7 +4,7 @@ def write_build_metadata(build_metadata)
   build_metadata_file = "lib/bundler/build_metadata.rb"
 
   ivars = build_metadata.sort.map do |k, v|
-    "    @#{k} = #{BUNDLER_SPEC.send(:ruby_code, v)}"
+    "    @#{k} = #{bundler_spec.send(:ruby_code, v)}"
   end.join("\n")
 
   contents = File.read(build_metadata_file)
@@ -14,7 +14,7 @@ end
 
 task :build_metadata do
   build_metadata = {
-    :built_at => BUNDLER_SPEC.date.utc.strftime("%Y-%m-%d"),
+    :built_at => bundler_spec.date.utc.strftime("%Y-%m-%d"),
     :git_commit_sha => `git rev-parse --short HEAD`.strip,
     :release => Rake::Task["release"].instance_variable_get(:@already_invoked),
   }
