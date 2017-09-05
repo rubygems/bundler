@@ -45,6 +45,12 @@ RSpec.describe Bundler::PersistentHTTP do
       include_examples "does not warn"
     end
 
+    context "without a socket" do
+      let(:socket) { nil }
+
+      include_examples "does not warn"
+    end
+
     context "with a different TLD" do
       let(:uri) { "https://foo.bar" }
       include_examples "does not warn"

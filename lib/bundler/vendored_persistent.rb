@@ -30,6 +30,7 @@ module Bundler
       return unless (uri.host || "").end_with?("rubygems.org")
 
       socket = connection.instance_variable_get(:@socket)
+      return unless socket
       socket_io = socket.io
       return unless socket_io.respond_to?(:ssl_version)
       ssl_version = socket_io.ssl_version
