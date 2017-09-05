@@ -436,11 +436,8 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
-    method_option "parseable", :type => :boolean, :banner => "Use minimal formatting for more parseable output"
-    def config(*args)
-      require "bundler/cli/config"
-      Config.new(options, args, self).run
-    end
+    require "bundler/cli/config"
+    subcommand "config", Config
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
