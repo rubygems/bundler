@@ -10,7 +10,6 @@ module Bundler
 
     attr_reader(
       :dependencies,
-      :gem_version_promoter,
       :locked_deps,
       :locked_gems,
       :platforms,
@@ -125,25 +124,25 @@ module Bundler
         @unlock[:gems] = @locked_specs.for(eager_unlock).map(&:name)
       end
 
-      @gem_version_promoter = create_gem_version_promoter
-
       @dependency_changes = converge_dependencies
       @local_changes = converge_locals
 
       @requires = compute_requires
     end
 
-    def create_gem_version_promoter
-      locked_specs =
-        if unlocking? && @locked_specs.empty? && !@lockfile_contents.empty?
-          # Definition uses an empty set of locked_specs to indicate all gems
-          # are unlocked, but GemVersionPromoter needs the locked_specs
-          # for conservative comparison.
-          Bundler::SpecSet.new(@locked_gems.specs)
-        else
-          @locked_specs
-        end
-      GemVersionPromoter.new(locked_specs, @unlock[:gems])
+    def gem_version_promoter
+      @gem_version_promoter ||= begin
+        locked_specs =
+          if unlocking? && @locked_specs.empty? && !@lockfile_contents.empty?
+            # Definition uses an empty set of locked_specs to indicate all gems
+            # are unlocked, but GemVersionPromoter needs the locked_specs
+            # for conservative comparison.
+            Bundler::SpecSet.new(@locked_gems.specs)
+          else
+            @locked_specs
+          end
+        GemVersionPromoter.new(locked_specs, @unlock[:gems])
+      end
     end
 
     def resolve_with_cache!
@@ -218,6 +217,7 @@ module Bundler
       @index = nil
       @resolve = nil
       @specs = nil
+      @gem_version_promoter = nil
     end
 
     def requested_specs
