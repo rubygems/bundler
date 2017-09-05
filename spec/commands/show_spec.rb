@@ -41,7 +41,7 @@ RSpec.describe "bundle show", :bundler => "< 2" do
 
     it "prints the path to the running bundler" do
       bundle "show bundler"
-      expect(out).to eq(File.expand_path("../../../", __FILE__))
+      expect(out).to eq(File.expand_path(Spec::Path.root.to_s, __FILE__))
     end
 
     it "complains if gem not in bundle" do
