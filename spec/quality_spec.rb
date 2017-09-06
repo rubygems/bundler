@@ -180,6 +180,7 @@ RSpec.describe "The library itself" do
       lockfile_uses_separate_rubygems_sources
       use_gem_version_promoter_for_major_updates
       warned_version
+      viz_command
     ]
 
     all_settings = Hash.new {|h, k| h[k] = [] }
