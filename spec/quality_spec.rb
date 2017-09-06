@@ -179,6 +179,7 @@ RSpec.describe "The library itself" do
       inline
       lockfile_uses_separate_rubygems_sources
       use_gem_version_promoter_for_major_updates
+      viz_command
     ]
 
     all_settings = Hash.new {|h, k| h[k] = [] }
