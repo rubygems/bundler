@@ -461,11 +461,15 @@ module Bundler::Molinillo
       # @param [UnwindDetails] details of the conflict just unwound from
       # @return [void]
       def filter_possibilities_for_primary_unwind(unwind_details)
-        all_requirements = unwind_details.conflicting_requirements
+        unwinds_to_state = unused_unwind_options.select { |uw| uw.state_index == unwind_details.state_index }
+        unwinds_to_state << unwind_details
+        unwind_requirement_sets = unwinds_to_state.map(&:conflicting_requirements)
 
         state.possibilities.reject! do |possibility_set|
           possibility_set.possibilities.none? do |poss|
-            possibility_satisfies_requirements?(poss, all_requirements)
+            unwind_requirement_sets.any? do |requirements|
+              possibility_satisfies_requirements?(poss, requirements)
+            end
           end
         end
       end
