@@ -87,6 +87,7 @@ module Bundler
       @force = force
       @specs = all_specs.map {|s| SpecInstallation.new(s) }
       @spec_set = all_specs
+      @rake = @specs.find {|s| s.name == "rake" }
     end
 
     def call
@@ -218,6 +219,8 @@ module Bundler
     # are installed.
     def enqueue_specs
       @specs.select(&:ready_to_enqueue?).each do |spec|
+        next if @rake && !@rake.installed? && spec.name != @rake.name
+
         if spec.dependencies_installed? @specs
           spec.state = :enqueued
           worker_pool.enq spec
