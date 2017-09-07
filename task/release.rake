@@ -123,7 +123,7 @@ namespace :release do
     version = args.version
 
     version ||= begin
-      version = BUNDLER_SPEC.version
+      version = bundler_spec.version
       segments = version.segments
       if segments.last.is_a?(String)
         segments << "1"
@@ -133,7 +133,7 @@ namespace :release do
       segments.join(".")
     end
 
-    confirm "You are about to release #{version}, currently #{BUNDLER_SPEC.version}"
+    confirm "You are about to release #{version}, currently #{bundler_spec.version}"
 
     milestones = gh_api_request(:path => "repos/bundler/bundler/milestones?state=open")
     unless patch_milestone = milestones.find {|m| m["title"] == version }
@@ -147,7 +147,7 @@ namespace :release do
     end
     prs.compact!
 
-    BUNDLER_SPEC.version = version
+    bundler_spec.version = version
 
     branch = version.split(".", 3)[0, 2].push("stable").join("-")
     sh("git", "checkout", branch)
