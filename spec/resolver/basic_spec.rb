@@ -50,6 +50,12 @@ RSpec.describe "Resolving" do
     should_resolve_as %w[activemerchant-2.3.5 activesupport-3.0.0.beta1]
   end
 
+  it "doesn't select a pre-release if not specified in the Gemfile" do
+    dep "activesupport"
+    dep "reform"
+    should_resolve_as %w[reform-1.0.0 activesupport-2.3.5]
+  end
+
   it "raises an exception if a child dependency is not resolved" do
     @index = a_unresovable_child_index
     dep "chef_app_error"
