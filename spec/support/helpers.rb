@@ -88,11 +88,11 @@ module Spec
     end
 
     def lib
-      File.expand_path(root.join("lib"), __FILE__)
+      root.join("lib")
     end
 
     def spec
-      File.expand_path(spec_dir.to_s, __FILE__)
+      spec_dir.to_s
     end
 
     def bundle(cmd, options = {})
@@ -102,7 +102,7 @@ module Spec
       no_color = options.delete("no-color") { cmd.to_s !~ /\A(e|ex|exe|exec|conf|confi|config)(\s|\z)/ }
       options["no-color"] = true if no_color
 
-      bundle_bin = options.delete("bundle_bin") || File.expand_path(bindir.join("bundle"), __FILE__)
+      bundle_bin = options.delete("bundle_bin") || bindir.join("bundle")
 
       if system_bundler = options.delete(:system_bundler)
         bundle_bin = "-S bundle"
@@ -171,12 +171,12 @@ module Spec
     end
 
     def bundler(cmd, options = {})
-      options["bundle_bin"] = File.expand_path(bindir.join("bundler"), __FILE__)
+      options["bundle_bin"] = bindir.join("bundler")
       bundle(cmd, options)
     end
 
     def bundle_ruby(options = {})
-      options["bundle_bin"] = File.expand_path(bindir.join("bundle_ruby"), __FILE__)
+      options["bundle_bin"] = bindir.join("bundle_ruby")
       bundle("", options)
     end
 

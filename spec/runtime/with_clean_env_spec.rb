@@ -79,7 +79,7 @@ RSpec.describe "Bundler.with_env helpers" do
 
     it "should clean up RUBYLIB" do
       code = "print Bundler.clean_env['RUBYLIB']"
-      ENV["RUBYLIB"] = File.expand_path(root.join("lib"), __FILE__) + File::PATH_SEPARATOR + "/foo"
+      ENV["RUBYLIB"] = root.join("lib").to_s + File::PATH_SEPARATOR + "/foo"
       result = bundle("exec '#{Gem.ruby}' -e #{code.inspect}")
       expect(result).to eq("/foo")
     end

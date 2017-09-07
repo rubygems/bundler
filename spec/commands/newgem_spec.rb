@@ -170,11 +170,10 @@ RSpec.describe "bundle gem" do
 
     # This spec cannot have `git` available in the test env
     before do
-      bundle_bin = File.expand_path(bindir.join("bundle"), __FILE__)
       load_paths = [lib, spec]
       load_path_str = "-I#{load_paths.join(File::PATH_SEPARATOR)}"
 
-      sys_exec "PATH=\"\" #{Gem.ruby} #{load_path_str} #{bundle_bin} gem #{gem_name}"
+      sys_exec "PATH=\"\" #{Gem.ruby} #{load_path_str} #{bindir.join("bundle")} gem #{gem_name}"
     end
 
     it "creates the gem without the need for git" do
