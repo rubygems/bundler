@@ -7,10 +7,11 @@ require "bundler/psyched_yaml"
 require "bundler/vendored_fileutils"
 require "uri"
 require "digest/sha1"
+require File.expand_path("../support/path.rb", __FILE__)
 
 begin
   require "rubygems"
-  spec = Gem::Specification.load("bundler.gemspec")
+  spec = Gem::Specification.load(Spec::Path.gemspec.to_s)
   rspec = spec.dependencies.find {|d| d.name == "rspec" }
   gem "rspec", rspec.requirement.to_s
   require "rspec"
@@ -46,7 +47,7 @@ $debug = false
 Spec::Manpages.setup
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
-ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.root}/spec/support/hax.rb"
+ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
 ENV["BUNDLE_SPEC_RUN"] = "true"
 
 # Don't wrap output in tests
