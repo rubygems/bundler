@@ -12,12 +12,12 @@ module Spec
       @gemspec ||= Pathname.new(File.expand_path(root.join("bundler.gemspec"), __FILE__))
     end
 
-    def bin
-      @bin ||= Pathname.new(File.expand_path(root.join("exe"), __FILE__))
+    def bindir
+      @bindir ||= Pathname.new(File.expand_path(root.join("exe"), __FILE__))
     end
 
-    def spec
-      @spec ||= Pathname.new(File.expand_path(root.join("spec"), __FILE__))
+    def spec_dir
+      @spec_dir ||= Pathname.new(File.expand_path(root.join("spec"), __FILE__))
     end
 
     def tmp(*path)
