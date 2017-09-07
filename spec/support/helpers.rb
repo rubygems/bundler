@@ -88,11 +88,11 @@ module Spec
     end
 
     def lib
-      File.expand_path(Spec::Path.root.join("lib"), __FILE__)
+      File.expand_path(root.join("lib"), __FILE__)
     end
 
     def spec
-      File.expand_path(Spec::Path.spec_dir.to_s, __FILE__)
+      File.expand_path(spec_dir.to_s, __FILE__)
     end
 
     def bundle(cmd, options = {})
@@ -102,7 +102,7 @@ module Spec
       no_color = options.delete("no-color") { cmd.to_s !~ /\A(e|ex|exe|exec|conf|confi|config)(\s|\z)/ }
       options["no-color"] = true if no_color
 
-      bundle_bin = options.delete("bundle_bin") || File.expand_path(Spec::Path.bindir.join("bundle"), __FILE__)
+      bundle_bin = options.delete("bundle_bin") || File.expand_path(bindir.join("bundle"), __FILE__)
 
       if system_bundler = options.delete(:system_bundler)
         bundle_bin = "-S bundle"
@@ -171,12 +171,12 @@ module Spec
     end
 
     def bundler(cmd, options = {})
-      options["bundle_bin"] = File.expand_path(Spec::Path.bindir.join("bundler"), __FILE__)
+      options["bundle_bin"] = File.expand_path(bindir.join("bundler"), __FILE__)
       bundle(cmd, options)
     end
 
     def bundle_ruby(options = {})
-      options["bundle_bin"] = File.expand_path(Spec::Path.bindir.join("bundle_ruby"), __FILE__)
+      options["bundle_bin"] = File.expand_path(bindir.join("bundle_ruby"), __FILE__)
       bundle("", options)
     end
 
@@ -300,7 +300,7 @@ module Spec
       gem_repo = options.fetch(:gem_repo) { gem_repo1 }
       gems.each do |g|
         path = if g == :bundler
-          Dir.chdir(root) { gem_command! :build, Spec::Path.gemspec.to_s }
+          Dir.chdir(root) { gem_command! :build, gemspec.to_s }
           bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
         elsif g.to_s =~ %r{\A/.*\.gem\z}
           g
