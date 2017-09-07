@@ -61,7 +61,7 @@ RSpec.describe "bundle exec" do
   it "handles --keep-file-descriptors" do
     require "tempfile"
 
-    bundle_bin = File.expand_path("#{Spec::Path.bindir}/bundle", __FILE__)
+    bundle_bin = File.expand_path(Spec::Path.bindir.join("bundle"), __FILE__)
 
     command = Tempfile.new("io-test")
     command.sync = true
@@ -474,7 +474,7 @@ RSpec.describe "bundle exec" do
       Bundler.rubygems.extend(Monkey)
       G
       bundle "install --deployment"
-      bundle "exec ruby -e '`#{Spec::Path.bindir}/bundler -v`; puts $?.success?'"
+      bundle "exec ruby -e '`#{Spec::Path.bindir.join("bundler")} -v`; puts $?.success?'"
       expect(out).to match("true")
     end
   end
