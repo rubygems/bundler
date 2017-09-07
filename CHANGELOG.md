@@ -1,3 +1,11 @@
+## 1.16.0.pre.2 (2017-09-06)
+
+Bugfixes:
+
+  - handle when a connection is missing a socket when warning about OpenSSL version (@greysteil)
+  - the description for the `rake release` task now reflects `$RUBYGEMS_HOST` (@wadetandy)
+  - fix a bug where `bundle update` would regress transitive dependencies (@greysteil)
+
 ## 1.16.0.pre.1 (2017-09-04)
 
 Features:
