@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require File.expand_path("../path.rb", __FILE__)
-
 module Spec
   module Helpers
     def reset!
