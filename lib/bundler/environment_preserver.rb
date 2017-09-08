@@ -12,9 +12,9 @@ module Bundler
       GEM_PATH
       MANPATH
       PATH
+      RB_USER_INSTALL
       RUBYLIB
       RUBYOPT
-      RB_USER_INSTALL
     ].map(&:freeze).freeze
     BUNDLER_PREFIX = "BUNDLER_ORIG_".freeze
 
