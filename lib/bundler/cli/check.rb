@@ -9,7 +9,7 @@ module Bundler
     end
 
     def run
-      CLI::Common.set_path options[:path], :if_given
+      Bundler.settings.set_command_option_if_given :path, options[:path]
 
       begin
         definition = Bundler.definition

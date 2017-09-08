@@ -24,7 +24,7 @@ RSpec.describe "bundle install" do
 
       Dir.chdir(dir) do
         bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
-        expect(out).to include("installed into `../vendor/bundle`")
+        expect(out).to include("installed into `./vendor/bundle`")
       end
 
       dir.rmtree
@@ -65,18 +65,18 @@ RSpec.describe "bundle install" do
       it "installs the standalone bundle relative to the cwd" do
         Dir.chdir(bundled_app.parent) do
           bundle! :install, :gemfile => bundled_app("Gemfile"), :standalone => true
-          expect(out).to include("installed into `./bundle`")
-          expect(bundled_app("../bundle")).to be_directory
-          expect(bundled_app("../bundle/ruby")).to be_directory
+          expect(out).to include("installed into `./bundled_app/bundle`")
+          expect(bundled_app("bundle")).to be_directory
+          expect(bundled_app("bundle/ruby")).to be_directory
         end
 
-        bundle! "config --delete path"
+        bundle! "config unset path"
 
         Dir.chdir(bundled_app("subdir").tap(&:mkpath)) do
           bundle! :install, :gemfile => bundled_app("Gemfile"), :standalone => true
-          expect(out).to include("installed into `./bundle`")
-          expect(bundled_app("subdir/bundle")).to be_directory
-          expect(bundled_app("subdir/bundle/ruby")).to be_directory
+          expect(out).to include("installed into `../bundle`")
+          expect(bundled_app("bundle")).to be_directory
+          expect(bundled_app("bundle/ruby")).to be_directory
         end
       end
     end

@@ -167,10 +167,14 @@ module Bundler
     end
 
     def normalize_settings
-      CLI::Common.set_path nil if options[:system]
-      CLI::Common.set_path "vendor/bundle" if options[:deployment]
-      CLI::Common.set_path options["path"], :if_given
-      CLI::Common.set_path "bundle" if options["standalone"] && Bundler.settings[:path].nil?
+      Bundler.settings.set_command_option :path, nil if options[:system]
+      Bundler.settings.temporary(:path_relative_to_cwd => false) do
+        Bundler.settings.set_command_option :path, "vendor/bundle" if options[:deployment]
+      end
+      Bundler.settings.set_command_option_if_given :path, options[:path]
+      Bundler.settings.temporary(:path_relative_to_cwd => false) do
+        Bundler.settings.set_command_option :path, "bundle" if options["standalone"] && Bundler.settings[:path].nil?
+      end
 
       bin_option = options["binstubs"]
       bin_option = nil if bin_option && bin_option.empty?

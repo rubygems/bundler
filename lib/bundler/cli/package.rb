@@ -10,7 +10,7 @@ module Bundler
 
     def run
       Bundler.ui.level = "error" if options[:quiet]
-      CLI::Common.set_path options[:path], :if_given
+      Bundler.settings.set_command_option_if_given :path, options[:path]
       Bundler.settings.set_command_option_if_given :cache_all_platforms, options["all-platforms"]
       Bundler.settings.set_command_option_if_given :cache_path, options["cache-path"]
 
