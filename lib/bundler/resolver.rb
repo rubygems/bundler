@@ -103,7 +103,7 @@ module Bundler
         results = index.search(dependency, @base[dependency.name])
 
         inital_requirement = @initial_requirements.find {|req| req.name == dependency.name }
-        if inital_requirement && !inital_requirement.requirement.prerelease?
+        if !inital_requirement || !inital_requirement.requirement.prerelease?
           # Move prereleases to the beginning of the list, so they're considered
           # last during resolution.
           pre, results = results.partition {|spec| spec.version.prerelease? }
