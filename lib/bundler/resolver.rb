@@ -41,6 +41,9 @@ module Bundler
     end
 
     def start(requirements)
+      @prerelease_specified = {}
+      requirements.each {|dep| @prerelease_specified[dep.name] ||= dep.prerelease? }
+
       verify_gemfile_dependencies_are_found!(requirements)
       dg = @resolver.resolve(requirements, @base_dg)
       dg.map(&:payload).
@@ -99,6 +102,14 @@ module Bundler
       search = @search_for[dependency] ||= begin
         index = index_for(dependency)
         results = index.search(dependency, @base[dependency.name])
+
+        unless @prerelease_specified[dependency.name]
+          # Move prereleases to the beginning of the list, so they're considered
+          # last during resolution.
+          pre, results = results.partition {|spec| spec.version.prerelease? }
+          results = pre + results
+        end
+
         if vertex = @base_dg.vertex_named(dependency.name)
           locked_requirement = vertex.payload.requirement
         end
