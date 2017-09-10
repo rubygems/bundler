@@ -115,6 +115,12 @@ module Bundler
       self
     end
 
+    def spec_names
+      names = specs.keys + sources.map(&:spec_names)
+      names.uniq!
+      names
+    end
+
     # returns a list of the dependencies
     def unmet_dependency_names
       dependency_names.select do |name|
