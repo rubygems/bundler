@@ -265,9 +265,8 @@ module Bundler
         dependency_names = @dependencies.map(&:name)
 
         sources.all_sources.each do |source|
-          source.dependency_names = dependency_names.dup
+          source.dependency_names = dependency_names - pinned_spec_names(source)
           idx.add_source source.specs
-          dependency_names -= pinned_spec_names(source.specs)
           dependency_names.concat(source.unmet_deps).uniq!
         end
 
@@ -281,21 +280,25 @@ module Bundler
     # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
     # each spec we found, we add all possible versions from all sources to the index.
     def double_check_for_index(idx, dependency_names)
+      pinned_names = pinned_spec_names
       loop do
         idxcount = idx.size
+
+        names = :names # do this so we only have to traverse to get dependency_names from the index once
+        unmet_dependency_names = lambda do
+          return names unless names == :names
+          new_names = sources.all_sources.map(&:dependency_names_to_double_check)
+          return names = nil if new_names.compact!
+          names = new_names.flatten(1).concat(dependency_names)
+          names.uniq!
+          names -= pinned_names
+          names
+        end
+
         sources.all_sources.each do |source|
-          names = :names # do this so we only have to traverse to get dependency_names from the index once
-          unmet_dependency_names = proc do
-            break names unless names == :names
-            names = if idx.size > Source::Rubygems::API_REQUEST_LIMIT
-              new_names = idx.dependency_names_if_available
-              new_names && dependency_names.+(new_names).uniq
-            else
-              dependency_names.+(idx.dependency_names).uniq
-            end
-          end
           source.double_check_for(unmet_dependency_names, :override_dupes)
         end
+
         break if idxcount == idx.size
       end
     end
@@ -916,18 +919,15 @@ module Bundler
       source_requirements
     end
 
-    def pinned_spec_names(specs)
-      names = []
-      specs.each do |s|
-        # TODO: when two sources without blocks is an error, we can change
-        # this check to !s.source.is_a?(Source::LocalRubygems). For now,
-        # we need to ask every RubyGems for every gem name.
-        if s.source.is_a?(Source::Git) || s.source.is_a?(Source::Path)
-          names << s.name
-        end
+    def pinned_spec_names(skip = nil)
+      pinned_names = []
+      default = Bundler.feature_flag.lockfile_uses_separate_rubygems_sources? && sources.default_source
+      @dependencies.each do |dep|
+        dep_source = dep.source || default
+        next if dep_source == skip
+        pinned_names << dep.name
       end
-      names.uniq!
-      names
+      pinned_names
     end
 
     def requested_groups

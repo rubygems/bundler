@@ -259,11 +259,30 @@ module Bundler
         return unless api_fetchers.any?
 
         unmet_dependency_names = unmet_dependency_names.call
-        return if !unmet_dependency_names.nil? && unmet_dependency_names.empty?
+        unless unmet_dependency_names.nil?
+          unmet_dependency_names -= remote_specs.spec_names # avoid re-fetching things we've already gotten
+          return if unmet_dependency_names.empty?
+        end
 
         Bundler.ui.debug "Double checking for #{unmet_dependency_names || "all specs (due to the size of the request)"} in #{self}"
 
         fetch_names(api_fetchers, unmet_dependency_names, index, override_dupes)
+      end
+
+      def dependency_names_to_double_check
+        names = []
+        remote_specs.each do |spec|
+          case spec
+          when EndpointSpecification, Gem::Specification, StubSpecification, LazySpecification
+            names.concat(spec.runtime_dependencies)
+          when RemoteSpecification # from the full index
+            return nil
+          else
+            raise "unhandled spec type (#{spec.inspect})"
+          end
+        end
+        names.map!(&:name) if names
+        names
       end
 
     protected
