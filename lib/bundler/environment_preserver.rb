@@ -12,6 +12,7 @@ module Bundler
       GEM_PATH
       MANPATH
       PATH
+      RB_USER_INSTALL
       RUBYLIB
       RUBYOPT
     ].map(&:freeze).freeze
