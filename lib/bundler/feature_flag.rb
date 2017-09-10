@@ -44,6 +44,7 @@ module Bundler
     settings_flag(:list_command) { bundler_2_mode? }
     settings_flag(:lockfile_uses_separate_rubygems_sources) { bundler_2_mode? }
     settings_flag(:only_update_to_newer_versions) { bundler_2_mode? }
+    settings_flag(:path_relative_to_cwd) { bundler_2_mode? }
     settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }
     settings_flag(:prefer_gems_rb) { bundler_2_mode? }
     settings_flag(:print_only_version_number) { bundler_2_mode? }
