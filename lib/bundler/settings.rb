@@ -43,6 +43,7 @@ module Bundler
       no_install
       no_prune
       only_update_to_newer_versions
+      path_relative_to_cwd
       path.system
       plugins
       prefer_gems_rb
@@ -247,6 +248,20 @@ module Bundler
         path ||= ".bundle" unless use_system_gems?
         path ||= Bundler.rubygems.gem_dir
         path
+      end
+
+      def base_path_relative_to_pwd
+        base_path = Pathname.new(self.base_path)
+        expanded_base_path = base_path.expand_path(Bundler.root)
+        relative_path = expanded_base_path.relative_path_from(Pathname.pwd)
+        if relative_path.to_s.start_with?("..")
+          relative_path = base_path if base_path.absolute?
+        else
+          relative_path = Pathname.new(File.join(".", relative_path))
+        end
+        relative_path
+      rescue ArgumentError
+        expanded_base_path
       end
 
       def validate!
