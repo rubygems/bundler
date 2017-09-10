@@ -141,6 +141,10 @@ module Spec
         gem "reform", ["1.0.0"] do
           dep "activesupport", ">= 1.0.0.beta1"
         end
+
+        gem "need-pre", ["1.0.0"] do
+          dep "activesupport", "~> 3.0.0.beta1"
+        end
       end
     end
 

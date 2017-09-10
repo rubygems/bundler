@@ -61,6 +61,11 @@ RSpec.describe "Resolving" do
     should_resolve_as %w[reform-1.0.0 activesupport-2.3.5]
   end
 
+  it "selects a pre-release for sub-dependencies if it's the only option" do
+    dep "need-pre"
+    should_resolve_as %w[need-pre-1.0.0 activesupport-3.0.0.beta1]
+  end
+
   it "raises an exception if a child dependency is not resolved" do
     @index = a_unresovable_child_index
     dep "chef_app_error"
