@@ -44,9 +44,12 @@ module Bundler
     def start(requirements)
       verify_gemfile_dependencies_are_found!(requirements)
       dg = @resolver.resolve(requirements, @base_dg)
-      dg.map(&:payload).
+      dg.
+        tap {|resolved| validate_resolved_specs!(resolved) }.
+        map(&:payload).
         reject {|sg| sg.name.end_with?("\0") }.
-        map(&:to_specs).flatten
+        map(&:to_specs).
+        flatten
     rescue Molinillo::VersionConflict => e
       message = version_conflict_message(e)
       raise VersionConflict.new(e.conflicts.keys.uniq, message)
@@ -353,6 +356,30 @@ module Bundler
         end,
         :version_for_spec => lambda {|spec| spec.version }
       )
+    end
+
+    def validate_resolved_specs!(resolved_specs)
+      resolved_specs.each do |v|
+        name = v.name
+        next unless sources = relevant_sources_for_vertex(v)
+        sources.compact!
+        if default_index = sources.index(@source_requirements[:default])
+          sources.delete_at(default_index)
+        end
+        sources.reject! {|s| s.specs[name].empty? }
+        sources.uniq!
+        next if sources.size <= 1
+
+        multisource_disabled = Bundler.feature_flag.disable_multisource?
+
+        msg = ["The gem '#{name}' was found in multiple relevant sources."]
+        msg.concat sources.map {|s| "  * #{s}" }.sort
+        msg << "You #{multisource_disabled ? :must : :should} add this gem to the source block for the source you wish it to be installed from."
+        msg = msg.join("\n")
+
+        raise SecurityError, msg if multisource_disabled
+        Bundler.ui.error "Warning: #{msg}"
+      end
     end
   end
 end
