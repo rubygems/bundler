@@ -23,7 +23,7 @@ RSpec.describe "bundle install" do
       dir.mkpath
 
       Dir.chdir(dir) do
-        bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
+        bundle! :install, forgotten_command_line_options(:path => dir.join("vendor/bundle"))
         expect(out).to include("installed into `./vendor/bundle`")
       end
 
