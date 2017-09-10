@@ -27,4 +27,18 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
       end.to raise_error(Bundler::CompactIndexClient::Updater::MisMatchedChecksumError)
     end
   end
+
+  context "when bundler doesn't have permissions on Dir.tmpdir" do
+    let(:response) { double(:response, :body => "") }
+    let(:local_path) { Pathname("/tmp/localpath") }
+    let(:remote_path) { double(:remote_path) }
+
+    it "Errno::EACCES is raised" do
+      allow(Dir).to receive(:mktmpdir) { raise Errno::EACCES }
+
+      expect do
+        updater.update(local_path, remote_path)
+      end.to raise_error(Bundler::PermissionError)
+    end
+  end
 end
