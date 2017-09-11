@@ -193,15 +193,10 @@ module Bundler
       raise e.exception("#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}")
     end
 
-    def user_bundle_path_default
-      Pathname.new(user_home).join(".bundle")
-    end
-
     def user_bundle_path(dir="home")
-      # if "home", user_bundle_path_default
       env_var, fallback = case dir
                 when "home"
-                  ["BUNDLE_USER_HOME", user_bundle_path_default]
+                  ["BUNDLE_USER_HOME", Pathname.new(user_home).join(".bundle")]
                 when "cache"
                   ["BUNDLE_USER_CACHE", user_bundle_path.join("cache")]
                 when "config"
@@ -209,9 +204,15 @@ module Bundler
                 when "plugin"
                   ["BUNDLE_USER_PLUGIN", user_bundle_path.join("plugin")]
                 else
-                  nil
+                  raise BundlerError, "Unknown user path requested: #{dir}"
                 end
-      ENV.fetch(env_var, fallback)
+      # `fallback` will already be a Pathname, but Pathname.new() is
+      # idempotent so it's OK
+      Pathname.new(ENV.fetch(env_var, fallback))
+    end
+
+    def user_cache
+      user_bundle_path("cache")
     end
 
     def home
@@ -224,10 +225,6 @@ module Bundler
 
     def specs_path
       bundle_path.join("specifications")
-    end
-
-    def user_cache
-      user_bundle_path("cache")
     end
 
     def root
