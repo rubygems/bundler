@@ -229,56 +229,61 @@ EOF
   end
 
   context "user cache dir" do
-    let(:home_path)         { ENV.fetch "HOME" }
-    let(:bundle_user_cache_default) { "#{home_path}/.cache" }
-    let(:bundle_user_cache_custom)  { "#{home_path}/User/cache" }
-    let(:fallback_dir)      { "#{bundle_user_cache_default}/bundler" }
-    let(:cache_dir)         { "#{bundle_user_cache_custom}/bundler" }
-    let(:legacy_cache_dir)  { "#{home_path}/.bundle/cache" }
+    let(:home_path)                  { Pathname.new(ENV["HOME"]) }
 
-    describe "#bundle_user_path_config" do
+    let(:xdg_data_home)              { home_path.join(".local") }
+    let(:xdg_cache_home)             { home_path.join(".cache") }
+    let(:xdg_config_home)            { home_path.join(".config") }
+
+    let(:bundle_user_home_default)   { home_path.join(".bundle") }
+    let(:bundle_user_home_custom)    { xdg_data_home.join("bundle") }
+
+    let(:bundle_user_cache_default)  { bundle_user_home_default.join("cache") }
+    let(:bundle_user_cache_custom)   { xdg_cache_home.join("bundle") }
+
+    let(:bundle_user_config_default) { bundle_user_home_default.join("config") }
+    let(:bundle_user_config_custom)  { xdg_config_home.join("bundle") }
+
+    let(:bundle_user_plugin_default) { bundle_user_home_default.join("plugin") }
+    let(:bundle_user_plugin_custom)  { xdg_data_home.join("bundle").join("plugin") }
+
+    describe "#user_bundle_path" do
       before do
         allow(Bundler.rubygems).to receive(:user_home).and_return(home_path)
-        allow(File).to receive(:writable?).with(home_path).and_return(true)
-        allow(File).to receive(:directory?).with(home_path).and_return(true)
-        allow(File).to receive(:directory?).with(fallback_dir).and_return(true)
-        allow(File).to receive(:directory?).with(cache_dir).and_return(true)
       end
 
-      it "should use the value of BUNDLE_USER_CACHE_HOME" do
-        ENV["BUNDLE_USER_CACHE_HOME"] = bundle_user_cache_custom
-        expect(Bundler.bundle_user_home("CACHE", fallback_dir)).to eq(Pathname(cache_dir))
+      it "should use the default home path" do
+        expect(Bundler.user_bundle_path).to           eq(bundle_user_home_default)
+        expect(Bundler.user_bundle_path("home")).to   eq(bundle_user_home_default)
+        expect(Bundler.user_bundle_path("cache")).to  eq(bundle_user_cache_default)
+        expect(Bundler.user_cache).to                 eq(bundle_user_cache_default)
+        expect(Bundler.user_bundle_path("config")).to eq(bundle_user_config_default)
+        expect(Bundler.user_bundle_path("plugin")).to eq(bundle_user_plugin_default)
       end
 
-      it "should fall back to the alternative directory" do
-        expect(Bundler.bundle_user_home("CACHE", bundle_user_cache_default)).to eq(Pathname(fallback_dir))
-      end
-    end
-
-    describe "#user_cache" do
-      before do
-        allow(Bundler.rubygems).to receive(:user_home).and_return(home_path)
-        allow(File).to receive(:writable?).with(home_path).and_return(true)
-        allow(File).to receive(:directory?).with(home_path).and_return(true)
+      it "should use custom home path as root for other paths" do
+        ENV["BUNDLE_USER_HOME"] = bundle_user_home_custom.to_s
+        expect(Bundler.user_bundle_path).to           eq(bundle_user_home_custom)
+        expect(Bundler.user_bundle_path("home")).to   eq(bundle_user_home_custom)
+        expect(Bundler.user_bundle_path("cache")).to  eq(bundle_user_home_custom.join("cache"))
+        expect(Bundler.user_cache).to                 eq(bundle_user_home_custom.join("cache"))
+        expect(Bundler.user_bundle_path("config")).to eq(bundle_user_home_custom.join("config"))
+        expect(Bundler.user_bundle_path("plugin")).to eq(bundle_user_home_custom.join("plugin"))
       end
 
-      it "should use ~/.bundle/cache if it exists" do
-        allow(FileTest).to receive(:exist?).with(legacy_cache_dir).and_return(true)
-        expect(Bundler.user_cache).to eq(Pathname(legacy_cache_dir))
+      it "should use all custom paths, except home" do
+        ENV.delete("BUNDLE_USER_HOME")
+        ENV["BUNDLE_USER_CACHE"]  = bundle_user_cache_custom.to_s
+        ENV["BUNDLE_USER_CONFIG"] = bundle_user_config_custom.to_s
+        ENV["BUNDLE_USER_PLUGIN"] = bundle_user_plugin_custom.to_s
+        expect(Bundler.user_bundle_path).to           eq(bundle_user_home_default)
+        expect(Bundler.user_bundle_path("home")).to   eq(bundle_user_home_default)
+        expect(Bundler.user_bundle_path("cache")).to  eq(bundle_user_cache_custom)
+        expect(Bundler.user_cache).to                 eq(bundle_user_cache_custom)
+        expect(Bundler.user_bundle_path("config")).to eq(bundle_user_config_custom)
+        expect(Bundler.user_bundle_path("plugin")).to eq(bundle_user_plugin_custom)
       end
 
-      it "should use BUNDLE_USER_CACHE_HOME if set" do
-        allow(FileTest).to receive(:exist?).with(legacy_cache_dir).and_return(false)
-        allow(FileTest).to receive(:exist?).with(cache_dir).and_return(true)
-        ENV["BUNDLE_USER_CACHE_HOME"] = bundle_user_cache_custom
-        expect(Bundler.user_cache).to eq(Pathname(cache_dir))
-      end
-
-      it "should use ~/.cache/bundler as default cache path" do
-        allow(FileTest).to receive(:exist?).with(legacy_cache_dir).and_return(false)
-        allow(FileTest).to receive(:exist?).with(fallback_dir).and_return(true)
-        expect(Bundler.user_cache).to eq(Pathname(fallback_dir))
-      end
     end
   end
 end
