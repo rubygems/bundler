@@ -205,7 +205,7 @@ module Bundler
                             ["BUNDLE_USER_PLUGIN", user_bundle_path.join("plugin")]
                           else
                             raise BundlerError, "Unknown user path requested: #{dir}"
-                          end
+      end
       # `fallback` will already be a Pathname, but Pathname.new() is
       # idempotent so it's OK
       Pathname.new(ENV.fetch(env_var, fallback))
