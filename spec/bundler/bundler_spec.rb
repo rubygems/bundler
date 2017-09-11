@@ -283,7 +283,6 @@ EOF
         expect(Bundler.user_bundle_path("config")).to eq(bundle_user_config_custom)
         expect(Bundler.user_bundle_path("plugin")).to eq(bundle_user_plugin_custom)
       end
-
     end
   end
 end
