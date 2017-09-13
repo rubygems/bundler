@@ -320,7 +320,7 @@ RSpec.describe "gemcutter's dependency API" do
       gem 'somegem', '1.0.0'
     G
 
-    bundle :install, :artifice => "endpoint_extra_api"
+    bundle! :install, :artifice => "endpoint_extra_api"
 
     expect(the_bundle).to include_gems "somegem 1.0.0"
     expect(the_bundle).to include_gems "activesupport 1.2.3"
@@ -368,7 +368,7 @@ RSpec.describe "gemcutter's dependency API" do
 
     bundle :install, :artifice => "endpoint_extra"
 
-    expect(out).to include("Fetching gem metadata from http://localgemserver.test/..")
+    expect(out).to include("Fetching gem metadata from http://localgemserver.test/.")
     expect(out).to include("Fetching source index from http://localgemserver.test/extra")
   end
 
