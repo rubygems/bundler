@@ -41,7 +41,7 @@ module Bundler
 
       # the patch level options imply strict is also true. It wouldn't make
       # sense otherwise.
-      strict = options[:strict] ||
+      strict = options["filter-strict"] ||
         Bundler::CLI::Common.patch_level_options(options).any?
 
       filter_options_patch = options.keys &
