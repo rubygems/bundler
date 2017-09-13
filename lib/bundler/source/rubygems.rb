@@ -260,7 +260,11 @@ module Bundler
 
         unmet_dependency_names = unmet_dependency_names.call
         unless unmet_dependency_names.nil?
-          unmet_dependency_names -= remote_specs.spec_names # avoid re-fetching things we've already gotten
+          if api_fetchers.size <= 1
+            # can't do this when there are multiple fetchers because then we might not fetch from _all_
+            # of them
+            unmet_dependency_names -= remote_specs.spec_names # avoid re-fetching things we've already gotten
+          end
           return if unmet_dependency_names.empty?
         end
 

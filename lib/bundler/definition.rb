@@ -923,7 +923,7 @@ module Bundler
       pinned_names = []
       default = Bundler.feature_flag.lockfile_uses_separate_rubygems_sources? && sources.default_source
       @dependencies.each do |dep|
-        dep_source = dep.source || default
+        next unless dep_source = dep.source || default
         next if dep_source == skip
         pinned_names << dep.name
       end
