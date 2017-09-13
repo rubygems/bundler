@@ -96,6 +96,8 @@ RSpec.describe "bundle executable" do
     let(:bundler_version) { "1.1" }
     let(:latest_version) { nil }
     before do
+      bundle! "config --global disable_version_check false"
+
       simulate_bundler_version(bundler_version)
       if latest_version
         info_path = home(".bundle/cache/compact_index/rubygems.org.443.29b0360b937aa4d161703e6160654e47/info/bundler")
