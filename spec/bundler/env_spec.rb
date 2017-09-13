@@ -136,7 +136,7 @@ RSpec.describe Bundler::Env do
           and_return("git version 1.2.3 (Apple Git-BS)")
         expect(Bundler::Source::Git::GitProxy).to receive(:new).and_return(git_proxy_stub)
 
-        expect(described_class.report).to include("Git       1.2.3 (Apple Git-BS)")
+        expect(described_class.report).to include("Git         1.2.3 (Apple Git-BS)")
       end
     end
   end

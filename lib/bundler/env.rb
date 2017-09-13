@@ -86,21 +86,44 @@ module Bundler
       "not installed"
     end
 
+    def self.version_of(script)
+      return "not installed" unless Bundler.which(script)
+      `#{script} --version`
+    end
+
+    def self.chruby_version
+      return "not installed" unless Bundler.which("chruby-exec")
+      `chruby-exec -- chruby --version`.
+        sub(/.*^chruby: (#{Gem::Version::VERSION_PATTERN}).*/m, '\1')
+    end
+
     def self.environment
       out = []
 
       out << ["Bundler", Bundler::VERSION]
-      out << ["RubyGems", Gem::VERSION]
+      out << ["  Platforms", Gem.platforms.join(", ")]
       out << ["Ruby", ruby_version]
-      out << ["GEM_HOME", ENV["GEM_HOME"]] unless ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
-      out << ["GEM_PATH", ENV["GEM_PATH"]] unless ENV["GEM_PATH"].nil? || ENV["GEM_PATH"].empty?
-      out << ["RVM", ENV["rvm_version"]] if ENV["rvm_version"]
-      out << ["Git", git_version]
-      out << ["Platform", Gem::Platform.local]
-      out << ["OpenSSL", OpenSSL::OPENSSL_VERSION] if defined?(OpenSSL::OPENSSL_VERSION)
+      out << ["  Full Path", Gem.ruby]
+      out << ["  Config Dir", Gem::ConfigFile::SYSTEM_CONFIG_PATH]
+      out << ["RubyGems", Gem::VERSION]
+      out << ["  Gem Home", ENV.fetch("GEM_HOME") { Gem.dir }]
+      out << ["  Gem Path", ENV.fetch("GEM_PATH") { Gem.path.join(File::PATH_SEPARATOR) }]
+      out << ["  User Path", Gem.user_dir]
+      out << ["  Bin Dir", Gem.bindir]
+      out << ["OpenSSL"] if defined?(OpenSSL)
+      out << ["  Compiled", OpenSSL::OPENSSL_VERSION] if defined?(OpenSSL::OPENSSL_VERSION)
+      out << ["  Loaded", OpenSSL::OPENSSL_LIBRARY_VERSION] if defined?(OpenSSL::OPENSSL_LIBRARY_VERSION)
+      out << ["  Cert File", OpenSSL::X509::DEFAULT_CERT_FILE] if defined?(OpenSSL::X509::DEFAULT_CERT_FILE)
+      out << ["  Cert Dir", OpenSSL::X509::DEFAULT_CERT_DIR] if defined?(OpenSSL::X509::DEFAULT_CERT_DIR)
+      out << ["Tools"]
+      out << ["  Git", git_version]
+      out << ["  RVM", ENV.fetch("rvm_version") { version_of("rvm") }]
+      out << ["  rbenv", version_of("rbenv")]
+      out << ["  chruby", chruby_version]
+
       %w[rubygems-bundler open_gem].each do |name|
         specs = Bundler.rubygems.find_name(name)
-        out << [name, "(#{specs.map(&:version).join(",")})"] unless specs.empty?
+        out << ["  #{name}", "(#{specs.map(&:version).join(",")})"] unless specs.empty?
       end
       if (exe = caller.last.split(":").first) && exe =~ %r{(exe|bin)/bundler?\z}
         shebang = File.read(exe).lines.first
@@ -125,6 +148,6 @@ module Bundler
       out << "```\n"
     end
 
-    private_class_method :read_file, :ruby_version, :git_version, :append_formatted_table
+    private_class_method :read_file, :ruby_version, :git_version, :append_formatted_table, :version_of, :chruby_version
   end
 end
