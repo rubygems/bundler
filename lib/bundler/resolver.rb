@@ -39,6 +39,7 @@ module Bundler
       @gem_version_promoter = gem_version_promoter
       @allow_bundler_dependency_conflicts = Bundler.feature_flag.allow_bundler_dependency_conflicts?
       @use_gvp = Bundler.feature_flag.use_gem_version_promoter_for_major_updates? || !@gem_version_promoter.major?
+      @lockfile_uses_separate_rubygems_sources = Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
     end
 
     def start(requirements)
@@ -149,18 +150,16 @@ module Bundler
 
     def index_for(dependency)
       source = @source_requirements[dependency.name]
-      if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      if source
+        source.specs
+      elsif @lockfile_uses_separate_rubygems_sources
         Index.build do |idx|
-          if source
-            idx.add_source source.specs
-          elsif dependency.all_sources
+          if dependency.all_sources
             dependency.all_sources.each {|s| idx.add_source(s.specs) if s }
           else
             idx.add_source @source_requirements[:default].specs
           end
         end
-      elsif source
-        source.specs
       else
         @index
       end
@@ -195,7 +194,7 @@ module Bundler
     def relevant_sources_for_vertex(vertex)
       if vertex.root?
         [@source_requirements[vertex.name]]
-      elsif Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      elsif @lockfile_uses_separate_rubygems_sources
         vertex.recursive_predecessors.map do |v|
           @source_requirements[v.name]
         end << @source_requirements[:default]
@@ -343,7 +342,7 @@ module Bundler
               [conflict.requirement.source]
             elsif conflict.requirement.all_sources
               conflict.requirement.all_sources
-            elsif Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+            elsif @lockfile_uses_separate_rubygems_sources
               # every conflict should have an explicit group of sources when we
               # enforce strict pinning
               raise "no source set for #{conflict}"

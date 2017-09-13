@@ -253,6 +253,22 @@ The checksum of /versions does not match the checksum provided by the server! So
     end
   end
 
+  it "does not double check for gems that are only installed locally" do
+    system_gems %w[rack-1.0.0 thin-1.0 net_a-1.0]
+    bundle! "config --local path.system true"
+    ENV["BUNDLER_SPEC_ALL_REQUESTS"] = strip_whitespace(<<-EOS).strip
+      #{source_uri}/versions
+      #{source_uri}/info/rack
+    EOS
+
+    install_gemfile! <<-G, :artifice => "compact_index", :verbose => true
+      source "#{source_uri}"
+      gem "rack"
+    G
+
+    expect(last_command.stdboth).not_to include "Double checking"
+  end
+
   it "fetches again when more dependencies are found in subsequent sources", :bundler => "< 2" do
     build_repo2 do
       build_gem "back_deps" do |s|
@@ -279,14 +295,13 @@ The checksum of /versions does not match the checksum provided by the server! So
       FileUtils.rm_rf Dir[gem_repo2("gems/foo-*.gem")]
     end
 
-    gemfile <<-G
+    install_gemfile! <<-G, :artifice => "compact_index_extra", :verbose => true
       source "#{source_uri}"
       source "#{source_uri}/extra" do
         gem "back_deps"
       end
     G
 
-    bundle! :install, :artifice => "compact_index_extra"
     expect(the_bundle).to include_gems "back_deps 1.0", "foo 1.0"
   end
 

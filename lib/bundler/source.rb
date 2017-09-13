@@ -38,6 +38,10 @@ module Bundler
     # dependencies, looking for gems we don't have info on yet.
     def double_check_for(*); end
 
+    def dependency_names_to_double_check
+      specs.dependency_names
+    end
+
     def include?(other)
       other == self
     end

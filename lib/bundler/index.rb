@@ -115,6 +115,12 @@ module Bundler
       self
     end
 
+    def spec_names
+      names = specs.keys + sources.map(&:spec_names)
+      names.uniq!
+      names
+    end
+
     # returns a list of the dependencies
     def unmet_dependency_names
       dependency_names.select do |name|
@@ -131,19 +137,6 @@ module Bundler
         end
       end
       names.uniq
-    end
-
-    def dependency_names_if_available
-      reduce([]) do |names, spec|
-        case spec
-        when EndpointSpecification, Gem::Specification, LazySpecification, StubSpecification
-          names.concat(spec.dependencies)
-        when RemoteSpecification # from the full index
-          return nil
-        else
-          raise "unhandled spec type in #dependency_names_if_available (#{spec.inspect})"
-        end
-      end.tap {|n| n && n.map!(&:name) }
     end
 
     def use(other, override_dupes = false)
