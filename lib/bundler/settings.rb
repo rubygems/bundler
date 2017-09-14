@@ -73,6 +73,7 @@ module Bundler
     ].freeze
 
     DEFAULT_CONFIG = {
+      :disable_version_check => true,
       :redirect => 5,
       :retry => 3,
       :timeout => 10,
