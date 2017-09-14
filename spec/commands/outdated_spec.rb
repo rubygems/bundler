@@ -302,14 +302,15 @@ RSpec.describe "bundle outdated" do
     end
   end
 
-  describe "with --strict option" do
+  filter_strict_option = Bundler.feature_flag.bundler_2_mode? ? :"filter-strict" : :strict
+  describe "with --#{filter_strict_option} option" do
     it "only reports gems that have a newer version that matches the specified dependency version requirements" do
       update_repo2 do
         build_gem "activesupport", "3.0"
         build_gem "weakling", "0.0.5"
       end
 
-      bundle "outdated --strict"
+      bundle :outdated, filter_strict_option => true
 
       expect(out).to_not include("activesupport (newest")
       expect(out).to include("(newest 0.0.5, installed 0.0.3, requested ~> 0.0.1)")
@@ -321,7 +322,7 @@ RSpec.describe "bundle outdated" do
         gem "rack_middleware", "1.0"
       G
 
-      bundle "outdated --strict"
+      bundle :outdated, filter_strict_option => true
 
       expect(out).to_not include("rack (1.2")
     end
@@ -339,7 +340,7 @@ RSpec.describe "bundle outdated" do
           build_gem "weakling", "0.0.5"
         end
 
-        bundle "outdated --strict --filter-patch"
+        bundle :outdated, filter_strict_option => true, "filter-patch" => true
 
         expect(out).to_not include("activesupport (newest")
         expect(out).to include("(newest 0.0.5, installed 0.0.3")
@@ -357,7 +358,7 @@ RSpec.describe "bundle outdated" do
           build_gem "weakling", "0.1.5"
         end
 
-        bundle "outdated --strict --filter-minor"
+        bundle :outdated, filter_strict_option => true, "filter-minor" => true
 
         expect(out).to_not include("activesupport (newest")
         expect(out).to include("(newest 0.1.5, installed 0.0.3")
@@ -375,7 +376,7 @@ RSpec.describe "bundle outdated" do
           build_gem "weakling", "1.1.5"
         end
 
-        bundle "outdated --strict --filter-major"
+        bundle :outdated, filter_strict_option => true, "filter-major" => true
 
         expect(out).to_not include("activesupport (newest")
         expect(out).to include("(newest 1.1.5, installed 0.0.3")

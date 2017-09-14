@@ -83,7 +83,7 @@ module Bundler
       raise InvalidOption, "Provide only one of the following options: #{patch_level.join(", ")}" unless patch_level.length <= 1
       definition.gem_version_promoter.tap do |gvp|
         gvp.level = patch_level.first || :major
-        gvp.strict = options[:strict] || options["update-strict"]
+        gvp.strict = options[:strict] || options["update-strict"] || options["filter-strict"]
       end
     end
 
