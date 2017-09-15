@@ -51,7 +51,7 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   file (a binstub) that loads Bundler, runs the command, and puts it in `bin/`.
   This lets you link the binstub inside of an application to the exact gem
   version the application needs.
-  
+ 
   Creates a directory (defaults to `~/bin`) and places any executables from the
   gem there. These executables run in Bundler's context. If used, you might add
   this directory to your environment's `PATH` variable. For instance, if the
