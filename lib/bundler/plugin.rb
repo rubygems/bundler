@@ -81,8 +81,8 @@ module Bundler
 
     # The directory root for all plugin related data
     #
-    # Points to root in app_config_path if ran in an app else points to the one
-    # in user_bundle_path
+    # If run in an app, points to local root, in app_config_path
+    # Otherwise, points to global root, in Bundler.user_bundle_path("plugin")
     def root
       @root ||= if SharedHelpers.in_bundle?
         local_root
@@ -97,7 +97,7 @@ module Bundler
 
     # The global directory root for all plugin related data
     def global_root
-      Bundler.user_bundle_path.join("plugin")
+      Bundler.user_bundle_path("plugin")
     end
 
     # The cache directory for plugin stuffs

@@ -395,7 +395,7 @@ module Bundler
         Pathname.new(ENV["BUNDLE_CONFIG"])
       else
         begin
-          Bundler.user_bundle_path.join("config")
+          Bundler.user_bundle_path("config")
         rescue PermissionError, GenericSystemCallError
           nil
         end

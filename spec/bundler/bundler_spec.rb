@@ -306,4 +306,62 @@ EOF
       expect(Bundler.tmp_home_path("USER", "")).to eq(Pathname("/TMP/bundler/home/USER"))
     end
   end
+
+  context "user cache dir" do
+    let(:home_path)                  { Pathname.new(ENV["HOME"]) }
+
+    let(:xdg_data_home)              { home_path.join(".local") }
+    let(:xdg_cache_home)             { home_path.join(".cache") }
+    let(:xdg_config_home)            { home_path.join(".config") }
+
+    let(:bundle_user_home_default)   { home_path.join(".bundle") }
+    let(:bundle_user_home_custom)    { xdg_data_home.join("bundle") }
+
+    let(:bundle_user_cache_default)  { bundle_user_home_default.join("cache") }
+    let(:bundle_user_cache_custom)   { xdg_cache_home.join("bundle") }
+
+    let(:bundle_user_config_default) { bundle_user_home_default.join("config") }
+    let(:bundle_user_config_custom)  { xdg_config_home.join("bundle") }
+
+    let(:bundle_user_plugin_default) { bundle_user_home_default.join("plugin") }
+    let(:bundle_user_plugin_custom)  { xdg_data_home.join("bundle").join("plugin") }
+
+    describe "#user_bundle_path" do
+      before do
+        allow(Bundler.rubygems).to receive(:user_home).and_return(home_path)
+      end
+
+      it "should use the default home path" do
+        expect(Bundler.user_bundle_path).to           eq(bundle_user_home_default)
+        expect(Bundler.user_bundle_path("home")).to   eq(bundle_user_home_default)
+        expect(Bundler.user_bundle_path("cache")).to  eq(bundle_user_cache_default)
+        expect(Bundler.user_cache).to                 eq(bundle_user_cache_default)
+        expect(Bundler.user_bundle_path("config")).to eq(bundle_user_config_default)
+        expect(Bundler.user_bundle_path("plugin")).to eq(bundle_user_plugin_default)
+      end
+
+      it "should use custom home path as root for other paths" do
+        ENV["BUNDLE_USER_HOME"] = bundle_user_home_custom.to_s
+        expect(Bundler.user_bundle_path).to           eq(bundle_user_home_custom)
+        expect(Bundler.user_bundle_path("home")).to   eq(bundle_user_home_custom)
+        expect(Bundler.user_bundle_path("cache")).to  eq(bundle_user_home_custom.join("cache"))
+        expect(Bundler.user_cache).to                 eq(bundle_user_home_custom.join("cache"))
+        expect(Bundler.user_bundle_path("config")).to eq(bundle_user_home_custom.join("config"))
+        expect(Bundler.user_bundle_path("plugin")).to eq(bundle_user_home_custom.join("plugin"))
+      end
+
+      it "should use all custom paths, except home" do
+        ENV.delete("BUNDLE_USER_HOME")
+        ENV["BUNDLE_USER_CACHE"]  = bundle_user_cache_custom.to_s
+        ENV["BUNDLE_USER_CONFIG"] = bundle_user_config_custom.to_s
+        ENV["BUNDLE_USER_PLUGIN"] = bundle_user_plugin_custom.to_s
+        expect(Bundler.user_bundle_path).to           eq(bundle_user_home_default)
+        expect(Bundler.user_bundle_path("home")).to   eq(bundle_user_home_default)
+        expect(Bundler.user_bundle_path("cache")).to  eq(bundle_user_cache_custom)
+        expect(Bundler.user_cache).to                 eq(bundle_user_cache_custom)
+        expect(Bundler.user_bundle_path("config")).to eq(bundle_user_config_custom)
+        expect(Bundler.user_bundle_path("plugin")).to eq(bundle_user_plugin_custom)
+      end
+    end
+  end
 end
