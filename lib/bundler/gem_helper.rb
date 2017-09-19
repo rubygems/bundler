@@ -186,7 +186,7 @@ module Bundler
     end
 
     def sh_with_code(cmd, &block)
-      out, status = sh_with_code(cmd, &block)
+      outbuf, status = sh_with_code(cmd, &block)
       [outbuf, (status&&status.exitstatus)||-1]
     end
 
