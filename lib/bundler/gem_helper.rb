@@ -75,7 +75,7 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh(%W"gem build -V #{spec_path}") do
+      sh(%W[gem build -V #{spec_path}]) do
         file_name = File.basename(built_gem_path)
         SharedHelpers.filesystem_access(File.join(base, "pkg")) {|p| FileUtils.mkdir_p(p) }
         FileUtils.mv(built_gem_path, "pkg")
@@ -86,17 +86,19 @@ module Bundler
 
     def install_gem(built_gem_path = nil, local = false)
       built_gem_path ||= build_gem
-      cmd = %W"gem install #{built_gem_path}"
+      cmd = %W[gem install #{built_gem_path}]
       cmd << "--local" if local
       out, status = sh_with_status(cmd)
-      raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless status.success? and out[/Successfully installed/]
+      unless status.success? && out[/Successfully installed/]
+        raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output"
+      end
       Bundler.ui.confirm "#{name} (#{version}) installed."
     end
 
   protected
 
     def rubygem_push(path)
-      gem_command = %W"gem push #{path}"
+      gem_command = %W[gem push #{path}]
       gem_command << "--key" << gem_key if gem_key
       gem_command << "--host" << allowed_push_host if allowed_push_host
       unless allowed_push_host || Bundler.user_home.join(".gem/credentials").file?
@@ -137,7 +139,7 @@ module Bundler
     end
 
     def already_tagged?
-      return false unless sh(%W"git tag").split(/\n/).include?(version_tag)
+      return false unless sh(%w[git tag]).split(/\n/).include?(version_tag)
       Bundler.ui.confirm "Tag #{version_tag} has already been created."
       true
     end
@@ -147,20 +149,20 @@ module Bundler
     end
 
     def clean?
-      sh_with_status(%W"git diff --exit-code")[1].success?
+      sh_with_status(%w[git diff --exit-code])[1].success?
     end
 
     def committed?
-      sh_with_status(%W"git diff-index --quiet --cached HEAD")[1].success?
+      sh_with_status(%w[git diff-index --quiet --cached HEAD])[1].success?
     end
 
     def tag_version
-      sh %W"git tag -m Version\ #{version} #{version_tag}"
+      sh %W[git tag -m Version\ #{version} #{version_tag}]
       Bundler.ui.confirm "Tagged #{version_tag}."
       yield if block_given?
     rescue
       Bundler.ui.error "Untagging #{version_tag} due to error."
-      sh_with_status %W"git tag -d #{version_tag}"
+      sh_with_status %W[git tag -d #{version_tag}]
       raise
     end
 
@@ -187,13 +189,13 @@ module Bundler
 
     def sh_with_code(cmd, &block)
       outbuf, status = sh_with_code(cmd, &block)
-      [outbuf, (status&&status.exitstatus)||-1]
+      [outbuf, (status && status.exitstatus) || -1]
     end
 
     def sh_with_status(cmd, &block)
       Bundler.ui.debug(cmd)
       SharedHelpers.chdir(base) do
-        outbuf = IO.popen(cmd, err: %i[child out], &:read)
+        outbuf = IO.popen(cmd, err: [:child, :out], &:read)
         status = $?
         block.call(outbuf) if status.success? && block
         [outbuf, status]
