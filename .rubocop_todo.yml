@@ -6,12 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Layout/EmptyLinesAroundExceptionHandlingKeywords:
-  Exclude:
-    - 'Rakefile'
-
 # Offense count: 10
 # Cop supports --auto-correct.
 # Configuration parameters: SupportedStyles, IndentationWidth.
@@ -35,22 +29,6 @@ Layout/MultilineMethodCallIndentation:
     - 'lib/bundler/cli/common.rb'
     - 'spec/bundler/plugin/source_list_spec.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: AllowForAlignment.
-Layout/SpaceAroundOperators:
-  Exclude:
-    - 'lib/bundler/retry.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SupportedStylesForEmptyBraces, SpaceBeforeBlockParameters.
-# SupportedStyles: space, no_space
-# SupportedStylesForEmptyBraces: space, no_space
-Layout/SpaceInsideBlockBraces:
-  Exclude:
-    - 'lib/bundler/installer/parallel_installer.rb'
-
 # Offense count: 31
 Lint/AmbiguousBlockAssociation:
   Exclude:
@@ -66,11 +44,6 @@ Lint/AmbiguousBlockAssociation:
     - 'spec/runtime/setup_spec.rb'
     - 'spec/support/helpers.rb'
     - 'spec/support/indexes.rb'
-
-# Offense count: 1
-Lint/DuplicateMethods:
-  Exclude:
-    - 'lib/bundler/rubygems_ext.rb'
 
 # Offense count: 2
 Lint/EmptyWhen:
@@ -134,11 +107,6 @@ Lint/UselessAssignment:
   Exclude:
     - 'lib/bundler/index.rb'
     - 'lib/bundler/installer.rb'
-
-# Offense count: 1
-Lint/Void:
-  Exclude:
-    - 'lib/bundler/spec_set.rb'
 
 # Offense count: 2564
 # Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
@@ -316,13 +284,6 @@ Style/GuardClause:
     - 'spec/commands/newgem_spec.rb'
     - 'spec/support/sometimes.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: MaxLineLength.
-Style/IfUnlessModifier:
-  Exclude:
-    - 'lib/bundler/dsl.rb'
-
 # Offense count: 9
 # Cop supports --auto-correct.
 # Configuration parameters: InverseMethods, InverseBlocks.
@@ -345,14 +306,6 @@ Style/MethodMissing:
     - 'lib/bundler/remote_specification.rb'
     - 'spec/support/builders.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: separated, grouped
-Style/MixinGrouping:
-  Exclude:
-    - 'lib/bundler/spec_set.rb'
-
 # Offense count: 2
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 # SupportedStyles: module_function, extend_self
@@ -372,16 +325,6 @@ Style/MultilineIfModifier:
     - 'lib/bundler/runtime.rb'
     - 'lib/bundler/source/rubygems.rb'
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: Whitelist.
-# Whitelist: be, be_a, be_an, be_between, be_falsey, be_kind_of, be_instance_of, be_truthy, be_within, eq, eql, end_with, include, match, raise_error, respond_to, start_with
-Style/NestedParenthesizedCalls:
-  Exclude:
-    - 'lib/bundler/resolver.rb'
-    - 'spec/commands/lock_spec.rb'
-    - 'spec/runtime/setup_spec.rb'
-
 # Offense count: 5
 # Cop supports --auto-correct.
 # Configuration parameters: AutoCorrect, EnforcedStyle, SupportedStyles.
@@ -392,12 +335,6 @@ Style/NumericPredicate:
     - 'lib/bundler/gem_helper.rb'
     - 'lib/bundler/mirror.rb'
     - 'lib/bundler/source/path.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/OrAssignment:
-  Exclude:
-    - 'lib/bundler/ui/shell.rb'
 
 # Offense count: 24
 # Cop supports --auto-correct.
@@ -420,21 +357,6 @@ Style/RaiseArgs:
     - 'spec/bundler/fetcher/index_spec.rb'
     - 'spec/bundler/rubygems_integration_spec.rb'
     - 'spec/bundler/shared_helpers_spec.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/RedundantParentheses:
-  Exclude:
-    - 'lib/bundler/cli/console.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, AllowSafeAssignment.
-# SupportedStyles: require_parentheses, require_no_parentheses, require_parentheses_when_complex
-Style/TernaryParentheses:
-  Exclude:
-    - 'lib/bundler/cli/common.rb'
-    - 'lib/bundler/gem_version_promoter.rb'
 
 # Offense count: 9
 # Cop supports --auto-correct.
