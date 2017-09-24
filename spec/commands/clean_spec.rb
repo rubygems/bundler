@@ -733,4 +733,54 @@ RSpec.describe "bundle clean" do
     expect(vendored_gems("bundler/gems/extensions")).to exist
     expect(vendored_gems("bundler/gems/very_simple_git_binary-1.0-#{revision[0..11]}")).to exist
   end
+
+  it "removes extensions after clean" do
+    build_repo2 do
+      build_gem "c_extension" do |s|
+        s.extensions = ["ext/extconf.rb"]
+        s.write "ext/extconf.rb", <<-E
+          require "mkmf"
+          name = "c_extension_bundle"
+          dir_config(name)
+          raise "OMG" unless with_config("c_extension") == "hello"
+          create_makefile(name)
+        E
+
+        s.write "ext/c_extension.c", <<-C
+          #include "ruby.h"
+
+          VALUE c_extension_true(VALUE self) {
+            return Qtrue;
+          }
+
+          void Init_c_extension_bundle() {
+            VALUE c_Extension = rb_define_class("CExtension", rb_cObject);
+            rb_define_method(c_Extension, "its_true", c_extension_true, 0);
+          }
+        C
+
+        s.write "lib/c_extension.rb", <<-C
+          require "c_extension_bundle"
+        C
+      end
+    end
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      gem "c_extension"
+    G
+
+    bundle "install --path vendor/bundle"
+
+    expect(vendored_gems.join("extensions", Gem::Platform.local.to_s, Gem::ConfigMap[:ruby_version] + "-static", "c_extension-1.0")).to exist
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+    G
+
+    bundle! :clean
+
+    expect(vendored_gems.join("extensions", Gem::Platform.local.to_s, Gem::ConfigMap[:ruby_version] + "-static", "c_extension-1.0")).not_to exist
+  end
 end
