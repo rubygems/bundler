@@ -26,8 +26,8 @@ addons:
       secure: "TrzIv116JLGUxm6PAUskCYrv8KTDguncKROVwbnjVPKTGDAgoDderd8JUdDEXrKoZ9qGLD2TPYKExt9/QDl71E+qHdWnVqWv4HKCUk2P9z/VLKzHuggOUBkCXiJUhjywUieCJhI3N92bfq2EjSBbu2/OFHqWOjLQ+QCooTEBjv8="
 
 rvm:
-  - 2.4.1
-  - 2.3.4
+  - 2.4.2
+  - 2.3.5
 
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:125 for the list of possible RGV values
@@ -41,13 +41,13 @@ matrix:
   include:
     # Ruby 2.4, Rubygems 2.6.8 and up
     # Ruby 2.3, Rubygems 2.5.1 and up
-    - rvm: 2.3.4
+    - rvm: 2.3.5
       env: RGV=v2.5.2
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
       env: RGV=master
     # 1.x mode (we want to keep stuff passing in 1.x mode for now)
-    - rvm: 2.4.1
+    - rvm: 2.4.2
       env: RGV=v2.6.13 BUNDLER_SPEC_SUB_VERSION=1.98
     - rvm: 1.8.7
       env: RGV=v2.6.13 BUNDLER_SPEC_SUB_VERSION=1.98
