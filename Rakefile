@@ -105,7 +105,8 @@ begin
     # can't go in the gemspec because of the ruby version requirement
     gem "rubocop", "= 0.50.0"
     require "rubocop/rake_task"
-    RuboCop::RakeTask.new
+    rubocop = RuboCop::RakeTask.new
+    rubocop.options = ["--parallel"]
   end
 
   namespace :spec do
