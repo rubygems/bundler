@@ -104,7 +104,7 @@ module Bundler
       out << ["  Platforms", Gem.platforms.join(", ")]
       out << ["Ruby", ruby_version]
       out << ["  Full Path", Gem.ruby]
-      out << ["  Config Dir", Gem::ConfigFile::SYSTEM_CONFIG_PATH]
+      out << ["  Config Dir", Pathname.new(Gem::ConfigFile::SYSTEM_WIDE_CONFIG_FILE).dirname]
       out << ["RubyGems", Gem::VERSION]
       out << ["  Gem Home", ENV.fetch("GEM_HOME") { Gem.dir }]
       out << ["  Gem Path", ENV.fetch("GEM_PATH") { Gem.path.join(File::PATH_SEPARATOR) }]
