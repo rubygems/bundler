@@ -724,6 +724,7 @@ module Bundler
                instance_variable_get(:@cache).
                dependencies("bundler").
                map {|d| Gem::Version.new(d.first) }.
+               reject(&:prerelease?).
                max
       return unless latest
 

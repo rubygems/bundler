@@ -147,13 +147,8 @@ To install the latest version, run `gem install bundler`
 
       context "and is a pre-release" do
         let(:latest_version) { "222.0.0.pre.4" }
-        it "prints the version warning" do
-          bundle "fail"
-          expect(last_command.stdout).to start_with(<<-EOS.strip)
-The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
-To install the latest version, run `gem install bundler --pre`
-          EOS
-        end
+
+        include_examples "no warning"
       end
     end
   end
