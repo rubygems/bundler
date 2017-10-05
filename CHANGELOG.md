@@ -1,3 +1,16 @@
+## 1.16.0.pre.3 (2017-10-04)
+
+Features:
+
+  - the output from `bundle env` includes more information, particularly both the compiled & loaded versions of OpenSSL (@indirect)
+
+Bugfixes:
+
+  - fix a bug where installing on FreeBSD would accidentally raise an error (#6013, @olleolleolle)
+  - fix a regression in 1.16 where pre-release gems could accidentally be resolved even when the gemfile contained no pre-release requirements (@greysteil)
+  - bundler will avoid making unnecessary network requests to fetch dependency data, fixing a regression introduced in 1.16 (@segiddins)
+  - the outdated bundler version message is disabled by default until the message has been fine-tuned (#6004, @segiddins)
+
 ## 1.16.0.pre.2 (2017-09-06)
 
 Bugfixes:
