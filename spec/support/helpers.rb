@@ -213,7 +213,7 @@ module Spec
         args = args.gsub(/(?=")/, "\\")
         args = %("#{args}")
       end
-      sys_exec("#{Gem.ruby} -rubygems -S gem --backtrace #{command} #{args}")
+      sys_exec("#{Gem.ruby} -rrubygems -S gem --backtrace #{command} #{args}")
     end
     bang :gem_command
 
