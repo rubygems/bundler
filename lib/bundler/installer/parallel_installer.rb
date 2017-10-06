@@ -115,7 +115,7 @@ module Bundler
           s,
           s.missing_lockfile_dependencies(@specs.map(&:name)),
         ]
-      end.reject { |a| a.last.empty? }
+      end.reject {|a| a.last.empty? }
       return if missing_dependencies.empty?
 
       warning = []
@@ -150,7 +150,7 @@ module Bundler
     end
 
     def worker_pool
-      @worker_pool ||= Bundler::Worker.new @size, "Parallel Installer", lambda { |spec_install, worker_num|
+      @worker_pool ||= Bundler::Worker.new @size, "Parallel Installer", lambda {|spec_install, worker_num|
         do_install(spec_install, worker_num)
       }
     end

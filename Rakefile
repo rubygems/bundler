@@ -246,7 +246,6 @@ begin
       end
     end
   end
-
 rescue LoadError
   task :spec do
     abort "Run `rake spec:deps` to be able to run the specs"
@@ -314,7 +313,6 @@ begin
 
     task(:require) {}
   end
-
 rescue LoadError
   namespace :man do
     task(:require) { abort "Install the ronn gem to be able to release!" }

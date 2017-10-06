@@ -323,7 +323,7 @@ module Bundler
         :additional_message_for_conflict => lambda do |o, name, conflict|
           if name == "bundler"
             o << %(\n  Current Bundler version:\n    bundler (#{Bundler::VERSION}))
-            other_bundler_required = !conflict.requirement.requirement.satisfied_by?(Gem::Version.new Bundler::VERSION)
+            other_bundler_required = !conflict.requirement.requirement.satisfied_by?(Gem::Version.new(Bundler::VERSION))
           end
 
           if name == "bundler" && other_bundler_required
