@@ -35,7 +35,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.6.13
+  - RGV=v2.6.14
 
 matrix:
   include:
@@ -48,9 +48,9 @@ matrix:
       env: RGV=master
     # 1.x mode (we want to keep stuff passing in 1.x mode for now)
     - rvm: 2.4.2
-      env: RGV=v2.6.13 BUNDLER_SPEC_SUB_VERSION=1.98
+      env: RGV=v2.6.14 BUNDLER_SPEC_SUB_VERSION=1.98
     - rvm: 1.8.7
-      env: RGV=v2.6.13 BUNDLER_SPEC_SUB_VERSION=1.98
+      env: RGV=v2.6.14 BUNDLER_SPEC_SUB_VERSION=1.98
 
   allow_failures:
     - rvm: ruby-head
