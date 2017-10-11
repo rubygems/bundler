@@ -67,19 +67,11 @@ module Bundler
       ARGV.replace(args)
       $0 = file
       Process.setproctitle(process_title(file, args)) if Process.respond_to?(:setproctitle)
-      ui = Bundler.ui
       Bundler.ui = nil
       require "bundler/setup"
       signals = Signal.list.keys - RESERVED_SIGNALS
       signals.each {|s| trap(s, "DEFAULT") }
       Kernel.load(file)
-    rescue SystemExit
-      raise
-    rescue Exception => e # rubocop:disable Lint/RescueException
-      Bundler.ui = ui
-      Bundler.ui.error "bundler: failed to load command: #{cmd} (#{file})"
-      backtrace = e.backtrace.take_while {|bt| !bt.start_with?(__FILE__) }
-      abort "#{e.class}: #{e.message}\n  #{backtrace.join("\n  ")}"
     end
 
     def process_title(file, args)
