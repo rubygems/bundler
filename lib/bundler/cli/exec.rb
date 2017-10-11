@@ -67,7 +67,6 @@ module Bundler
       ARGV.replace(args)
       $0 = file
       Process.setproctitle(process_title(file, args)) if Process.respond_to?(:setproctitle)
-      ui = Bundler.ui
       Bundler.ui = nil
       require "bundler/setup"
       signals = Signal.list.keys - RESERVED_SIGNALS
