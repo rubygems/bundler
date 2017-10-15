@@ -15,7 +15,7 @@ class CompactIndexAPI < Endpoint
 
     def etag_response
       response_body = yield
-      checksum = Digest::MD5.hexdigest(response_body)
+      checksum = Digest(:MD5).hexdigest(response_body)
       return if not_modified?(checksum)
       headers "ETag" => quote(checksum)
       headers "Surrogate-Control" => "max-age=2592000, stale-while-revalidate=60"

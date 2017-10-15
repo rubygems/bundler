@@ -8,7 +8,7 @@ RSpec.describe Bundler::Source::Rubygems::Remote do
   end
 
   before do
-    allow(Digest::MD5).to receive(:hexdigest).with(duck_type(:to_s)) {|string| "MD5HEX(#{string})" }
+    allow(Digest(:MD5)).to receive(:hexdigest).with(duck_type(:to_s)) {|string| "MD5HEX(#{string})" }
   end
 
   let(:uri_no_auth) { URI("https://gems.example.com") }
