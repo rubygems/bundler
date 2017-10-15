@@ -36,7 +36,7 @@ RSpec.describe Bundler::Plugin::API::Source do
 
   context "install_path" do
     let(:uri) { "uri://to/a/repository-name" }
-    let(:hash) { Digest::SHA1.hexdigest(uri) }
+    let(:hash) { Digest(:SHA1).hexdigest(uri) }
     let(:install_path) { Pathname.new "/bundler/install/path" }
 
     before do

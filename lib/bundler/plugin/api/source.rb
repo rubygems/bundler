@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "uri"
-require "digest/sha1"
+require "digest"
 
 module Bundler
   module Plugin
@@ -272,7 +272,7 @@ module Bundler
         end
 
         def uri_hash
-          Digest::SHA1.hexdigest(uri)
+          Digest(:SHA1).hexdigest(uri)
         end
 
         # Note: Do not override if you don't know what you are doing.

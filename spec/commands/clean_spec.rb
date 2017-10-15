@@ -141,7 +141,7 @@ RSpec.describe "bundle clean" do
 
     bundle :clean
 
-    digest = Digest::SHA1.hexdigest(git_path.to_s)
+    digest = Digest(:SHA1).hexdigest(git_path.to_s)
     cache_path = Bundler::VERSION.start_with?("1.") ? vendored_gems("cache/bundler/git/foo-1.0-#{digest}") : home(".bundle/cache/git/foo-1.0-#{digest}")
     expect(cache_path).to exist
   end
@@ -175,7 +175,7 @@ RSpec.describe "bundle clean" do
 
     expect(vendored_gems("gems/rack-1.0.0")).to exist
     expect(vendored_gems("bundler/gems/foo-#{revision[0..11]}")).not_to exist
-    digest = Digest::SHA1.hexdigest(git_path.to_s)
+    digest = Digest(:SHA1).hexdigest(git_path.to_s)
     expect(vendored_gems("cache/bundler/git/foo-#{digest}")).not_to exist
 
     expect(vendored_gems("specifications/rack-1.0.0.gemspec")).to exist
@@ -254,7 +254,7 @@ RSpec.describe "bundle clean" do
 
     expect(out).to include("")
     expect(vendored_gems("bundler/gems/foo-#{revision[0..11]}")).to exist
-    digest = Digest::SHA1.hexdigest(git_path.to_s)
+    digest = Digest(:SHA1).hexdigest(git_path.to_s)
     expect(vendored_gems("cache/bundler/git/foo-#{digest}")).to_not exist
   end
 
