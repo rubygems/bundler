@@ -4,25 +4,29 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
 1. [Fork the Bundler repo](https://github.com/bundler/bundler), and clone the fork onto your machine. ([Follow this tutorial](https://help.github.com/articles/fork-a-repo/) for instructions on forking a repo.)
 
-2. Install `groff-base` and `graphviz` packages using your package manager, e.g for Ubuntu:
+2. Install `groff-base` and `graphviz` packages using your package manager:
 
-      `$ sudo apt-get install graphviz groff-base -y`
+        $ sudo apt-get install graphviz groff-base -y
 
-   and for OS X (with brew installed):
+    And for OS X (with brew installed):
 
-      `$ brew install graphviz homebrew/dupes/groff`
+        $ brew install graphviz homebrew/dupes/groff
 
-3. Install Bundler's development dependencies:
+3. You may also have to install the `bsdmainutils` package on linux if your distribution does not include the `col` command.
 
-      `$ bin/rake spec:deps`
+        $ sudo apt-get install bsdmainutils -y
 
-4. Run the test suite, to make sure things are working:
+4. Install Bundler's development dependencies:
 
-      `$ bin/rake spec`
+        $ bin/rake spec:deps
 
-5. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias ([follow these instructions](https://www.moncefbelyamani.com/create-aliases-in-bash-profile-to-assign-shortcuts-for-common-terminal-commands/) for adding aliases to your `~/.bashrc` profile):
+5. Run the test suite, to make sure things are working:
 
-      `$ alias dbundle='/path/to/bundler/repo/bin/bundle'`
+        $ bin/rake spec
+
+6. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias ([follow these instructions](https://www.moncefbelyamani.com/create-aliases-in-bash-profile-to-assign-shortcuts-for-common-terminal-commands/) for adding aliases to your `~/.bashrc` profile):
+
+        $ alias dbundle='/path/to/bundler/repo/bin/bundle
 
 ## Debugging with `pry`
 
