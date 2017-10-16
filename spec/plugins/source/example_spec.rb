@@ -142,7 +142,7 @@ RSpec.describe "real source plugins" do
     end
 
     describe "bundle cache/package" do
-      let(:uri_hash) { Digest::SHA1.hexdigest(lib_path("a-path-gem-1.0").to_s) }
+      let(:uri_hash) { Digest(:SHA1).hexdigest(lib_path("a-path-gem-1.0").to_s) }
       it "copies repository to vendor cache and uses it" do
         bundle "install"
         bundle :cache, forgotten_command_line_options([:all, :cache_all] => true)

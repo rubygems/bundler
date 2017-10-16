@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "bundler/lockfile_parser"
-require "digest/sha1"
+require "digest"
 require "set"
 
 module Bundler

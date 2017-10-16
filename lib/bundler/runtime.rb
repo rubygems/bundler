@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "digest/sha1"
+require "digest"
 
 module Bundler
   class Runtime
