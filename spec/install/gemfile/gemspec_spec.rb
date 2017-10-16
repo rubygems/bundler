@@ -145,7 +145,9 @@ RSpec.describe "bundle install from an existing gemspec" do
     G
 
     bundle! "install", :verbose => true
-    expect(out).to include("Found no changes, using resolution from the lockfile")
+
+    message = "Found no changes, using resolution from the lockfile"
+    expect(out.scan(message).size).to eq(1)
   end
 
   it "should match a lockfile without needing to re-resolve with development dependencies" do
@@ -162,7 +164,9 @@ RSpec.describe "bundle install from an existing gemspec" do
     G
 
     bundle! "install", :verbose => true
-    expect(out).to include("Found no changes, using resolution from the lockfile")
+
+    message = "Found no changes, using resolution from the lockfile"
+    expect(out.scan(message).size).to eq(1)
   end
 
   it "should match a lockfile on non-ruby platforms with a transitive platform dependency" do
