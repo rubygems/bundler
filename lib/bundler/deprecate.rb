@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module Bundler
-  if defined? ::Deprecate
+  if defined? Bundler::Deprecate
+    # nothing to do!
+  elsif defined? ::Deprecate
     Deprecate = ::Deprecate
   elsif defined? Gem::Deprecate
     Deprecate = Gem::Deprecate
