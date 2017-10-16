@@ -113,9 +113,12 @@ module Bundler
       end
 
       # double-assignment to avoid warnings about variables that will be used by ERB
-      bin_path = bin_path = Bundler.bin_path
-      relative_gemfile_path = relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
-      ruby_command = ruby_command = Thor::Util.ruby_command
+      bin_path = Bundler.bin_path
+      bin_path = bin_path
+      relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
+      relative_gemfile_path = relative_gemfile_path
+      ruby_command = Thor::Util.ruby_command
+      ruby_command = ruby_command
       template_path = File.expand_path("../templates/Executable", __FILE__)
       if spec.name == "bundler"
         template_path += ".bundler"
@@ -157,13 +160,16 @@ module Bundler
       unless path = Bundler.settings[:path]
         raise "Can't standalone without an explicit path set"
       end
-      standalone_path = standalone_path = Bundler.root.join(path).relative_path_from(bin_path)
+      standalone_path = Bundler.root.join(path).relative_path_from(bin_path)
+      standalone_path = standalone_path
       template = File.read(File.expand_path("../templates/Executable.standalone", __FILE__))
-      ruby_command = ruby_command = Thor::Util.ruby_command
+      ruby_command = Thor::Util.ruby_command
+      ruby_command = ruby_command
 
       spec.executables.each do |executable|
         next if executable == "bundle"
-        executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
+        executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
+        executable_path = executable_path
         File.open "#{bin_path}/#{executable}", "w", 0o755 do |f|
           f.puts ERB.new(template, nil, "-").result(binding)
         end
