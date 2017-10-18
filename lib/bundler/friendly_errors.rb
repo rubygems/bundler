@@ -120,6 +120,8 @@ module Bundler
 
   def self.with_friendly_errors
     yield
+  rescue SignalException
+    raise
   rescue Exception => e
     FriendlyErrors.log_error(e)
     exit FriendlyErrors.exit_status(e)
