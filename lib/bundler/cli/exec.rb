@@ -73,7 +73,7 @@ module Bundler
       signals = Signal.list.keys - RESERVED_SIGNALS
       signals.each {|s| trap(s, "DEFAULT") }
       Kernel.load(file)
-    rescue SystemExit
+    rescue SystemExit, SignalException
       raise
     rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = ui
