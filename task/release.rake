@@ -80,12 +80,12 @@ namespace :release do
 
   def release_notes(version)
     title_token = "## "
-    current_verison_title = "#{title_token}#{version}"
+    current_version_title = "#{title_token}#{version}"
     current_minor_title = "#{title_token}#{version.segments[0, 2].join(".")}"
     text = File.open("CHANGELOG.md", "r:UTF-8", &:read)
     lines = text.split("\n")
 
-    current_version_index = lines.find_index {|line| line.strip =~ /^#{current_verison_title}($|\b)/ }
+    current_version_index = lines.find_index {|line| line.strip =~ /^#{current_version_title}($|\b)/ }
     unless current_version_index
       raise "Update the changelog for the last version (#{version})"
     end
