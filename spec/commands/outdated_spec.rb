@@ -135,6 +135,17 @@ RSpec.describe "bundle outdated" do
       expect(out).to include("activesupport")
       expect(out).to include("duradura")
     end
+
+    it "returns a sorted list of outdated gems from one group => 'test'" do
+      test_group_option("test", 2)
+
+      expect(out).not_to include("===== Group default =====")
+      expect(out).not_to include("terranova (")
+
+      expect(out).to include("===== Group development, test =====")
+      expect(out).to include("activesupport")
+      expect(out).to include("duradura")
+    end
   end
 
   describe "with --groups option" do
