@@ -33,8 +33,6 @@ RSpec.describe Bundler::Plugin do
   end
 
   describe "list command" do
-    let(:opts) { { "version" => "~> 1.0", "source" => "foo" } }
-
     context "when no plugins are installed" do
       before { allow(index).to receive(:installed_plugins) { [] } }
       it "outputs no plugins installed" do

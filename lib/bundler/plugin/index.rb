@@ -100,7 +100,7 @@ module Bundler
       end
 
       def plugin_commands(plugin)
-        @commands.find_all {|_, n| n == plugins }.map(&:first)
+        @commands.find_all {|_, n| n == plugin }.map(&:first)
       end
 
       def source?(source)
