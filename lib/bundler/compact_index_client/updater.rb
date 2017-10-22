@@ -104,7 +104,7 @@ module Bundler
         # because we need to preserve \n line endings on windows when calculating
         # the checksum
         SharedHelpers.filesystem_access(path, :read) do
-          Digest(:MD5).hexdigest(IO.read(path))
+          SharedHelpers.digest(:MD5).hexdigest(IO.read(path))
         end
       end
     end

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "bundler/lockfile_parser"
-require "digest"
 require "set"
 
 module Bundler

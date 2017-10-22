@@ -48,7 +48,7 @@ module Bundler
       return true unless source = @package.instance_variable_get(:@gem)
       return true unless source.respond_to?(:with_read_io)
       digest = source.with_read_io do |io|
-        digest = Digest(:SHA256).new
+        digest = SharedHelpers.digest(:SHA256).new
         digest << io.read(16_384) until io.eof?
         io.rewind
         send(checksum_type(checksum), digest)
