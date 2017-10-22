@@ -46,6 +46,26 @@ module Bundler
       Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n ")}"
     end
 
+    # List installed plugins and commands
+    #
+    def list
+      installed_plugins = index.installed_plugins
+      if installed_plugins.any?
+        output = String.new
+        installed_plugins.each do |plugin|
+          output << "#{plugin}\n"
+          output << "-----\n"
+          index.plugin_commands(plugin).each do |command|
+            output << "  #{command}\n"
+          end
+          output << "\n"
+        end
+      else
+        output = "No plugins installed"
+      end
+      Bundler.ui.info output
+    end
+
     # Evaluates the Gemfile with a limited DSL and installs the plugins
     # specified by plugin method
     #
