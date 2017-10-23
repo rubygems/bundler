@@ -218,6 +218,11 @@ module Bundler
       end
     end
 
+    def digest(name)
+      require "digest"
+      Digest(name)
+    end
+
   private
 
     def validate_bundle_path

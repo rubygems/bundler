@@ -26,7 +26,7 @@ module Bundler
             cache_uri = original_uri || uri
 
             uri_parts = [cache_uri.host, cache_uri.user, cache_uri.port, cache_uri.path]
-            uri_digest = Digest(:MD5).hexdigest(uri_parts.compact.join("."))
+            uri_digest = SharedHelpers.digest(:MD5).hexdigest(uri_parts.compact.join("."))
 
             uri_parts[-1] = uri_digest
             uri_parts.compact.join(".")

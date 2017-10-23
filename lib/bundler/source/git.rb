@@ -2,7 +2,6 @@
 
 require "bundler/vendored_fileutils"
 require "uri"
-require "digest"
 
 module Bundler
   class Source
@@ -284,7 +283,7 @@ module Bundler
           # If there is no URI scheme, assume it is an ssh/git URI
           input = uri
         end
-        Digest(:SHA1).hexdigest(input)
+        SharedHelpers.digest(:SHA1).hexdigest(input)
       end
 
       def cached_revision
