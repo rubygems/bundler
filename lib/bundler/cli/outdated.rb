@@ -118,7 +118,7 @@ module Bundler
           [nil, ordered_groups].flatten.each do |groups|
             gems = outdated_gems_by_groups[groups]
             contains_group = if groups
-              groups.split(",").include?(options[:group])
+              groups.split(", ").include?(options[:group])
             else
               options[:group] == "group"
             end
