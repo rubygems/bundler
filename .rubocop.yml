@@ -64,6 +64,8 @@ Style/SignalException:
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
+  Exclude:
+    - lib/bundler/templates/*
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
