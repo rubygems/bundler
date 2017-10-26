@@ -377,5 +377,29 @@ module Spec
         end
       end
     end
+
+    def an_ambiguous_index
+      build_index do
+        gem("a", "1.0.0") do
+          dep "c", ">= 0"
+        end
+
+        gem("b", %w[0.5.0 1.0.0])
+
+        gem("b", "2.0.0") do
+          dep "c", "< 2.0.0"
+        end
+
+        gem("c", "1.0.0") do
+          dep "d", "1.0.0"
+        end
+
+        gem("c", "2.0.0") do
+          dep "d", "2.0.0"
+        end
+
+        gem("d", %w[1.0.0 2.0.0])
+      end
+    end
   end
 end

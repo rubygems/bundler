@@ -35,6 +35,13 @@ RSpec.describe "Resolving" do
     should_resolve_as %w[berkshelf-2.0.7 chef-10.26 chef_app-1.0.0 json-1.7.7]
   end
 
+  it "prefers expicitly requested dependencies when resolving an index which would otherwise be ambiguous" do
+    @index = an_ambiguous_index
+    dep "a"
+    dep "b"
+    should_resolve_as %w[a-1.0.0 b-2.0.0 c-1.0.0 d-1.0.0]
+  end
+
   it "resolves a index with root level conflict on child" do
     @index = a_index_with_root_conflict_on_child
     dep "i18n", "~> 0.4"
