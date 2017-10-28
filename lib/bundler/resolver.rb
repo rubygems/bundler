@@ -205,12 +205,14 @@ module Bundler
       dependencies.sort_by do |dependency|
         dependency.all_sources = relevant_sources_for_vertex(activated.vertex_named(dependency.name))
         name = name_for(dependency)
+        vertex = activated.vertex_named(name)
         [
           @base_dg.vertex_named(name) ? 0 : 1,
-          activated.vertex_named(name).payload ? 0 : 1,
+          vertex.payload ? 0 : 1,
+          vertex.root? ? 0 : 1,
           amount_constrained(dependency),
           conflicts[name] ? 0 : 1,
-          activated.vertex_named(name).payload ? 0 : search_for(dependency).count,
+          vertex.payload ? 0 : search_for(dependency).count,
           self.class.platform_sort_key(dependency.__platform),
         ]
       end
