@@ -52,7 +52,7 @@ module Bundler
     #
     # Fourthly, Bundler checks if the Gemfile.lock exists, and if so
     # then proceeds to set up a definition based on the Gemfile and the Gemfile.lock.
-    # During this step Bundler will also download infomrmation about any new gems
+    # During this step Bundler will also download information about any new gems
     # that are not in the Gemfile.lock and resolve any dependencies if needed.
     #
     # Fifthly, Bundler resolves the dependencies either through a cache of gems or by remote.
