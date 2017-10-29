@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "rbconfig"
+require "find"
 
 module Bundler
   class CLI::Doctor
@@ -61,6 +62,7 @@ module Bundler
     end
 
     def run
+      check_home_permissions
       Bundler.ui.level = "error" if options[:quiet]
       Bundler.settings.validate!
       check!
@@ -88,6 +90,38 @@ module Bundler
         raise ProductionError, message
       else
         Bundler.ui.info "No issues found with the installed bundle"
+      end
+    end
+
+  private
+
+    def check_home_permissions
+      check_for_files_not_owned_by_current_user_but_still_rw
+      check_for_files_not_readable_or_writable
+    end
+
+    def check_for_files_not_owned_by_current_user_but_still_rw
+      return unless any_files_not_owned_by_current_user_but_still_rw?
+      Bundler.ui.warn "Files exist in Bundler home that are owned by another " \
+        "user, but are stil readable/writable"
+    end
+
+    def check_for_files_not_readable_or_writable
+      return unless any_files_not_readable_or_writable?
+      raise ProductionError, "Files exist in Bundler home that are not " \
+        "readable/writable to the current user"
+    end
+
+    def any_files_not_readable_or_writable?
+      Find.find(Bundler.home.to_s).any? do |f|
+        !(File.writable?(f) && File.readable?(f))
+      end
+    end
+
+    def any_files_not_owned_by_current_user_but_still_rw?
+      Find.find(Bundler.home.to_s).any? do |f|
+        (File.stat(f).uid != Process.uid) &&
+          (File.writable?(f) && File.readable?(f))
       end
     end
   end
