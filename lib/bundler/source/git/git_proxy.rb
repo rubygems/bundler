@@ -221,6 +221,7 @@ module Bundler
 
         def in_path(&blk)
           checkout unless path.exist?
+          _ = URICredentialsFilter # load it before we chdir
           SharedHelpers.chdir(path, &blk)
         end
 
