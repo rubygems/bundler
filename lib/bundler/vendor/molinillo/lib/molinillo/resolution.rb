@@ -218,7 +218,7 @@ module Bundler::Molinillo
           next unless vertex.payload
 
           latest_version = vertex.payload.possibilities.reverse_each.find do |possibility|
-            vertex.requirements.uniq.all? { |req| requirement_satisfied_by?(req, activated, possibility) }
+            vertex.requirements.all? { |req| requirement_satisfied_by?(req, activated, possibility) }
           end
 
           activated.set_payload(vertex.name, latest_version)
