@@ -33,7 +33,7 @@ module Bundler::Molinillo
       # @return [Array<Object>] all of the requirements that required
       #   this vertex
       def requirements
-        incoming_edges.map(&:requirement) + explicit_requirements
+        (incoming_edges.map(&:requirement) + explicit_requirements).uniq
       end
 
       # @return [Array<Edge>] the edges of {#graph} that have `self` as their
