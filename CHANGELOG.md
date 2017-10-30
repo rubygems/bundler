@@ -1,3 +1,17 @@
+## 1.16.0 (2017-10-30)
+
+Bugfixes:
+
+  - avoid new RubyGems warning about unsafe YAML loading (to keep output consistent) (@segiddins)
+  - load digest subclasses in a thread-safe manner (@segiddins, @colby-swandale)
+  - avoid unusued variable warnings under ruby 2.5 (@amatsuda)
+  - fix printing the same message twice in verbose mode ([#6028](https://github.com/bundler/issues/6028), @akhramov)
+  - allow `SignalException`s to bubble up to the interpreter during `bundle exec` ([#6090](https://github.com/bundler/issues/6090), @dekellum)
+  - avoid activating stdlib digest under Ruby 2.5 (@segiddins)
+  - prioritise explicitly requested gems in dependency resolution sort order (@segiddins)
+  - reduce memory usage during dependency resolution ([#6114](https://github.com/bundler/issues/6114), @greysteil)
+  - ensure that the default bundler gem is not accidentally activated on ruby 2.5 when using local git overrides (@segiddins)
+
 ## 1.16.0.pre.3 (2017-10-04)
 
 Features:
