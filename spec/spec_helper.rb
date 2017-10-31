@@ -3,6 +3,7 @@
 $:.unshift File.expand_path("..", __FILE__)
 $:.unshift File.expand_path("../../lib", __FILE__)
 
+require "rubygems"
 require "bundler/psyched_yaml"
 require "bundler/vendored_fileutils"
 require "uri"
@@ -10,7 +11,6 @@ require "digest"
 require File.expand_path("../support/path.rb", __FILE__)
 
 begin
-  require "rubygems"
   spec = Gem::Specification.load("bundler.gemspec")
   rspec = spec.dependencies.find {|d| d.name == "rspec" }
   gem "rspec", rspec.requirement.to_s

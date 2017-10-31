@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+begin
+  require "rubygems/deprecate"
+rescue LoadError
+  # it's fine if it doesn't exist on the current RubyGems...
+  nil
+end
+
 module Bundler
   if defined? Bundler::Deprecate
     # nothing to do!
