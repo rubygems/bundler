@@ -8,7 +8,8 @@ module Bundler
   elsif defined? Gem::Deprecate
     Deprecate = Gem::Deprecate
   else
-    class Deprecate; end
+    class Deprecate
+    end
   end
 
   unless Deprecate.respond_to?(:skip_during)
@@ -23,7 +24,7 @@ module Bundler
 
   unless Deprecate.respond_to?(:skip)
     def Deprecate.skip
-      @skip
+      @skip ||= false
     end
   end
 
