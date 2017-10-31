@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+begin
+  require "rubygems/deprecate"
+rescue LoadError
+  # it's fine if it doesn't exist on the current RubyGems...
+  nil
+end
+
 module Bundler
   if defined? Bundler::Deprecate
     # nothing to do!
@@ -8,7 +15,8 @@ module Bundler
   elsif defined? Gem::Deprecate
     Deprecate = Gem::Deprecate
   else
-    class Deprecate; end
+    class Deprecate
+    end
   end
 
   unless Deprecate.respond_to?(:skip_during)
@@ -23,7 +31,7 @@ module Bundler
 
   unless Deprecate.respond_to?(:skip)
     def Deprecate.skip
-      @skip
+      @skip ||= false
     end
   end
 

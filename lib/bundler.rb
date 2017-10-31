@@ -501,6 +501,8 @@ EOF
   private
 
     def eval_yaml_gemspec(path, contents)
+      Kernel.send(:require, "bundler/psyched_yaml")
+
       # If the YAML is invalid, Syck raises an ArgumentError, and Psych
       # raises a Psych::SyntaxError. See psyched_yaml.rb for more info.
       Gem::Specification.from_yaml(contents)

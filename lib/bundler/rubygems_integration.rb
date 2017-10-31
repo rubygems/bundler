@@ -299,6 +299,7 @@ module Bundler
 
     def spec_from_gem(path, policy = nil)
       require "rubygems/security"
+      require "bundler/psyched_yaml"
       gem_from_path(path, security_policies[policy]).spec
     rescue Gem::Package::FormatError
       raise GemspecError, "Could not read gem at #{path}. It may be corrupted."
