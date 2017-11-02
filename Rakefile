@@ -298,7 +298,7 @@ begin
 
     task :clean do
       leftovers = Dir["man/*"].reject do |f|
-        File.extname(f) == ".ronn"
+        File.extname(f) == ".ronn" || f == "man/index.txt"
       end
       rm leftovers if leftovers.any?
     end

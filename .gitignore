@@ -13,6 +13,7 @@
 /lib/bundler/man/
 man/*
 !man/*.ronn
+!man/index.txt
 
 # rspec failure tracking
 .rspec_status
