@@ -107,6 +107,8 @@ module Bundler
         end
 
         if installed?(spec) && !force
+          spec.loaded_from ||= loaded_from(spec)
+
           print_using_message "Using #{version_message(spec)}"
           return nil # no post-install message
         end
