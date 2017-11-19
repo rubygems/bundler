@@ -15,6 +15,21 @@ RSpec.describe "bundle list", :bundler => "2" do
     end
   end
 
+  context "with paths option" do
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rails"
+      G
+    end
+    it "prints the path of each gem in the bundle" do
+      bundle "list --paths"
+      expect(out).to match(%r{.*\/rails\-2\.3\.2})
+      expect(out).to match(%r{.*\/rack\-1\.0\.0})
+    end
+  end
+
   context "when no gems are in the gemfile" do
     before do
       install_gemfile <<-G
