@@ -101,25 +101,25 @@ module Bundler
     end
 
     def check_for_files_not_owned_by_current_user_but_still_rw
-      return unless any_files_not_owned_by_current_user_but_still_rw?
+      return unless files_not_owned_by_current_user_but_still_rw.any?
       Bundler.ui.warn "Files exist in Bundler home that are owned by another " \
-        "user, but are stil readable/writable"
+        "user, but are stil readable/writable. These files are: #{files_not_owned_by_current_user_but_still_rw.join("\n")}"
     end
 
     def check_for_files_not_readable_or_writable
-      return unless any_files_not_readable_or_writable?
-      raise ProductionError, "Files exist in Bundler home that are not " \
-        "readable/writable to the current user"
+      return unless files_not_readable_or_writable.any?
+      Bundler.ui.warn "Files exist in Bundler home that are not " \
+        "readable/writable to the current user. These files are: #{files_not_readable_or_writable.join("\n")}"
     end
 
-    def any_files_not_readable_or_writable?
-      Find.find(Bundler.home.to_s).any? do |f|
+    def files_not_readable_or_writable
+      Find.find(Bundler.home.to_s).select do |f|
         !(File.writable?(f) && File.readable?(f))
       end
     end
 
-    def any_files_not_owned_by_current_user_but_still_rw?
-      Find.find(Bundler.home.to_s).any? do |f|
+    def files_not_owned_by_current_user_but_still_rw
+      Find.find(Bundler.home.to_s).select do |f|
         (File.stat(f).uid != Process.uid) &&
           (File.writable?(f) && File.readable?(f))
       end

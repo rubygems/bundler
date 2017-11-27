@@ -66,9 +66,9 @@ RSpec.describe "bundle doctor" do
     allow(stat).to receive(:uid) { Process.uid }
     allow(File).to receive(:writable?).with(unwritable_file) { false }
     allow(File).to receive(:readable?).with(unwritable_file) { false }
-    expect { doctor.run }.to raise_error(
-      Bundler::ProductionError,
-      "Files exist in Bundler home that are not readable/writable to the current user"
+    expect { doctor.run }.not_to raise_error
+    expect(@stdout.string).to include(
+      "Files exist in Bundler home that are not readable/writable to the current user. These files are: #{unwritable_file}"
     )
   end
 
@@ -81,6 +81,6 @@ RSpec.describe "bundle doctor" do
     allow(File).to receive(:writable?).with(unwritable_file) { true }
     allow(File).to receive(:readable?).with(unwritable_file) { true }
     expect { Bundler::CLI::Doctor.new({}).run }.not_to raise_error
-    expect(@stdout.string).to include("Files exist in Bundler home that are owned by another user, but are stil readable/writable")
+    expect(@stdout.string).to include("Files exist in Bundler home that are owned by another user, but are stil readable/writable. These files are: #{unwritable_file}")
   end
 end
