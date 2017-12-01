@@ -8,6 +8,8 @@ module Bundler
 
     def run
       specs = Bundler.load.specs.reject {|s| s.name == "bundler" }.sort_by(&:name)
+
+      return Bundler.ui.error "The `--name-only` and `--paths` options cannot be used together" if @options["name-only"] && @options["paths"]
       return specs.each {|s| Bundler.ui.info s.name } if @options["name-only"]
       return specs.each {|s| Bundler.ui.info s.full_gem_path } if @options["paths"]
 
