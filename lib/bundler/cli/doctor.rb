@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "rbconfig"
-require "find"
 
 module Bundler
   class CLI::Doctor
@@ -62,7 +61,6 @@ module Bundler
     end
 
     def run
-      check_home_permissions
       Bundler.ui.level = "error" if options[:quiet]
       Bundler.settings.validate!
       check!
@@ -80,6 +78,8 @@ module Bundler
         end
       end
 
+      permissions_valid = check_home_permissions
+
       if broken_links.any?
         message = "The following gems are missing OS dependencies:"
         broken_links.map do |spec, paths|
@@ -88,7 +88,7 @@ module Bundler
           end
         end.flatten.sort.each {|m| message += m }
         raise ProductionError, message
-      else
+      elsif !permissions_valid
         Bundler.ui.info "No issues found with the installed bundle"
       end
     end
@@ -96,33 +96,33 @@ module Bundler
   private
 
     def check_home_permissions
-      check_for_files_not_owned_by_current_user_but_still_rw
-      check_for_files_not_readable_or_writable
-    end
-
-    def check_for_files_not_owned_by_current_user_but_still_rw
-      return unless files_not_owned_by_current_user_but_still_rw.any?
-      Bundler.ui.warn "Files exist in Bundler home that are owned by another " \
-        "user, but are stil readable/writable. These files are:\n - #{files_not_owned_by_current_user_but_still_rw.join("\n - ")}"
-    end
-
-    def check_for_files_not_readable_or_writable
-      return unless files_not_readable_or_writable.any?
-      Bundler.ui.warn "Files exist in Bundler home that are not " \
-        "readable/writable to the current user. These files are:\n - #{files_not_readable_or_writable.join("\n - ")}"
-    end
-
-    def files_not_readable_or_writable
-      Find.find(Bundler.home.to_s).select do |f|
-        !(File.writable?(f) && File.readable?(f))
+      require "find"
+      files_not_readable_or_writable = []
+      files_not_owned_by_current_user_but_still_rw = []
+      Find.find(Bundler.home.to_s).each do |f|
+        if !File.writable?(f) || !File.readable?(f)
+          files_not_readable_or_writable << f
+        elsif File.stat(f).uid != Process.uid
+          files_not_owned_by_current_user_but_still_rw << f
+        end
       end
-    end
 
-    def files_not_owned_by_current_user_but_still_rw
-      Find.find(Bundler.home.to_s).select do |f|
-        (File.stat(f).uid != Process.uid) &&
-          (File.writable?(f) && File.readable?(f))
+      ok = true
+      if files_not_owned_by_current_user_but_still_rw.any?
+        Bundler.ui.warn "Files exist in the Bundler home that are owned by another " \
+          "user, but are stil readable/writable. These files are:\n - #{files_not_owned_by_current_user_but_still_rw.join("\n - ")}"
+
+        ok = false
       end
+
+      if files_not_readable_or_writable.any?
+        Bundler.ui.warn "Files exist in the Bundler home that are not " \
+          "readable/writable to the current user. These files are:\n - #{files_not_readable_or_writable.join("\n - ")}"
+
+        ok = false
+      end
+
+      ok
     end
   end
 end
