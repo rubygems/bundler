@@ -103,13 +103,13 @@ module Bundler
     def check_for_files_not_owned_by_current_user_but_still_rw
       return unless files_not_owned_by_current_user_but_still_rw.any?
       Bundler.ui.warn "Files exist in Bundler home that are owned by another " \
-        "user, but are stil readable/writable. These files are: #{files_not_owned_by_current_user_but_still_rw.join("\n")}"
+        "user, but are stil readable/writable. These files are:\n - #{files_not_owned_by_current_user_but_still_rw.join("\n - ")}"
     end
 
     def check_for_files_not_readable_or_writable
       return unless files_not_readable_or_writable.any?
       Bundler.ui.warn "Files exist in Bundler home that are not " \
-        "readable/writable to the current user. These files are: #{files_not_readable_or_writable.join("\n")}"
+        "readable/writable to the current user. These files are:\n - #{files_not_readable_or_writable.join("\n - ")}"
     end
 
     def files_not_readable_or_writable
