@@ -118,8 +118,8 @@ module Bundler
                             when "jruby"
                               JRUBY_VERSION.dup
                             else
-                              raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
-      end
+                              RUBY_ENGINE_VERSION.dup
+                            end
       patchlevel = RUBY_PATCHLEVEL.to_s
 
       @ruby_version ||= RubyVersion.new(ruby_version, patchlevel, ruby_engine, ruby_engine_version)
