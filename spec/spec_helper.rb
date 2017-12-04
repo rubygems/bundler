@@ -20,7 +20,7 @@ rescue LoadError
   abort "Run rake spec:deps to install development dependencies"
 end
 
-if File.expand_path(__FILE__) =~ %r{([^\w/\.])}
+if File.expand_path(__FILE__) =~ %r{([^\w/\.-])}
   abort "The bundler specs cannot be run from a path that contains special characters (particularly #{$1.inspect})"
 end
 
