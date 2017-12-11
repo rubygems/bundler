@@ -36,5 +36,5 @@ RSpec.describe "double checking sources", :realworld => true do
 
     ruby! cmd
     ruby! cmd
-  end
+  end if RUBY_VERSION >= "2.2" # rails 5.x and rack 2.x only supports >= Ruby 2.2.
 end
