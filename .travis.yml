@@ -6,6 +6,9 @@ before_script:
   - travis_retry rake man:build
   - travis_retry rake spec:rubygems:clone_rubygems_$RGV
 
+# temporary workaround for https://github.com/travis-ci/travis-ci/issues/8892
+group: deprecated-2017Q4
+
 branches:
   only:
     - master
