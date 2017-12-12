@@ -48,6 +48,8 @@ Gem::Specification.new do |s|
   s.files += Dir.glob("man/**/*")
   # Include the CHANGELOG.md, LICENSE.md, README.md manually
   s.files += %w[CHANGELOG.md LICENSE.md README.md]
+  # include the gemspec itself because warbler breaks w/o it
+  s.files += %w[bundler.gemspec]
 
   s.bindir        = "exe"
   s.executables   = %w[bundle bundler]
