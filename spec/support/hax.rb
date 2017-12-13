@@ -13,7 +13,7 @@ module Gem
   end
   @platforms = [Gem::Platform::RUBY, Gem::Platform.local]
 
-  if defined?(@path_to_default_spec_map)
+  if defined?(@path_to_default_spec_map) && !ENV["BUNDLER_SPEC_KEEP_DEFAULT_BUNDLER_GEM"]
     @path_to_default_spec_map.delete_if do |_path, spec|
       spec.name == "bundler"
     end

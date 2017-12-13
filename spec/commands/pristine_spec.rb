@@ -41,6 +41,7 @@ RSpec.describe "bundle pristine" do
     end
 
     it "does not delete the bundler gem" do
+      ENV["BUNDLER_SPEC_KEEP_DEFAULT_BUNDLER_GEM"] = "true"
       system_gems :bundler
       bundle! "install"
       bundle! "pristine", :system_bundler => true
