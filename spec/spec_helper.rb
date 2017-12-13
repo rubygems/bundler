@@ -3,11 +3,18 @@
 $:.unshift File.expand_path("..", __FILE__)
 $:.unshift File.expand_path("../../lib", __FILE__)
 
+require "rubygems"
+module Gem
+  if defined?(@path_to_default_spec_map)
+    @path_to_default_spec_map.delete_if do |_path, spec|
+      spec.name == "bundler"
+    end
+  end
+end
+
 begin
-  require "rubygems"
   require File.expand_path("../support/path.rb", __FILE__)
   spec = Gem::Specification.load(Spec::Path.gemspec.to_s)
-  Gem.remove_unresolved_default_spec(spec) if Gem.respond_to?(:remove_unresolved_default_spec)
   rspec = spec.dependencies.find {|d| d.name == "rspec" }
   gem "rspec", rspec.requirement.to_s
   require "rspec"
