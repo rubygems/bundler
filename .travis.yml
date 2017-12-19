@@ -108,6 +108,20 @@ matrix:
       env: RGV=master
 
   allow_failures:
+    # Remove 1.8.7-2.1.10 matrix after merging bundler-1.16.1 into rubygems-2.7.x
+    - rvm: 2.1.10
+      env: RGV=v2.2.5
+    - rvm: 2.0.0
+      env: RGV=v2.2.5
+    - rvm: 1.9.3
+      env: RGV=v2.2.5
+    - rvm: 1.8.7
+      env: RGV=v2.2.5
+    - rvm: 2.0.0
+      env: RGV=v2.1.11
+    - rvm: 1.9.3
+      env: RGV=v2.1.11
+
     - rvm: 1.8.7
       env: RGV=v2.0.14
     - rvm: 1.8.7
