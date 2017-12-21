@@ -552,6 +552,7 @@ RSpec.describe "bundle exec" do
         ex << "raise SignalException, 'SIGTERM'\n"
         ex
       end
+      let(:expected_err) { ENV["TRAVIS"] ? "Terminated" : "" }
       let(:exit_code) do
         # signal mask 128 + plus signal 15 -> TERM
         # this is specified by C99
@@ -780,10 +781,13 @@ __FILE__: #{path.to_s.inspect}
         file.chmod(0o777)
 
         aggregate_failures do
-          expect(bundle!("exec #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
-          expect(bundle!("exec bundle exec #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
-          expect(bundle!("exec ruby #{file}", :system_bundler => true, :artifice => nil)).to eq(expected)
-          expect(run!(file.read, :no_lib => true, :artifice => nil)).to eq(expected)
+          expect(bundle!("exec #{file}", :artifice => nil)).to eq(expected)
+          expect(bundle!("exec bundle exec #{file}", :artifice => nil)).to eq(expected)
+          expect(bundle!("exec ruby #{file}", :artifice => nil)).to eq(expected)
+          # Ignore expectaion for default bundler gem conflict.
+          unless ENV["BUNDLER_SPEC_SUB_VERSION"]
+            expect(run!(file.read, :no_lib => true, :artifice => nil)).to eq(expected)
+          end
         end
 
         # sanity check that we get the newer, custom version without bundler
