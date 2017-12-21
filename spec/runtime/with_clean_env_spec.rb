@@ -56,11 +56,9 @@ RSpec.describe "Bundler.with_env helpers" do
     end
 
     it "removes variables that bundler added" do
-      system_gems :bundler
-      system_gems :bundler, :path => :bundle_path # to ensure the bundler under test is the one activated...
-      original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")')
+      original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")', :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" })
       code = 'puts Bundler.original_env.to_a.map {|e| e.join("=") }.sort.join("\n")'
-      bundle! "exec '#{Gem.ruby}' -e #{code.dump}", :system_bundler => true
+      bundle! "exec '#{Gem.ruby}' -e #{code.dump}", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
       expect(out).to eq original
     end
   end

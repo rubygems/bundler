@@ -46,7 +46,9 @@ RSpec.describe "bundle pristine" do
       bundle! "install"
       bundle! "pristine", :system_bundler => true
       bundle! "-v", :system_bundler => true
-      expect(out).to end_with(Bundler::VERSION)
+      # An old rubygems couldn't handle a correct version of vendoered bundler.
+      bundler_version = Gem::VERSION < "2.1" ? "1.16.0" : Bundler::VERSION
+      expect(out).to end_with(bundler_version)
     end
   end
 

@@ -37,7 +37,7 @@ RSpec.describe "require 'bundler/gem_tasks'" do
 
   it "adds 'pkg' to rake/clean's CLOBBER" do
     with_gem_path_as(Spec::Path.base_system_gems.to_s) do
-      sys_exec! %('#{Gem.ruby}' -rrake -e 'load "Rakefile"; puts CLOBBER.inspect')
+      sys_exec! %('#{Gem.ruby}' -S rake -e 'load "Rakefile"; puts CLOBBER.inspect')
     end
     expect(last_command.stdout).to eq '["pkg"]'
   end
