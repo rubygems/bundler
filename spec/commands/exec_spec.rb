@@ -726,6 +726,28 @@ __FILE__: #{path.to_s.inspect}
         expect(out).to eq("foo")
       end
     end
+
+    context "signals not being trapped by bunder" do
+      let(:executable) { strip_whitespace <<-RUBY }
+        #{shebang}
+
+        signals = "#{test_signals.join(", ")}".split(", ") # ruby 1.8.7 doesn't preserve array in string interpolation, hence the join/split.
+        result = signals.map do |sig|
+          Signal.trap(sig, "IGNORE")
+        end
+        puts result.select { |ret| ret == "IGNORE" }.count
+      RUBY
+
+      it "makes sure no unexpected signals are restored to DEFAULT" do
+        test_signals.each do |n|
+          Signal.trap(n, "IGNORE")
+        end
+
+        bundle("exec #{path}")
+
+        expect(out).to eq(test_signals.count.to_s)
+      end
+    end
   end
 
   context "nested bundle exec" do

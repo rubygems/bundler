@@ -217,6 +217,14 @@ module Spec
     end
     bang :gem_command
 
+    def test_signals
+      open3_reserved_signals = %w[CHLD CLD PIPE]
+      reserved_signals = %w[SEGV BUS ILL FPE VTALRM KILL STOP EXIT]
+      bundler_signals = %w[INT]
+
+      Signal.list.keys - (bundler_signals + reserved_signals + open3_reserved_signals)
+    end
+
     def sys_exec(cmd)
       command_execution = CommandExecution.new(cmd.to_s, Dir.pwd)
 
