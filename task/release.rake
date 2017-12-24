@@ -1,10 +1,13 @@
 # frozen_string_literal: true
-
 require "bundler/gem_tasks"
+
 task :build => ["build_metadata", "man:build", "generate_files"] do
   Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
 end
-task :release => ["man:require", "man:build", "release:verify_github", "build_metadata"]
+
+["man:require", "release:verify_github"].reverse.each do |task|
+  Rake::Task["release"].prerequisites.unshift(task)
+end
 
 namespace :release do
   def gh_api_post(opts)
