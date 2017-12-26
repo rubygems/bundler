@@ -27,8 +27,8 @@ addons:
 
 rvm:
   - 2.5.0
-  - 2.4.2
-  - 2.3.5
+  - 2.4.3
+  - 2.3.6
 
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:125 for the list of possible RGV values
