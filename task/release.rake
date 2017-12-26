@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+
 require "bundler/gem_tasks"
 
 task :build => ["build_metadata", "man:build", "generate_files"] do
   Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
 end
 
-["man:require", "release:verify_github"].reverse.each do |task|
+["man:require", "release:verify_github"].reverse_each do |task|
   Rake::Task["release"].prerequisites.unshift(task)
 end
 
