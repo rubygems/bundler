@@ -43,10 +43,12 @@ namespace :release do
                                             end}"
     end
     JSON.parse(response.body)
+  rescue => e
+    puts "GitHub request error! Make sure your .netrc for api.github.com is valid.\n\n"
+    raise e
   end
 
   task :verify_github do
-    require "pp"
     gh_api_post :path => "/user"
   end
 
