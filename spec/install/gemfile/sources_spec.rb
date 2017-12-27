@@ -627,8 +627,8 @@ RSpec.describe "bundle install with gems on multiple sources" do
       end
 
       install_gemfile <<-G
-        source "file:#{gem_repo4}"
-        source "file:#{gem_repo1}" do
+        source "file://localhost#{gem_repo4}"
+        source "file://localhost#{gem_repo1}" do
           gem "thin"
         end
         gem "depends_on_rack"
@@ -636,8 +636,8 @@ RSpec.describe "bundle install with gems on multiple sources" do
       expect(last_command).to be_failure
       expect(last_command.stderr).to eq strip_whitespace(<<-EOS).strip
         The gem 'rack' was found in multiple relevant sources.
-          * rubygems repository file:#{gem_repo1}/ or installed locally
-          * rubygems repository file:#{gem_repo4}/ or installed locally
+          * rubygems repository file://localhost#{gem_repo1}/ or installed locally
+          * rubygems repository file://localhost#{gem_repo4}/ or installed locally
         You must add this gem to the source block for the source you wish it to be installed from.
       EOS
       expect(the_bundle).not_to be_locked
