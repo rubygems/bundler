@@ -34,7 +34,7 @@ Calling binstubs with [GEM [GEM]] will create binstubs for all given gems.
   Makes binstubs that can work without depending on Rubygems or Bundler at
   runtime.
 
-* `--sheband`:
+* `--shebang`:
   Specify a different shebang executable name than the default (default 'ruby')
 
 ## BUNDLE INSTALL --BINSTUBS
