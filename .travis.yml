@@ -26,8 +26,9 @@ addons:
       secure: "TrzIv116JLGUxm6PAUskCYrv8KTDguncKROVwbnjVPKTGDAgoDderd8JUdDEXrKoZ9qGLD2TPYKExt9/QDl71E+qHdWnVqWv4HKCUk2P9z/VLKzHuggOUBkCXiJUhjywUieCJhI3N92bfq2EjSBbu2/OFHqWOjLQ+QCooTEBjv8="
 
 rvm:
-  - 2.4.2
-  - 2.3.5
+  - 2.5.0
+  - 2.4.3
+  - 2.3.6
 
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:125 for the list of possible RGV values
@@ -35,7 +36,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.7.1
+  - RGV=v2.7.4
 
 matrix:
   include:
@@ -52,9 +53,9 @@ matrix:
       env: RGV=master
     # 1.x mode (we want to keep stuff passing in 1.x mode for now)
     - rvm: 2.4.2
-      env: RGV=v2.7.1 BUNDLER_SPEC_SUB_VERSION=1.98
+      env: RGV=v2.7.4 BUNDLER_SPEC_SUB_VERSION=1.98
     - rvm: 1.8.7
-      env: RGV=v2.7.1 BUNDLER_SPEC_SUB_VERSION=1.98
+      env: RGV=v2.7.4 BUNDLER_SPEC_SUB_VERSION=1.98
 
   allow_failures:
     - rvm: ruby-head
