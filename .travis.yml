@@ -29,8 +29,9 @@ addons:
       secure: "TrzIv116JLGUxm6PAUskCYrv8KTDguncKROVwbnjVPKTGDAgoDderd8JUdDEXrKoZ9qGLD2TPYKExt9/QDl71E+qHdWnVqWv4HKCUk2P9z/VLKzHuggOUBkCXiJUhjywUieCJhI3N92bfq2EjSBbu2/OFHqWOjLQ+QCooTEBjv8="
 
 rvm:
-  - 2.4.1
-  - 2.3.4
+  - 2.5.1
+  - 2.4.3
+  - 2.3.6
   - 2.2.7
   - 2.1.10
   - 2.0.0
@@ -42,7 +43,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.6.8
+  - RGV=v2.7.4
 
 matrix:
   include:
