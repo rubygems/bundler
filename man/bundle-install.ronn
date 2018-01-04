@@ -366,7 +366,7 @@ which other gems in the Gemfile(5) still depend on, run
 `Summary`: In general, after making a change to the Gemfile(5) , you
 should first try to run `bundle install`, which will guarantee that no
 other gem in the Gemfile(5) is impacted by the change. If that
-does not work, run [bundle update(1)][bundle-update].
+does not work, run [bundle update(1)][bundle-update(1)].
 
 ## SEE ALSO
 

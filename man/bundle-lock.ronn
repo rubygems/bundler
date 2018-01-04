@@ -91,4 +91,4 @@ For a full explanation of gem platforms, see `gem help platform`.
 
 ## PATCH LEVEL OPTIONS
 
-See [bundle update(1)][bundle-update] for details.
+See [bundle update(1)][bundle-update(1)] for details.
