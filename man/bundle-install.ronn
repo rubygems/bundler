@@ -3,31 +3,20 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
 
 ## SYNOPSIS
 
-`bundle install` [--binstubs[=DIRECTORY]]
-                 [--clean]
-                 [--deployment]
-                 [--frozen]
-                 [--full-index]
+`bundle install` [--full-index]
                  [--gemfile=GEMFILE]
                  [--jobs=NUMBER]
                  [--local]
-                 [--no-cache]
-                 [--no-prune]
-                 [--path PATH]
                  [--quiet]
                  [--redownload]
                  [--retry=NUMBER]
-                 [--shebang]
                  [--standalone[=GROUP[ GROUP...]]]
-                 [--system]
                  [--trust-policy=POLICY]
-                 [--with=GROUP[ GROUP...]]
-                 [--without=GROUP[ GROUP...]]
 
 ## DESCRIPTION
 
 Install the gems specified in your Gemfile(5). If this is the first
-time you run bundle install (and a `Gemfile.lock` does not exist),
+time you have run bundle install (and a `Gemfile.lock` does not exist),
 Bundler will fetch all remote sources, resolve dependencies and
 install all needed gems.
 
@@ -42,40 +31,6 @@ gems that you did update. You can find more information about this
 update process below under [CONSERVATIVE UPDATING][].
 
 ## OPTIONS
-
-To apply any of `--binstubs`, `--deployment`, `--path`, or `--without` every
-time `bundle install` is run, use `bundle config` (see bundle-config(1)).
-
-* `--binstubs[=<directory>]`:
-  Binstubs are scripts that wrap around executables. Bundler creates a small Ruby
-  file (a binstub) that loads Bundler, runs the command, and puts it in `bin/`.
-  This lets you link the binstub inside of an application to the exact gem
-  version the application needs.
-
-  Creates a directory (defaults to `~/bin`) and places any executables from the
-  gem there. These executables run in Bundler's context. If used, you might add
-  this directory to your environment's `PATH` variable. For instance, if the
-  `rails` gem comes with a `rails` executable, this flag will create a
-  `bin/rails` executable that ensures that all referred dependencies will be
-  resolved using the bundled gems.
-
-* `--clean`:
-  On finishing the installation Bundler is going to remove any gems not present
-  in the current Gemfile(5). Don't worry, gems currently in use will not be
-  removed.
-
-* `--deployment`:
-  In [deployment mode][DEPLOYMENT MODE], Bundler will 'roll-out' the bundle for
-  production or CI use. Please check carefully if you want to have this option
-  enabled in your development environment.
-
-* `--redownload`:
-  Force download every gem, even if the required versions are already available
-  locally.
-
-* `--frozen`:
-  Do not allow the Gemfile.lock to be updated after this install. Exits
-  non-zero if there are going to be changes to the Gemfile.lock.
 
 * `--full-index`:
   Bundler will not call Rubygems' API endpoint (default) but download and cache
@@ -99,33 +54,16 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   appropriate platform-specific gem exists on `rubygems.org` it will not be
   found.
 
-* `--no-cache`:
-  Do not update the cache in `vendor/cache` with the newly bundled gems. This
-  does not remove any gems in the cache but keeps the newly bundled gems from
-  being cached during the install.
-
-* `--no-prune`:
-  Don't remove stale gems from the cache when the installation finishes.
-
-* `--path=<path>`:
-  The location to install the specified gems to. This defaults to Rubygems'
-  setting. Bundler shares this location with Rubygems, `gem install ...` will
-  have gem installed there, too. Therefore, gems installed without a
-  `--path ...` setting will show up by calling `gem list`. Accordingly, gems
-  installed to other locations will not get listed.
-
 * `--quiet`:
   Do not print progress information to the standard output. Instead, Bundler
   will exit using a status code (`$?`).
 
 * `--retry=[<number>]`:
-  Retry failed network or git requests for <number> times.
+  Retries failed network or git requests for <number> times.
 
-* `--shebang=<ruby-executable>`:
-  Uses the specified ruby executable (usually `ruby`) to execute the scripts
-  created with `--binstubs`. In addition, if you use `--binstubs` together with
-  `--shebang jruby` these executables will be changed to execute `jruby`
-  instead.
+* `--redownload`:
+  Force downloads every gem, even if the required versions are already available
+  locally.
 
 * `--standalone[=<list>]`:
   Makes a bundle that can work without depending on Rubygems or Bundler at
@@ -135,72 +73,17 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   in the manner required. Using this option implicitly sets `path`, which is a
   [remembered option][REMEMBERED OPTIONS].
 
-* `--system`:
-  Installs the gems specified in the bundle to the system's Rubygems location.
-  This overrides any previous configuration of `--path`.
-
 * `--trust-policy=[<policy>]`:
-  Apply the Rubygems security policy <policy>, where policy is one of
+  Applies the Rubygems security policy <policy>, where policy is one of
   `HighSecurity`, `MediumSecurity`, `LowSecurity`, `AlmostNoSecurity`, or
   `NoSecurity`. For more details, please see the Rubygems signing documentation
   linked below in [SEE ALSO][].
 
-* `--with=<list>`:
-  A space-separated list of groups referencing gems to install. If an
-  optional group is given it is installed. If a group is given that is
-  in the remembered list of groups given to --without, it is removed
-  from that list.
-
-* `--without=<list>`:
-  A space-separated list of groups referencing gems to skip during installation.
-  If a group is given that is in the remembered list of groups given
-  to --with, it is removed from that list.
-
-## DEPLOYMENT MODE
-
-Bundler's defaults are optimized for development. To switch to
-defaults optimized for deployment and for CI, use the `--deployment`
-flag. Do not activate deployment mode on development machines, as it
-will cause an error when the Gemfile(5) is modified.
-
-1. A `Gemfile.lock` is required.
-
-   To ensure that the same versions of the gems you developed with
-   and tested with are also used in deployments, a `Gemfile.lock`
-   is required.
-
-   This is mainly to ensure that you remember to check your
-   `Gemfile.lock` into version control.
-
-2. The `Gemfile.lock` must be up to date
-
-   In development, you can modify your Gemfile(5) and re-run
-   `bundle install` to [conservatively update][CONSERVATIVE UPDATING]
-   your `Gemfile.lock` snapshot.
-
-   In deployment, your `Gemfile.lock` should be up-to-date with
-   changes made in your Gemfile(5).
-
-3. Gems are installed to `vendor/bundle` not your default system location
-
-   In development, it's convenient to share the gems used in your
-   application with other applications and other scripts that run on
-   the system.
-
-   In deployment, isolation is a more important default. In addition,
-   the user deploying the application may not have permission to install
-   gems to the system, or the web server may not have permission to
-   read them.
-
-   As a result, `bundle install --deployment` installs gems to
-   the `vendor/bundle` directory in the application. This may be
-   overridden using the `--path` option.
-
 ## SUDO USAGE
 
-By default, Bundler installs gems to the same location as `gem install`.
+By default, Bundler installs gems into `.bundle`.
 
-In some cases, that location may not be writable by your Unix user. In
+In some cases, that location may not be writable by an unprivileged user. In
 that case, Bundler will stage everything in a temporary directory,
 then ask you for your `sudo` password in order to copy the gems into
 their system location.
@@ -212,14 +95,14 @@ You should never use `sudo bundle install`. This is because several
 other steps in `bundle install` must be performed as the current user:
 
 * Updating your `Gemfile.lock`
-* Updating your `vendor/cache`, if necessary
+* Updating your `~/.bundle/cache`, if necessary
 * Checking out private git repositories using your user's SSH keys
 
 Of these three, the first two could theoretically be performed by
 `chown`ing the resulting files to `$SUDO_USER`. The third, however,
 can only be performed by invoking the `git` command as
 the current user. Therefore, git gems are downloaded and installed
-into `~/.bundle` rather than $GEM_HOME or $BUNDLE_PATH.
+into `~/.bundle` rather than $BUNDLE_PATH.
 
 As a result, you should run `bundle install` as the current user,
 and Bundler will ask for your password if it is needed to put the
@@ -228,13 +111,16 @@ gems into their final location.
 ## INSTALLING GROUPS
 
 By default, `bundle install` will install all gems in all groups
-in your Gemfile(5), except those declared for a different platform.
+in your Gemfile(5), except those declared for a different platform
+than the platform your installing your gems into.
 
 However, you can explicitly tell Bundler to skip installing
-certain groups with the `--without` option. This option takes
+certain groups with the `without` config. This config takes
 a space-separated list of groups.
 
-While the `--without` option will skip _installing_ the gems in the
+     $ bundle config set without test development
+
+While the `without` config will skip _installing_ the gems in the
 specified groups, it will still _download_ those gems and use them to
 resolve the dependencies of every gem in your Gemfile(5).
 
@@ -242,12 +128,12 @@ This is so that installing a different set of groups on another
  machine (such as a production server) will not change the
 gems and versions that you have already developed and tested against.
 
-`Bundler offers a rock-solid guarantee that the third-party
+Bundler offers a guarantee that the third-party
 code you are running in development and testing is also the
 third-party code you are running in production. You can choose
 to exclude some of that code in different environments, but you
 will never be caught flat-footed by different versions of
-third-party code being used in different environments.`
+third-party code being used in different environments.
 
 For a simple illustration, consider the following Gemfile(5):
 
@@ -260,13 +146,14 @@ For a simple illustration, consider the following Gemfile(5):
     end
 
 In this case, `sinatra` depends on any version of Rack (`>= 1.0`), while
-`rack-perftools-profiler` depends on 1.x (`~> 1.0`).
+`rack-perftools-profiler` depends on Rack 1.x (`~> 1.0`).
 
-When you run `bundle install --without production` in development, we
-look at the dependencies of `rack-perftools-profiler` as well. That way,
-you do not spend all your time developing against Rack 2.0, using new
-APIs unavailable in Rack 1.x, only to have Bundler switch to Rack 1.2
-when the `production` group _is_ used.
+When you configure Bundler to exclude `production` with
+`bundle config set without production` and run `bundle install`
+in development, we look at the dependencies of `rack-perftools-profiler`
+as well. That way, you do not spend all your time developing against
+Rack 2.0, using new APIs unavailable in Rack 1.x, only to have
+Bundler switch to Rack 1.2 when the `production` group _is_ used.
 
 This should not cause any problems in practice, because we do not
 attempt to `install` the gems in the excluded groups, and only evaluate
@@ -315,7 +202,7 @@ in the lock for gems.
 When you make a change to the Gemfile(5) and then run `bundle install`,
 Bundler will update only the gems that you modified.
 
-In other words, if a gem that you `did not modify` worked before
+In other words, if a gem that you did not modify worked before
 you called `bundle install`, it will continue to use the exact
 same versions of all dependencies as it used before the update.
 
@@ -376,6 +263,24 @@ which other gems in the Gemfile(5) still depend on, run
 should first try to run `bundle install`, which will guarantee that no
 other gem in the Gemfile(5) is impacted by the change. If that
 does not work, run [bundle update(1)](bundle-update.1.html).
+
+## Transitioning from Bundler 2
+
+Bundler 3 has removed several options from the CLI that are configurable
+through the [bundle config(1)][bundle-config] command.
+
+The `path`, `with`, `without`, `frozen`, `deployment`, `shebang`, `clean`
+options can be set by using `bundle config`:
+
+    $ bundle config set without development:test
+
+Note: The `system` option is configured through the `path.system` option
+
+### Binstubs
+
+The `binstub` option has been removed from the CLI and no option exists
+as a replacement. Instead use the [bundle-binstub(1)](bundle-binstub)
+command to generate binstubs.
 
 ## SEE ALSO
 
