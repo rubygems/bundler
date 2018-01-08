@@ -27,8 +27,8 @@ in your local bundler configuration.
 
 ## REMOTE FETCHING
 
-By default, if you run [bundle install(1)][bundle-install] after running
-[bundle package(1)][bundle-package], bundler will still connect to `rubygems.org`
+By default, if you run `bundle install(1)`][bundle-install(1)] after running
+[bundle package(1)][bundle-package(1)], bundler will still connect to `rubygems.org`
 to check whether a platform-specific gem exists for any of the gems
 in `vendor/cache`.
 
@@ -66,7 +66,7 @@ machine and check in the gems. For instance, you can run
 staging process, and check in the `vendor/cache` before
 deploying to production.
 
-By default, [bundle package(1)][bundle-package] fetches and also
+By default, [bundle package(1)][bundle-package(1)] fetches and also
 installs the gems to the default location. To package the
 dependencies to `vendor/cache` without installing them to the
 local install location, you can run `bundle package --no-install`.

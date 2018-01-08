@@ -69,7 +69,7 @@ are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
 
 ## PATCH LEVEL OPTIONS
 
-See [bundle update(1)][bundle-update] for details.
+See [bundle update(1)][bundle-update(1)] for details.
 
 One difference between the patch level options in `bundle update` and here is the `--strict` option.
 `--strict` was already an option on outdated before the patch level options were added. `--strict`

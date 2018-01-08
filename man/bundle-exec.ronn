@@ -8,11 +8,11 @@ bundle-exec(1) -- Execute a command in the context of the bundle
 ## DESCRIPTION
 
 This command executes the command, making all gems specified in the
-`Gemfile(5)` available to `require` in Ruby programs.
+[`Gemfile(5)`][Gemfile(5)] available to `require` in Ruby programs.
 
 Essentially, if you would normally have run something like
 `rspec spec/my_spec.rb`, and you want to use the gems specified
-in the `Gemfile(5)` and installed via [bundle install(1)][bundle-install], you
+in the [`Gemfile(5)`][Gemfile(5)] and installed via [bundle install(1)][bundle-install(1)], you
 should run `bundle exec rspec spec/my_spec.rb`.
 
 Note that `bundle exec` does not require that an executable is
@@ -27,7 +27,7 @@ available on your shell's `$PATH`.
 
 ## BUNDLE INSTALL --BINSTUBS
 
-If you use the `--binstubs` flag in [bundle install(1)][bundle-install], Bundler will
+If you use the `--binstubs` flag in [bundle install(1)][bundle-install(1)], Bundler will
 automatically create a directory (which defaults to `app_root/bin`)
 containing all of the executables available from gems in the bundle.
 
