@@ -285,6 +285,7 @@ module Bundler
     if Bundler.feature_flag.list_command?
       desc "list", "List all gems in the bundle"
       method_option "name-only", :type => :boolean, :banner => "print only the gem names"
+      method_option "paths", :type => :boolean, :banner => "print the path to each gem in the bundle"
       def list
         require "bundler/cli/list"
         List.new(options).run

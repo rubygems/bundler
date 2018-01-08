@@ -13,3 +13,5 @@ Prints a list of all the gems in the bundle including their version.
 
 * `--name-only`:
   Print only the name of each gem.
+* `--paths`:
+  Print the path to each gem in the bundle.

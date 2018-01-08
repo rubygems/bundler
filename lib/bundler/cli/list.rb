@@ -8,7 +8,10 @@ module Bundler
 
     def run
       specs = Bundler.load.specs.reject {|s| s.name == "bundler" }.sort_by(&:name)
+
+      raise InvalidOption, "The `--name-only` and `--paths` options cannot be used together" if @options["name-only"] && @options["paths"]
       return specs.each {|s| Bundler.ui.info s.name } if @options["name-only"]
+      return specs.each {|s| Bundler.ui.info s.full_gem_path } if @options["paths"]
 
       return Bundler.ui.info "No gems in the Gemfile" if specs.empty?
       Bundler.ui.info "Gems included by the bundle:"
