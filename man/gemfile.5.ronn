@@ -35,7 +35,7 @@ this warning, by using the [`:source` option](#SOURCE) or a
 
 ### CREDENTIALS
 
-Some gem sources require a username and password. Use [bundle config(1)][bundle-config] to set
+Some gem sources require a username and password. Use [bundle config(1)][bundle-config(1)] to set
 the username and password for any of the sources that need it. The command must
 be run once on each computer that will install the Gemfile, but this keeps the
 credentials from being stored in plain text in version control.
@@ -228,7 +228,7 @@ As with groups, you can specify one or more platforms:
     gem "ruby-debug", :platforms => :mri_18
     gem "nokogiri",   :platforms => [:mri_18, :jruby]
 
-All operations involving groups (`bundle install`, `Bundler.setup`,
+All operations involving groups ([`bundle install`][bundle-install(1)], `Bundler.setup`,
 `Bundler.require`) behave exactly the same as if any groups not
 matching the current platform were explicitly excluded.
 
@@ -465,7 +465,7 @@ software is installed or some other conditions are met.
 
 ## GEMSPEC
 
-The [.gemspec](http://guides.rubygems.org/specification-reference/) file is where
+The [`.gemspec`](http://guides.rubygems.org/specification-reference/) file is where
  you provide metadata about your gem to Rubygems. Some required Gemspec
  attributes include the name, description, and homepage of your gem. This is
  also where you specify the dependencies your gem needs to run.

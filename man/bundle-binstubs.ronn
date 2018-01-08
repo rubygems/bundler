@@ -40,4 +40,4 @@ Calling binstubs with [GEM [GEM]] will create binstubs for all given gems.
 ## BUNDLE INSTALL --BINSTUBS
 
 To create binstubs for all the gems in the bundle you can use the `--binstubs`
-flag in [bundle install(1)][bundle-install].
+flag in [bundle install(1)][bundle-install(1)].
