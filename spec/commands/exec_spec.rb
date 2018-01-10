@@ -784,7 +784,7 @@ __FILE__: #{path.to_s.inspect}
           expect(bundle!("exec #{file}", :artifice => nil)).to eq(expected)
           expect(bundle!("exec bundle exec #{file}", :artifice => nil)).to eq(expected)
           expect(bundle!("exec ruby #{file}", :artifice => nil)).to eq(expected)
-          # Ignore expectaion for default bundler gem conflict.
+          # Ignore expectation for default bundler gem conflict.
           unless ENV["BUNDLER_SPEC_SUB_VERSION"]
             expect(run!(file.read, :no_lib => true, :artifice => nil)).to eq(expected)
           end
