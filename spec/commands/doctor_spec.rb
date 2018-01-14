@@ -58,7 +58,7 @@ RSpec.describe "bundle doctor" do
     E
   end
 
-  it "exits with an error if home contains files that are not read/write" do
+  it "exits with an error if home contains files that are not readable/writable" do
     stat = double("stat")
     unwritable_file = double("file")
     doctor = Bundler::CLI::Doctor.new({})
