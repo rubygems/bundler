@@ -117,7 +117,7 @@ module Bundler
 
       if files_not_readable_or_writable.any?
         Bundler.ui.warn "Files exist in the Bundler home that are not " \
-          "readable/writable to the current user. These files are:\n - #{files_not_readable_or_writable.join("\n - ")}"
+          "readable/writable by the current user. These files are:\n - #{files_not_readable_or_writable.join("\n - ")}"
 
         ok = false
       end

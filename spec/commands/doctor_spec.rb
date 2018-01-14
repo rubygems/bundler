@@ -69,7 +69,7 @@ RSpec.describe "bundle doctor" do
     allow(File).to receive(:readable?).with(unwritable_file) { false }
     expect { doctor.run }.not_to raise_error
     expect(@stdout.string).to include(
-      "Files exist in the Bundler home that are not readable/writable to the current user. These files are:\n - #{unwritable_file}"
+      "Files exist in the Bundler home that are not readable/writable by the current user. These files are:\n - #{unwritable_file}"
     )
     expect(@stdout.string).not_to include("No issues")
   end
