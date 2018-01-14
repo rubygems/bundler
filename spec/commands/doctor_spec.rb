@@ -74,6 +74,22 @@ RSpec.describe "bundle doctor" do
     expect(@stdout.string).not_to include("No issues")
   end
 
+  it "exits with an error if home contains files that are not readable/writable and are not owned by the current user" do
+    stat = double("stat")
+    unwritable_file = double("file")
+    doctor = Bundler::CLI::Doctor.new({})
+    allow(Find).to receive(:find).with(Bundler.home.to_s) { [unwritable_file] }
+    allow(File).to receive(:stat).with(unwritable_file) { stat }
+    allow(stat).to receive(:uid) { 0o0000 }
+    allow(File).to receive(:writable?).with(unwritable_file) { false }
+    allow(File).to receive(:readable?).with(unwritable_file) { false }
+    expect { doctor.run }.not_to raise_error
+    expect(@stdout.string).to include(
+      "Files exist in the Bundler home that are owned by another user, and are not readable/writable. These files are:\n - #{unwritable_file}"
+    )
+    expect(@stdout.string).not_to include("No issues")
+  end
+
   it "exits with a warning if home contains files that are read/write but not owned by current user" do
     stat = double("stat")
     unwritable_file = double("file")

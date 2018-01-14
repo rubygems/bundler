@@ -98,10 +98,15 @@ module Bundler
     def check_home_permissions
       require "find"
       files_not_readable_or_writable = []
+      files_not_rw_and_owned_by_different_user = []
       files_not_owned_by_current_user_but_still_rw = []
       Find.find(Bundler.home.to_s).each do |f|
         if !File.writable?(f) || !File.readable?(f)
-          files_not_readable_or_writable << f
+          if File.stat(f).uid != Process.uid
+            files_not_rw_and_owned_by_different_user << f
+          else
+            files_not_readable_or_writable << f
+          end
         elsif File.stat(f).uid != Process.uid
           files_not_owned_by_current_user_but_still_rw << f
         end
@@ -111,6 +116,13 @@ module Bundler
       if files_not_owned_by_current_user_but_still_rw.any?
         Bundler.ui.warn "Files exist in the Bundler home that are owned by another " \
           "user, but are still readable/writable. These files are:\n - #{files_not_owned_by_current_user_but_still_rw.join("\n - ")}"
+
+        ok = false
+      end
+
+      if files_not_rw_and_owned_by_different_user.any?
+        Bundler.ui.warn "Files exist in the Bundler home that are owned by another " \
+          "user, and are not readable/writable. These files are:\n - #{files_not_rw_and_owned_by_different_user.join("\n - ")}"
 
         ok = false
       end
