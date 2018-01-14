@@ -110,7 +110,7 @@ module Bundler
       ok = true
       if files_not_owned_by_current_user_but_still_rw.any?
         Bundler.ui.warn "Files exist in the Bundler home that are owned by another " \
-          "user, but are stil readable/writable. These files are:\n - #{files_not_owned_by_current_user_but_still_rw.join("\n - ")}"
+          "user, but are still readable/writable. These files are:\n - #{files_not_owned_by_current_user_but_still_rw.join("\n - ")}"
 
         ok = false
       end
