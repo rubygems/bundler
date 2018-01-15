@@ -93,7 +93,7 @@ RSpec.describe "bundle binstubs <gem>" do
             R
           end
         end
-        install_gemfile! <<-G
+        install_gemfile! <<-G, :verbose => true
           source "file://#{gem_repo2}"
           gem "rack"
           gem "prints_loaded_gems"

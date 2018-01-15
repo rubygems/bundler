@@ -151,7 +151,7 @@ begin
       (branches + releases).each do |rg|
         desc "Run specs with RubyGems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
-          t.rspec_opts = %w[--format progress --color]
+          t.rspec_opts = %w[--color]
           t.ruby_opts  = %w[-w]
         end
 
