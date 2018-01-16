@@ -70,7 +70,7 @@ module Bundler
       create_bundle_path
 
       ProcessLock.lock do
-        if Bundler.frozen?
+        if Bundler.frozen_bundle?
           @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
         end
 
@@ -90,7 +90,7 @@ module Bundler
         end
         install(options)
 
-        lock unless Bundler.frozen?
+        lock unless Bundler.frozen_bundle?
         Standalone.new(options[:standalone], @definition).generate if options[:standalone]
       end
     end

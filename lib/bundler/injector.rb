@@ -13,7 +13,7 @@ module Bundler
     end
 
     def inject(gemfile_path, lockfile_path)
-      if Bundler.frozen?
+      if Bundler.frozen_bundle?
         # ensure the lock and Gemfile are synced
         Bundler.definition.ensure_equivalent_gemfile_and_lockfile(true)
       end
