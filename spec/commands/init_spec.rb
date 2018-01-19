@@ -64,6 +64,22 @@ RSpec.describe "bundle init" do
     end
   end
 
+  context "when the dir is not writable by the current user" do
+    let(:subdir) { "child_dir" }
+
+    it "notifies the user that it can not write to it" do
+      FileUtils.mkdir bundled_app(subdir)
+      FileUtils.chmod "a-w", bundled_app(subdir)
+
+      Dir.chdir bundled_app(subdir) do
+        bundle :init
+      end
+
+      expect(out).to include("directory is not writable")
+      expect(bundled_app(subdir)).to be_empty
+    end
+  end
+
   context "when a gems.rb file exists in a parent directory", :bundler => ">= 2" do
     let(:subdir) { "child_dir" }
 
