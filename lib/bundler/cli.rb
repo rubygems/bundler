@@ -515,8 +515,6 @@ module Bundler
     method_option :mit, :type => :boolean, :desc => "Generate an MIT license file. Set a default with `bundle config gem.mit true`."
     method_option :test, :type => :string, :lazy_default => "rspec", :aliases => "-t", :banner => "rspec",
                          :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config gem.test rspec`."
-    method_option :error_class, :type => :string, :default => "StandardError", :aliases => "-e",
-                                :desc => "Generate a base error class for your library."
     def gem(name)
     end
 
