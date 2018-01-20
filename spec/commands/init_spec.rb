@@ -64,12 +64,14 @@ RSpec.describe "bundle init" do
     end
   end
 
-  context "when the dir is not writable by the current user", :bundler => ">= 2" do
+  context "when the dir is not writable by the current user" do
     let(:subdir) { "child_dir" }
 
     it "notifies the user that it can not write to it" do
       FileUtils.mkdir bundled_app(subdir)
-      FileUtils.chmod "a-w", bundled_app(subdir)
+      # chmod a-w it
+      mode = File.stat(bundled_app(subdir)).mode ^ 0o222
+      FileUtils.chmod mode, bundled_app(subdir)
 
       Dir.chdir bundled_app(subdir) do
         bundle :init
