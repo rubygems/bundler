@@ -310,6 +310,10 @@ RSpec.describe "bundle gem" do
       expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(%r{require "test_gem/version"})
     end
 
+    it "creates a base error class" do
+      expect(bundled_app("test_gem/lib/test_gem.rb").read).to include("class Error < StandardError")
+    end
+
     it "runs rake without problems" do
       system_gems ["rake-10.0.2"]
 
@@ -547,6 +551,38 @@ RSpec.describe "bundle gem" do
     context "with coc option in bundle config settings set to false" do
       it_behaves_like "--coc flag"
       it_behaves_like "--no-coc flag"
+    end
+  end
+
+  context "--error-class flag set" do
+    context "with valid error class name" do
+      it "generates a gem skeleton with error subclassing given base class" do
+        execute_bundle_gem("test_gem", "--error-class RuntimeError")
+        expect(bundled_app("test_gem/lib/test_gem.rb").read).to include("< RuntimeError")
+      end
+    end
+
+    context "with non-error class name" do
+      it "fails to generate a gem skeleton" do
+        expect do
+          execute_bundle_gem("test_gem", "--error-class Enumerable")
+        end.to raise_error(RuntimeError, /Invalid error class/)
+      end
+    end
+
+    context "with invalid class name" do
+      it "fails to generate a gem skeleton" do
+        expect do
+          execute_bundle_gem("test_gem", "--error-class qpwoeiryt")
+        end.to raise_error(RuntimeError, /Invalid class name/)
+      end
+    end
+  end
+
+  context "--no-error-class flag set" do
+    it "generates a gem skeleton without error subclass" do
+      execute_bundle_gem("test_gem", "--no-error-class")
+      expect(bundled_app("test_gem/lib/test_gem.rb").read).to_not include("class Error")
     end
   end
 

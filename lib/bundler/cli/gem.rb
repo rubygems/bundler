@@ -28,6 +28,7 @@ module Bundler
       @target = SharedHelpers.pwd.join(gem_name)
 
       validate_ext_name if options[:ext]
+      validate_error_class if options[:error_class]
     end
 
     def run
@@ -56,6 +57,7 @@ module Bundler
         :test             => options[:test],
         :ext              => options[:ext],
         :exe              => options[:exe],
+        :error_class      => options[:error_class],
         :bundler_version  => bundler_dependency_version,
         :github_username  => github_username.empty? ? "[USERNAME]" : github_username
       }
@@ -239,6 +241,18 @@ module Bundler
 
       return unless existing_constant
       Bundler.ui.error "Invalid gem name #{name} constant #{constant_name} is already in use. Please choose another gem name."
+      exit 1
+    end
+
+    def validate_error_class
+      error_class = options[:error_class]
+
+      if (error = Object.const_get(error_class)) && !(error <= Exception) # rubocop:disable Style/InverseMethods
+        Bundler.ui.error "Invalid error class #{error_class}. Please use a class inheriting from Exception."
+        exit 1
+      end
+    rescue NameError
+      Bundler.ui.error "Invalid class name #{error_class} for error class. Please provide an Exception subclass."
       exit 1
     end
 
