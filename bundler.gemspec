@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors     = [
     "André Arko", "Samuel Giddins", "Chris Morris", "James Wen", "Tim Moore",
     "André Medeiros", "Jessica Lynn Suttles", "Terence Lee", "Carl Lerche",
-    "Yehuda Katz"
+    "Yehuda Katz", "Colby Swandale", "Hiroshi Shibata"
   ]
   s.email       = ["team@bundler.io"]
   s.homepage    = "http://bundler.io"
