@@ -36,7 +36,7 @@ module Bundler
   private
 
     def gemfile
-      @gemfile ||= Bundler.feature_flag.init_gems_rb? ? "gems.rb" : "Gemfile"
+      @gemfile ||= @options[:gemsrb] ? "gems.rb" : "Gemfile"
     end
   end
 end

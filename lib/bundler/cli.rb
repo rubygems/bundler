@@ -143,6 +143,7 @@ module Bundler
       dependency listed in the gemspec file to the newly created Gemfile.
     D
     deprecated_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
+    method_option "gemsrb", :type => :boolean, :default => false, :banner => "Generate a gems.rb instead of a Gemfile"
     def init
       require "bundler/cli/init"
       Init.new(options.dup).run
