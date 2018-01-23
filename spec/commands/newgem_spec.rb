@@ -310,6 +310,10 @@ RSpec.describe "bundle gem" do
       expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(%r{require "test_gem/version"})
     end
 
+    it "creates a base error class" do
+      expect(bundled_app("test_gem/lib/test_gem.rb").read).to include("class Error < StandardError")
+    end
+
     it "runs rake without problems" do
       system_gems ["rake-10.0.2"]
 
