@@ -6,7 +6,7 @@ If at any point you get stuck, here's how to [get in touch with the Bundler team
 
 ## First contribution suggestions
 
-We track [small bugs and features](https://github.com/bundler/bundler/labels/contribution%3A%20small) so that anyone who wants to help can start with something that's not too overwhelming.
+We track [small bugs and features](https://github.com/bundler/bundler/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) so that anyone who wants to help can start with something that's not too overwhelming.
 
 Generally, great ways to get started helping out with Bundler are:
 
