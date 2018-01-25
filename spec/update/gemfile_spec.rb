@@ -9,7 +9,7 @@ RSpec.describe "bundle update" do
       G
 
       bundle! :install, :gemfile => bundled_app("NotGemfile")
-      bundle! :update, :all => bundle_update_requires_all?, :gemfile => bundled_app("NotGemfile")
+      bundle! :update, :gemfile => bundled_app("NotGemfile"), :all => bundle_update_requires_all?
 
       ENV["BUNDLE_GEMFILE"] = "NotGemfile"
       expect(the_bundle).to include_gems "rack 1.0.0"
@@ -26,6 +26,7 @@ RSpec.describe "bundle update" do
       bundle "config --local gemfile #{bundled_app("NotGemfile")}"
       bundle! :install
     end
+
     it "uses the gemfile to update" do
       bundle! "update", :all => bundle_update_requires_all?
       bundle "list"
@@ -44,11 +45,12 @@ RSpec.describe "bundle update" do
   end
 
   context "with prefer_gems_rb set" do
+    before { bundle! "config prefer_gems_rb true" }
+    
     it "prefers gems.rb to Gemfile" do
       create_file("gems.rb", "gem 'bundler'")
       create_file("Gemfile", "raise 'wrong Gemfile!'")
 
-      bundle! "config prefer_gems_rb true"
       bundle! :install
       bundle! :update, :all => bundle_update_requires_all?
 
