@@ -11,6 +11,8 @@ RSpec.describe "bundle update" do
       bundle! :install, :gemfile => bundled_app("NotGemfile")
       bundle! :update, :gemfile => bundled_app("NotGemfile"), :all => bundle_update_requires_all?
 
+      # Specify BUNDLE_GEMFILE for `the_bundle`
+      # to retrieve the proper Gemfile
       ENV["BUNDLE_GEMFILE"] = "NotGemfile"
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
