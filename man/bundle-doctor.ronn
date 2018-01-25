@@ -4,6 +4,7 @@ bundle-doctor(1) -- Checks for missing OS dependencies
 ## SYNOPSIS
 
 `bundle doctor` [--quiet]
+                [--gemfile=GEMFILE]
 
 ## DESCRIPTION
 
@@ -16,3 +17,10 @@ and exists status 0.
 
 * `--quiet`:
   Only output warnings and errors.
+
+* `--gemfile=<gemfile>`:
+  The location of the Gemfile(5) which Bundler should use. This defaults
+  to a Gemfile(5) in the current working directory. In general, Bundler
+  will assume that the location of the Gemfile(5) is also the project's
+  root and will try to find `Gemfile.lock` and `vendor/cache` relative
+  to this location.
