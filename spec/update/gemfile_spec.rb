@@ -35,6 +35,7 @@ RSpec.describe "bundle update" do
 
       expect(out).to include("rack (1.0.0)")
     end
+
     it "uses the gemfile while in a subdirectory" do
       bundled_app("subdir").mkpath
       Dir.chdir(bundled_app("subdir")) do
@@ -48,7 +49,7 @@ RSpec.describe "bundle update" do
 
   context "with prefer_gems_rb set" do
     before { bundle! "config prefer_gems_rb true" }
-    
+
     it "prefers gems.rb to Gemfile" do
       create_file("gems.rb", "gem 'bundler'")
       create_file("Gemfile", "raise 'wrong Gemfile!'")
