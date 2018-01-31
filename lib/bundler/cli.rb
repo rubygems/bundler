@@ -233,6 +233,8 @@ module Bundler
     D
     method_option "full-index", :type => :boolean, :banner =>
       "Fall back to using the single-file index of all gems"
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
     method_option "group", :aliases => "-g", :type => :array, :banner =>
       "Update a specific group"
     method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
