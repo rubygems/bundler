@@ -427,7 +427,7 @@ EOF
 
     def load_gemspec_uncached(file, validate = false)
       path = Pathname.new(file)
-      contents = path.read
+      contents = read_file(file)
       spec = if contents.start_with?("---") # YAML header
         eval_yaml_gemspec(path, contents)
       else
