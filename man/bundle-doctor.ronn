@@ -9,8 +9,8 @@ bundle-doctor(1) -- Checks the bundle for common problems
 ## DESCRIPTION
 
 Checks your Gemfile and gem environment for common problems. If issues
-are detected, Bundler prints them and exists status 1. Otherwise,
-Bundler prints a success message and exists status 0.
+are detected, Bundler prints them and exits status 1. Otherwise,
+Bundler prints a success message and exits status 0.
 
 Examples of common problems caught by bundle-doctor include:
 
