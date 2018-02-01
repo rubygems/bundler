@@ -21,6 +21,10 @@ Lint/EndAlignment:
 Lint/UnusedMethodArgument:
   Enabled: false
 
+Lint/ScriptPermission:
+  Exclude:
+    - 'lib/bundler/templates/Executable'
+
 # Layout
 
 Layout/AccessModifierIndentation:
