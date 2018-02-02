@@ -17,7 +17,7 @@ Bundler tries for perfect backwards compatibility. That means that if something 
 
 When Bunder N is the latest version, Bundler N-1 will receive bugfixes, but no new features. Bundler N-2 will receive security fixes, but no bugfixes. Bundler N-3 will not be maintained.
 
-Bundler 2 and above will support Ruby and RubyGems versions for the same amount of time as the Ruby core team supports them. As of February 2018, that means no support for Ruby 2.2, security fixes only for Ruby 2.3, and full support for Ruby 2.4 and 2.5.
+Bundler 2 and above will support Ruby and RubyGems versions for the same amount of time as the Ruby core team supports them. As of February 2018, that means no support for Ruby 2.2, security fixes only for Ruby 2.3, and full support (including new features and bugfixes) for Ruby 2.4 and 2.5.
 
 ### User experience guidelines
 
@@ -54,11 +54,11 @@ Contributors who have contributed regularly for more than six months (or impleme
 
 ### Release guidelines
 
-Bugfixes releases should generally be cut as soon as possible. Multiple bugfix releases are preferable to waiting to release a committed fix.
+Bugfix releases should generally be cut as soon as possible. Multiple bugfix releases are preferable to waiting for a specific fix to land.
 
 Minor/feature releases can be cut anytime a new feature is ready, but don’t have to be. Minor version releases should include an update to the documentation website, creating a new set of documentation for that minor version.
 
-Major version releases should be cut no more than once per year, probably sometime between Christmas and Valentine’s Day, to stay in sync with deprecated Ruby versions. Breaking changes other than dropping support for old Ruby versions should be avoided whenever possible, but may be included in major releases.
+Major version releases should be cut no more than once per year, generally between Ruby's release on December 25 and and February 15 of the next year. Releasing soon after Ruby helps us stay in sync with deprecated Ruby versions. Breaking changes other than dropping support for old Ruby versions should be avoided whenever possible, but may be included in major releases.
 
 ### Enforcement guidelines
 
