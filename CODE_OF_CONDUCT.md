@@ -15,7 +15,7 @@ When reporting, please include any relevant details, links, screenshots, context
 
 ## Our Pledge
 
-In the interest of fostering an open and welcoming environment, we as members of the package.community community pledge to making participation in our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, technical preferences, nationality, personal appearance, race, religion, or sexual identity and orientation.
+In the interest of fostering an open and welcoming environment, we as members of the Bundler community pledge to making participation in our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, technical preferences, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
 ## Our Standards
 
@@ -111,7 +111,7 @@ Sometimes, though, you need to get admins involved. Admins will do their best to
 
 > Patt: "Leave me alone I haven't said anything bad wtf is wrong with you."
 
-> MxAdmin1: _removes patt_ _DMs patt_ "I mean it. Please refer to the CoC over at package.community/code-of-conduct if you have questions, but you can consider this an actual warning. I'd appreciate it if you reworded your messages in #general, since they made folks there uncomfortable. Let's try and be kind, yeah?"
+> MxAdmin1: _removes patt_ _DMs patt_ "I mean it. Please refer to the CoC over at bundler.io/conduct.html if you have questions, but you can consider this an actual warning. I'd appreciate it if you reworded your messages in #general, since they made folks there uncomfortable. Let's try and be kind, yeah?"
 
 > Patt: _Replies to DM_ "@mxadmin1 Okay sorry. I'm just frustrated and I'm kinda burnt out and I guess I got carried away. I'll DM Alex a note apologizing and edit my messages. Sorry for the trouble."
 
