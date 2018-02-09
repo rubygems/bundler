@@ -64,10 +64,10 @@ RSpec.describe "bundle show", :bundler => "< 2" do
       bundle "show --verbose"
 
       loaded_bundler_spec = Bundler.load.specs["bundler"]
-      if loaded_bundler_spec.size > 0
-        expected = loaded_bundler_spec[0].homepage
+      expected = if !loaded_bundler_spec.empty?
+        loaded_bundler_spec[0].homepage
       else
-        expected = "No website available."
+        "No website available."
       end
 
       expect(out).to include("* actionmailer (2.3.2)")

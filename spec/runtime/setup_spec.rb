@@ -159,8 +159,8 @@ RSpec.describe "Bundler.setup" do
 
       load_path = clean_load_path(out.split("\n"))
 
-      if Bundler.load.specs["bundler"].size > 0
-        load_path.delete_if{|path| path =~ /bundler/ }
+      unless Bundler.load.specs["bundler"].empty?
+        load_path.delete_if {|path| path =~ /bundler/ }
       end
 
       expect(load_path).to start_with(

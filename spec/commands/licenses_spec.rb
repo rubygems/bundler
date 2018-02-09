@@ -13,10 +13,10 @@ RSpec.describe "bundle licenses" do
     bundle "licenses"
 
     loaded_bundler_spec = Bundler.load.specs["bundler"]
-    if loaded_bundler_spec.size > 0
-      expected = loaded_bundler_spec[0].license
+    expected = if !loaded_bundler_spec.empty?
+      loaded_bundler_spec[0].license
     else
-      expected = "Unknown"
+      "Unknown"
     end
 
     expect(out).to include("bundler: #{expected}")
