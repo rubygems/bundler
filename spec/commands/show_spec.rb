@@ -63,9 +63,16 @@ RSpec.describe "bundle show", :bundler => "< 2" do
     it "prints summary of gems" do
       bundle "show --verbose"
 
+      loaded_bundler_spec = Bundler.load.specs["bundler"]
+      if loaded_bundler_spec.size > 0
+        expected = loaded_bundler_spec[0].homepage
+      else
+        expected = "No website available."
+      end
+
       expect(out).to include("* actionmailer (2.3.2)")
       expect(out).to include("\tSummary:  This is just a fake gem for testing")
-      expect(out).to include("\tHomepage: No website available.")
+      expect(out).to include("\tHomepage: #{expected}")
       expect(out).to include("\tStatus:   Up to date")
     end
   end

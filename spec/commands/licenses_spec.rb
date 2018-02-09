@@ -12,7 +12,14 @@ RSpec.describe "bundle licenses" do
   it "prints license information for all gems in the bundle" do
     bundle "licenses"
 
-    expect(out).to include("bundler: Unknown")
+    loaded_bundler_spec = Bundler.load.specs["bundler"]
+    if loaded_bundler_spec.size > 0
+      expected = loaded_bundler_spec[0].license
+    else
+      expected = "Unknown"
+    end
+
+    expect(out).to include("bundler: #{expected}")
     expect(out).to include("with_license: MIT")
   end
 

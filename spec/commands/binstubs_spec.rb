@@ -100,7 +100,7 @@ RSpec.describe "bundle binstubs <gem>" do
         bundle! "binstubs bundler rack prints_loaded_gems"
       end
 
-      let(:system_bundler_version) { Bundler::VERSION }
+      let(:system_bundler_version) { Gem::Version.new(Bundler::VERSION).bump.to_s }
 
       it "runs bundler" do
         sys_exec! "#{bundled_app("bin/bundle")} install"
@@ -108,6 +108,8 @@ RSpec.describe "bundle binstubs <gem>" do
       end
 
       context "when BUNDLER_VERSION is set" do
+        let(:system_bundler_version) { Bundler::VERSION }
+
         it "runs the correct version of bundler" do
           sys_exec "BUNDLER_VERSION='999.999.999' #{bundled_app("bin/bundle")} install"
           expect(exitstatus).to eq(42) if exitstatus
@@ -117,6 +119,8 @@ RSpec.describe "bundle binstubs <gem>" do
       end
 
       context "when a lockfile exists with a locked bundler version" do
+        let(:system_bundler_version) { Bundler::VERSION }
+
         it "runs the correct version of bundler when the version is newer" do
           lockfile lockfile.gsub(system_bundler_version, "999.999.999")
           sys_exec "#{bundled_app("bin/bundle")} install"
@@ -172,7 +176,11 @@ RSpec.describe "bundle binstubs <gem>" do
         let(:system_bundler_version) { :bundler }
         it "loads all gems" do
           sys_exec! bundled_app("bin/print_loaded_gems").to_s
-          expect(out).to eq %(["bundler-#{Bundler::VERSION}", "prints_loaded_gems-1.0", "rack-1.2"])
+          if Bundler.load.specs["bundler"][0].default_gem?
+            expect(out).to eq %(["prints_loaded_gems-1.0", "rack-1.2"])
+          else
+            expect(out).to eq %(["bundler-#{Bundler::VERSION}", "prints_loaded_gems-1.0", "rack-1.2"])
+          end
         end
 
         context "when requesting a different bundler version" do
