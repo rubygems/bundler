@@ -102,9 +102,15 @@ RSpec.describe "bundle binstubs <gem>" do
 
       let(:system_bundler_version) { Gem::Version.new(Bundler::VERSION).bump.to_s }
 
-      it "runs bundler" do
-        sys_exec! "#{bundled_app("bin/bundle")} install"
-        expect(out).to eq %(system bundler #{system_bundler_version}\n["install"])
+      context "when system bundler was used" do
+        # Support master branch of bundler
+        if ENV["BUNDLER_SPEC_SUB_VERSION"]
+          let(:system_bundler_version) { Bundler::VERSION }
+        end
+        it "runs bundler" do
+          sys_exec! "#{bundled_app("bin/bundle")} install"
+          expect(out).to eq %(system bundler #{system_bundler_version}\n["install"])
+        end
       end
 
       context "when BUNDLER_VERSION is set" do
