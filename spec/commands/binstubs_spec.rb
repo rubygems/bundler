@@ -176,7 +176,9 @@ RSpec.describe "bundle binstubs <gem>" do
         let(:system_bundler_version) { :bundler }
         it "loads all gems" do
           sys_exec! bundled_app("bin/print_loaded_gems").to_s
-          if Bundler.load.specs["bundler"][0].default_gem?
+          # RG < 2.0.14 didn't have a `Gem::Specification#default_gem?`
+          # This is dirty detection for old RG versions.
+          if File.dirname(Bundler.load.specs["bundler"][0].loaded_from) =~ %r{specifications/default}
             expect(out).to eq %(["prints_loaded_gems-1.0", "rack-1.2"])
           else
             expect(out).to eq %(["bundler-#{Bundler::VERSION}", "prints_loaded_gems-1.0", "rack-1.2"])
