@@ -504,13 +504,3 @@ bundler uses the following priority order:
      `rubygems.org`
   3. The sources specified via global `source` lines, searching each source in
      your `Gemfile` from last added to first added.
-
-## Should I check my `Gemfile.lock` into version control?
-
-When Bundler first shipped, the `Gemfile.lock` was gitignored inside gems.
-Over time, however, it became clear that this practice forces the pain of
-broken dependencies onto new contributors, while leaving existing contributors
-potentially unaware of the problem. Since `bundle install` is usually the
-first step towards a contribution, the pain of broken dependencies would
-discourage new contributors from contributing. As a result, we have revised our
-guidance for gem authors to now recommend checking in the lock for gems.
