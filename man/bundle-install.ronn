@@ -290,11 +290,20 @@ of a dependency of a gem in your Gemfile(5)) can result in radically
 different gems being needed to satisfy all dependencies.
 
 As a result, you `SHOULD` check your `Gemfile.lock` into version
-control. If you do not, every machine that checks out your
-repository (including your production server) will resolve all
+control, in both applications and gems. If you do not, every machine that
+checks out your repository (including your production server) will resolve all
 dependencies again, which will result in different versions of
 third-party code being used if `any` of the gems in the Gemfile(5)
 or any of their dependencies have been updated.
+
+When Bundler first shipped, the `Gemfile.lock` was included in the `.gitignore`
+file included with generated gems.  Over time, however, it became clear that
+this practice forces the pain of broken dependencies onto new contributors,
+while leaving existing contributors potentially unaware of the problem. Since
+`bundle install` is usually the first step towards a contribution, the pain of
+broken dependencies would discourage new contributors from contributing. As a
+result, we have revised our guidance for gem authors to now recommend checking
+in the lock for gems.
 
 ## CONSERVATIVE UPDATING
 
