@@ -100,6 +100,9 @@ RSpec.describe "bundle binstubs <gem>" do
         bundle! "binstubs bundler rack prints_loaded_gems"
       end
 
+      # When environment has a same version of bundler as default gems.
+      # `system_gems "bundler-x.y.z"` will detect system binstub.
+      # We need to avoid it by virtual version of bundler.
       let(:system_bundler_version) { Gem::Version.new(Bundler::VERSION).bump.to_s }
 
       context "when system bundler was used" do
