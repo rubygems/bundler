@@ -84,9 +84,6 @@ module Bundler
     def append_to(gemfile_path, new_gem_lines)
       gemfile_path.open("a") do |f|
         f.puts
-        if @options["timestamp"] || @options["timestamp"].nil?
-          f.puts "# Added at #{Time.now} by #{`whoami`.chomp}:"
-        end
         f.puts new_gem_lines
       end
     end
