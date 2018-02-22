@@ -30,6 +30,7 @@ module Bundler
           FileUtils.rm_rf spec.full_gem_path
         when Source::Git
           source.remote!
+          FileUtils.rm_rf spec.extension_dir if spec.have_extensions?
           FileUtils.rm_rf spec.full_gem_path
         else
           Bundler.ui.warn("Cannot pristine #{gem_name}. Gem is sourced from local path.")
