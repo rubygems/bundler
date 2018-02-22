@@ -311,7 +311,7 @@ RSpec.describe "bundle gem" do
     end
 
     it "creates a base error class" do
-      expect(bundled_app("test_gem/lib/test_gem.rb").read).to include("class Error < StandardError")
+      expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(/class Error < StandardError; end$/)
     end
 
     it "runs rake without problems" do
