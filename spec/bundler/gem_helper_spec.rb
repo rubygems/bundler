@@ -197,6 +197,7 @@ RSpec.describe Bundler::GemHelper do
           `git init`
           `git config user.email "you@example.com"`
           `git config user.name "name"`
+          `git config commit.gpgsign false`
           `git config push.default simple`
         end
 
