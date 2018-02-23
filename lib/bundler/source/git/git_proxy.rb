@@ -29,7 +29,9 @@ module Bundler
           msg = String.new
           msg << "Git error: command `git #{command}` in directory #{SharedHelpers.pwd} has failed."
           msg << "\n#{extra_info}" if extra_info
-          msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path && path.exist?
+          msg << "\nIf this error persists you could try the following:"
+          msg << "\n  * Removing the cache directory '#{path}'" if path && path.exist?
+          msg << "\n  * Removing your 'Gemfile.lock' (or 'gems.rb.locked') file"
           super msg
         end
       end
