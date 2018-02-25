@@ -86,7 +86,7 @@ module Bundler
       installed_specs = Installer.new.install_definition(definition)
 
       save_plugins plugins, installed_specs, builder.inferred_plugins
-    rescue => e
+    rescue RuntimeError => e
       unless e.is_a?(GemfileError)
         Bundler.ui.error "Failed to install plugin: #{e.message}\n  #{e.backtrace[0]}"
       end
@@ -284,7 +284,7 @@ module Bundler
       load path.join(PLUGIN_FILE_NAME)
 
       @loaded_plugin_names << name
-    rescue => e
+    rescue RuntimeError => e
       Bundler.ui.error "Failed loading plugin #{name}: #{e.message}"
       raise
     end

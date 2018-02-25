@@ -161,7 +161,7 @@ module Bundler
       )
       success, message = begin
         gem_installer.install_from_spec
-      rescue => e
+      rescue RuntimeError => e
         raise e, "#{e}\n\n#{require_tree_for_spec(spec_install.spec)}"
       end
       if success
