@@ -36,7 +36,11 @@ module Bundler
   private
 
     def gemfile
-      @gemfile ||= @options[:gemsrb] ? "gems.rb" : "Gemfile"
+      @gemfile ||= generate_gems_rb? ? "gems.rb" : "Gemfile"
+    end
+
+    def generate_gems_rb?
+      @options[:gemsrb] || Bundler.settings[:init_gems_rb]
     end
   end
 end

@@ -42,13 +42,19 @@ RSpec.describe "bundle init" do
   end
 
   context "when gemsrb option given" do
-    before do
-      create_file("gems.rb", <<-G)
-        gem "rails"
-      G
+    it "generates a gems.rb file" do
+      bundle! :init, :gemsrb => true
+
+      expect(bundled_app("gems.rb")).to be_file
     end
 
     context "when gems.rb already exists" do
+      before do
+        create_file("gems.rb", <<-G)
+          gem "rails"
+        G
+      end
+
       it "does not change existing gems.rb" do
         expect { bundle :init, :gemsrb => true }.not_to change { File.read(bundled_app("gems.rb")) }
       end
@@ -61,6 +67,57 @@ RSpec.describe "bundle init" do
 
     context "when a gems.rb file exists in a parent directory" do
       let(:subdir) { "child_dir" }
+      before do
+        create_file("gems.rb", <<-G)
+          gem "rails"
+        G
+      end
+
+      it "lets users generate a gems.rb in a child directory" do
+        FileUtils.mkdir bundled_app(subdir)
+
+        Dir.chdir bundled_app(subdir) do
+          bundle! :init, :gemsrb => true
+        end
+
+        expect(out).to include("Writing new gems.rb")
+        expect(bundled_app("#{subdir}/gems.rb")).to be_file
+      end
+    end
+  end
+
+  context "when init_gems_rb setting is true" do
+    before { bundle! "config init_gems_rb true" }
+
+    it "generates a gems.rb file" do
+      bundle :init
+      expect(bundled_app("gems.rb")).to be_file
+    end
+
+    context "when gems.rb already exists" do
+      before do
+        create_file("gems.rb", <<-G)
+          gem "rails"
+        G
+      end
+
+      it "does not change existing gems.rb" do
+        expect { bundle :init }.not_to change { File.read(bundled_app("gems.rb")) }
+      end
+
+      it "notifies the user that an existing gems.rb already exists" do
+        bundle :init
+        expect(out).to include("gems.rb already exists")
+      end
+    end
+
+    context "when a gems.rb file exists in a parent directory" do
+      let(:subdir) { "child_dir" }
+      before do
+        create_file("gems.rb", <<-G)
+          gem "rails"
+        G
+      end
 
       it "lets users generate a gems.rb in a child directory" do
         FileUtils.mkdir bundled_app(subdir)
