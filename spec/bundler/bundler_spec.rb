@@ -264,7 +264,7 @@ EOF
         it { should be true }
       end
 
-      context "with unwritable files in a parent dir", pending: true do
+      context "with unwritable files in a parent dir" do
         # Regression test for https://github.com/bundler/bundler/pull/6316
         # It doesn't matter if there are other unwritable files so long as
         # bundle_path can be created
