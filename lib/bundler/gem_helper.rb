@@ -187,28 +187,13 @@ module Bundler
       out
     end
 
-    if RUBY_VERSION >= "1.9"
-      def sh_with_status(cmd, &block)
-        Bundler.ui.debug(cmd)
-        SharedHelpers.chdir(base) do
-          outbuf = IO.popen(cmd, :err => [:child, :out], &:read)
-          status = $?
-          block.call(outbuf) if status.success? && block
-          [outbuf, status]
-        end
-      end
-    else
-      def sh_with_status(cmd, &block)
-        cmd = cmd.shelljoin if cmd.respond_to?(:shelljoin)
-        cmd += " 2>&1"
-        outbuf = String.new
-        Bundler.ui.debug(cmd)
-        SharedHelpers.chdir(base) do
-          outbuf = `#{cmd}`
-          status = $?
-          block.call(outbuf) if status.success? && block
-          [outbuf, status]
-        end
+    def sh_with_status(cmd, &block)
+      Bundler.ui.debug(cmd)
+      SharedHelpers.chdir(base) do
+        outbuf = IO.popen(cmd, :err => [:child, :out], &:read)
+        status = $?
+        block.call(outbuf) if status.success? && block
+        [outbuf, status]
       end
     end
 
