@@ -132,7 +132,7 @@ module Bundler
     end
 
     def inflate(obj)
-      Gem.inflate(obj)
+      Gem::Util.inflate(obj)
     end
 
     def sources=(val)
