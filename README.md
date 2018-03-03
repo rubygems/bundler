@@ -45,7 +45,8 @@ To get in touch with the Bundler core team and other Bundler users, please see [
 
 ### Contributing
 
-If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [our documentation section](doc/README.md).
+If you'd like to contribute to Bundler, that's awesome, and we <3 you. We've put together [the Bundler contributor guide](https://github.com/bundler/bundler/blob/master/doc/contributing/README.md) with all of the information you need to get started.
+
 
 While some Bundler contributors are compensated by Ruby Together, the project maintainers make decisions independent of Ruby Together. As a project, we welcome contributions regardless of the author’s affiliation with Ruby Together.
 
