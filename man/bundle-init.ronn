@@ -12,16 +12,18 @@ adding a [`Gemfile(5)`][Gemfile(5)] to a gem with a gemspec, the `--gemspec` opt
 automatically add each dependency listed in the gemspec file to the newly
 created [`Gemfile(5)`][Gemfile(5)].
 
-One of the lines included in the default [`Gemfile(5)`][Gemfile(5)]
-generated is `# frozen_string_literal: true`. This is a magic comment
-supported for the first time in Ruby 2.3. The presence of this line
-results in all string literals in the file being implicitly frozen.
-Frozen string literals will be the default in Ruby 3.
-
 ## OPTIONS
 
 * `--gemspec`:
   Use the specified .gemspec to create the [`Gemfile(5)`][Gemfile(5)]
+
+## FILES
+
+Included in the default [`Gemfile(5)`][Gemfile(5)]
+generated is the line `# frozen_string_literal: true`. This is a magic comment
+supported for the first time in Ruby 2.3. The presence of this line
+results in all string literals in the file being implicitly frozen.
+Frozen string literals will be the default in Ruby 3.
 
 ## SEE ALSO
 
