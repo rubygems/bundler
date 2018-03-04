@@ -16,3 +16,14 @@ created [`Gemfile(5)`][Gemfile(5)].
 
 * `--gemspec`:
   Use the specified .gemspec to create the [`Gemfile(5)`][Gemfile(5)]
+
+## FILES
+
+Included in the default [`Gemfile(5)`][Gemfile(5)]
+generated is the line `# frozen_string_literal: true`. This is a magic comment
+supported for the first time in Ruby 2.3. The presence of this line
+results in all string literals in the file being implicitly frozen.
+
+## SEE ALSO
+
+[Gemfile(5)](http://bundler.io/man/gemfile.5.html)
