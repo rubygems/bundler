@@ -571,7 +571,7 @@ module Bundler
         redefine_method(klass, sym, method)
       end
       if Binding.public_method_defined?(:source_location)
-        post_reset_hooks.reject! {|proc| proc.binding.source_location == __FILE__ }
+        post_reset_hooks.reject! {|proc| proc.binding.source_location[0] == __FILE__ }
       else
         post_reset_hooks.reject! {|proc| proc.binding.eval("__FILE__") == __FILE__ }
       end
