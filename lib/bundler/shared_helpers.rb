@@ -145,7 +145,7 @@ module Bundler
         raise DeprecatedError, "[REMOVED FROM #{major_version}.0] #{message}"
       end
 
-      return unless prints_major_deprecations?
+      return unless prints_major_deprecations?(major_version)
       @major_deprecation_ui ||= Bundler::UI::Shell.new("no-color" => true)
       ui = Bundler.ui.is_a?(@major_deprecation_ui.class) ? Bundler.ui : @major_deprecation_ui
       ui.warn("[DEPRECATED FOR #{major_version}.0] #{message}")
@@ -342,9 +342,9 @@ module Bundler
       $LOAD_PATH.uniq!
     end
 
-    def prints_major_deprecations?
+    def prints_major_deprecations?(major_version)
       require "bundler"
-      deprecation_release = Bundler::VERSION.split(".").drop(1).include?("99")
+      deprecation_release = Bundler.bundler_major_version >= (major_version - 1)
       return false if !deprecation_release && !Bundler.settings[:major_deprecations]
       require "bundler/deprecate"
       return false if Bundler::Deprecate.skip
