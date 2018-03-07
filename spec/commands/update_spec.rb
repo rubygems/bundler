@@ -473,6 +473,23 @@ RSpec.describe "bundle update in more complicated situations" do
     expect(the_bundle).to include_gems "thin 2.0", "rack 10.0", "rack-obama 1.0"
   end
 
+  it "will not warn when changing gem sources but not versions" do
+    build_git "rack"
+
+    install_gemfile! <<-G
+      gem "rack", :git => '#{lib_path("rack-1.0")}'
+    G
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    bundle! "update rack"
+
+    expect(last_command.stdboth).not_to include "attempted to update"
+  end
+
   it "will update only from pinned source" do
     install_gemfile <<-G
       source "file://#{gem_repo2}"
