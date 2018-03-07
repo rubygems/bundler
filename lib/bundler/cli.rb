@@ -34,8 +34,16 @@ module Bundler
       super
 
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
+
+      if ENV["BUNDLE_GEMFILE"] && !ENV["BUNDLE_GEMFILE"].empty?
+        custom_gemfile = ENV["BUNDLE_GEMFILE"]
+      end
+
       if custom_gemfile && !custom_gemfile.empty?
-        Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", File.expand_path(custom_gemfile)
+        unless ENV["BUNDLE_GEMFILE"]
+          Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", File.expand_path(custom_gemfile)
+        end
+
         Bundler.reset_paths!
       end
 
