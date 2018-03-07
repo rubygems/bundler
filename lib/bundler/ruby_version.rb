@@ -88,7 +88,7 @@ module Bundler
       raise ArgumentError, "Can only diff with a RubyVersion, not a #{other.class}" unless other.is_a?(RubyVersion)
       if engine != other.engine && @input_engine
         [:engine, engine, other.engine]
-      elsif versions.empty? || !matches?(versions, other.gem_version) || versions_string(other.versions).match(/^#{versions_string(versions)}/).nil?
+      elsif versions.empty? || (!matches?(versions, other.gem_version) && versions_string(other.versions).match(/^#{versions_string(versions)}/).nil?)
         [:version, versions_string(versions), versions_string(other.versions)]
       elsif @input_engine && !matches?(engine_versions, other.engine_gem_version)
         [:engine_version, versions_string(engine_versions), versions_string(other.engine_versions)]
