@@ -114,6 +114,10 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
+  config.mock_with :rspec do |mocks|
+    mocks.allow_message_expectations_on_nil = false
+  end
+
   config.before :all do
     build_repo1
   end
