@@ -473,6 +473,22 @@ RSpec.describe "bundle update in more complicated situations" do
     expect(the_bundle).to include_gems "thin 2.0", "rack 10.0", "rack-obama 1.0"
   end
 
+  it "will not warn when an explicitly updated git gem changes sha but not version" do
+    build_git "foo"
+
+    install_gemfile! <<-G
+      gem "foo", :git => '#{lib_path("foo-1.0")}'
+    G
+
+    update_git "foo" do |s|
+      s.write "lib/foo2.rb", "puts :foo2"
+    end
+
+    bundle! "update foo"
+
+    expect(last_command.stdboth).not_to include "attempted to update"
+  end
+
   it "will not warn when changing gem sources but not versions" do
     build_git "rack"
 
