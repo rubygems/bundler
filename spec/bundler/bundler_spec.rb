@@ -315,7 +315,7 @@ EOF
     context "unwritable paths" do
       before do
         FileUtils.touch("tmp/vendor/bundle/unwritable.txt")
-        FileUtils.chmod(0400, "tmp/vendor/bundle/unwritable.txt")
+        FileUtils.chmod(0o400, "tmp/vendor/bundle/unwritable.txt")
       end
       it "should return true and display warn message" do
         allow(Bundler).to receive(:bundle_path).and_return(Pathname("tmp/vendor/bundle"))
