@@ -114,6 +114,19 @@ RSpec.describe "bundle lock" do
     expect(read_lockfile).to eq(@lockfile)
   end
 
+  it "can lock without downloading gems" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "rack_middleware", :group => "test"
+    G
+    bundle! "config set without test"
+    bundle! "config set path .bundle"
+    bundle! "lock"
+    expect(bundled_app(".bundle")).not_to exist
+  end
+
   # see update_spec for more coverage on same options. logic is shared so it's not necessary
   # to repeat coverage here.
   context "conservative updates" do
