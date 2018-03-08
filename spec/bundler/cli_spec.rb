@@ -51,17 +51,19 @@ RSpec.describe "bundle executable" do
     end
   end
 
-  context "when ENV['BUNDLE_GEMFILE'] not an empty string" do
+  context "when ENV['BUNDLE_GEMFILE'] is specified" do
     before { create_file "Gemfile.dev" }
-    it "checks for the specified gemfile" do
-      gemfile bundled_app("Gemfile.dev"), <<-G
-        source "file://#{gem_repo1}"
-        gem 'rack'
-      G
+    it "uses specified gemfile" do
+      with_env_vars("BUNDLE_GEMFILE" => "Gemfile.dev") do
+        gemfile bundled_app("Gemfile.dev"), <<-G
+          source "file://#{gem_repo1}"
+          gem 'rack'
+        G
 
-      bundle :install, :env => { "BUNDLE_GEMFILE" => "Gemfile.dev" }
+        bundle :install
 
-      expect(the_bundle).to include_gems "rack 1.0.0"
+        expect(the_bundle).to include_gems "rack 1.0.0"
+      end
     end
   end
 
