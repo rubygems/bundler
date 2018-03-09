@@ -39,19 +39,21 @@ RSpec.describe "bundle executable" do
   end
 
   context "behaviour with ENV['BUNDLE_GEMFILE']" do
-    # TODO: set config variable `gemfile` to Gemfile.dev
-    # reason for failing test
+    before do
+      gemfile bundled_app("Gemfile.dev"), <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+
+      bundle! "config --local gemfile #{bundled_app("Gemfile.dev")}"
+    end
 
     context "when not specified" do
       it "uses the value specified in config file" do
-        gemfile bundled_app("Gemfile.dev"), <<-G
-          source "file://#{gem_repo1}"
-          gem 'rack'
-        G
-
         bundle :install
+        bundle :list
 
-        expect(the_bundle).to include_gems "rack 1.0.0"
+        expect(out).to include "rack (1.0.0)"
       end
     end
 
