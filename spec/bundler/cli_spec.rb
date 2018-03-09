@@ -38,23 +38,12 @@ RSpec.describe "bundle executable" do
     end
   end
 
-  context "when ENV['BUNDLE_GEMFILE'] is set to an empty string" do
-    it "ignores it" do
-      gemfile bundled_app("Gemfile"), <<-G
-        source "file://#{gem_repo1}"
-        gem 'rack'
-      G
+  context "behaviour with ENV['BUNDLE_GEMFILE']" do
+    # TODO: set config variable `gemfile` to Gemfile.dev
+    # reason for failing test
 
-      bundle :install, :env => { "BUNDLE_GEMFILE" => "" }
-
-      expect(the_bundle).to include_gems "rack 1.0.0"
-    end
-  end
-
-  context "when ENV['BUNDLE_GEMFILE'] is specified" do
-    before { create_file "Gemfile.dev" }
-    it "uses specified gemfile" do
-      with_env_vars("BUNDLE_GEMFILE" => "Gemfile.dev") do
+    context "when not specified" do
+      it "uses the value specified in config file" do
         gemfile bundled_app("Gemfile.dev"), <<-G
           source "file://#{gem_repo1}"
           gem 'rack'
@@ -63,6 +52,34 @@ RSpec.describe "bundle executable" do
         bundle :install
 
         expect(the_bundle).to include_gems "rack 1.0.0"
+      end
+    end
+
+    context "when set to an empty string" do
+      it "ignores it and searches for default gemfiles" do
+        gemfile bundled_app("Gemfile"), <<-G
+          source "file://#{gem_repo1}"
+          gem 'rack'
+        G
+
+        bundle :install, :env => { "BUNDLE_GEMFILE" => "" }
+
+        expect(the_bundle).to include_gems "rack 1.0.0"
+      end
+    end
+
+    context "when passed a value" do
+      it "uses specified gemfile" do
+        with_env_vars("BUNDLE_GEMFILE" => "Gemfile.other") do
+          gemfile bundled_app("Gemfile.other"), <<-G
+            source "file://#{gem_repo1}"
+            gem 'rack'
+          G
+
+          bundle :install
+
+          expect(the_bundle).to include_gems "rack 1.0.0"
+        end
       end
     end
   end
