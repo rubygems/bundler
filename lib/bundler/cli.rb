@@ -35,15 +35,11 @@ module Bundler
 
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
 
-      if ENV["BUNDLE_GEMFILE"] && !ENV["BUNDLE_GEMFILE"].empty?
-        custom_gemfile = ENV["BUNDLE_GEMFILE"]
+      if custom_gemfile && !custom_gemfile.empty? && !ENV["BUNDLE_GEMFILE"]
+        Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", File.expand_path(custom_gemfile)
       end
 
-      if custom_gemfile && !custom_gemfile.empty?
-        Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", File.expand_path(custom_gemfile) unless ENV["BUNDLE_GEMFILE"]
-
-        Bundler.reset_paths!
-      end
+      Bundler.reset_paths!
 
       Bundler.settings.set_command_option_if_given :retry, options[:retry]
 
