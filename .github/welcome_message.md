@@ -4,4 +4,4 @@ We use Travis CI to test and make sure your change works functionally and uses a
 
 If you have any questions or concerns that you wish to ask, feel free to leave a comment in this PR or join our #bundler channel on [Slack](http://slack.bundler.io/).
 
-For more information about contributing to the Bundler project feel free to review our [CONTRIBUTING](https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md) guide
+For more information about contributing to the Bundler project feel free to review our [CONTRIBUTING](https://github.com/bundler/bundler/blob/master/doc/contributing/README.md) guide
