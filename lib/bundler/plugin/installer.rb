@@ -14,12 +14,10 @@ module Bundler
       def install(names, options)
         version = options[:version] || [">= 0"]
         Bundler.settings.temporary(:lockfile_uses_separate_rubygems_sources => false, :disable_multisource => false) do
-          if options[:git]
-            install_git(names, version, options)
-          else
-            sources = options[:source] || Bundler.rubygems.sources
-            install_rubygems(names, version, sources)
-          end
+          sources = extract_sources_from_options!(options)
+          source_list = prepare_source_list(sources, options)
+          definition = create_definition(names, source_list, version)
+          install_definition(definition)
         end
       end
 
@@ -38,40 +36,37 @@ module Bundler
 
     private
 
-      def install_git(names, version, options)
-        uri = options.delete(:git)
-        options["uri"] = uri
+      def extract_sources_from_options!(options)
+        sources = {}
 
-        source_list = SourceList.new
-        source_list.add_git_source(options)
+        sources[:git] = options.delete(:git) if options[:git]
+        sources[:source] = options.delete(:source) if options[:source]
 
-        # To support both sources
-        if options[:source]
-          source_list.add_rubygems_source("remotes" => options[:source])
-        end
-
-        deps = names.map {|name| Dependency.new name, version }
-
-        definition = Definition.new(nil, deps, source_list, true)
-        install_definition(definition)
+        sources
       end
 
-      # Installs the plugin from rubygems source and returns the path where the
-      # plugin was installed
-      #
-      # @param [String] name of the plugin gem to search in the source
-      # @param [Array] version of the gem to install
-      # @param [String, Array<String>] source(s) to resolve the gem
-      #
-      # @return [Hash] map of names to the specs of plugins installed
-      def install_rubygems(names, version, sources)
-        deps = names.map {|name| Dependency.new name, version }
-
+      def prepare_source_list(sources, options)
         source_list = SourceList.new
-        source_list.add_rubygems_source("remotes" => sources)
 
-        definition = Definition.new(nil, deps, source_list, true)
-        install_definition(definition)
+        if sources[:git]
+          source_list.add_git_source(options.merge("uri" => sources[:git]))
+        end
+
+        if sources[:source]
+          source_list.add_rubygems_source("remotes" => sources[:source])
+        end
+
+        if sources.empty?
+          sources = Bundler.rubygems.sources
+          source_list.add_rubygems_source("remotes" => sources)
+        end
+
+        source_list
+      end
+
+      def create_definition(names, source_list, version)
+        deps = names.map {|name| Dependency.new name, version }
+        Definition.new(nil, deps, source_list, true)
       end
 
       # Installs the plugins and deps from the provided specs and returns map of
