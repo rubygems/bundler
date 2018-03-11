@@ -40,6 +40,7 @@ module Bundler
         sources = {}
 
         sources[:git] = options.delete(:git) if options[:git]
+        sources[:file] = options.delete(:file) if options[:file]
         sources[:source] = options.delete(:source) if options[:source]
 
         sources
@@ -50,6 +51,11 @@ module Bundler
 
         if sources[:git]
           source_list.add_git_source(options.merge("uri" => sources[:git]))
+        end
+
+        if sources[:file]
+          file_uri = "file://#{URI.escape(sources[:file])}"
+          source_list.add_git_source(options.merge("uri" => file_uri))
         end
 
         if sources[:source]

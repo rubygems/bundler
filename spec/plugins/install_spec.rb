@@ -122,6 +122,17 @@ RSpec.describe "bundler plugin install" do
       expect(out).to include("Installed plugin foo")
       plugin_should_be_installed("foo")
     end
+
+    it "installs form a local git source" do
+      build_git "foo" do |s|
+        s.write "plugins.rb"
+      end
+
+      bundle "plugin install foo --file #{lib_path("foo-1.0")}"
+
+      expect(out).to include("Installed plugin foo")
+      plugin_should_be_installed("foo")
+    end
   end
 
   context "Gemfile eval" do
