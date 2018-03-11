@@ -54,8 +54,7 @@ module Bundler
         end
 
         if sources[:file]
-          file_uri = "file://#{URI.escape(sources[:file])}"
-          source_list.add_git_source(options.merge("uri" => file_uri))
+          source_list.add_git_source(options.merge("uri" => sources[:file]))
         end
 
         if sources[:source]
