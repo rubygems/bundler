@@ -302,8 +302,14 @@ EOF
     end
     after do
       FileUtils.rm_rf("tmp/vendor/bundle")
-      Bundler.remove_instance_variable(:@requires_sudo_ran)
-      Bundler.remove_instance_variable(:@requires_sudo)
+      if Bundler.respond_to?(:remove_instance_variable)
+        Bundler.remove_instance_variable(:@requires_sudo_ran)
+        Bundler.remove_instance_variable(:@requires_sudo)
+      else
+        # TODO: Remove these code when Bundler drops Ruby 1.8.7 support
+        Bundler.send(:remove_instance_variable, :@requires_sudo_ran)
+        Bundler.send(:remove_instance_variable, :@requires_sudo)
+      end
     end
     context "writable paths" do
       it "should return false and display nothing" do
