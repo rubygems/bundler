@@ -610,7 +610,11 @@ RSpec.describe "bundle exec" do
       let(:executable) { super() << "\nclass Err < Exception\ndef backtrace; end;\nend\nraise Err" }
       let(:exit_code) { 1 }
       let(:expected_err) do
-        "bundler: failed to load command: #{path} (#{path})\nErr: Err"
+        if LessThanProc.with(RUBY_VERSION).call("1.9")
+          "Err: Err"
+        else
+          "bundler: failed to load command: #{path} (#{path})\nErr: Err"
+        end
       end
 
       it_behaves_like "it runs"
