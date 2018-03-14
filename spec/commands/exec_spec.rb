@@ -606,6 +606,26 @@ RSpec.describe "bundle exec" do
       it_behaves_like "it runs"
     end
 
+    context "the executable raises an error without a backtrace", :bundler => "< 2" do
+      let(:executable) { super() << "\nclass Err < Exception\ndef backtrace; end;\nend\nraise Err" }
+      let(:exit_code) { 1 }
+      let(:expected_err) do
+        "bundler: failed to load command: #{path} (#{path})\nErr: Err"
+      end
+
+      it_behaves_like "it runs"
+    end
+
+    context "the executable raises an error without a backtrace", :bundler => "2" do
+      let(:executable) { super() << "\nclass Err < Exception\ndef backtrace; end;\nend\nraise Err" }
+      let(:exit_code) { 1 }
+      let(:expected_err) do
+        "bundler: failed to load command: #{path} (#{path})\nErr: Err"
+      end
+
+      it_behaves_like "it runs"
+    end
+
     context "when the file uses the current ruby shebang" do
       let(:shebang) { "#!#{Gem.ruby}" }
       it_behaves_like "it runs"
