@@ -624,9 +624,13 @@ RSpec.describe "bundle exec" do
     context "the executable raises an error without a backtrace", :bundler => "2" do
       let(:executable) { super() << "\nclass Err < Exception\ndef backtrace; end;\nend\nraise Err" }
       let(:exit_code) { 1 }
-      let(:expected) { super() << "\nbundler: failed to load command: #{path} (#{path})" }
-      let(:expected_err) do
-        "bundler: failed to load command: #{path} (#{path})\nErr: Err"
+      let(:expected_err) { "bundler: failed to load command: #{path} (#{path})\nErr: Err" }
+      let(:expected) do
+        if ENV["BUNDLER_SPEC_SUB_VERSION"] == "1.98"
+          super() << "\nbundler: failed to load command: #{path} (#{path})"
+        else
+          super()
+        end
       end
 
       it_behaves_like "it runs"
