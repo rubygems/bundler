@@ -33,7 +33,9 @@ module Bundler
 
           # first try to fetch any new bytes on the existing file
           if retrying.nil? && local_path.file?
-            FileUtils.cp local_path, local_temp_path
+            SharedHelpers.filesystem_access(local_temp_path) do
+              FileUtils.cp local_path, local_temp_path
+            end
             headers["If-None-Match"] = etag_for(local_temp_path)
             headers["Range"] =
               if local_temp_path.size.nonzero?
