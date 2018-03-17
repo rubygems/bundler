@@ -64,7 +64,7 @@ module Bundler
       File.read(filename.to_s).strip
     rescue Errno::ENOENT
       "<No #{filename} found>"
-    rescue => e
+    rescue RuntimeError => e
       "#{e.class}: #{e.message}"
     end
 

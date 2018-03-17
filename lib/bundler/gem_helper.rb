@@ -160,7 +160,7 @@ module Bundler
       sh %W[git tag -m Version\ #{version} #{version_tag}]
       Bundler.ui.confirm "Tagged #{version_tag}."
       yield if block_given?
-    rescue
+    rescue RuntimeError
       Bundler.ui.error "Untagging #{version_tag} due to error."
       sh_with_status %W[git tag -d #{version_tag}]
       raise
