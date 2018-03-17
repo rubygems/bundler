@@ -1,17 +1,43 @@
-## 1.4.0
+## 1.4.0.pre.2
 
 Features:
 
-  - add `ENV['DEBUG_RESOLVER_TREE']` outputs resolver tree (@dblock)
-  - set $MANPATH so `bundle exec man name` works (#1624, @sunaku)
-  - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
-  - faster installs using gemspecs from the local system cache (#2497, @mipearson)
-  - add `bundle install -jN` for N parallel gem installations (#2481, @eagletmt)
-  - allow `require: true` as an alias for `require: <name>` (#2538, @ndbroadbent)
+  - add support for the x64-mingw32 platform (#2356, #2590, @larskanis)
+  - add :patchlevel option to ruby DSL
+  - add `bundler` bin (#2598, @kirs)
+  - friendly ambiguous error messages (#2581, #2550, @jlsuttles, @jendiamond, @joyicecloud)
 
 Bugfixes:
 
-  - reduce stack size while resolving, helping JRuby overflow less (#2510, @headius)
+  - allow passwordless Basic Auth (#2606, @rykov)
+  - don't suggest `gem install foo` when `foo` is a git gem that fails (@kirs)
+  - revert #2569, going back to git instead of https for :github gems
+
+## 1.4.0.pre.1 (2013-08-04)
+
+Features:
+
+  - retry network requests while installing gems (#2561, @ascherger)
+  - faster installs using gemspecs from the local system cache (#2497, @mipearson)
+  - add `bundle install -jN` for N parallel gem installations (#2481, @eagletmt)
+  - add `ENV['DEBUG_RESOLVER_TREE']` outputs resolver tree (@dblock)
+  - set $MANPATH so `bundle exec man name` works (#1624, @sunaku)
+  - use `man` instead of `groff` (#2579, @ixti, @simi)
+  - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
+  - allow `require: true` as an alias for `require: <name>` (#2538, @ndbroadbent)
+  - rescue and report Thor errors (#2478, @pjvds)
+  - detect cyclic dependencies (#2564, @gnufied)
+  - support multiple gems in `binstubs` (#2576, @lucasmazza)
+  - use https instead of git for :github gems (#2569, @fuadsaud)
+  - add quiet option to `bundle package` (#2573, @shtirlic)
+  - use RUBYLIB instead of RUBYOPT for better Windows support (#2536, @equinux)
+
+Bugfixes:
+
+  - reduce stack size while resolving to fix JRuby overflow (#2510, @headius)
+  - display GitErrors while loading specs in --verbose mode (#2461)
+  - allow the same options hash to be passed to multiple gems (#2447)
+  - handle missing binaries without an exception (#2019, @luismreis)
 
 ## 1.3.6
 

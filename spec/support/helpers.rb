@@ -222,13 +222,13 @@ module Spec
       ENV["PATH"] = "#{tmp("broken_path")}:#{ENV["PATH"]}"
     end
 
-    def fake_groff!
-      FileUtils.mkdir_p(tmp("fake_groff"))
-      File.open(tmp("fake_groff/groff"), "w", 0755) do |f|
+    def fake_man!
+      FileUtils.mkdir_p(tmp("fake_man"))
+      File.open(tmp("fake_man/man"), "w", 0755) do |f|
         f.puts "#!/usr/bin/env ruby\nputs ARGV.inspect\n"
       end
 
-      ENV["PATH"] = "#{tmp("fake_groff")}:#{ENV["PATH"]}"
+      ENV["PATH"] = "#{tmp("fake_man")}:#{ENV["PATH"]}"
     end
 
     def kill_path!

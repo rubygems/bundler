@@ -84,16 +84,15 @@ module Bundler
           @definition.resolve_remotely!
       end
 
-      # Must install gems in the order that the resolver provides
-      # as dependencies might actually affect the installation of
-      # the gem.
       Installer.post_install_messages = {}
 
-      size = options[:jobs] || 1
-      size = [size, 1].max
-
-      if size > 1 && can_install_parallely?
-        install_in_parallel size, options[:standalone]
+      # the order that the resolver provides is significant, since
+      # dependencies might actually affect the installation of a gem.
+      # that said, it's a rare situation (other than rake), and parallel
+      # installation is just SO MUCH FASTER. so we let people opt in.
+      jobs = [Bundler.settings[:jobs].to_i, 1].max
+      if jobs > 1 && can_install_parallely?
+        install_in_parallel jobs, options[:standalone]
       else
         install_sequentially options[:standalone]
       end
@@ -102,17 +101,21 @@ module Bundler
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
-    def install_gem_from_spec(spec, standalone = false)
+    def install_gem_from_spec(spec, standalone = false, worker = 0)
       # Download the gem to get the spec, because some specs that are returned
       # by rubygems.org are broken and wrong.
       Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
 
       # Fetch the build settings, if there are any
-      settings = Bundler.settings["build.#{spec.name}"]
-      message = nil
+      settings             = Bundler.settings["build.#{spec.name}"]
+      install_message      = nil
+      post_install_message = nil
+      debug_message        = nil
       Bundler.rubygems.with_build_args [settings] do
-        message = spec.source.install(spec)
-        Bundler.ui.debug "  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
+        install_message, post_install_message, debug_message = spec.source.install(spec)
+        Bundler.ui.info install_message
+        Bundler.ui.debug debug_message if debug_message
+        Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
 
       if Bundler.settings[:bin] && standalone
@@ -122,17 +125,21 @@ module Bundler
       end
 
       FileUtils.rm_rf(Bundler.tmp)
-      message
+      post_install_message
     rescue Exception => e
-      # install hook failed
+      # if install hook failed or gem signature is bad, just die
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
 
       # other failure, likely a native extension build failure
       Bundler.ui.info ""
       Bundler.ui.warn "#{e.class}: #{e.message}"
       msg = "An error occurred while installing #{spec.name} (#{spec.version}),"
-      msg << " and Bundler cannot continue.\nMake sure that `gem install"
-      msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      msg << " and Bundler cannot continue."
+
+      unless spec.source.options["git"]
+        msg << "\nMake sure that `gem install"
+        msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      end
       Bundler.ui.debug e.backtrace.join("\n")
       raise Bundler::InstallError, msg
     end
@@ -256,7 +263,7 @@ module Bundler
 
     def install_sequentially(standalone)
       specs.each do |spec|
-        message = install_gem_from_spec spec, standalone
+        message = install_gem_from_spec spec, standalone, 0
         if message
           Installer.post_install_messages[spec.name] = message
         end
@@ -272,9 +279,9 @@ module Bundler
         remains[spec.name] = true
       end
 
-      worker_pool = ParallelWorkers.worker_pool size, lambda { |name|
+      worker_pool = ParallelWorkers.worker_pool size, lambda { |name, worker|
         spec = name2spec[name]
-        message = install_gem_from_spec spec, standalone
+        message = install_gem_from_spec spec, standalone, worker
         { :name => spec.name, :post_install => message }
       }
       specs.each do |spec|

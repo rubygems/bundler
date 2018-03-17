@@ -2,11 +2,19 @@ Great to have you here! Here are a few ways you can help out with [Bundler](http
 
 # Where should I start?
 
-You can start learning about Bundler by reading [the documentation](http://gembundler.com). If you want, you can also read a (lengthy) explanation of [why Bundler exists and what it does](http://gembundler.com/v1.2/rationale.html). You can also check out discussions about Bundler on the [Bundler mailing list](https://groups.google.com/group/ruby-bundler) and in the [Bundler IRC channel](irc://irc.freenode.net/#bundler), which is #bundler on Freenode.
+You can start learning about Bundler by reading [the documentation](http://bundler.io). If you want, you can also read a (lengthy) explanation of [why Bundler exists and what it does](http://bundler.io/v1.2/rationale.html). You can also check out discussions about Bundler on the [Bundler mailing list](https://groups.google.com/group/ruby-bundler) and in the [Bundler IRC channel](irc://irc.freenode.net/#bundler), which is #bundler on Freenode.
 
-## Core Team
+## Your first commits
 
-The Bundler core team consists of André Arko ([@indirect](http://github.com/indirect)), Terence Lee ([@hone](http://github.com/hone)), and Jessica Lynn Suttles ([@jlsuttles](http://github.com/jlsuttles)), with support and advice from original Bundler author Yehuda Katz ([@wycats](http://github.com/wycats)).
+If you’re interested in contributing to Bundler, that’s awesome! We’d love your help.
+
+If you have any questions after reading this page, please feel free to contact either [@indirect](http://github.com/indirect) or [@hone](http://github.com/hone). They are both happy to provide help working through your first bugfix or thinking through the problem you’re trying to resolve.
+
+## Tackle some small problems
+
+We track [small
+bugs](https://github.com/bundler/bundler/issues?labels=small&state=open) and [small features](https://github.com/bundler/bundler-features/issues?labels=small&state=open) so that anyone who wants to help can start with something that's not too overwhelming. If nothing on those lists looks good, though, just talk to us.
+
 
 # Development setup
 
@@ -26,18 +34,6 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
      With that set up, you can test changes you've made to Bundler by running `dbundle`, without interfering with the regular `bundle` command.
 
-
-# Adding new features
-
-If you would like to add a new feature to Bundler, please follow these steps:
-
-  1. [Create an issue](https://github.com/bundler/bundler/issues/new) to discuss your feature.
-  2. Base your commits on the master branch, since we follow [SemVer](http://semver.org) and don't add new features to old releases.
-  3. Commit the code and at least one test covering your changes to a feature branch in your fork.
-  4. Put a line in the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the "Features" heading.
-  5. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your feature branch.
-
-If you don't hear back immediately, don’t get discouraged! We all have day jobs, but we respond to most tickets within a day or two.
 
 # Bug triage
 
@@ -70,6 +66,19 @@ If you can reproduce an issue, you're well on your way to fixing it. :) Fixing i
 Finally, the ticket may be a duplicate of another older ticket. If you notice a ticket is a duplicate, simply comment on the ticket noting the original ticket’s number. For example, you could say “This is a duplicate of issue #42, and can be closed”.
 
 
+# Adding new features
+
+If you would like to add a new feature to Bundler, please follow these steps:
+
+  1. [Create an issue](https://github.com/bundler/bundler-features/issues/new) to discuss your feature.
+  2. Base your commits on the master branch, since we follow [SemVer](http://semver.org) and don't add new features to old releases.
+  3. Commit the code and at least one test covering your changes to a feature branch in your fork.
+  4. Put a line in the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the "Features" heading.
+  5. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your feature branch.
+
+If you don't hear back immediately, don’t get discouraged! We all have day jobs, but we respond to most tickets within a day or two.
+
+
 # Beta testing
 
 Early releases require heavy testing, especially across various system setups. We :heart: testers, and are big fans of anyone who can run `gem install bundler --pre` and try out upcoming releases in their development and staging environments.
@@ -86,11 +95,11 @@ We don't currently have any translations, but please reach out to us if you woul
 
 Code needs explanation, and sometimes those who know the code well have trouble explaining it to someone just getting into it. Because of that, we welcome documentation suggestions and patches from everyone, especially if they are brand new to using Bundler.
 
-Bundler has two main sources of documentation: the built-in help (including usage information and man pages) and the [Bundler documentation site](http://gembundler.com).
+Bundler has two main sources of documentation: the built-in help (including usage information and man pages) and the [Bundler documentation site](http://bundler.io).
 
 If you’d like to submit a patch to the man pages, follow the steps for adding a feature above. All of the man pages are located in the `man` directory. Just use the “Documentation” heading when you describe what you did in the changelog.
 
-If you have a suggestion or proposed change for [gembundler.com](http://gembundler.com), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
+If you have a suggestion or proposed change for [bundler.io](http://bundler.io), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
 
 # Community
@@ -99,17 +108,10 @@ Community is an important part of all we do. If you’d like to be part of the B
 
 It would be tremendously helpful to have more people answering questions about Bundler (and often simply about Rubygems or Ruby itself) in our [issue tracker](https://github.com/bundler/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
 
-Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [gembundler.com](http://www.gembundler.com), we would absolutely love it if you opened an issue or pull request on the [bundler-site](https://github.com/bundler/bundler-site) repository.
+Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [bundler.io](http://bundler.io), we would absolutely love it if you opened an issue or pull request on the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
 Finally, sharing your experiences and discoveries by writing them up is a valuable way to help others who have similar problems or experiences in the future. You can write a blog post, create an example and commit it to Github, take screenshots, or make videos.
 
 Examples of how Bundler is used help everyone, and we’ve discovered that people already use it in ways that we never imagined when we were writing it. If you’re still not sure what to write about, there are also several projects doing interesting things based on Bundler. They could probably use publicity too.
 
 If you let someone on the core team know you wrote about Bundler, we will add your post to the list of Bundler resources on the Github project wiki.
-
-
-# Your first commits
-
-If you’re interested in contributing to Bundler, that’s awesome! We’d love your help.
-
-If you have any questions after reading this page, please feel free to contact either [@indirect](http://github.com/indirect) or [@hone](http://github.com/hone). They are both happy to provide help working through your first bugfix or thinking through the problem you’re trying to resolve.

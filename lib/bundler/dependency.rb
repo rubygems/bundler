@@ -23,7 +23,9 @@ module Bundler
       :mingw    => Gem::Platform::MINGW,
       :mingw_18 => Gem::Platform::MINGW,
       :mingw_19 => Gem::Platform::MINGW,
-      :mingw_20 => Gem::Platform::MINGW
+      :mingw_20 => Gem::Platform::MINGW,
+      :x64_mingw    => Gem::Platform::X64_MINGW,
+      :x64_mingw_20 => Gem::Platform::X64_MINGW
     }.freeze
 
     def initialize(name, version, options = {}, &blk)
