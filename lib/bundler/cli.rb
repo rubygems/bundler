@@ -6,6 +6,13 @@ module Bundler
   class CLI < Thor
     include Thor::Actions
 
+    def self.start(*)
+      super
+    rescue Exception => e
+      Bundler.ui = UI::Shell.new
+      raise e
+    end
+
     def initialize(*)
       super
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
@@ -44,11 +51,8 @@ module Bundler
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)
 
-        if Bundler.which("groff") && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          groff = "groff -Wall -mtty-char -mandoc -Tascii"
-          pager = pager_system
-
-          Kernel.exec "#{groff} #{root}/#{command} | #{pager}"
+        if Bundler.which("man") && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
+          Kernel.exec "man #{root}/#{command}"
         else
           puts File.read("#{root}/#{command}.txt")
         end
@@ -230,16 +234,16 @@ module Bundler
 
       opts["no-cache"] ||= opts[:local]
 
-      # Can't use Bundler.settings for this because settings needs gemfile.dirname
       Bundler.settings[:path]     = nil if opts[:system]
       Bundler.settings[:path]     = "vendor/bundle" if opts[:deployment]
-      Bundler.settings[:path]     = opts[:path] if opts[:path]
-      Bundler.settings[:path]     ||= "bundle" if opts[:standalone]
+      Bundler.settings[:path]     = opts["path"] if opts["path"]
+      Bundler.settings[:path]     ||= "bundle" if opts["standalone"]
       Bundler.settings[:bin]      = opts["binstubs"] if opts["binstubs"]
       Bundler.settings[:bin]      = nil if opts["binstubs"] && opts["binstubs"].empty?
-      Bundler.settings[:shebang]  = opts["shebang"] if opts[:shebang]
+      Bundler.settings[:shebang]  = opts["shebang"] if opts["shebang"]
+      Bundler.settings[:jobs]     = opts["jobs"] if opts["jobs"]
       Bundler.settings[:no_prune] = true if opts["no-prune"]
-      Bundler.settings[:clean]    = opts[:clean] if opts[:clean]
+      Bundler.settings[:clean]    = opts["clean"] if opts["clean"]
       Bundler.settings.without    = opts[:without]
       Bundler.ui.level            = "warn" if opts[:quiet]
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
@@ -307,8 +311,7 @@ module Bundler
         Bundler.definition(true)
       else
         # cycle through the requested gems, just to make sure they exist
-        lock = Bundler.read_file(Bundler.default_lockfile)
-        names = LockfileParser.new(lock).specs.map{ |s| s.name }
+        names = Bundler.locked_gems.specs.map{ |s| s.name }
         gems.each do |g|
           next if names.include?(g)
           raise GemNotFound, not_found_message(g, names)
@@ -379,18 +382,26 @@ module Bundler
       "binstub destination directory (default bin)"
     method_option "force", :type => :boolean, :default => false, :banner =>
       "overwrite existing binstubs if they exist"
-    def binstubs(gem_name)
+    def binstubs(*gems)
       Bundler.definition.validate_ruby!
       Bundler.settings[:bin] = options["path"] if options["path"]
       Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
       installer = Installer.new(Bundler.root, Bundler.definition)
-      spec      = installer.specs.find{|s| s.name == gem_name }
-      raise GemNotFound, not_found_message(gem_name, Bundler.definition.specs) unless spec
 
-      if spec.name == "bundler"
-        Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
-      else
-        installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
+      if gems.empty?
+        Bundler.ui.error "`bundle binstubs` needs at least one gem to run."
+        exit 1
+      end
+
+      gems.each do |gem_name|
+        spec = installer.specs.find{|s| s.name == gem_name }
+        raise GemNotFound, not_found_message(gem_name, Bundler.definition.specs) unless spec
+
+        if spec.name == "bundler"
+          Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
+        else
+          installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
+        end
       end
     end
 
@@ -485,6 +496,7 @@ module Bundler
     desc "package", "Locks and then caches all of the gems into vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
+    method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
@@ -492,6 +504,7 @@ module Bundler
       bundle without having to download any additional gems.
     D
     def package
+      Bundler.ui.level = "warn" if options[:quiet]
       setup_cache_all
       install
       # TODO: move cache contents here now that all bundles are locked
@@ -866,12 +879,6 @@ module Bundler
       message
     end
 
-    def pager_system
-      pager = ENV['PAGER'] || ENV['MANPAGER']
-      pager ||= 'less -R' if Bundler.which("less")
-      pager ||= 'more' if Bundler.which("more")
-      pager ||= 'cat'
-    end
 
     def without_groups_message
       groups = Bundler.settings.without

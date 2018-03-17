@@ -1,3 +1,5 @@
+require 'bundler/shared_helpers'
+
 module Spec
   module Builders
     def self.constantize(name)
@@ -588,7 +590,9 @@ module Spec
     private
 
       def git(cmd)
-        Dir.chdir(@path) { `git #{cmd}`.strip }
+        Bundler::SharedHelpers.with_clean_git_env do
+          Dir.chdir(@path) { `git #{cmd}`.strip }
+        end
       end
 
     end

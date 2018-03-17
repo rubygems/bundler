@@ -151,15 +151,15 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
+        debug = nil
         if requires_checkout? && !@copied
-          Bundler.ui.debug "  * Checking out revision: #{ref}"
+          debug = "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
           serialize_gemspecs_in(install_path)
           @copied = true
         end
         generate_bin(spec)
-        nil
+        ["Using #{spec.name} (#{spec.version}) from #{to_s}", nil, debug]
       end
 
       def cache(spec)

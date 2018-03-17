@@ -26,6 +26,30 @@ describe "bundle binstubs <gem>" do
       expect(bundled_app("bin/rails")).to exist
     end
 
+    it "does install multiple binstubs" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rails"
+      G
+
+      bundle "binstubs rails rack"
+
+      expect(bundled_app("bin/rackup")).to exist
+      expect(bundled_app("bin/rails")).to exist
+    end
+
+    it "displays an error when used without any gem" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "binstubs", :exitstatus => true
+      expect(exitstatus).to eq(1)
+      expect(out).to eq("`bundle binstubs` needs at least one gem to run.")
+    end
+
     it "does not bundle the bundler binary" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"

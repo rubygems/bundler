@@ -89,7 +89,7 @@ begin
     namespace :rubygems do
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
-      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.25 v2.0.3).each do |rg|
+      %w(master 2.0 v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.25 v2.0.6).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(-fs --color)
@@ -219,19 +219,5 @@ end
 
 task :build => ["man:clean", "man:build"]
 task :release => ["man:clean", "man:build"]
-
-namespace :vendor do
-  desc "Build the vendor dir"
-  task :build => :clean do
-    sh "git clone git://github.com/wycats/thor.git lib/bundler/vendor/tmp"
-    sh "mv lib/bundler/vendor/tmp/lib/* lib/bundler/vendor/"
-    rm_rf "lib/bundler/vendor/tmp"
-  end
-
-  desc "Clean the vendor dir"
-  task :clean do
-    rm_rf "lib/bundler/vendor"
-  end
-end
 
 task :default => :spec

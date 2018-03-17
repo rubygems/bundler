@@ -300,7 +300,7 @@ describe "gemcutter's dependency API" do
     expect(out).to include("Fetching gem metadata from #{source_uri}")
   end
 
-  fit "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
+  it "should install when EndpointSpecification has a bin dir owned by root", :sudo => true do
     sudo "mkdir -p #{system_gem_path("bin")}"
     sudo "chown -R root #{system_gem_path("bin")}"
 
@@ -309,7 +309,6 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint"
-    puts out, err
     should_be_installed "rails 2.3.2"
   end
 
@@ -419,6 +418,20 @@ describe "gemcutter's dependency API" do
 
       bundle :install, :artifice => "endpoint_creds_diff_host"
       should_be_installed "rack 1.0.0"
+    end
+
+    describe "with no password" do
+      let(:password) { nil }
+
+      it "passes basic authentication details" do
+        gemfile <<-G
+          source "#{basic_auth_source_uri}"
+          gem "rack"
+        G
+
+        bundle :install, :artifice => "endpoint_basic_authentication"
+        should_be_installed "rack 1.0.0"
+      end
     end
   end
 

@@ -32,7 +32,7 @@ describe "Resolving platform craziness" do
 
     before :each do
       @index = build_index do
-        platforms "mingw32 mswin32" do |platform|
+        platforms "mingw32 mswin32 x64-mingw32" do |platform|
           gem "thin", "1.2.7", platform
         end
       end
@@ -50,6 +50,12 @@ describe "Resolving platform craziness" do
       platforms "x86-mingw32"
       dep "thin"
       should_resolve_as %w(thin-1.2.7-x86-mingw32)
+    end
+
+    it "finds x64-mingw gems" do
+      platforms "x64-mingw32"
+      dep "thin"
+      should_resolve_as %w(thin-1.2.7-x64-mingw32)
     end
   end
 

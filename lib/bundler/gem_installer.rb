@@ -6,7 +6,7 @@ module Bundler
       # Bundler needs to install gems regardless of binstub overwriting
     end
 
-    if WINDOWS
+    if Bundler.current_ruby.mswin? || Bundler.current_ruby.jruby?
       def build_extensions
         # Gain the lock because rubygems use Dir.chdir
         SharedHelpers.chdir('.') do

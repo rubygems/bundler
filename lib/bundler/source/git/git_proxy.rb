@@ -85,7 +85,7 @@ module Bundler
 
         def git(command, check_errors=true)
           if allow?
-            out = %x{git #{command}}
+            out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
 
             if check_errors && $?.exitstatus != 0
               msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."

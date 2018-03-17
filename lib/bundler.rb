@@ -154,6 +154,13 @@ module Bundler
       end
     end
 
+    def locked_gems
+      @locked_gems ||= begin
+        lock = Bundler.read_file(Bundler.default_lockfile)
+        LockfileParser.new(lock)
+      end
+    end
+
     def ruby_scope
       "#{Bundler.rubygems.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}"
     end
@@ -295,7 +302,19 @@ module Bundler
     end
 
     def sudo(str)
-      `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' #{str}`
+      prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, '').strip + " "
+      Your user account isn't allowed to install to the system Rubygems.
+      You can cancel this installation and run:
+
+          bundle install --path vendor/bundle
+
+      to install the gems into ./vendor/bundle/, or you can enter your password
+      and install the bundled gems to Rubygems using sudo.
+
+      Password:
+      PROMPT
+
+      `sudo -p "#{prompt}" #{str}`
     end
 
     def read_file(file)

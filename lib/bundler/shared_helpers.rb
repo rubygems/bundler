@@ -33,7 +33,7 @@ module Bundler
       find_gemfile
     end
 
-    if WINDOWS
+    if Bundler.current_ruby.mswin? || Bundler.current_ruby.jruby?
       require 'monitor'
       @chdir_monitor = Monitor.new
       def chdir(dir, &blk)
@@ -55,6 +55,19 @@ module Bundler
       def pwd
         Dir.pwd
       end
+    end
+
+    def with_clean_git_env(&block)
+      keys    = %w[GIT_DIR GIT_WORK_TREE]
+      old_env = keys.inject({}) do |h, k|
+        h.update(k => ENV[k])
+      end
+
+      keys.each {|key| ENV.delete(key) }
+
+      block.call
+    ensure
+      keys.each {|key| ENV[key] = old_env[key] }
     end
 
   private

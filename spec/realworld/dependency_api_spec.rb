@@ -48,7 +48,7 @@ describe "gemcutter's dependency API", :realworld => true do
         gem "rack"
 
         old_v, $VERBOSE = $VERBOSE, nil
-        Bundler::Fetcher::API_TIMEOUT = 1
+        Bundler::Fetcher.api_timeout = 1
         $VERBOSE = old_v
       G
 

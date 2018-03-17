@@ -69,11 +69,10 @@ module Bundler
 
       def install(spec)
         if installed_specs[spec].any?
-          Bundler.ui.info "Using #{spec.name} (#{spec.version})"
-          return
+          return ["Using #{spec.name} (#{spec.version})", nil]
         end
 
-        Bundler.ui.info "Installing #{spec.name} (#{spec.version})"
+        install_message = "Installing #{spec.name} (#{spec.version})"
         path = cached_gem(spec)
         if Bundler.requires_sudo?
           install_path = Bundler.tmp
@@ -105,10 +104,9 @@ module Bundler
             Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.system_bindir}"
           end
         end
-        Bundler.ui.info "Installed #{spec.name} (#{spec.version})"
         installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
-        spec.post_install_message
+        [install_message, spec.post_install_message]
       end
 
       def cache(spec)
