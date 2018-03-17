@@ -158,6 +158,9 @@ module Bundler
 
       # Open gemspec in editor
       open_editor(options["edit"], target.join("#{name}.gemspec")) if options[:edit]
+
+      Bundler.ui.info "Gem '#{name}' was successfully created. " \
+        "For more information on making a RubyGem visit https://bundler.io/guides/creating_gem.html"
     rescue Errno::EEXIST => e
       raise GenericSystemCallError.new(e, "There was a conflict while creating the new gem.")
     end
