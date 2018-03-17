@@ -152,6 +152,13 @@ module Bundler
       end
     end
 
+    def locked_gems
+      @locked_gems ||= begin
+        lock = Bundler.read_file(Bundler.default_lockfile)
+        LockfileParser.new(lock)
+      end
+    end
+
     def ruby_scope
       "#{Bundler.rubygems.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}"
     end

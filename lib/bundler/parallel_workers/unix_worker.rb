@@ -9,7 +9,7 @@ module Bundler
         def work(obj)
           Marshal.dump obj, io_w
           Marshal.load io_r
-        rescue IOError
+        rescue IOError, Errno::EPIPE
           nil
         end
       end
@@ -62,7 +62,6 @@ module Bundler
         @threads = size.times.map do |i|
           Thread.start do
             worker = @workers[i]
-            Thread.current.abort_on_exception = true
             loop do
               obj = @request_queue.deq
               break if obj.equal? POISON
