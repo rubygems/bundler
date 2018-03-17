@@ -220,7 +220,7 @@ module Bundler
     def processor_count
       require "etc"
       Etc.nprocessors
-    rescue Runtimeerror
+    rescue StandardError
       1
     end
 
