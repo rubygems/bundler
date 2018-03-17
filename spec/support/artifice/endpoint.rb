@@ -15,6 +15,8 @@ class Endpoint < Sinatra::Base
 
   helpers do
     def dependencies_for(gem_names, marshal = gem_repo1("specs.4.8"))
+      return [] if gem_names.nil? || gem_names.empty?
+
       require 'rubygems'
       require 'bundler'
       Bundler::Deprecate.skip_during do

@@ -27,8 +27,7 @@ module Bundler
         @name       = options["name"]
         @version    = options["version"]
 
-        @update     = false
-        @installed  = nil
+        @copied     = false
         @local      = false
       end
 
@@ -93,6 +92,7 @@ module Bundler
 
       def unlock!
         git_proxy.revision = nil
+        @unlocked = true
       end
 
       def local_override!(path)
@@ -125,7 +125,7 @@ module Bundler
 
         changed = cached_revision && cached_revision != git_proxy.revision
 
-        if changed && !git_proxy.contains?(cached_revision)
+        if changed && !@unlocked && !git_proxy.contains?(cached_revision)
           raise GitError, "The Gemfile lock is pointing to revision #{shortref_for_display(cached_revision)} " \
             "but the current branch in your local override for #{name} does not contain such commit. " \
             "Please make sure your branch is up to date."
@@ -140,23 +140,26 @@ module Bundler
           set_local!(app_cache_path)
         end
 
-        if requires_checkout? && !@update
+        if requires_checkout? && !@copied
           git_proxy.checkout
           git_proxy.copy_to(install_path, submodules)
-          @update = true
+          serialize_gemspecs_in(install_path)
+          @copied = true
         end
 
         local_specs
       end
 
       def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
-        if requires_checkout? && !@installed
-          Bundler.ui.debug "  * Checking out revision: #{ref}"
+        debug = nil
+        if requires_checkout? && !@copied
+          debug = "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
-          @installed = true
+          serialize_gemspecs_in(install_path)
+          @copied = true
         end
         generate_bin(spec)
+        ["Using #{spec.name} (#{spec.version}) from #{to_s}", nil, debug]
       end
 
       def cache(spec)
@@ -166,17 +169,14 @@ module Bundler
         FileUtils.rm_rf(app_cache_path)
         git_proxy.checkout if requires_checkout?
         git_proxy.copy_to(app_cache_path, @submodules)
-        # Evaluate gemspecs and cache the result. Gemspecs
-        # in git might require git or other dependencies.
-        # The gemspecs we cache should already be evaluated.
-        spec_path = app_cache_path.join(File.basename(spec.loaded_from))
-        File.open(spec_path, 'wb') {|file| file.print spec.to_ruby }
+        serialize_gemspecs_in(app_cache_path)
       end
 
       def load_spec_files
         super
-      rescue PathError, GitError
-        raise GitError, "#{to_s} is not checked out. Please run `bundle install`"
+      rescue PathError => e
+        Bundler.ui.trace e
+        raise GitError, "#{to_s} is not yet checked out. Run `bundle install` first."
       end
 
       # This is the path which is going to contain a cache
@@ -200,6 +200,18 @@ module Bundler
       end
 
     private
+
+      def serialize_gemspecs_in(destination)
+        expanded_path = destination.expand_path(Bundler.root)
+        Dir["#{expanded_path}/#{@glob}"].each do |spec_path|
+          # Evaluate gemspecs and cache the result. Gemspecs
+          # in git might require git or other dependencies.
+          # The gemspecs we cache should already be evaluated.
+          spec = Bundler.load_gemspec(spec_path)
+          next unless spec
+          File.open(spec_path, 'wb') {|file| file.write(spec.to_ruby) }
+        end
+      end
 
       def set_local!(path)
         @local       = true
@@ -261,7 +273,6 @@ module Bundler
 
       def git_proxy
         @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision){ allow_git_ops? }
-
       end
 
     end

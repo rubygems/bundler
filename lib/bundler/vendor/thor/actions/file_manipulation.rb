@@ -129,7 +129,7 @@ class Thor
     #
     # ==== Example
     #
-    #   chmod "script/*", 0755
+    #   chmod "script/server", 0755
     #
     def chmod(path, mode, config={})
       return unless behavior == :invoke
@@ -251,7 +251,7 @@ class Thor
     def uncomment_lines(path, flag, *args)
       flag = flag.respond_to?(:source) ? flag.source : flag
 
-      gsub_file(path, /^(\s*)#\s*(.*#{flag})/, '\1\2', *args)
+      gsub_file(path, /^(\s*)#[[:blank:]]*(.*#{flag})/, '\1\2', *args)
     end
 
     # Comment all lines matching a given regex.  It will leave the space
@@ -293,8 +293,11 @@ class Thor
     end
     alias :remove_dir :remove_file
 
-    attr_accessor :output_buffer
+  attr_accessor :output_buffer
+  private :output_buffer, :output_buffer=
+
   private
+
     def concat(string)
       @output_buffer.concat(string)
     end

@@ -1,4 +1,4 @@
-Portions copyright (c) 2010 Andre Arko
+Portions copyright (c) 2010 Andre Arko  
 Portions copyright (c) 2009 Engine Yard
 
 MIT License

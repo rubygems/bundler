@@ -6,7 +6,7 @@ module Bundler
   module Source
     # TODO: Refactor this class
     class Rubygems
-      FORCE_MODERN_INDEX_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
+      API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
 
       attr_reader :remotes, :caches
       attr_accessor :dependency_names
@@ -15,6 +15,7 @@ module Bundler
         @options = options
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
         @fetchers = {}
+        @dependency_names = []
         @allow_remote = false
         @allow_cached = false
 
@@ -68,11 +69,10 @@ module Bundler
 
       def install(spec)
         if installed_specs[spec].any?
-          Bundler.ui.info "Using #{spec.name} (#{spec.version}) "
-          return
+          return ["Using #{spec.name} (#{spec.version})", nil]
         end
 
-        Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
+        install_message = "Installing #{spec.name} (#{spec.version})"
         path = cached_gem(spec)
         if Bundler.requires_sudo?
           install_path = Bundler.tmp
@@ -93,10 +93,6 @@ module Bundler
           ).install
         end
 
-        if spec.post_install_message
-          Installer.post_install_messages[spec.name] = spec.post_install_message
-        end
-
         # SUDO HAX
         if Bundler.requires_sudo?
           Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/gems"
@@ -110,6 +106,7 @@ module Bundler
         end
         installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
+        [install_message, spec.post_install_message]
       end
 
       def cache(spec)
@@ -216,41 +213,35 @@ module Bundler
 
       def remote_specs
         @remote_specs ||= begin
-          idx     = Index.new
-          old     = Bundler.rubygems.sources
+          old = Bundler.rubygems.sources
+          idx = Index.new
 
-          sources = {}
-          remotes.each do |uri|
-            fetcher          = Bundler::Fetcher.new(uri)
-            specs            = fetcher.specs(dependency_names, self)
-            sources[fetcher] = specs.size
+          fetchers       = remotes.map { |uri| Bundler::Fetcher.new(uri) }
+          api_fetchers   = fetchers.select { |f| f.use_api }
+          index_fetchers = fetchers - api_fetchers
 
-            idx.use specs
-          end
+          # gather lists from non-api sites
+          index_fetchers.each { |f| idx.use f.specs(nil, self) }
+          return idx if api_fetchers.empty?
 
-          # don't need to fetch all specifications for every gem/version on
-          # the rubygems repo if there's no api endpoints to search over
-          # or it has too many specs to fetch
-          fetchers              = sources.keys
-          api_fetchers          = fetchers.select {|fetcher| fetcher.has_api }
-          modern_index_fetchers = fetchers - api_fetchers
-          if api_fetchers.any? && modern_index_fetchers.all? {|fetcher| sources[fetcher] < FORCE_MODERN_INDEX_LIMIT }
-            # this will fetch all the specifications on the rubygems repo
-            unmet_dependency_names = idx.unmet_dependency_names
-            unmet_dependency_names -= ['bundler'] # bundler will always be unmet
+          # because ensuring we have all the gems we need involves downloading
+          # the gemspecs of those gems, if the non-api sites contain more than
+          # about 100 gems, we just treat all sites as non-api for speed.
+          if idx.size < API_REQUEST_LIMIT && dependency_names.size < API_REQUEST_LIMIT
+            api_fetchers.each { |f| idx.use f.specs(dependency_names, self) }
 
-            Bundler.ui.debug "Unmet Dependencies: #{unmet_dependency_names}"
-            if unmet_dependency_names.any?
-              api_fetchers.each do |fetcher|
-                idx.use fetcher.specs(unmet_dependency_names, self)
-              end
-            end
+            # it's possible that gems from one source depend on gems from some
+            # other source, so now we download gemspecs and iterate over those
+            # dependencies, looking for gems we don't have info on yet.
+            unmet = idx.unmet_dependency_names
+
+            # if there are any cross-site gems we missed, get them now
+            api_fetchers.each { |f| idx.use f.specs(unmet, self) } if unmet.any?
           else
-            Bundler::Fetcher.disable_endpoint = true
-            api_fetchers.each {|fetcher| idx.use fetcher.specs([], self) }
+            api_fetchers.each { |f| idx.use f.specs(nil, self) }
           end
 
-          idx
+          return idx
         ensure
           Bundler.rubygems.sources = old
         end

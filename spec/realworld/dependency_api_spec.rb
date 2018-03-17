@@ -48,14 +48,13 @@ describe "gemcutter's dependency API", :realworld => true do
         gem "rack"
 
         old_v, $VERBOSE = $VERBOSE, nil
-        Bundler::Fetcher::API_TIMEOUT = 1
+        Bundler::Fetcher.api_timeout = 1
         $VERBOSE = old_v
       G
 
       bundle :install
-      expect(out).to include("\nFetching full source index from #{@server_uri}")
+      expect(out).to include("Fetching source index from #{@server_uri}/")
       should_be_installed "rack 1.0.0"
     end
   end
-
 end

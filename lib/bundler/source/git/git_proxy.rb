@@ -58,7 +58,7 @@ module Bundler
             File.chmod((0777 & ~File.umask), destination)
           end
 
-          Dir.chdir(destination) do
+          SharedHelpers.chdir(destination) do
             git %|fetch --force --quiet --tags "#{path}"|
             git "reset --hard #{@revision}"
 
@@ -85,7 +85,7 @@ module Bundler
 
         def git(command, check_errors=true)
           if allow?
-            out = %x{git #{command}}
+            out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
 
             if check_errors && $?.exitstatus != 0
               msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
@@ -95,7 +95,7 @@ module Bundler
             out
           else
             raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
-                            "this error message could probably be more useful. Please submit a ticket at http://github.com/carlhuda/bundler/issues " \
+                            "this error message could probably be more useful. Please submit a ticket at http://github.com/bundler/bundler/issues " \
                             "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
           end
         end
@@ -127,7 +127,7 @@ module Bundler
 
         def in_path(&blk)
           checkout unless path.exist?
-          Dir.chdir(path, &blk)
+          SharedHelpers.chdir(path, &blk)
         end
 
         def allowed_in_path
@@ -137,6 +137,7 @@ module Bundler
             raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
           end
         end
+
       end
 
     end

@@ -23,7 +23,9 @@ module Bundler
       :mingw    => Gem::Platform::MINGW,
       :mingw_18 => Gem::Platform::MINGW,
       :mingw_19 => Gem::Platform::MINGW,
-      :mingw_20 => Gem::Platform::MINGW
+      :mingw_20 => Gem::Platform::MINGW,
+      :x64_mingw    => Gem::Platform::X64_MINGW,
+      :x64_mingw_20 => Gem::Platform::X64_MINGW
     }.freeze
 
     def initialize(name, version, options = {}, &blk)
@@ -70,7 +72,9 @@ module Bundler
 
     def current_platform?
       return true if @platforms.empty?
-      @platforms.any? { |p| send("#{p}?") }
+      @platforms.any? { |p|
+        Bundler.current_ruby.send("#{p}?")
+      }
     end
 
     def to_lock
@@ -79,72 +83,11 @@ module Bundler
       out << "\n"
     end
 
-  private
 
-    def ruby?
-      !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby" || RUBY_ENGINE == "rbx" || RUBY_ENGINE == "maglev")
+    def specific?
+      super
+    rescue NoMethodError
+      requirement != ">= 0"
     end
-
-    def ruby_18?
-      ruby? && RUBY_VERSION < "1.9"
-    end
-
-    def ruby_19?
-      ruby? && RUBY_VERSION >= "1.9"
-    end
-
-    def ruby_20?
-      ruby? && RUBY_VERSION >= "2.0"
-    end
-
-    def mri?
-      !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby")
-    end
-
-    def mri_18?
-      mri? && RUBY_VERSION < "1.9"
-    end
-
-    def mri_19?
-      mri? && RUBY_VERSION >= "1.9"
-    end
-
-
-    def mri_20?
-      mri? && RUBY_VERSION >= "2.0"
-    end
-
-    def rbx?
-      ruby? && defined?(RUBY_ENGINE) && RUBY_ENGINE == "rbx"
-    end
-
-    def jruby?
-      defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
-    end
-
-    def maglev?
-      defined?(RUBY_ENGINE) && RUBY_ENGINE == "maglev"
-    end
-
-    def mswin?
-      Bundler::WINDOWS
-    end
-
-    def mingw?
-      Bundler::WINDOWS && Gem::Platform.local.os == "mingw32"
-    end
-
-    def mingw_18?
-      mingw? && RUBY_VERSION < "1.9"
-    end
-
-    def mingw_19?
-      mingw? && RUBY_VERSION >= "1.9"
-    end
-
-    def mingw_20?
-      mingw? && RUBY_VERSION >= "2.0"
-    end
-
   end
 end

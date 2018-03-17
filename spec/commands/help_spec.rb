@@ -7,25 +7,25 @@ describe "bundle help" do
     system_gems "bundler-0.8.1"
 
     bundle "help", :expect_err => true
-    expect(err).to include("Please remove Bundler 0.8 versions.")
-    expect(err).to include("This can be done by running `gem cleanup bundler`.")
+    expect(err).to include("older than 0.9")
+    expect(err).to include("running `gem cleanup bundler`.")
   end
 
-  it "uses groff when available" do
-    fake_groff!
+  it "uses mann when available" do
+    fake_man!
 
     bundle "help gemfile"
-    expect(out).to eq(%|["-Wall", "-mtty-char", "-mandoc", "-Tascii", "#{root}/lib/bundler/man/gemfile.5"]|)
+    expect(out).to eq(%|["#{root}/lib/bundler/man/gemfile.5"]|)
   end
 
   it "prefixes bundle commands with bundle- when finding the groff files" do
-    fake_groff!
+    fake_man!
 
     bundle "help install"
-    expect(out).to eq(%|["-Wall", "-mtty-char", "-mandoc", "-Tascii", "#{root}/lib/bundler/man/bundle-install"]|)
+    expect(out).to eq(%|["#{root}/lib/bundler/man/bundle-install"]|)
   end
 
-  it "simply outputs the txt file when there is no groff on the path" do
+  it "simply outputs the txt file when there is no man on the path" do
     kill_path!
 
     bundle "help install", :expect_err => true

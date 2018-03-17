@@ -19,5 +19,5 @@ end
 FakeWeb.register_uri(:get, "http://localgemserver.test/gems/rcov-1.0-x86-mswin32.gem",
   :status => ["404", "Not Found"])
 
-FakeWeb.register_uri(:get, "http://localgemserver.test/api/v1/dependencies?gems=rcov",
+FakeWeb.register_uri(:get, "http://localgemserver.test/api/v1/dependencies",
   :status => ["404", "Not Found"])

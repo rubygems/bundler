@@ -12,7 +12,7 @@ VM about your platform.
 
 For instance, using this Gemfile(5):
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     ruby "1.9.3"
 

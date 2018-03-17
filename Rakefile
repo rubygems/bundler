@@ -5,6 +5,13 @@ require 'rubygems'
 require 'shellwords'
 require 'benchmark'
 
+def safe_task(&block)
+  yield
+  true
+rescue
+  false
+end
+
 # Benchmark task execution
 module Rake
   class Task
@@ -19,20 +26,13 @@ module Rake
   end
 end
 
-task :release => ["man:clean", "man:build"]
-
-def safe_task(&block)
-  yield
-  true
-rescue
-  false
-end
-
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    sh "#{Gem.ruby} -S gem list ronn | (grep 'ronn' 1> /dev/null) || #{Gem.ruby} -S gem install ronn --no-ri --no-rdoc"
-    sh "#{Gem.ruby} -S gem list rspec | (grep 'rspec (2.' 1> /dev/null) || #{Gem.ruby} -S gem install rspec --no-ri --no-rdoc"
+    {"rdiscount" => "~> 1.6", "ronn" => "~> 0.7.3", "rspec" => "~> 2.13"}.each do |name, version|
+      sh "#{Gem.ruby} -S gem list -i #{name} -v '#{version}' || " \
+         "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
+    end
   end
 
   namespace :travis do
@@ -43,11 +43,6 @@ namespace :spec do
       system("sudo sed -i '/secure_path/d' /etc/sudoers")
       # Install groff for the ronn gem
       system("sudo apt-get install groff -y")
-      # Recompile ruby-head, because the VM version is quite old
-      if ENV['RUBY_VERSION'] == 'ruby-head'
-        system("rvm reinstall ruby-head")
-        system("ruby --version")
-      end
       # Install the other gem deps, etc.
       Rake::Task["spec:deps"].invoke
     end
@@ -90,10 +85,11 @@ begin
       system "sudo rm -rf #{File.expand_path('../tmp/sudo_gem_home', __FILE__)}"
     end
 
+    # Rubygems specs by version
     namespace :rubygems do
-      # Rubygems specs by version
       rubyopt = ENV["RUBYOPT"]
-      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.24 v2.0.0.preview2.2).each do |rg|
+      # When editing this list, also edit .travis.yml!
+      %w(master 2.0 v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.25 v2.0.6).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(-fs --color)
@@ -147,7 +143,7 @@ begin
 
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task :travis do
-      rg = ENV['RGV'] || 'master'
+      rg = ENV['RGV'] || 'v1.8.24'
 
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
       specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
@@ -178,6 +174,15 @@ begin
     end
   end
 
+rescue LoadError
+  task :spec do
+    abort "Run `rake spec:deps` to be able to run the specs"
+  end
+end
+
+begin
+  require 'ronn'
+
   namespace :man do
     directory "lib/bundler/man"
 
@@ -206,23 +211,13 @@ begin
   end
 
 rescue LoadError
-  task :spec do
-    abort "Run `rake spec:deps` to be able to run the specs"
+  namespace :man do
+    task(:build) { abort "Install the ronn gem to be able to release!" }
+    task(:clean) { abort "Install the ronn gem to be able to release!" }
   end
 end
 
-namespace :vendor do
-  desc "Build the vendor dir"
-  task :build => :clean do
-    sh "git clone git://github.com/wycats/thor.git lib/bundler/vendor/tmp"
-    sh "mv lib/bundler/vendor/tmp/lib/* lib/bundler/vendor/"
-    rm_rf "lib/bundler/vendor/tmp"
-  end
-
-  desc "Clean the vendor dir"
-  task :clean do
-    rm_rf "lib/bundler/vendor"
-  end
-end
+task :build => ["man:clean", "man:build"]
+task :release => ["man:clean", "man:build"]
 
 task :default => :spec

@@ -1,29 +1,36 @@
 require "spec_helper"
 
 describe "bundle outdated" do
-
   before :each do
     build_repo2 do
       build_git "foo", :path => lib_path("foo")
+      build_git "zebra", :path => lib_path("zebra")
     end
 
     install_gemfile <<-G
       source "file://#{gem_repo2}"
-      gem "activesupport", "2.3.5"
+      gem "zebra", :git => "#{lib_path('zebra')}"
       gem "foo", :git => "#{lib_path('foo')}"
+      gem "activesupport", "2.3.5"
     G
   end
 
   describe "with no arguments" do
-    it "returns list of outdated gems" do
+    it "returns a sorted list of outdated gems" do
       update_repo2 do
         build_gem "activesupport", "3.0"
         update_git "foo", :path => lib_path("foo")
+        update_git "zebra", :path => lib_path("zebra")
       end
 
       bundle "outdated"
-      expect(out).to include("activesupport (3.0 > 2.3.5)")
+
+      expect(out).to include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\"")
       expect(out).to include("foo (1.0")
+
+      # Gem names are one per-line, between "*" and their parenthesized version.
+      gem_list = out.split("\n").map { |g| g[ /\* (.*) \(/, 1] }.compact
+      expect(gem_list).to eq(gem_list.sort)
     end
 
     it "returns non zero exit status if outdated gems present" do
@@ -85,7 +92,7 @@ describe "bundle outdated" do
         end
 
         bundle "outdated --pre"
-        expect(out).to include("activesupport (3.0.0.beta > 2.3.5)")
+        expect(out).to include("activesupport (3.0.0.beta > 2.3.5) Gemfile specifies \"= 2.3.5\"")
       end
     end
 
@@ -102,9 +109,8 @@ describe "bundle outdated" do
         G
 
         bundle "outdated"
-        expect(out).to include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1)")
+        expect(out).to include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1) Gemfile specifies \"= 3.0.0.beta.1\"")
       end
     end
   end
-
 end

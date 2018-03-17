@@ -99,6 +99,20 @@ describe "gemcutter's dependency API" do
     should_be_installed("rails 2.3.2")
   end
 
+  it "doesn't fail if you only have a git gem with no deps when using --deployment" do
+    build_git "foo"
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'foo', :git => "file:///#{lib_path('foo-1.0')}"
+    G
+
+    bundle "install", :artifice => "endpoint"
+    bundle "install --deployment", :artifice => "endpoint", :exitstatus => true
+
+    expect(exitstatus).to eq(0)
+    should_be_installed("foo 1.0")
+  end
+
   it "falls back when the API errors out" do
     simulate_platform mswin
 
@@ -108,7 +122,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :fakeweb => "windows"
-    expect(out).to include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
@@ -124,7 +138,7 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint_fallback"
-    expect(out).to include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
 
     should_be_installed(
       "activesupport 2.3.2",
@@ -144,7 +158,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_marshal_fail"
-    expect(out).to include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -216,11 +230,8 @@ describe "gemcutter's dependency API" do
 
     bundle :install, :artifice => "endpoint_extra"
 
-    output = <<-OUTPUT.gsub(/^ +/,'')
-      Fetching gem metadata from http://localgemserver.test/..
-      Fetching gem metadata from http://localgemserver.test/extra/.
-    OUTPUT
-    expect(out).to include(output)
+    expect(out).to include("Fetching gem metadata from http://localgemserver.test/..")
+    expect(out).to include("Fetching source index from http://localgemserver.test/extra")
   end
 
   it "does not fetch every specs if the index of gems is large when doing back deps" do
@@ -230,7 +241,7 @@ describe "gemcutter's dependency API" do
       end
       build_gem "missing"
       # need to hit the limit
-      1.upto(Bundler::Source::Rubygems::FORCE_MODERN_INDEX_LIMIT) do |i|
+      1.upto(Bundler::Source::Rubygems::API_REQUEST_LIMIT) do |i|
         build_gem "gem#{i}"
       end
 
@@ -289,7 +300,7 @@ describe "gemcutter's dependency API" do
     expect(out).to include("Fetching gem metadata from #{source_uri}")
   end
 
-  it "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
+  it "should install when EndpointSpecification has a bin dir owned by root", :sudo => true do
     sudo "mkdir -p #{system_gem_path("bin")}"
     sudo "chown -R root #{system_gem_path("bin")}"
 
@@ -398,6 +409,30 @@ describe "gemcutter's dependency API" do
       bundle :install, :artifice => "endpoint_500"
       expect(out).not_to include("#{user}:#{password}")
     end
+
+    it "does not pass the user / password to different hosts on redirect" do
+      gemfile <<-G
+        source "#{basic_auth_source_uri}"
+        gem "rack"
+      G
+
+      bundle :install, :artifice => "endpoint_creds_diff_host"
+      should_be_installed "rack 1.0.0"
+    end
+
+    describe "with no password" do
+      let(:password) { nil }
+
+      it "passes basic authentication details" do
+        gemfile <<-G
+          source "#{basic_auth_source_uri}"
+          gem "rack"
+        G
+
+        bundle :install, :artifice => "endpoint_basic_authentication"
+        should_be_installed "rack 1.0.0"
+      end
+    end
   end
 
   context "when ruby is compiled without openssl" do
@@ -408,15 +443,7 @@ describe "gemcutter's dependency API" do
       bundled_app("broken_ssl").mkpath
       bundled_app("broken_ssl/openssl.rb").open("w") do |f|
         f.write <<-RUBY
-          $:.delete File.expand_path("..", __FILE__)
-          require 'openssl'
-
-          require 'bundler'
-          class Bundler::Fetcher
-            def fetch(*)
-              raise LoadError, "cannot load such file -- openssl"
-            end
-          end
+          raise LoadError, "cannot load such file -- openssl"
         RUBY
       end
     end
@@ -427,16 +454,35 @@ describe "gemcutter's dependency API" do
         gem "rack"
       G
 
-      bundle :install, :artifice => "endpoint",
-        :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
-      expect(out).to include("Could not load OpenSSL.")
+      bundle :install, :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
+      expect(out).to include("OpenSSL")
+    end
+  end
+
+  context "when SSL certificate verification fails" do
+    it "explains what happened" do
+      # Install a monkeypatch that reproduces the effects of openssl raising
+      # a certificate validation error when Rubygems tries to connect.
+      gemfile <<-G
+        class Net::HTTP
+          def start
+            raise OpenSSL::SSL::SSLError, "certificate verify failed"
+          end
+        end
+
+        source "#{source_uri.gsub(/http/, 'https')}"
+        gem "rack"
+      G
+
+      bundle :install
+      expect(out).to match(/could not verify the SSL certificate/i)
     end
   end
 
   context ".gemrc with sources is present" do
     before do
       File.open(home('.gemrc'), 'w') do |file|
-        file.puts({:sources => ["http://rubygems.org"]}.to_yaml)
+        file.puts({:sources => ["https://rubygems.org"]}.to_yaml)
       end
     end
 
@@ -455,4 +501,5 @@ describe "gemcutter's dependency API" do
       expect(exitstatus).to eq(0)
     end
   end
+
 end

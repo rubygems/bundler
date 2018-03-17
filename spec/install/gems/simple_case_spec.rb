@@ -291,7 +291,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :expect_err => true
-      expect(out).to match(/Your Gemfile has no remote sources/i)
+      expect(out).to match(/Your Gemfile has no gem server sources/i)
     end
 
     it "creates a Gemfile.lock on a blank Gemfile" do
@@ -310,7 +310,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install
-      expect(out).to include("Could not reach http://localhost:9384/")
+      expect(out).to include("Could not fetch specs from http://localhost:9384/")
       expect(out).not_to include("file://")
     end
 
@@ -509,7 +509,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      expect(out).to match(/Your Gemfile has no remote sources/)
+      expect(out).to match(/Your Gemfile has no gem server sources/)
     end
   end
 
@@ -658,6 +658,7 @@ describe "bundle install with gem sources" do
 
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
         Fetching source index from file:#{gem_repo2}/
+        Resolving dependencies...
         Bundler could not find compatible versions for gem "bundler":
           In Gemfile:
             bundler (= 0.9.2) ruby
@@ -715,6 +716,7 @@ describe "bundle install with gem sources" do
 
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
         Fetching source index from file:#{gem_repo2}/
+        Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             activemerchant (>= 0) ruby depends on
@@ -735,6 +737,7 @@ describe "bundle install with gem sources" do
 
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
         Fetching source index from file:#{gem_repo2}/
+        Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             rails_fail (>= 0) ruby depends on
@@ -811,4 +814,22 @@ describe "bundle install with gem sources" do
     end
   end
 
+  it "should use gemspecs in the system cache when available" do
+    gemfile <<-G
+      source "http://localtestserver.gem"
+      gem 'rack'
+    G
+
+    FileUtils.mkdir_p "#{tmp}/gems/system/specifications"
+    File.open("#{tmp}/gems/system/specifications/rack-1.0.0.gemspec", 'w+') do |f|
+      spec = Gem::Specification.new do |s|
+        s.name = 'rack'
+        s.version = '1.0.0'
+        s.add_runtime_dependency 'activesupport', '2.3.2'
+      end
+      f.write spec.to_ruby
+    end
+    bundle :install, :artifice => 'endpoint_marshal_fail' # force gemspec load
+    should_be_installed "activesupport 2.3.2"
+  end
 end

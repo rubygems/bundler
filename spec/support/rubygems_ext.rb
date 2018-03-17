@@ -19,6 +19,7 @@ module Spec
         # 3.0.0 breaks 1.9.2 specs
         `gem install builder --version 2.1.2 --no-rdoc --no-ri`
         `gem install rack --no-rdoc --no-ri`
+        `gem install pry --no-rdoc --no-ri`
       end
 
       ENV['HOME'] = Path.home.to_s

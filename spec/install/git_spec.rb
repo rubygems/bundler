@@ -30,6 +30,23 @@ describe "bundle install with git sources" do
       expect(Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"]).to have(1).item
     end
 
+    it "caches the evaluated gemspec" do
+      git = update_git "foo" do |s|
+        s.executables = ["foobar"] # we added this the first time, so keep it now
+        s.files = ["bin/foobar"] # updating git nukes the files list
+        foospec = s.to_ruby.gsub(/s\.files.*/, 's.files = `git ls-files`.split("\n")')
+        s.write "foo.gemspec", foospec
+      end
+
+      bundle "update foo"
+
+      sha = git.ref_for("master", 11)
+      spec_file = default_bundle_path.join("bundler/gems/foo-1.0-#{sha}/foo.gemspec").to_s
+      ruby_code = Gem::Specification.load(spec_file).to_ruby
+      file_code = File.read(spec_file)
+      expect(file_code).to eq(ruby_code)
+    end
+
     it "does not update the git source implicitly" do
       update_git "foo"
 
@@ -835,6 +852,48 @@ describe "bundle install with git sources" do
         puts FOO
       R
       expect(out).to eq("YES")
+    end
+
+    it "does not prompt to gem install if extension fails" do
+      build_git "foo" do |s|
+        s.add_dependency "rake"
+        s.extensions << "Rakefile"
+        s.write "Rakefile", <<-RUBY
+          task :default do
+            raise
+          end
+        RUBY
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      expect(out).to include("An error occurred while installing foo (1.0)")
+      expect(out).not_to include("gem install foo")
+    end
+  end
+
+  it "ignores git environment variables" do
+    build_git "xxxxxx" do |s|
+      s.executables = "xxxxxxbar"
+    end
+
+    Bundler::SharedHelpers.with_clean_git_env do
+      ENV['GIT_DIR']       = 'bar'
+      ENV['GIT_WORK_TREE'] = 'bar'
+
+      install_gemfile <<-G, :exitstatus => true
+        source "file://#{gem_repo1}"
+        git "#{lib_path('xxxxxx-1.0')}" do
+          gem 'xxxxxx'
+        end
+      G
+
+      expect(exitstatus).to eq(0)
+      expect(ENV['GIT_DIR']).to eq('bar')
+      expect(ENV['GIT_WORK_TREE']).to eq('bar')
     end
   end
 

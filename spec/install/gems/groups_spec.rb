@@ -182,16 +182,6 @@ describe "bundle install with gem sources" do
           should_be_installed "rack 1.0.0", "activesupport 2.3.5"
         end
 
-        it "works when locked as well" do
-          bundle "install --without emo"
-          bundle "lock"
-
-          simulate_new_machine
-
-          bundle "install --without lolercoaster"
-          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
-        end
-
         describe "with a gem defined multiple times in different groups" do
           before :each do
             gemfile <<-G
@@ -253,15 +243,6 @@ describe "bundle install with gem sources" do
           should_be_installed "rack 1.0.0", "activesupport 2.3.5"
         end
 
-        it "works when locked as well" do
-          bundle "install --without emo"
-          bundle "lock"
-
-          simulate_new_machine
-
-          bundle "install --without lolercoaster"
-          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
-        end
       end
     end
   end

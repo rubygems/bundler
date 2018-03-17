@@ -12,6 +12,29 @@ describe "Bundler::GemHelpers#generic" do
 
   it "converts non-windows platforms into ruby" do
     expect(generic(pl('x86-darwin-10'))).to eq(pl('ruby'))
+    expect(generic(pl('ruby'))).to eq(pl('ruby'))
+  end
+
+  it "converts java platform variants into java" do
+    expect(generic(pl('universal-java-17'))).to eq(pl('java'))
+    expect(generic(pl('java'))).to eq(pl('java'))
+  end
+
+  it "converts mswin platform variants into x86-mswin32" do
+    expect(generic(pl('mswin32'))).to eq(pl('x86-mswin32'))
+    expect(generic(pl('i386-mswin32'))).to eq(pl('x86-mswin32'))
+    expect(generic(pl('x86-mswin32'))).to eq(pl('x86-mswin32'))
+  end
+
+  it "converts 32-bit mingw platform variants into x86-mingw32" do
+    expect(generic(pl('mingw32'))).to eq(pl('x86-mingw32'))
+    expect(generic(pl('i386-mingw32'))).to eq(pl('x86-mingw32'))
+    expect(generic(pl('x86-mingw32'))).to eq(pl('x86-mingw32'))
+  end
+
+  it "converts 64-bit mingw platform variants into x64-mingw32" do
+    expect(generic(pl('x64-mingw32'))).to eq(pl('x64-mingw32'))
+    expect(generic(pl('x86_64-mingw32'))).to eq(pl('x64-mingw32'))
   end
 end
 

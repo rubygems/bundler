@@ -47,8 +47,13 @@ class Thor
       #
       def ask(statement, *args)
         options = args.last.is_a?(Hash) ? args.pop : {}
+        color = args.first
 
-        options[:limited_to] ? ask_filtered(statement, options[:limited_to], *args) : ask_simply(statement, *args)
+        if options[:limited_to]
+          ask_filtered(statement, color, options)
+        else
+          ask_simply(statement, color, options)
+        end
       end
 
       # Say (print) something to the user. If the sentence ends with a whitespace
@@ -61,7 +66,7 @@ class Thor
       def say(message="", color=nil, force_new_line=(message.to_s !~ /( |\t)\Z/))
         message = message.to_s
 
-        message = set_color(message, *color) if color
+        message = set_color(message, *color) if color && can_display_colors?
 
         spaces = "  " * padding
 
@@ -226,20 +231,20 @@ class Thor
           answer = ask %[Overwrite #{destination}? (enter "h" for help) #{options}]
 
           case answer
-            when is?(:yes), is?(:force), ""
-              return true
-            when is?(:no), is?(:skip)
-              return false
-            when is?(:always)
-              return @always_force = true
-            when is?(:quit)
-              say 'Aborting...'
-              raise SystemExit
-            when is?(:diff)
-              show_diff(destination, yield) if block_given?
-              say 'Retrying...'
-            else
-              say file_collision_help
+          when is?(:yes), is?(:force), ""
+            return true
+          when is?(:no), is?(:skip)
+            return false
+          when is?(:always)
+            return @always_force = true
+          when is?(:quit)
+            say 'Aborting...'
+            raise SystemExit
+          when is?(:diff)
+            show_diff(destination, yield) if block_given?
+            say 'Retrying...'
+          else
+            say file_collision_help
           end
         end
       end
@@ -274,6 +279,10 @@ class Thor
       end
 
     protected
+
+      def can_display_colors?
+        false
+      end
 
       def lookup_color(color)
         return color unless color.is_a?(Symbol)
@@ -368,17 +377,30 @@ HELP
         end
       end
 
-      def ask_simply(statement, color=nil)
-        say("#{statement} ", color)
-        stdin.gets.tap{|text| text.strip! if text}
+      def ask_simply(statement, color, options)
+        default = options[:default]
+        message = [statement, ("(#{default})" if default), nil].uniq.join(" ")
+        say(message, color)
+        result = stdin.gets
+
+        return unless result
+
+        result.strip!
+
+        if default && result == ""
+          default
+        else
+          result
+        end
       end
 
-      def ask_filtered(statement, answer_set, *args)
+      def ask_filtered(statement, color, options)
+        answer_set = options[:limited_to]
         correct_answer = nil
         until correct_answer
-          answer = ask_simply("#{statement} #{answer_set.inspect}", *args)
+          answers = answer_set.join(", ")
+          answer = ask_simply("#{statement} [#{answers}]", color, options)
           correct_answer = answer_set.include?(answer) ? answer : nil
-          answers = answer_set.map(&:inspect).join(", ")
           say("Your response must be one of: [#{answers}]. Please try again.") unless correct_answer
         end
         correct_answer

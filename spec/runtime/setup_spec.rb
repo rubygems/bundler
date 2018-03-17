@@ -46,6 +46,19 @@ describe "Bundler.setup" do
       expect(out).to eq("WIN")
     end
 
+    it "accepts string for group name" do
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup(:default, 'test')
+
+        require 'rack'
+        puts RACK
+      RUBY
+      expect(err).to eq("")
+      expect(out).to eq("1.0.0")
+    end
+
     it "leaves all groups available if they were already" do
       ruby <<-RUBY
         require 'rubygems'
@@ -301,7 +314,7 @@ describe "Bundler.setup" do
 
     it "provides a useful exception when the git repo is not checked out yet" do
       run "1", :expect_err => true
-      expect(err).to include("#{lib_path('rack-1.0.0')} (at master) is not checked out. Please run `bundle install`")
+      expect(err).to match(/the git source #{lib_path('rack-1.0.0')} is not yet checked out. Please run `bundle install`/i)
     end
 
     it "does not hit the git binary if the lockfile is available and up to date" do
@@ -537,7 +550,7 @@ describe "Bundler.setup" do
           end
         R
 
-        expect(out).to eq("You have already activated thin 1.1, but your Gemfile requires thin 1.0. Using bundle exec may solve this.")
+        expect(out).to eq("You have already activated thin 1.1, but your Gemfile requires thin 1.0. Prepending `bundle exec` to your command may solve this.")
       end
 
       it "version_requirement is now deprecated in rubygems 1.4.0+" do
@@ -806,7 +819,7 @@ describe "Bundler.setup" do
         s.write "bar.gemspec", "require 'foobarbaz'"
       end
       bundle :install
-      expect(out).to include("was a LoadError while evaluating bar.gemspec")
+      expect(out).to include("was a LoadError while loading bar.gemspec")
       expect(out).to include("foobarbaz")
       expect(out).to include("bar.gemspec:1")
       expect(out).to include("try to require a relative path") if RUBY_VERSION >= "1.9"

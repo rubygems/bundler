@@ -39,6 +39,7 @@ class Thor
     # config<Hash>:: give :verbose => false to not log the status.
     #                If :recursive => false, does not look for paths recursively.
     #                If :mode => :preserve, preserve the file mode from the source.
+    #                If :exclude_pattern => /regexp/, prevents copying files that match that regexp.
     #
     # ==== Examples
     #
@@ -74,23 +75,42 @@ class Thor
         def execute!
           lookup = Util.escape_globs(source)
           lookup = config[:recursive] ? File.join(lookup, '**') : lookup
-          lookup = File.join(lookup, '{*,.[a-z]*}')
+          lookup = file_level_lookup(lookup)
 
-          Dir[lookup].sort.each do |file_source|
+          files(lookup).sort.each do |file_source|
             next if File.directory?(file_source)
+            next if config[:exclude_pattern] && file_source.match(config[:exclude_pattern])
             file_destination = File.join(given_destination, file_source.gsub(source, '.'))
             file_destination.gsub!('/./', '/')
 
             case file_source
-              when /\.empty_directory$/
-                dirname = File.dirname(file_destination).gsub(/\/\.$/, '')
-                next if dirname == given_destination
-                base.empty_directory(dirname, config)
-              when /\.tt$/
-                destination = base.template(file_source, file_destination[0..-4], config, &@block)
-              else
-                destination = base.copy_file(file_source, file_destination, config, &@block)
+            when /\.empty_directory$/
+              dirname = File.dirname(file_destination).gsub(/\/\.$/, '')
+              next if dirname == given_destination
+              base.empty_directory(dirname, config)
+            when /\.tt$/
+              destination = base.template(file_source, file_destination[0..-4], config, &@block)
+            else
+              destination = base.copy_file(file_source, file_destination, config, &@block)
             end
+          end
+        end
+
+        if RUBY_VERSION < '2.0'
+          def file_level_lookup(previous_lookup)
+            File.join(previous_lookup, '{*,.[a-z]*}')
+          end
+
+          def files(lookup)
+            Dir[lookup]
+          end
+        else
+          def file_level_lookup(previous_lookup)
+            File.join(previous_lookup, '*')
+          end
+
+          def files(lookup)
+            Dir.glob(lookup, File::FNM_DOTMATCH)
           end
         end
 

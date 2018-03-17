@@ -21,7 +21,7 @@ describe "bundle inject" do
       bundle "install"
     end
 
-    it "adds the injected gems to the gemfile" do
+    it "adds the injected gems to the Gemfile" do
       expect(bundled_app("Gemfile").read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
       expect(bundled_app("Gemfile").read).to match(/rack-obama/)

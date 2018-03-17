@@ -1,7 +1,26 @@
 require 'rubygems'
+# rubygems master requires UI for ConfigFile but doesn't require it
+require 'rubygems/user_interaction'
+require 'rubygems/config_file'
 
 module Bundler
   class RubygemsIntegration
+
+    def self.version
+      @version ||= Gem::Version.new(Gem::VERSION)
+    end
+
+    def self.provides?(req_str)
+      Gem::Requirement.new(req_str).satisfied_by?(version)
+    end
+
+    def version
+      self.class.version
+    end
+
+    def provides?(req_str)
+      self.class.provides?(req_str)
+    end
 
     def build_args
       Gem::Command.build_args
@@ -29,6 +48,10 @@ module Bundler
 
     def configuration
       Gem.configuration
+    rescue Gem::SystemExitException => e
+      Bundler.ui.error "#{e.class}: #{e.message}"
+      Bundler.ui.trace e
+      raise Gem::SystemExitException
     end
 
     def ruby_engine
@@ -72,6 +95,14 @@ module Bundler
       Gem.path
     end
 
+    def spec_cache_dirs
+      @spec_cache_dirs ||= begin
+        dirs = gem_path.map {|dir| File.join(dir, 'specifications')}
+        dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in Rubygems 2.0.3 or earlier
+        dirs.uniq.select {|dir| File.directory? dir}
+      end
+    end
+
     def marshal_spec_dir
       Gem::MARSHAL_SPEC_DIR
     end
@@ -84,10 +115,6 @@ module Bundler
       Gem.bin_path(gem, bin, ver)
     end
 
-    def refresh
-      Gem.refresh
-    end
-
     def preserve_paths
       # this is a no-op outside of Rubygems 1.8
       yield
@@ -98,21 +125,22 @@ module Bundler
     end
 
     def fetch_specs(all, pre, &blk)
-      Gem::SpecFetcher.new.list(all, pre).each(&blk)
+      specs = Gem::SpecFetcher.new.list(all, pre)
+      specs.each { yield } if block_given?
+      specs
+    end
+
+    def fetch_prerelease_specs
+      fetch_specs(false, true)
+    rescue Gem::RemoteFetcher::FetchError
+      [] # if we can't download them, there aren't any
     end
 
     def fetch_all_remote_specs
-      spec_list = Hash.new { |h,k| h[k] = [] }
-      begin
-        # Fetch all specs, minus prerelease specs
-        spec_list = Gem::SpecFetcher.new.list(true, false)
-        # Then fetch the prerelease specs
-        begin
-          Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
-        rescue Gem::RemoteFetcher::FetchError
-          # ignore if we can't fetch the prerelease specs
-        end
-      end
+      # Fetch all specs, minus prerelease specs
+      spec_list = fetch_specs(true, false)
+      # Then fetch the prerelease specs
+      fetch_prerelease_specs.each {|k, v| spec_list[k] += v }
 
       return spec_list
     end
@@ -127,11 +155,26 @@ module Bundler
       end
     end
 
-    def spec_from_gem(path)
+    def gem_from_path(path, policy = nil)
       require 'rubygems/format'
-      Gem::Format.from_file_by_path(path).spec
+      Gem::Format.from_file_by_path(path, policy)
+    end
+
+    def spec_from_gem(path, policy = nil)
+      require 'rubygems/security'
+      gem_from_path(path, Gem::Security::Policies[policy]).spec
     rescue Gem::Package::FormatError
-      raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
+      raise GemspecError, "Could not read gem at #{path}. It may be corrupted."
+    rescue Exception, Gem::Exception, Gem::Security::Exception => e
+      if e.is_a?(Gem::Security::Exception) ||
+          e.message =~ /unknown trust policy|unsigned gem/i ||
+          e.message =~ /couldn't verify (meta)?data signature/i
+        raise SecurityError,
+          "The gem #{File.basename(path, '.gem')} can't be installed because " \
+          "the security policy didn't allow it, with the message: #{e.message}"
+      else
+        raise e
+      end
     end
 
     def build(spec)
@@ -140,11 +183,20 @@ module Bundler
     end
 
     def build_gem(gem_dir, spec)
-      Dir.chdir(gem_dir) { build(spec) }
+      SharedHelpers.chdir(gem_dir) { build(spec) }
     end
 
     def download_gem(spec, uri, path)
       Gem::RemoteFetcher.fetcher.download(spec, uri, path)
+    end
+
+    def security_policies
+      @security_policies ||= begin
+        require 'rubygems/security'
+        Gem::Security::Policies
+      rescue LoadError, NameError
+        {}
+      end
     end
 
     def reverse_rubygems_kernel_mixin
@@ -405,8 +457,6 @@ module Bundler
 
     # Rubygems 2.0
     class Future < RubygemsIntegration
-      require 'rubygems/package'
-
       def stub_rubygems(specs)
         Gem::Specification.all = specs
 
@@ -423,30 +473,40 @@ module Bundler
         Gem::Specification.find_all_by_name name
       end
 
-      def fetch_all_remote_specs
-        fetched, errors = Gem::SpecFetcher.new.available_specs(:complete)
-        # only raise if we don't get any specs back.
-        # this means we still work if prerelease_specs.4.8.gz
-        # don't exist but specs.4.8.gz do
-        if fetched.empty? && error = errors.detect {|e| e.is_a?(Gem::SourceFetchProblem) }
-          raise Gem::RemoteFetcher::FetchError.new(error.error, error.source)
-        end
+      def fetch_specs(source, name)
+        path = source + "#{name}.#{Gem.marshal_version}.gz"
+        string = Gem::RemoteFetcher.fetcher.fetch_path(path)
+        Bundler.load_marshal(string)
+      rescue Gem::RemoteFetcher::FetchError => e
+        # it's okay for prerelease to fail
+        raise e unless name == "prerelease_specs"
+      end
 
+      def fetch_all_remote_specs
+        # Since SpecFetcher now returns NameTuples, we just fetch directly
+        # and unmarshal the array ourselves.
         hash = {}
-        fetched.each do |source, tuples|
-          hash[source.uri] = tuples.map { |tuple| tuple.to_a }
+
+        Gem.sources.each do |source|
+          source = URI.parse(source.to_s) unless source.is_a?(URI)
+          hash[source] = fetch_specs(source, "specs")
+
+          pres = fetch_specs(source, "prerelease_specs")
+          hash[source].push(*pres) if pres && !pres.empty?
         end
 
         hash
       end
 
-      def spec_from_gem(path)
-        Gem::Package.new(path).spec
-      rescue Gem::Package::FormatError
-        raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
+      def gem_from_path(path, policy = nil)
+        require 'rubygems/package'
+        p = Gem::Package.new(path)
+        p.security_policy = policy if policy
+        return p
       end
 
       def build(spec)
+        require 'rubygems/package'
         Gem::Package.build(spec)
       end
 
@@ -454,15 +514,15 @@ module Bundler
 
   end
 
-  if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.99.99')
+  if RubygemsIntegration.provides?(">= 1.99.99")
     @rubygems = RubygemsIntegration::Future.new
-  elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.8.5')
+  elsif RubygemsIntegration.provides?('>= 1.8.5')
     @rubygems = RubygemsIntegration::Modern.new
-  elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.8.0')
+  elsif RubygemsIntegration.provides?('>= 1.8.0')
     @rubygems = RubygemsIntegration::AlmostModern.new
-  elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.7.0')
+  elsif RubygemsIntegration.provides?('>= 1.7.0')
     @rubygems = RubygemsIntegration::Transitional.new
-  elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.4.0')
+  elsif RubygemsIntegration.provides?('>= 1.4.0')
     @rubygems = RubygemsIntegration::Legacy.new
   else # Rubygems 1.3.6 and 1.3.7
     @rubygems = RubygemsIntegration::Ancient.new

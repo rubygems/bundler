@@ -118,7 +118,6 @@ module Bundler
       end
 
       def g
-        require 'graphviz'
         @g ||= ::GraphViz.digraph(@graph_name, {:concentrate => true, :normalize => true, :nodesep => 0.55}) do |g|
           g.edge[:weight]   = 2
           g.edge[:fontname] = g.node[:fontname] = 'Arial, Helvetica, SansSerif'
