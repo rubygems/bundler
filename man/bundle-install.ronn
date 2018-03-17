@@ -9,8 +9,10 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--local] [--deployment]
                  [--binstubs[=DIRECTORY]]
                  [--standalone[=GROUP1[ GROUP2...]]]
-                 [--quiet]
+                 [--trust-policy=POLICY]
+                 [--jobs=SIZE]
                  [--no-cache]
+                 [--quiet]
 
 ## DESCRIPTION
 
@@ -58,7 +60,7 @@ update process below under [CONSERVATIVE UPDATING][].
   Do not attempt to connect to `rubygems.org`, instead using just
   the gems already present in Rubygems' cache or in `vendor/cache`.
   Note that if a more appropriate platform-specific gem exists on
-  `rubygems.org`, it will not be found.
+  `rubygems.org`, it will not be found. This option implies `--no-cache`.
 
 * `--deployment`:
   Switches bundler's defaults into [deployment mode][DEPLOYMENT MODE].
@@ -82,10 +84,22 @@ update process below under [CONSERVATIVE UPDATING][].
   `bundle` directory and installs the bundle there. It also generates
   a `bundle/bundler/setup.rb` file to replace Bundler's own setup.
 
+* `--trust-policy=[<policy>]`:
+  Apply the Rubygems security policy named <policy>, where policy is one of
+  HighSecurity, MediumSecurity, LowSecurity, or NoSecurity. For more detail,
+  see the Rubygems signing documentation, linked below in [SEE ALSO][].
+
+* `--jobs=[<size>]`:
+  Install gems parallely by starting <size> number of parallel workers.
+
 * `--no-cache`:
   Do not update the cache in `vendor/cache` with the newly bundled gems. This
   does not remove any existing cached gems, only stops the newly bundled gems
   from being cached during the install.
+
+* `--quiet`:
+  Do not print progress information to stdout. Instead, communicate the
+  success of the install operation via exit status code.
 
 ## DEPLOYMENT MODE
 
@@ -182,7 +196,7 @@ third-party code being used in different environments.`
 
 For a simple illustration, consider the following Gemfile(5):
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "sinatra"
 
@@ -278,7 +292,7 @@ same versions of all dependencies as it used before the update.
 
 Let's take a look at an example. Here's your original Gemfile(5):
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "actionpack", "2.3.8"
     gem "activemerchant"
@@ -294,7 +308,7 @@ gems in your Gemfile(5).
 
 Next, you modify your Gemfile(5) to:
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "actionpack", "3.0.0.rc"
     gem "activemerchant"
@@ -311,7 +325,7 @@ evaluates the gems currently being used to satisfy its requirements:
     also used to satisfy a dependency in `activemerchant`,
     which is not being updated
   * `rack ~> 1.1.0`:
-    not currently being used to satify another dependency
+    not currently being used to satisfy another dependency
 
 Because you did not explicitly ask to update `activemerchant`,
 you would not expect it to suddenly stop working after updating
@@ -333,3 +347,8 @@ which other gems in the Gemfile(5) still depend on, run
 should first try to run `bundle install`, which will guarantee that no
 other gems in the Gemfile(5) are impacted by the change. If that
 does not work, run [bundle update(1)][bundle-update].
+
+## SEE ALSO
+
+* Gem install docs: http://docs.rubygems.org/read/chapter/2
+* Rubygems signing docs: http://docs.rubygems.org/read/chapter/21

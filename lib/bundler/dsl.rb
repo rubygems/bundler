@@ -2,15 +2,12 @@ require 'bundler/dependency'
 
 module Bundler
   class Dsl
+    include RubyDsl
+
     def self.evaluate(gemfile, lockfile, unlock)
       builder = new
       builder.eval_gemfile(gemfile)
       builder.to_definition(lockfile, unlock)
-    rescue ScriptError, RegexpError, NameError, ArgumentError => e
-      e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
-      Bundler.ui.info e.backtrace.join("\n       ")
-      raise GemfileError, "There was an error in your Gemfile," \
-        " and Bundler cannot continue."
     end
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
@@ -28,19 +25,26 @@ module Bundler
       @ruby_version    = nil
     end
 
-    def eval_gemfile(gemfile)
-      instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+    def eval_gemfile(gemfile, contents = nil)
+      contents ||= Bundler.read_file(gemfile.to_s)
+      instance_eval(contents, gemfile.to_s, 1)
     rescue SyntaxError => e
       bt = e.message.split("\n")[1..-1]
       raise GemfileError, ["Gemfile syntax error:", *bt].join("\n")
+    rescue ScriptError, RegexpError, NameError, ArgumentError => e
+      e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
+      Bundler.ui.warn e.backtrace.join("\n       ")
+      raise GemfileError, "There was an error in your Gemfile," \
+        " and Bundler cannot continue."
     end
 
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
       name              = opts && opts[:name] || '{,*}'
       development_group = opts && opts[:development_group] || :development
-      path              = File.expand_path(path, Bundler.default_gemfile.dirname)
-      gemspecs = Dir[File.join(path, "#{name}.gemspec")]
+      expanded_path     = File.expand_path(path, Bundler.default_gemfile.dirname)
+
+      gemspecs = Dir[File.join(expanded_path, "#{name}.gemspec")]
 
       case gemspecs.size
       when 1
@@ -53,9 +57,9 @@ module Bundler
           end
         end
       when 0
-        raise InvalidOption, "There are no gemspecs at #{path}."
+        raise InvalidOption, "There are no gemspecs at #{expanded_path}."
       else
-        raise InvalidOption, "There are multiple gemspecs at #{path}. Please use the :name option to specify which one."
+        raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. Please use the :name option to specify which one."
       end
     end
 
@@ -64,8 +68,8 @@ module Bundler
         raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
       end
 
-      options = Hash === args.last ? args.pop : {}
-      version = args || [">= 0"]
+      options = Hash === args.last ? args.pop.dup : {}
+      version = args
 
       _normalize_options(name, version, options)
 
@@ -79,9 +83,9 @@ module Bundler
           elsif dep.type == :development
             return
           else
-            raise DslError, "You cannot specify the same gem twice with different version requirements. " \
+            raise GemfileError, "You cannot specify the same gem twice with different version requirements. \n" \
                             "You specified: #{current.name} (#{current.requirement}) and " \
-                            "#{dep.name} (#{dep.requirement})"
+                            "#{dep.name} (#{dep.requirement})\n"
           end
         end
 
@@ -91,9 +95,9 @@ module Bundler
           elsif dep.type == :development
             return
           else
-            raise DslError, "You cannot specify the same gem twice coming from different sources. You " \
-                            "specified that #{dep.name} (#{dep.requirement}) should come from " \
-                            "#{current.source || 'an unspecified source'} and #{dep.source}"
+            raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
+                            "You specified that #{dep.name} (#{dep.requirement}) should come from " \
+                            "#{current.source || 'an unspecified source'} and #{dep.source}\n"
           end
         end
       end
@@ -173,14 +177,6 @@ module Bundler
       @env = old
     end
 
-    def ruby(ruby_version, options = {})
-      raise GemfileError, "Please define :engine_version" if options[:engine] && options[:engine_version].nil?
-      raise GemfileError, "Please define :engine" if options[:engine_version] && options[:engine].nil?
-
-      raise GemfileError, "ruby_version must match the :engine_version for MRI" if options[:engine] == "ruby" && options[:engine_version] && ruby_version != options[:engine_version]
-      @ruby_version = RubyVersion.new(ruby_version, options[:engine], options[:engine_version])
-    end
-
     def method_missing(name, *args)
       location = caller[0].split(':')[0..1].join(':')
       raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile\n" \
@@ -203,7 +199,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      valid_keys = %w(group groups git github path name branch ref tag require submodules platform platforms type)
+      valid_keys = %w(group groups git gist github path name branch ref tag require submodules platform platforms type)
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
         plural = invalid_keys.size > 1
@@ -229,12 +225,16 @@ module Bundler
       platforms.map! { |p| p.to_sym }
       platforms.each do |p|
         next if VALID_PLATFORMS.include?(p)
-        raise DslError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
+        raise GemfileError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
       end
 
       if github = opts.delete("github")
         github = "#{github}/#{github}" unless github.include?("/")
         opts["git"] = "git://github.com/#{github}.git"
+      end
+
+      if gist = opts.delete("gist")
+        opts["git"] = "https://gist.github.com/#{gist}.git"
       end
 
       ["git", "path"].each do |type|

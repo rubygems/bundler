@@ -30,7 +30,7 @@ based on the latest versions of all gems available in the sources.
 
 Consider the following Gemfile(5):
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "rails", "3.0.0.rc"
     gem "nokogiri"
@@ -38,7 +38,7 @@ Consider the following Gemfile(5):
 When you run [bundle install(1)][bundle-install] the first time, bundler will resolve
 all of the dependencies, all the way down, and install what you need:
 
-    Fetching source index for http://rubygems.org/
+    Fetching source index for https://rubygems.org/
     Installing rake (10.0.2)
     Installing abstract (1.0.0)
     Installing activesupport (3.0.0.rc)
@@ -103,7 +103,7 @@ Sometimes, multiple gems declared in your Gemfile(5) are satisfied by the same
 second-level dependency. For instance, consider the case of `thin` and
 `rack-perftools-profiler`.
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "thin"
     gem "rack-perftools-profiler"
@@ -111,7 +111,7 @@ second-level dependency. For instance, consider the case of `thin` and
 The `thin` gem depends on `rack >= 1.0`, while `rack-perftools-profiler` depends
 on `rack ~> 1.0`. If you run bundle install, you get:
 
-    Fetching source index for http://rubygems.org/
+    Fetching source index for https://rubygems.org/
     Installing daemons (1.1.0)
     Installing eventmachine (0.12.10) with native extensions
     Installing open4 (1.0.1)

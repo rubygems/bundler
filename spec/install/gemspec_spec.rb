@@ -62,7 +62,7 @@ describe "bundle install from an existing gemspec" do
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}'
     G
-    error.should match(/There are no gemspecs at #{tmp.join('foo')}/)
+    expect(error).to match(/There are no gemspecs at #{tmp.join('foo')}/)
   end
 
   it "should raise if there are too many gemspecs available" do
@@ -74,7 +74,7 @@ describe "bundle install from an existing gemspec" do
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}'
     G
-    error.should match(/There are multiple gemspecs at #{tmp.join('foo')}/)
+    expect(error).to match(/There are multiple gemspecs at #{tmp.join('foo')}/)
   end
 
   it "should pick a specific gemspec" do
@@ -125,9 +125,9 @@ describe "bundle install from an existing gemspec" do
       # doesn't change. Exit codes should be used correctly (they can be more
       # than just 0 and 1).
       output = bundle("install --deployment")
-      output.should_not match(/You have added to the Gemfile/)
-      output.should_not match(/You have deleted from the Gemfile/)
-      output.should_not match(/install in deployment mode after changing/)
+      expect(output).not_to match(/You have added to the Gemfile/)
+      expect(output).not_to match(/You have deleted from the Gemfile/)
+      expect(output).not_to match(/install in deployment mode after changing/)
     end
   end
 
@@ -140,7 +140,7 @@ describe "bundle install from an existing gemspec" do
     install_gemfile <<-G, :expect_err => true
       gemspec :path => '#{tmp.join("foo")}'
     G
-    @err.should_not match(/ahh/)
+    expect(@err).not_to match(/ahh/)
   end
 
   context "when child gemspecs conflict with a released gemspec" do

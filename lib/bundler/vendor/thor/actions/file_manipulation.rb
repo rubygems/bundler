@@ -10,7 +10,9 @@ class Thor
     # ==== Parameters
     # source<String>:: the relative path to the source root.
     # destination<String>:: the relative path to the destination root.
-    # config<Hash>:: give :verbose => false to not log the status.
+    # config<Hash>:: give :verbose => false to not log the status, and
+    #                :mode => :preserve, to preserve the file mode from the source.
+
     #
     # ==== Examples
     #
@@ -27,6 +29,10 @@ class Thor
         content = File.binread(source)
         content = block.call(content) if block
         content
+      end
+      if config[:mode] == :preserve
+        mode = File.stat(source).mode
+        chmod(destination, mode, config)
       end
     end
 
@@ -123,7 +129,7 @@ class Thor
     #
     # ==== Example
     #
-    #   chmod "script/*", 0755
+    #   chmod "script/server", 0755
     #
     def chmod(path, mode, config={})
       return unless behavior == :invoke
@@ -245,7 +251,7 @@ class Thor
     def uncomment_lines(path, flag, *args)
       flag = flag.respond_to?(:source) ? flag.source : flag
 
-      gsub_file(path, /^(\s*)#\s*(.*#{flag})/, '\1\2', *args)
+      gsub_file(path, /^(\s*)#[[:blank:]]*(.*#{flag})/, '\1\2', *args)
     end
 
     # Comment all lines matching a given regex.  It will leave the space
@@ -287,8 +293,11 @@ class Thor
     end
     alias :remove_dir :remove_file
 
+  attr_accessor :output_buffer
+  private :output_buffer, :output_buffer=
+
   private
-    attr_accessor :output_buffer
+
     def concat(string)
       @output_buffer.concat(string)
     end

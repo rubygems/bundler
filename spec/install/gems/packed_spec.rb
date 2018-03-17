@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe "bundle install with gem sources" do
   describe "when cached and locked" do
-    it "does not hit the remote at all" do
+    it "does not hit the remote at all if --local is passed" do
       build_repo2
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -14,10 +14,11 @@ describe "bundle install with gem sources" do
       FileUtils.rm_rf gem_repo2
 
       bundle "install --local"
+      expect(out).not_to include("Updating files in vendor/cache")
       should_be_installed "rack 1.0.0"
     end
 
-    it "does not hit the remote at all" do
+    it "does not hit the remote at all if --deployment is passed" do
       build_repo2
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -29,6 +30,7 @@ describe "bundle install with gem sources" do
       FileUtils.rm_rf gem_repo2
 
       bundle "install --deployment"
+      expect(out).not_to include("Updating files in vendor/cache")
       should_be_installed "rack 1.0.0"
     end
 
@@ -44,7 +46,7 @@ describe "bundle install with gem sources" do
       end
 
       bundle :install
-      err.should be_empty
+      expect(err).to be_empty
       should_be_installed "rack 1.0"
     end
 
@@ -65,7 +67,7 @@ describe "bundle install with gem sources" do
           gem "platform_specific"
         G
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 RUBY"
+        expect(out).to eq("1.0.0 RUBY")
       end
     end
 
@@ -75,10 +77,10 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
       bundled_app("vendor/cache").mkpath
-      bundled_app("vendor/cache").children.should be_empty
+      expect(bundled_app("vendor/cache").children).to be_empty
 
       bundle "install --no-cache"
-      bundled_app("vendor/cache").children.should be_empty
+      expect(bundled_app("vendor/cache").children).to be_empty
     end
   end
 end

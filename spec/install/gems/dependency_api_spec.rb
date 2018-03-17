@@ -10,7 +10,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching gem metadata from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -21,7 +21,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Could not find gem ' sinatra")
+    expect(out).to include("Could not find gem ' sinatra")
   end
 
   it "should handle nested dependencies" do
@@ -31,7 +31,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching gem metadata from #{source_uri}/...")
+    expect(out).to include("Fetching gem metadata from #{source_uri}/...")
     should_be_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
@@ -59,7 +59,7 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint"
 
     bundle "install --deployment", :artifice => "endpoint"
-    out.should include("Fetching gem metadata from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -99,6 +99,20 @@ describe "gemcutter's dependency API" do
     should_be_installed("rails 2.3.2")
   end
 
+  it "doesn't fail if you only have a git gem with no deps when using --deployment" do
+    build_git "foo"
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'foo', :git => "file:///#{lib_path('foo-1.0')}"
+    G
+
+    bundle "install", :artifice => "endpoint"
+    bundle "install --deployment", :artifice => "endpoint", :exitstatus => true
+
+    expect(exitstatus).to eq(0)
+    should_be_installed("foo 1.0")
+  end
+
   it "falls back when the API errors out" do
     simulate_platform mswin
 
@@ -108,7 +122,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :fakeweb => "windows"
-    out.should include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
@@ -124,7 +138,7 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint_fallback"
-    out.should include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
 
     should_be_installed(
       "activesupport 2.3.2",
@@ -144,7 +158,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_marshal_fail"
-    out.should include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -155,56 +169,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_redirect"
-    out.should match(/Too many redirects/)
-  end
-
-  context "when Gemcutter API takes too long to respond" do
-    before do
-      # need to hack, so we can require rack
-      old_gem_home = ENV['GEM_HOME']
-      ENV['GEM_HOME'] = Spec::Path.base_system_gems.to_s
-      require 'rack'
-      ENV['GEM_HOME'] = old_gem_home
-
-      port = 21453
-      port += 1 while TCPSocket.new("127.0.0.1", port) rescue false
-      @server_uri = "http://127.0.0.1:#{port}"
-
-      require File.expand_path('../../../support/artifice/endpoint_timeout', __FILE__)
-      require 'thread'
-      @t = Thread.new {
-        server = Rack::Server.start(:app       => EndpointTimeout,
-                                    :Host      => '0.0.0.0',
-                                    :Port      => port,
-                                    :server    => 'webrick',
-                                    :AccessLog => [])
-        server.start
-      }
-      @t.run
-
-      # ensure server is started
-      require 'timeout'
-      Timeout.timeout(15) { sleep(0.1) until @t.status == "sleep" }
-    end
-
-    after do
-      @t.kill
-    end
-
-    it "times out and falls back on the modern index" do
-      gemfile <<-G
-        source "#{@server_uri}"
-        gem "rack"
-
-        old_v, $VERBOSE = $VERBOSE, nil
-        Bundler::Fetcher::API_TIMEOUT = 1
-        $VERBOSE = old_v
-      G
-
-      bundle :install
-      expect(out).to include("\nFetching full source index from #{@server_uri}")
-      should_be_installed "rack 1.0.0"
-    end
+    expect(out).to match(/Too many redirects/)
   end
 
   context "when --full-index is specified" do
@@ -215,7 +180,7 @@ describe "gemcutter's dependency API" do
       G
 
       bundle "install --full-index", :artifice => "endpoint"
-      out.should include("Fetching source index from #{source_uri}")
+      expect(out).to include("Fetching source index from #{source_uri}")
       should_be_installed "rack 1.0.0"
     end
 
@@ -226,7 +191,7 @@ describe "gemcutter's dependency API" do
       G
 
       bundle "update --full-index", :artifice => "endpoint"
-      out.should include("Fetching source index from #{source_uri}")
+      expect(out).to include("Fetching source index from #{source_uri}")
       should_be_installed "rack 1.0.0"
     end
   end
@@ -265,11 +230,8 @@ describe "gemcutter's dependency API" do
 
     bundle :install, :artifice => "endpoint_extra"
 
-    output = <<OUTPUT
-Fetching gem metadata from http://localgemserver.test/..
-Fetching gem metadata from http://localgemserver.test/extra/.
-OUTPUT
-    out.should include(output)
+    expect(out).to include("Fetching gem metadata from http://localgemserver.test/..")
+    expect(out).to include("Fetching source index from http://localgemserver.test/extra")
   end
 
   it "does not fetch every specs if the index of gems is large when doing back deps" do
@@ -279,7 +241,7 @@ OUTPUT
       end
       build_gem "missing"
       # need to hit the limit
-      1.upto(Bundler::Source::Rubygems::FORCE_MODERN_INDEX_LIMIT) do |i|
+      1.upto(Bundler::Source::Rubygems::API_REQUEST_LIMIT) do |i|
         build_gem "gem#{i}"
       end
 
@@ -335,10 +297,10 @@ OUTPUT
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching gem metadata from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
   end
 
-  fit "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
+  it "should install when EndpointSpecification has a bin dir owned by root", :sudo => true do
     sudo "mkdir -p #{system_gem_path("bin")}"
     sudo "chown -R root #{system_gem_path("bin")}"
 
@@ -347,7 +309,6 @@ OUTPUT
       gem "rails"
     G
     bundle :install, :artifice => "endpoint"
-    puts out, err
     should_be_installed "rails 2.3.2"
   end
 
@@ -360,7 +321,7 @@ OUTPUT
     bundle "install --binstubs", :artifice => "endpoint"
 
     gembin "rackup"
-    out.should == "1.0.0"
+    expect(out).to eq("1.0.0")
   end
 
   it "installs the bins when using --path and uses autoclean" do
@@ -371,7 +332,7 @@ OUTPUT
 
     bundle "install --path vendor/bundle", :artifice => "endpoint"
 
-    vendored_gems("bin/rackup").should exist
+    expect(vendored_gems("bin/rackup")).to exist
   end
 
   it "installs the bins when using --path and uses bundle clean" do
@@ -382,7 +343,7 @@ OUTPUT
 
     bundle "install --path vendor/bundle --no-clean", :artifice => "endpoint"
 
-    vendored_gems("bin/rackup").should exist
+    expect(vendored_gems("bin/rackup")).to exist
   end
 
   it "prints post_install_messages" do
@@ -392,7 +353,7 @@ OUTPUT
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Post-install message from rack:")
+    expect(out).to include("Post-install message from rack:")
   end
 
   it "should display the post install message for a dependency" do
@@ -402,8 +363,8 @@ OUTPUT
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Post-install message from rack:")
-    out.should include("Rack's post install message")
+    expect(out).to include("Post-install message from rack:")
+    expect(out).to include("Rack's post install message")
   end
 
   context "when using basic authentication" do
@@ -424,7 +385,7 @@ OUTPUT
       G
 
       bundle :install, :artifice => "endpoint_basic_authentication"
-      out.should_not include("#{user}:#{password}")
+      expect(out).not_to include("#{user}:#{password}")
       should_be_installed "rack 1.0.0"
     end
 
@@ -435,7 +396,7 @@ OUTPUT
       G
 
       bundle :install, :artifice => "endopint_marshal_fail_basic_authentication"
-      out.should_not include("#{user}:#{password}")
+      expect(out).not_to include("#{user}:#{password}")
       should_be_installed "rack 1.0.0"
     end
 
@@ -446,7 +407,31 @@ OUTPUT
       G
 
       bundle :install, :artifice => "endpoint_500"
-      out.should_not include("#{user}:#{password}")
+      expect(out).not_to include("#{user}:#{password}")
+    end
+
+    it "does not pass the user / password to different hosts on redirect" do
+      gemfile <<-G
+        source "#{basic_auth_source_uri}"
+        gem "rack"
+      G
+
+      bundle :install, :artifice => "endpoint_creds_diff_host"
+      should_be_installed "rack 1.0.0"
+    end
+
+    describe "with no password" do
+      let(:password) { nil }
+
+      it "passes basic authentication details" do
+        gemfile <<-G
+          source "#{basic_auth_source_uri}"
+          gem "rack"
+        G
+
+        bundle :install, :artifice => "endpoint_basic_authentication"
+        should_be_installed "rack 1.0.0"
+      end
     end
   end
 
@@ -458,15 +443,7 @@ OUTPUT
       bundled_app("broken_ssl").mkpath
       bundled_app("broken_ssl/openssl.rb").open("w") do |f|
         f.write <<-RUBY
-          $:.delete File.expand_path("..", __FILE__)
-          require 'openssl'
-
-          require 'bundler'
-          class Bundler::Fetcher
-            def fetch(*)
-              raise LoadError, "cannot load such file -- openssl"
-            end
-          end
+          raise LoadError, "cannot load such file -- openssl"
         RUBY
       end
     end
@@ -477,20 +454,19 @@ OUTPUT
         gem "rack"
       G
 
-      bundle :install, :artifice => "endpoint",
-        :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
-      out.should include("Could not load OpenSSL.")
+      bundle :install, :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
+      expect(out).to include("OpenSSL")
     end
   end
 
   context "when SSL certificate verification fails" do
-    it "explains what is going on" do
+    it "explains what happened" do
       # Install a monkeypatch that reproduces the effects of openssl raising
-      # a certificate validation error at the appropriate moment.
+      # a certificate validation error when Rubygems tries to connect.
       gemfile <<-G
-        class Bundler::Fetcher
-          def fetch_all_remote_specs
-            raise OpenSSL::SSL::SSLError, "Certificate invalid"
+        class Net::HTTP
+          def start
+            raise OpenSSL::SSL::SSLError, "certificate verify failed"
           end
         end
 

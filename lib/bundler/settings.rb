@@ -1,17 +1,19 @@
 module Bundler
   class Settings
-    def initialize(root)
+    def initialize(root = nil)
       @root          = root
       @local_config  = load_config(local_config_file)
       @global_config = load_config(global_config_file)
     end
 
     def [](key)
-      key = key_for(key)
-      @local_config[key] || ENV[key] || @global_config[key]
+      the_key = key_for(key)
+      value = (@local_config[the_key] || ENV[the_key] || @global_config[the_key])
+      is_bool(key) ? to_bool(value) : value
     end
 
     def []=(key, value)
+      local_config_file || raise(GemfileNotFound)
       set_key(key, value, @local_config, local_config_file)
     end
 
@@ -98,10 +100,22 @@ module Bundler
       !@local_config.key?(key_for(:path))
     end
 
+    def ignore_config?
+      ENV['BUNDLE_IGNORE_CONFIG']
+    end
+
   private
     def key_for(key)
       key = key.to_s.sub(".", "__").upcase
       "BUNDLE_#{key}"
+    end
+
+    def is_bool(key)
+      %w(frozen cache_all no_prune disable_local_branch_check).include? key.to_s
+    end
+
+    def to_bool(value)
+      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i)
     end
 
     def set_key(key, value, hash, file)
@@ -111,7 +125,8 @@ module Bundler
         hash[key] = value
         hash.delete(key) if value.nil?
         FileUtils.mkdir_p(file.dirname)
-        File.open(file, "w") { |f| f.puts hash.to_yaml }
+        require 'bundler/psyched_yaml'
+        File.open(file, "w") { |f| f.puts YAML.dump(hash) }
       end
       value
     end
@@ -122,14 +137,16 @@ module Bundler
     end
 
     def local_config_file
-      Pathname.new("#{@root}/config")
+      Pathname.new(@root).join("config") if @root
     end
 
     def load_config(config_file)
-      if config_file.exist? && !config_file.size.zero?
-        yaml = YAML.load_file(config_file)
+      valid_file = config_file && config_file.exist? && !config_file.size.zero?
+      if !ignore_config? && valid_file
+        Hash[config_file.read.scan(/^(BUNDLE_.+): ['"]?(.+?)['"]?$/)]
+      else
+        {}
       end
-      yaml || {}
     end
 
   end

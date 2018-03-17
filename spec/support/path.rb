@@ -33,7 +33,7 @@ module Spec
     end
 
     def vendored_gems(path = nil)
-      bundled_app("vendor/bundle/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}/#{path}")
+      bundled_app(*["vendor/bundle", Gem.ruby_engine, Gem::ConfigMap[:ruby_version], path].compact)
     end
 
     def cached_gem(path)
@@ -54,6 +54,10 @@ module Spec
 
     def gem_repo3(*args)
       tmp("gems/remote3", *args)
+    end
+
+    def security_repo(*args)
+      tmp("gems/security_repo", *args)
     end
 
     def system_gem_path(*path)

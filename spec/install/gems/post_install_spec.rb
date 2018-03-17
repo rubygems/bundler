@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe 'bundle install with gem sources' do
-  describe 'when gems include post install messages' do
+describe "bundle install with gem sources" do
+  describe "when gems include post install messages" do
     it "should display the post-install messages after installing" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -11,16 +11,16 @@ describe 'bundle install with gem sources' do
       G
 
       bundle :install
-      out.should include("Post-install message from rack:")
-      out.should include("Rack's post install message")
-      out.should include("Post-install message from thin:")
-      out.should include("Thin's post install message")
-      out.should include("Post-install message from rack-obama:")
-      out.should include("Rack-obama's post install message")
+      expect(out).to include("Post-install message from rack:")
+      expect(out).to include("Rack's post install message")
+      expect(out).to include("Post-install message from thin:")
+      expect(out).to include("Thin's post install message")
+      expect(out).to include("Post-install message from rack-obama:")
+      expect(out).to include("Rack-obama's post install message")
     end
   end
 
-  describe 'when gems do not include post install messages' do
+  describe "when gems do not include post install messages" do
     it "should not display any post-install messages" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -28,7 +28,7 @@ describe 'bundle install with gem sources' do
       G
 
       bundle :install
-      out.should_not include("Post-install message")
+      expect(out).not_to include("Post-install message")
     end
   end
 
@@ -40,8 +40,8 @@ describe 'bundle install with gem sources' do
       G
 
       bundle :install
-      out.should include("Post-install message from rack:")
-      out.should include("Rack's post install message")
+      expect(out).to include("Post-install message from rack:")
+      expect(out).to include("Rack's post install message")
     end
   end
 end

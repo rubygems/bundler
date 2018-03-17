@@ -20,8 +20,9 @@ module Bundler
           installed to the shared/bundle path. Gems in the development and \
           test group will not be installed. The install command is executed \
           with the --deployment and --quiet flags. If the bundle cmd cannot \
-          be found then you can override the bundle_cmd variable to specifiy \
-          which one it should use.
+          be found then you can override the bundle_cmd variable to specify \
+          which one it should use. The base path to the app is fetched from \
+          the :latest_release variable. Set it for custom deploy layouts.
 
           You can override any of these defaults by setting the variables shown below.
 

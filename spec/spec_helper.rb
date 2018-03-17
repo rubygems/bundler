@@ -31,6 +31,9 @@ FileUtils.rm_rf(Spec::Path.gem_repo1)
 ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r#{Spec::Path.root}/spec/support/rubygems_hax/platform.rb"
 ENV['BUNDLE_SPEC_RUN'] = "true"
 
+# Don't wrap output in tests
+ENV['THOR_COLUMNS'] = '10000'
+
 RSpec.configure do |config|
   config.include Spec::Builders
   config.include Spec::Helpers
@@ -71,6 +74,10 @@ RSpec.configure do |config|
     pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
   end
 
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+
   config.before :all do
     build_repo1
   end
@@ -82,6 +89,8 @@ RSpec.configure do |config|
   end
 
   config.after :each do
+    puts @out if example.exception
+
     Dir.chdir(original_wd)
     # Reset ENV
     ENV['PATH']           = original_path

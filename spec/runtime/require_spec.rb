@@ -33,6 +33,10 @@ describe "Bundler.require" do
       s.write "lib/seven.rb", "puts 'seven'"
     end
 
+    build_lib "eight", "1.0.0" do |s|
+      s.write "lib/eight.rb", "puts 'eight'"
+    end
+
     gemfile <<-G
       path "#{lib_path}"
       gem "one", :group => :bar, :require => %w(baz qux)
@@ -42,38 +46,43 @@ describe "Bundler.require" do
       gem "five"
       gem "six", :group => "string"
       gem "seven", :group => :not
+      gem "eight", :require => true, :group => :require_true
     G
   end
 
   it "requires the gems" do
     # default group
     run "Bundler.require"
-    out.should eq("two")
+    expect(out).to eq("two")
 
     # specific group
     run "Bundler.require(:bar)"
-    out.should eq("baz\nqux")
+    expect(out).to eq("baz\nqux")
 
     # default and specific group
     run "Bundler.require(:default, :bar)"
-    out.should eq("baz\nqux\ntwo")
+    expect(out).to eq("baz\nqux\ntwo")
 
     # specific group given as a string
     run "Bundler.require('bar')"
-    out.should eq("baz\nqux")
+    expect(out).to eq("baz\nqux")
 
     # specific group declared as a string
     run "Bundler.require(:string)"
-    out.should eq("six")
+    expect(out).to eq("six")
 
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
-    out.split("\n").sort.should == ['seven', 'three']
+    expect(out.split("\n").sort).to eq(['seven', 'three'])
+
+    # test require: true
+    run "Bundler.require(:require_true)"
+    expect(out).to eq("eight")
   end
 
   it "allows requiring gems with non standard names explicitly" do
     run "Bundler.require ; require 'mofive'"
-    out.should == "two\nfive"
+    expect(out).to eq("two\nfive")
   end
 
   it "raises an exception if a require is specified but the file does not exist" do
@@ -86,7 +95,7 @@ describe "Bundler.require" do
       Bundler.require
     R
 
-    err.should == "ZOMG LOAD ERROR"
+    expect(err).to eq("ZOMG LOAD ERROR")
   end
 
   describe "with namespaced gems" do
@@ -104,7 +113,7 @@ describe "Bundler.require" do
       G
 
       run "Bundler.require"
-      out.should eq("jquery/rails")
+      expect(out).to eq("jquery/rails")
     end
 
     it "silently passes if the require fails" do
@@ -122,7 +131,7 @@ describe "Bundler.require" do
       RUBY
       ruby(cmd, :expect_err => true)
 
-      err.should be_empty
+      expect(err).to be_empty
     end
 
     it "does not mangle explictly given requires" do
@@ -134,7 +143,7 @@ describe "Bundler.require" do
       load_error_run <<-R, 'jquery-rails'
         Bundler.require
       R
-      err.should == "ZOMG LOAD ERROR"
+      expect(err).to eq("ZOMG LOAD ERROR")
     end
 
     it "handles the case where regex fails" do
@@ -156,20 +165,42 @@ describe "Bundler.require" do
       RUBY
       run(cmd, :expect_err => true)
 
-      err.should == "ZOMG LOAD ERROR"
+      expect(err).to eq("ZOMG LOAD ERROR")
+    end
+
+    it "doesn't swallow the error when the library has an unrelated error" do
+      build_lib "load-fuuu", "1.0.0" do |s|
+        s.write "lib/load-fuuu.rb", "raise LoadError.new(\"cannot load such file -- load-bar\")"
+      end
+
+      gemfile <<-G
+        path "#{lib_path}"
+        gem "load-fuuu"
+      G
+
+      cmd = <<-RUBY
+        begin
+          Bundler.require
+        rescue LoadError => e
+          $stderr.puts "ZOMG LOAD ERROR: \#{e.message}"
+        end
+      RUBY
+      run(cmd, :expect_err => true)
+
+      expect(err).to eq("ZOMG LOAD ERROR: cannot load such file -- load-bar")
     end
   end
 
   describe "using bundle exec" do
     it "requires the locked gems" do
       bundle "exec ruby -e 'Bundler.require'"
-      out.should eq("two")
+      expect(out).to eq("two")
 
       bundle "exec ruby -e 'Bundler.require(:bar)'"
-      out.should eq("baz\nqux")
+      expect(out).to eq("baz\nqux")
 
       bundle "exec ruby -e 'Bundler.require(:default, :bar)'"
-      out.should == "baz\nqux\ntwo"
+      expect(out).to eq("baz\nqux\ntwo")
     end
   end
 
@@ -206,7 +237,7 @@ describe "Bundler.require" do
       G
 
       run "Bundler.require"
-      out.should eq("two\nmodule_two\none")
+      expect(out).to eq("two\nmodule_two\none")
     end
 
     describe "a gem with different requires for different envs" do
@@ -224,17 +255,17 @@ describe "Bundler.require" do
 
       it "requires both with Bundler.require(both)" do
         run "Bundler.require(:one, :two)"
-        out.should == "ONE\nTWO"
+        expect(out).to eq("ONE\nTWO")
       end
 
       it "requires one with Bundler.require(:one)" do
         run "Bundler.require(:one)"
-        out.should == "ONE"
+        expect(out).to eq("ONE")
       end
 
       it "requires :two with Bundler.require(:two)" do
         run "Bundler.require(:two)"
-        out.should == "TWO"
+        expect(out).to eq("TWO")
       end
     end
 
@@ -246,7 +277,7 @@ describe "Bundler.require" do
       G
 
       run "Bundler.require"
-      out.should eq("two_not_loaded\none\ntwo")
+      expect(out).to eq("two_not_loaded\none\ntwo")
     end
 
     describe "with busted gems" do
@@ -262,7 +293,7 @@ describe "Bundler.require" do
         load_error_run <<-R, 'no_such_file_omg'
           Bundler.require
         R
-        err.should == 'ZOMG LOAD ERROR'
+        expect(err).to eq('ZOMG LOAD ERROR')
       end
     end
   end
@@ -281,7 +312,7 @@ describe "Bundler.require with platform specific dependencies" do
     G
 
     run "Bundler.require", :expect_err => true
-    err.should be_empty
+    expect(err).to be_empty
   end
 
   it "requires gems pinned to multiple platforms, including the current one" do
@@ -295,7 +326,7 @@ describe "Bundler.require with platform specific dependencies" do
 
     run "Bundler.require; puts RACK", :expect_err => true
 
-    out.should eq("1.0.0")
-    err.should be_empty
+    expect(out).to eq("1.0.0")
+    expect(err).to be_empty
   end
 end

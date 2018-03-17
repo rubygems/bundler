@@ -32,7 +32,7 @@ describe "bundle update" do
       G
 
       bundle "update rails"
-      out.should include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
+      expect(out).to include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
       should_be_installed "rails 3.0", "activesupport 3.0"
     end
 
@@ -89,9 +89,9 @@ describe "bundle update" do
         gem "foo", "1.0", :git => "#{lib_path('foo_two')}"
       G
 
-      err.should be_empty
-      out.should include("Fetching #{lib_path}/foo_two")
-      out.should include("Your bundle is complete!")
+      expect(err).to be_empty
+      expect(out).to include("Fetching #{lib_path}/foo_two")
+      expect(out).to include("Your bundle is complete!")
     end
 
 
@@ -114,7 +114,7 @@ describe "bundle update" do
       G
 
       bundle "update", :exitstatus => true
-      exitstatus.should == 0
+      expect(exitstatus).to eq(0)
     end
 
     describe "with submodules" do
@@ -137,7 +137,7 @@ describe "bundle update" do
         end
       end
 
-      it "it unlocks the source when submodules is added to a git source" do
+      it "it unlocks the source when submodules are added to a git source" do
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}" do
             gem "has_submodule"
@@ -145,7 +145,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should eq('GEM')
+        expect(out).to eq('GEM')
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}", :submodules => true do
@@ -154,10 +154,10 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GIT'
+        expect(out).to eq('GIT')
       end
 
-      it "it unlocks the source when submodules is removed from git source" do
+      it "it unlocks the source when submodules are removed from git source" do
         pending "This would require actually removing the submodule from the clone"
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}", :submodules => true do
@@ -166,7 +166,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should eq('GIT')
+        expect(out).to eq('GIT')
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}" do
@@ -175,7 +175,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GEM'
+        expect(out).to eq('GEM')
       end
     end
 
@@ -189,7 +189,24 @@ describe "bundle update" do
       lib_path("foo-1.0").join(".git").rmtree
 
       bundle :update, :expect_err => true
-      out.should include(lib_path("foo-1.0").to_s)
+      expect(out).to include(lib_path("foo-1.0").to_s)
+    end
+
+    it "should not explode on invalid revision on update of gem by name" do
+      build_git "rack", "0.8"
+
+      build_git "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle "update rack"
+      expect(out).to include("Your bundle is updated!")
     end
 
   end

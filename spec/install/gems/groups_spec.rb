@@ -26,7 +26,7 @@ describe "bundle install with gem sources" do
           puts ACTIVESUPPORT
         R
 
-        err.should == "ZOMG LOAD ERROR"
+        expect(err).to eq("ZOMG LOAD ERROR")
       end
 
       it "installs gems with inline :groups into those groups" do
@@ -37,18 +37,18 @@ describe "bundle install with gem sources" do
           puts THIN
         R
 
-        err.should == "ZOMG LOAD ERROR"
+        expect(err).to eq("ZOMG LOAD ERROR")
       end
 
       it "sets up everything if Bundler.setup is used with no groups" do
         out = run("require 'rack'; puts RACK")
-        out.should eq('1.0.0')
+        expect(out).to eq('1.0.0')
 
         out = run("require 'activesupport'; puts ACTIVESUPPORT")
-        out.should eq('2.3.5')
+        expect(out).to eq('2.3.5')
 
         out = run("require 'thin'; puts THIN")
-        out.should eq('1.0')
+        expect(out).to eq('1.0')
       end
 
       it "removes old groups when new groups are set up" do
@@ -58,7 +58,7 @@ describe "bundle install with gem sources" do
           puts THIN
         RUBY
 
-        err.should == "ZOMG LOAD ERROR"
+        expect(err).to eq("ZOMG LOAD ERROR")
       end
 
       it "sets up old groups when they have previously been removed" do
@@ -67,7 +67,7 @@ describe "bundle install with gem sources" do
           Bundler.setup(:default, :emo)
           require 'thin'; puts THIN
         RUBY
-        out.should == '1.0'
+        expect(out).to eq('1.0')
       end
     end
 
@@ -102,13 +102,13 @@ describe "bundle install with gem sources" do
 
         it "does not say it installed gems from the excluded group" do
           bundle :install, :without => "emo"
-          out.should_not include("activesupport")
+          expect(out).not_to include("activesupport")
         end
 
         it "allows Bundler.setup for specific groups" do
           bundle :install, :without => "emo"
           run("require 'rack'; puts RACK", :default)
-          out.should == '1.0.0'
+          expect(out).to eq('1.0.0')
         end
 
         it "does not effect the resolve" do
@@ -138,7 +138,7 @@ describe "bundle install with gem sources" do
           ENV["BUNDLE_WITHOUT"] = "emo"
 
           bundle :install
-          out.should_not include("activesupport")
+          expect(out).not_to include("activesupport")
 
           should_be_installed "rack 1.0.0", :groups => [:default]
           should_not_be_installed "activesupport 2.3.5", :groups => [:default]
@@ -179,16 +179,6 @@ describe "bundle install with gem sources" do
 
         it "installs the gem if any of its groups are installed" do
           bundle "install --without emo"
-          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
-        end
-
-        it "works when locked as well" do
-          bundle "install --without emo"
-          bundle "lock"
-
-          simulate_new_machine
-
-          bundle "install --without lolercoaster"
           should_be_installed "rack 1.0.0", "activesupport 2.3.5"
         end
 
@@ -253,15 +243,6 @@ describe "bundle install with gem sources" do
           should_be_installed "rack 1.0.0", "activesupport 2.3.5"
         end
 
-        it "works when locked as well" do
-          bundle "install --without emo"
-          bundle "lock"
-
-          simulate_new_machine
-
-          bundle "install --without lolercoaster"
-          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
-        end
       end
     end
   end

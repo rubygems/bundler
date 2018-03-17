@@ -13,7 +13,7 @@ rescue LoadError
 end
 
 # At least load the YAML stdlib, whatever that may be
-require 'yaml' unless defined?(YAML)
+require 'yaml' unless defined?(YAML.dump)
 
 module Bundler
   # On encountering invalid YAML,
