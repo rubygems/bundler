@@ -28,7 +28,7 @@ describe "bundle update" do
           puts "WIN" if defined?(FOO_PREV_REF)
         RUBY
 
-        out.should == "WIN"
+        expect(out).to eq("WIN")
       end
     end
 
@@ -47,5 +47,4 @@ describe "bundle update" do
       should_be_installed "rack 1.0"
     end
   end
-
 end

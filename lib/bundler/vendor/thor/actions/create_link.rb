@@ -41,7 +41,7 @@ class Thor
         invoke_with_conflict_check do
           FileUtils.mkdir_p(File.dirname(destination))
           # Create a symlink by default
-          config[:symbolic] ||= true
+          config[:symbolic] = true if config[:symbolic].nil?
           File.unlink(destination) if exists?
           if config[:symbolic]
             File.symlink(render, destination)
@@ -52,6 +52,9 @@ class Thor
         given_destination
       end
 
+      def exists?
+        super || File.symlink?(destination)
+      end
     end
   end
 end

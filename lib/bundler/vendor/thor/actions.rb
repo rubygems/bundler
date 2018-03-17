@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'uri'
-require 'thor/core_ext/file_binary_read'
+require 'thor/core_ext/io_binary_read'
 require 'thor/actions/create_file'
 require 'thor/actions/create_link'
 require 'thor/actions/directory'
@@ -55,7 +55,7 @@ class Thor
                                :desc => "Run but do not make any changes"
 
         class_option :quiet, :type => :boolean, :aliases => "-q", :group => :runtime,
-                             :desc => "Supress status output"
+                             :desc => "Suppress status output"
 
         class_option :skip, :type => :boolean, :aliases => "-s", :group => :runtime,
                             :desc => "Skip files that already exist"
@@ -73,13 +73,13 @@ class Thor
     #
     def initialize(args=[], options={}, config={})
       self.behavior = case config[:behavior].to_s
-        when "force", "skip"
-          _cleanup_options_and_set(options, config[:behavior])
-          :invoke
-        when "revoke"
-          :revoke
-        else
-          :invoke
+      when "force", "skip"
+        _cleanup_options_and_set(options, config[:behavior])
+        :invoke
+      when "revoke"
+        :revoke
+      else
+        :invoke
       end
 
       super
@@ -114,8 +114,12 @@ class Thor
     # the script started).
     #
     def relative_to_original_destination_root(path, remove_dot=true)
-      path = path.gsub(@destination_stack[0], '.')
-      remove_dot ? (path[2..-1] || '') : path
+      path = path.dup
+      if path.gsub!(@destination_stack[0], '.')
+        remove_dot ? (path[2..-1] || '') : path
+      else
+        path
+      end
     end
 
     # Holds source paths in instance so they can be manipulated.
@@ -223,7 +227,7 @@ class Thor
     # ==== Parameters
     # command<String>:: the command to be executed.
     # config<Hash>:: give :verbose => false to not log the status, :capture => true to hide to output. Specify :with
-    #                to append an executable to command executation.
+    #                to append an executable to command execution.
     #
     # ==== Example
     #
@@ -264,8 +268,8 @@ class Thor
     # switches.
     #
     # ==== Parameters
-    # task<String>:: the task to be invoked
-    # args<Array>:: arguments to the task
+    # command<String>:: the command to be invoked
+    # args<Array>:: arguments to the command
     # config<Hash>:: give :verbose => false to not log the status, :capture => true to hide to output.
     #                Other options are given as parameter to Thor.
     #
@@ -278,13 +282,13 @@ class Thor
     #   thor :list, :all => true, :substring => 'rails'
     #   #=> thor list --all --substring=rails
     #
-    def thor(task, *args)
+    def thor(command, *args)
       config  = args.last.is_a?(Hash) ? args.pop : {}
       verbose = config.key?(:verbose) ? config.delete(:verbose) : true
       pretend = config.key?(:pretend) ? config.delete(:pretend) : false
       capture = config.key?(:capture) ? config.delete(:capture) : false
 
-      args.unshift task
+      args.unshift(command)
       args.push Thor::Options.to_switches(config)
       command = args.join(' ').strip
 
@@ -301,12 +305,12 @@ class Thor
 
       def _cleanup_options_and_set(options, key) #:nodoc:
         case options
-          when Array
-            %w(--force -f --skip -s).each { |i| options.delete(i) }
-            options << "--#{key}"
-          when Hash
-            [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
-            options.merge!(key => true)
+        when Array
+          %w(--force -f --skip -s).each { |i| options.delete(i) }
+          options << "--#{key}"
+        when Hash
+          [:force, :skip, "force", "skip"].each { |i| options.delete(i) }
+          options.merge!(key => true)
         end
       end
 

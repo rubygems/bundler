@@ -1,29 +1,22 @@
 #!/usr/bin/env ruby
+
+# Exit cleanly from an early interrupt
+Signal.trap("INT") { exit 1 }
+
 require 'bundler'
-begin
-  # Check if an older version of bundler is installed
-  $:.each do |path|
-    if path =~ %r'/bundler-0.(\d+)' && $1.to_i < 9
-      err = "Please remove Bundler 0.8 versions."
-      err << "This can be done by running `gem cleanup bundler`."
-      abort(err)
-    end
+# Check if an older version of bundler is installed
+$LOAD_PATH.each do |path|
+  if path =~ %r'/bundler-0.(\d+)' && $1.to_i < 9
+    err = "Looks like you have a version of bundler that's older than 0.9.\n"
+    err << "Please remove your old versions.\n"
+    err << "An easy way to do this is by running `gem cleanup bundler`."
+    abort(err)
   end
-  require 'bundler/cli'
-  Bundler::CLI.start
-rescue Bundler::BundlerError => e
-  Bundler.ui.error e.message
-  Bundler.ui.debug e.backtrace.join("\n")
-  exit e.status_code
-rescue Interrupt => e
-  Bundler.ui.error "\nQuitting..."
-  Bundler.ui.debug e.backtrace.join("\n")
-  exit 1
-rescue SystemExit => e
-  exit e.status
-rescue Exception => e
-  Bundler.ui.error(
-    "Unfortunately, a fatal error has occurred. Please see the Bundler \n" \
-    "troubleshooting documentation at http://bit.ly/bundler-issues. Thanks! \n")
-  raise e
 end
+
+require 'bundler/cli'
+# Force Thor to raise exceptions so we can exit non-zero.
+ENV["THOR_DEBUG"] = "1"
+
+require 'bundler/friendly_errors'
+Bundler.with_friendly_errors { Bundler::CLI.start }

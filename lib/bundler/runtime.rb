@@ -5,6 +5,8 @@ module Bundler
     include SharedHelpers
 
     def setup(*groups)
+      groups.map! { |g| g.to_sym }
+
       # Has to happen first
       clean_load_path
 
@@ -21,7 +23,8 @@ module Bundler
 
         if activated_spec = Bundler.rubygems.loaded_specs(spec.name) and activated_spec.version != spec.version
           e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
-                                 "but your Gemfile requires #{spec.name} #{spec.version}. Using bundle exec may solve this."
+                                 "but your Gemfile requires #{spec.name} #{spec.version}. Prepending " \
+                                 "`bundle exec` to your command may solve this."
           e.name = spec.name
           if e.respond_to?(:requirement=)
             e.requirement = Gem::Requirement.new(spec.version.to_s)
@@ -36,6 +39,8 @@ module Bundler
         $LOAD_PATH.unshift(*load_paths)
       end
 
+      setup_manpath
+
       lock
 
       self
@@ -46,6 +51,7 @@ module Bundler
       /^Missing \w+ (?:file\s*)?([^\s]+.rb)$/i,
       /^Missing API definition file in (.+)$/i,
       /^cannot load such file -- (.+)$/i,
+      /^dlopen\([^)]*\): Library not loaded: (.+)$/i,
     ]
 
     def require(*groups)
@@ -64,21 +70,25 @@ module Bundler
           # dependency. If there are none, use the dependency's name
           # as the autorequire.
           Array(dep.autorequire || dep.name).each do |file|
+            # Allow `require: true` as an alias for `require: <name>`
+            file = dep.name if file == true
             required_file = file
             Kernel.require file
           end
         rescue LoadError => e
+          REGEXPS.find { |r| r =~ e.message }
+          raise if dep.autorequire || $1 != required_file
+
           if dep.autorequire.nil? && dep.name.include?('-')
             begin
               namespaced_file = dep.name.gsub('-', '/')
               Kernel.require namespaced_file
             rescue LoadError
               REGEXPS.find { |r| r =~ e.message }
-              raise if dep.autorequire || $1.gsub('-', '/') != namespaced_file
+              regex_name = $1
+              raise e if dep.autorequire || (regex_name && regex_name.gsub('-', '/') != namespaced_file)
+              raise e if regex_name.nil?
             end
-          else
-            REGEXPS.find { |r| r =~ e.message }
-            raise if dep.autorequire || $1 != required_file
           end
         end
       end
@@ -97,39 +107,28 @@ module Bundler
     def cache
       FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
 
-      Bundler.ui.info "Updating .gem files in vendor/cache"
+      Bundler.ui.info "Updating files in vendor/cache"
       specs.each do |spec|
         next if spec.name == 'bundler'
         spec.source.cache(spec) if spec.source.respond_to?(:cache)
       end
+
+      Dir[cache_path.join("*/.git")].each do |git_dir|
+        FileUtils.rm_rf(git_dir)
+        FileUtils.touch(File.expand_path("../.bundlecache", git_dir))
+      end
+
       prune_cache unless Bundler.settings[:no_prune]
     end
 
     def prune_cache
       FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
-
       resolve = @definition.resolve
-      cached  = Dir["#{cache_path}/*.gem"]
-
-      cached = cached.delete_if do |path|
-        spec = Bundler.rubygems.spec_from_gem path
-
-        resolve.any? do |s|
-          s.name == spec.name && s.version == spec.version && !s.source.is_a?(Bundler::Source::Git)
-        end
-      end
-
-      if cached.any?
-        Bundler.ui.info "Removing outdated .gem files from vendor/cache"
-
-        cached.each do |path|
-          Bundler.ui.info "  * #{File.basename(path)}"
-          File.delete(path)
-        end
-      end
+      prune_gem_cache(resolve)
+      prune_git_and_path_cache(resolve)
     end
 
-    def clean
+    def clean(dry_run = false)
       gem_bins             = Dir["#{Gem.dir}/bin/*"]
       git_dirs             = Dir["#{Gem.dir}/bundler/gems/*"]
       git_cache_dirs       = Dir["#{Gem.dir}/cache/bundler/git/*"]
@@ -137,7 +136,8 @@ module Bundler
       gem_files            = Dir["#{Gem.dir}/cache/*.gem"]
       gemspec_files        = Dir["#{Gem.dir}/specifications/*.gemspec"]
       spec_gem_paths       = []
-      spec_git_paths       = []
+      # need to keep git sources around
+      spec_git_paths       = @definition.sources.select {|s| s.is_a?(Bundler::Source::Git) }.map {|s| s.path.to_s }
       spec_git_cache_dirs  = []
       spec_gem_executables = []
       spec_cache_paths     = []
@@ -148,7 +148,8 @@ module Bundler
         md = %r{(.+bundler/gems/.+-[a-f0-9]{7,12})}.match(spec.full_gem_path)
         spec_git_paths << md[1] if md
         spec_gem_executables << spec.executables.collect do |executable|
-          "#{Bundler.rubygems.gem_bindir}/#{executable}"
+          e = "#{Bundler.rubygems.gem_bindir}/#{executable}"
+          [e, "#{e}.bat"]
         end
         spec_cache_paths << spec.cache_file
         spec_gemspec_paths << spec.spec_file
@@ -164,38 +165,46 @@ module Bundler
       stale_gem_files      = gem_files - spec_cache_paths
       stale_gemspec_files  = gemspec_files - spec_gemspec_paths
 
-      stale_gem_bins.each {|bin| FileUtils.rm(bin) }
       output = stale_gem_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
-
-        FileUtils.rm_rf(gem_dir)
 
         parts   = full_name.split('-')
         name    = parts[0..-2].join('-')
         version = parts.last
         output  = "#{name} (#{version})"
 
-        Bundler.ui.info "Removing #{output}"
+        if dry_run
+          Bundler.ui.info "Would have removed #{output}"
+        else
+          Bundler.ui.info "Removing #{output}"
+          FileUtils.rm_rf(gem_dir)
+        end
 
         output
       end + stale_git_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
-
-        FileUtils.rm_rf(gem_dir)
 
         parts    = full_name.split('-')
         name     = parts[0..-2].join('-')
         revision = parts[-1]
         output   = "#{name} (#{revision})"
 
-        Bundler.ui.info "Removing #{output}"
+        if dry_run
+          Bundler.ui.info "Would have removed #{output}"
+        else
+          Bundler.ui.info "Removing #{output}"
+          FileUtils.rm_rf(gem_dir)
+        end
 
         output
       end
 
-      stale_gem_files.each {|file| FileUtils.rm(file) if File.exists?(file) }
-      stale_gemspec_files.each {|file| FileUtils.rm(file) if File.exists?(file) }
-      stale_git_cache_dirs.each {|dir| FileUtils.rm_rf(dir) if File.exists?(dir) }
+      unless dry_run
+        stale_gem_bins.each { |bin| FileUtils.rm(bin) if File.exists?(bin) }
+        stale_gem_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
+        stale_gemspec_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
+        stale_git_cache_dirs.each { |dir| FileUtils.rm_rf(dir) if File.exists?(dir) }
+      end
 
       output
     end
@@ -218,13 +227,78 @@ module Bundler
       # Set RUBYOPT
       rubyopt = [ENV["RUBYOPT"]].compact
       if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
-        rubyopt.unshift "-rbundler/setup"
-        rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
+        rubyopt.unshift %|-rbundler/setup|
         ENV["RUBYOPT"] = rubyopt.join(' ')
       end
+
+      # Set RUBYLIB
+      rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
+      rubylib.unshift File.expand_path('../..', __FILE__)
+      ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
   private
+
+    def prune_gem_cache(resolve)
+      cached  = Dir["#{cache_path}/*.gem"]
+
+      cached = cached.delete_if do |path|
+        spec = Bundler.rubygems.spec_from_gem path
+
+        resolve.any? do |s|
+          s.name == spec.name && s.version == spec.version && !s.source.is_a?(Bundler::Source::Git)
+        end
+      end
+
+      if cached.any?
+        Bundler.ui.info "Removing outdated .gem files from vendor/cache"
+
+        cached.each do |path|
+          Bundler.ui.info "  * #{File.basename(path)}"
+          File.delete(path)
+        end
+      end
+    end
+
+    def prune_git_and_path_cache(resolve)
+      cached  = Dir["#{cache_path}/*/.bundlecache"]
+
+      cached = cached.delete_if do |path|
+        name = File.basename(File.dirname(path))
+
+        resolve.any? do |s|
+          source = s.source
+          source.respond_to?(:app_cache_dirname) && source.app_cache_dirname == name
+        end
+      end
+
+      if cached.any?
+        Bundler.ui.info "Removing outdated git and path gems from vendor/cache"
+
+        cached.each do |path|
+          path = File.dirname(path)
+          Bundler.ui.info "  * #{File.basename(path)}"
+          FileUtils.rm_rf(path)
+        end
+      end
+    end
+
+    def setup_manpath
+      # Store original MANPATH for restoration later in with_clean_env()
+      ENV['BUNDLE_ORIG_MANPATH'] = ENV['MANPATH']
+
+      # Add man/ subdirectories from activated bundles to MANPATH for man(1)
+      manuals = $LOAD_PATH.map do |path|
+        man_subdir = path.sub(/lib$/, 'man')
+        man_subdir unless Dir[man_subdir + '/man?/'].empty?
+      end.compact
+
+      unless manuals.empty?
+        ENV['MANPATH'] = manuals.concat(
+          ENV['MANPATH'].to_s.split(File::PATH_SEPARATOR)
+        ).uniq.join(File::PATH_SEPARATOR)
+      end
+    end
 
     def cache_path
       root.join("vendor/cache")

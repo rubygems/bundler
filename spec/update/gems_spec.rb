@@ -29,7 +29,19 @@ describe "bundle update" do
         exit!
       G
       bundle "update"
-      bundled_app("Gemfile.lock").should exist
+      expect(bundled_app("Gemfile.lock")).to exist
+    end
+  end
+
+  describe "--quiet argument" do
+    it "shows UI messages without --quiet argument" do
+      bundle "update"
+      expect(out).to include("Fetching source")
+    end
+
+    it "does not show UI messages with --quiet argument" do
+      bundle "update --quiet"
+      expect(out).not_to include("Fetching source")
     end
   end
 
@@ -44,12 +56,31 @@ describe "bundle update" do
     end
   end
 
+  describe "with an unknown dependency" do
+    it "should inform the user" do
+      bundle "update halting-problem-solver", :expect_err=>true
+      expect(out).to include "Could not find gem 'halting-problem-solver'"
+    end
+    it "should suggest alternatives" do
+      bundle "update active-support", :expect_err=>true
+      expect(out).to include "Did you mean activesupport?"
+    end
+  end
+
+  describe "with a child dependency" do
+    it "should update the child dependency" do
+      update_repo2
+      bundle "update rack"
+      should_be_installed "rack 1.2"
+    end
+  end
+
   describe "with --local option" do
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)
 
       bundle "update --local"
-      out.should_not match(/Fetching source index/)
+      expect(out).not_to match(/Fetching source index/)
     end
   end
 end
@@ -110,13 +141,13 @@ describe "bundle update when a gem depends on a newer version of bundler" do
 
   it "should not explode" do
     bundle "update"
-    err.should be_empty
+    expect(err).to be_empty
   end
 
   it "should explain that bundler conflicted" do
     bundle "update"
-    out.should_not =~ /in snapshot/i
-    out.should =~ /current Bundler version/i
-    out.should =~ /perhaps you need to update bundler/i
+    expect(out).not_to match(/in snapshot/i)
+    expect(out).to match(/current Bundler version/i)
+    expect(out).to match(/perhaps you need to update bundler/i)
   end
 end

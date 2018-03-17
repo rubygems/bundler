@@ -1,15 +1,16 @@
+require 'thor/command'
 require 'thor/core_ext/hash_with_indifferent_access'
 require 'thor/core_ext/ordered_hash'
 require 'thor/error'
-require 'thor/shell'
 require 'thor/invocation'
 require 'thor/parser'
-require 'thor/task'
+require 'thor/shell'
 require 'thor/util'
 
 class Thor
   autoload :Actions,    'thor/actions'
   autoload :RakeCompat, 'thor/rake_compat'
+  autoload :Group,      'thor/group'
 
   # Shortcuts for help.
   HELP_MAPPINGS       = %w(-h -? --help -D)
@@ -19,7 +20,7 @@ class Thor
                            action add_file create_file in_root inside run run_ruby_script)
 
   module Base
-    attr_accessor :options
+    attr_accessor :options, :parent_options, :args
 
     # It receives arguments in an Array and two hashes, one for options and
     # other for configuration.
@@ -38,22 +39,46 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args=[], options={}, config={})
-      args = Thor::Arguments.parse(self.class.arguments, args)
-      args.each { |key, value| send("#{key}=", value) }
-
       parse_options = self.class.class_options
 
+      # The start method splits inbound arguments at the first argument
+      # that looks like an option (starts with - or --). It then calls
+      # new, passing in the two halves of the arguments Array as the
+      # first two parameters.
+
       if options.is_a?(Array)
-        task_options  = config.delete(:task_options) # hook for start
-        parse_options = parse_options.merge(task_options) if task_options
+        command_options = config.delete(:command_options) # hook for start
+        parse_options = parse_options.merge(command_options) if command_options
         array_options, hash_options = options, {}
       else
+        # Handle the case where the class was explicitly instantiated
+        # with pre-parsed options.
         array_options, hash_options = [], options
       end
 
-      opts = Thor::Options.new(parse_options, hash_options)
+      # Let Thor::Options parse the options first, so it can remove
+      # declared options from the array. This will leave us with
+      # a list of arguments that weren't declared.
+      stop_on_unknown = self.class.stop_on_unknown_option? config[:current_command]
+      opts = Thor::Options.new(parse_options, hash_options, stop_on_unknown)
       self.options = opts.parse(array_options)
+      self.options = config[:class_options].merge(self.options) if config[:class_options]
+
+      # If unknown options are disallowed, make sure that none of the
+      # remaining arguments looks like an option.
       opts.check_unknown! if self.class.check_unknown_options?(config)
+
+      # Add the remaining arguments from the options parser to the
+      # arguments passed in to initialize. Then remove any positional
+      # arguments declared using #argument (this is primarily used
+      # by Thor::Group). Tis will leave us with the remaining
+      # positional arguments.
+      to_parse  = args
+      to_parse += opts.remaining unless self.class.strict_args_position?(config)
+
+      thor_args = Thor::Arguments.new(self.class.arguments)
+      thor_args.parse(to_parse).each { |k,v| __send__("#{k}=", v) }
+      @args = thor_args.remaining
     end
 
     class << self
@@ -95,15 +120,15 @@ class Thor
 
     module ClassMethods
       def attr_reader(*) #:nodoc:
-        no_tasks { super }
+        no_commands { super }
       end
 
       def attr_writer(*) #:nodoc:
-        no_tasks { super }
+        no_commands { super }
       end
 
       def attr_accessor(*) #:nodoc:
-        no_tasks { super }
+        no_commands { super }
       end
 
       # If you want to raise an error for unknown options, call check_unknown_options!
@@ -120,17 +145,39 @@ class Thor
         !!check_unknown_options
       end
 
+      # If true, option parsing is suspended as soon as an unknown option or a
+      # regular argument is encountered.  All remaining arguments are passed to
+      # the command as regular arguments.
+      def stop_on_unknown_option?(command_name) #:nodoc:
+        false
+      end
+
+      # If you want only strict string args (useful when cascading thor classes),
+      # call strict_args_position! This is disabled by default to allow dynamic
+      # invocations.
+      def strict_args_position!
+        @strict_args_position = true
+      end
+
+      def strict_args_position #:nodoc:
+        @strict_args_position ||= from_superclass(:strict_args_position, false)
+      end
+
+      def strict_args_position?(config) #:nodoc:
+        !!strict_args_position
+      end
+
       # Adds an argument to the class and creates an attr_accessor for it.
       #
       # Arguments are different from options in several aspects. The first one
       # is how they are parsed from the command line, arguments are retrieved
       # from position:
       #
-      #   thor task NAME
+      #   thor command NAME
       #
       # Instead of:
       #
-      #   thor task --name=NAME
+      #   thor command --name=NAME
       #
       # Besides, arguments are used inside your code as an accessor (self.argument),
       # while options are all kept in a hash (self.options).
@@ -157,7 +204,7 @@ class Thor
       #
       def argument(name, options={})
         is_thor_reserved_word?(name, :argument)
-        no_tasks { attr_accessor name }
+        no_commands { attr_accessor name }
 
         required = if options.key?(:optional)
           !options[:optional]
@@ -175,8 +222,9 @@ class Thor
                                "the non-required argument #{argument.human_name.inspect}."
         end if required
 
-        arguments << Thor::Argument.new(name, options[:desc], required, options[:type],
-                                              options[:default], options[:banner])
+        options[:required] = required
+
+        arguments << Thor::Argument.new(name, options)
       end
 
       # Returns this class arguments, looking up in the ancestors chain.
@@ -210,13 +258,14 @@ class Thor
       # options<Hash>:: Described below.
       #
       # ==== Options
-      # :desc     - Description for the argument.
-      # :required - If the argument is required or not.
-      # :default  - Default value for this argument.
-      # :group    - The group for this options. Use by class options to output options in different levels.
-      # :aliases  - Aliases for this option.
-      # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
-      # :banner   - String to show on usage notes.
+      # :desc::     -- Description for the argument.
+      # :required:: -- If the argument is required or not.
+      # :default::  -- Default value for this argument.
+      # :group::    -- The group for this options. Use by class options to output options in different levels.
+      # :aliases::  -- Aliases for this option. <b>Note:</b> Thor follows a convention of one-dash-one-letter options. Thus aliases like "-something" wouldn't be parsed; use either "\--something" or "-s" instead.
+      # :type::     -- The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
+      # :banner::   -- String to show on usage notes.
+      # :hide::     -- If you want to hide this option from the help.
       #
       def class_option(name, options={})
         build_option(name, options, class_options)
@@ -225,7 +274,7 @@ class Thor
       # Removes a previous defined argument. If :undefine is given, undefine
       # accessors as well.
       #
-      # ==== Paremeters
+      # ==== Parameters
       # names<Array>:: Arguments to be removed
       #
       # ==== Examples
@@ -244,7 +293,7 @@ class Thor
 
       # Removes a previous defined class option.
       #
-      # ==== Paremeters
+      # ==== Parameters
       # names<Array>:: Class options to be removed
       #
       # ==== Examples
@@ -259,88 +308,92 @@ class Thor
       end
 
       # Defines the group. This is used when thor list is invoked so you can specify
-      # that only tasks from a pre-defined group will be shown. Defaults to standard.
+      # that only commands from a pre-defined group will be shown. Defaults to standard.
       #
       # ==== Parameters
       # name<String|Symbol>
       #
       def group(name=nil)
-        case name
-          when nil
-            @group ||= from_superclass(:group, 'standard')
-          else
-            @group = name.to_s
+        @group = case name
+        when nil
+          @group || from_superclass(:group, 'standard')
+        else
+          name.to_s
         end
       end
 
-      # Returns the tasks for this Thor class.
+      # Returns the commands for this Thor class.
       #
       # ==== Returns
-      # OrderedHash:: An ordered hash with tasks names as keys and Thor::Task
+      # OrderedHash:: An ordered hash with commands names as keys and Thor::Command
       #               objects as values.
       #
-      def tasks
-        @tasks ||= Thor::CoreExt::OrderedHash.new
+      def commands
+        @commands ||= Thor::CoreExt::OrderedHash.new
       end
+      alias tasks commands
 
-      # Returns the tasks for this Thor class and all subclasses.
+      # Returns the commands for this Thor class and all subclasses.
       #
       # ==== Returns
-      # OrderedHash:: An ordered hash with tasks names as keys and Thor::Task
+      # OrderedHash:: An ordered hash with commands names as keys and Thor::Command
       #               objects as values.
       #
-      def all_tasks
-        @all_tasks ||= from_superclass(:all_tasks, Thor::CoreExt::OrderedHash.new)
-        @all_tasks.merge(tasks)
+      def all_commands
+        @all_commands ||= from_superclass(:all_commands, Thor::CoreExt::OrderedHash.new)
+        @all_commands.merge(commands)
       end
+      alias all_tasks all_commands
 
-      # Removes a given task from this Thor class. This is usually done if you
+      # Removes a given command from this Thor class. This is usually done if you
       # are inheriting from another class and don't want it to be available
       # anymore.
       #
-      # By default it only remove the mapping to the task. But you can supply
+      # By default it only remove the mapping to the command. But you can supply
       # :undefine => true to undefine the method from the class as well.
       #
       # ==== Parameters
-      # name<Symbol|String>:: The name of the task to be removed
-      # options<Hash>:: You can give :undefine => true if you want tasks the method
+      # name<Symbol|String>:: The name of the command to be removed
+      # options<Hash>:: You can give :undefine => true if you want commands the method
       #                 to be undefined from the class as well.
       #
-      def remove_task(*names)
+      def remove_command(*names)
         options = names.last.is_a?(Hash) ? names.pop : {}
 
         names.each do |name|
-          tasks.delete(name.to_s)
-          all_tasks.delete(name.to_s)
+          commands.delete(name.to_s)
+          all_commands.delete(name.to_s)
           undef_method name if options[:undefine]
         end
       end
+      alias remove_task remove_command
 
-      # All methods defined inside the given block are not added as tasks.
+      # All methods defined inside the given block are not added as commands.
       #
       # So you can do:
       #
       #   class MyScript < Thor
-      #     no_tasks do
-      #       def this_is_not_a_task
+      #     no_commands do
+      #       def this_is_not_a_command
       #       end
       #     end
       #   end
       #
-      # You can also add the method and remove it from the task list:
+      # You can also add the method and remove it from the command list:
       #
       #   class MyScript < Thor
-      #     def this_is_not_a_task
+      #     def this_is_not_a_command
       #     end
-      #     remove_task :this_is_not_a_task
+      #     remove_command :this_is_not_a_command
       #   end
       #
-      def no_tasks
-        @no_tasks = true
+      def no_commands
+        @no_commands = true
         yield
       ensure
-        @no_tasks = false
+        @no_commands = false
       end
+      alias no_tasks no_commands
 
       # Sets the namespace for the Thor or Thor::Group class. By default the
       # namespace is retrieved from the class name. If your Thor class is named
@@ -352,7 +405,7 @@ class Thor
       #
       #   namespace :my_scripts
       #
-      # You change how your tasks are invoked:
+      # You change how your commands are invoked:
       #
       #   thor my_scripts -h
       #
@@ -360,26 +413,25 @@ class Thor
       #
       #   namespace :default
       #
-      # Your tasks can be invoked with a shortcut. Instead of:
+      # Your commands can be invoked with a shortcut. Instead of:
       #
-      #   thor :my_task
+      #   thor :my_command
       #
       def namespace(name=nil)
-        case name
-        when nil
-          @namespace ||= Thor::Util.namespace_from_thor_class(self)
-        else
+        if name
           @namespace = name.to_s
+        else
+          @namespace ||= Thor::Util.namespace_from_thor_class(self)
         end
       end
 
-      # Parses the task and options from the given args, instantiate the class
-      # and invoke the task. This method is used when the arguments must be parsed
+      # Parses the command and options from the given args, instantiate the class
+      # and invoke the command. This method is used when the arguments must be parsed
       # from an array. If you are inside Ruby and want to use a Thor class, you
       # can simply initialize it:
       #
       #   script = MyScript.new(args, options, config)
-      #   script.invoke(:task, first_arg, second_arg, third_arg)
+      #   script.invoke(:command, first_arg, second_arg, third_arg)
       #
       def start(given_args=ARGV, config={})
         config[:shell] ||= Thor::Base.shell.new
@@ -387,34 +439,46 @@ class Thor
       rescue Thor::Error => e
         ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
+      rescue Errno::EPIPE
+        # This happens if a thor command is piped to something like `head`,
+        # which closes the pipe when it's done reading. This will also
+        # mean that if the pipe is closed, further unnecessary
+        # computation will not occur.
+        exit(0)
       end
 
-      # Allows to use private methods from parent in child classes as tasks.
+      # Allows to use private methods from parent in child classes as commands.
       #
-      # ==== Paremeters
-      #   names<Array>:: Method names to be used as tasks
+      # ==== Parameters
+      #   names<Array>:: Method names to be used as commands
       #
       # ==== Examples
       #
-      #   public_task :foo
-      #   public_task :foo, :bar, :baz
+      #   public_command :foo
+      #   public_command :foo, :bar, :baz
       #
-      def public_task(*names)
+      def public_command(*names)
         names.each do |name|
           class_eval "def #{name}(*); super end"
         end
       end
+      alias public_task public_command
 
-      def handle_no_task_error(task) #:nodoc:
-        if $thor_runner
-          raise UndefinedTaskError, "Could not find task #{task.inspect} in #{namespace.inspect} namespace."
+      def handle_no_command_error(command, has_namespace = $thor_runner) #:nodoc:
+        if has_namespace
+          raise UndefinedCommandError, "Could not find command #{command.inspect} in #{namespace.inspect} namespace."
         else
-          raise UndefinedTaskError, "Could not find task #{task.inspect}."
+          raise UndefinedCommandError, "Could not find command #{command.inspect}."
         end
       end
+      alias handle_no_task_error handle_no_command_error
 
-      def handle_argument_error(task, error) #:nodoc:
-        raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{self.banner(task).inspect}."
+      def handle_argument_error(command, error, args, arity) #:nodoc:
+        msg = "ERROR: \"#{basename} #{command.name}\" was called with "
+        msg << 'no arguments'               if  args.empty?
+        msg << 'arguments ' << args.inspect if !args.empty?
+        msg << "\nUsage: #{self.banner(command).inspect}"
+        raise InvocationError, msg
       end
 
       protected
@@ -447,15 +511,18 @@ class Thor
           padding = options.collect{ |o| o.aliases.size }.max.to_i * 4
 
           options.each do |option|
-            item = [ option.usage(padding) ]
-            item.push(option.description ? "# #{option.description}" : "")
+            unless option.hide
+              item = [ option.usage(padding) ]
+              item.push(option.description ? "# #{option.description}" : "")
 
-            list << item
-            list << [ "", "# Default: #{option.default}" ] if option.show_default?
+              list << item
+              list << [ "", "# Default: #{option.default}" ] if option.show_default?
+              list << [ "", "# Possible values: #{option.enum.join(', ')}" ] if option.enum
+            end
           end
 
           shell.say(group_name ? "#{group_name} options:" : "Options:")
-          shell.print_table(list, :ident => 2)
+          shell.print_table(list, :indent => 2)
           shell.say ""
         end
 
@@ -470,10 +537,9 @@ class Thor
         # ==== Parameters
         # name<Symbol>:: The name of the argument.
         # options<Hash>:: Described in both class_option and method_option.
+        # scope<Hash>:: Options hash that is being built up
         def build_option(name, options, scope) #:nodoc:
-          scope[name] = Thor::Option.new(name, options[:desc], options[:required],
-                                               options[:type], options[:default], options[:banner],
-                                               options[:lazy_default], options[:group], options[:aliases])
+          scope[name] = Thor::Option.new(name, options)
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a
@@ -489,27 +555,29 @@ class Thor
           end
         end
 
-        # Finds a task with the given name. If the task belongs to the current
+        # Finds a command with the given name. If the command belongs to the current
         # class, just return it, otherwise dup it and add the fresh copy to the
-        # current task hash.
-        def find_and_refresh_task(name) #:nodoc:
-          task = if task = tasks[name.to_s]
-            task
-          elsif task = all_tasks[name.to_s]
-            tasks[name.to_s] = task.clone
+        # current command hash.
+        def find_and_refresh_command(name) #:nodoc:
+          command = if command = commands[name.to_s]
+            command
+          elsif command = all_commands[name.to_s]
+            commands[name.to_s] = command.clone
           else
-            raise ArgumentError, "You supplied :for => #{name.inspect}, but the task #{name.inspect} could not be found."
+            raise ArgumentError, "You supplied :for => #{name.inspect}, but the command #{name.inspect} could not be found."
           end
         end
+        alias find_and_refresh_task find_and_refresh_command
 
         # Everytime someone inherits from a Thor class, register the klass
         # and file into baseclass.
         def inherited(klass)
           Thor::Base.register_klass_file(klass)
+          klass.instance_variable_set(:@no_commands, false)
         end
 
         # Fire this callback whenever a method is added. Added methods are
-        # tracked as tasks by invoking the create_task method.
+        # tracked as commands by invoking the create_command method.
         def method_added(meth)
           meth = meth.to_s
 
@@ -519,12 +587,11 @@ class Thor
           end
 
           # Return if it's not a public instance method
-          return unless public_instance_methods.include?(meth) ||
-                        public_instance_methods.include?(meth.to_sym)
+          return unless public_method_defined?(meth.to_sym)
 
-          return if @no_tasks || !create_task(meth)
+          return if @no_commands || !create_command(meth)
 
-          is_thor_reserved_word?(meth, :task)
+          is_thor_reserved_word?(meth, :command)
           Thor::Base.register_klass_file(self)
         end
 
@@ -535,7 +602,17 @@ class Thor
             default
           else
             value = superclass.send(method)
-            value.dup if value
+
+            # Ruby implements `dup` on Object, but raises a `TypeError`
+            # if the method is called on immediates. As a result, we
+            # don't have a good way to check whether dup will succeed
+            # without calling it and rescuing the TypeError.
+            begin
+              value.dup
+            rescue TypeError
+              value
+            end
+
           end
         end
 
@@ -556,10 +633,11 @@ class Thor
         def baseclass #:nodoc:
         end
 
-        # SIGNATURE: Creates a new task if valid_task? is true. This method is
+        # SIGNATURE: Creates a new command if valid_command? is true. This method is
         # called when a new method is added to the class.
-        def create_task(meth) #:nodoc:
+        def create_command(meth) #:nodoc:
         end
+        alias create_task create_command
 
         # SIGNATURE: Defines behavior when the initialize method is added to the
         # class.
@@ -567,7 +645,7 @@ class Thor
         end
 
         # SIGNATURE: The hook invoked by start.
-        def dispatch(task, given_args, given_opts, config) #:nodoc:
+        def dispatch(command, given_args, given_opts, config) #:nodoc:
           raise NotImplementedError
         end
 

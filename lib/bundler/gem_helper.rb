@@ -1,21 +1,30 @@
-$:.unshift File.expand_path('../vendor', __FILE__)
-require 'thor'
+require 'bundler/vendored_thor' unless defined?(Thor)
 require 'bundler'
 
 module Bundler
   class GemHelper
     include Rake::DSL if defined? Rake::DSL
 
-    def self.install_tasks(opts = {})
-      dir = opts[:dir] || Dir.pwd
-      self.new(dir, opts[:name]).install
+    class << self
+      # set when install'd.
+      attr_accessor :instance
+
+      def install_tasks(opts = {})
+        new(opts[:dir], opts[:name]).install
+      end
+
+      def gemspec(&block)
+        gemspec = instance.gemspec
+        block.call(gemspec) if block
+        gemspec
+      end
     end
 
     attr_reader :spec_path, :base, :gemspec
 
-    def initialize(base, name = nil)
-      Bundler.ui = UI::Shell.new(Thor::Base.shell.new)
-      @base = base
+    def initialize(base = nil, name = nil)
+      Bundler.ui = UI::Shell.new
+      @base = (base ||= SharedHelpers.pwd)
       gemspecs = name ? [File.join(base, "#{name}.gemspec")] : Dir[File.join(base, "{,*}.gemspec")]
       raise "Unable to determine name from existing gemspec. Use :name => 'gemname' in #install_tasks to manually set it." unless gemspecs.size == 1
       @spec_path = gemspecs.first
@@ -23,20 +32,24 @@ module Bundler
     end
 
     def install
-      desc "Build #{name}-#{version}.gem into the pkg directory"
+      built_gem_path = nil
+
+      desc "Build #{name}-#{version}.gem into the pkg directory."
       task 'build' do
-        build_gem
+        built_gem_path = build_gem
       end
 
-      desc "Build and install #{name}-#{version}.gem into system gems"
-      task 'install' do
-        install_gem
+      desc "Build and install #{name}-#{version}.gem into system gems."
+      task 'install' => 'build' do
+        install_gem(built_gem_path)
       end
 
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
-      task 'release' do
-        release_gem
+      task 'release' => 'build' do
+        release_gem(built_gem_path)
       end
+
+      GemHelper.instance = self
     end
 
     def build_gem
@@ -45,33 +58,30 @@ module Bundler
         file_name = File.basename(built_gem_path)
         FileUtils.mkdir_p(File.join(base, 'pkg'))
         FileUtils.mv(built_gem_path, 'pkg')
-        Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}"
+        Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}."
       }
       File.join(base, 'pkg', file_name)
     end
 
-    def install_gem
-      built_gem_path = build_gem
-      out, _ = sh_with_code("gem install '#{built_gem_path}'")
+    def install_gem(built_gem_path=nil)
+      built_gem_path ||= build_gem
+      out, _ = sh_with_code("gem install '#{built_gem_path}' --local")
       raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless out[/Successfully installed/]
-      Bundler.ui.confirm "#{name} (#{version}) installed"
+      Bundler.ui.confirm "#{name} (#{version}) installed."
     end
 
-    def release_gem
+    def release_gem(built_gem_path=nil)
       guard_clean
-      guard_already_tagged
-      built_gem_path = build_gem
-      tag_version {
-        git_push
-        rubygem_push(built_gem_path)
-      }
+      built_gem_path ||= build_gem
+      tag_version { git_push } unless already_tagged?
+      rubygem_push(built_gem_path) if gem_push?
     end
 
     protected
     def rubygem_push(path)
       if Pathname.new("~/.gem/credentials").expand_path.exist?
         sh("gem push '#{path}'")
-        Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org"
+        Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org."
       else
         raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
       end
@@ -84,7 +94,7 @@ module Bundler
     def git_push
       perform_git_push
       perform_git_push ' --tags'
-      Bundler.ui.confirm "Pushed git commits and tags"
+      Bundler.ui.confirm "Pushed git commits and tags."
     end
 
     def perform_git_push(options = '')
@@ -93,26 +103,31 @@ module Bundler
       raise "Couldn't git push. `#{cmd}' failed with the following output:\n\n#{out}\n" unless code == 0
     end
 
-    def guard_already_tagged
+    def already_tagged?
       if sh('git tag').split(/\n/).include?(version_tag)
-        raise("This tag has already been committed to the repo.")
+        Bundler.ui.confirm "Tag #{version_tag} has already been created."
+        true
       end
     end
 
     def guard_clean
-      clean? or raise("There are files that need to be committed first.")
+      clean? && committed? or raise("There are files that need to be committed first.")
     end
 
     def clean?
       sh_with_code("git diff --exit-code")[1] == 0
     end
 
+    def committed?
+      sh_with_code("git diff-index --quiet --cached HEAD")[1] == 0
+    end
+
     def tag_version
       sh "git tag -a -m \"Version #{version}\" #{version_tag}"
-      Bundler.ui.confirm "Tagged #{version_tag}"
+      Bundler.ui.confirm "Tagged #{version_tag}."
       yield if block_given?
     rescue
-      Bundler.ui.error "Untagged #{version_tag} due to error"
+      Bundler.ui.error "Untagging #{version_tag} due to error."
       sh_with_code "git tag -d #{version_tag}"
       raise
     end
@@ -138,13 +153,17 @@ module Bundler
       cmd << " 2>&1"
       outbuf = ''
       Bundler.ui.debug(cmd)
-      Dir.chdir(base) {
+      SharedHelpers.chdir(base) {
         outbuf = `#{cmd}`
         if $? == 0
           block.call(outbuf) if block
         end
       }
       [outbuf, $?]
+    end
+
+    def gem_push?
+      ! %w{n no nil false off 0}.include?(ENV['gem_push'].to_s.downcase)
     end
   end
 end

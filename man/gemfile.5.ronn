@@ -20,10 +20,38 @@ a number of methods used to describe the gem requirements.
 At the top of the `Gemfile`, add one line for each `Rubygems` source that
 might contain the gems listed in the `Gemfile`.
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
     source "http://gems.github.com"
 
-Each of these _source_s `MUST` be a valid Rubygems repository.
+Each of these _source_s `MUST` be a valid Rubygems repository. Sources are
+checked for gems following the heuristics described in [SOURCE PRIORITY][].
+
+## RUBY (#ruby)
+
+If your application requires a specific Ruby version or engine, specify your
+requirements using the `ruby` method, with the following arguments.
+All parameters are `OPTIONAL` unless otherwise specified.
+
+### VERSION (required)
+
+The version of Ruby that your application requires. If your application
+requires an alternate Ruby engine, such as JRuby or Rubinius, this should be
+the Ruby version that the engine is compatible with.
+
+    ruby "1.9.3"
+
+### ENGINE (:engine)
+
+Each application _may_ specify a Ruby engine. If an engine is specified, an
+engine version _must_ also be specified.
+
+### ENGINE VERSION (:engine_version)
+
+Each application _may_ specify a Ruby engine version. If an engine version is
+specified, an engine _must_ also be specified. If the engine is "ruby" the
+engine version specified _must_ match the Ruby version.
+
+    ruby "1.8.7", :engine => "jruby", :engine_version => "1.6.7"
 
 ## GEMS (#gem)
 
@@ -46,17 +74,19 @@ Each _gem_ `MAY` have one or more version specifiers.
 ### REQUIRE AS (:require)
 
 Each _gem_ `MAY` specify files that should be used when autorequiring via
-`Bundler.require`. You may pass an array with multiple files, or `false` to
+`Bundler.require`. You may pass an array with multiple files or `true` if file
+you want `required` has same name as _gem_ or `false` to
 prevent any file from being autorequired.
 
-    gem "sqlite3-ruby", :require => "sqlite3"
     gem "redis", :require => ["redis/connection/hiredis", "redis"]
     gem "webmock", :require => false
+    gem "debugger", :require => true
 
 The argument defaults to the name of the gem. For example, these are identical:
 
     gem "nokogiri"
     gem "nokogiri", :require => "nokogiri"
+    gem "nokogiri", :require => true
 
 ### GROUPS (:group or :groups)
 
@@ -100,7 +130,7 @@ are obviously not available).
 Note that on `bundle install`, bundler downloads and evaluates all gems, in order to
 create a single canonical list of all of the required gems and their dependencies.
 This means that you cannot list different versions of the same gems in different
-groups. For more details, see [Understanding Bundler](http://gembundler.com/rationale.html).
+groups. For more details, see [Understanding Bundler](http://bundler.io/rationale.html).
 
 ### PLATFORMS (:platforms)
 
@@ -117,12 +147,16 @@ There are a number of `Gemfile` platforms:
     _ruby_ `AND` version 1.8
   * `ruby_19`:
     _ruby_ `AND` version 1.9
+  * `ruby_20`:
+    _ruby_ `AND` version 2.0
   * `mri`:
     Same as _ruby_, but not Rubinius
   * `mri_18`:
     _mri_ `AND` version 1.8
   * `mri_19`:
     _mri_ `AND` version 1.9
+  * `mri_20`:
+    _mri_ `AND` version 2.0
   * `rbx`:
     Same as _ruby_, but only Rubinius (not MRI)
   * `jruby`:
@@ -130,11 +164,17 @@ There are a number of `Gemfile` platforms:
   * `mswin`:
     Windows
   * `mingw`:
-    Windows 'mingw32' platform (aka RubyInstaller)
+    Windows 32 bit 'mingw32' platform (aka RubyInstaller)
   * `mingw_18`:
     _mingw_ `AND` version 1.8
   * `mingw_19`:
     _mingw_ `AND` version 1.9
+  * `mingw_20`:
+    _mingw_ `AND` version 2.0
+  * `x64_mingw`:
+    Windows 64 bit 'mingw32' platform (aka RubyInstaller x64)
+  * `x64_mingw_20`:
+    _x64_mingw_ `AND` version 2.0
 
 As with groups, you can specify one or more platforms:
 
@@ -203,13 +243,31 @@ the `.gemspec`.
     | |-actionpack.gemspec    [actionpack gem located here]
     |~activesupport
     | |-activesupport.gemspec [activesupport gem located here]
-    ...
+    |...
 
 To install a gem located in a git repository, bundler changes to
 the directory containing the gemspec, runs `gem build name.gemspec`
 and then installs the resulting gem. The `gem build` command,
 which comes standard with Rubygems, evaluates the `.gemspec` in
 the context of the directory in which it is located.
+
+### GITHUB (:github)
+
+If the git repository you want to use is hosted on GitHub and is public, you can use the
+:github shorthand to specify just the github username and repository name (without the
+trailing ".git"), separated by a slash. If both the username and repository name are the
+same, you can omit one.
+
+    gem "rails", :github => "rails/rails"
+    gem "rails", :github => "rails"
+
+Are both equivalent to
+
+    gem "rails", :git => "git://github.com/rails/rails.git"
+
+In addition, if you wish to choose a specific branch:
+
+    gem "rails", :github => "rails/rails", :branch => "branch_name"
 
 ### PATH (:path)
 
@@ -239,7 +297,7 @@ applied to a group of gems by using block form.
 
     platforms :ruby do
       gem "ruby-debug"
-      gem "sqlite3-ruby"
+      gem "sqlite3"
     end
 
     group :development do

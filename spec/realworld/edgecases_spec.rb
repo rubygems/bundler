@@ -7,23 +7,23 @@ describe "real world edgecases", :realworld => true do
       source :rubygems
       gem "linecache", "0.46"
     G
-    err.should eq("")
+    expect(err).to eq("")
   end
 
-  # https://github.com/carlhuda/bundler/issues/1202
-  it "bundle cache works with rubygems 1.3.7 and pre gems" do
+  # https://github.com/bundler/bundler/issues/1202
+  it "bundle cache works with rubygems 1.3.7 and pre gems", :ruby => "1.8" do
     install_gemfile <<-G
       source :rubygems
       gem "rack",          "1.3.0.beta2"
       gem "will_paginate", "3.0.pre2"
     G
     bundle :cache
-    out.should_not include("Removing outdated .gem files from vendor/cache")
+    expect(out).not_to include("Removing outdated .gem files from vendor/cache")
   end
 
-  # https://github.com/carlhuda/bundler/issues/1486
+  # https://github.com/bundler/bundler/issues/1486
   # this is a hash collision that only manifests on 1.8.7
-  it "finds the correct child versions" do
+  it "finds the correct child versions", :ruby => "1.8" do
     install_gemfile <<-G
       source :rubygems
 
@@ -32,21 +32,21 @@ describe "real world edgecases", :realworld => true do
       gem 'activerecord', '~> 3.0'
       gem 'builder', '~> 2.1.2'
     G
-    out.should include("activemodel (3.0.5)")
+    expect(out).to include("activemodel (3.0.5)")
   end
 
-  # https://github.com/carlhuda/bundler/issues/1500
+  # https://github.com/bundler/bundler/issues/1500
   it "does not fail install because of gem plugins" do
     realworld_system_gems("open_gem --version 1.4.2", "rake --version 0.9.2")
     gemfile <<-G
       source :rubygems
 
-      gem 'rack', '1.0.0'
+      gem 'rack', '1.0.1'
     G
 
     bundle "install --path vendor/bundle", :expect_err => true
-    err.should_not include("Could not find rake")
-    err.should be_empty
+    expect(err).not_to include("Could not find rake")
+    expect(err).to be_empty
   end
 
   it "checks out git repos when the lockfile is corrupted" do
@@ -141,7 +141,7 @@ describe "real world edgecases", :realworld => true do
             multi_json (~> 1.0)
 
       GEM
-        remote: http://rubygems.org/
+        remote: https://rubygems.org/
         specs:
           arel (3.0.2)
           builder (3.0.0)
@@ -172,6 +172,6 @@ describe "real world edgecases", :realworld => true do
     L
 
     bundle :install, :exitstatus => true
-    exitstatus.should == 0
+    expect(exitstatus).to eq(0)
   end
 end

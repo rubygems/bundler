@@ -10,7 +10,9 @@ class Thor
     # ==== Parameters
     # source<String>:: the relative path to the source root.
     # destination<String>:: the relative path to the destination root.
-    # config<Hash>:: give :verbose => false to not log the status.
+    # config<Hash>:: give :verbose => false to not log the status, and
+    #                :mode => :preserve, to preserve the file mode from the source.
+
     #
     # ==== Examples
     #
@@ -27,6 +29,10 @@ class Thor
         content = File.binread(source)
         content = block.call(content) if block
         content
+      end
+      if config[:mode] == :preserve
+        mode = File.stat(source).mode
+        chmod(destination, mode, config)
       end
     end
 
@@ -123,7 +129,7 @@ class Thor
     #
     # ==== Example
     #
-    #   chmod "script/*", 0755
+    #   chmod "script/server", 0755
     #
     def chmod(path, mode, config={})
       return unless behavior == :invoke
@@ -187,7 +193,7 @@ class Thor
     #
     # ==== Examples
     #
-    #   inject_into_class "app/controllers/application_controller.rb", "  filter_parameter :password\n"
+    #   inject_into_class "app/controllers/application_controller.rb", ApplicationController, "  filter_parameter :password\n"
     #
     #   inject_into_class "app/controllers/application_controller.rb", ApplicationController do
     #     "  filter_parameter :password\n"
@@ -229,6 +235,44 @@ class Thor
       end
     end
 
+    # Uncomment all lines matching a given regex.  It will leave the space
+    # which existed before the comment hash in tact but will remove any spacing
+    # between the comment hash and the beginning of the line.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # flag<Regexp|String>:: the regexp or string used to decide which lines to uncomment
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Example
+    #
+    #   uncomment_lines 'config/initializers/session_store.rb', /active_record/
+    #
+    def uncomment_lines(path, flag, *args)
+      flag = flag.respond_to?(:source) ? flag.source : flag
+
+      gsub_file(path, /^(\s*)#[[:blank:]]*(.*#{flag})/, '\1\2', *args)
+    end
+
+    # Comment all lines matching a given regex.  It will leave the space
+    # which existed before the beginning of the line in tact and will insert
+    # a single space after the comment hash.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # flag<Regexp|String>:: the regexp or string used to decide which lines to comment
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Example
+    #
+    #   comment_lines 'config/initializers/session_store.rb', /cookie_store/
+    #
+    def comment_lines(path, flag, *args)
+      flag = flag.respond_to?(:source) ? flag.source : flag
+
+      gsub_file(path, /^(\s*)([^#|\n]*#{flag})/, '\1# \2', *args)
+    end
+
     # Removes a file at the given location.
     #
     # ==== Parameters
@@ -249,8 +293,11 @@ class Thor
     end
     alias :remove_dir :remove_file
 
+  attr_accessor :output_buffer
+  private :output_buffer, :output_buffer=
+
   private
-    attr_accessor :output_buffer
+
     def concat(string)
       @output_buffer.concat(string)
     end

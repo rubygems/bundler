@@ -90,16 +90,19 @@ class Thor
 
         # Filenames in the encoded form are converted. If you have a file:
         #
-        #   %class_name%.rb
+        #   %file_name%.rb
         #
-        # It gets the class name from the base and replace it:
+        # It calls #file_name from the base and replaces %-string with the
+        # return value (should be String) of #file_name:
         #
         #   user.rb
         #
+        # The method referenced can be either public or private.
+        #
         def convert_encoded_instructions(filename)
-          filename.gsub(/%(.*?)%/) do |string|
-            instruction = $1.strip
-            base.respond_to?(instruction) ? base.send(instruction) : string
+          filename.gsub(/%(.*?)%/) do |initial_string|
+            method = $1.strip
+            base.respond_to?(method, true) ? base.send(method) : initial_string
           end
         end
 

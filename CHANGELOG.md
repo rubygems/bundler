@@ -1,3 +1,394 @@
+## 1.4.0.pre.2
+
+Features:
+
+  - add support for the x64-mingw32 platform (#2356, #2590, @larskanis)
+  - add :patchlevel option to ruby DSL
+  - add `bundler` bin (#2598, @kirs)
+  - friendly ambiguous error messages (#2581, #2550, @jlsuttles, @jendiamond, @joyicecloud)
+
+Bugfixes:
+
+  - allow passwordless Basic Auth (#2606, @rykov)
+  - don't suggest `gem install foo` when `foo` is a git gem that fails (@kirs)
+  - revert #2569, going back to git instead of https for :github gems
+
+## 1.4.0.pre.1 (2013-08-04)
+
+Features:
+
+  - retry network requests while installing gems (#2561, @ascherger)
+  - faster installs using gemspecs from the local system cache (#2497, @mipearson)
+  - add `bundle install -jN` for N parallel gem installations (#2481, @eagletmt)
+  - add `ENV['DEBUG_RESOLVER_TREE']` outputs resolver tree (@dblock)
+  - set $MANPATH so `bundle exec man name` works (#1624, @sunaku)
+  - use `man` instead of `groff` (#2579, @ixti, @simi)
+  - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
+  - allow `require: true` as an alias for `require: <name>` (#2538, @ndbroadbent)
+  - rescue and report Thor errors (#2478, @pjvds)
+  - detect cyclic dependencies (#2564, @gnufied)
+  - support multiple gems in `binstubs` (#2576, @lucasmazza)
+  - use https instead of git for :github gems (#2569, @fuadsaud)
+  - add quiet option to `bundle package` (#2573, @shtirlic)
+  - use RUBYLIB instead of RUBYOPT for better Windows support (#2536, @equinux)
+
+Bugfixes:
+
+  - reduce stack size while resolving to fix JRuby overflow (#2510, @headius)
+  - display GitErrors while loading specs in --verbose mode (#2461)
+  - allow the same options hash to be passed to multiple gems (#2447)
+  - handle missing binaries without an exception (#2019, @luismreis)
+
+## 1.3.6
+
+Bugfixes:
+
+  - set --no-cache when bundle install --local is called (@TimMoore)
+  - make gemspec path option preserve relative paths in lock file (@bwillis)
+
+## 1.3.5 (3 April 2013)
+
+Features:
+
+  - progress indicator while resolver is running (@chief)
+
+Bugfixes:
+
+  - update local overrides with orphaned revisions (@jamesferguson)
+  - revert to working quoting of RUBYOPT on Windows (@ogra)
+  - use basic auth even when SSL is not available (@jayniz)
+  - installing git gems without dependencies in deployment now works
+
+## 1.3.4 (15 March 2103)
+
+Bugfixes:
+
+  - load YAML on Rubygems versions that define module YAML
+  - fix regression that broke --without on ruby 1.8.7
+
+## 1.3.3 (13 March 2013)
+
+Features:
+
+  - compatible with Rubygems 2.0.2 (higher and lower already work)
+  - mention skipped groups in bundle install and bundle update output (@simi)
+  - `gem` creates rake tasks for minitest (@coop) and rspec
+
+Bugfixes:
+
+  - require rbconfig for standalone mode
+
+## 1.3.2 (7 March 2013)
+
+Features:
+
+  - include rubygems.org CA chain
+
+Bugfixes:
+
+  - don't store --dry-run as a Bundler setting
+
+## 1.3.1 (3 March 2013)
+
+Bugfixes:
+
+  - include manpages in gem, restoring many help pages
+  - handle more SSL certificate verification failures
+  - check for the full version of SSL, which we need (@alup)
+  - gem rake task 'install' now depends on task 'build' (@sunaku)
+
+## 1.3.0 (24 February 2013)
+
+Features:
+
+  - raise a useful error when the lockfile contains a merge conflict (@zofrex)
+  - ensure `rake release` checks for uncommitted as well as unstaged (@benmoss)
+  - allow environment variables to be negated with 'false' and '0' (@brettporter)
+  - set $MANPATH inside `exec` for gems with man pages (@sunaku)
+  - partial gem names for `open` and `update` now return a list (@takkanm)
+
+Bugfixes:
+
+  - `update` now (again) finds gems that aren't listed in the Gemfile
+  - `install` now (again) updates cached gems that aren't in the Gemfile
+  - install Gemfiles with HTTP sources even without OpenSSL present
+  - display CerficateFailureError message in full
+
+## 1.3.0.pre.8 (12 February 2013)
+
+Security:
+
+  - validate SSL certificate chain during HTTPS network requests
+  - don't send HTTP Basic Auth creds when redirected to other hosts (@perplexes)
+  - add `--trust-policy` to `install`, like `gem install -P` (@CosmicCat, #2293)
+
+Features:
+
+  - optimize resolver when too new of a gem is already activated (@rykov, #2248)
+  - update Net::HTTP::Persistent for SSL cert validation and no_proxy ENV
+  - explain SSL cert validation failures
+  - generate gemspecs when installing git repos, removing shellouts
+  - add pager selection (@csgui)
+  - add `licenses` command (@bryanwoods, #1898)
+  - sort output from `outdated` (@richardkmichael, #1896)
+  - add a .travis.yml to `gem -t` (@ndbroadbent, #2143)
+  - inform users when the resolver starts
+  - disable reverse DNS to speed up API requests (@raggi)
+
+Bugfixes:
+
+  - raise errors while requiring dashed gems (#1807)
+  - quote the Bundler path on Windows (@jgeiger, #1862, #1856)
+  - load gemspecs containing unicode (@gaffneyc, #2301)
+  - support any ruby version in --standalone
+  - resolve some ruby -w warnings (@chastell, #2193)
+  - don't scare users with an error message during API fallback
+  - `install --binstubs` is back to overwriting. thanks, SemVer.
+
+## 1.3.0.pre.7 (22 January 2013)
+
+Bugfixes:
+
+  - stubs for gems with dev deps no longer cause exceptions (#2272)
+  - don't suggest binstubs to --binstubs users
+
+## 1.3.0.pre.6 (22 January 2013)
+
+Features:
+
+  - `binstubs` lists child gem bins if a gem has no binstubs
+  - `bundle gem --edit` will open the new gemspec (@ndbroadbent)
+  - `bundle gem --test rspec` now makes working tests (@tricknotes)
+  - `bundle env` prints info about bundler's environment (@peeja)
+  - add `BUNDLE_IGNORE_CONFIG` environment variable support (@richo)
+
+Bugfixes:
+
+  - don't overwrite custom binstubs during `install --binstubs`
+  - don't throw an exception if `binstubs` gem doesn't exist
+  - `bundle config` now works in directories without a Gemfile
+
+## 1.3.0.pre.5 (Jan 9, 2013)
+
+Features:
+
+  - make `--standalone` require lines ruby engine/version agnostic
+  - add `--dry-run` to `bundle clean` (@wfarr, #2237)
+
+Bugfixes:
+
+  - don't skip writing binstubs when doing `bundle install`
+  - distinguish between ruby 1.9/2.0 when using :platforms (@spastorino)
+
+## 1.3.0.pre.4 (Jan 3, 2013)
+
+Features:
+
+  - `bundle binstubs <gem>` to setup individual binstubs
+  - `bundle install --binstubs ""` will remove binstubs option
+  - `bundle clean --dry-run` will print out gems instead of removing them
+
+Bugfixes:
+
+  - Avoid stack traces when Ctrl+C during bundle command (@mitchellh)
+  - fix YAML parsing in in ruby-preview2
+
+## 1.3.0.pre.3 (Dec 21, 2012)
+
+Features:
+
+  - pushing gems during `rake release` can be disabled (@trans)
+  - installing gems with `rake install` is much faster (@utkarshkukreti)
+  - added platforms :ruby_20 and :mri_20, since the ABI has changed
+  - added '--edit' option to open generated gemspec in editor
+
+Bugfixes:
+
+  - :git gems with extensions now work with Rubygems >= 2.0 (@jeremy)
+  - revert SemVer breaking change to :github
+  - `outdated` exits non-zero if outdated gems found (@rohit, #2021)
+  - https Gist URLs for compatibility with Gist 2.0 (@NARKOZ)
+  - namespaced gems no longer generate a superfluous directory (@banyan)
+
+## 1.3.0.pre.2 (Dec 9, 2012)
+
+Features:
+
+  - `config` expands local overrides like `local.rack .` (@gkop, #2205)
+  - `gem` generates files correctly for names like `jquery-rails` (@banyan, #2201)
+  - use gems from gists with the :gist option in the Gemfile (@jgaskins)
+
+Bugfixes:
+
+  - Gemfile sources other than rubygems.org work even when .gemrc contains sources
+  - caching git gems now caches specs, fixing e.g. git ls-files (@bison, #2039)
+  - `show GEM` now warns if the directory has been deleted (@rohit, #2070)
+  - git output hidden when running in --quiet mode (@rohit)
+
+## 1.3.0.pre (Nov 29, 2012)
+
+Features:
+
+  - compatibile with Ruby 2.0.0-preview2
+  - compatibile with Rubygems 2.0.0.preview2 (@drbrain, @evanphx)
+  - ruby 2.0 added to the `:ruby19` ABI-compatible platform
+  - lazy load YAML, allowing Psych to be specified in the Gemfile
+  - significant performance improvements (@cheald, #2181)
+  - `inject` command for scripted Gemfile additions (Engine Yard)
+  - :github option uses slashless arguements as repo owner (@rking)
+  - `open` suggests gem names for typos (@jdelStrother)
+  - `update` reports non-existent gems (@jdelStrother)
+  - `gem` option --test can generate rspec stubs (@MafcoCinco)
+  - `gem` option --test can generate minitest stubs (@kcurtin)
+  - `gem` command generates MIT license (@BrentWheeldon)
+  - gem rake task 'release' resuses existing tags (@shtirlic)
+
+Bugfixes:
+
+  - JRuby new works with HTTPS gem sources (@davidcelis)
+  - `install` installs both rake rake-built gems at once (@crowbot, #2107)
+  - handle Errno::ETIMEDOUT errors (@jmoses)
+  - handle Errno::EAGAIN errors on JRuby
+  - disable ANSI coloring when output is redirected (@tomykaira)
+  - raise LoadErrors correctly during Bundler.require (@Empact)
+  - do not swallow --verbose on `bundle exec` (@sol, #2102)
+  - `gem` generates gemspecs that block double-requires
+  - `gem` generates gemspecs that admit they depend on rake
+
+## 1.2.5 (Feb 24, 2013)
+
+Bugfixes:
+
+  - install Gemfiles with HTTP sources even without OpenSSL present
+  - display CerficateFailureError message in full
+
+## 1.2.4 (Feb 12, 2013)
+
+Features:
+
+  - warn about Ruby 2.0 and Rubygems 2.0
+  - inform users when the resolver starts
+  - disable reverse DNS to speed up API requests (@raggi)
+
+Bugfixes:
+
+  - don't send user/pass when redirected to another host (@perplexes)
+  - load gemspecs containing unicode (@gaffneyc, #2301)
+  - support any ruby version in --standalone
+  - resolve some ruby -w warnings (@chastell, #2193)
+  - don't scare users with an error message during API fallback
+
+## 1.2.3 (Nov 29, 2012)
+
+Bugfixes:
+
+  - fix exceptions while loading some gemspecs
+
+## 1.2.2 (Nov 14, 2012)
+
+Bugfixes:
+
+  - support new Psych::SyntaxError for Ruby 2.0.0 (@tenderlove, @sol)
+  - `bundle viz` works with git gems again (@hirochachacha)
+  - recognize more cases when OpenSSL is not present
+
+## 1.2.1 (Sep 19, 2012)
+
+Bugfixes:
+
+  - `bundle clean` now works with BUNDLE_WITHOUT groups again
+  - have a net/http read timeout around the Gemcutter API Endpoint
+
+## 1.2.0 (Aug 30, 2012)
+
+Bugfixes:
+
+  - raise original error message from LoadError's
+
+Documentation:
+
+  - `platform` man pages
+
+## 1.2.0.rc.2 (Aug 8, 2012)
+
+Bugfixes:
+
+  - `clean` doesn't remove gems that are included in the lockfile
+
+## 1.2.0.rc (Jul 17, 2012)
+
+Features:
+
+  - `check` now has a `--dry-run` option (@svenfuchs, #1811)
+  - loosen ruby directive for engines
+  - prune git/path directories inside vendor/cache (@josevalim, #1988)
+  - update vendored thor to 0.15.2 (@sferik)
+  - add .txt to LICENSE (@postmodern, #2001)
+  - add `config disable_local_branch_check` (@josevalim, #1985)
+  - fall back on the full index when experiencing syck errors (#1419)
+  - handle syntax errors in Ruby gemspecs (#1974)
+
+Bugfixes:
+
+  - fix `pack`/`cache` with `--all` (@josevalim, #1989)
+  - don't display warning message when `cache_all` is set
+  - check for `nil` PATH (#2006)
+  - Always try to keep original GEM_PATH (@drogus, #1920)
+
+## 1.2.0.pre.1 (May 27, 2012)
+
+Features:
+
+  - Git gems import submodules of submodules recursively (@nwwatson, #1935)
+
+Bugfixes:
+
+  - Exit from `check` with a non-zero status when frozen with no lock
+  - Use `latest_release` in Capistrano and Vlad integration (#1264)
+  - Work around a Ruby 1.9.3p194 bug in Psych when config files are empty
+
+Documentation:
+
+  - Add instructions for local git repos to the `config` manpage
+  - Update the `Gemfile` manpage to include ruby versions (@stevenh512)
+  - When OpenSSL is missing, provide instructions for fixing (#1776 etc.)
+  - Unknown exceptions now link to ISSUES for help instead of a new ticket
+  - Correct inline help for `clean --force` (@dougbarth, #1911)
+
+## 1.2.0.pre (May 4, 2012)
+
+Features:
+
+  - bundle package now accepts --all to package git and path dependencies
+  - bundle config now accepts --local, --global and --delete options
+  - It is possible to override a git repository via configuration.
+    For instance, if you have a git dependency on rack, you can force
+    it to use a local repo with `bundle config local.rack ~/path/to/rack`
+  - Cache gemspec loads for performance (@dekellum, #1635)
+  - add --full-index flag to `bundle update` (@fluxx, #1829)
+  - add --quiet flag to `bundle update` (@nashby, #1654)
+  - Add Bundler::GemHelper.gemspec (@knu, #1637)
+  - Graceful handling of Gemfile syntax errors (@koraktor, #1661)
+  - `bundle platform` command
+  - add ruby to DSL, to specify version of ruby
+  - error out if the ruby version doesn't match
+
+Performance:
+
+  - bundle exec shouldn't run Bundler.setup just setting the right rubyopts options is enough (@spastorino, #1598)
+
+Bugfixes:
+
+  - Avoid passing RUBYOPT changes in with_clean_env block (@eric1234, #1604)
+  - Use the same ruby to run subprocesses as is running rake (@brixen)
+
+Documentation:
+
+  - Add :github documentation in DSL (@zofrex, #1848, #1851, #1852)
+  - Add docs for the --no-cache option (@fluxx, #1796)
+  - Add basic documentation for bin_path and bundle_path (@radar)
+  - Add documentation for the run method in Bundler::Installer
+
 ## 1.1.5 (Jul 17, 2012)
 
 Features:

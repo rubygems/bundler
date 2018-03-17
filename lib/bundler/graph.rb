@@ -15,6 +15,7 @@ module Bundler
       @node_options      = {}
       @edge_options      = {}
 
+      _patching_gem_dependency_class
       _populate_relations
     end
 
@@ -27,7 +28,6 @@ module Bundler
     private
 
     def _populate_relations
-      relations = Hash.new {|h, k| h[k] = Set.new}
       parent_dependencies = _groups.values.to_set.flatten
       while true
         if parent_dependencies.empty?
@@ -36,19 +36,17 @@ module Bundler
           tmp = Set.new
           parent_dependencies.each do |dependency|
             child_dependencies = dependency.to_spec.runtime_dependencies.to_set
-            relations[dependency.name] += child_dependencies.to_set
             @relations[dependency.name] += child_dependencies.map(&:name).to_set
             tmp += child_dependencies
 
-            @node_options[dependency.name] = {:label => _make_label(dependency, :node)}
+            @node_options[dependency.name] = _make_label(dependency, :node)
             child_dependencies.each do |c_dependency|
-              @edge_options["#{dependency.name}_#{c_dependency.name}"] = {:label => _make_label(c_dependency, :edge)}
+              @edge_options["#{dependency.name}_#{c_dependency.name}"] = _make_label(c_dependency, :edge)
             end
           end
           parent_dependencies = tmp
         end
       end
-      @relations
     end
 
     def _groups
@@ -58,8 +56,8 @@ module Bundler
           relations[group.to_s].add(dependency)
           @relations[group.to_s].add(dependency.name)
 
-          @node_options[group.to_s] ||= {:label => _make_label(group, :node)}
-          @edge_options["#{group}_#{dependency.name}"] = {:label => _make_label(dependency, :edge)}
+          @node_options[group.to_s] ||= _make_label(group, :node)
+          @edge_options["#{group}_#{dependency.name}"] = _make_label(dependency, :edge)
         end
       end
       @groups = relations.keys
@@ -84,7 +82,28 @@ module Bundler
       else
         raise ArgumentError, "2nd argument is invalid"
       end
-      label
+      label.nil? ? {} : { :label => label }
+    end
+
+    def _patching_gem_dependency_class
+      # method borrow from rubygems/dependency.rb
+      # redefinition of matching_specs will also redefine to_spec and to_specs
+      Gem::Dependency.class_eval do
+        def matching_specs platform_only = false
+          matches = Bundler.load.specs.select { |spec|
+            self.name === spec.name and # TODO: == instead of ===
+              requirement.satisfied_by? spec.version
+          }
+
+          if platform_only
+            matches.reject! { |spec|
+              not Gem::Platform.match spec.platform
+            }
+          end
+
+          matches = matches.sort_by { |s| s.sort_obj } # HACK: shouldn't be needed
+        end
+      end
     end
 
     class GraphVizClient
@@ -99,7 +118,6 @@ module Bundler
       end
 
       def g
-        require 'graphviz'
         @g ||= ::GraphViz.digraph(@graph_name, {:concentrate => true, :normalize => true, :nodesep => 0.55}) do |g|
           g.edge[:weight]   = 2
           g.edge[:fontname] = g.node[:fontname] = 'Arial, Helvetica, SansSerif'
@@ -109,7 +127,7 @@ module Bundler
 
       def run
         @groups.each do |group|
-          g.add_node(
+          g.add_nodes(
             group,
             {:style     => 'filled',
              :fillcolor => '#B9B9D5',
@@ -121,11 +139,11 @@ module Bundler
         @relations.each do |parent, children|
           children.each do |child|
             if @groups.include?(parent)
-              g.add_node(child, {:style => 'filled', :fillcolor => '#B9B9D5'}.merge(@node_options[child]))
-              g.add_edge(parent, child, {:constraint => false}.merge(@edge_options["#{parent}_#{child}"]))
+              g.add_nodes(child, {:style => 'filled', :fillcolor => '#B9B9D5'}.merge(@node_options[child]))
+              g.add_edges(parent, child, {:constraint => false}.merge(@edge_options["#{parent}_#{child}"]))
             else
-              g.add_node(child, @node_options[child])
-              g.add_edge(parent, child, @edge_options["#{parent}_#{child}"])
+              g.add_nodes(child, @node_options[child])
+              g.add_edges(parent, child, @edge_options["#{parent}_#{child}"])
             end
           end
         end

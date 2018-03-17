@@ -292,7 +292,7 @@ describe "the lockfile format" do
     G
   end
 
-  it "order dependencies of dependencies in alphabetical order" do
+  it "orders dependencies' dependencies in alphabetical order" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -317,8 +317,8 @@ describe "the lockfile format" do
             actionpack (= 2.3.2)
             activerecord (= 2.3.2)
             activeresource (= 2.3.2)
-            rake (= 0.8.7)
-          rake (0.8.7)
+            rake (= 10.0.2)
+          rake (10.0.2)
 
       PLATFORMS
         #{generic(Gem::Platform.local)}
@@ -328,7 +328,7 @@ describe "the lockfile format" do
     G
   end
 
-  it "orders dependencies according to version" do
+  it "orders dependencies by version" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem 'double_deps'
@@ -469,6 +469,30 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo
+    G
+  end
+
+  it "stores relative paths when the path is provided for gemspec" do
+    build_lib("foo", :path => tmp.join("foo"))
+
+    install_gemfile <<-G
+      gemspec :path => "../foo"
+    G
+
+    lockfile_should_be <<-G
+      PATH
+        remote: ../foo
+        specs:
+          foo (1.0)
+
+      GEM
+        specs:
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        foo!
     G
   end
 
@@ -633,20 +657,20 @@ describe "the lockfile format" do
       gem "rack", "1.1"
     G
 
-    bundled_app("Gemfile.lock").should_not exist
-    out.should include "rack (= 1.0) and rack (= 1.1)"
+    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(out).to include "rack (= 1.0) and rack (= 1.1)"
   end
 
 
-  it "raises if two different versions are used" do
+  it "raises if two different sources are used" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
       gem "rack", :git => "git://hubz.com"
     G
 
-    bundled_app("Gemfile.lock").should_not exist
-    out.should include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
+    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(out).to include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
   end
 
   it "works correctly with multiple version dependencies" do
@@ -676,7 +700,7 @@ describe "the lockfile format" do
   # * multiple copies of the same GIT section appeared in the lockfile
   # * when this happened, those sections got multiple copies of gems
   #   in those sections.
-  it "fix corrupted lockfiles" do
+  it "fixes corrupted lockfiles" do
     build_git "omg", :path => lib_path('omg')
     revision = revision_for(lib_path('omg'))
 
@@ -720,7 +744,7 @@ describe "the lockfile format" do
     should_be_installed "omg 1.0"
 
     # Confirm that duplicate specs do not appear
-    File.read(bundled_app('Gemfile.lock')).should == strip_whitespace(<<-L)
+    expect(File.read(bundled_app('Gemfile.lock'))).to eq(strip_whitespace(<<-L))
       GIT
         remote: #{lib_path('omg')}
         revision: #{revision}
@@ -740,7 +764,7 @@ describe "the lockfile format" do
     L
   end
 
-  describe "line endings" do
+  describe "a line ending" do
     def set_lockfile_mtime_to_known_value
       time = Time.local(2000, 1, 1, 0, 0, 0)
       File.utime(time, time, bundled_app('Gemfile.lock'))
@@ -755,7 +779,7 @@ describe "the lockfile format" do
     end
 
     it "generates Gemfile.lock with \\n line endings" do
-      File.read(bundled_app("Gemfile.lock")).should_not match("\r\n")
+      expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
       should_be_installed "rack 1.0"
     end
 
@@ -764,8 +788,8 @@ describe "the lockfile format" do
       it "preserves Gemfile.lock \\n line endings" do
         update_repo2
 
-        lambda { bundle "update" }.should change { File.mtime(bundled_app('Gemfile.lock')) }
-        File.read(bundled_app("Gemfile.lock")).should_not match("\r\n")
+        expect { bundle "update" }.to change { File.mtime(bundled_app('Gemfile.lock')) }
+        expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
         should_be_installed "rack 1.2"
       end
 
@@ -775,8 +799,8 @@ describe "the lockfile format" do
         File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
-        lambda { bundle "update" }.should change { File.mtime(bundled_app('Gemfile.lock')) }
-        File.read(bundled_app("Gemfile.lock")).should match("\r\n")
+        expect { bundle "update" }.to change { File.mtime(bundled_app('Gemfile.lock')) }
+        expect(File.read(bundled_app("Gemfile.lock"))).to match("\r\n")
         should_be_installed "rack 1.2"
       end
     end
@@ -784,12 +808,12 @@ describe "the lockfile format" do
     context "when nothing changes" do
 
       it "preserves Gemfile.lock \\n line endings" do
-        lambda { ruby <<-RUBY
+        expect { ruby <<-RUBY
                    require 'rubygems'
                    require 'bundler'
                    Bundler.setup
                  RUBY
-               }.should_not change { File.mtime(bundled_app('Gemfile.lock')) }
+               }.not_to change { File.mtime(bundled_app('Gemfile.lock')) }
       end
 
       it "preserves Gemfile.lock \\n\\r line endings" do
@@ -797,13 +821,40 @@ describe "the lockfile format" do
         File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
-        lambda { ruby <<-RUBY
+        expect { ruby <<-RUBY
                    require 'rubygems'
                    require 'bundler'
                    Bundler.setup
                  RUBY
-               }.should_not change { File.mtime(bundled_app('Gemfile.lock')) }
+               }.not_to change { File.mtime(bundled_app('Gemfile.lock')) }
       end
     end
+  end
+
+  it "refuses to install if Gemfile.lock contains conflict markers" do
+    lockfile <<-L
+      GEM
+        remote: file://#{gem_repo1}/
+        specs:
+      <<<<<<<
+          rack (1.0.0)
+      =======
+          rack (1.0.1)
+      >>>>>>>
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack
+    L
+
+    error = install_gemfile(<<-G, :expect_err => true)
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    expect(error).to match(/your Gemfile.lock contains merge conflicts/i)
+    expect(error).to match(/git checkout HEAD -- Gemfile.lock/i)
   end
 end

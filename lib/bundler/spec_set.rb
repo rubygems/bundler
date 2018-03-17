@@ -22,9 +22,11 @@ module Bundler
         next if handled[dep] || skip.include?(dep.name)
 
         spec = lookup[dep.name].find do |s|
-          match_current_platform ?
-            Gem::Platform.match(s.platform) :
+          if match_current_platform
+            Gem::Platform.match(s.platform)
+          else
             s.match_platform(dep.__platform)
+          end
         end
 
         handled[dep] = true
@@ -107,7 +109,22 @@ module Bundler
 
     def sorted
       rake = @specs.find { |s| s.name == 'rake' }
-      @sorted ||= ([rake] + tsort).compact.uniq
+      begin
+        @sorted ||= ([rake] + tsort).compact.uniq
+      rescue TSort::Cyclic => error
+        cgems = extract_circular_gems(error)
+        raise CyclicDependencyError, "Your Gemfile requires gems that depend" \
+          " depend on each other, creating an infinite loop. Please remove" \
+          " either gem '#{cgems[1]}' or gem '#{cgems[0]}' and try again."
+      end
+    end
+
+    def extract_circular_gems(error)
+      if Bundler.current_ruby.mri? && Bundler.current_ruby.on_19?
+        error.message.scan(/(\w+) \([^)]/).flatten
+      else
+        error.message.scan(/@name="(.*?)"/).flatten
+      end
     end
 
     def lookup

@@ -31,7 +31,7 @@ module Bundler
     end
 
     def inspect
-      "<Index sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
+      "#<#{self.class}:0x#{object_id} sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
     end
 
     def empty?
@@ -95,7 +95,7 @@ module Bundler
           s.dependencies.map{|d| d.name }
         end
       end.flatten.uniq
-      dependency_names.select{|name| specs_by_name(name).empty? }
+      dependency_names.select{|name| name != 'bundler' && specs_by_name(name).empty? }
     end
 
     def use(other, override_dupes = false)

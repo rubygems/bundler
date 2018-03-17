@@ -67,7 +67,7 @@ describe "bundle install with explicit source paths" do
     G
 
     bundle "install --frozen", :exitstatus => true
-    exitstatus.should == 0
+    expect(exitstatus).to eq(0)
   end
 
   it "installs dependencies from the path even if a newer gem is available elsewhere" do
@@ -87,7 +87,7 @@ describe "bundle install with explicit source paths" do
     G
 
     run "require 'rack'"
-    out.should == 'WIN OVERRIDE'
+    expect(out).to eq('WIN OVERRIDE')
   end
 
   it "works" do
@@ -191,8 +191,8 @@ describe "bundle install with explicit source paths" do
       gemspec :path => "#{lib_path("foo")}"
     G
 
-    exitstatus.should eq(15)
-    out.should =~ /There are multiple gemspecs/
+    expect(exitstatus).to eq(15)
+    expect(out).to match(/There are multiple gemspecs/)
   end
 
   it "allows :name to be specified to resolve ambiguity" do
@@ -220,7 +220,7 @@ describe "bundle install with explicit source paths" do
     G
 
     bundle "exec foobar"
-    out.should == "1.0"
+    expect(out).to eq("1.0")
   end
 
   it "handles directories in bin/" do
@@ -231,7 +231,7 @@ describe "bundle install with explicit source paths" do
     install_gemfile <<-G
       gem 'foo', '1.0', :path => "#{lib_path('foo-1.0')}"
     G
-    err.should == ""
+    expect(err).to eq("")
   end
 
   it "removes the .gem file after installing" do
@@ -241,7 +241,7 @@ describe "bundle install with explicit source paths" do
       gem 'foo', :path => "#{lib_path('foo-1.0')}"
     G
 
-    lib_path('foo-1.0').join('foo-1.0.gem').should_not exist
+    expect(lib_path('foo-1.0').join('foo-1.0.gem')).not_to exist
   end
 
   describe "block syntax" do
@@ -297,7 +297,7 @@ describe "bundle install with explicit source paths" do
     G
 
     bundle "exec foo"
-    out.should == "1.0"
+    expect(out).to eq("1.0")
   end
 
   describe "when the gem version in the path is updated" do
@@ -402,4 +402,67 @@ describe "bundle install with explicit source paths" do
       should_be_installed "bar 1.0"
     end
   end
+
+  describe "gem install hooks" do
+    it "runs pre-install hooks" do
+      build_git "foo"
+      gemfile <<-G
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      File.open(lib_path("install_hooks.rb"), "w") do |h|
+        h.write <<-H
+          require 'rubygems'
+          Gem.pre_install_hooks << lambda do |inst|
+            STDERR.puts "Ran pre-install hook: \#{inst.spec.full_name}"
+          end
+        H
+      end
+
+      bundle :install, :expect_err => true,
+        :requires => [lib_path('install_hooks.rb')]
+      expect(err).to eq("Ran pre-install hook: foo-1.0")
+    end
+
+    it "runs post-install hooks" do
+      build_git "foo"
+      gemfile <<-G
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      File.open(lib_path("install_hooks.rb"), "w") do |h|
+        h.write <<-H
+          require 'rubygems'
+          Gem.post_install_hooks << lambda do |inst|
+            STDERR.puts "Ran post-install hook: \#{inst.spec.full_name}"
+          end
+        H
+      end
+
+      bundle :install, :expect_err => true,
+        :requires => [lib_path('install_hooks.rb')]
+      expect(err).to eq("Ran post-install hook: foo-1.0")
+    end
+
+    it "complains if the install hook fails" do
+      build_git "foo"
+      gemfile <<-G
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      File.open(lib_path("install_hooks.rb"), "w") do |h|
+        h.write <<-H
+          require 'rubygems'
+          Gem.pre_install_hooks << lambda do |inst|
+            false
+          end
+        H
+      end
+
+      bundle :install, :expect_err => true,
+        :requires => [lib_path('install_hooks.rb')]
+      expect(out).to include("failed for foo-1.0")
+    end
+  end
+
 end
