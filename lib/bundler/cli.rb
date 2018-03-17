@@ -741,7 +741,7 @@ module Bundler
       end
 
       Bundler.ui.warn "The latest bundler is #{latest}, but you are currently running #{current}.\n#{suggestion}"
-    rescue
+    rescue RuntimeError
       nil
     end
   end

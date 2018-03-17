@@ -63,7 +63,7 @@ module Bundler
         @plugin_paths[name] = path
         @load_paths[name] = load_paths
         save_index
-      rescue
+      rescue StandardError
         @commands = old_commands
         raise
       end

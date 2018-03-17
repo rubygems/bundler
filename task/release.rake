@@ -38,7 +38,7 @@ namespace :release do
     if response.code.to_i >= 400
       raise "#{uri}\n#{response.inspect}\n#{begin
                                               JSON.parse(response.body)
-                                            rescue
+                                            rescue JSON::ParseError
                                               response.body
                                             end}"
     end

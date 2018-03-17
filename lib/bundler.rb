@@ -191,7 +191,7 @@ module Bundler
         end
         tmp_home_path.join(login).tap(&:mkpath)
       end
-    rescue => e
+    rescue RuntimeError => e
       raise e.exception("#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}")
     end
 
@@ -416,7 +416,7 @@ EOF
 
     def load_marshal(data)
       Marshal.load(data)
-    rescue => e
+    rescue StandardError => e
       raise MarshalError, "#{e.class}: #{e.message}"
     end
 
