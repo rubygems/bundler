@@ -60,13 +60,8 @@ module Bundler
       def install_all_sources(names, version, git_source_options, rubygems_source)
         source_list = SourceList.new
 
-        if git_source_options
-          source_list.add_git_source(git_source_options)
-        end
-
-        if rubygems_source
-          source_list.add_rubygems_source("remotes" => rubygems_source)
-        end
+        source_list.add_git_source(git_source_options) if git_source_options
+        source_list.add_rubygems_source("remotes" => rubygems_source) if rubygems_source
 
         deps = names.map {|name| Dependency.new name, version }
 
