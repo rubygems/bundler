@@ -120,8 +120,8 @@ module Bundler
       @source_changes = converge_sources
 
       unless @unlock[:lock_shared_dependencies]
-        eager_unlock = expand_dependencies(@unlock[:gems])
-        @unlock[:gems] = @locked_specs.for(eager_unlock).map(&:name)
+        eager_unlock = expand_dependencies(@unlock[:gems], true)
+        @unlock[:gems] = @locked_specs.for(eager_unlock, [], false, false, false).map(&:name)
       end
 
       @dependency_changes = converge_dependencies
