@@ -14,8 +14,7 @@ module Bundler
       def install(names, options)
         version = options[:version] || [">= 0"]
         Bundler.settings.temporary(:lockfile_uses_separate_rubygems_sources => false, :disable_multisource => false) do
-          sources = extract_sources_from_options!(options)
-          source_list = prepare_source_list(sources, options)
+          source_list = prepare_source_list(options)
           definition = create_definition(names, source_list, version)
           install_definition(definition)
         end
@@ -36,32 +35,24 @@ module Bundler
 
     private
 
-      def extract_sources_from_options!(options)
-        sources = {}
-
-        sources[:git] = options.delete(:git) if options[:git]
-        sources[:file] = options.delete(:file) if options[:file]
-        sources[:source] = options.delete(:source) if options[:source]
-
-        sources
-      end
-
-      def prepare_source_list(sources, options)
+      def prepare_source_list(options)
         source_list = SourceList.new
 
-        if sources[:git]
-          source_list.add_git_source(options.merge("uri" => sources[:git]))
+        if options[:git]
+          uri = options.delete(:git)
+          source_list.add_git_source(options.merge("uri" => uri))
         end
 
-        if sources[:file]
-          source_list.add_git_source(options.merge("uri" => sources[:file]))
+        if options[:file]
+          uri = options.delete(:file)
+          source_list.add_git_source(options.merge("uri" => uri))
         end
 
-        if sources[:source]
+        if options[:source]
           source_list.add_rubygems_source("remotes" => sources[:source])
         end
 
-        if sources.empty?
+        if options[:source].nil? && source_list.git_sources.empty?
           sources = Bundler.rubygems.sources
           source_list.add_rubygems_source("remotes" => sources)
         end
