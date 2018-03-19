@@ -44,7 +44,7 @@ module Bundler
     private
 
       # Rubocop misunderstands the semantics of this method, assuming an `else` code block
-      # that doesn't actually exist. See https://github.com/bbatsov/rubocop/issues/5702.
+      # that doesn't exist. See https://github.com/bbatsov/rubocop/issues/5702.
       #
       # rubocop:disable Style/GuardClause
       def check_sources_consistency!(options)
