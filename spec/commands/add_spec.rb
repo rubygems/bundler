@@ -172,4 +172,16 @@ RSpec.describe "bundle add" do
       expect(out).to include("You specified: weakling (~> 0.0.1) and weakling (>= 0).")
     end
   end
+
+  it "throws an error if a gem is added which is already specified in Gemfile" do
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "rack", "1.0"
+    G
+
+    bundle "add 'rack'"
+
+    expect(out).to include "You cannot specify the same gem twice with different version requirements"
+    expect(out).to include "If you want to update the gem version, run `bundle update rack`. You may need to change the version requirement specified in the Gemfile if it's too restrictive"
+  end
 end
