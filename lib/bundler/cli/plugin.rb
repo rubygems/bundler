@@ -5,13 +5,7 @@ module Bundler
   class CLI::Plugin < Thor
     desc "install PLUGINS", "Install the plugin from the source"
     long_desc <<-D
-      Install plugins from any of the sources provided:
-
-      - from rubygems (`--source` option)
-      - from a remote git source (`--git` option)
-      - from a local git repo (`--local-git /path/to/repo` option)
-
-      If no sources are provided, it uses Gem.sources.
+      Install plugins either from the rubygems source provided (with --source option) or from a remote/git source provided (with respectively --git and --local-git options). If no sources are provided, it uses Gem.sources
    D
     method_option "source", :type => :string, :default => nil, :banner =>
       "URL of the RubyGems source to fetch the plugin from"
