@@ -101,13 +101,18 @@ module Bundler
       @static_gemfile  = false
 
       @locked_gems            = lockfile
-      @lockfile               = lockfile && lockfile.lockfile
-      @lockfile_contents      = lockfile && lockfile.lockfile_contents || String.new
-      @locked_bundler_version = lockfile && lockfile.bundler_version
-      @locked_ruby_version    = lockfile && lockfile.ruby_version
-      @locked_platforms       = lockfile && lockfile.platforms || []
+      @lockfile               = lockfile
+      @lockfile_contents      = String.new
+      @locked_bundler_version = nil
+      @locked_ruby_version    = nil
+      @locked_platforms       = []
 
       if lockfile
+        @lockfile               = lockfile.lockfile
+        @lockfile_contents      = lockfile.lockfile_contents || String.new
+        @locked_bundler_version = lockfile.bundler_version
+        @locked_ruby_version    = lockfile.ruby_version
+        @locked_platforms       = lockfile.platforms || []
         @platforms = @locked_platforms.dup
 
         if unlock != true

@@ -216,6 +216,11 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
+      # Convert lockfile to LockfileParser object
+      if lockfile && !lockfile.instance_of?(LockfileParser)
+        lockfile = LockfileParser.new(Bundler.read_file(lockfile))
+      end
+
       Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups, @gemfiles).tap do |definition|
         definition.static_gemfile = !@dynamic
       end
