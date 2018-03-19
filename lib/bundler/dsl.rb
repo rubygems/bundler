@@ -109,7 +109,7 @@ module Bundler
             return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
                             "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement}). " \
-                            "You can also update the gem by running `bundle update #{current.name}`"
+                            "If you want to update the gem version, run `bundle update #{current.name}`. You may need to change the version requirement specified in the Gemfile if it's too restrictive"
           end
 
         else
