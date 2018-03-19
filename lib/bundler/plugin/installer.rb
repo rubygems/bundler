@@ -19,7 +19,7 @@ module Bundler
         Bundler.settings.temporary(:lockfile_uses_separate_rubygems_sources => false, :disable_multisource => false) do
           if options[:git]
             install_git(names, version, options)
-          elsif options[:file]
+          elsif options[:'local-git']
             install_local_git(names, version, options)
           else
             sources = options[:source] || Bundler.rubygems.sources
@@ -44,7 +44,7 @@ module Bundler
     private
 
       def check_sources_consistency!(options)
-        if options[:git] && options[:file]
+        if options[:git] && options[:'local-git']
           raise InvalidOption, "Remote and local plugin git sources can't be both specified"
         end
       end
@@ -57,7 +57,7 @@ module Bundler
       end
 
       def install_local_git(names, version, options)
-        uri = options.delete(:file)
+        uri = options.delete(:'local-git')
         options["uri"] = uri
 
         install_all_sources(names, version, options, options[:source])

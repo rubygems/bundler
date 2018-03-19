@@ -9,7 +9,7 @@ module Bundler
 
       - from rubygems (`--source` option)
       - from a remote git source (`--git` option)
-      - from a local git repo (`--file /path/to/repo` option)
+      - from a local git repo (`--local-git /path/to/repo` option)
 
       If no sources are provided, it uses Gem.sources.
    D
@@ -19,7 +19,7 @@ module Bundler
       "The version of the plugin to fetch"
     method_option "git", :type => :string, :default => nil, :banner =>
       "URL of the git repo to fetch from"
-    method_option "file", :type => :string, :default => nil, :banner =>
+    method_option "local-git", :type => :string, :default => nil, :banner =>
       "Path of the local git repo to fetch from"
     method_option "branch", :type => :string, :default => nil, :banner =>
       "The git branch to checkout"
