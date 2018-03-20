@@ -220,7 +220,7 @@ RSpec.describe Bundler::Definition do
         end
 
         it "should get a locked specs list when updating all" do
-          definition = Bundler::Definition.new(bundled_app("Gemfile.lock"), [], Bundler::SourceList.new, true)
+          definition = Bundler::Definition.new(Bundler::LockfileParser.new(Bundler.read_file("Gemfile.lock")), [], Bundler::SourceList.new, true)
           locked_specs = definition.gem_version_promoter.locked_specs
           expect(locked_specs.to_a.map(&:name)).to eq ["foo"]
           expect(definition.instance_variable_get("@locked_specs").empty?).to eq true
@@ -282,7 +282,7 @@ RSpec.describe Bundler::Definition do
                                      Bundler::Dependency.new("shared_owner_b", ">= 0")]
           unlock_hash_for_bundle_install = {}
           definition = Bundler::Definition.new(
-            bundled_app("Gemfile.lock"),
+            Bundler::LockfileParser.new(Bundler.read_file("Gemfile.lock")),
             updated_deps_in_gemfile,
             source_list,
             unlock_hash_for_bundle_install
@@ -296,7 +296,7 @@ RSpec.describe Bundler::Definition do
                                      Bundler::Dependency.new("shared_owner_a", ">= 0"),
                                      Bundler::Dependency.new("shared_owner_b", ">= 0")]
           definition = Bundler::Definition.new(
-            bundled_app("Gemfile.lock"),
+            Bundler::LockfileParser.new(Bundler.read_file("Gemfile.lock")),
             updated_deps_in_gemfile,
             source_list,
             :gems => ["shared_owner_a"], :lock_shared_dependencies => true
