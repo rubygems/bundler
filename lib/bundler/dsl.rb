@@ -103,13 +103,19 @@ module Bundler
       # if there's already a dependency with this name we try to prefer one
       if current = @dependencies.find {|d| d.name == dep.name }
         deleted_dep = @dependencies.delete(current) if current.type == :development
-
         if current.requirement != dep.requirement
           unless deleted_dep
             return if dep.type == :development
-            raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
-                            "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement}). " \
-                            "If you want to update the gem version, run `bundle update #{current.name}`. You may need to change the version requirement specified in the Gemfile if it's too restrictive"
+
+            # If no version is specified on adding gem
+            if "#{dep.requirement}" == ">= 0"
+              raise GemfileError, "Gem `#{current.name}` is already added.\n" \
+                              "If you want to update the gem version, run `bundle update #{current.name}`."
+            else
+              raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
+                              "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement}). " \
+                              "If you want to update the gem version, run `bundle update #{current.name}`. You may need to change the version requirement specified in the Gemfile if it's too restrictive"
+            end
           end
 
         else
