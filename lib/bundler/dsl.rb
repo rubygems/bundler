@@ -108,9 +108,9 @@ module Bundler
             return if dep.type == :development
 
             # If no version is specified on adding gem
-            if "#{dep.requirement}" == ">= 0"
+            if dep.requirement.to_s == ">= 0"
               raise GemfileError, "Gem `#{current.name}` is already added.\n" \
-                              "If you want to update the gem version, run `bundle update #{current.name}`."
+                              "If you want to update the gem version, run `bundle update #{current.name}`"
             else
               raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
                               "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement}). " \

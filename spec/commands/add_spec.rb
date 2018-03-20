@@ -173,15 +173,29 @@ RSpec.describe "bundle add" do
     end
   end
 
-  it "throws an error if a gem is added which is already specified in Gemfile" do
-    install_gemfile <<-G
-      source "file://#{gem_repo2}"
-      gem "rack", "1.0"
-    G
+  context "throws an error if a gem is added which is already specified in Gemfile" do
+    it "with version requirements" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack", "1.0"
+      G
 
-    bundle "add 'rack'"
+      bundle "add 'rack' --version=1.1"
 
-    expect(out).to include "You cannot specify the same gem twice with different version requirements"
-    expect(out).to include "If you want to update the gem version, run `bundle update rack`. You may need to change the version requirement specified in the Gemfile if it's too restrictive"
+      expect(out).to include "You cannot specify the same gem twice with different version requirements"
+      expect(out).to include "If you want to update the gem version, run `bundle update rack`. You may need to change the version requirement specified in the Gemfile if it's too restrictive"
+    end
+
+    it "without version requirements" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack", "1.0"
+      G
+
+      bundle "add 'rack'"
+
+      expect(out).to include("Gem `rack` is already added.")
+      expect(out).to include("If you want to update the gem version, run `bundle update rack`.")
+    end
   end
 end
