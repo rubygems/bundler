@@ -1,16 +1,10 @@
 <%- if RUBY_VERSION < "2.0.0" -%>
 # coding: utf-8
 
-lib = File.expand_path("../lib", __FILE__)
-<%- else -%>
-lib = File.expand_path("lib", __dir__)
 <%- end -%>
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "<%= config[:namespaced_path] %>/version"
-
 Gem::Specification.new do |spec|
   spec.name          = <%= config[:name].inspect %>
-  spec.version       = <%= config[:constant_name] %>::VERSION
+  spec.version       = File.read(File.expand_path("../VERSION", __FILE__)).strip
   spec.authors       = [<%= config[:author].inspect %>]
   spec.email         = [<%= config[:email].inspect %>]
 

@@ -278,7 +278,12 @@ RSpec.describe "bundle gem" do
     end
 
     it "starts with version 0.1.0" do
-      expect(bundled_app("test_gem/lib/test_gem/version.rb").read).to match(/VERSION = "0.1.0"/)
+      expect(bundled_app("test_gem/VERSION")).to read_as("0.1.0")
+      expect(bundled_app("test_gem/lib/test_gem/version.rb")).to read_as(strip_whitespace(<<-RUBY))
+        module TestGem
+          VERSION = File.read(File.expand_path("../../../VERSION", __FILE__)).strip.freeze
+        end
+      RUBY
     end
 
     it "does not nest constants" do
@@ -572,7 +577,14 @@ RSpec.describe "bundle gem" do
     end
 
     it "starts with version 0.1.0" do
-      expect(bundled_app("test-gem/lib/test/gem/version.rb").read).to match(/VERSION = "0.1.0"/)
+      expect(bundled_app("test-gem/VERSION")).to read_as("0.1.0")
+      expect(bundled_app("test-gem/lib/test/gem/version.rb")).to read_as(strip_whitespace(<<-RUBY))
+        module Test
+          module Gem
+            VERSION = File.read(File.expand_path("../../../../VERSION", __FILE__)).strip.freeze
+          end
+        end
+      RUBY
     end
 
     it "nests constants so they work" do

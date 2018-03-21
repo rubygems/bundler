@@ -66,10 +66,11 @@ module Bundler
         "lib/newgem.rb.tt" => "lib/#{namespaced_path}.rb",
         "lib/newgem/version.rb.tt" => "lib/#{namespaced_path}/version.rb",
         "newgem.gemspec.tt" => "#{name}.gemspec",
+        "VERSION" => "VERSION",
         "Rakefile.tt" => "Rakefile",
         "README.md.tt" => "README.md",
         "bin/console.tt" => "bin/console",
-        "bin/setup.tt" => "bin/setup"
+        "bin/setup.tt" => "bin/setup",
       }
 
       executables = %w[
