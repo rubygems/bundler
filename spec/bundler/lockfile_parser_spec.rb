@@ -33,7 +33,7 @@ RSpec.describe Bundler::LockfileParser do
     it "returns the attributes" do
       attributes = described_class.sections_in_lockfile(lockfile_contents)
       expect(attributes).to contain_exactly(
-        "BUNDLED WITH", "DEPENDENCIES", "GEM", "GIT", "PLATFORMS", "RUBY VERSION"
+        "BUNDLED WITH", "DEPENDENCIES", "GEM", "GIT", "PLATFORMS", "RUBY VERSION",
       )
     end
   end
@@ -60,7 +60,7 @@ RSpec.describe Bundler::LockfileParser do
 
       it "returns the same as > 1.0" do
         expect(subject).to contain_exactly(
-          described_class::BUNDLED, described_class::RUBY, described_class::PLUGIN
+          described_class::BUNDLED, described_class::RUBY, described_class::PLUGIN, described_class::GROUPS, described_class::GEMFILES
         )
       end
     end
@@ -70,7 +70,7 @@ RSpec.describe Bundler::LockfileParser do
 
       it "returns the same as for the release version" do
         expect(subject).to contain_exactly(
-          described_class::RUBY, described_class::PLUGIN
+          described_class::RUBY, described_class::PLUGIN, described_class::GROUPS, described_class::GEMFILES
         )
       end
     end
