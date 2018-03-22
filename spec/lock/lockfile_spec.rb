@@ -75,6 +75,67 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
   end
 
+  context "behaviour with _static_gemfile! in Gemfile" do
+    it "when _static_gemfile! is not specified" do
+      install_gemfile <<-G
+        source "file://localhost#{gem_repo1}/"
+
+        gem "rack"
+      G
+
+      bundle :install
+
+      lockfile_should_be <<-G
+        GEM
+          remote: file://localhost#{gem_repo1}/
+          specs:
+            rack (1.0.0)
+
+        PLATFORMS
+          #{lockfile_platforms}
+
+        DEPENDENCIES
+          rack
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      G
+    end
+
+    context "when _static_gemfile! is specified" do
+      it "md5 is available" do
+        install_gemfile <<-G
+          source "file://localhost#{gem_repo1}"
+          _static_gemfile!
+
+          gem "rack"
+        G
+
+        lockfile_should_be <<-G
+          GEM
+            remote: file://localhost#{gem_repo1}/
+            specs:
+              rack (1.0.0)
+
+          PLATFORMS
+            #{lockfile_platforms}
+
+          DEPENDENCIES
+            rack
+              group: default
+
+          OPTIONAL GROUPS
+
+          GEMFILE CHECKSUMS
+            Gemfile: md5 #{Digest::MD5.file(bundled_app("Gemfile")).hexdigest}
+
+          BUNDLED WITH
+             #{Bundler::VERSION}
+        G
+      end
+    end
+  end
+
   it "does not update the lockfile's bundler version if nothing changed during bundle install" do
     version = "#{Bundler::VERSION.split(".").first}.0.0.0.a"
 
