@@ -148,6 +148,55 @@ RSpec.describe "bundle gem" do
     end
   end
 
+  shared_examples_for "--rubocop flag" do
+    before do
+      bundle! "gem #{gem_name} --rubocop"
+    end
+
+    it "generates a gem skeleton with rubocop" do
+      gem_skeleton_assertions
+      expect(bundled_app("test-gem/Rakefile")).to read_as(
+        include('require "rubocop/rake_task"').
+        and(include("RuboCop::RakeTask.new").
+        and(match(/:default.+:rubocop/)))
+      )
+    end
+
+    it "includes rubocop in generated Gemfile" do
+      Dir.chdir(bundled_app(gem_name)) do
+        builder = Bundler::Dsl.new
+        builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
+        builder.dependencies
+        rubocop_dep = builder.dependencies.find {|d| d.name == "rubocop" }
+        expect(rubocop_dep).not_to be_nil
+      end
+    end
+  end
+
+  shared_examples_for "--no-rubocop flag" do
+    define_negated_matcher :exclude, :include
+
+    before do
+      bundle! "gem #{gem_name} --no-rubocop"
+    end
+
+    it "generates a gem skeleton without rubocop" do
+      gem_skeleton_assertions
+      expect(bundled_app("test-gem/Rakefile")).to read_as(exclude("rubocop"))
+      expect(bundled_app("test-gem/#{gem_name}.gemspec")).to read_as(exclude("rubocop"))
+    end
+
+    it "does not include rubocop in generated Gemfile" do
+      Dir.chdir(bundled_app(gem_name)) do
+        builder = Bundler::Dsl.new
+        builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
+        builder.dependencies
+        rubocop_dep = builder.dependencies.find {|d| d.name == "rubocop" }
+        expect(rubocop_dep).to be_nil
+      end
+    end
+  end
+
   context "README.md" do
     context "git config github.user present" do
       before do
@@ -518,7 +567,7 @@ RSpec.describe "bundle gem" do
 
     context "with mit option in bundle config settings set to true" do
       before do
-        global_config "BUNDLE_GEM__MIT" => "true", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
+        global_config "BUNDLE_GEM__MIT" => "true", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__RUBOCOP" => "false", "BUNDLE_GEM__COC" => "false"
       end
       it_behaves_like "--mit flag"
       it_behaves_like "--no-mit flag"
@@ -531,7 +580,7 @@ RSpec.describe "bundle gem" do
 
     context "with coc option in bundle config settings set to true" do
       before do
-        global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "true"
+        global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__RUBOCOP" => "false", "BUNDLE_GEM__COC" => "true"
       end
       it_behaves_like "--coc flag"
       it_behaves_like "--no-coc flag"
@@ -540,6 +589,19 @@ RSpec.describe "bundle gem" do
     context "with coc option in bundle config settings set to false" do
       it_behaves_like "--coc flag"
       it_behaves_like "--no-coc flag"
+    end
+
+    context "with rubocop option in bundle config settings set to true" do
+      before do
+        global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false", "BUNDLE_GEM__RUBOCOP" => "true"
+      end
+      it_behaves_like "--rubocop flag"
+      it_behaves_like "--no-rubocop flag"
+    end
+
+    context "with rubocop option in bundle config settings set to false" do
+      it_behaves_like "--rubocop flag"
+      it_behaves_like "--no-rubocop flag"
     end
   end
 
