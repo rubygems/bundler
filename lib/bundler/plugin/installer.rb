@@ -48,7 +48,7 @@ module Bundler
       #
       # rubocop:disable Style/GuardClause
       def check_sources_consistency!(options)
-        if options[:git] && options[:local_git]
+        if options.key?(:git) && options.key?(:local_git)
           raise InvalidOption, "Remote and local plugin git sources can't be both specified"
         end
       end
