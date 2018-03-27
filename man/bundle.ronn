@@ -26,7 +26,7 @@ started, and Gemfile(5) for more information on the `Gemfile` format.
 
 ## BUNDLE COMMANDS
 
-We divide `bundle` subcommands into primary commands and utilities.
+We divide `bundle` subcommands into primary commands and utilities:
 
 ## PRIMARY COMMANDS
 
@@ -41,10 +41,10 @@ We divide `bundle` subcommands into primary commands and utilities.
   `vendor/cache` directory
 
 * [`bundle exec(1)`][bundle-exec(1)]:
-  Execute a script in the context of the current bundle
+  Execute a script in the current bundle
 
 * [`bundle config(1)`][bundle-config(1)]:
-  Specify and read configuration options for bundler
+  Specify and read configuration options for Bundler
 
 * `bundle help(1)`:
   Display detailed help for each subcommand
@@ -59,7 +59,7 @@ We divide `bundle` subcommands into primary commands and utilities.
 
 * [`bundle check(1)`][bundle-check(1)]:
   Determine whether the requirements for your application are installed
-  and available to bundler
+  and available to Bundler
 
 * [`bundle show(1)`][bundle-show(1)]:
   Show the source location of a particular gem in the bundle
@@ -68,7 +68,7 @@ We divide `bundle` subcommands into primary commands and utilities.
   Show all of the outdated gems in the current bundle
 
 * `bundle console(1)`:
-  Start an IRB session in the context of the current bundle
+  Start an IRB session in the current bundle
 
 * [`bundle open(1)`][bundle-open(1)]:
   Open an installed gem in the editor
@@ -83,16 +83,16 @@ We divide `bundle` subcommands into primary commands and utilities.
   Generate a simple `Gemfile`, placed in the current directory
 
 * [`bundle gem(1)`][bundle-gem(1)]:
-  Create a simple gem, suitable for development with bundler
+  Create a simple gem, suitable for development with Bundler
 
 * [`bundle platform(1)`][bundle-platform(1)]:
   Display platform compatibility information
 
 * [`bundle clean(1)`][bundle-clean(1)]:
-  Clean up unused gems in your bundler directory
+  Clean up unused gems in your Bundler directory
 
 * `bundle doctor(1)`:
-  Display warnings about common potential problems
+  Display warnings about common problems
 
 ## PLUGINS
 
@@ -102,7 +102,7 @@ and execute it, passing down any extra arguments to it.
 
 ## OBSOLETE
 
-These commands are obsolete and should no longer be used
+These commands are obsolete and should no longer be used:
 
 * `bundle cache(1)`
 * `bundle show(1)`
