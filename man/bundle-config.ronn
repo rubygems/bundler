@@ -7,10 +7,14 @@ bundle-config(1) -- Set bundler configuration options
 
 ## DESCRIPTION
 
-This command allows you to interact with bundler's configuration system.
-Bundler retrieves its configuration from the local application (`app/.bundle/config`),
-environment variables, and the user's home directory (`~/.bundle/config`),
-in that order of priority.
+This command allows you to interact with Bundler's configuration system.
+
+Bundler loads configuration settings in this order:
+
+1. Local config (`app/.bundle/config`)
+2. Environmental variables (`ENV`)
+3. Global config (`~/.bundle/config`)
+4. Bundler default config
 
 Executing `bundle config` with no parameters will print a list of all
 bundler configuration for the current bundle, and where that configuration
@@ -76,7 +80,7 @@ The options that can be configured are:
 
 ## BUILD OPTIONS
 
-You can use `bundle config` to give bundler the flags to pass to the gem
+You can use `bundle config` to give Bundler the flags to pass to the gem
 installer every time bundler tries to install a particular gem.
 
 A very common example, the `mysql` gem, requires Snow Leopard users to
