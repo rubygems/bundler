@@ -59,6 +59,6 @@ While some Bundler contributors are compensated by Ruby Together, the project ma
 
 Everyone interacting in the Bundler project’s codebases, issue trackers, chat rooms, and mailing lists is expected to follow the [Bundler code of conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md).
 
-###License
+### License
 
 [MIT License](https://github.com/bundler/bundler/blob/master/LICENSE.md)
