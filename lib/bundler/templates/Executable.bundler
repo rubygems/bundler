@@ -8,6 +8,7 @@
 # this file is here to facilitate running it.
 #
 
+require "pathname"
 require "rubygems"
 
 m = Module.new do
@@ -38,10 +39,39 @@ m = Module.new do
   end
 
   def gemfile
-    gemfile = ENV["BUNDLE_GEMFILE"]
-    return gemfile if gemfile && !gemfile.empty?
+    gemfile = find_gemfile
+    return unless gemfile
+    Pathname.new(gemfile).untaint.expand_path.to_s
+  end
 
-    File.expand_path("../<%= relative_gemfile_path %>", __FILE__)
+  def find_gemfile
+    given = ENV["BUNDLE_GEMFILE"]
+    return given if given && !given.empty?
+    find_file(*gemfile_names)
+  end
+
+  def gemfile_names
+    ["Gemfile", "gems.rb"]
+  end
+
+  def find_file(*names)
+    search_up(*names) do |filename|
+      return filename if File.file?(filename)
+    end
+  end
+
+  def search_up(*names)
+    previous = nil
+    current  = File.expand_path(Pathname.pwd).untaint
+
+    until !File.directory?(current) || current == previous
+      names.each do |name|
+        filename = File.join(current, name)
+        yield filename
+      end
+      previous = current
+      current = File.expand_path("..", current)
+    end
   end
 
   def lockfile

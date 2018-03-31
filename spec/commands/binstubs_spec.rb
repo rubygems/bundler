@@ -187,6 +187,54 @@ RSpec.describe "bundle binstubs <gem>" do
           end
         end
       end
+
+      context "when using multiple gemfiles" do
+        before do
+          build_repo2 do
+            build_gem "print_hello", "1.0" do |s|
+              s.executables = "print_hello"
+              s.bindir = "exe"
+              s.write "exe/print_hello", <<-R
+                puts "Hello"
+              R
+            end
+          end
+
+          bundle! "config --global path #{bundled_app("bundle")}"
+          bundle! "config --global bin #{bundled_app("bundle/bin")}"
+          install_gemfile! <<-G
+            source "file://#{gem_repo2}"
+          G
+          bundle! "binstubs bundler"
+        end
+
+        it "does not contain references to a specific gemfile path" do
+          create_file "one/Gemfile", <<-G
+            source "file://#{gem_repo2}"
+            gem "rack"
+          G
+          create_file "two/Gemfile", <<-G
+            source "file://#{gem_repo2}"
+            gem "print_hello"
+          G
+
+          Dir.chdir("one")
+          bundle! "install"
+          expect(out).to include("rack")
+
+          bundler_binstub = sys_exec "cat #{bundled_app("bundle/bin")}/bundle"
+          expect(bundler_binstub).to_not include("one/Gemfile")
+          expect(bundler_binstub).to_not include("../../../Gemfile")
+
+          Dir.chdir("../two")
+          bundle! "install"
+          expect(out).to include("print_hello")
+
+          bundler_binstub2 = sys_exec "cat #{bundled_app("bundle/bin")}/bundle"
+          expect(bundler_binstub2).to_not include("two/Gemfile")
+          expect(bundler_binstub2).to_not include("../../../Gemfile")
+        end
+      end
     end
 
     it "installs binstubs from git gems" do
