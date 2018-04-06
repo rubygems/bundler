@@ -82,7 +82,7 @@ module Bundler
     end
 
     def append_to(gemfile_path, new_gem_lines)
-      gemfile_path.open("a") do |f|
+      File.open(gemfile_path, "a") do |f|
         f.puts
         f.puts new_gem_lines
       end
