@@ -111,4 +111,33 @@ RSpec.describe Bundler::RubygemsIntegration do
       end
     end
   end
+
+  describe "#setup" do
+    let(:script) do
+      <<-EOF
+      require 'bundler/rubygems_integration'
+      if defined?(Bundler::Runtime)
+        $stderr.puts("Bundler::Runtime should not be defined")
+        exit 1
+      end
+      class MySpec < Gem::Specification
+        attr_accessor :load_paths
+      end
+
+      spec = MySpec.new do |s|
+        s.name = "to-validate"
+        s.version = "1.0.0"
+        s.loaded_from = __FILE__
+        s.load_paths = ["/foo/bar"]
+      end
+
+      Bundler.rubygems.setup([spec])
+      puts $LOAD_PATH.join("\n")
+EOF
+    end
+
+    it "runs without the rest of Bundler loaded" do
+      expect(ruby(script)).to include("/foo/bar\n")
+    end
+  end
 end

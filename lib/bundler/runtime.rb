@@ -20,28 +20,19 @@ module Bundler
       specs = groups.any? ? @definition.specs_for(groups) : requested_specs
 
       SharedHelpers.set_bundle_environment
-      Bundler.rubygems.replace_entrypoints(specs)
 
-      # Activate the specs
-      load_paths = specs.map do |spec|
+      specs.each do |spec|
         unless spec.loaded_from
           raise GemNotFound, "#{spec.full_name} is missing. Run `bundle install` to get it."
         end
 
         check_for_activated_spec!(spec)
-
-        Bundler.rubygems.mark_loaded(spec)
-        spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
-      end.reverse.flatten
-
-      # See Gem::Specification#add_self_to_load_path (since RubyGems 1.8)
-      if insert_index = Bundler.rubygems.load_path_insert_index
-        # Gem directories must come after -I and ENV['RUBYLIB']
-        $LOAD_PATH.insert(insert_index, *load_paths)
-      else
-        # We are probably testing in core, -I and RUBYLIB don't apply
-        $LOAD_PATH.unshift(*load_paths)
       end
+
+      Bundler.rubygems.setup(
+        specs,
+        :make_kernel_gem_public => Bundler.feature_flag.setup_makes_kernel_gem_public?
+      )
 
       setup_manpath
 

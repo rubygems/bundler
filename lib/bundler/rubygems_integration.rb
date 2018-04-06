@@ -48,6 +48,23 @@ module Bundler
       Gem.loaded_specs[name]
     end
 
+    def setup(specs, opts = {})
+      replace_entrypoints(specs, opts[:make_kernel_gem_public])
+      load_paths = specs.map do |spec|
+        mark_loaded(spec)
+        spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
+      end.reverse.flatten
+
+      # See Gem::Specification#add_self_to_load_path (since RubyGems 1.8)
+      if insert_index = load_path_insert_index
+        # Gem directories must come after -I and ENV['RUBYLIB']
+        $LOAD_PATH.insert(insert_index, *load_paths)
+      else
+        # We are probably testing in core, -I and RUBYLIB don't apply
+        $LOAD_PATH.unshift(*load_paths)
+      end
+    end
+
     def mark_loaded(spec)
       if spec.respond_to?(:activated=)
         current = Gem.loaded_specs[spec.name]
@@ -363,7 +380,7 @@ module Bundler
       false
     end
 
-    def replace_gem(specs, specs_by_name)
+    def replace_gem(specs, specs_by_name, make_kernel_gem_public)
       reverse_rubygems_kernel_mixin
 
       executables = nil
@@ -405,7 +422,7 @@ module Bundler
         end
 
         # backwards compatibility shim, see https://github.com/bundler/bundler/issues/5102
-        kernel_class.send(:public, :gem) if Bundler.feature_flag.setup_makes_kernel_gem_public?
+        kernel_class.send(:public, :gem) if make_kernel_gem_public
       end
     end
 
@@ -504,13 +521,13 @@ module Bundler
 
     # Replace or hook into RubyGems to provide a bundlerized view
     # of the world.
-    def replace_entrypoints(specs)
+    def replace_entrypoints(specs, make_kernel_gem_public)
       specs_by_name = specs.reduce({}) do |h, s|
         h[s.name] = s
         h
       end
 
-      replace_gem(specs, specs_by_name)
+      replace_gem(specs, specs_by_name, make_kernel_gem_public)
       stub_rubygems(specs)
       replace_bin_path(specs, specs_by_name)
       replace_refresh
