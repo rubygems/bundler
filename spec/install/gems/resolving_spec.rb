@@ -166,8 +166,9 @@ RSpec.describe "bundle install with install-time dependencies" do
       end
 
       describe "with a compound requirement" do
-        let(:ruby_requirement) { %("< 5000", "> 0.1") }
-        let(:error_message_requirement) { "< 5000, > 0.1" }
+        let(:reqs) { ["> 0.1", "< 5000"] }
+        let(:ruby_requirement) { reqs.map(&:dump).join(", ") }
+        let(:error_message_requirement) { Gem::Requirement.new(reqs).to_s }
 
         it_behaves_like "ruby version conflicts"
       end
