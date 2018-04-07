@@ -321,39 +321,51 @@ RSpec.describe "bundle install with gem sources" do
       expect(File.exist?(bundled_app("Gemfile.lock"))).to eq(true)
     end
 
-    it "throws a warning if a gem is added twice in Gemfile without version requirements" do
-      install_gemfile <<-G
-        source "file://#{gem_repo2}"
-        gem "rack"
-        gem "rack"
-      G
-
-      expect(out).to include("Your Gemfile lists the gem rack (>= 0) more than once.")
-      expect(out).to include("Remove any duplicate entries and specify the gem only once (per group).")
-      expect(out).to include("While it's not a problem now, it could cause errors if you change the version of one of them later.")
-    end
-
-    context "throws an error if a gem is added twice in Gemfile with version requirements" do
-      it "version of one dependency is not specified" do
+    context "throws a warning if a gem is added twice in Gemfile" do
+      it "without version requirements" do
         install_gemfile <<-G
           source "file://#{gem_repo2}"
-          gem "rack", "1.0"
+          gem "rack"
           gem "rack"
         G
 
-        expect(out).to include("Gem `rack` is already added")
+        expect(out).to include("Your Gemfile lists the gem rack (>= 0) more than once.")
+        expect(out).to include("Remove any duplicate entries and specify the gem only once (per group).")
+        expect(out).to include("While it's not a problem now, it could cause errors if you change the version of one of them later.")
       end
 
-      it "version of both dependencies are specified" do
+      it "with same versions" do
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "rack", "1.0"
+          gem "rack", "1.0"
+        G
+
+        expect(out).to include("Your Gemfile lists the gem rack (= 1.0) more than once.")
+        expect(out).to include("Remove any duplicate entries and specify the gem only once (per group).")
+        expect(out).to include("While it's not a problem now, it could cause errors if you change the version of one of them later.")
+      end
+
+      it "version of one dependency is not specified" do
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "rack"
+          gem "rack", "1.0"
+        G
+
+        expect(out).to include("You cannot specify the same gem twice with different version requirements")
+        expect(out).to include("You specified: rack (>= 0) and rack (= 1.0).")
+      end
+
+      it "different versions of both dependencies are specified" do
         install_gemfile <<-G
           source "file://#{gem_repo2}"
           gem "rack", "1.0"
           gem "rack", "1.1"
         G
-        p out
+
         expect(out).to include("You cannot specify the same gem twice with different version requirements")
         expect(out).to include("You specified: rack (= 1.0) and rack (= 1.1).")
-        expect(out).to include("Remove any duplicate entries and specify the gem only once (per group).")
       end
     end
 

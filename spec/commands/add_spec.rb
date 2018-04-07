@@ -173,8 +173,19 @@ RSpec.describe "bundle add" do
     end
   end
 
-  context "throws an error if a gem is added which is already specified in Gemfile" do
-    it "with version requirements" do
+  it "installs gem if a gem is added with same version requirements as specified in Gemfile" do
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "rack"
+    G
+
+    bundle "add 'rack'"
+
+    expect(out).to include("Fetching source index from file:#{gem_repo2}")
+  end
+
+  context "throws an error if a gem is added which is already specified in Gemfile with version" do
+    it "with different version requirement" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack", "1.0"
@@ -182,6 +193,7 @@ RSpec.describe "bundle add" do
 
       bundle "add 'rack' --version=1.1"
 
+      expect(out).to include("Gem `rack` is already added.")
       expect(out).to include("You cannot specify the same gem twice with different version requirements")
       expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may need to change the version requirement specified in the Gemfile if it's too restrictive")
     end
@@ -195,6 +207,23 @@ RSpec.describe "bundle add" do
       bundle "add 'rack'"
 
       expect(out).to include("Gem `rack` is already added.")
+      expect(out).to include("You cannot specify the same gem twice with different version requirements")
+      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may need to change the version requirement specified in the Gemfile if it's too restrictive")
+    end
+  end
+
+  context "throws an error if a gem is added which is already specified in Gemfile without version" do
+    it "with different version requirements" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack"
+      G
+
+      bundle "add 'rack' --version=1.1"
+
+      expect(out).to include("Gem `rack` is already added.")
+      expect(out).to include("You cannot specify the same gem twice with different version requirements")
+      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may need to change the version requirement specified in the Gemfile if it's too restrictive")
     end
   end
 end
