@@ -345,8 +345,10 @@ RSpec.describe "bundle install with gem sources" do
         expect(out).to include("Remove any duplicate entries and specify the gem only once (per group).")
         expect(out).to include("While it's not a problem now, it could cause errors if you change the version of one of them later.")
       end
+    end
 
-      it "version of one dependency is not specified" do
+    context "throws an error if a gem is added twice in Gemfile" do
+      it "when version of one dependency is not specified" do
         install_gemfile <<-G
           source "file://#{gem_repo2}"
           gem "rack"
@@ -357,7 +359,7 @@ RSpec.describe "bundle install with gem sources" do
         expect(out).to include("You specified: rack (>= 0) and rack (= 1.0).")
       end
 
-      it "different versions of both dependencies are specified" do
+      it "when different versions of both dependencies are specified" do
         install_gemfile <<-G
           source "file://#{gem_repo2}"
           gem "rack", "1.0"

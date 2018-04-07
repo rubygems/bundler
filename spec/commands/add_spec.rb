@@ -193,9 +193,8 @@ RSpec.describe "bundle add" do
 
       bundle "add 'rack' --version=1.1"
 
-      expect(out).to include("Gem `rack` is already added.")
       expect(out).to include("You cannot specify the same gem twice with different version requirements")
-      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may need to change the version requirement specified in the Gemfile if it's too restrictive")
+      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
     end
 
     it "without version requirements" do
@@ -206,9 +205,8 @@ RSpec.describe "bundle add" do
 
       bundle "add 'rack'"
 
-      expect(out).to include("Gem `rack` is already added.")
       expect(out).to include("You cannot specify the same gem twice with different version requirements")
-      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may need to change the version requirement specified in the Gemfile if it's too restrictive")
+      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
     end
   end
 
@@ -221,9 +219,8 @@ RSpec.describe "bundle add" do
 
       bundle "add 'rack' --version=1.1"
 
-      expect(out).to include("Gem `rack` is already added.")
       expect(out).to include("You cannot specify the same gem twice with different version requirements")
-      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may need to change the version requirement specified in the Gemfile if it's too restrictive")
+      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
     end
   end
 end
