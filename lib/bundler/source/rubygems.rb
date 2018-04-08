@@ -479,7 +479,10 @@ module Bundler
         else
           uri = spec.remote.uri
           Bundler.ui.confirm("Fetching #{version_message(spec)}")
-          Bundler.rubygems.download_gem(spec, uri, download_path)
+          rubygems_local_path = Bundler.rubygems.download_gem(spec, uri, download_path)
+          if rubygems_local_path != local_path
+            FileUtils.mv(rubygems_local_path, local_path)
+          end
           cache_globally(spec, local_path)
         end
       end
