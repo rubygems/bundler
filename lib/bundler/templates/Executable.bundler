@@ -8,7 +8,6 @@
 # this file is here to facilitate running it.
 #
 
-require "pathname"
 require "rubygems"
 
 m = Module.new do
@@ -41,7 +40,7 @@ m = Module.new do
   def gemfile
     gemfile = find_gemfile
     return unless gemfile
-    Pathname.new(gemfile).untaint.expand_path.to_s
+    File.expand_path(gemfile)
   end
 
   def find_gemfile
@@ -62,7 +61,7 @@ m = Module.new do
 
   def search_up(*names)
     previous = nil
-    current  = File.expand_path(Pathname.pwd).untaint
+    current  = File.expand_path(Dir.pwd)
 
     until !File.directory?(current) || current == previous
       names.each do |name|
