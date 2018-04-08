@@ -188,51 +188,64 @@ RSpec.describe "bundle binstubs <gem>" do
         end
       end
 
-      context "when using multiple gemfiles" do
+      context "when working with multiple gemfiles" do
+        let(:bundle_binstub) { bundled_app("bin/bundle") }
+        let(:load_bundle_exe) { "load Gem.bin_path(\"bundler\", \"bundle\")" }
+        let(:output_bundle_gemfile) { "puts ENV[\"BUNDLE_GEMFILE\"]" }
+
         before do
           build_repo2 do
             build_gem "print_hello", "1.0" do |s|
               s.executables = "print_hello"
               s.bindir = "exe"
               s.write "exe/print_hello", <<-R
-                puts "Hello"
+                puts "Hello!"
+              R
+            end
+            build_gem "print_goodbye", "1.0" do |s|
+              s.executables = "print_goodbye"
+              s.bindir = "exe"
+              s.write "exe/print_goodbye", <<-R
+                puts "Goodbye."
               R
             end
           end
 
-          bundle! "config --global path #{bundled_app("bundle")}"
-          bundle! "config --global bin #{bundled_app("bundle/bin")}"
+          bundle! "config --global path #{bundled_app}"
+          bundle! "config --global bin #{bundled_app("bin")}"
+
           install_gemfile! <<-G
             source "file://#{gem_repo2}"
           G
           bundle! "binstubs bundler"
         end
 
-        it "does not contain references to a specific gemfile path" do
+        it "uses the correct Gemfile" do
           create_file "one/Gemfile", <<-G
-            source "file://#{gem_repo2}"
-            gem "rack"
-          G
-          create_file "two/Gemfile", <<-G
             source "file://#{gem_repo2}"
             gem "print_hello"
           G
+          create_file "two/Gemfile", <<-G
+            source "file://#{gem_repo2}"
+            gem "print_goodbye"
+          G
+          Dir.chdir("one") { bundle! "install" }
+          Dir.chdir("two") { bundle! "install" }
 
-          Dir.chdir("one")
-          bundle! "install"
-          expect(out).to include("rack")
+          binstub = File.read(bundled_app("bin/bundle"))
+          # Replace load statement with BUNDLE_GEMFILE puts
+          binstub.gsub!(load_bundle_exe, output_bundle_gemfile)
+          File.open(bundle_binstub, "w") {|f| f.puts binstub }
 
-          bundler_binstub = sys_exec "cat #{bundled_app("bundle/bin")}/bundle"
-          expect(bundler_binstub).to_not include("one/Gemfile")
-          expect(bundler_binstub).to_not include("../../../Gemfile")
+          Dir.chdir("one") do
+            sys_exec "#{bundled_app("bin/bundle")} exec print_hello"
+            expect(out).to eq(bundled_app("one/Gemfile").to_s)
+          end
 
-          Dir.chdir("../two")
-          bundle! "install"
-          expect(out).to include("print_hello")
-
-          bundler_binstub2 = sys_exec "cat #{bundled_app("bundle/bin")}/bundle"
-          expect(bundler_binstub2).to_not include("two/Gemfile")
-          expect(bundler_binstub2).to_not include("../../../Gemfile")
+          Dir.chdir("two") do
+            sys_exec "#{bundled_app("bin/bundle")} exec print_goodbye"
+            expect(out).to eq(bundled_app("two/Gemfile").to_s)
+          end
         end
       end
     end
