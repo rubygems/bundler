@@ -12,6 +12,9 @@ module Bundler
       @options = options
     end
 
+    # @param [Pathname] gemfile_path The Gemfile in which to inject the new dependency.
+    # @param [Pathname] lockfile_path The lockfile in which to inject the new dependency.
+    # @return [Array]
     def inject(gemfile_path, lockfile_path)
       if Bundler.frozen_bundle?
         # ensure the lock and Gemfile are synced
@@ -82,7 +85,7 @@ module Bundler
     end
 
     def append_to(gemfile_path, new_gem_lines)
-      File.open(gemfile_path, "a") do |f|
+      gemfile_path.open("a") do |f|
         f.puts
         f.puts new_gem_lines
       end
