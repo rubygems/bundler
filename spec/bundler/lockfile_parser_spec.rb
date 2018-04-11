@@ -33,7 +33,7 @@ RSpec.describe Bundler::LockfileParser do
     it "returns the attributes" do
       attributes = described_class.sections_in_lockfile(lockfile_contents)
       expect(attributes).to contain_exactly(
-        "BUNDLED WITH", "DEPENDENCIES", "GEM", "GIT", "PLATFORMS", "RUBY VERSION",
+        "BUNDLED WITH", "DEPENDENCIES", "GEM", "GIT", "PLATFORMS", "RUBY VERSION"
       )
     end
   end

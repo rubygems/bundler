@@ -38,7 +38,7 @@ module Bundler
     GROUPS       = "OPTIONAL GROUPS".freeze
     GEMFILES     = "GEMFILE CHECKSUMS".freeze
     SPECS        = "  specs:".freeze
-    OPTIONS      = /^ {2}+([a-z]+): (.*)$/i
+    OPTIONS      = /^ {2}+([a-z.]+): (.*)$/i
     SOURCE       = [GIT, GEM, PATH, PLUGIN].freeze
 
     SECTIONS_BY_VERSION_INTRODUCED = {
@@ -117,6 +117,7 @@ module Bundler
           send("parse_#{@state}", line) if @state
         end
       end
+
       send("finalize_#{@state}") if @state
 
       @sources << @rubygems_aggregate unless Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?

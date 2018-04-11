@@ -39,9 +39,11 @@ module Bundler
       raise GemfileNotFound, "#{gemfile} not found" unless gemfile.file?
 
       parsed_lockfile = nil
+
       if lockfile && File.exist?(lockfile)
         parsed_lockfile = LockfileParser.new(Bundler.read_file(lockfile))
         changed_gemfiles = parsed_lockfile.gemfiles.values.reject(&:unchanged?)
+
         if !changed_gemfiles.empty?
           nil
         elsif unlock != {}
