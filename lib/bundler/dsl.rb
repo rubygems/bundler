@@ -218,7 +218,11 @@ module Bundler
     def to_definition(lockfile, unlock)
       # Convert lockfile to LockfileParser object
       if lockfile && !lockfile.instance_of?(LockfileParser)
-        lockfile = LockfileParser.new(Bundler.read_file(lockfile))
+        if File.exist?(lockfile)
+          lockfile = LockfileParser.new(Bundler.read_file(lockfile))
+        else
+          lockfile = nil
+        end
       end
 
       Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups, @gemfiles).tap do |definition|
