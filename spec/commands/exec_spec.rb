@@ -610,13 +610,7 @@ RSpec.describe "bundle exec" do
       let(:executable) { super() << "\nclass Err < Exception\ndef backtrace; end;\nend\nraise Err" }
       let(:exit_code) { 1 }
       let(:expected) { super() << "\nbundler: failed to load command: #{path} (#{path})" }
-      let(:expected_err) do
-        if ENV["BUNDLER_SPEC_SUB_VERSION"] == "1.98"
-          "Err: Err"
-        else
-          "bundler: failed to load command: #{path} (#{path})\nErr: Err"
-        end
-      end
+      let(:expected_err) { "Err: Err" }
 
       it_behaves_like "it runs"
     end
@@ -625,13 +619,7 @@ RSpec.describe "bundle exec" do
       let(:executable) { super() << "\nclass Err < Exception\ndef backtrace; end;\nend\nraise Err" }
       let(:exit_code) { 1 }
       let(:expected_err) { "bundler: failed to load command: #{path} (#{path})\nErr: Err" }
-      let(:expected) do
-        if ENV["BUNDLER_SPEC_SUB_VERSION"] == "1.98"
-          super() << "\nbundler: failed to load command: #{path} (#{path})"
-        else
-          super()
-        end
-      end
+      let(:expected) { super() }
 
       it_behaves_like "it runs"
     end
