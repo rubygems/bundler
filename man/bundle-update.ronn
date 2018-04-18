@@ -3,7 +3,8 @@ bundle-update(1) -- Update your gems to the latest available versions
 
 ## SYNOPSIS
 
-`bundle update` <*gems> [--group=NAME]
+`bundle update` <*gems> [--all]
+                        [--group=NAME]
                         [--source=NAME]
                         [--local]
                         [--ruby]
@@ -18,7 +19,7 @@ bundle-update(1) -- Update your gems to the latest available versions
 
 ## DESCRIPTION
 
-Update the gems specified (all gems, if none are specified), ignoring
+Update the gems specified (all gems, if `--all` flag is used), ignoring
 the previously installed gems specified in the `Gemfile.lock`. In
 general, you should use [bundle install(1)](bundle-install.1.html) to install the same exact
 gems and versions across machines.
@@ -27,6 +28,9 @@ You would use `bundle update` to explicitly update the version of a
 gem.
 
 ## OPTIONS
+
+* `--all`:
+  Update all gems specified in Gemfile.
 
 * `--group=<name>`, `-g=[<name>]`:
   Only update the gems in the specified group. For instance, you can update all gems
@@ -80,7 +84,7 @@ gem.
 
 ## UPDATING ALL GEMS
 
-If you run `bundle update` with no parameters, bundler will ignore
+If you run `bundle update --all`, bundler will ignore
 any previously installed gems and resolve all dependencies again
 based on the latest versions of all gems available in the sources.
 
@@ -139,10 +143,10 @@ the gems you use.
 However, from time to time, you might want to update the gems you are using to the
 newest versions that still match the gems in your Gemfile(5).
 
-To do this, run `bundle update`, which will ignore the `Gemfile.lock`, and resolve
+To do this, run `bundle update --all`, which will ignore the `Gemfile.lock`, and resolve
 all the dependencies again. Keep in mind that this process can result in a significantly
 different set of the 25 gems, based on the requirements of new gems that the gem
-authors released since the last time you ran `bundle update`.
+authors released since the last time you ran `bundle update --all`.
 
 ## UPDATING A LIST OF GEMS
 
@@ -343,4 +347,4 @@ use the following workflow:
 * If you want to update all the gems to the latest possible versions that
   still match the gems listed in the Gemfile(5), run
 
-    $ bundle update
+    $ bundle update --all
