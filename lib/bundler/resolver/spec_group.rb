@@ -54,10 +54,6 @@ module Bundler
         dependencies.concat(metadata_dependencies).flatten
       end
 
-      def platforms_for_dependency_named(dependency)
-        __dependencies.select {|_, deps| deps.map(&:name).include? dependency }.keys
-      end
-
       def ==(other)
         return unless other.is_a?(SpecGroup)
         name == other.name &&
