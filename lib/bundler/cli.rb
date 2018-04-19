@@ -321,6 +321,8 @@ module Bundler
       "Specify a different shebang executable name than the default (usually 'ruby')"
     method_option "standalone", :type => :boolean, :banner =>
       "Make binstubs that can work without the Bundler runtime"
+    method_option "all", :type => :boolean, :banner =>
+      "Install binstubs for all gems"
     def binstubs(*gems)
       require "bundler/cli/binstubs"
       Binstubs.new(options, gems).run
