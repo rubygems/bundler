@@ -12,6 +12,9 @@ module Bundler
       @options = options
     end
 
+    # @param [Pathname] gemfile_path The Gemfile in which to inject the new dependency.
+    # @param [Pathname] lockfile_path The lockfile in which to inject the new dependency.
+    # @return [Array]
     def inject(gemfile_path, lockfile_path)
       if Bundler.frozen_bundle?
         # ensure the lock and Gemfile are synced
