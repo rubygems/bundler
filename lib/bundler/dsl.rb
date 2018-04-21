@@ -109,10 +109,16 @@ module Bundler
             return if dep.type == :development
 
             update_prompt = ""
+            change_version = ". You may also need to change the version requirement specified in the Gemfile if it's too restrictive."
 
             if File.basename(@gemfile) == "injected gems"
-              update_prompt = ". If you want to update the gem version, run `bundle update #{current.name}`. " \
-                              "You may also need to change the version requirement specified in the Gemfile if it's too restrictive"
+              if dep.requirements_list.include?(">= 0") && !current.requirements_list.include?(">= 0")
+                update_prompt = ". Gem already added"
+              else
+                update_prompt = ". If you want to update the gem version, run `bundle update #{current.name}`"
+
+                update_prompt += change_version unless current.requirements_list.include?(">= 0")
+              end
             end
 
             raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
