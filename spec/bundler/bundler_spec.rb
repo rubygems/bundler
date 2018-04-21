@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "bundler"
+require "tmpdir"
 
 RSpec.describe Bundler do
   describe "#load_gemspec_uncached" do
@@ -304,6 +305,72 @@ EOF
       expect(FileUtils).to receive(:mkpath).once.ordered.with("/TMP/bundler/home/USER")
       expect(File).to receive(:chmod).with(0o777, "/TMP/bundler/home")
       expect(Bundler.tmp_home_path("USER", "")).to eq(Pathname("/TMP/bundler/home/USER"))
+    end
+  end
+
+  describe "#requires_sudo?" do
+    let!(:tmpdir) { Dir.mktmpdir }
+    let(:bundle_path) { Pathname("#{tmpdir}/bundle") }
+
+    def clear_cached_requires_sudo
+      # Private in ruby 1.8.7
+      return unless Bundler.instance_variable_defined?(:@requires_sudo_ran)
+      Bundler.send(:remove_instance_variable, :@requires_sudo_ran)
+      Bundler.send(:remove_instance_variable, :@requires_sudo)
+    end
+
+    before do
+      clear_cached_requires_sudo
+      allow(Bundler).to receive(:which).with("sudo").and_return("/usr/bin/sudo")
+      allow(Bundler).to receive(:bundle_path).and_return(bundle_path)
+    end
+
+    after do
+      FileUtils.rm_rf(tmpdir)
+      clear_cached_requires_sudo
+    end
+
+    subject { Bundler.requires_sudo? }
+
+    context "bundle_path doesn't exist" do
+      it { should be false }
+
+      context "and parent dir can't be written" do
+        before do
+          FileUtils.chmod(0o500, tmpdir)
+        end
+
+        it { should be true }
+      end
+
+      context "with unwritable files in a parent dir" do
+        # Regression test for https://github.com/bundler/bundler/pull/6316
+        # It doesn't matter if there are other unwritable files so long as
+        # bundle_path can be created
+        before do
+          file = File.join(tmpdir, "unrelated_file")
+          FileUtils.touch(file)
+          FileUtils.chmod(0o400, file)
+        end
+
+        it { should be false }
+      end
+    end
+
+    context "bundle_path exists" do
+      before do
+        FileUtils.mkdir_p(bundle_path)
+      end
+
+      it { should be false }
+
+      context "and is unwritable" do
+        before do
+          FileUtils.chmod(0o500, bundle_path)
+        end
+
+        it { should be true }
+      end
     end
   end
 
