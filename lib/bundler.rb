@@ -369,7 +369,7 @@ EOF
         unwritable_files = files.reject {|f| File.writable?(f) }
         sudo_needed = !unwritable_files.empty?
         if sudo_needed
-          Bundler.ui.warn "Following files may not be writable, so sudo is needed: #{unwritable_files.map(&:to_s).join(",")}"
+          Bundler.ui.warn "Following files may not be writable, so sudo is needed:\n  #{unwritable_files.map(&:to_s).join("\n  ")}"
         end
       end
 

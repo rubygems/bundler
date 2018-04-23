@@ -320,12 +320,18 @@ EOF
     end
     context "unwritable paths" do
       before do
-        FileUtils.touch("tmp/vendor/bundle/unwritable.txt")
-        FileUtils.chmod(0o400, "tmp/vendor/bundle/unwritable.txt")
+        FileUtils.touch("tmp/vendor/bundle/unwritable1.txt")
+        FileUtils.touch("tmp/vendor/bundle/unwritable2.txt")
+        FileUtils.chmod(0o400, "tmp/vendor/bundle/unwritable1.txt")
+        FileUtils.chmod(0o400, "tmp/vendor/bundle/unwritable2.txt")
       end
       it "should return true and display warn message" do
         allow(Bundler).to receive(:bundle_path).and_return(Pathname("tmp/vendor/bundle"))
-        message = "Following files may not be writable, so sudo is needed: tmp/vendor/bundle/unwritable.txt"
+        message = <<-MESSAGE.chomp
+Following files may not be writable, so sudo is needed:
+  tmp/vendor/bundle/unwritable1.txt
+  tmp/vendor/bundle/unwritable2.txt
+MESSAGE
         expect(Bundler.ui).to receive(:warn).with(message)
         expect(Bundler.requires_sudo?).to eq(true)
       end
