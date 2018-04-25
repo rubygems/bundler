@@ -1,0 +1,16 @@
+bundle-remove(1) -- Removes gem specified in Gemfile
+===========================================================================
+
+## SYNOPSIS
+
+`bundle remove [GEMS]`
+
+## DESCRIPTION
+
+Removes a set of specified gems.
+
+Example:
+
+bundle remove rails
+
+bundle remove rails rack
