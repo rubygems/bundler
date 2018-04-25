@@ -91,6 +91,19 @@ module Bundler
       end
     end
 
+    def remove_gem(gem_name)
+      dep_to_remove = @dependencies.find {|d| d.name == gem_name }
+
+      if dep_to_remove.nil?
+        raise GemfileError, "You cannot remove a gem which not specified in Gemfile.\n" \
+                          "#{gem_name} is not specified in Gemfile so not removed."
+      end
+
+      @dependencies.delete(dep_to_remove)
+
+      dep_to_remove
+    end
+
     def gem(name, *args)
       options = args.last.is_a?(Hash) ? args.pop.dup : {}
       version = args || [">= 0"]
