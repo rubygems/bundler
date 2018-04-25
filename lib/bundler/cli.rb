@@ -166,6 +166,15 @@ module Bundler
       Check.new(options).run
     end
 
+    desc "remove [GEM_NAME]", "Removes the gem from gemfile"
+    long_desc <<-D
+      Scans the gemfile for the gem and removes it. If not found, Bundler prints a error message.
+    D
+    def remove(gem_name)
+      require "bundler/cli/remove"
+      Remove.new(gem_name).run
+    end
+
     desc "install [OPTIONS]", "Install the current environment to the system"
     long_desc <<-D
       Install will install all of the gems in the current bundle, making them available
