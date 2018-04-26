@@ -35,10 +35,16 @@ module Bundler
   private
 
     def remove_gems_from_gemfile
+      patterns = []
+      @gems.each do |g|
+        patterns << /gem "#{g}"/
+      end
+
+      re = Regexp.union(patterns)
+
       lines = ""
       IO.readlines(Bundler.default_gemfile).map do |line|
-        # Todo: Do this for all gems
-        lines += line unless line =~ /gem "#{@gems[0]}"/
+        lines += line unless line.match(re)
       end
 
       File.open(Bundler.default_gemfile, "w") do |file|
