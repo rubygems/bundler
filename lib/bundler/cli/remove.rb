@@ -11,6 +11,7 @@ module Bundler
       builder = Dsl.new
       builder.eval_gemfile(Bundler.default_gemfile)
 
+      # store removed gems to display on successfull removal
       @removed_deps = builder.remove_gems(@gems)
 
       # resolve to see if the after removing dep broke anything
@@ -26,20 +27,23 @@ module Bundler
       # invalidate the cached Bundler.definition
       Bundler.reset_paths!
 
-      # Todo: Discuss about using this
+      # TODO: Discuss about using this,
+      # currently gems are not removed from .bundle
       # Installer.install(Bundler.root, Bundler.definition)
 
-      print_success
+      display_removed_gems
     end
 
   private
 
     def remove_gems_from_gemfile
+      # store patterns of all gems to be removed
       patterns = []
       @gems.each do |g|
         patterns << /gem "#{g}"/
       end
 
+      # create a union of patterns to match any of them
       re = Regexp.union(patterns)
 
       lines = ""
@@ -47,12 +51,19 @@ module Bundler
         lines += line unless line.match(re)
       end
 
+      # TODO: remove any empty blocks
+      lines = remove_empty_blocks(lines)
+
       File.open(Bundler.default_gemfile, "w") do |file|
         file.puts lines
       end
     end
 
-    def print_success
+    def remove_empty_blocks(lines)
+      lines
+    end
+
+    def display_removed_gems
       @removed_deps.each do |dep|
         Bundler.ui.confirm "#{dep.name}(#{dep.requirement}) was removed."
       end
