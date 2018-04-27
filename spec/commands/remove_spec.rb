@@ -58,7 +58,7 @@ RSpec.describe "bundle remove" do
   end
 
   context "removes empty block on removal of all gems from it" do
-    it "when a gem is present in gemfile" do
+    it "when single block with gem is present" do
       gemfile <<-G
         source "file://#{gem_repo1}"
 
@@ -71,6 +71,27 @@ RSpec.describe "bundle remove" do
 
       expect(gemfile).to_not match(/group :test do/)
       expect(gemfile).to_not match(/gem "minitest"/)
+      expect(out).to include("minitest(>= 0) was removed.")
+    end
+
+    it "when any other empty block is also present" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        group :test do
+          gem "minitest"
+        end
+
+        group :dev do
+
+        end
+      G
+
+      bundle "remove minitest"
+
+      expect(gemfile).to_not match(/group :test do/)
+      expect(gemfile).to_not match(/gem "minitest"/)
+      expect(gemfile).to_not match(/group :dev do/)
       expect(out).to include("minitest(>= 0) was removed.")
     end
   end

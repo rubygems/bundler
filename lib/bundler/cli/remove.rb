@@ -47,20 +47,33 @@ module Bundler
       re = Regexp.union(patterns)
 
       lines = ""
+      group = false
+      whole_group = ""
+      inside_group = ""
       IO.readlines(Bundler.default_gemfile).map do |line|
-        lines += line unless line.match(re)
-      end
+        group = true if line =~ /group /
 
-      # TODO: remove any empty blocks
-      lines = remove_empty_blocks(lines)
+        lines += line if !line.match(re) && !group
+
+        next unless group
+        whole_group += line unless line.match(re)
+
+        if line =~ /end/
+          group = false
+        elsif line !~ /group /
+          inside_group += line unless line.match(re)
+        end
+
+        if inside_group =~ /gem / && !group
+          lines += whole_group
+          inside_group = ""
+          whole_group = ""
+        end
+      end
 
       File.open(Bundler.default_gemfile, "w") do |file|
         file.puts lines
       end
-    end
-
-    def remove_empty_blocks(lines)
-      lines
     end
 
     def display_removed_gems
