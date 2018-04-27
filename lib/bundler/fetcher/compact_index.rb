@@ -97,11 +97,15 @@ module Bundler
       def bundle_worker(func = nil)
         @bundle_worker ||= begin
           worker_name = "Compact Index (#{display_uri.host})"
-          Bundler::Worker.new(Bundler.current_ruby.rbx? ? 1 : 25, worker_name, func)
+          Bundler::Worker.new(worker_pool_limit, worker_name, func)
         end
         @bundle_worker.tap do |worker|
           worker.instance_variable_set(:@func, func) if func
         end
+      end
+
+      def worker_pool_limit
+        Bundler.current_ruby.rbx? ? 1 : ENV.fetch("COMPACT_INDEX_POOL", 25).to_i
       end
 
       def cache_path
