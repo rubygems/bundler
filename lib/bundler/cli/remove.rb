@@ -14,18 +14,12 @@ module Bundler
       # store removed gems to display on successfull removal
       @removed_deps = builder.remove_gems(@gems)
 
-      # resolve to see if the after removing dep broke anything
+      # remove gems from lockfile
       @definition = builder.to_definition(Bundler.default_lockfile, {})
-      @definition.resolve_remotely!
-
-      # since nothing broke, we can remove those gems from the gemfile
-      remove_gems_from_gemfile
-
-      # since we resolved successfully, write out the lockfile
       @definition.lock(Bundler.default_lockfile)
 
-      # invalidate the cached Bundler.definition
-      Bundler.reset_paths!
+      # remove those gems from the gemfile
+      remove_gems_from_gemfile
 
       # TODO: Discuss about using this,
       # currently gems are not removed from .bundle
@@ -64,11 +58,10 @@ module Bundler
           inside_group += line unless line.match(re)
         end
 
-        if inside_group =~ /gem / && !group
-          lines += whole_group
-          inside_group = ""
-          whole_group = ""
-        end
+        next unless inside_group =~ /gem / && !group
+        lines += whole_group
+        inside_group = ""
+        whole_group = ""
       end
 
       File.open(Bundler.default_gemfile, "w") do |file|
