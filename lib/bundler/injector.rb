@@ -7,6 +7,11 @@ module Bundler
       injector.inject(Bundler.default_gemfile, Bundler.default_lockfile)
     end
 
+    def self.remove(gems, options = {})
+      injector = new(gems, options)
+      injector.remove(Bundler.default_gemfile, Bundler.default_lockfile)
+    end
+
     def initialize(new_deps, options = {})
       @new_deps = new_deps
       @options = options
@@ -51,6 +56,26 @@ module Bundler
         # return an array of the deps that we added
         @new_deps
       end
+    end
+
+    # @param [Pathname] gemfile_path The Gemfile from which to remove dependencies.
+    # @param [Pathname] lockfile_path The lockfile from which to remove dependencies.
+    # @return [Array]
+    def remove(gemfile_path, lockfile_path)
+      builder = Dsl.new
+      builder.eval_gemfile(Bundler.default_gemfile)
+
+      removed_deps = builder.remove_gems(@new_deps)
+
+      @definition = builder.to_definition(lockfile_path, {})
+
+      remove_gems_from_gemfile(removed_deps, gemfile_path)
+
+      # write out the lockfile
+      @definition.lock(lockfile_path)
+
+      # return removed deps
+      removed_deps
     end
 
   private
@@ -99,6 +124,47 @@ module Bundler
       gemfile_path.open("a") do |f|
         f.puts
         f.puts new_gem_lines
+      end
+    end
+
+    def remove_gems_from_gemfile(removed_deps, gemfile_path)
+      # store patterns of all gems to be removed
+      patterns = []
+      removed_deps.each do |dep|
+        patterns << /gem "#{dep.name}"/
+        patterns << /gem '#{dep.name}'/
+      end
+
+      # create a union of patterns to match any of them
+      re = Regexp.union(patterns)
+
+      lines = ""
+      group = false
+      whole_group = ""
+      inside_group = ""
+
+      IO.readlines(gemfile_path).map do |line|
+        group = true if line =~ /group /
+
+        lines += line if !line.match(re) && !group
+
+        next unless group
+        whole_group += line unless line.match(re)
+
+        if line =~ /end/
+          group = false
+        elsif line !~ /group /
+          inside_group += line unless line.match(re)
+        end
+
+        next unless inside_group =~ /gem / && !group
+        lines += whole_group
+        inside_group = ""
+        whole_group = ""
+      end
+
+      File.open(gemfile_path, "w") do |file|
+        file.puts lines.chomp
       end
     end
   end

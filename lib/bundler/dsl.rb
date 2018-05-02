@@ -99,7 +99,7 @@ module Bundler
 
         if deleted_dep.nil?
           raise GemfileError, "You cannot remove a gem which not specified in Gemfile.\n" \
-                            "#{gem_name} is not specified in Gemfile so not removed."
+                            "`#{gem_name}` is not specified in Gemfile so not removed."
         end
 
         @dependencies.delete(deleted_dep)
