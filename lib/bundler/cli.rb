@@ -170,9 +170,11 @@ module Bundler
     long_desc <<-D
       Scans the gemfile for the gems and removes them. If not found, Bundler prints a error message.
     D
+    method_option "install", :type => :boolean, :banner =>
+      "Remove gem from bundle"
     def remove(*gems)
       require "bundler/cli/remove"
-      Remove.new(gems).run
+      Remove.new(gems, options).run
     end
 
     desc "install [OPTIONS]", "Install the current environment to the system"
