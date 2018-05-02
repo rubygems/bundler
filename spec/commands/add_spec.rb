@@ -85,7 +85,7 @@ RSpec.describe "bundle add" do
     it "adds gem to Gemfile but is not installed" do
       bundle "add foo --skip-install --version=2.0"
 
-      expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "= 2.0"})
+      expect(bundled_app("Gemfile").read).to match(/gem "foo", "= 2.0"/)
       expect(the_bundle).to_not include_gems "foo 2.0"
     end
   end
