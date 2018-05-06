@@ -138,34 +138,38 @@ module Bundler
       # create a union of patterns to match any of them
       re = Regexp.union(patterns)
 
-      lines = ""
-      group = false
-      whole_group = ""
-      inside_group = ""
+      new_gemfile = []
+      IO.readlines(gemfile_path).each {|line| new_gemfile << line unless line.match(re) }
 
-      IO.readlines(gemfile_path).map do |line|
-        group = true if line =~ /group /
+      nested_groups = 0
 
-        lines += line if !line.match(re) && !group
+      # remove lone \n and append them with other strings
+      # and count number of nested groups
+      new_gemfile.each_with_index do |line, index|
+        nested_groups += 1 if new_gemfile[index + 1] =~ /group / && line =~ /group /
 
-        next unless group
-        whole_group += line unless line.match(re)
+        if new_gemfile[index + 1] == "\n"
+          new_gemfile[index] += new_gemfile[index + 1]
+          new_gemfile.delete_at(index + 1)
+        end
+      end
 
-        if line =~ /end/
-          group = false
-        elsif line !~ /group /
-          inside_group += line unless line.match(re)
+      while nested_groups >= 0
+        nested_groups -= 1
+
+        new_gemfile.each_with_index do |line, index|
+          next if line !~ /group /
+          if new_gemfile[index + 1] =~ /end/
+            new_gemfile[index] = nil
+            new_gemfile[index + 1] = nil
+          end
         end
 
-        next unless inside_group =~ /gem / && !group
-        lines += whole_group
-        inside_group = ""
-        whole_group = ""
+        # remove nil elements
+        new_gemfile.reject!(&:nil?)
       end
 
-      File.open(gemfile_path, "w") do |file|
-        file.puts lines.chomp
-      end
+      File.open(gemfile_path, "w") {|file| file.puts new_gemfile.join.chomp }
     end
   end
 end
