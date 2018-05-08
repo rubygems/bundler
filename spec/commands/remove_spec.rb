@@ -229,4 +229,110 @@ RSpec.describe "bundle remove" do
       end
     end
   end
+
+  describe "arbitrary gemfile" do
+    context "when mutiple gems are present in same line" do
+      it "does not removes the gem" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"; gem "rails"
+        G
+
+        expected_gemfile = "source \"file://#{gem_repo1}\"\n\n" \
+                        "gem \"rack\"; gem \"rails\"\n"
+
+        bundle "remove rails"
+
+        expect(gemfile).to eq(expected_gemfile)
+        expect(out).to include("The specified gem could not be removed.")
+      end
+    end
+  end
+
+  context "with sources" do
+    before do
+      build_repo gem_repo3 do
+        build_gem "rspec"
+      end
+    end
+
+    it "removes gems and empty source blocks" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "rack"
+
+        source "file://#{gem_repo3}" do
+          gem "rspec"
+        end
+      G
+
+      bundle! "install"
+
+      expected_gemfile = "source \"file://#{gem_repo1}\"\n\n" \
+                      "gem \"rack\"\n"
+
+      bundle! "remove rspec"
+
+      expect(gemfile).to eq(expected_gemfile)
+      expect(out).to include("rspec(>= 0) was removed.")
+    end
+  end
+
+  context "with eval_gemfile" do
+    it "removes gems" do
+      create_file "Gemfile-other", <<-G
+        gem "rack"
+      G
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        eval_gemfile "Gemfile-other"
+      G
+
+      bundle! "remove rack"
+
+      expect(bundled_app("Gemfile-other").read).to_not include("gem \"rack\"")
+      expect(out).to include("rack(>= 0) was removed.")
+    end
+  end
+
+  context "with install_if" do
+    it "should remove gems inside blocks and empty blocks" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        install_if(lambda { false }) do
+          gem "rack"
+        end
+      G
+
+      expected_gemfile = "source \"file://#{gem_repo1}\"\n"
+
+      bundle! "remove rack"
+
+      expect(gemfile).to eq(expected_gemfile)
+      expect(out).to include("rack(>= 0) was removed.")
+    end
+  end
+
+  context "with env" do
+    it "should remove gems inside blocks and empty blocks" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        env "BUNDLER_TEST" do
+          gem "rack"
+        end
+      G
+
+      expected_gemfile = "source \"file://#{gem_repo1}\"\n"
+
+      bundle! "remove rack"
+
+      expect(gemfile).to eq(expected_gemfile)
+      expect(out).to include("rack(>= 0) was removed.")
+    end
+  end
 end

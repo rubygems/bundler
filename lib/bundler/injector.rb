@@ -141,35 +141,42 @@ module Bundler
       new_gemfile = []
       IO.readlines(gemfile_path).each {|line| new_gemfile << line unless line.match(re) }
 
-      nested_groups = 0
-
       # remove lone \n and append them with other strings
-      # and count number of nested groups
-      new_gemfile.each_with_index do |line, index|
-        nested_groups += 1 if new_gemfile[index + 1] =~ /group / && line =~ /group /
-
+      new_gemfile.each_with_index do |_line, index|
         if new_gemfile[index + 1] == "\n"
           new_gemfile[index] += new_gemfile[index + 1]
           new_gemfile.delete_at(index + 1)
         end
       end
 
-      while nested_groups >= 0
-        nested_groups -= 1
+      blocks = ["group ", "source ", "env ", "install_if"]
+      blocks.each {|block| remove_nested_blocks(new_gemfile, block) }
 
-        new_gemfile.each_with_index do |line, index|
-          next if line !~ /group /
-          if new_gemfile[index + 1] =~ /end/
-            new_gemfile[index] = nil
-            new_gemfile[index + 1] = nil
+      File.open(gemfile_path, "w") {|file| file.puts new_gemfile.join.chomp }
+    end
+
+    def remove_nested_blocks(gemfile, block_name)
+      nested_blocks = 0
+
+      # count number of nested groups
+      gemfile.each_with_index do |line, index|
+        nested_blocks += 1 if gemfile[index + 1] =~ /#{block_name}/ && line =~ /#{block_name}/
+      end
+
+      while nested_blocks >= 0
+        nested_blocks -= 1
+
+        gemfile.each_with_index do |line, index|
+          next if line !~ /#{block_name}/
+          if gemfile[index + 1] =~ /end/
+            gemfile[index] = nil
+            gemfile[index + 1] = nil
           end
         end
 
         # remove nil elements
-        new_gemfile.reject!(&:nil?)
+        gemfile.reject!(&:nil?)
       end
-
-      File.open(gemfile_path, "w") {|file| file.puts new_gemfile.join.chomp }
     end
   end
 end
