@@ -105,7 +105,7 @@ module Spec
       bundle_bin = options.delete("bundle_bin") || bindir.join("bundle")
 
       if system_bundler = options.delete(:system_bundler)
-        bundle_bin = "-S bundle"
+        bundle_bin = system_gem_path("bin", "bundle")
       end
 
       env = options.delete(:env) || {}
