@@ -119,6 +119,8 @@ module Bundler
       relative_gemfile_path = relative_gemfile_path
       ruby_command = Thor::Util.ruby_command
       ruby_command = ruby_command
+      application_locked = options[:locked] || Bundler.settings[:application_locked]
+      application_locked = application_locked
       template_path = File.expand_path("../templates/Executable", __FILE__)
       if spec.name == "bundler"
         template_path += ".bundler"
@@ -128,6 +130,8 @@ module Bundler
 
       exists = []
       spec.executables.each do |executable|
+        next if executable == "bundle" && application_locked == false
+
         binstub_path = "#{bin_path}/#{executable}"
         if File.exist?(binstub_path) && !options[:force]
           exists << executable

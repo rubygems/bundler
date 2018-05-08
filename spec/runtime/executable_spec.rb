@@ -88,7 +88,7 @@ RSpec.describe "Running bin/* commands" do
       gem "bundler"
     G
 
-    bundle! "binstubs bundler"
+    bundle! "binstubs bundler --locked"
 
     expect(bundled_app("bin/bundle")).to exist
   end
@@ -186,5 +186,55 @@ RSpec.describe "Running bin/* commands" do
 
     expect(exitstatus).to eq(0) if exitstatus
     expect(out).to eq("1.0")
+  end
+
+  context "when using application-locked binstubs" do
+    before do
+      system_gems :bundler
+      build_repo2 do
+        build_gem "print_hello", "1.0" do |s|
+          s.executable = "print_hello"
+          s.bindir = "exe"
+          s.write "exe/print_hello", <<-R
+            puts "Hello!"
+          R
+        end
+      end
+      create_file "one/Gemfile", <<-G
+        source "file://#{gem_repo2}"
+        gem "print_hello"
+      G
+      bundle "config bin #{bundled_app("bin")}"
+    end
+
+    context "with the bundle binstub" do
+      before(:each) do
+        bundle "install"
+        bundle "binstubs bundler rack --locked"
+      end
+
+      it "allows a command to run out of the bundle" do
+        Dir.chdir(tmp) do
+          bundle "exec rackup", "bundle_bin" => bundled_app("bin/bundle")
+          expect(out).to eq("1.0.0")
+        end
+
+        Dir.chdir("one") do
+          bundle "exec rackup", "bundle_bin" => bundled_app("bin/bundle")
+          expect(out).to eq("1.0.0")
+        end
+      end
+
+      it "uses the locked gemfile over the current working directory" do
+        Dir.chdir("one") do
+          bundle "install", "bundle_bin" => bundled_app("bin/bundle")
+          expect(out).to_not include("print_hello")
+        end
+
+        bundle "list", "bundle_bin" => bundled_app("bin/bundle")
+        expect(out).to_not include("print_hello")
+        expect(out).to include("rack")
+      end
+    end
   end
 end

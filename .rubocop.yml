@@ -5,6 +5,7 @@ AllCops:
   TargetRubyVersion: 1.9
   Exclude:
     - tmp/**/*
+    - lib/bundler/templates/Executable
     - lib/bundler/vendor/**/*
   DisplayCopNames: true
 
@@ -20,10 +21,6 @@ Lint/EndAlignment:
 
 Lint/UnusedMethodArgument:
   Enabled: false
-
-Lint/ScriptPermission:
-  Exclude:
-    - 'lib/bundler/templates/Executable'
 
 # Layout
 

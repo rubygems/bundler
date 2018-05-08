@@ -16,7 +16,7 @@ module Bundler
       Bundler.settings.set_command_option_if_given :shebang, options["shebang"]
       installer = Installer.new(Bundler.root, Bundler.definition)
 
-      installer_opts = { :force => options[:force], :binstubs_cmd => true }
+      installer_opts = { :force => options[:force], :binstubs_cmd => true, :locked => options[:locked] }
 
       if options[:all]
         raise InvalidOption, "Cannot specify --all with specific gems" unless gems.empty?
@@ -40,6 +40,8 @@ module Bundler
           Bundler.settings.temporary(:path => (Bundler.settings[:path] || Bundler.root)) do
             installer.generate_standalone_bundler_executable_stubs(spec)
           end
+        elsif gem_name == "bundler" && options[:locked] == false
+          next Bundler.ui.warn("Sorry, Bundler can only be run via RubyGems.")
         else
           installer.generate_bundler_executable_stubs(spec, installer_opts)
         end

@@ -39,6 +39,49 @@ RSpec.describe "bundle binstubs <gem>" do
       expect(bundled_app("bin/rails")).to exist
     end
 
+    it "installs application-locked binstubs" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rails"
+      G
+
+      bundle "binstubs rack rails --locked"
+
+      expect(bundled_app("bin/rackup")).to exist
+      expect(File.read("bin/rackup")).to include("bundle_binstub")
+
+      expect(bundled_app("bin/rails")).to exist
+      expect(File.read("bin/rails")).to include("bundle_binstub")
+    end
+
+    it "allows installing generic binstubs" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rails"
+      G
+
+      bundle "binstubs rack rails --locked=false"
+
+      expect(bundled_app("bin/rackup")).to exist
+      expect(File.read("bin/rackup")).to_not include("bundle_binstub")
+
+      expect(bundled_app("bin/rails")).to exist
+      expect(File.read("bin/rails")).to_not include("bundle_binstub")
+    end
+
+    it "does not create a generic bundle binstub" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "binstubs bundler rack --locked=false"
+
+      expect(out).to include("Bundler can only be run via RubyGems")
+    end
+
     it "allows installing all binstubs" do
       install_gemfile! <<-G
         source "file://#{gem_repo1}"
@@ -80,7 +123,7 @@ RSpec.describe "bundle binstubs <gem>" do
           gem "rack"
         G
 
-        bundle "binstubs rack"
+        bundle "binstubs rack --locked"
 
         File.open("bin/bundle", "wb") do |file|
           file.print "OMG"
@@ -121,7 +164,7 @@ RSpec.describe "bundle binstubs <gem>" do
           gem "rack"
           gem "prints_loaded_gems"
         G
-        bundle! "binstubs bundler rack prints_loaded_gems"
+        bundle! "binstubs bundler rack prints_loaded_gems --locked"
       end
 
       let(:system_bundler_version) { Bundler::VERSION }

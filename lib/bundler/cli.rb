@@ -317,6 +317,8 @@ module Bundler
       "Binstub destination directory (default bin)"
     method_option "shebang", :type => :string, :banner =>
       "Specify a different shebang executable name than the default (usually 'ruby')"
+    method_option "locked", :type => :boolean, :default => Bundler.bundler_major_version >= 2, :banner =>
+      "Make binstubs that are locked to a specific application"
     method_option "standalone", :type => :boolean, :banner =>
       "Make binstubs that can work without the Bundler runtime"
     method_option "all", :type => :boolean, :banner =>
