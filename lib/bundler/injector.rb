@@ -65,7 +65,7 @@ module Bundler
       builder = Dsl.new
       builder.eval_gemfile(Bundler.default_gemfile)
 
-      removed_deps = builder.remove_gems(@new_deps)
+      removed_deps = remove_gems(builder, @new_deps)
 
       @definition = builder.to_definition(lockfile_path, {})
 
@@ -127,7 +127,28 @@ module Bundler
       end
     end
 
+    def remove_gems(builder, gems)
+      removed_deps = []
+
+      gems.each do |gem_name|
+        deleted_dep = builder.dependencies.find {|d| d.name == gem_name }
+
+        if deleted_dep.nil?
+          raise GemfileError, "You cannot remove a gem which not specified in Gemfile.\n" \
+                            "`#{gem_name}` is not specified in Gemfile so not removed."
+        end
+
+        builder.dependencies.delete(deleted_dep)
+
+        removed_deps << deleted_dep
+      end
+
+      removed_deps
+    end
+
     def remove_gems_from_gemfile(removed_deps, gemfile_path)
+      # patterns = /gem\s+['"]#{Regexp.union(removed_deps)}\1|gem\(['"]#{Regexp.union(removed_deps)}\2\)/
+
       # store patterns of all gems to be removed
       patterns = []
       removed_deps.each do |dep|
@@ -138,8 +159,7 @@ module Bundler
       # create a union of patterns to match any of them
       re = Regexp.union(patterns)
 
-      new_gemfile = []
-      IO.readlines(gemfile_path).each {|line| new_gemfile << line unless line.match(re) }
+      new_gemfile = IO.readlines(gemfile_path).reject {|line| line.match(re) }
 
       # remove lone \n and append them with other strings
       new_gemfile.each_with_index do |_line, index|
@@ -149,10 +169,10 @@ module Bundler
         end
       end
 
-      blocks = ["group ", "source ", "env ", "install_if"]
+      blocks = %w[group source env install_if]
       blocks.each {|block| remove_nested_blocks(new_gemfile, block) }
 
-      File.open(gemfile_path, "w") {|file| file.puts new_gemfile.join.chomp }
+      SharedHelpers.filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts new_gemfile.join.chomp } }
     end
 
     def remove_nested_blocks(gemfile, block_name)
@@ -160,7 +180,9 @@ module Bundler
 
       # count number of nested groups
       gemfile.each_with_index do |line, index|
-        nested_blocks += 1 if gemfile[index + 1] =~ /#{block_name}/ && line =~ /#{block_name}/
+        unless gemfile[index + 1].nil?
+          nested_blocks += 1 if gemfile[index + 1].include?(block_name) && line.include?(block_name)
+        end
       end
 
       while nested_blocks >= 0
@@ -168,7 +190,7 @@ module Bundler
 
         gemfile.each_with_index do |line, index|
           next if line !~ /#{block_name}/
-          if gemfile[index + 1] =~ /end/
+          if gemfile[index + 1] =~ /^\s*end\s*$/
             gemfile[index] = nil
             gemfile[index + 1] = nil
           end
