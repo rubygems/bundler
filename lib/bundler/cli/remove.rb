@@ -9,7 +9,7 @@ module Bundler
 
     def run
       # Raise error if no gems are specified
-      raise InvalidOption, "Please specify gems to remove" if @gems.empty?
+      raise InvalidOption, "Please specify gems to remove." if @gems.empty?
 
       removed_deps = Injector.remove(@gems, {})
 

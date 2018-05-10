@@ -1,6 +1,33 @@
 # frozen_string_literal: true
 
 RSpec.describe "bundle remove" do
+  context "when no gems are specified" do
+    it "throws error" do
+      gemfile <<-G
+          source "file://#{gem_repo1}"
+        G
+
+      bundle "remove"
+
+      expect(out).to include("Please specify gems to remove.")
+    end
+  end
+
+  context "when --install flag is specified" do
+    it "removes gems from .bundle" do
+      gemfile <<-G
+          source "file://#{gem_repo1}"
+
+          gem "rack"
+        G
+
+      bundle "remove rack --install"
+
+      expect(out).to include("rack was removed.")
+      expect(the_bundle).to_not include_gems "rack"
+    end
+  end
+
   describe "basic gemfile" do
     context "remove single gem from gemfile" do
       it "when gem is present in gemfile" do
@@ -336,6 +363,16 @@ RSpec.describe "bundle remove" do
       expect(out).to include("rack was removed.")
       gemfile_should_be <<-G
         source "file://#{gem_repo1}"
+      G
+    end
+  end
+
+  context "with gemspec" do
+    it "" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+
       G
     end
   end

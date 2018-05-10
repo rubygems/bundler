@@ -65,11 +65,11 @@ module Bundler
       builder = Dsl.new
       builder.eval_gemfile(Bundler.default_gemfile)
 
-      removed_deps = remove_gems(builder, @new_deps)
+      removed_deps = remove_gems_from_dependencies(builder, @new_deps)
 
       @definition = builder.to_definition(lockfile_path, {})
 
-      remove_gems_from_gemfile(removed_deps, gemfile_path)
+      remove_gems_from_gemfile(@new_deps, gemfile_path)
 
       # write out the lockfile
       @definition.lock(lockfile_path)
@@ -127,7 +127,7 @@ module Bundler
       end
     end
 
-    def remove_gems(builder, gems)
+    def remove_gems_from_dependencies(builder, gems)
       removed_deps = []
 
       gems.each do |gem_name|
@@ -146,20 +146,11 @@ module Bundler
       removed_deps
     end
 
-    def remove_gems_from_gemfile(removed_deps, gemfile_path)
-      # patterns = /gem\s+['"]#{Regexp.union(removed_deps)}\1|gem\(['"]#{Regexp.union(removed_deps)}\2\)/
-
+    def remove_gems_from_gemfile(gems, gemfile_path)
       # store patterns of all gems to be removed
-      patterns = []
-      removed_deps.each do |dep|
-        patterns << /gem "#{dep.name}"/
-        patterns << /gem '#{dep.name}'/
-      end
+      patterns = /gem\s+['"]#{Regexp.union(gems)}['"]|gem\(['"]#{Regexp.union(gems)}['"]\)/
 
-      # create a union of patterns to match any of them
-      re = Regexp.union(patterns)
-
-      new_gemfile = IO.readlines(gemfile_path).reject {|line| line.match(re) }
+      new_gemfile = IO.readlines(gemfile_path).reject {|line| line.match(patterns) }
 
       # remove lone \n and append them with other strings
       new_gemfile.each_with_index do |_line, index|
@@ -169,9 +160,10 @@ module Bundler
         end
       end
 
-      blocks = %w[group source env install_if]
-      blocks.each {|block| remove_nested_blocks(new_gemfile, block) }
+      # remove any empty (and nested) blocks
+      %w[group source env install_if].each {|block| remove_nested_blocks(new_gemfile, block) }
 
+      # write the new gemfile
       SharedHelpers.filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts new_gemfile.join.chomp } }
     end
 
@@ -179,11 +171,7 @@ module Bundler
       nested_blocks = 0
 
       # count number of nested groups
-      gemfile.each_with_index do |line, index|
-        unless gemfile[index + 1].nil?
-          nested_blocks += 1 if gemfile[index + 1].include?(block_name) && line.include?(block_name)
-        end
-      end
+      gemfile.each_with_index {|line, index| nested_blocks += 1 if !gemfile[index + 1].nil? && gemfile[index + 1].include?(block_name) && line.include?(block_name) }
 
       while nested_blocks >= 0
         nested_blocks -= 1
