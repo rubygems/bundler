@@ -2,8 +2,8 @@
 
 module Bundler
   class Injector
-    def self.inject(new_deps, options = {})
-      injector = new(new_deps, options)
+    def self.inject(deps, options = {})
+      injector = new(deps, options)
       injector.inject(Bundler.default_gemfile, Bundler.default_lockfile)
     end
 
@@ -12,8 +12,8 @@ module Bundler
       injector.remove(Bundler.default_gemfile, Bundler.default_lockfile)
     end
 
-    def initialize(new_deps, options = {})
-      @new_deps = new_deps
+    def initialize(deps, options = {})
+      @deps = deps
       @options = options
     end
 
@@ -33,19 +33,18 @@ module Bundler
         builder.eval_gemfile(gemfile_path)
 
         # don't inject any gems that are already in the Gemfile
-        @new_deps -= builder.dependencies
+        @deps -= builder.dependencies
 
         # add new deps to the end of the in-memory Gemfile
-        # Set conservative versioning to false because
-        # we want to let the resolver resolve the version first
-        builder.eval_gemfile("injected gems", build_gem_lines(false)) if @new_deps.any?
+        # Set conservative versioning to false because we want to let the resolver resolve the version first
+        builder.eval_gemfile("injected gems", build_gem_lines(false)) if @deps.any?
 
         # resolve to see if the new deps broke anything
         @definition = builder.to_definition(lockfile_path, {})
         @definition.resolve_remotely!
 
         # since nothing broke, we can add those gems to the gemfile
-        append_to(gemfile_path, build_gem_lines(@options[:conservative_versioning])) if @new_deps.any?
+        append_to(gemfile_path, build_gem_lines(@options[:conservative_versioning])) if @deps.any?
 
         # since we resolved successfully, write out the lockfile
         @definition.lock(Bundler.default_lockfile)
@@ -54,7 +53,7 @@ module Bundler
         Bundler.reset_paths!
 
         # return an array of the deps that we added
-        @new_deps
+        @deps
       end
     end
 
@@ -65,11 +64,11 @@ module Bundler
       builder = Dsl.new
       builder.eval_gemfile(Bundler.default_gemfile)
 
-      removed_deps = remove_gems_from_dependencies(builder, @new_deps)
+      removed_deps = remove_gems_from_dependencies(builder, @deps)
 
       @definition = builder.to_definition(lockfile_path, {})
 
-      remove_gems_from_gemfile(@new_deps, gemfile_path)
+      remove_gems_from_gemfile(@deps, gemfile_path)
 
       # evalute the new gemfile to look for any failure cases
       builder2 = Dsl.new
@@ -111,7 +110,7 @@ module Bundler
     end
 
     def build_gem_lines(conservative_versioning)
-      @new_deps.map do |d|
+      @deps.map do |d|
         name = d.name.dump
 
         requirement = if conservative_versioning
