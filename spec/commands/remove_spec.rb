@@ -262,7 +262,7 @@ RSpec.describe "bundle remove" do
 
   describe "arbitrary gemfile" do
     context "when mutiple gems are present in same line" do
-      it "does not removes the gem" do
+      it "shows warning for gems not removed" do
         install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "rack"; gem "rails"
@@ -270,10 +270,33 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rails"
 
-        expect(out).to include("The specified gem could not be removed.")
+        expect(out).to include("rails could not be removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
           gem "rack"; gem "rails"
+        G
+      end
+    end
+
+    context "when some gems could not be removed" do
+      it "shows warning for gems not removed and success for those removed" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem"rack"
+          gem"rspec"
+          gem "rails"
+          gem "minitest"
+        G
+
+        bundle "remove rails rack rspec minitest"
+
+        expect(out).to include("rails was removed.")
+        expect(out).to include("minitest was removed.")
+        expect(out).to include("rack, rspec could not be removed.")
+        gemfile_should_be <<-G
+          source "file://#{gem_repo1}"
+          gem"rack"
+          gem"rspec"
         G
       end
     end

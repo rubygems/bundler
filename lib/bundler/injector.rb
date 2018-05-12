@@ -71,11 +71,21 @@ module Bundler
 
       remove_gems_from_gemfile(@new_deps, gemfile_path)
 
+      # evalute the new gemfile to look for any failure cases
+      builder2 = Dsl.new
+      builder2.eval_gemfile(Bundler.default_gemfile)
+
+      # record gems which could not be removed due to some reasons
+      errored_gems = builder2.dependencies & removed_deps
+
+      # warn user regarding those gems
+      Bundler.ui.warn "#{errored_gems.map(&:name).join(", ")} could not be removed." unless errored_gems.empty?
+
       # write out the lockfile
       @definition.lock(lockfile_path)
 
-      # return removed deps
-      removed_deps
+      # return actual removed deps
+      removed_deps - errored_gems
     end
 
   private
