@@ -21,7 +21,7 @@ RSpec.describe "bundle remove" do
           gem "rack"
         G
 
-      bundle "remove rack --install"
+      bundle! "remove rack --install"
 
       expect(out).to include("rack was removed.")
       expect(the_bundle).to_not include_gems "rack"
@@ -391,12 +391,20 @@ RSpec.describe "bundle remove" do
   end
 
   context "with gemspec" do
-    it "" do
-      install_gemfile <<-G
+    it "should not remove the gem" do
+      build_lib("foo", :path => tmp.join("foo")) do |s|
+        s.write("foo.gemspec", "")
+        s.add_dependency "rack"
+      end
+
+      install_gemfile(<<-G)
         source "file://#{gem_repo1}"
-
-
+        gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
       G
+
+      bundle! "remove foo"
+
+      expect(out).to include("foo could not be removed.")
     end
   end
 end
