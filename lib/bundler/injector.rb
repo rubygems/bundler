@@ -61,6 +61,7 @@ module Bundler
     # @param [Pathname] lockfile_path The lockfile from which to remove dependencies.
     # @return [Array]
     def remove(gemfile_path, lockfile_path)
+      # evaluate the Gemfile we have
       builder = Dsl.new
       builder.eval_gemfile(Bundler.default_gemfile)
 
@@ -136,6 +137,9 @@ module Bundler
       end
     end
 
+    # @param [Dsl]    builder Dsl object of current Gemfile.
+    # @param [Array]  gems Array of names of gems to be removed.
+    # @return [Array] removed_deps Array of removed dependencies.
     def remove_gems_from_dependencies(builder, gems)
       removed_deps = []
 
@@ -155,10 +159,13 @@ module Bundler
       removed_deps
     end
 
+    # @param [Array] gems            Array of names of gems to be removed.
+    # @param [Pathname] gemfile_path The Gemfile from which to remove dependencies.
     def remove_gems_from_gemfile(gems, gemfile_path)
       # store patterns of all gems to be removed
-      patterns = /gem\s+['"]#{Regexp.union(gems)}['"]|gem\(['"]#{Regexp.union(gems)}['"]\)/
+      patterns = /gem\s+(['"])#{Regexp.union(gems)}\1|gem\((['"])#{Regexp.union(gems)}\2\)/
 
+      # remove lines which match the regex
       new_gemfile = IO.readlines(gemfile_path).reject {|line| line.match(patterns) }
 
       # remove lone \n and append them with other strings
@@ -176,10 +183,12 @@ module Bundler
       SharedHelpers.filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts new_gemfile.join.chomp } }
     end
 
+    # @param [Pathname] gemfile_path The Gemfile from which to remove dependencies.
+    # @param [String] block_name     Name of block name to look for.
     def remove_nested_blocks(gemfile, block_name)
       nested_blocks = 0
 
-      # count number of nested groups
+      # count number of nested blocks
       gemfile.each_with_index {|line, index| nested_blocks += 1 if !gemfile[index + 1].nil? && gemfile[index + 1].include?(block_name) && line.include?(block_name) }
 
       while nested_blocks >= 0

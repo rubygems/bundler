@@ -268,7 +268,7 @@ RSpec.describe "bundle remove" do
           gem "rack"; gem "rails"
         G
 
-        bundle "remove rails"
+        bundle! "remove rails"
 
         expect(out).to include("rails could not be removed.")
         gemfile_should_be <<-G
@@ -288,7 +288,7 @@ RSpec.describe "bundle remove" do
           gem "minitest"
         G
 
-        bundle "remove rails rack rspec minitest"
+        bundle! "remove rails rack rspec minitest"
 
         expect(out).to include("rails was removed.")
         expect(out).to include("minitest was removed.")
