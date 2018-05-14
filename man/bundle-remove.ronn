@@ -3,14 +3,23 @@ bundle-remove(1) -- Removes gem specified in Gemfile
 
 ## SYNOPSIS
 
-`bundle remove [GEMS]`
+`bundle remove [GEMS] [--install]`
 
 ## DESCRIPTION
 
-Removes a set of specified gems.
+Removes a set of specified gems from Gemfile or if needed from the bundle itself.
+If any gem specified to be removed does not exist the in Gemfile, Bundler prints error message.
+If gem could not be removed due to any reason Bundler warns the user.
+
+## OPTIONS
+
+* `--install`:
+  Remove gems from bundle.
 
 Example:
 
 bundle remove rails
 
 bundle remove rails rack
+
+bundle remove rails rack --install
