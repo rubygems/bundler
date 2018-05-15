@@ -11,6 +11,7 @@ module Bundler
       # Raise error if no gems are specified
       raise InvalidOption, "Please specify gems to remove." if @gems.empty?
 
+      # remove requested gems
       removed_deps = Injector.remove(@gems, {})
 
       # Remove gems from .bundle if install flag is specified

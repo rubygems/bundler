@@ -268,9 +268,9 @@ RSpec.describe "bundle remove" do
           gem "rack"; gem "rails"
         G
 
-        bundle! "remove rails"
+        bundle "remove rails"
 
-        expect(out).to include("rails could not be removed.")
+        expect(out).to include("Gems could not be removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
           gem "rack"; gem "rails"

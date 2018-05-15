@@ -61,31 +61,27 @@ module Bundler
     # @param [Pathname] lockfile_path The lockfile from which to remove dependencies.
     # @return [Array]
     def remove(gemfile_path, lockfile_path)
+      # get initial gemfile snap shot
+      initial_gemfile = IO.readlines(gemfile_path)
+
       # evaluate the Gemfile we have
       builder = Dsl.new
       builder.eval_gemfile(Bundler.default_gemfile)
 
+      # remove gems from dependencies
       removed_deps = remove_gems_from_dependencies(builder, @deps)
 
-      @definition = builder.to_definition(lockfile_path, {})
+      # gemfile after removing requested gems
+      cleaned_gemfile = remove_gems_from_gemfile(@deps, gemfile_path)
 
-      remove_gems_from_gemfile(@deps, gemfile_path)
+      # write the new gemfile
+      write_to_gemfile(gemfile_path, cleaned_gemfile)
 
-      # evalute the new gemfile to look for any failure cases
-      builder2 = Dsl.new
-      builder2.eval_gemfile(Bundler.default_gemfile)
-
-      # record gems which could not be removed due to some reasons
-      errored_gems = builder2.dependencies & removed_deps
-
-      # warn user regarding those gems
-      Bundler.ui.warn "#{errored_gems.map(&:name).join(", ")} could not be removed." unless errored_gems.empty?
-
-      # write out the lockfile
-      @definition.lock(lockfile_path)
-
-      # return actual removed deps
-      removed_deps - errored_gems
+      # check for errors
+      # including extra gems being removed
+      # or some gems not being removed
+      # and return the actual removed deps
+      cross_check_for_errors(gemfile_path, builder.dependencies, removed_deps, initial_gemfile)
     end
 
   private
@@ -179,8 +175,13 @@ module Bundler
       # remove any empty (and nested) blocks
       %w[group source env install_if].each {|block| remove_nested_blocks(new_gemfile, block) }
 
-      # write the new gemfile
-      SharedHelpers.filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts new_gemfile.join.chomp } }
+      new_gemfile.join.chomp
+    end
+
+    # @param [Pathname] gemfile_path  The Gemfile from which to remove dependencies.
+    # @param [String]  contents       Content to written to Gemfile.
+    def write_to_gemfile(gemfile_path, contents)
+      SharedHelpers.filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts contents } }
     end
 
     # @param [Pathname] gemfile_path The Gemfile from which to remove dependencies.
@@ -205,6 +206,36 @@ module Bundler
         # remove nil elements
         gemfile.reject!(&:nil?)
       end
+    end
+
+    # @param [Pathname] gemfile_path   The Gemfile from which to remove dependencies.
+    # @param [Array] original_deps     Array of original dependencies.
+    # @param [Array] removed_deps      Array of removed dependencies.
+    # @param [Array] initial_gemfile   Contents of original Gemfile before any operation.
+    def cross_check_for_errors(gemfile_path, original_deps, removed_deps, initial_gemfile)
+      # evalute the new gemfile to look for any failure cases
+      builder = Dsl.new
+      builder.eval_gemfile(Bundler.default_gemfile)
+
+      # record gems which were removed but not requested
+      extra_removed_gems = original_deps - builder.dependencies
+
+      # if some extra gems were removed then raise error
+      # and revert Gemfile to original
+      unless extra_removed_gems.empty?
+        write_to_gemfile(gemfile_path, initial_gemfile.join)
+
+        raise InvalidOption, "Gems could not be removed."
+      end
+
+      # record gems which could not be removed due to some reasons
+      errored_deps = builder.dependencies & removed_deps
+
+      # warn user regarding those gems
+      Bundler.ui.warn "#{errored_deps.map(&:name).join(", ")} could not be removed." unless errored_deps.empty?
+
+      # return actual removed dependencies
+      removed_deps - errored_deps
     end
   end
 end
