@@ -195,13 +195,14 @@ module Bundler
         "\nEither installing with `--full-index` or running `bundle update #{spec.name}` should fix the problem."
     end
 
-    def pretty_dependency(dep, print_source = false)
+    def pretty_dependency(dep, print_source = false, print_requirements = false)
       msg = String.new(dep.name)
       msg << " (#{dep.requirement})" unless dep.requirement == Gem::Requirement.default
       if dep.is_a?(Bundler::Dependency)
         platform_string = dep.platforms.join(", ")
         msg << " " << platform_string if !platform_string.empty? && platform_string != Gem::Platform::RUBY
       end
+      msg << " (#{dep.requirement})" if print_requirements && dep.requirement
       msg << " from the `#{dep.source}` source" if print_source && dep.source
       msg
     end

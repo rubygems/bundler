@@ -61,27 +61,16 @@ module Bundler
     # @param [Pathname] lockfile_path The lockfile from which to remove dependencies.
     # @return [Array]
     def remove(gemfile_path, lockfile_path)
-      # get initial gemfile snap shot
-      initial_gemfile = IO.readlines(gemfile_path)
-
-      # evaluate the Gemfile we have
+      # evaluate the main Gemfile
       builder = Dsl.new
       builder.eval_gemfile(Bundler.default_gemfile)
 
-      # remove gems from dependencies
-      removed_deps = remove_gems_from_dependencies(builder, @deps)
+      definition = builder.to_definition(lockfile_path, {})
 
-      # gemfile after removing requested gems
-      cleaned_gemfile = remove_gems_from_gemfile(@deps, gemfile_path)
-
-      # write the new gemfile
-      write_to_gemfile(gemfile_path, cleaned_gemfile)
-
-      # check for errors
-      # including extra gems being removed
-      # or some gems not being removed
-      # and return the actual removed deps
-      cross_check_for_errors(gemfile_path, builder.dependencies, removed_deps, initial_gemfile)
+      definition.gemfiles.each do |g|
+        # print success for removed gems
+        evaluate_gemfile(g).each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false, true)} was removed." }
+      end
     end
 
   private
@@ -131,6 +120,34 @@ module Bundler
         f.puts
         f.puts new_gem_lines
       end
+    end
+
+    # evalutes a gemfile to remove the specified gem
+    # from it.
+    def evaluate_gemfile(gemfile_path)
+      # get initial gemfile snap shot
+      initial_gemfile = IO.readlines(gemfile_path)
+
+      Bundler.ui.info "Removing gems from #{gemfile_path}"
+
+      # evaluate the Gemfile we have
+      builder = Dsl.new
+      builder.eval_gemfile(Bundler.default_gemfile)
+
+      # remove gems from dependencies
+      removed_deps = remove_gems_from_dependencies(builder, @deps)
+
+      # gemfile after removing requested gems
+      cleaned_gemfile = remove_gems_from_gemfile(@deps, gemfile_path)
+
+      # write the new gemfile
+      write_to_gemfile(gemfile_path, cleaned_gemfile)
+
+      # check for errors
+      # including extra gems being removed
+      # or some gems not being removed
+      # and return the actual removed deps
+      cross_check_for_errors(gemfile_path, builder.dependencies, removed_deps, initial_gemfile)
     end
 
     # @param [Dsl]    builder Dsl object of current Gemfile.
