@@ -30,20 +30,20 @@ We divide `bundle` subcommands into primary commands and utilities:
 
 ## PRIMARY COMMANDS
 
-* [`bundle install(1)`][bundle-install(1)]:
+* [`bundle install(1)`](bundle-install.1.html):
   Install the gems specified by the `Gemfile` or `Gemfile.lock`
 
-* [`bundle update(1)`][bundle-update(1)]:
+* [`bundle update(1)`](bundle-update.1.html):
   Update dependencies to their latest versions
 
-* [`bundle package(1)`][bundle-package(1)]:
+* [`bundle package(1)`](bundle-package.1.html):
   Package the .gem files required by your application into the
   `vendor/cache` directory
 
-* [`bundle exec(1)`][bundle-exec(1)]:
+* [`bundle exec(1)`](bundle-exec.1.html):
   Execute a script in the current bundle
 
-* [`bundle config(1)`][bundle-config(1)]:
+* [`bundle config(1)`](bundle-config.1.html):
   Specify and read configuration options for Bundler
 
 * `bundle help(1)`:
@@ -51,44 +51,44 @@ We divide `bundle` subcommands into primary commands and utilities:
 
 ## UTILITIES
 
-* [`bundle add(1)`][bundle-add(1)]:
+* [`bundle add(1)`](bundle-add.1.html):
   Add the named gem to the Gemfile and run `bundle install`
 
-* [`bundle binstubs(1)`][bundle-binstubs(1)]:
+* [`bundle binstubs(1)`](bundle-binstubs.1.html):
   Generate binstubs for executables in a gem
 
-* [`bundle check(1)`][bundle-check(1)]:
+* [`bundle check(1)`](bundle-check.1.html):
   Determine whether the requirements for your application are installed
   and available to Bundler
 
-* [`bundle show(1)`][bundle-show(1)]:
+* [`bundle show(1)`](bundle-show.1.html):
   Show the source location of a particular gem in the bundle
 
-* [`bundle outdated(1)`][bundle-outdated(1)]:
+* [`bundle outdated(1)`](bundle-outdated.1.html):
   Show all of the outdated gems in the current bundle
 
 * `bundle console(1)`:
   Start an IRB session in the current bundle
 
-* [`bundle open(1)`][bundle-open(1)]:
+* [`bundle open(1)`](bundle-open.1.html):
   Open an installed gem in the editor
 
 * [`bundle lock(1)`][bundle-lock]:
   Generate a lockfile for your dependencies
 
-* [`bundle viz(1)`][bundle-viz(1)]:
+* [`bundle viz(1)`](bundle-viz.1.html):
   Generate a visual representation of your dependencies
 
-* [`bundle init(1)`][bundle-init(1)]:
+* [`bundle init(1)`](bundle-init.1.html):
   Generate a simple `Gemfile`, placed in the current directory
 
-* [`bundle gem(1)`][bundle-gem(1)]:
+* [`bundle gem(1)`](bundle-gem.1.html):
   Create a simple gem, suitable for development with Bundler
 
-* [`bundle platform(1)`][bundle-platform(1)]:
+* [`bundle platform(1)`](bundle-platform.1.html):
   Display platform compatibility information
 
-* [`bundle clean(1)`][bundle-clean(1)]:
+* [`bundle clean(1)`](bundle-clean.1.html):
   Clean up unused gems in your Bundler directory
 
 * `bundle doctor(1)`:
