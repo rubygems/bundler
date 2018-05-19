@@ -67,9 +67,15 @@ module Bundler
 
       definition = builder.to_definition(lockfile_path, {})
 
-      definition.gemfiles.each do |g|
+      definition.gemfiles.each do |path|
         # print success for removed gems
-        evaluate_gemfile(g).each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false, true)} was removed." }
+        removed_deps = evaluate_gemfile(path)
+
+        if removed_deps.empty?
+          Bundler.ui.warn "No gems were removed."
+        else
+          removed_deps.each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false, true)} was removed." }
+        end
       end
     end
 
@@ -132,10 +138,14 @@ module Bundler
 
       # evaluate the Gemfile we have
       builder = Dsl.new
-      builder.eval_gemfile(Bundler.default_gemfile)
+      builder.eval_gemfile(gemfile_path)
 
       # remove gems from dependencies
       removed_deps = remove_gems_from_dependencies(builder, @deps)
+
+      # abort the opertion if no gems were removed
+      # no need to operate on gemfile furthur
+      return [] if removed_deps.empty?
 
       # gemfile after removing requested gems
       cleaned_gemfile = remove_gems_from_gemfile(@deps, gemfile_path)
@@ -160,6 +170,9 @@ module Bundler
         deleted_dep = builder.dependencies.find {|d| d.name == gem_name }
 
         if deleted_dep.nil?
+          # TODO: keeping this here yet needs to be discussed
+          # Bundler.ui.warn "`#{gem_name}` is not specified in Gemfile so not removed."
+          # return []
           raise GemfileError, "You cannot remove a gem which not specified in Gemfile.\n" \
                             "`#{gem_name}` is not specified in Gemfile so not removed."
         end
@@ -232,7 +245,7 @@ module Bundler
     def cross_check_for_errors(gemfile_path, original_deps, removed_deps, initial_gemfile)
       # evalute the new gemfile to look for any failure cases
       builder = Dsl.new
-      builder.eval_gemfile(Bundler.default_gemfile)
+      builder.eval_gemfile(gemfile_path)
 
       # record gems which were removed but not requested
       extra_removed_gems = original_deps - builder.dependencies
