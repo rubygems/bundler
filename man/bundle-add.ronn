@@ -3,10 +3,10 @@ bundle-add(1) -- Add gem to the Gemfile and run bundle install
 
 ## SYNOPSIS
 
-`bundle add` <GEM_NAME> [--group=GROUP] [--version=VERSION] [--source=SOURCE]
+`bundle add` <GEM_NAME> [--group=GROUP] [--version=VERSION] [--source=SOURCE] [--skip-install]
 
 ## DESCRIPTION
-Adds the named gem to the Gemfile and run `bundle install`.
+Adds the named gem to the Gemfile and run `bundle install`. `bundle install` can be avoided by using the flag `--skip-install`.
 
 Example:
 
@@ -15,6 +15,8 @@ bundle add rails
 bundle add rails --version "< 3.0, > 1.1"
 
 bundle add rails --version "~> 5.0.0" --source "https://gems.example.com" --group "development"
+
+bundle add rails --skip-install
 
 bundle add rails --group "development, test"
 
@@ -27,3 +29,6 @@ bundle add rails --group "development, test"
 
 * `--source`, , `-s`:
   Specify the source for the added gem.
+
+* `--skip-install`:
+  Adds the gem to the Gemfile but does not install it.

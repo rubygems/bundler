@@ -75,8 +75,18 @@ RSpec.describe "bundle add" do
   describe "with --source" do
     it "adds dependency with specified source" do
       bundle "add 'foo' --source='file://#{gem_repo2}'"
+
       expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "~> 2.0", :source => "file:\/\/#{gem_repo2}"})
       expect(the_bundle).to include_gems "foo 2.0"
+    end
+  end
+
+  describe "with --skip-install" do
+    it "adds gem to Gemfile but is not installed" do
+      bundle "add foo --skip-install --version=2.0"
+
+      expect(bundled_app("Gemfile").read).to match(/gem "foo", "= 2.0"/)
+      expect(the_bundle).to_not include_gems "foo 2.0"
     end
   end
 
