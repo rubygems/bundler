@@ -67,15 +67,10 @@ module Bundler
 
       definition = builder.to_definition(lockfile_path, {})
 
+      # remove gems from each gemfiles we have
       definition.gemfiles.each do |path|
         # print success for removed gems
-        removed_deps = evaluate_gemfile(path)
-
-        if removed_deps.empty?
-          Bundler.ui.warn "No gems were removed."
-        else
-          removed_deps.each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false, true)} was removed." }
-        end
+        evaluate_gemfile(path).each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false, true)} was removed." }
       end
     end
 
@@ -131,9 +126,11 @@ module Bundler
     # evalutes a gemfile to remove the specified gem
     # from it.
     def evaluate_gemfile(gemfile_path)
-      # get initial gemfile snap shot
+      # get initial snap shot of the gemfile
       initial_gemfile = IO.readlines(gemfile_path)
 
+      # inform user of the the gemfile currently
+      # being evaluated
       Bundler.ui.info "Removing gems from #{gemfile_path}"
 
       # evaluate the Gemfile we have
@@ -170,11 +167,8 @@ module Bundler
         deleted_dep = builder.dependencies.find {|d| d.name == gem_name }
 
         if deleted_dep.nil?
-          # TODO: keeping this here yet needs to be discussed
-          # Bundler.ui.warn "`#{gem_name}` is not specified in Gemfile so not removed."
-          # return []
-          raise GemfileError, "You cannot remove a gem which not specified in Gemfile.\n" \
-                            "`#{gem_name}` is not specified in Gemfile so not removed."
+          Bundler.ui.warn "`#{gem_name}` is not specified in Gemfile so not removed."
+          return []
         end
 
         builder.dependencies.delete(deleted_dep)

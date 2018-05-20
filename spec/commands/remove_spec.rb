@@ -50,9 +50,8 @@ RSpec.describe "bundle remove" do
           source "file://#{gem_repo1}"
         G
 
-        bundle "remove rack"
+        bundle! "remove rack"
 
-        expect(out).to include("You cannot remove a gem which not specified in Gemfile.")
         expect(out).to include("`rack` is not specified in Gemfile so not removed.")
       end
     end
@@ -82,8 +81,7 @@ RSpec.describe "bundle remove" do
           gem "rails"
         G
 
-        bundle "remove rack rails"
-        expect(out).to include("You cannot remove a gem which not specified in Gemfile.")
+        bundle! "remove rack rails"
         expect(out).to include("`rack` is not specified in Gemfile so not removed.")
       end
     end
@@ -353,7 +351,7 @@ RSpec.describe "bundle remove" do
       end
     end
 
-    context "when gem to removed is not specified in the gemfile" do
+    context "when gem to be removed is not specified in the gemfile" do
       it "throws error for gems not present" do
         # an empty gemfile
         # indicating the gem is not present in the gemfile
@@ -366,9 +364,8 @@ RSpec.describe "bundle remove" do
           eval_gemfile "Gemfile-other"
         G
 
-        bundle "remove rack"
+        bundle! "remove rack"
 
-        expect(out).to include("You cannot remove a gem which not specified in Gemfile.")
         expect(out).to include("`rack` is not specified in Gemfile so not removed.")
       end
     end
@@ -386,16 +383,85 @@ RSpec.describe "bundle remove" do
           gem "rack"
         G
 
-        bundle "remove rack"
+        bundle! "remove rack"
 
         expect(out).to include("rack (>= 0) was removed.")
-        expect(out).to include("You cannot remove a gem which not specified in Gemfile.")
         expect(out).to include("`rack` is not specified in Gemfile so not removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
           eval_gemfile "Gemfile-other"
         G
+      end
+    end
+
+    context "when gems can not be removed from other gemfile" do
+      it "shows error" do
+        create_file "Gemfile-other", <<-G
+          gem "rails"; gem "rack"
+        G
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+
+          eval_gemfile "Gemfile-other"
+          gem "rack"
+        G
+
+        bundle "remove rack"
+
+        expect(out).to include("rack could not be removed.")
+        gemfile_should_be <<-G
+          source "file://#{gem_repo1}"
+
+          eval_gemfile "Gemfile-other"
+        G
+      end
+    end
+
+    context "when gems could not be removed from parent gemfile" do
+      it "shows error" do
+        create_file "Gemfile-other", <<-G
+          gem "rack"
+        G
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+
+          eval_gemfile "Gemfile-other"
+          gem "rails"; gem "rack"
+        G
+
+        bundle "remove rack"
+
+        expect(out).to include("Gems could not be removed.")
+        expect(bundled_app("Gemfile-other").read).to include("rack")
+        gemfile_should_be <<-G
+          source "file://#{gem_repo1}"
+
+          eval_gemfile "Gemfile-other"
+          gem "rails"; gem "rack"
+        G
+      end
+    end
+
+    context "when gem present in gemfiles but could not be removed from one from one of them" do
+      it "removes gem which can be removed and shows warning for file from which it can not be removed" do
+        create_file "Gemfile-other", <<-G
+          gem "rack"
+        G
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+
+          eval_gemfile "Gemfile-other"
+          gem"rack"
+        G
+
+        bundle! "remove rack"
+
+        expect(out).to include("rack could not be removed.")
+        expect(bundled_app("Gemfile-other").read).to_not include("gem \"rack\"")
       end
     end
   end
