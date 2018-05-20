@@ -373,8 +373,8 @@ EOF
       @requires_sudo = settings.allow_sudo? && sudo_present && sudo_needed
     end
 
-    def mkdir_p(path)
-      if requires_sudo?
+    def mkdir_p(path, options = {})
+      if requires_sudo? && !options[:no_sudo]
         sudo "mkdir -p '#{path}'" unless File.exist?(path)
       else
         SharedHelpers.filesystem_access(path, :write) do |p|
