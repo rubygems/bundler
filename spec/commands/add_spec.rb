@@ -17,6 +17,14 @@ RSpec.describe "bundle add" do
     G
   end
 
+  context "when no gems are specified" do
+    it "shows error" do
+      bundle "add"
+
+      expect(out).to include("Please specify gems to add")
+    end
+  end
+
   describe "without version specified" do
     it "version requirement becomes ~> major.minor.patch when resolved version is < 1.0" do
       bundle "add 'bar'"
