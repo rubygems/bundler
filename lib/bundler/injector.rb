@@ -31,7 +31,8 @@ module Bundler
         @new_deps -= builder.dependencies
 
         # add new deps to the end of the in-memory Gemfile
-        # Set conservative versioning to false because we want to let the resolver resolve the version first
+        # Set conservative versioning to false because
+        # we want to let the resolver resolve the version first
         builder.eval_gemfile("injected gems", build_gem_lines(false)) if @new_deps.any?
 
         # resolve to see if the new deps broke anything

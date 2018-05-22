@@ -2,8 +2,8 @@
 
 module Bundler
   class CLI::Add
-    def initialize(options, gem_name)
-      @gem_name = gem_name
+    def initialize(options, gems)
+      @gems = gems
       @options = options
       @options[:group] = @options[:group].split(",").map(&:strip) if !@options[:group].nil? && !@options[:group].empty?
     end
@@ -18,12 +18,17 @@ module Bundler
           raise InvalidOption, "Invalid gem requirement pattern '#{v}'" unless Gem::Requirement::PATTERN =~ v.to_s
         end
       end
-      dependency = Bundler::Dependency.new(@gem_name, version, @options)
 
-      Injector.inject([dependency],
-        :conservative_versioning => @options[:version].nil?, # Perform conservative versioning only when version is not specified
-        :optimistic => @options[:optimistic],
-        :strict => @options[:strict])
+      # to store dependencies formed from gem names
+      dependencies = []
+
+      # create a dependency from gem name and
+      # push to dependencies
+      @gems.each {|g| dependencies << Bundler::Dependency.new(g, version, @options) }
+
+      # inject the dependencies
+      Injector.inject(dependencies, :conservative_versioning => @options[:version].nil?) # Perform conservative versioning only when version is not specified
+
       Installer.install(Bundler.root, Bundler.definition) unless @options["skip-install"]
     end
   end
