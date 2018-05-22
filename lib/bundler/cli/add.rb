@@ -14,6 +14,10 @@ module Bundler
       # raise error when no gems are specified
       raise InvalidOption, "Please specify gems to add." if @gems.empty?
 
+      # show warning when options are used with mutiple gems
+      # for time being they will be applied to the last gem
+      Bundler.ui.warn "All the options will be applied to all gems`."
+
       version = @options[:version].nil? ? nil : @options[:version].split(",").map(&:strip)
 
       unless version.nil?
