@@ -15,7 +15,7 @@ module Bundler
       raise InvalidOption, "Please specify gems to add." if @gems.empty?
 
       # show warning when options are used with mutiple gems
-      # for time being they will be applied to the last gem
+      # for time being they will be applied to the all gems
       Bundler.ui.warn "All the options will be applied to all gems`."
 
       version = @options[:version].nil? ? nil : @options[:version].split(",").map(&:strip)
@@ -26,14 +26,8 @@ module Bundler
         end
       end
 
-      # to store dependencies formed from gem names
-      dependencies = []
+      dependencies = @gems.map {|g| Bundler::Dependency.new(g, version, @options) }
 
-      # create a dependency from gem name and
-      # push to dependencies
-      @gems.each {|g| dependencies << Bundler::Dependency.new(g, version, @options) }
-
-      # inject the dependencies
       Injector.inject(dependencies, :conservative_versioning => @options[:version].nil?) # Perform conservative versioning only when version is not specified
 
       Installer.install(Bundler.root, Bundler.definition) unless @options["skip-install"]
