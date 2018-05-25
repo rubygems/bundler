@@ -268,8 +268,8 @@ RSpec.describe Bundler::Plugin do
         s.write "plugins.rb", code
       end
 
-      Bundler::Plugin::Events.define(:EVENT_1, "event-1")
-      Bundler::Plugin::Events.define(:EVENT_2, "event-2")
+      Bundler::Plugin::Events.send(:define, :EVENT_1, "event-1")
+      Bundler::Plugin::Events.send(:define, :EVENT_2, "event-2")
 
       allow(index).to receive(:hook_plugins).with(Bundler::Plugin::Events::EVENT_1).
         and_return(["foo-plugin"])
