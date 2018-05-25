@@ -29,6 +29,7 @@ module Bundler
 
     settings_flag(:allow_bundler_dependency_conflicts) { bundler_2_mode? }
     settings_flag(:allow_offline_install) { bundler_2_mode? }
+    settings_flag(:application_locked) { bundler_2_mode? }
     settings_flag(:auto_clean_without_path) { bundler_2_mode? }
     settings_flag(:auto_config_jobs) { bundler_2_mode? }
     settings_flag(:cache_all) { bundler_2_mode? }
