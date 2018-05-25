@@ -14,10 +14,6 @@ module Bundler
       # raise error when no gems are specified
       raise InvalidOption, "Please specify gems to add." if @gems.empty?
 
-      # show warning when options are used with mutiple gems
-      # for time being they will be applied to the all gems
-      Bundler.ui.warn "All the options will be applied to all gems`."
-
       version = @options[:version].nil? ? nil : @options[:version].split(",").map(&:strip)
 
       unless version.nil?
@@ -28,7 +24,10 @@ module Bundler
 
       dependencies = @gems.map {|g| Bundler::Dependency.new(g, version, @options) }
 
-      Injector.inject(dependencies, :conservative_versioning => @options[:version].nil?) # Perform conservative versioning only when version is not specified
+      Injector.inject(dependencies,
+        :conservative_versioning => @options[:version].nil?, # Perform conservative versioning only when version is not specified
+        :optimistic => @options[:optimistic],
+        :strict => @options[:strict])
 
       Installer.install(Bundler.root, Bundler.definition) unless @options["skip-install"]
     end
