@@ -407,7 +407,9 @@ EOF
     end
 
     def read_file(file)
-      File.open(file, "rb", &:read)
+      SharedHelpers.filesystem_access(file, :read) do
+        File.open(file, "rb", &:read)
+      end
     end
 
     def load_marshal(data)
