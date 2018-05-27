@@ -197,12 +197,13 @@ module Bundler
 
     def pretty_dependency(dep, print_source = false, print_requirements = false)
       msg = String.new(dep.name)
-      msg << " (#{dep.requirement})" unless dep.requirement == Gem::Requirement.default
+      msg << " (#{dep.requirement})" if dep.requirement != Gem::Requirement.default || print_requirements
+
       if dep.is_a?(Bundler::Dependency)
         platform_string = dep.platforms.join(", ")
         msg << " " << platform_string if !platform_string.empty? && platform_string != Gem::Platform::RUBY
       end
-      msg << " (#{dep.requirement})" if print_requirements && dep.requirement
+
       msg << " from the `#{dep.source}` source" if print_source && dep.source
       msg
     end
