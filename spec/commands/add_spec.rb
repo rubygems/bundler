@@ -116,4 +116,28 @@ RSpec.describe "bundle add" do
     bundle "add 'baz' --source='file://does/not/exist'"
     expect(out).to include("Could not fetch specs from file://does/not/exist/")
   end
+
+  describe "with --optimistic" do
+    it "adds optimistic version" do
+      bundle! "add 'foo' --optimistic"
+      expect(bundled_app("Gemfile").read).to include %(gem "foo", ">= 2.0")
+      expect(the_bundle).to include_gems "foo 2.0"
+    end
+  end
+
+  describe "with --strict option" do
+    it "adds strict version" do
+      bundle! "add 'foo' --strict"
+      expect(bundled_app("Gemfile").read).to include %(gem "foo", "= 2.0")
+      expect(the_bundle).to include_gems "foo 2.0"
+    end
+  end
+
+  describe "with no option" do
+    it "adds pessimistic version" do
+      bundle! "add 'foo'"
+      expect(bundled_app("Gemfile").read).to include %(gem "foo", "~> 2.0")
+      expect(the_bundle).to include_gems "foo 2.0"
+    end
+  end
 end

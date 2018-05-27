@@ -18,7 +18,10 @@ module Bundler
       end
       dependency = Bundler::Dependency.new(@gem_name, version, @options)
 
-      Injector.inject([dependency], :conservative_versioning => @options[:version].nil?) # Perform conservative versioning only when version is not specified
+      Injector.inject([dependency],
+        :conservative_versioning => @options[:version].nil?, # Perform conservative versioning only when version is not specified
+        :optimistic => @options[:optimistic],
+        :strict => @options[:strict])
       Installer.install(Bundler.root, Bundler.definition) unless @options["skip-install"]
     end
   end
