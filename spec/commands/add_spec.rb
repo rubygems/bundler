@@ -140,4 +140,12 @@ RSpec.describe "bundle add" do
       expect(the_bundle).to include_gems "foo 2.0"
     end
   end
+
+  describe "with --optimistic and --strict" do
+    it "throws error" do
+      bundle "add 'foo' --strict --optimistic"
+
+      expect(out).to include("You can not specify `--strict` and `--optimistic` at the same time")
+    end
+  end
 end

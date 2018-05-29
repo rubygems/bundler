@@ -9,6 +9,8 @@ module Bundler
     end
 
     def run
+      raise InvalidOption, "You can not specify `--strict` and `--optimistic` at the same time." if @options[:strict] && @options[:optimistic]
+
       version = @options[:version].nil? ? nil : @options[:version].split(",").map(&:strip)
 
       unless version.nil?
