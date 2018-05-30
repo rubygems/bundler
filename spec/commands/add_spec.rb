@@ -173,19 +173,8 @@ RSpec.describe "bundle add" do
     end
   end
 
-  it "installs gem if a gem is added with same version requirements as specified in Gemfile" do
-    install_gemfile <<-G
-      source "file://#{gem_repo2}"
-      gem "rack"
-    G
-
-    bundle "add 'rack'"
-
-    expect(out).to include("Fetching source index from file:#{gem_repo2}")
-  end
-
-  context "throws an error if a gem is added which is already specified in Gemfile with version" do
-    it "with different version requirement" do
+  describe "when a gem is added which is already specified in Gemfile with version" do
+    it "shows an error when added with different version requirement" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack", "1.0"
@@ -197,7 +186,7 @@ RSpec.describe "bundle add" do
       expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
     end
 
-    it "without version requirements" do
+    it "shows error when added without version requirements" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack", "1.0"
@@ -211,8 +200,8 @@ RSpec.describe "bundle add" do
     end
   end
 
-  context "throws an error if a gem is added which is already specified in Gemfile without version" do
-    it "with different version requirements" do
+  describe "when a gem is added which is already specified in Gemfile without version" do
+    it "shows an error when added with different version requirement" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack"
