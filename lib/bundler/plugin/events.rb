@@ -14,6 +14,14 @@ module Bundler
       end
       private_class_method :define
 
+      def self.reset
+        @events.each do |_, const|
+          remove_const(const)
+        end
+        @events = nil
+      end
+      private_class_method :reset
+
       # Check if an event has been defined
       # @param event [String] An event to check
       # @return [Boolean] A boolean indicating if the event has been defined

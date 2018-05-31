@@ -11,7 +11,7 @@ RSpec.describe Bundler::Plugin::Events do
 
       it "can define a new constant" do
         Bundler::Plugin::Events.send(:define, :NEW_CONSTANT, "value")
-        expect(Bundler::Plugin::Events::NEW_CONSTANT).to be("value")
+        expect(Bundler::Plugin::Events::NEW_CONSTANT).to eq("value")
       end
     end
   end

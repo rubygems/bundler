@@ -268,6 +268,7 @@ RSpec.describe Bundler::Plugin do
         s.write "plugins.rb", code
       end
 
+      Bundler::Plugin::Events.send(:reset)
       Bundler::Plugin::Events.send(:define, :EVENT_1, "event-1")
       Bundler::Plugin::Events.send(:define, :EVENT_2, "event-2")
 
