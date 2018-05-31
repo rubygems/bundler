@@ -24,6 +24,7 @@ RSpec.describe "command plugins" do
   it "executes without arguments" do
     expect(out).to include("Installed plugin command-mah")
 
+    Dir.mkdir ".bundle"
     bundle "mahcommand"
     expect(out).to eq("MahHello")
   end
@@ -46,6 +47,7 @@ RSpec.describe "command plugins" do
       end
     end
 
+    Dir.mkdir ".bundle"
     bundle "plugin install the-echoer --source file://#{gem_repo2}"
     expect(out).to include("Installed plugin the-echoer")
 

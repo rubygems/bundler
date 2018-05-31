@@ -14,6 +14,7 @@ RSpec.describe "bundle executable" do
   end
 
   it "looks for a binary and executes it if it's named bundler-<task>" do
+    Dir.mkdir ".bundle"
     File.open(tmp("bundler-testtasks"), "w", 0o755) do |f|
       f.puts "#!/usr/bin/env ruby\nputs 'Hello, world'\n"
     end
@@ -88,6 +89,7 @@ RSpec.describe "bundle executable" do
   describe "printing the outdated warning" do
     shared_examples_for "no warning" do
       it "prints no warning" do
+        Dir.mkdir ".bundle"
         bundle "fail"
         expect(last_command.stdboth).to eq("Could not find command \"fail\".")
       end

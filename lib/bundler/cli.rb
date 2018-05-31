@@ -30,6 +30,17 @@ module Bundler
       end
     end
 
+    def self.dynamic_command_class
+      CustomSubCommand
+    end
+
+    class CustomSubCommand < DynamicCommand
+      def run(*)
+        SharedHelpers.set_bundle_environment
+        super
+      end
+    end
+
     def initialize(*args)
       super
 
