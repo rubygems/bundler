@@ -69,8 +69,11 @@ module Bundler
 
       # remove gems from each gemfiles we have
       definition.gemfiles.each do |path|
-        # print success for removed gems
-        evaluate_gemfile(path).each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false, true)} was removed." }
+        deps = evaluate_gemfile(path)
+
+        show_warning("No gems were removed from the gemfile.") if deps.empty?
+
+        deps.each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false, true)} was removed." }
       end
     end
 
@@ -167,8 +170,8 @@ module Bundler
         deleted_dep = builder.dependencies.find {|d| d.name == gem_name }
 
         if deleted_dep.nil?
-          Bundler.ui.warn "`#{gem_name}` is not specified in Gemfile so not removed."
-          return []
+          show_warning "`#{gem_name}` is not specified in Gemfile so not removed."
+          next
         end
 
         builder.dependencies.delete(deleted_dep)
@@ -208,8 +211,8 @@ module Bundler
       SharedHelpers.filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts contents } }
     end
 
-    # @param [Pathname] gemfile_path The Gemfile from which to remove dependencies.
-    # @param [String] block_name     Name of block name to look for.
+    # @param [Array] gemfile       Array of gemfile contents.
+    # @param [String] block_name   Name of block name to look for.
     def remove_nested_blocks(gemfile, block_name)
       nested_blocks = 0
 
@@ -256,10 +259,14 @@ module Bundler
       errored_deps = builder.dependencies & removed_deps
 
       # warn user regarding those gems
-      Bundler.ui.warn "#{errored_deps.map(&:name).join(", ")} could not be removed." unless errored_deps.empty?
+      show_warning "#{errored_deps.map(&:name).join(", ")} could not be removed." unless errored_deps.empty?
 
       # return actual removed dependencies
       removed_deps - errored_deps
+    end
+
+    def show_warning(message)
+      Bundler.ui.info Bundler.ui.add_color(message, :yellow)
     end
   end
 end

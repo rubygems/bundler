@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle remove", :focus do
+RSpec.describe "bundle remove" do
   context "when no gems are specified" do
     it "throws error" do
       gemfile <<-G
