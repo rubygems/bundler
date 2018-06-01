@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle remove" do
+RSpec.describe "bundle remove", :focus do
   context "when no gems are specified" do
     it "throws error" do
       gemfile <<-G
-          source "file://#{gem_repo1}"
-        G
+        source "file://#{gem_repo1}"
+      G
 
       bundle "remove"
 
@@ -16,10 +16,10 @@ RSpec.describe "bundle remove" do
   context "when --install flag is specified" do
     it "removes gems from .bundle" do
       gemfile <<-G
-          source "file://#{gem_repo1}"
+        source "file://#{gem_repo1}"
 
-          gem "rack"
-        G
+        gem "rack"
+      G
 
       bundle! "remove rack --install"
 
@@ -28,9 +28,9 @@ RSpec.describe "bundle remove" do
     end
   end
 
-  describe "basic gemfile" do
-    context "remove single gem from gemfile" do
-      it "when gem is present in gemfile" do
+  describe "remove single gem from gemfile" do
+    context "when gem is present in gemfile" do
+      it "shows success for removed gem" do
         gemfile <<-G
           source "file://#{gem_repo1}"
 
@@ -44,8 +44,10 @@ RSpec.describe "bundle remove" do
           source "file://#{gem_repo1}"
         G
       end
+    end
 
-      it "when gem is not present in gemfile" do
+    context "when gem is not present in gemfile" do
+      it "shows warning for gem that could not be removed" do
         gemfile <<-G
           source "file://#{gem_repo1}"
         G
@@ -53,11 +55,14 @@ RSpec.describe "bundle remove" do
         bundle! "remove rack"
 
         expect(out).to include("`rack` is not specified in Gemfile so not removed.")
+        expect(out).to include("No gems were removed from the gemfile")
       end
     end
+  end
 
-    context "remove mutiple gems from gemfile" do
-      it "when all gems are present in gemfile" do
+  describe "remove mutiple gems from gemfile" do
+    context "when all gems are present in gemfile" do
+      it "shows success fir all removed gems" do
         gemfile <<-G
           source "file://#{gem_repo1}"
 
@@ -70,43 +75,54 @@ RSpec.describe "bundle remove" do
         expect(out).to include("rack (>= 0) was removed.")
         expect(out).to include("rails (>= 0) was removed.")
         gemfile_should_be <<-G
-          source "file://#{gem_repo1}"
+        source "file://#{gem_repo1}"
         G
       end
+    end
 
-      it "when a gem is not present in gemfile" do
+    context "when some gems are not present in the gemfile" do
+      it "shows warning for those not present and success for those that can be removed" do
         gemfile <<-G
           source "file://#{gem_repo1}"
 
           gem "rails"
+          gem "minitest"
+          gem "rspec"
         G
 
-        bundle! "remove rack rails"
+        bundle! "remove rails rack minitest"
+        expect(out).to include("rails (>= 0) was removed.")
+        expect(out).to include("minitest (>= 0) was removed.")
         expect(out).to include("`rack` is not specified in Gemfile so not removed.")
+        gemfile_should_be <<-G
+          source "file://#{gem_repo1}"
+
+          gem "rspec"
+        G
       end
     end
   end
 
-  describe "with groups" do
-    context "with inline groups" do
-      it "removes the gem" do
-        gemfile <<-G
-          source "file://#{gem_repo1}"
+  context "with inline groups" do
+    it "removes the specified gem" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
 
-          gem "rack", :group => [:dev]
-        G
+        gem "rack", :group => [:dev]
+      G
 
-        bundle! "remove rack"
+      bundle! "remove rack"
 
-        expect(out).to include("rack (>= 0) was removed.")
-        gemfile_should_be <<-G
-          source "file://#{gem_repo1}"
-        G
-      end
+      expect(out).to include("rack (>= 0) was removed.")
+      gemfile_should_be <<-G
+        source "file://#{gem_repo1}"
+      G
     end
+  end
 
-    context "removes empty block on removal of all gems from it" do
-      it "when single group block with gem is present" do
+  describe "with group blocks" do
+    context "when single group block with gem to be removed is present" do
+      it "removes the group block" do
         gemfile <<-G
           source "file://#{gem_repo1}"
 
@@ -122,8 +138,10 @@ RSpec.describe "bundle remove" do
           source "file://#{gem_repo1}"
         G
       end
+    end
 
-      it "when any other empty block is also present" do
+    context "when an empty block is also present" do
+      it "removes all empty blocks" do
         gemfile <<-G
           source "file://#{gem_repo1}"
 
@@ -144,8 +162,8 @@ RSpec.describe "bundle remove" do
       end
     end
 
-    context "when gem belongs to mutiple groups" do
-      it "when gems assigned to multiple groups" do
+    context "when the gem belongs to mutiple groups" do
+      it "removes the groups" do
         gemfile <<-G
           source "file://#{gem_repo1}"
 
@@ -161,8 +179,10 @@ RSpec.describe "bundle remove" do
           source "file://#{gem_repo1}"
         G
       end
+    end
 
-      it "gem is present in mutiple groups" do
+    context "when the gem is present in mutiple groups" do
+      it "removes all empty blocks" do
         gemfile <<-G
           source "file://#{gem_repo1}"
 
@@ -183,9 +203,11 @@ RSpec.describe "bundle remove" do
         G
       end
     end
+  end
 
-    context "nested group blocks" do
-      it "when all the groups will be empty after removal" do
+  describe "nested group blocks" do
+    context "when all the groups will be empty after removal" do
+      it "removes the empty nested blocks" do
         gemfile <<-G
           source "file://#{gem_repo1}"
 
@@ -203,8 +225,10 @@ RSpec.describe "bundle remove" do
           source "file://#{gem_repo1}"
         G
       end
+    end
 
-      it "when outer group will not be empty after removal" do
+    context "when outer group will not be empty after removal" do
+      it "removes only empty blocks" do
         install_gemfile <<-G
           source "file://#{gem_repo1}"
 
@@ -229,8 +253,10 @@ RSpec.describe "bundle remove" do
           end
         G
       end
+    end
 
-      it "when inner group will not be empty after removal" do
+    context "when inner group will not be empty after removal" do
+      it "removes only empty blocks" do
         install_gemfile <<-G
           source "file://#{gem_repo1}"
 
@@ -332,8 +358,28 @@ RSpec.describe "bundle remove" do
   end
 
   describe "with eval_gemfile" do
-    context "when gems are present in gemfile" do
-      it "removes gems" do
+    context "when gems are present in both gemfiles" do
+      it "removes the gems" do
+        create_file "Gemfile-other", <<-G
+          gem "rack"
+        G
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+
+          eval_gemfile "Gemfile-other"
+
+          gem "rack"
+        G
+
+        bundle! "remove rack"
+
+        expect(out).to include("rack (>= 0) was removed.")
+      end
+    end
+
+    context "when gems are present in other gemfile" do
+      it "removes the gems" do
         create_file "Gemfile-other", <<-G
           gem "rack"
         G
@@ -351,8 +397,8 @@ RSpec.describe "bundle remove" do
       end
     end
 
-    context "when gem to be removed is not specified in the gemfile" do
-      it "throws error for gems not present" do
+    context "when gems to be removed are not specified in any of the gemfiles" do
+      it "throws error for the gems not present" do
         # an empty gemfile
         # indicating the gem is not present in the gemfile
         create_file "Gemfile-other", <<-G
@@ -371,7 +417,7 @@ RSpec.describe "bundle remove" do
     end
 
     context "when the gem is present in parent file but not in gemfile specified by eval_gemfile" do
-      it "removes gem" do
+      it "removes the gem" do
         create_file "Gemfile-other", <<-G
           gem "rails"
         G
@@ -411,6 +457,7 @@ RSpec.describe "bundle remove" do
         bundle "remove rack"
 
         expect(out).to include("rack could not be removed.")
+        expect(out).to include("Gems could not be removed")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
@@ -435,7 +482,7 @@ RSpec.describe "bundle remove" do
         bundle "remove rack"
 
         expect(out).to include("Gems could not be removed.")
-        expect(bundled_app("Gemfile-other").read).to include("rack")
+        expect(bundled_app("Gemfile-other").read).to include("gem \"rack\"")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
@@ -467,7 +514,7 @@ RSpec.describe "bundle remove" do
   end
 
   context "with install_if" do
-    it "should remove gems inside blocks and empty blocks" do
+    it "removes gems inside blocks and empty blocks" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
 
@@ -486,7 +533,7 @@ RSpec.describe "bundle remove" do
   end
 
   context "with env" do
-    it "should remove gems inside blocks and empty blocks" do
+    it "removes gems inside blocks and empty blocks" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
 
