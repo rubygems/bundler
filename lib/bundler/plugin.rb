@@ -5,6 +5,7 @@ require "bundler/plugin/api"
 module Bundler
   module Plugin
     autoload :DSL,        "bundler/plugin/dsl"
+    autoload :Events,     "bundler/plugin/events"
     autoload :Index,      "bundler/plugin/index"
     autoload :Installer,  "bundler/plugin/installer"
     autoload :SourceList, "bundler/plugin/source_list"
@@ -155,6 +156,9 @@ module Bundler
     # To be called via the API to register a hooks and corresponding block that
     # will be called to handle the hook
     def add_hook(event, &block)
+      unless Events.defined_event?(event)
+        raise ArgumentError, "Event '#{event}' not defined in Bundler::Plugin::Events"
+      end
       @hooks_by_event[event.to_s] << block
     end
 
@@ -166,6 +170,9 @@ module Bundler
     # @param [String] event
     def hook(event, *args, &arg_blk)
       return unless Bundler.feature_flag.plugins?
+      unless Events.defined_event?(event)
+        raise ArgumentError, "Event '#{event}' not defined in Bundler::Plugin::Events"
+      end
 
       plugins = index.hook_plugins(event)
       return unless plugins.any?
