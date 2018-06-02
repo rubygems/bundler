@@ -15,7 +15,7 @@ module Bundler
       private_class_method :define
 
       def self.reset
-        @events.each do |_, const|
+        @events.each_value do |const|
           remove_const(const)
         end
         @events = nil
