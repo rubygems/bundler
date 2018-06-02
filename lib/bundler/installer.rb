@@ -21,7 +21,7 @@ module Bundler
     # For more information see the #run method on this class.
     def self.install(root, definition, options = {})
       installer = new(root, definition)
-      Plugin.hook("before-install-all", definition.dependencies)
+      Plugin.hook(Plugin::Events::GEM_BEFORE_INSTALL_ALL, definition.dependencies)
       installer.run(options)
       installer
     end
