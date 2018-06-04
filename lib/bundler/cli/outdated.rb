@@ -66,7 +66,7 @@ module Bundler
         current_dependencies.key? spec.name
       end
 
-      specs = if options["filter-dependencies"]
+      specs = if options["only-explicit"]
         gemfile_specs
       else
         gemfile_specs + dependency_specs

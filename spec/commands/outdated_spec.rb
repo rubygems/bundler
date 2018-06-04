@@ -765,7 +765,7 @@ RSpec.describe "bundle outdated" do
     end
   end
 
-  describe "with --filter-dependencies" do
+  describe "with --only-explicit" do
     it "does not report outdated dependent gems" do
       build_repo4 do
         build_gem "weakling", %w[0.2 0.3] do |s|
@@ -785,7 +785,7 @@ RSpec.describe "bundle outdated" do
         gem 'weakling'
       G
 
-      bundle "outdated --filter-dependencies"
+      bundle "outdated --only-explicit"
 
       expect(out).to include("weakling (newest 0.3")
       expect(out).not_to include("bar (newest 2.2")
