@@ -69,7 +69,7 @@ module Bundler
 
       # remove gems from each gemfiles we have
       definition.gemfiles.each do |path|
-        deps = evaluate_gemfile(path)
+        deps = remove_deps(path)
 
         show_warning("No gems were removed from the gemfile.") if deps.empty?
 
@@ -128,7 +128,7 @@ module Bundler
 
     # evalutes a gemfile to remove the specified gem
     # from it.
-    def evaluate_gemfile(gemfile_path)
+    def remove_deps(gemfile_path)
       # get initial snap shot of the gemfile
       initial_gemfile = IO.readlines(gemfile_path)
 
@@ -170,8 +170,7 @@ module Bundler
         deleted_dep = builder.dependencies.find {|d| d.name == gem_name }
 
         if deleted_dep.nil?
-          show_warning "`#{gem_name}` is not specified in Gemfile so not removed."
-          next
+          raise GemfileError, "`#{gem_name}` is not specified in Gemfile so could not be removed."
         end
 
         builder.dependencies.delete(deleted_dep)
@@ -186,7 +185,7 @@ module Bundler
     # @param [Pathname] gemfile_path The Gemfile from which to remove dependencies.
     def remove_gems_from_gemfile(gems, gemfile_path)
       # store patterns of all gems to be removed
-      patterns = /gem\s+(['"])#{Regexp.union(gems)}\1|gem\((['"])#{Regexp.union(gems)}\2\)/
+      patterns = /gem\s+(['"])#{Regexp.union(gems)}\1|gem\s*\((['"])#{Regexp.union(gems)}\2\)/
 
       # remove lines which match the regex
       new_gemfile = IO.readlines(gemfile_path).reject {|line| line.match(patterns) }

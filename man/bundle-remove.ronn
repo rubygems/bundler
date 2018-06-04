@@ -14,7 +14,7 @@ If gem could not be removed due to any reason Bundler warns the user.
 ## OPTIONS
 
 * `--install`:
-  Remove gems from bundle.
+  Runs 'bundle install' after removing the gems from the gemfile.
 
 Example:
 
