@@ -61,7 +61,17 @@ module Bundler
       seg_end_index = version >= Gem::Version.new("1.0") ? 1 : 2
 
       prerelease_suffix = version.to_s.gsub(version.release.to_s, "") if version.prerelease?
-      "~> #{segments[0..seg_end_index].join(".")}#{prerelease_suffix}"
+      "#{version_prefix}#{segments[0..seg_end_index].join(".")}#{prerelease_suffix}"
+    end
+
+    def version_prefix
+      if @options[:strict]
+        "= "
+      elsif @options[:optimistic]
+        ">= "
+      else
+        "~> "
+      end
     end
 
     def build_gem_lines(conservative_versioning)
