@@ -333,6 +333,8 @@ module Bundler
     method_option "source", :aliases => "-s", :type => :string
     method_option "skip-install", :type => :boolean, :banner =>
       "Adds gem to the Gemfile but does not install it"
+    method_option "optimistic", :type => :boolean, :banner => "Adds optimistic declaration of version to gem"
+    method_option "strict", :type => :boolean, :banner => "Adds strict declaration of version to gem"
     def add(gem_name)
       require "bundler/cli/add"
       Add.new(options.dup, gem_name).run

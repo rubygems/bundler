@@ -3,7 +3,7 @@ bundle-add(1) -- Add gem to the Gemfile and run bundle install
 
 ## SYNOPSIS
 
-`bundle add` <GEM_NAME> [--group=GROUP] [--version=VERSION] [--source=SOURCE] [--skip-install]
+`bundle add` <GEM_NAME> [--group=GROUP] [--version=VERSION] [--source=SOURCE] [--skip-install] [--strict] [--optimistic]
 
 ## DESCRIPTION
 Adds the named gem to the Gemfile and run `bundle install`. `bundle install` can be avoided by using the flag `--skip-install`.
@@ -32,3 +32,9 @@ bundle add rails --group "development, test"
 
 * `--skip-install`:
   Adds the gem to the Gemfile but does not install it.
+
+* `--optimistic`:
+  Adds optimistic declaration of version
+
+* `--strict`:
+  Adds strict declaration of version
