@@ -9,23 +9,11 @@ module Bundler
     def run
       raise InvalidOption, "The `--only` and `--without` options cannot be used together" if @options[:only] && @options[:without]
 
-      raise InvalidOption, "The `--name-only` and `--paths` options cannot be used together" if @options["name-only"] && @options["paths"]
+      raise InvalidOption, "The `--name-only` and `--paths` options cannot be used together" if @options["name-only"] && @options[:paths]
 
-      builder = Dsl.new
-      builder.eval_gemfile(Bundler.default_gemfile)
+      specs = Bundler.load.specs.reject {|s| s.name == "bundler" }.sort_by(&:name)
 
-      @definition = builder.to_definition(Bundler.default_lockfile, {})
-
-      verify_group_exists
-
-      @definition.resolve_remotely!
-
-      # get gems that are to be shown from upper and then filter them from specs
-
-      p @definition.specs
-      return
-
-      specs = filter_groups.map(&:to_spec).sort_by(&:name)
+      specs = filtered_specs_by_groups(specs) if @options[:only] || @options[:without]
 
       return Bundler.ui.info "No gems in the Gemfile" if specs.empty?
 
@@ -42,25 +30,31 @@ module Bundler
   private
 
     def verify_group_exists
-      if @options[:without] && !@definition.groups.include?(@options[:without].to_sym)
-        raise InvalidOption, "`#{@options[:without]}` group could not be found"
-      end
+      raise InvalidOption, "`#{@options[:without]}` group could not be found." if @options[:without] && !@definition.groups.include?(@options[:without].to_sym)
 
-      if @options[:only] && !@definition.groups.include?(@options[:only].to_sym)
-        raise InvalidOption, "`#{@options[:only]}` group could not be found"
-      end
+      raise InvalidOption, "`#{@options[:only]}` group could not be found." if @options[:only] && !@definition.groups.include?(@options[:only].to_sym)
     end
 
-    def filter_groups
-      deps = @definition.dependencies.reject {|d| d.name == "bundler" }
+    def filtered_specs_by_groups(specs)
+      builder = Dsl.new
+      builder.eval_gemfile(Bundler.default_gemfile)
 
-      if @options[:without]
-        deps.reject {|d| d.groups.include?(@options[:without].to_sym) }
-      elsif @options[:only]
-        deps.select {|d| d.groups.include?(@options[:only].to_sym) }
-      else
-        deps
-      end
+      @definition = builder.to_definition(Bundler.default_lockfile, {})
+
+      verify_group_exists
+
+      deps = @definition.dependencies
+
+      filtered_specs =
+        if @options[:without]
+          deps.reject {|d| d.groups.include?(@options[:without].to_sym) }
+        elsif @options[:only]
+          deps.select {|d| d.groups.include?(@options[:only].to_sym) }
+        else
+          deps
+        end.map(&:name)
+
+      specs.select {|s| filtered_specs.include?(s.name) }
     end
   end
 end
