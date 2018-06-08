@@ -189,6 +189,34 @@ EOF
     end
   end
 
+  describe "#mkdir_p" do
+    it "creates a folder at the given path" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      Bundler.mkdir_p(bundled_app.join("foo", "bar"))
+      expect(bundled_app.join("foo", "bar")).to exist
+    end
+
+    context "when mkdir_p requires sudo" do
+      it "creates a new folder using sudo" do
+        expect(Bundler).to receive(:requires_sudo?).and_return(true)
+        expect(Bundler).to receive(:sudo).and_return true
+        Bundler.mkdir_p(bundled_app.join("foo"))
+      end
+    end
+
+    context "with :no_sudo option" do
+      it "forces mkdir_p to not use sudo" do
+        expect(Bundler).to receive(:requires_sudo?).and_return(true)
+        expect(Bundler).to_not receive(:sudo)
+        Bundler.mkdir_p(bundled_app.join("foo"), :no_sudo => true)
+      end
+    end
+  end
+
   describe "#user_home" do
     context "home directory is set" do
       it "should return the user home" do
