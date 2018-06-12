@@ -159,12 +159,13 @@ module Bundler
     def user_home
       @user_home ||= begin
         home = Bundler.rubygems.user_home
+        bundle_home = home ? File.join(home, ".bundle") : nil
 
         warning = if home.nil?
           "Your home directory is not set."
         elsif !File.directory?(home)
           "`#{home}` is not a directory."
-        elsif !File.writable?(home)
+        elsif !File.writable?(home) && (!File.directory?(bundle_home) || !File.writable?(bundle_home))
           "`#{home}` is not writable."
         end
 
