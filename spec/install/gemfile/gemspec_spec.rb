@@ -442,7 +442,7 @@ RSpec.describe "bundle install from an existing gemspec" do
         context "as a runtime dependency" do
           it "keeps java dependencies in the lockfile" do
             expect(the_bundle).to include_gems "foo 1.0", "platform_specific 1.0 RUBY"
-            expect(lockfile).to eq strip_whitespace(<<-L)
+            expected = strip_whitespace(<<-L)
               PATH
                 remote: .
                 specs:
@@ -465,6 +465,8 @@ RSpec.describe "bundle install from an existing gemspec" do
               BUNDLED WITH
                  #{Bundler::VERSION}
             L
+            expected = expected.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
+            expect(lockfile).to eq expected
           end
         end
 
@@ -473,7 +475,7 @@ RSpec.describe "bundle install from an existing gemspec" do
 
           it "keeps java dependencies in the lockfile" do
             expect(the_bundle).to include_gems "foo 1.0", "platform_specific 1.0 RUBY"
-            expect(lockfile).to eq strip_whitespace(<<-L)
+            expected = strip_whitespace(<<-L)
               PATH
                 remote: .
                 specs:
@@ -496,6 +498,8 @@ RSpec.describe "bundle install from an existing gemspec" do
               BUNDLED WITH
                  #{Bundler::VERSION}
             L
+            expected = expected.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
+            expect(lockfile).to eq expected
           end
         end
 
@@ -505,7 +509,7 @@ RSpec.describe "bundle install from an existing gemspec" do
 
           it "keeps java dependencies in the lockfile" do
             expect(the_bundle).to include_gems "foo 1.0", "indirect_platform_specific 1.0", "platform_specific 1.0 RUBY"
-            expect(lockfile).to eq strip_whitespace(<<-L)
+            expected = strip_whitespace(<<-L)
               PATH
                 remote: .
                 specs:
@@ -530,6 +534,8 @@ RSpec.describe "bundle install from an existing gemspec" do
               BUNDLED WITH
                  #{Bundler::VERSION}
             L
+            expected = expected.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
+            expect(lockfile).to eq expected
           end
         end
       end
@@ -543,7 +549,7 @@ RSpec.describe "bundle install from an existing gemspec" do
         context "as a runtime dependency" do
           it "keeps java dependencies in the lockfile" do
             expect(the_bundle).to include_gems "foo 1.0", "platform_specific 1.0 RUBY"
-            expect(lockfile).to eq strip_whitespace(<<-L)
+            expected = strip_whitespace(<<-L)
               GEM
                 remote: file://localhost#{gem_repo2}/
                 specs:
@@ -559,13 +565,14 @@ RSpec.describe "bundle install from an existing gemspec" do
               PLATFORMS
                 java
                 ruby
-
               DEPENDENCIES
                 foo!
 
               BUNDLED WITH
                  #{Bundler::VERSION}
             L
+            expected = expected.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
+            expect(lockfile).to eq expected
           end
         end
 
@@ -574,7 +581,7 @@ RSpec.describe "bundle install from an existing gemspec" do
 
           it "keeps java dependencies in the lockfile" do
             expect(the_bundle).to include_gems "foo 1.0", "platform_specific 1.0 RUBY"
-            expect(lockfile).to eq strip_whitespace(<<-L)
+            expected = strip_whitespace(<<-L)
               GEM
                 remote: file://localhost#{gem_repo2}/
                 specs:
@@ -597,6 +604,8 @@ RSpec.describe "bundle install from an existing gemspec" do
               BUNDLED WITH
                  #{Bundler::VERSION}
             L
+            expected = expected.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
+            expect(lockfile).to eq expected
           end
         end
 
@@ -606,7 +615,7 @@ RSpec.describe "bundle install from an existing gemspec" do
 
           it "keeps java dependencies in the lockfile" do
             expect(the_bundle).to include_gems "foo 1.0", "indirect_platform_specific 1.0", "platform_specific 1.0 RUBY"
-            expect(lockfile).to eq strip_whitespace(<<-L)
+            expected = strip_whitespace(<<-L)
               GEM
                 remote: file://localhost#{gem_repo2}/
                 specs:
@@ -631,6 +640,8 @@ RSpec.describe "bundle install from an existing gemspec" do
               BUNDLED WITH
                  #{Bundler::VERSION}
             L
+            expected = expected.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
+            expect(lockfile).to eq expected
           end
         end
       end

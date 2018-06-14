@@ -116,10 +116,12 @@ RSpec.describe "post bundle message" do
           gem "rack"
           gem "not-a-gem", :group => :development
         G
-        expect(out).to include <<-EOS.strip
+        msg = <<-EOS.strip
 Could not find gem 'not-a-gem' in rubygems repository file://localhost#{gem_repo1}/ or installed locally.
 The source does not contain any versions of 'not-a-gem'
         EOS
+        msg = msg.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
+        expect(out).to include msg
       end
 
       it "should report a helpful error message with reference to cache if available" do

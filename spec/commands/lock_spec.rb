@@ -53,6 +53,7 @@ RSpec.describe "bundle lock" do
       BUNDLED WITH
          #{Bundler::VERSION}
     L
+    @lockfile = @lockfile.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
   end
 
   it "prints a lockfile when there is no existing lockfile with --print" do
@@ -257,7 +258,7 @@ RSpec.describe "bundle lock" do
 
     simulate_platform(mingw) { bundle! :lock }
 
-    expect(the_bundle.lockfile).to read_as(strip_whitespace(<<-G))
+    lockfile_should_be(<<-G, the_bundle.lockfile)
       GEM
         remote: file://localhost#{gem_repo4}/
         specs:
@@ -282,7 +283,7 @@ RSpec.describe "bundle lock" do
 
     simulate_platform(rb) { bundle! :lock }
 
-    expect(the_bundle.lockfile).to read_as(strip_whitespace(<<-G))
+    lockfile_should_be(<<-G, the_bundle.lockfile)
       GEM
         remote: file://localhost#{gem_repo4}/
         specs:

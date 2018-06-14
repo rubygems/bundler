@@ -1166,6 +1166,7 @@ end
            #{Bundler::VERSION}
       L
 
+      lock = lock.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
       lock
     end
 

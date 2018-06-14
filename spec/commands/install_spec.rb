@@ -354,8 +354,10 @@ RSpec.describe "bundle install with gem sources" do
       G
 
       expect(last_command.stdboth).not_to match(/Error Report/i)
+      msg = "Make sure that `gem install ajp-rails -v '0.0.0' --source 'file://localhost#{gem_repo2}/'` succeeds before bundling."
+      msg = msg.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
       expect(last_command.bundler_err).to include("An error occurred while installing ajp-rails (0.0.0), and Bundler cannot continue.").
-        and include("Make sure that `gem install ajp-rails -v '0.0.0' --source 'file://localhost#{gem_repo2}/'` succeeds before bundling.")
+        and include(msg)
     end
 
     it "doesn't blow up when the local .bundle/config is empty" do

@@ -18,7 +18,7 @@ RSpec.describe "bundle install" do
         source "file:\/\/localhost#{gem_repo2}"
         gem "rails"
       G
-      expect(last_command.bundler_err).to end_with(<<-M.strip)
+      msg = <<-M.strip
 An error occurred while installing activesupport (2.3.2), and Bundler cannot continue.
 Make sure that `gem install activesupport -v '2.3.2' --source 'file://localhost#{gem_repo2}/'` succeeds before bundling.
 
@@ -27,6 +27,8 @@ In Gemfile:
     actionmailer was resolved to 2.3.2, which depends on
       activesupport
                      M
+      msg = msg.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
+      expect(last_command.bundler_err).to end_with(msg)
     end
 
     context "when installing a git gem" do
@@ -111,7 +113,7 @@ In Gemfile:
           gem "rails"
         end
       G
-      expect(last_command.bundler_err).to end_with(<<-M.strip)
+      msg = <<-M.strip
 An error occurred while installing activesupport (2.3.2), and Bundler cannot continue.
 Make sure that `gem install activesupport -v '2.3.2' --source 'file://localhost#{gem_repo2}/'` succeeds before bundling.
 
@@ -120,6 +122,8 @@ In Gemfile:
     actionmailer was resolved to 2.3.2, which depends on
       activesupport
                      M
+      msg = msg.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
+      expect(last_command.bundler_err).to end_with(msg)
     end
 
     context "because the downloaded .gem was invalid" do
