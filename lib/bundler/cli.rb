@@ -355,6 +355,18 @@ module Bundler
       Add.new(options.dup, gems).run
     end
 
+    desc "change GEM [OPTIONS]", "Change gem properties"
+    long_desc <<-D
+      Change
+    D
+    method_option "version", :aliases => "-v", :type => :string
+    method_option "group", :aliases => "-g", :type => :string
+    method_option "source", :aliases => "-s", :type => :string
+    def change(gem_name)
+      require "bundler/cli/change"
+      Change.new(options.dup, gem_name).run
+    end
+
     desc "outdated GEM [OPTIONS]", "List installed gems with newer versions available"
     long_desc <<-D
       Outdated lists the names and versions of gems that have a newer version available
