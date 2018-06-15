@@ -565,6 +565,7 @@ RSpec.describe "bundle install from an existing gemspec" do
               PLATFORMS
                 java
                 ruby
+
               DEPENDENCIES
                 foo!
 
