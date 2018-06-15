@@ -17,6 +17,14 @@ RSpec.describe "bundle add" do
     G
   end
 
+  context "when no gems are specified" do
+    it "shows error" do
+      bundle "add"
+
+      expect(last_command.bundler_err).to include("Please specify gems to add")
+    end
+  end
+
   describe "without version specified" do
     it "version requirement becomes ~> major.minor.patch when resolved version is < 1.0" do
       bundle "add 'bar'"
@@ -146,6 +154,22 @@ RSpec.describe "bundle add" do
       bundle "add 'foo' --strict --optimistic"
 
       expect(out).to include("You can not specify `--strict` and `--optimistic` at the same time")
+    end
+  end
+
+  context "multiple gems" do
+    it "adds multiple gems to gemfile" do
+      bundle! "add bar baz"
+
+      expect(bundled_app("Gemfile").read).to match(/gem "bar", "~> 0.12.3"/)
+      expect(bundled_app("Gemfile").read).to match(/gem "baz", "~> 1.2"/)
+    end
+
+    it "throws error if any of the specified gems are present in the gemfile with different version" do
+      bundle "add weakling bar"
+
+      expect(out).to include("You cannot specify the same gem twice with different version requirements")
+      expect(out).to include("You specified: weakling (~> 0.0.1) and weakling (>= 0).")
     end
   end
 end
