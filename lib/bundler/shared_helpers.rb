@@ -195,9 +195,9 @@ module Bundler
         "\nEither installing with `--full-index` or running `bundle update #{spec.name}` should fix the problem."
     end
 
-    def pretty_dependency(dep, print_source = false, print_requirements = false)
+    def pretty_dependency(dep, print_source = false)
       msg = String.new(dep.name)
-      msg << " (#{dep.requirement})" if dep.requirement != Gem::Requirement.default || print_requirements
+      msg << " (#{dep.requirement})" unless dep.requirement == Gem::Requirement.default
 
       if dep.is_a?(Bundler::Dependency)
         platform_string = dep.platforms.join(", ")
