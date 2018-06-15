@@ -189,6 +189,23 @@ RSpec.describe "bundle update" do
       expect(the_bundle).not_to include_gems "rack 1.2"
     end
 
+    context "when conservatively updating a group with non-group sub-deps" do
+      it "should update only specified group gems" do
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activemerchant", :group => :development
+          gem "activesupport"
+        G
+        update_repo2 do
+          build_gem "activemerchant", "2.0"
+          build_gem "activesupport", "3.0"
+        end
+        bundle "update --conservative --group development"
+        expect(the_bundle).to include_gems "activemerchant 2.0"
+        expect(the_bundle).not_to include_gems "activesupport 3.0"
+      end
+    end
+
     context "when there is a source with the same name as a gem in a group" do
       before :each do
         build_git "foo", :path => lib_path("activesupport")
