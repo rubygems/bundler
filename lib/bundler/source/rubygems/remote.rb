@@ -25,7 +25,14 @@ module Bundler
 
             cache_uri = original_uri || uri
 
-            uri_parts = [cache_uri.host, cache_uri.user, cache_uri.port, cache_uri.path]
+            # URI::File of Ruby 2.6 returns empty string when given "file://".
+            if defined?(URI::File) && cache_uri.is_a?(URI::File)
+              host = nil
+            else
+              host = cache_uri.host
+            end
+
+            uri_parts = [host, cache_uri.user, cache_uri.port, cache_uri.path]
             uri_digest = SharedHelpers.digest(:MD5).hexdigest(uri_parts.compact.join("."))
 
             uri_parts[-1] = uri_digest
