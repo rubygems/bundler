@@ -1166,8 +1166,7 @@ end
            #{Bundler::VERSION}
       L
 
-      lock = lock.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
-      lock
+      normalize_uri_file(lock)
     end
 
     before do

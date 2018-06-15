@@ -13,9 +13,7 @@ RSpec.describe "bundle install with a mirror configured" do
 
     it "installs from the normal location" do
       bundle :install
-      msg = "Fetching source index from file://localhost#{gem_repo1}"
-      msg = msg.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
-      expect(out).to include(msg)
+      expect(out).to include(normalize_uri_file("Fetching source index from file://localhost#{gem_repo1}"))
       expect(the_bundle).to include_gems "rack 1.0"
     end
   end
@@ -33,12 +31,8 @@ RSpec.describe "bundle install with a mirror configured" do
 
     it "installs the gem from the mirror" do
       bundle :install
-      msg = "Fetching source index from file://localhost#{gem_repo1}"
-      msg = msg.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
-      expect(out).to include(msg)
-      msg = "Fetching source index from file://localhost#{gem_repo2}"
-      msg = msg.gsub(%r{file:\/\/localhost}, "file://") if defined?(URI::File)
-      expect(out).not_to include(msg)
+      expect(out).to include(normalize_uri_file("Fetching source index from file://localhost#{gem_repo1}"))
+      expect(out).not_to include(normalize_uri_file("Fetching source index from file://localhost#{gem_repo2}"))
       expect(the_bundle).to include_gems "rack 1.0"
     end
   end
