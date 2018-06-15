@@ -543,7 +543,7 @@ RSpec.describe "bundle install from an existing gemspec" do
         context "as a runtime dependency" do
           it "keeps java dependencies in the lockfile" do
             expect(the_bundle).to include_gems "foo 1.0", "platform_specific 1.0 RUBY"
-            expect(lockfile).to eq nomalize_uri_file(strip_whitespace(<<-L))
+            expect(lockfile).to eq normalize_uri_file(strip_whitespace(<<-L))
               GEM
                 remote: file://localhost#{gem_repo2}/
                 specs:
