@@ -15,6 +15,7 @@ bundle-outdated(1) -- List installed gems with newer versions available
                         [--filter-major]
                         [--filter-minor]
                         [--filter-patch]
+                        [--only-explicit]
 
 ## DESCRIPTION
 
@@ -66,6 +67,9 @@ are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
 
 * `--filter-patch`:
   Only list patch newer versions.
+
+* `--only-explicit`:
+  Only list gems specified in your Gemfile, not their dependencies.
 
 ## PATCH LEVEL OPTIONS
 
