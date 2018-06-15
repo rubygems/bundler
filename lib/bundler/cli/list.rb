@@ -11,9 +11,11 @@ module Bundler
 
       raise InvalidOption, "The `--name-only` and `--paths` options cannot be used together" if @options["name-only"] && @options[:paths]
 
-      specs = Bundler.load.specs.reject {|s| s.name == "bundler" }.sort_by(&:name)
-
-      specs = filtered_specs_by_groups(specs) if @options[:only] || @options[:without]
+      specs = if @options[:only] || @options[:without]
+        filtered_specs_by_groups
+      else
+        Bundler.load.specs
+      end.reject {|s| s.name == "bundler" }.sort_by(&:name)
 
       return Bundler.ui.info "No gems in the Gemfile" if specs.empty?
 
@@ -29,32 +31,28 @@ module Bundler
 
   private
 
-    def verify_group_exists
-      raise InvalidOption, "`#{@options[:without]}` group could not be found." if @options[:without] && !@definition.groups.include?(@options[:without].to_sym)
+    def verify_group_exists(groups)
+      raise InvalidOption, "`#{@options[:without]}` group could not be found." if @options[:without] && !groups.include?(@options[:without].to_sym)
 
-      raise InvalidOption, "`#{@options[:only]}` group could not be found." if @options[:only] && !@definition.groups.include?(@options[:only].to_sym)
+      raise InvalidOption, "`#{@options[:only]}` group could not be found." if @options[:only] && !groups.include?(@options[:only].to_sym)
     end
 
-    def filtered_specs_by_groups(specs)
-      builder = Dsl.new
-      builder.eval_gemfile(Bundler.default_gemfile)
+    def filtered_specs_by_groups
+      definition = Bundler.definition
+      groups = definition.groups
 
-      @definition = builder.to_definition(Bundler.default_lockfile, {})
+      verify_group_exists(groups)
 
-      verify_group_exists
-
-      deps = @definition.dependencies
-
-      filtered_specs =
+      show_groups =
         if @options[:without]
-          deps.reject {|d| d.groups.include?(@options[:without].to_sym) }
+          groups.reject {|g| g == @options[:without].to_sym }
         elsif @options[:only]
-          deps.select {|d| d.groups.include?(@options[:only].to_sym) }
+          groups.select {|g| g == @options[:only].to_sym }
         else
-          deps
-        end.map(&:name)
+          groups
+        end.map(&:to_sym)
 
-      specs.select {|s| filtered_specs.include?(s.name) }
+      definition.specs_for(show_groups)
     end
   end
 end
