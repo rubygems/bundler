@@ -109,15 +109,14 @@ module Bundler
             return if dep.type == :development
 
             update_prompt = ""
-            change_version = ". You may also need to change the version requirement specified in the Gemfile if it's too restrictive."
 
-            if File.basename(@gemfile) == "injected gems"
+            if File.basename(@gemfile) == Injector::INJECTED_GEMS
               if dep.requirements_list.include?(">= 0") && !current.requirements_list.include?(">= 0")
                 update_prompt = ". Gem already added"
               else
                 update_prompt = ". If you want to update the gem version, run `bundle update #{current.name}`"
 
-                update_prompt += change_version unless current.requirements_list.include?(">= 0")
+                update_prompt += ". You may also need to change the version requirement specified in the Gemfile if it's too restrictive." unless current.requirements_list.include?(">= 0")
               end
             end
 
