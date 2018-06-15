@@ -23,7 +23,7 @@ RSpec.describe "bundle remove" do
 
       bundle! "remove rack --install"
 
-      expect(out).to include("rack (>= 0) was removed.")
+      expect(out).to include("rack was removed.")
       expect(the_bundle).to_not include_gems "rack"
     end
   end
@@ -39,7 +39,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rack"
 
-        expect(out).to include("rack (>= 0) was removed.")
+        expect(out).to include("rack was removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
         G
@@ -54,7 +54,7 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rack"
 
-        expect(out).to include("`rack` is not specified in Gemfile so could not be removed.")
+        expect(out).to include("`rack` is not specified in #{bundled_app("Gemfile")} so it could not be removed.")
       end
     end
   end
@@ -71,8 +71,8 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rack rails"
 
-        expect(out).to include("rack (>= 0) was removed.")
-        expect(out).to include("rails (>= 0) was removed.")
+        expect(out).to include("rack was removed.")
+        expect(out).to include("rails was removed.")
         gemfile_should_be <<-G
         source "file://#{gem_repo1}"
         G
@@ -91,7 +91,7 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rails rack minitest"
 
-        expect(out).to include("`rack` is not specified in Gemfile so could not be removed.")
+        expect(out).to include("`rack` is not specified in #{bundled_app("Gemfile")} so it could not be removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
@@ -113,7 +113,7 @@ RSpec.describe "bundle remove" do
 
       bundle! "remove rack"
 
-      expect(out).to include("rack (>= 0) was removed.")
+      expect(out).to include("rack was removed.")
       gemfile_should_be <<-G
         source "file://#{gem_repo1}"
       G
@@ -133,7 +133,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rspec"
 
-        expect(out).to include("rspec (>= 0) was removed.")
+        expect(out).to include("rspec was removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
         G
@@ -155,7 +155,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rspec"
 
-        expect(out).to include("rspec (>= 0) was removed.")
+        expect(out).to include("rspec was removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
         G
@@ -174,7 +174,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rspec"
 
-        expect(out).to include("rspec (>= 0) was removed.")
+        expect(out).to include("rspec was removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
         G
@@ -197,7 +197,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rspec"
 
-        expect(out).to include("rspec (>= 0) was removed.")
+        expect(out).to include("rspec was removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
         G
@@ -220,7 +220,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rspec"
 
-        expect(out).to include("rspec (>= 0) was removed.")
+        expect(out).to include("rspec was removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
         G
@@ -243,7 +243,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rspec"
 
-        expect(out).to include("rspec (>= 0) was removed.")
+        expect(out).to include("rspec was removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
@@ -270,7 +270,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rspec"
 
-        expect(out).to include("rspec (>= 0) was removed.")
+        expect(out).to include("rspec was removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
@@ -294,7 +294,7 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rails"
 
-        expect(out).to include("Gems could not be removed.")
+        expect(out).to include("Gems could not be removed. rack (>= 0) would also have been removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
           gem "rack"; gem "rails"
@@ -314,8 +314,8 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rails rack rspec minitest"
 
-        expect(out).to include("rails (>= 0) was removed.")
-        expect(out).to include("minitest (>= 0) was removed.")
+        expect(out).to include("rails was removed.")
+        expect(out).to include("minitest was removed.")
         expect(out).to include("rack, rspec could not be removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
@@ -348,7 +348,7 @@ RSpec.describe "bundle remove" do
 
       bundle! "remove rspec"
 
-      expect(out).to include("rspec (>= 0) was removed.")
+      expect(out).to include("rspec was removed.")
       gemfile_should_be <<-G
         source "file://#{gem_repo1}"
 
@@ -374,7 +374,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rack"
 
-        expect(out).to include("rack (>= 0) was removed.")
+        expect(out).to include("rack was removed.")
       end
     end
 
@@ -393,7 +393,7 @@ RSpec.describe "bundle remove" do
         bundle! "remove rack"
 
         expect(bundled_app("Gemfile-other").read).to_not include("gem \"rack\"")
-        expect(out).to include("rack (>= 0) was removed.")
+        expect(out).to include("rack was removed.")
       end
     end
 
@@ -412,7 +412,7 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rack"
 
-        expect(out).to include("`rack` is not specified in Gemfile so could not be removed.")
+        expect(out).to include("`rack` is not specified in #{bundled_app("Gemfile")} so it could not be removed.")
       end
     end
 
@@ -431,8 +431,8 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rack"
 
-        expect(out).to include("rack (>= 0) was removed.")
-        expect(out).to include("`rack` is not specified in Gemfile so could not be removed.")
+        expect(out).to include("rack was removed.")
+        expect(out).to include("`rack` is not specified in #{bundled_app("Gemfile-other")} so it could not be removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
@@ -456,8 +456,8 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rack"
 
-        expect(out).to include("rack could not be removed.")
-        expect(out).to include("Gems could not be removed")
+        expect(out).to include("rack was removed.")
+        expect(out).to include("Gems could not be removed. rails (>= 0) would also have been removed.")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
@@ -481,7 +481,7 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rack"
 
-        expect(out).to include("Gems could not be removed.")
+        expect(out).to include("Gems could not be removed. rails (>= 0) would also have been removed.")
         expect(bundled_app("Gemfile-other").read).to include("gem \"rack\"")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
@@ -507,7 +507,7 @@ RSpec.describe "bundle remove" do
 
         bundle! "remove rack"
 
-        expect(out).to include("rack could not be removed.")
+        expect(out).to include("rack was removed.")
         expect(bundled_app("Gemfile-other").read).to_not include("gem \"rack\"")
       end
     end
@@ -525,7 +525,7 @@ RSpec.describe "bundle remove" do
 
       bundle! "remove rack"
 
-      expect(out).to include("rack (>= 0) was removed.")
+      expect(out).to include("rack was removed.")
       gemfile_should_be <<-G
         source "file://#{gem_repo1}"
       G
@@ -544,7 +544,7 @@ RSpec.describe "bundle remove" do
 
       bundle! "remove rack"
 
-      expect(out).to include("rack (>= 0) was removed.")
+      expect(out).to include("rack was removed.")
       gemfile_should_be <<-G
         source "file://#{gem_repo1}"
       G

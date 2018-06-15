@@ -61,19 +61,13 @@ module Bundler
     # @param [Pathname] lockfile_path The lockfile from which to remove dependencies.
     # @return [Array]
     def remove(gemfile_path, lockfile_path)
-      # evaluate the main Gemfile
-      builder = Dsl.new
-      builder.eval_gemfile(Bundler.default_gemfile)
-
-      definition = builder.to_definition(lockfile_path, {})
-
       # remove gems from each gemfiles we have
-      definition.gemfiles.each do |path|
+      Bundler.definition.gemfiles.each do |path|
         deps = remove_deps(path)
 
         show_warning("No gems were removed from the gemfile.") if deps.empty?
 
-        deps.each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false, true)} was removed." }
+        deps.each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false)} was removed." }
       end
     end
 
@@ -141,7 +135,7 @@ module Bundler
       builder.eval_gemfile(gemfile_path)
 
       # remove gems from dependencies
-      removed_deps = remove_gems_from_dependencies(builder, @deps)
+      removed_deps = remove_gems_from_dependencies(builder, @deps, gemfile_path)
 
       # abort the opertion if no gems were removed
       # no need to operate on gemfile furthur
@@ -160,17 +154,18 @@ module Bundler
       cross_check_for_errors(gemfile_path, builder.dependencies, removed_deps, initial_gemfile)
     end
 
-    # @param [Dsl]    builder Dsl object of current Gemfile.
-    # @param [Array]  gems Array of names of gems to be removed.
-    # @return [Array] removed_deps Array of removed dependencies.
-    def remove_gems_from_dependencies(builder, gems)
+    # @param [Dsl]      builder Dsl object of current Gemfile.
+    # @param [Array]    gems Array of names of gems to be removed.
+    # @param [Pathname] path of the Gemfile
+    # @return [Array]   removed_deps Array of removed dependencies.
+    def remove_gems_from_dependencies(builder, gems, gemfile_path)
       removed_deps = []
 
       gems.each do |gem_name|
         deleted_dep = builder.dependencies.find {|d| d.name == gem_name }
 
         if deleted_dep.nil?
-          raise GemfileError, "`#{gem_name}` is not specified in Gemfile so could not be removed."
+          raise GemfileError, "`#{gem_name}` is not specified in #{gemfile_path} so it could not be removed."
         end
 
         builder.dependencies.delete(deleted_dep)
@@ -222,15 +217,14 @@ module Bundler
         nested_blocks -= 1
 
         gemfile.each_with_index do |line, index|
-          next if line !~ /#{block_name}/
+          next unless !line.nil? && line.include?(block_name)
           if gemfile[index + 1] =~ /^\s*end\s*$/
             gemfile[index] = nil
             gemfile[index + 1] = nil
           end
         end
 
-        # remove nil elements
-        gemfile.reject!(&:nil?)
+        gemfile.compact!
       end
     end
 
@@ -251,7 +245,7 @@ module Bundler
       unless extra_removed_gems.empty?
         write_to_gemfile(gemfile_path, initial_gemfile.join)
 
-        raise InvalidOption, "Gems could not be removed."
+        raise InvalidOption, "Gems could not be removed. #{extra_removed_gems.join(", ")} would also have been removed. Bundler cannot continue."
       end
 
       # record gems which could not be removed due to some reasons
