@@ -87,7 +87,7 @@ Lint/RescueException:
     - 'lib/bundler/worker.rb'
 
 # Offense count: 29
-Lint/RescueWithoutErrorClass:
+Lint/RescueStandardError:
   Enabled: false
 
 # Offense count: 2
@@ -145,20 +145,6 @@ Performance/Caller:
   Exclude:
     - 'lib/bundler/rubygems_integration.rb'
     - 'spec/support/builders.rb'
-
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: AutoCorrect.
-Performance/HashEachMethods:
-  Exclude:
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/dependency.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/index.rb'
-    - 'lib/bundler/plugin.rb'
-    - 'spec/install/gems/standalone_spec.rb'
-    - 'spec/support/builders.rb'
-    - 'spec/support/helpers.rb'
 
 # Offense count: 7
 # Cop supports --auto-correct.
@@ -297,7 +283,7 @@ Style/InverseMethods:
     - 'lib/bundler/resolver/spec_group.rb'
 
 # Offense count: 6
-Style/MethodMissing:
+Style/MethodMissingSuper:
   Exclude:
     - 'lib/bundler/dep_proxy.rb'
     - 'lib/bundler/dsl.rb'
@@ -362,7 +348,17 @@ Style/RaiseArgs:
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyleForMultiline, SupportedStylesForMultiline.
 # SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  Exclude:
+    - 'lib/bundler/cli/gem.rb'
+    - 'lib/bundler/fetcher.rb'
+    - 'lib/bundler/gem_helpers.rb'
+    - 'lib/bundler/graph.rb'
+    - 'lib/bundler/ruby_version.rb'
+    - 'lib/bundler/similarity_detector.rb'
+    - 'spec/support/artifice/endpoint.rb'
+
+Style/TrailingCommaInHashLiteral:
   Exclude:
     - 'lib/bundler/cli/gem.rb'
     - 'lib/bundler/fetcher.rb'
