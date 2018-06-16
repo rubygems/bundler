@@ -249,7 +249,7 @@ module Bundler
       end
 
       # record gems which could not be removed due to some reasons
-      errored_deps = builder.dependencies & removed_deps
+      errored_deps = builder.dependencies.select {|d| d.gemfile == gemfile_path } & removed_deps.select {|d| d.gemfile == gemfile_path }
 
       # warn user regarding those gems
       show_warning "#{errored_deps.map(&:name).join(", ")} could not be removed." unless errored_deps.empty?
