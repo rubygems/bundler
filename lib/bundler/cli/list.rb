@@ -7,11 +7,11 @@ module Bundler
     end
 
     def run
-      raise InvalidOption, "The `--only` and `--without` options cannot be used together" if @options[:only] && @options[:without]
+      raise InvalidOption, "The `--only-group` and `--without-group` options cannot be used together" if @options["only-group"] && @options["without-group"]
 
       raise InvalidOption, "The `--name-only` and `--paths` options cannot be used together" if @options["name-only"] && @options[:paths]
 
-      specs = if @options[:only] || @options[:without]
+      specs = if @options["only-group"] || @options["without-group"]
         filtered_specs_by_groups
       else
         Bundler.load.specs
@@ -32,9 +32,9 @@ module Bundler
   private
 
     def verify_group_exists(groups)
-      raise InvalidOption, "`#{@options[:without]}` group could not be found." if @options[:without] && !groups.include?(@options[:without].to_sym)
+      raise InvalidOption, "`#{@options["without-group"]}` group could not be found." if @options["without-group"] && !groups.include?(@options["without-group"].to_sym)
 
-      raise InvalidOption, "`#{@options[:only]}` group could not be found." if @options[:only] && !groups.include?(@options[:only].to_sym)
+      raise InvalidOption, "`#{@options["only-group"]}` group could not be found." if @options["only-group"] && !groups.include?(@options["only-group"].to_sym)
     end
 
     def filtered_specs_by_groups
@@ -44,10 +44,10 @@ module Bundler
       verify_group_exists(groups)
 
       show_groups =
-        if @options[:without]
-          groups.reject {|g| g == @options[:without].to_sym }
-        elsif @options[:only]
-          groups.select {|g| g == @options[:only].to_sym }
+        if @options["without-group"]
+          groups.reject {|g| g == @options["without-group"].to_sym }
+        elsif @options["only-group"]
+          groups.select {|g| g == @options["only-group"].to_sym }
         else
           groups
         end.map(&:to_sym)

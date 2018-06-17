@@ -18,18 +18,18 @@ RSpec.describe "bundle list", :bundler => "2" do
     end
   end
 
-  context "with without and only option" do
+  context "with without-group and only-group option" do
     it "raises an error" do
-      bundle "list --without dev --only test"
+      bundle "list --without-group dev --only-group test"
 
-      expect(out).to eq "The `--only` and `--without` options cannot be used together"
+      expect(out).to eq "The `--only-group` and `--without-group` options cannot be used together"
     end
   end
 
-  describe "with without option" do
+  describe "with without-group option" do
     context "when group is present" do
       it "prints the gems not in the specified group" do
-        bundle! "list --without test"
+        bundle! "list --without-group test"
 
         expect(out).to include("  * rack (1.0.0)")
         expect(out).not_to include("  * rspec (1.2.7)")
@@ -38,17 +38,17 @@ RSpec.describe "bundle list", :bundler => "2" do
 
     context "when group is not found" do
       it "raises an error" do
-        bundle "list --without random"
+        bundle "list --without-group random"
 
         expect(out).to eq "`random` group could not be found."
       end
     end
   end
 
-  describe "with only option" do
+  describe "with only-group option" do
     context "when group is present" do
       it "prints the gems in the specified group" do
-        bundle! "list --only default"
+        bundle! "list --only-group default"
 
         expect(out).to include("  * rack (1.0.0)")
         expect(out).not_to include("  * rspec (1.2.7)")
@@ -57,7 +57,7 @@ RSpec.describe "bundle list", :bundler => "2" do
 
     context "when group is not found" do
       it "raises an error" do
-        bundle "list --only random"
+        bundle "list --only-group random"
 
         expect(out).to eq "`random` group could not be found."
       end

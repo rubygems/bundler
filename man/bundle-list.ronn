@@ -3,7 +3,7 @@ bundle-list(1) -- List all the gems in the bundle
 
 ## SYNOPSIS
 
-`bundle list` [--name-only] [--paths] [--without=GROUP] [--only=GROUP]
+`bundle list` [--name-only] [--paths] [--without-group=GROUP] [--only-group=GROUP]
 
 ## DESCRIPTION
 
@@ -15,11 +15,11 @@ bundle list --name-only
 
 bundle list --paths
 
-bundle list --without test
+bundle list --without-group test
 
-bundle list --only dev
+bundle list --only-group dev
 
-bundle list --only dev --paths
+bundle list --only-group dev --paths
 
 ## OPTIONS
 
@@ -27,7 +27,7 @@ bundle list --only dev --paths
   Print only the name of each gem.
 * `--paths`:
   Print the path to each gem in the bundle.
-* `--without`:
+* `--without-group`:
   Print all gems expect from a group.
-* `--only`:
+* `--only-group`:
   Print gems from a particular group.
