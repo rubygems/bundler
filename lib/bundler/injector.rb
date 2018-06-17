@@ -123,28 +123,22 @@ module Bundler
     # evalutes a gemfile to remove the specified gem
     # from it.
     def remove_deps(gemfile_path)
-      # get initial snap shot of the gemfile
       initial_gemfile = IO.readlines(gemfile_path)
 
-      # inform user of the the gemfile currently
-      # being evaluated
       Bundler.ui.info "Removing gems from #{gemfile_path}"
 
       # evaluate the Gemfile we have
       builder = Dsl.new
       builder.eval_gemfile(gemfile_path)
 
-      # remove gems from dependencies
       removed_deps = remove_gems_from_dependencies(builder, @deps, gemfile_path)
 
       # abort the opertion if no gems were removed
       # no need to operate on gemfile furthur
       return [] if removed_deps.empty?
 
-      # gemfile after removing requested gems
       cleaned_gemfile = remove_gems_from_gemfile(@deps, gemfile_path)
 
-      # write the new gemfile
       write_to_gemfile(gemfile_path, cleaned_gemfile)
 
       # check for errors
@@ -179,7 +173,6 @@ module Bundler
     # @param [Array] gems            Array of names of gems to be removed.
     # @param [Pathname] gemfile_path The Gemfile from which to remove dependencies.
     def remove_gems_from_gemfile(gems, gemfile_path)
-      # store patterns of all gems to be removed
       patterns = /gem\s+(['"])#{Regexp.union(gems)}\1|gem\s*\((['"])#{Regexp.union(gems)}\2\)/
 
       # remove lines which match the regex
@@ -193,7 +186,6 @@ module Bundler
         end
       end
 
-      # remove any empty (and nested) blocks
       %w[group source env install_if].each {|block| remove_nested_blocks(new_gemfile, block) }
 
       new_gemfile.join.chomp
@@ -251,7 +243,6 @@ module Bundler
       # record gems which could not be removed due to some reasons
       errored_deps = builder.dependencies.select {|d| d.gemfile == gemfile_path } & removed_deps.select {|d| d.gemfile == gemfile_path }
 
-      # warn user regarding those gems
       show_warning "#{errored_deps.map(&:name).join(", ")} could not be removed." unless errored_deps.empty?
 
       # return actual removed dependencies

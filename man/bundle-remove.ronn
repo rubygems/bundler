@@ -7,14 +7,14 @@ bundle-remove(1) -- Removes gem specified in Gemfile
 
 ## DESCRIPTION
 
-Removes a set of specified gems from the Gemfile or if needed from the bundle itself.
+Removes a set of specified gems from the Gemfile or if needed runs `bundle install` and removes them from bundle as well.
 If any gem specified to be removed does not exist the in Gemfile, Bundler prints error message.
-If gem could not be removed due to any reason Bundler warns the user.
+If the gem could not be removed due to any reason, Bundler warns the user.
 
 ## OPTIONS
 
 * `--install`:
-  Runs 'bundle install' after removing the gems from the gemfile.
+  Runs 'bundle install' after removing the gems from the gemfile. This option sync the lockfile.
 
 Example:
 

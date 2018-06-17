@@ -10,7 +10,6 @@ module Bundler
     def run
       raise InvalidOption, "Please specify gems to remove." if @gems.empty?
 
-      # remove requested gems
       Injector.remove(@gems, {})
 
       Installer.install(Bundler.root, Bundler.definition) if @options["install"]
