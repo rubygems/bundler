@@ -23,6 +23,7 @@ module Bundler
       installer = new(root, definition)
       Plugin.hook(Plugin::Events::GEM_BEFORE_INSTALL_ALL, definition.dependencies)
       installer.run(options)
+      Plugin.hook(Plugin::Events::GEM_AFTER_INSTALL_ALL, definition.dependencies)
       installer
     end
 

@@ -155,6 +155,7 @@ module Bundler
     end
 
     def do_install(spec_install, worker_num)
+      Plugin.hook(Plugin::Events::GEM_BEFORE_INSTALL, spec_install)
       gem_installer = Bundler::GemInstaller.new(
         spec_install.spec, @installer, @standalone, worker_num, @force
       )
@@ -170,6 +171,7 @@ module Bundler
         spec_install.state = :failed
         spec_install.error = "#{message}\n\n#{require_tree_for_spec(spec_install.spec)}"
       end
+      Plugin.hook(Plugin::Events::GEM_AFTER_INSTALL, spec_install)
       spec_install
     end
 

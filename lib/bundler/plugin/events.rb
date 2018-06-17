@@ -31,9 +31,31 @@ module Bundler
       end
 
       # @!parse
-      #   # A hook called before any gems install
+      #   A hook called before each individual gem is installed
+      #   Includes a Bundler::ParallelInstaller::SpecInstallation.
+      #   No state, error, post_install_message will be present as nothing has installed yet
+      #   GEM_BEFORE_INSTALL = "before-install"
+      define :GEM_BEFORE_INSTALL, "before-install"
+
+      # @!parse
+      #   A hook called after each individual gem is installed
+      #   Includes a Bundler::ParallelInstaller::SpecInstallation.
+      #     - If state is failed, an error will be present.
+      #     - If state is success, a post_install_message may be present.
+      #   GEM_AFTER_INSTALL = "after-install"
+      define :GEM_AFTER_INSTALL,  "after-install"
+
+      # @!parse
+      #   A hook called before any gems install
+      #   Includes an Array of Bundler::Dependency objects
       #   GEM_BEFORE_INSTALL_ALL = "before-install-all"
       define :GEM_BEFORE_INSTALL_ALL, "before-install-all"
+
+      # @!parse
+      #   A hook called after any gems install
+      #   Includes an Array of Bundler::Dependency objects
+      #   GEM_AFTER_INSTALL_ALL = "after-install-all"
+      define :GEM_AFTER_INSTALL_ALL,  "after-install-all"
     end
   end
 end
