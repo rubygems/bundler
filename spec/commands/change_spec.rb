@@ -16,7 +16,7 @@ RSpec.describe "bundle change" do
 
   describe "when gem is not present" do
     it "throws error" do
-      bundle "change rake --group dev1"
+      bundle "change rack --group dev1"
 
       expect(out).to include("`rake` could not be found in the Gemfile.")
     end
