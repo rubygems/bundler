@@ -80,6 +80,13 @@ RSpec.describe "Resolving" do
     should_resolve_as %w[need-pre-1.0.0 activesupport-3.0.0.beta1]
   end
 
+  it "selects a pre-release if it's specified in the Gemfile" do
+    dep "activesupport", "= 3.0.0.beta"
+    dep "actionpack"
+
+    should_resolve_as %w[activesupport-3.0.0.beta actionpack-3.0.0.beta rack-1.1 rack-mount-0.6]
+  end
+
   it "raises an exception if a child dependency is not resolved" do
     @index = a_unresovable_child_index
     dep "chef_app_error"
