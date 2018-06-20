@@ -1166,7 +1166,7 @@ end
            #{Bundler::VERSION}
       L
 
-      lock
+      normalize_uri_file(lock)
     end
 
     before do
