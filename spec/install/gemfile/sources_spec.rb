@@ -33,7 +33,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
         expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
         expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
-        expect(out).to include("Installed from: file://localhost#{gem_repo1}")
+        expect(out).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo1}"))
         expect(the_bundle).to include_gems("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
       end
 
@@ -63,7 +63,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
         expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
         expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
-        expect(out).to include("Installed from: file://localhost#{gem_repo1}")
+        expect(out).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo1}"))
         expect(the_bundle).to include_gems("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
       end
     end
@@ -253,7 +253,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
             bundle :install
             expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
             expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
-            expect(out).to include("Installed from: file://localhost#{gem_repo2}")
+            expect(out).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo2}"))
             expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
@@ -634,7 +634,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
         gem "depends_on_rack"
       G
       expect(last_command).to be_failure
-      expect(last_command.stderr).to eq strip_whitespace(<<-EOS).strip
+      expect(last_command.stderr).to eq normalize_uri_file(strip_whitespace(<<-EOS).strip)
         The gem 'rack' was found in multiple relevant sources.
           * rubygems repository file://localhost#{gem_repo1}/ or installed locally
           * rubygems repository file://localhost#{gem_repo4}/ or installed locally

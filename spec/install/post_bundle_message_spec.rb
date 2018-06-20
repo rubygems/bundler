@@ -116,7 +116,7 @@ RSpec.describe "post bundle message" do
           gem "rack"
           gem "not-a-gem", :group => :development
         G
-        expect(out).to include <<-EOS.strip
+        expect(out).to include normalize_uri_file(<<-EOS.strip)
 Could not find gem 'not-a-gem' in rubygems repository file://localhost#{gem_repo1}/ or installed locally.
 The source does not contain any versions of 'not-a-gem'
         EOS
