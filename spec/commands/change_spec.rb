@@ -5,7 +5,7 @@ RSpec.describe "bundle change" do
     install_gemfile <<-G
       source "file://#{gem_repo2}"
 
-      gem "rake", '~> 1.0.0', :group => [:dev]
+      gem "rack", '~> 1.0.0', :group => [:dev]
 
       group :test do
         gem "minitest"
@@ -16,7 +16,7 @@ RSpec.describe "bundle change" do
 
   describe "when gem is not present" do
     it "throws error" do
-      bundle "change rack --group dev1"
+      bundle "change rake --group dev1"
 
       expect(out).to include("`rake` could not be found in the Gemfile.")
     end
@@ -25,9 +25,9 @@ RSpec.describe "bundle change" do
   describe "with --group option" do
     context "when group is present as inline" do
       it "changes group of the gem" do
-        bundle! "change rake --group dev1"
+        bundle! "change rack --group dev1"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rake\", '~> 1.0.0', :group => [:dev1]")
+        expect(bundled_app("Gemfile").read).to include("gem \"rack\", '~> 1.0.0', :group => [:dev1]")
       end
     end
 
@@ -38,7 +38,7 @@ RSpec.describe "bundle change" do
         gemfile_should_be <<-G
           source "file://#{gem_repo2}"
 
-          gem "rake", '~> 1.0.0', :group => [:dev]
+          gem "rack", '~> 1.0.0', :group => [:dev]
 
           gem "minitest", :group => [:test1]
 
@@ -53,17 +53,17 @@ RSpec.describe "bundle change" do
   describe "with --version option" do
     context "when specified version exists" do
       it "changes version of the gem" do
-        bundle! "change rake --version 1.0.1"
+        bundle! "change rack --version 1.0.1"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rake\", '= 1.0.1', :group => [:dev]")
+        expect(bundled_app("Gemfile").read).to include("gem \"rack\", '= 1.0.1', :group => [:dev]")
       end
     end
 
     context "when specified version does not exist" do
       it "throws error" do
-        bundle "change rake --version 42.0.0"
+        bundle "change rack --version 42.0.0"
 
-        expect(out).to include("Could not find gem 'rake (= 42.0.0)' in rubygems repository")
+        expect(out).to include("Could not find gem 'rack (= 42.0.0)' in rubygems repository")
       end
     end
   end

@@ -27,7 +27,8 @@ module Bundler
       Injector.inject(dependencies,
         :conservative_versioning => @options[:version].nil?, # Perform conservative versioning only when version is not specified
         :optimistic => @options[:optimistic],
-        :strict => @options[:strict])
+        :strict => @options[:strict],
+        :pessimistic => @options[:pessimistic])
 
       Installer.install(Bundler.root, Bundler.definition) unless @options["skip-install"]
     end
