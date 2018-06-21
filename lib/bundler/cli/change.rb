@@ -18,15 +18,7 @@ module Bundler
 
       @pass_options = {}
 
-      if @options[:group]
-        if @dep.groups.include?(@options[:group].to_sym)
-          Bundler.ui.warn "`#{@gem_name}` is already in `#{@options[:group]}`. Skipping."
-          return
-        end
-
-        @pass_options["group"] = []
-        @pass_options["group"] << @options[:group]
-      end
+      set_group_options
 
       set_version_options
 
@@ -55,6 +47,17 @@ module Bundler
       end
 
       @pass_options[:version] = @options[:version].nil? ? version : @options[:version]
+    end
+
+    def set_group_options
+      groups = @dep.groups
+      if @options[:group]
+        Bundler.ui.warn "`#{@gem_name}` is already in `#{@options[:group]}`." if groups.include?(@options[:group].to_sym)
+
+        @pass_options["group"] = @options[:group].to_s
+      else
+        @pass_options["group"] = groups.map(&:to_s).join(",")
+      end
     end
   end
 end
