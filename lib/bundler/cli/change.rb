@@ -18,17 +18,24 @@ module Bundler
 
       @pass_options = {}
 
+      initial_gemfile = IO.readlines(Bundler.default_gemfile)
+
       set_group_options
 
       set_version_options
 
       @pass_options[:source] = @options[:source] if @options[:source]
 
-      require "bundler/cli/remove"
-      CLI::Remove.new([@gem_name], {}).run
+      begin
+        require "bundler/cli/remove"
+        CLI::Remove.new([@gem_name], {}).run
 
-      require "bundler/cli/add"
-      CLI::Add.new(@pass_options, [@gem_name]).run
+        require "bundler/cli/add"
+        CLI::Add.new(@pass_options, [@gem_name]).run
+      rescue StandardError => e
+        Bundler.ui.error e
+        SharedHelpers.write_to_gemfile(Bundler.default_gemfile, initial_gemfile)
+      end
     end
 
   private

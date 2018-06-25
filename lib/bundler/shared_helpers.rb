@@ -226,6 +226,8 @@ module Bundler
       Digest(name)
     end
 
+    # @param [Pathname] gemfile_path  The Gemfile from which to remove dependencies.
+    # @param [String]  contents       Content to written to Gemfile.
     def write_to_gemfile(gemfile_path, contents)
       filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts contents } }
     end
