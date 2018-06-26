@@ -63,6 +63,33 @@ RSpec.describe "bundle install" do
     expect(out).to include("Bundle complete!")
   end
 
+  it "reads gemspecs respecting their encoding" do
+    skip "unicode constants are most likely not supported on 1.8" if RUBY_VERSION < "1.9"
+
+    create_file("version.rb", <<-RUBY)
+      module Persistent💎
+        VERSION = "0.0.1"
+      end
+    RUBY
+
+    create_file("persistent-dmnd.gemspec", <<-G)
+      require_relative "version"
+
+      Gem::Specification.new do |gem|
+        gem.name = "persistent-dmnd"
+        gem.version = Persistent💎::VERSION
+        gem.author = "Ivo Anjo"
+        gem.summary = "Unscratchable stuff"
+      end
+    G
+
+    install_gemfile <<-G
+      gemspec
+    G
+
+    expect(out).to include("Bundle complete!")
+  end
+
   context "when ruby version is specified in gemspec and gemfile" do
     it "installs when patch level is not specified and the version matches" do
       build_lib("foo", :path => bundled_app) do |s|
