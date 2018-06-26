@@ -8,7 +8,7 @@ module Bundler
     end
 
     def run
-      raise InvalidOption, "Please supply atleast one option to change." if @options.empty?
+      raise InvalidOption, "Please supply atleast one option to change." unless @options[:group] || @options[:version] || @options[:source]
 
       definition = Bundler.definition
 

@@ -22,6 +22,14 @@ RSpec.describe "bundle change" do
     end
   end
 
+  context "without options" do
+    it "throws error" do
+      bundle "change rack"
+
+      expect(out).to include("Please supply atleast one option to change.")
+    end
+  end
+
   describe "with --group option" do
     context "when group is present as inline" do
       it "changes group of the gem" do
@@ -55,14 +63,15 @@ RSpec.describe "bundle change" do
       it "changes version of the gem" do
         bundle! "change rack --version 1.0.1"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rack\", '= 1.0.1', :group => [:dev]")
+        expect(bundled_app("Gemfile").read).to include("gem \"rack\", '~> 1.0.1', :group => [:dev]")
       end
     end
 
     context "when specified version does not exist" do
       it "throws error" do
-        bundle "change rack --version 42.0.0"
+        bundle! "change rack --version 42.0.0"
 
+        expect(bundled_app("Gemfile").read).to include("gem \"rack\", '~> 1.0.0', :group => [:dev]")
         expect(out).to include("Could not find gem 'rack (= 42.0.0)' in rubygems repository")
       end
     end
