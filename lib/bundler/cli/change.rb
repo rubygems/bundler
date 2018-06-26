@@ -48,12 +48,16 @@ module Bundler
       when "="
         @pass_options[:strict] = true
       when ">="
-        @pass_options[:optimistic] = true
+        @pass_options[:optimistic] = true unless version == "0"
       else
         @pass_options[:pessimistic] = true
       end
 
-      @pass_options[:version] = @options[:version].nil? ? version : @options[:version]
+      @pass_options[:version] = if @options[:version].nil?
+        version.to_i.zero? ? nil : version
+      else
+        @options[:version]
+      end
     end
 
     def set_group_options
