@@ -3,12 +3,12 @@
 RSpec.describe "bundle change" do
   before :each do
     install_gemfile <<-G
-      source "file://#{gem_repo2}"
+      source "file://#{gem_repo1}"
 
-      gem "rack", '~> 1.0.0', :group => [:dev]
+      gem "rack", "~> 1.0", :group => [:dev]
 
       group :test do
-        gem "minitest"
+        gem "rack-test", "= 1.0"
         gem "rspec"
       end
     G
@@ -35,24 +35,34 @@ RSpec.describe "bundle change" do
       it "changes group of the gem" do
         bundle! "change rack --group dev1"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rack\", '~> 1.0.0', :group => [:dev1]")
+        gemfile_should_be <<-G
+          source "file://#{gem_repo1}"
+
+
+          group :test do
+            gem "rack-test", "= 1.0"
+            gem "rspec"
+          end
+
+          gem "rack", "~> 1.0", :group => [:dev1]
+        G
       end
     end
 
     context "when gem is present in the group block" do
       it "removes gem from the block" do
-        bundle! "change minitest --group test1"
+        bundle! "change rack-test --group test1"
 
         gemfile_should_be <<-G
-          source "file://#{gem_repo2}"
+          source "file://#{gem_repo1}"
 
-          gem "rack", '~> 1.0.0', :group => [:dev]
-
-          gem "minitest", :group => [:test1]
+          gem "rack", "~> 1.0", :group => [:dev]
 
           group :test do
             gem "rspec"
           end
+
+          gem "rack-test", "= 1.0", :group => [:test1]
         G
       end
     end
@@ -61,9 +71,9 @@ RSpec.describe "bundle change" do
   describe "with --version option" do
     context "when specified version exists" do
       it "changes version of the gem" do
-        bundle! "change rack --version 1.0.1"
+        bundle! "change rack --version 0.9.1"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rack\", '~> 1.0.1', :group => [:dev]")
+        expect(bundled_app("Gemfile").read).to include("gem \"rack\", \"~> 0.9.1\", :group => [:dev]")
       end
     end
 
@@ -71,8 +81,8 @@ RSpec.describe "bundle change" do
       it "throws error" do
         bundle! "change rack --version 42.0.0"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rack\", '~> 1.0.0', :group => [:dev]")
-        expect(out).to include("Could not find gem 'rack (= 42.0.0)' in rubygems repository")
+        expect(bundled_app("Gemfile").read).to include("gem \"rack\", \"~> 1.0\", :group => [:dev]")
+        expect(out).to include("Could not find gem 'rack (= 42.0.0)'")
       end
     end
   end
