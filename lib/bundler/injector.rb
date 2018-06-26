@@ -139,7 +139,7 @@ module Bundler
 
       cleaned_gemfile = remove_gems_from_gemfile(@deps, gemfile_path)
 
-      write_to_gemfile(gemfile_path, cleaned_gemfile)
+      SharedHelpers.write_to_gemfile(gemfile_path, cleaned_gemfile)
 
       # check for errors
       # including extra gems being removed
@@ -191,12 +191,6 @@ module Bundler
       new_gemfile.join.chomp
     end
 
-    # @param [Pathname] gemfile_path  The Gemfile from which to remove dependencies.
-    # @param [String]  contents       Content to written to Gemfile.
-    def write_to_gemfile(gemfile_path, contents)
-      SharedHelpers.filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts contents } }
-    end
-
     # @param [Array] gemfile       Array of gemfile contents.
     # @param [String] block_name   Name of block name to look for.
     def remove_nested_blocks(gemfile, block_name)
@@ -235,7 +229,7 @@ module Bundler
       # if some extra gems were removed then raise error
       # and revert Gemfile to original
       unless extra_removed_gems.empty?
-        write_to_gemfile(gemfile_path, initial_gemfile.join)
+        SharedHelpers.write_to_gemfile(gemfile_path, initial_gemfile.join)
 
         raise InvalidOption, "Gems could not be removed. #{extra_removed_gems.join(", ")} would also have been removed. Bundler cannot continue."
       end

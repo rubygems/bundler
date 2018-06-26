@@ -226,6 +226,10 @@ module Bundler
       Digest(name)
     end
 
+    def write_to_gemfile(gemfile_path, contents)
+      filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts contents } }
+    end
+
   private
 
     def validate_bundle_path
