@@ -600,7 +600,7 @@ module Spec
           @spec.rubygems_version = options[:rubygems_version]
           def @spec.mark_version; end
 
-          def @spec.validate; end
+          def @spec.validate(*); end
         end
 
         case options[:gemspec]
