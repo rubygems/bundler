@@ -12,10 +12,15 @@ module Bundler
       autoload :Git,      "bundler/plugin/installer/git"
 
       def install(names, options)
+        check_sources_consistency!(options)
+
         version = options[:version] || [">= 0"]
+
         Bundler.settings.temporary(:lockfile_uses_separate_rubygems_sources => false, :disable_multisource => false) do
           if options[:git]
             install_git(names, version, options)
+          elsif options[:local_git]
+            install_local_git(names, version, options)
           else
             sources = options[:source] || Bundler.rubygems.sources
             install_rubygems(names, version, sources)
@@ -38,22 +43,29 @@ module Bundler
 
     private
 
+      # Rubocop misunderstands the semantics of this method, assuming an `else` code block
+      # that doesn't exist. See https://github.com/bbatsov/rubocop/issues/5702.
+      #
+      # rubocop:disable Style/GuardClause
+      def check_sources_consistency!(options)
+        if options.key?(:git) && options.key?(:local_git)
+          raise InvalidOption, "Remote and local plugin git sources can't be both specified"
+        end
+      end
+      # rubocop:enable Style/GuardClause
+
       def install_git(names, version, options)
         uri = options.delete(:git)
         options["uri"] = uri
 
-        source_list = SourceList.new
-        source_list.add_git_source(options)
+        install_all_sources(names, version, options, options[:source])
+      end
 
-        # To support both sources
-        if options[:source]
-          source_list.add_rubygems_source("remotes" => options[:source])
-        end
+      def install_local_git(names, version, options)
+        uri = options.delete(:local_git)
+        options["uri"] = uri
 
-        deps = names.map {|name| Dependency.new name, version }
-
-        definition = Definition.new(nil, deps, source_list, true)
-        install_definition(definition)
+        install_all_sources(names, version, options, options[:source])
       end
 
       # Installs the plugin from rubygems source and returns the path where the
@@ -65,10 +77,16 @@ module Bundler
       #
       # @return [Hash] map of names to the specs of plugins installed
       def install_rubygems(names, version, sources)
-        deps = names.map {|name| Dependency.new name, version }
+        install_all_sources(names, version, nil, sources)
+      end
 
+      def install_all_sources(names, version, git_source_options, rubygems_source)
         source_list = SourceList.new
-        source_list.add_rubygems_source("remotes" => sources)
+
+        source_list.add_git_source(git_source_options) if git_source_options
+        source_list.add_rubygems_source("remotes" => rubygems_source) if rubygems_source
+
+        deps = names.map {|name| Dependency.new name, version }
 
         definition = Definition.new(nil, deps, source_list, true)
         install_definition(definition)
