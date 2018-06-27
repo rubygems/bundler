@@ -4,21 +4,72 @@ RSpec.describe "bundle list", :bundler => "2" do
   before do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
+
       gem "rack"
+      gem "rspec", :group => [:test]
     G
   end
 
   context "with name-only and paths option" do
     it "raises an error" do
       bundle "list --name-only --paths"
+
       expect(out).to eq "The `--name-only` and `--paths` options cannot be used together"
+    end
+  end
+
+  context "with without-group and only-group option" do
+    it "raises an error" do
+      bundle "list --without-group dev --only-group test"
+
+      expect(out).to eq "The `--only-group` and `--without-group` options cannot be used together"
+    end
+  end
+
+  describe "with without-group option" do
+    context "when group is present" do
+      it "prints the gems not in the specified group" do
+        bundle! "list --without-group test"
+
+        expect(out).to include("  * rack (1.0.0)")
+        expect(out).not_to include("  * rspec (1.2.7)")
+      end
+    end
+
+    context "when group is not found" do
+      it "raises an error" do
+        bundle "list --without-group random"
+
+        expect(out).to eq "`random` group could not be found."
+      end
+    end
+  end
+
+  describe "with only-group option" do
+    context "when group is present" do
+      it "prints the gems in the specified group" do
+        bundle! "list --only-group default"
+
+        expect(out).to include("  * rack (1.0.0)")
+        expect(out).not_to include("  * rspec (1.2.7)")
+      end
+    end
+
+    context "when group is not found" do
+      it "raises an error" do
+        bundle "list --only-group random"
+
+        expect(out).to eq "`random` group could not be found."
+      end
     end
   end
 
   context "with name-only option" do
     it "prints only the name of the gems in the bundle" do
       bundle "list --name-only"
-      expect(out).to eq "rack"
+
+      expect(out).to include("rack")
+      expect(out).to include("rspec")
     end
   end
 
