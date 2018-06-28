@@ -5,7 +5,7 @@ module Bundler
     def initialize(options, gems)
       @gems = gems
       @options = options
-      @options[:group] = @options[:group].split(",").map(&:strip) if !@options[:group].nil? && !@options[:group].empty?
+      @options["group"] = @options["group"].split(",").map(&:strip) if !@options["group"].nil? && !@options["group"].empty?
     end
 
     def run

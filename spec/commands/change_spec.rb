@@ -66,6 +66,43 @@ RSpec.describe "bundle change" do
         G
       end
     end
+
+    context "when mutiple groups are specified" do
+      it "adds mutiple groups" do
+        bundle! "change rack --group=dev,dev1"
+
+        gemfile_should_be <<-G
+          source "file://#{gem_repo1}"
+
+
+          group :test do
+            gem "rack-test", "= 1.0"
+            gem "rspec"
+          end
+
+          gem "rack", "~> 1.0", :groups => [:dev, :dev1]
+        G
+      end
+    end
+
+    context "when gem is already in one or more groups" do
+      it "shows warning that gem is present" do
+        bundle! "change rack --group=dev,dev1"
+
+        expect(out).to include("`rack` is already present in `dev`")
+        gemfile_should_be <<-G
+          source "file://#{gem_repo1}"
+
+
+          group :test do
+            gem "rack-test", "= 1.0"
+            gem "rspec"
+          end
+
+          gem "rack", "~> 1.0", :groups => [:dev, :dev1]
+        G
+      end
+    end
   end
 
   describe "with --version option" do

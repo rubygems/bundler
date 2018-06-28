@@ -63,9 +63,12 @@ module Bundler
     def set_group_options
       groups = @dep.groups
       if @options[:group]
-        Bundler.ui.warn "`#{@gem_name}` is already in `#{@options[:group]}`." if groups.include?(@options[:group].to_sym)
+        uniq_groups = @options[:group].split(",").uniq
+        common_groups = uniq_groups & groups.map(&:to_s)
 
-        @pass_options["group"] = @options[:group].to_s
+        Bundler.ui.warn "`#{@gem_name}` is already present in `#{common_groups.join(",")}`." unless common_groups.empty?
+
+        @pass_options["group"] = uniq_groups.join(",")
       else
         @pass_options["group"] = groups.map(&:to_s).join(",")
       end
