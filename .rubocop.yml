@@ -14,10 +14,6 @@ AllCops:
 Lint/AssignmentInCondition:
   Enabled: false
 
-Lint/EndAlignment:
-  EnforcedStyleAlignWith: variable
-  AutoCorrect: true
-
 Lint/UnusedMethodArgument:
   Enabled: false
 
@@ -32,6 +28,10 @@ Layout/AccessModifierIndentation:
 
 Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+  AutoCorrect: true
 
 Layout/MultilineOperationIndentation:
   EnforcedStyle: indented

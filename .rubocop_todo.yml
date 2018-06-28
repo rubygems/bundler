@@ -86,10 +86,6 @@ Lint/RescueException:
     - 'lib/bundler/rubygems_integration.rb'
     - 'lib/bundler/worker.rb'
 
-# Offense count: 29
-Lint/RescueStandardError:
-  Enabled: false
-
 # Offense count: 2
 Lint/ShadowedException:
   Exclude:
@@ -281,6 +277,10 @@ Style/InverseMethods:
     - 'lib/bundler/index.rb'
     - 'lib/bundler/resolver.rb'
     - 'lib/bundler/resolver/spec_group.rb'
+
+# Offense count: 29
+Style/RescueStandardError:
+  Enabled: false
 
 # Offense count: 6
 Style/MethodMissingSuper:
