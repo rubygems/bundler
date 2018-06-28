@@ -1,0 +1,23 @@
+bundle-change(1) -- Changes properties of a gem
+================================================================
+
+## SYNOPSIS
+
+`bundle change` <GEM_NAME> [--group=GROUP] [--version=VERSION] [--source=SOURCE]
+
+## DESCRIPTION
+Provide flexibilty of editing gemfile from command line by providing option to change gem properties.
+
+Example:
+
+bundle change rails --group dev --version 5.1
+
+## OPTIONS
+* `--version`, `-v`:
+  Specify version requirements for the added gem.
+
+* `--group`, `-g`:
+  Specify the groups for the added gem. Multiple groups should be separated by commas.
+
+* `--source`, , `-s`:
+  Specify the source for the added gem.

@@ -356,9 +356,9 @@ module Bundler
       Add.new(options.dup, gems).run
     end
 
-    desc "change GEM [OPTIONS]", "Change gem properties"
+    desc "change GEM [OPTIONS]", "Changes properties of a gem"
     long_desc <<-D
-      Change
+      Provide flexibilty of editing gemfile from command line by providing option to change gem properties.
     D
     method_option "version", :aliases => "-v", :type => :string
     method_option "group", :aliases => "-g", :type => :string
