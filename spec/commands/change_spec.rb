@@ -123,4 +123,15 @@ RSpec.describe "bundle change" do
       end
     end
   end
+
+  describe "with --source option" do
+    context "when source uri is correct" do
+      it "changes source uri of the gem" do
+        build_repo2
+        bundle! "change rack --source=file://#{gem_repo2}"
+
+        expect(bundled_app("Gemfile").read).to include("gem \"rack\", \"~> 1.0\", :group => [:dev], :source => \"file://#{gem_repo2}\"")
+      end
+    end
+  end
 end

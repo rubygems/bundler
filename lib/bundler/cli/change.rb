@@ -24,7 +24,7 @@ module Bundler
 
       set_version_options
 
-      @pass_options[:source] = @options[:source] if @options[:source]
+      @pass_options["source"] = @options[:source] if @options[:source]
 
       begin
         require "bundler/cli/remove"
