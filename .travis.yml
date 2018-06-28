@@ -28,7 +28,7 @@ addons:
 rvm:
   - 2.5.1
   - 2.4.3
-  - 2.3.6
+  - 2.3.7
 
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:125 for the list of possible RGV values
@@ -44,9 +44,9 @@ matrix:
     - rvm: 2.4.2
       env: RGV=v2.6.14
     # Ruby 2.3, Rubygems 2.5 and up
-    - rvm: 2.3.5
+    - rvm: 2.3.7
       env: RGV=v2.5.2
-    - rvm: 2.3.5
+    - rvm: 2.3.7
       env: RGV=v2.6.14
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
