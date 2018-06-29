@@ -6,6 +6,7 @@ RSpec.describe "bundle change" do
       source "file://#{gem_repo1}"
 
       gem "rack", "~> 1.0", :group => [:dev]
+      gem "weakling", ">=  0.0.1"
 
       group :test do
         gem "rack-test", "= 1.0"
@@ -38,6 +39,7 @@ RSpec.describe "bundle change" do
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
+          gem "weakling", ">=  0.0.1"
 
           group :test do
             gem "rack-test", "= 1.0"
@@ -57,6 +59,7 @@ RSpec.describe "bundle change" do
           source "file://#{gem_repo1}"
 
           gem "rack", "~> 1.0", :group => [:dev]
+          gem "weakling", ">=  0.0.1"
 
           group :test do
             gem "rspec"
@@ -74,6 +77,7 @@ RSpec.describe "bundle change" do
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
+          gem "weakling", ">=  0.0.1"
 
           group :test do
             gem "rack-test", "= 1.0"
@@ -93,6 +97,7 @@ RSpec.describe "bundle change" do
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
+          gem "weakling", ">=  0.0.1"
 
           group :test do
             gem "rack-test", "= 1.0"
@@ -120,6 +125,22 @@ RSpec.describe "bundle change" do
 
         expect(bundled_app("Gemfile").read).to include("gem \"rack\", \"~> 1.0\", :group => [:dev]")
         expect(out).to include("Could not find gem 'rack (= 42.0.0)'")
+      end
+    end
+
+    context "when other options are updated for gem whose version requirements are not specified" do
+      it "adds pessimistic version to gem" do
+        bundle! "change rspec --group test1"
+
+        expect(bundled_app("Gemfile").read).to include("gem \"rspec\", \"~> 1.2\", :group => [:test1]")
+      end
+    end
+
+    context "when other options are changed for gem which has optimistic version requirement" do
+      it "retains the optimistic version prefix" do
+        bundle! "change weakling --group dev1"
+
+        expect(bundled_app("Gemfile").read).to include("gem \"weakling\", \">= 0.0.3\", :group => [:dev1]")
       end
     end
   end
