@@ -24,7 +24,7 @@ Bundler is most commonly used to manage your application's dependencies. For exa
 
 ```
 bundle init
-echo 'gem "rspec"' >> Gemfile
+bundle add rspec
 bundle install
 bundle exec rspec
 ```
