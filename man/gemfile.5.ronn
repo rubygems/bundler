@@ -251,6 +251,12 @@ Selecting a specific source repository this way also suppresses the ambiguous
 gem warning described above in
 [GLOBAL SOURCES (#source)](#GLOBAL-SOURCES).
 
+Using the `:source` option for an individual gem will also make that source
+available as a possible global source for any other gems which do not specify
+explicit sources. Thus, when adding gems with explicit sources, it is
+recommended that you also ensure all other gems in the Gemfile are using
+explicit sources.
+
 ### GIT
 
 If necessary, you can specify that a gem is located at a particular
@@ -452,6 +458,13 @@ option given to the `bundle install` command.
 In the case of the `git` block form, the `:ref`, `:branch`, `:tag`,
 and `:submodules` options may be passed to the `git` method, and
 all gems in the block will inherit those options.
+
+The presence of a `source` block in a Gemfile also makes that source
+available as a possible global source for any other gems which do not specify
+explicit sources. Thus, when defining source blocks, it is
+recommended that you also ensure all other gems in the Gemfile are using
+explicit sources, either via source blocks or `:source` directives on
+individual gems.
 
 ## INSTALL_IF
 
