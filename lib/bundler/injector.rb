@@ -2,8 +2,10 @@
 
 module Bundler
   class Injector
-    def self.inject(deps, options = {})
-      injector = new(deps, options)
+    INJECTED_GEMS = "injected gems".freeze
+
+    def self.inject(new_deps, options = {})
+      injector = new(new_deps, options)
       injector.inject(Bundler.default_gemfile, Bundler.default_lockfile)
     end
 
@@ -36,8 +38,9 @@ module Bundler
         @deps -= builder.dependencies
 
         # add new deps to the end of the in-memory Gemfile
-        # Set conservative versioning to false because we want to let the resolver resolve the version first
-        builder.eval_gemfile("injected gems", build_gem_lines(false)) if @deps.any?
+        # Set conservative versioning to false because
+        # we want to let the resolver resolve the version first
+        builder.eval_gemfile(INJECTED_GEMS, build_gem_lines(false)) if @deps.any?
 
         # resolve to see if the new deps broke anything
         @definition = builder.to_definition(lockfile_path, {})

@@ -172,4 +172,46 @@ RSpec.describe "bundle add" do
       expect(out).to include("You specified: weakling (~> 0.0.1) and weakling (>= 0).")
     end
   end
+
+  describe "when a gem is added which is already specified in Gemfile with version" do
+    it "shows an error when added with different version requirement" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack", "1.0"
+      G
+
+      bundle "add 'rack' --version=1.1"
+
+      expect(out).to include("You cannot specify the same gem twice with different version requirements")
+      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
+    end
+
+    it "shows error when added without version requirements" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack", "1.0"
+      G
+
+      bundle "add 'rack'"
+
+      expect(out).to include("Gem already added.")
+      expect(out).to include("You cannot specify the same gem twice with different version requirements")
+      expect(out).not_to include("If you want to update the gem version, run `bundle update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
+    end
+  end
+
+  describe "when a gem is added which is already specified in Gemfile without version" do
+    it "shows an error when added with different version requirement" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack"
+      G
+
+      bundle "add 'rack' --version=1.1"
+
+      expect(out).to include("You cannot specify the same gem twice with different version requirements")
+      expect(out).to include("If you want to update the gem version, run `bundle update rack`.")
+      expect(out).not_to include("You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
+    end
+  end
 end
