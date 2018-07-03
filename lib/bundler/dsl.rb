@@ -107,13 +107,28 @@ module Bundler
         if current.requirement != dep.requirement
           unless deleted_dep
             return if dep.type == :development
+
+            update_prompt = ""
+
+            if File.basename(@gemfile) == Injector::INJECTED_GEMS
+              if dep.requirements_list.include?(">= 0") && !current.requirements_list.include?(">= 0")
+                update_prompt = ". Gem already added"
+              else
+                update_prompt = ". If you want to update the gem version, run `bundle update #{current.name}`"
+
+                update_prompt += ". You may also need to change the version requirement specified in the Gemfile if it's too restrictive." unless current.requirements_list.include?(">= 0")
+              end
+            end
+
             raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
-                            "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})"
+                            "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})" \
+                             "#{update_prompt}"
           end
 
         else
           Bundler.ui.warn "Your Gemfile lists the gem #{current.name} (#{current.requirement}) more than once.\n" \
                           "You should probably keep only one of them.\n" \
+                          "Remove any duplicate entries and specify the gem only once (per group).\n" \
                           "While it's not a problem now, it could cause errors if you change the version of one of them later."
         end
 
