@@ -27,7 +27,7 @@ RSpec.describe "bundle change" do
     it "throws error" do
       bundle "change rack"
 
-      expect(out).to include("Please supply atleast one option to change.")
+      expect(out).to include("Please supply at least one option to change.")
     end
   end
 

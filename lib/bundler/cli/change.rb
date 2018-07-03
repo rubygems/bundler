@@ -8,7 +8,7 @@ module Bundler
     end
 
     def run
-      raise InvalidOption, "Please supply atleast one option to change." unless @options[:group] || @options[:version] || @options[:source]
+      raise InvalidOption, "Please supply at least one option to change." unless @options[:group] || @options[:version] || @options[:source]
 
       definition = Bundler.definition
 
@@ -40,6 +40,10 @@ module Bundler
 
   private
 
+    # If version of the gem is specified in Gemfile then we preserve
+    # it and the prefix
+    # else if @options[:version] is present then we prefer strict version
+    # and for a empty version we let resolver get version and set as pessimistic
     def set_version_options
       req = @dep.requirement.requirements[0]
       version_prefix = req[0]

@@ -142,7 +142,7 @@ module Bundler
 
       cleaned_gemfile = remove_gems_from_gemfile(@deps, gemfile_path)
 
-      SharedHelpers.write_to_gemfile(gemfile_path, cleaned_gemfile)
+      SharedHelpers.write_file(gemfile_path, cleaned_gemfile)
 
       # check for errors
       # including extra gems being removed
@@ -232,7 +232,7 @@ module Bundler
       # if some extra gems were removed then raise error
       # and revert Gemfile to original
       unless extra_removed_gems.empty?
-        SharedHelpers.write_to_gemfile(gemfile_path, initial_gemfile.join)
+        SharedHelpers.write_file(gemfile_path, initial_gemfile.join)
 
         raise InvalidOption, "Gems could not be removed. #{extra_removed_gems.join(", ")} would also have been removed. Bundler cannot continue."
       end
