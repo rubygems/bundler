@@ -33,8 +33,8 @@ module Bundler
         require "bundler/cli/add"
         CLI::Add.new(@pass_options, [@gem_name]).run
       rescue StandardError => e
-        Bundler.ui.error e
-        SharedHelpers.write_to_gemfile(Bundler.default_gemfile, initial_gemfile)
+        SharedHelpers.write_file(Bundler.default_gemfile, initial_gemfile)
+        FriendlyErrors.log_error(e)
       end
     end
 
