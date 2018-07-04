@@ -26,29 +26,29 @@ module Bundler
           spec = resolve[dep.name].first.__materialize__
           gemfile << "#{"  " if groups}# #{spec.summary}" if spec
 
-          da = []
-          da << "  " if groups
-          da << "gem " << dep.name.dump
+          gem_contents = []
+          gem_contents << "  " if groups
+          gem_contents << "gem " << dep.name.dump
 
-          da << ", " << dep.requirement.as_list.map(&:inspect).join(", ") unless dep.requirement.none?
+          gem_contents << ", " << dep.requirement.as_list.map(&:inspect).join(", ") unless dep.requirement.none?
 
           unless dep.source.nil?
-            da << ", :source => \"" << dep.source.remotes << "\""
-            da = ["gemspec"] if dep.source.options["gemspec"]
+            gem_contents << ", :source => \"" << dep.source.remotes << "\""
+            gem_contents = ["gemspec"] if dep.source.options["gemspec"]
           end
 
-          da << ", platforms: " << dep.platforms.inspect unless dep.platforms.empty?
+          gem_contents << ", :platforms => " << dep.platforms.inspect unless dep.platforms.empty?
 
           if env = dep.instance_variable_get(:@env)
-            da << ", env: " << env.inspect
+            gem_contents << ", :env => " << env.inspect
           end
 
           if (req = dep.autorequire) && !req.empty?
             req = req.first if req.size == 1
-            da << ", require: " << req.inspect
+            gem_contents << ", :require => " << req.inspect
           end
 
-          gemfile << da.join
+          gemfile << gem_contents.join
         end
 
         gemfile << "end" if groups
