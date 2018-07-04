@@ -8,7 +8,7 @@ module Bundler
 
     def run
       definition = Bundler.definition
-      resolve = definition.resolve
+      @resolve = definition.resolve
 
       gemfile = []
       Array(definition.send(:sources).global_rubygems_source).each do |s|
@@ -21,18 +21,7 @@ module Bundler
         groups = nil if groups.empty? || groups.include?(:default)
 
         gemfile << "group #{groups.map(&:inspect).uniq.join(", ")} do" if groups
-
-        deps.sort_by(&:name).each do |dep|
-          spec = resolve[dep.name].first.__materialize__
-          gemfile << "#{"  " if groups}# #{spec.summary}" if spec
-
-          gem = []
-          gem << "  " if groups
-          gem << gem_contents(dep)
-
-          gemfile << gem.join
-        end
-
+        gemfile << deps_contents(deps.sort_by(&:name), !groups.nil?, true)
         gemfile << "end" if groups
         gemfile << nil
       end
@@ -47,6 +36,25 @@ module Bundler
     end
 
   private
+
+    # @param [[Bundler::Dependency]] deps        Array of dependency instances of gems
+    # @param [Boolean]               inside_group Whether gems to be shown are inside group
+    # @param [Boolean]               show_summary Whether summary for the gems is to be shown
+    def deps_contents(deps, inside_group = false, show_summary = false)
+      contents = []
+      deps.each do |dep|
+        if show_summary
+          spec = @resolve[dep.name].first.__materialize__
+          contents << "#{"  " if inside_group}# #{spec.summary}"
+        end
+
+        gem = []
+        gem << "  " if inside_group
+        gem << gem_contents(dep)
+        contents << gem.join
+      end
+      contents
+    end
 
     # @param [Bundler::Dependency] dep    Dependency instance of the gem
     # @param [Boolean]             groups Whether groups be shown in gem contents
