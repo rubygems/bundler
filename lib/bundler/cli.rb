@@ -358,9 +358,10 @@ module Bundler
     desc "canonical [OPTIONS]", ""
     long_desc <<-D
     D
+    method_option "view", :type => :boolean
     def canonical
       require "bundler/cli/canonical"
-      Canonical.new.run
+      Canonical.new(options).run
     end
 
     desc "outdated GEM [OPTIONS]", "List installed gems with newer versions available"

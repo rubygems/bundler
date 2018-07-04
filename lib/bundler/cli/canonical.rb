@@ -2,7 +2,9 @@
 
 module Bundler
   class CLI::Canonical
-    def initialize; end
+    def initialize(options)
+      @options = options
+    end
 
     def run
       definition = Bundler.definition
@@ -55,8 +57,12 @@ module Bundler
       end
 
       contents = gemfile.join("\n").gsub(/\n{3,}/, "\n\n").strip
-      puts contents
-      # SharedHelpers.write_to_gemfile(Bundler.default_gemfile, contents)
+
+      if @options[:view]
+        puts contents
+      else
+        SharedHelpers.write_to_gemfile(Bundler.default_gemfile, contents)
+      end
     end
   end
 end
