@@ -355,6 +355,14 @@ module Bundler
       Add.new(options.dup, gems).run
     end
 
+    desc "canonical [OPTIONS]", ""
+    long_desc <<-D
+    D
+    def canonical
+      require "bundler/cli/canonical"
+      Canonical.new.run
+    end
+
     desc "outdated GEM [OPTIONS]", "List installed gems with newer versions available"
     long_desc <<-D
       Outdated lists the names and versions of gems that have a newer version available
