@@ -20,39 +20,20 @@ module Bundler
       definition.dependencies.group_by(&:groups).each_key(&:sort!).sort_by(&:first).each do |groups, deps|
         groups = nil if groups.empty? || groups.include?(:default)
 
-        gemfile << "group #{groups.map(&:inspect).join(", ")} do" if groups
+        gemfile << "group #{groups.map(&:inspect).uniq.join(", ")} do" if groups
 
         deps.sort_by(&:name).each do |dep|
           spec = resolve[dep.name].first.__materialize__
           gemfile << "#{"  " if groups}# #{spec.summary}" if spec
 
-          gem_contents = []
-          gem_contents << "  " if groups
-          gem_contents << "gem " << dep.name.dump
+          gem = []
+          gem << "  " if groups
+          gem << gem_contents(dep)
 
-          gem_contents << ", " << dep.requirement.as_list.map(&:inspect).join(", ") unless dep.requirement.none?
-
-          unless dep.source.nil?
-            gem_contents << ", :source => \"" << dep.source.remotes << "\""
-            gem_contents = ["gemspec"] if dep.source.options["gemspec"]
-          end
-
-          gem_contents << ", :platforms => " << dep.platforms.inspect unless dep.platforms.empty?
-
-          if env = dep.instance_variable_get(:@env)
-            gem_contents << ", :env => " << env.inspect
-          end
-
-          if (req = dep.autorequire) && !req.empty?
-            req = req.first if req.size == 1
-            gem_contents << ", :require => " << req.inspect
-          end
-
-          gemfile << gem_contents.join
+          gemfile << gem.join
         end
 
         gemfile << "end" if groups
-
         gemfile << nil
       end
 
@@ -63,6 +44,34 @@ module Bundler
       else
         SharedHelpers.write_to_gemfile(Bundler.default_gemfile, contents)
       end
+    end
+
+  private
+
+    # @param [Bundler::Dependency] dep    Dependency instance of the gem
+    # @param [Boolean]             groups Whether groups be shown in gem contents
+    def gem_contents(dep, groups = false)
+      contents = []
+      contents << "gem " << dep.name.dump
+
+      contents << ", " << dep.requirement.as_list.map(&:inspect).join(", ") unless dep.requirement.none?
+
+      contents << ", :group#{"s" if dep.groups.uniq.size > 1} => " << dep.groups.uniq.inspect if groups
+
+      contents << ", :source => \"" << dep.source.remotes << "\"" unless dep.source.nil?
+      # contents = ["gemspec"] if dep.source.options["gemspec"]
+
+      contents << ", :platforms => " << dep.platforms.inspect unless dep.platforms.empty?
+
+      env = dep.instance_variable_get(:@env)
+      contents << ", :env => " << env.inspect if env
+
+      if (req = dep.autorequire) && !req.empty?
+        req = req.first if req.size == 1
+        contents << ", :require => " << req.inspect
+      end
+
+      contents
     end
   end
 end
