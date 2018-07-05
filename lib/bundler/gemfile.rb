@@ -7,7 +7,7 @@ module Bundler
       gemfile.full_gemfile
     end
 
-    def initialize(options)
+    def initialize(options = {})
       @options = options
       @resolve = nil
     end
@@ -24,14 +24,7 @@ module Bundler
       gemfile << nil
 
       definition.dependencies.group_by(&:groups).each_key(&:sort!).sort_by(&:first).each do |groups, deps|
-        groups = nil if groups.empty? || groups.include?(:default)
-
-        group_block = groups && !@options[:inline_groups]
-        inside_group = !groups.nil? && !@options[:inline_groups]
-        gemfile << "group #{groups.map(&:inspect).uniq.join(", ")} do" if group_block
-        gemfile << deps_contents(deps.sort_by(&:name), inside_group)
-        gemfile << "end" if group_block
-        gemfile << nil
+        gemfile << groups_wise(deps, groups)
       end
 
       gemfile
@@ -63,6 +56,22 @@ module Bundler
 
       contents
     end
+
+    def groups_wise(deps, groups)
+      gemfile = []
+      groups = nil if groups.empty? || groups.include?(:default)
+
+      group_block = groups && !@options[:inline_groups]
+      inside_group = !groups.nil? && !@options[:inline_groups]
+      gemfile << "group #{groups.map(&:inspect).uniq.join(", ")} do" if group_block
+      gemfile << deps_contents(deps.sort_by(&:name), inside_group)
+      gemfile << "end" if group_block
+      gemfile << nil
+
+      gemfile
+    end
+
+  private
 
     # @param [[Bundler::Dependency]] deps         Array of dependency instances of gems
     # @param [Boolean]               inside_group Whether gems to be shown are inside group

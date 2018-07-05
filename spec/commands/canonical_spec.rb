@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle canonical", :focus do
+RSpec.describe "bundle canonical" do
   before :each do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
