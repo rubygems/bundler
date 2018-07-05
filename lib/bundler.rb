@@ -33,6 +33,7 @@ module Bundler
   autoload :Fetcher,                "bundler/fetcher"
   autoload :FeatureFlag,            "bundler/feature_flag"
   autoload :GemHelper,              "bundler/gem_helper"
+  autoload :Gemfile,                "bundler/gemfile"
   autoload :GemHelpers,             "bundler/gem_helpers"
   autoload :GemRemoteFetcher,       "bundler/gem_remote_fetcher"
   autoload :GemVersionPromoter,     "bundler/gem_version_promoter"
