@@ -7,7 +7,7 @@ module Bundler
     end
 
     def run
-      contents = Gemfile.full_gemfile(:show_summary => true).join("\n").gsub(/\n{3,}/, "\n\n").strip
+      contents = Gemfile.full_gemfile(:show_summary => true, :as_string => true)
 
       if @options[:view]
         puts contents

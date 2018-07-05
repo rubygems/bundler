@@ -27,7 +27,11 @@ module Bundler
         gemfile << groups_wise(deps, groups)
       end
 
-      gemfile
+      if @options[:as_string]
+        gemfile.join("\n").gsub(/\n{3,}/, "\n\n").strip
+      else
+        gemfile
+      end
     end
 
     # @param  [Bundler::Dependency] dep    Dependency instance of the gem
