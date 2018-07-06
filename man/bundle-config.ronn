@@ -130,6 +130,10 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
    Ex: `https://some.host.com/gems/path/` -> `https://user_name:password@some.host.com/gems/path`
 * `allow_offline_install` (`BUNDLE_ALLOW_OFFLINE_INSTALL`):
    Allow Bundler to use cached data when installing without network access.
+* `application_locked` (`BUNDLE_APPLICATION_LOCKED`):
+   Allow Bundler to create application-locked binstubs. Application-locked
+   binstubs should not be added to your PATH unless you explicitly want to be
+   locked into that application's bundle.
 * `auto_clean_without_path` (`BUNDLE_AUTO_CLEAN_WITHOUT_PATH`):
    Automatically run `bundle clean` after installing when an explicit `path`
    has not been set and Bundler is not installing into the system gems.
