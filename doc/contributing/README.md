@@ -19,7 +19,7 @@ To request substantial changes to Bundler and/or Bundler documentation, please r
 Here are the different ways you can start contributing to the Bundler project:
 
 * [First contribution suggestions](https://github.com/bundler/bundler/blob/master/doc/contributing/HOW_YOU_CAN_HELP.md)
-* [Adding new features](https://github.com/bundler/bundler/blob/master/doc/development/NEW_FEATURES.md).
+* [Adding new features](https://github.com/bundler/bundler/blob/master/doc/development/NEW_FEATURES.md)
 * [Triaging bugs](https://github.com/bundler/bundler/blob/master/doc/contributing/BUG_TRIAGE.md)
 * [Writing documentation](https://github.com/bundler/bundler/blob/master/doc/documentation/WRITING.md)
 * [Community engagement](https://github.com/bundler/bundler/blob/master/doc/contributing/COMMUNITY.md)
