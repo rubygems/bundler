@@ -45,8 +45,9 @@ To get in touch with the Bundler core team and other Bundler users, please see [
 
 ### Contributing
 
-If you'd like to contribute to Bundler, that's awesome, and we <3 you. We've put together [the Bundler contributor guide](https://github.com/bundler/bundler/blob/master/doc/contributing/README.md) with all of the information you need to get started.
+If you'd like to contribute to Bundler, that's awesome, and we <3 you. We've put together [the Bundler contributor guide](https://github.com/bundler/bundler/blob/master/doc/contributing/README.md) with all of the information you need to get started. 
 
+If you'd like to request a substantial change to Bundler or to the Bundler documentation, refer to the [Bundler RFC process](https://github.com/bundler/rfcs) for more information.
 
 While some Bundler contributors are compensated by Ruby Together, the project maintainers make decisions independent of Ruby Together. As a project, we welcome contributions regardless of the author’s affiliation with Ruby Together.
 
@@ -61,4 +62,4 @@ Everyone interacting in the Bundler project’s codebases, issue trackers, chat 
 
 ### License
 
-[MIT License](https://github.com/bundler/bundler/blob/master/LICENSE.md)
+Bundler is available under an [MIT License](https://github.com/bundler/bundler/blob/master/LICENSE.md).
