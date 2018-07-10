@@ -861,6 +861,50 @@ end
     expect(out).to eq("true\ntrue")
   end
 
+  context "with bundler is located in symlinked GEM_HOME" do
+    let(:gem_home) { Dir.mktmpdir }
+    let(:symlinked_gem_home) { Tempfile.new("gem_home") }
+    let(:bundler_dir) { File.expand_path("../../..", __FILE__) }
+    let(:bundler_lib) { File.join(bundler_dir, "lib") }
+
+    before do
+      FileUtils.ln_sf(gem_home, symlinked_gem_home.path)
+      gems_dir = File.join(gem_home, "gems")
+      specifications_dir = File.join(gem_home, "specifications")
+      Dir.mkdir(gems_dir)
+      Dir.mkdir(specifications_dir)
+
+      FileUtils.ln_s(bundler_dir, File.join(gems_dir, "bundler-#{Bundler::VERSION}"))
+
+      gemspec = File.read("#{bundler_dir}/bundler.gemspec").
+                sub("Bundler::VERSION", %("#{Bundler::VERSION}"))
+      gemspec = gemspec.lines.reject {|line| line =~ %r{lib/bundler/version} }.join
+
+      File.open(File.join(specifications_dir, "bundler.gemspec"), "wb") do |f|
+        f.write(gemspec)
+      end
+    end
+
+    it "should succesfully require 'bundler/setup'" do
+      install_gemfile ""
+
+      ENV["GEM_PATH"] = symlinked_gem_home.path
+
+      ruby <<-R
+        if $LOAD_PATH.include?("#{bundler_lib}")
+          # We should use bundler from GEM_PATH for this test, so we should
+          # remove path to the bundler source tree
+          $LOAD_PATH.delete("#{bundler_lib}")
+        else
+          raise "We don't have #{bundler_lib} in $LOAD_PATH"
+        end
+        puts (require 'bundler/setup')
+      R
+
+      expect(out).to eql("true")
+    end
+  end
+
   it "stubs out Gem.refresh so it does not reveal system gems" do
     system_gems "rack-1.0.0"
 

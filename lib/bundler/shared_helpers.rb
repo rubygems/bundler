@@ -324,7 +324,7 @@ module Bundler
     end
 
     def bundler_ruby_lib
-      File.expand_path("../..", __FILE__)
+      resolve_path File.expand_path("../..", __FILE__)
     end
 
     def clean_load_path
@@ -336,10 +336,21 @@ module Bundler
       loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
 
       $LOAD_PATH.reject! do |p|
-        next if File.expand_path(p).start_with?(bundler_lib)
+        next if resolve_path(p).start_with?(bundler_lib)
         loaded_gem_paths.delete(p)
       end
       $LOAD_PATH.uniq!
+    end
+
+    def resolve_path(path)
+      expanded = File.expand_path(path)
+      return expanded unless File.respond_to?(:realpath)
+
+      while File.exist?(expanded) && File.realpath(expanded) != expanded
+        expanded = File.realpath(expanded)
+      end
+
+      expanded
     end
 
     def prints_major_deprecations?
