@@ -12,13 +12,6 @@ module Gem
   end
 end
 
-# Delete any copies of Bundler that have been dumped into site_ruby without
-# a gemspec. RubyGems cannot manage that Bundler, and so our tricks to make
-# sure that the correct version of Bundler loads will stop working.
-Dir.glob(File.join(RbConfig::CONFIG["sitelibdir"], "bundler*")).each do |f|
-  FileUtils.rm_rf f
-end
-
 begin
   require File.expand_path("../support/path.rb", __FILE__)
   spec = Gem::Specification.load(Spec::Path.gemspec.to_s)
@@ -34,6 +27,13 @@ require "bundler/psyched_yaml"
 require "bundler/vendored_fileutils"
 require "uri"
 require "digest"
+
+# Delete any copies of Bundler that have been dumped into site_ruby without
+# a gemspec. RubyGems cannot manage that Bundler, and so our tricks to make
+# sure that the correct version of Bundler loads will stop working.
+Dir.glob(File.join(RbConfig::CONFIG["sitelibdir"], "bundler*")).each do |f|
+  FileUtils.rm_rf f
+end
 
 if File.expand_path(__FILE__) =~ %r{([^\w/\.-])}
   abort "The bundler specs cannot be run from a path that contains special characters (particularly #{$1.inspect})"
