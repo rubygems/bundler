@@ -344,7 +344,11 @@ module Bundler
 
     def resolve_path(path)
       expanded = File.expand_path(path)
-      expanded = File.realpath(expanded) until expanded == File.realpath(expanded)
+
+      if File.respond_to?(:realpath)
+        expanded = File.realpath(expanded) until expanded == File.realpath(expanded)
+      end
+
       expanded
     end
 
