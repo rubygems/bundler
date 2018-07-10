@@ -1,3 +1,24 @@
+## 1.16.3 (2018-07-17)
+
+Features:
+
+  - Support URI::File of Ruby 2.6 (@hsbt)
+
+Bugfixes:
+
+  - Expand symlinks during setup to allow Bundler to load correctly when using symlinks in $GEM_HOME ([#6465](https://github.com/bundler/bundler/issues/6465), @ojab, @indirect)
+  - Dont let Bundler create temporary folders for gem installs which are owned by root ([#6258](https://github.com/bundler/bundler/issues/6258), @colby-swandale)
+  - Don't fallback to using temporary directories when needed directories already exist ([#6546](https://github.com/bundler/bundler/issues/6546), @brodock)
+  - Use SharedHelpers.filesystem_access when reading a Gemfile so friendly error messages can be given to the user ([#6541](https://github.com/bundler/bundler/issues/6541), @segiddins)
+  - Check if source responds to `#remotes` before printing gem install error message ([#6211](https://github.com/bundler/bundler/issues/6211), @colby-swandale)
+  - Handle Errno::ENOTSUP in the Bundler Process Lock to prevent exceptions when using NFS mounts ([#6566](https://github.com/bundler/bundler/issues/6566), @colby-swandale)
+  - Respect encodings when reading gemspecs ([#6598](https://github.com/bundler/bundler/issues/6598), @deivid-rodriguez)
+
+Documentation:
+
+  - Fix links between manual pages (@BanzaiMan)
+  - Add warning to Gemfile documentation for the use of the `source` option when declaring gems ([#6280](https://github.com/bundler/bundler/issues/6280), @forestgagnon)
+
 ## 1.16.2 (2018-04-20)
 
 Changes:
