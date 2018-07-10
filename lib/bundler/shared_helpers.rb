@@ -336,14 +336,16 @@ module Bundler
       loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
 
       $LOAD_PATH.reject! do |p|
-        expanded_p = File.expand_path(p)
-        next if expanded_p.start_with?(bundler_lib)
-        if File.exist?(expanded_p) && File.respond_to?(:realpath)
-          next if File.realpath(expanded_p).start_with?(bundler_lib)
-        end
+        next if resolve_path(p).start_with?(bundler_lib)
         loaded_gem_paths.delete(p)
       end
       $LOAD_PATH.uniq!
+    end
+
+    def resolve_path(path)
+      expanded = File.expand_path(path)
+      expanded = File.realpath(expanded) until expanded == File.realpath(expanded)
+      expanded
     end
 
     def prints_major_deprecations?
