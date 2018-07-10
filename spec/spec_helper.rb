@@ -12,6 +12,13 @@ module Gem
   end
 end
 
+# Delete any copies of Bundler that have been dumped into site_ruby without
+# a gemspec. RubyGems cannot manage that Bundler, and so our tricks to make
+# sure that the correct version of Bundler loads will stop working.
+Dir.glob(File.join(RbConfig::CONFIG["sitelibdir"], "bundler*")).each do |f|
+  FileUtils.rm_rf f
+end
+
 begin
   require File.expand_path("../support/path.rb", __FILE__)
   spec = Gem::Specification.load(Spec::Path.gemspec.to_s)
