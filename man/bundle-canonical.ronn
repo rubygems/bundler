@@ -1,0 +1,17 @@
+bundle-canonical(1) -- Prettifies the Gemfile
+===========================================================================
+
+## SYNOPSIS
+
+`bundle canonical` [--view]
+
+## DESCRIPTION
+
+Prettifies the Gemfile by giving it consistent ordering and formatting.
+
+If not, the first missing gem is listed and Bundler exits status 1.
+
+## OPTIONS
+
+* `--view`:
+  Displays what the Gemfile would look like on change but does not change the Gemfile.

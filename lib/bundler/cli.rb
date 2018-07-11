@@ -355,8 +355,9 @@ module Bundler
       Add.new(options.dup, gems).run
     end
 
-    desc "canonical [OPTIONS]", ""
+    desc "canonical [OPTIONS]", "Prettifies the Gemfile"
     long_desc <<-D
+      Prettifies the Gemfile by giving it consistent ordering and formatting.
     D
     method_option "view", :type => :boolean
     def canonical
