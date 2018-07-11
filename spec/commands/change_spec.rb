@@ -5,7 +5,7 @@ RSpec.describe "bundle change" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
-      gem "rack", "~> 1.0", :group => [:dev]
+      gem "rack", "~> 1.0", :group => :dev
       gem "weakling", ">=  0.0.1"
 
       group :test do
@@ -58,7 +58,7 @@ RSpec.describe "bundle change" do
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
-          gem "rack", "~> 1.0", :group => [:dev]
+          gem "rack", "~> 1.0", :group => :dev
           gem "weakling", ">=  0.0.1"
 
           group :test do
@@ -115,15 +115,15 @@ RSpec.describe "bundle change" do
       it "changes version of the gem" do
         bundle! "change rack --version 0.9.1"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rack\", \"~> 0.9.1\", :group => [:dev]")
+        expect(bundled_app("Gemfile").read).to include('gem "rack", "~> 0.9.1", :group => [:dev]')
       end
     end
 
     context "when specified version does not exist" do
       it "throws error" do
-        bundle! "change rack --version 42.0.0"
+        bundle "change rack --version 42.0.0"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rack\", \"~> 1.0\", :group => [:dev]")
+        expect(bundled_app("Gemfile").read).to include('gem "rack", "~> 1.0", :group => :dev')
         expect(out).to include("Could not find gem 'rack (= 42.0.0)'")
       end
     end
@@ -132,7 +132,7 @@ RSpec.describe "bundle change" do
       it "adds pessimistic version to gem" do
         bundle! "change rspec --group test1"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rspec\", \"~> 1.2\", :group => [:test1]")
+        expect(bundled_app("Gemfile").read).to include('gem "rspec", "~> 1.2", :group => [:test1]')
       end
     end
 
@@ -140,7 +140,7 @@ RSpec.describe "bundle change" do
       it "retains the optimistic version prefix" do
         bundle! "change weakling --group dev1"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"weakling\", \">= 0.0.3\", :group => [:dev1]")
+        expect(bundled_app("Gemfile").read).to include('gem "weakling", ">= 0.0.3", :group => [:dev1]')
       end
     end
   end
