@@ -66,13 +66,13 @@ RSpec.describe "bundle install" do
   it "reads gemspecs respecting their encoding" do
     skip "unicode constants are most likely not supported on 1.8" if RUBY_VERSION < "1.9"
 
-    create_file("version.rb", <<-RUBY)
+    create_file "version.rb", <<-RUBY
       module Persistent💎
         VERSION = "0.0.1"
       end
     RUBY
 
-    create_file("persistent-dmnd.gemspec", <<-G)
+    create_file "persistent-dmnd.gemspec", <<-G
       require_relative "version"
 
       Gem::Specification.new do |gem|
