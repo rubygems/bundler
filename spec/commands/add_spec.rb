@@ -141,6 +141,14 @@ RSpec.describe "bundle add" do
     end
   end
 
+  describe "with --pessimistic option" do
+    it "adds pessimistic version" do
+      bundle! "add 'foo' --pessimistic"
+      expect(bundled_app("Gemfile").read).to include %(gem "foo", "~> 2.0")
+      expect(the_bundle).to include_gems "foo 2.0"
+    end
+  end
+
   describe "with no option" do
     it "adds pessimistic version" do
       bundle! "add 'foo'"
