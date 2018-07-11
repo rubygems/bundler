@@ -10,14 +10,22 @@ Provide flexibilty of editing gemfile from command line by providing option to c
 
 Example:
 
-bundle change rails --group dev --version 5.1
+$ cat Gemfile | grep "rails"
+
+gem "rails"
+
+$ bundle change rails --group dev --version 5.1
+
+$ cat Gemfile | grep "rails"
+
+gem "rails", "= 5.1", :group => [:dev]
 
 ## OPTIONS
-* `--version`, `-v`:
+* `--version`:
   Specify version requirements for the added gem.
 
-* `--group`, `-g`:
+* `--group`:
   Specify the groups for the added gem. Multiple groups should be separated by commas.
 
-* `--source`, , `-s`:
+* `--source`:
   Specify the source for the added gem.
