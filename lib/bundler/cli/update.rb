@@ -76,7 +76,7 @@ module Bundler
           if !new_version
             Bundler.ui.warn "Bundler attempted to update #{name} but it was removed from the bundle"
           elsif new_version < locked_version
-            Bundler.ui.warn "Bundler attempted to update #{name} but its version regressed from #{locked_version} to #{new_version}"
+            Bundler.ui.warn "Note: #{name} version regressed from #{locked_version} to #{new_version}"
           elsif new_version == locked_version
             Bundler.ui.warn "Bundler attempted to update #{name} but its version stayed the same"
           end
