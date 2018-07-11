@@ -360,9 +360,9 @@ module Bundler
     long_desc <<-D
       Provide flexibilty of editing gemfile from command line by providing option to change gem properties.
     D
-    method_option "version", :aliases => "-v", :type => :string
-    method_option "group", :aliases => "-g", :type => :string
-    method_option "source", :aliases => "-s", :type => :string
+    method_option "version", :type => :string
+    method_option "group", :type => :string
+    method_option "source", :type => :string
     def change(gem_name)
       require "bundler/cli/change"
       Change.new(options.dup, gem_name).run
