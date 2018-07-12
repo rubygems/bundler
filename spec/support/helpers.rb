@@ -319,7 +319,11 @@ module Spec
 
         raise "OMG `#{path}` does not exist!" unless File.exist?(path)
 
-        gem_command! :install, "--no-rdoc --no-ri --ignore-dependencies '#{path}'"
+        if Gem::VERSION < "2.0.0"
+          gem_command! :install, "--no-rdoc --no-ri --ignore-dependencies '#{path}'"
+        else
+          gem_command! :install, "--no-document --ignore-dependencies '#{path}'"
+        end
         bundler_path && bundler_path.rmtree
       end
     end
