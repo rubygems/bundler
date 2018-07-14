@@ -5,9 +5,9 @@ RSpec.describe Bundler::Gemfile do
     install_gemfile <<-G
     source "file://#{gem_repo1}"
       gem "weakling", "~> 0.0.1"
-      gem "rack-test", :group => [:test]
-      gem "rack", :group => [:prod, :dev]
-      gem "rspec", :group => [:test]
+      gem "rack-test", :group => :test
+      gem "rack", :groups => [:prod, :dev]
+      gem "rspec", :group => :test
     G
   end
 
@@ -15,7 +15,9 @@ RSpec.describe Bundler::Gemfile do
     it "with show_groups true" do
       definition = Bundler.definition
       contents = subject.gem_contents(definition.dependencies.find {|d| d.name == "rack" }, true)
+      contents2 = subject.gem_contents(definition.dependencies.find {|d| d.name == "rack-test" }, true)
       expect(contents.join).to eq("gem \"rack\", :groups => [:prod, :dev]")
+      expect(contents2.join).to eq("gem \"rack-test\", :group => :test")
     end
 
     it "with show_groups false" do
@@ -82,6 +84,23 @@ RSpec.describe Bundler::Gemfile do
           # This is just a fake gem for testing
           gem "rspec"
         end
+        E
+        expect(subject.full_gemfile).to eq(strip_whitespace(expected))
+      end
+    end
+
+    context "with inline_groups" do
+      subject { Bundler::Gemfile.new(:as_string => true, :inline_groups => true) }
+      it "shows summary" do
+        expected = <<-E
+        source "file://#{gem_repo1}"
+
+        gem "weakling", "~> 0.0.1"
+
+        gem "rack", :groups => [:dev, :prod]
+
+        gem "rack-test", :group => :test
+        gem "rspec", :group => :test
         E
         expect(subject.full_gemfile).to eq(strip_whitespace(expected))
       end

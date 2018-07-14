@@ -34,7 +34,7 @@ module Bundler
       end
     end
 
-    # @param  [Bundler::Dependency] dep    Dependency instance of the gem
+    # @param  [Bundler::Dependency] dep         Dependency instance of the gem
     # @param  [Boolean]             show_groups Whether groups be shown in gem contents
     # @return [[String]]
     def gem_contents(dep, show_groups = false)
@@ -43,7 +43,17 @@ module Bundler
 
       contents << ", " << dep.requirement.as_list.map(&:inspect).join(", ") unless dep.requirement.none?
 
-      contents << ", :group#{"s" if dep.groups.uniq.size > 1} => " << dep.groups.uniq.inspect if show_groups || @options[:inline_groups]
+      if show_groups || @options[:inline_groups]
+        groups = dep.groups.reject {|g| g.to_s == "default" }.uniq
+
+        unless groups.empty?
+          contents << if groups.size == 1
+                        ", :group => :#{groups[0]}"
+                      else
+                        ", :groups => #{groups.inspect}"
+                      end
+        end
+      end
 
       contents << ", :source => \"" << dep.source.remotes << "\"" unless dep.source.nil?
       # contents = ["gemspec"] if @dep.source.options["gemspec"]

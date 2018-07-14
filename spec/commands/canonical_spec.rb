@@ -5,13 +5,13 @@ RSpec.describe "bundle canonical" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "weakling", "~> 0.0.1"
-      gem 'rack-test', :group => [:test]
-      gem 'rack', :group => [:prod, :test]
+      gem "rack-test", :group => :test
+      gem "rack", :groups => [:prod, :test]
     G
   end
 
   context "with --view option" do
-    it "does not update gemfile but display expected gemfile" do
+    it "does not update gemfile but displays expected gemfile" do
       bundle! "canonical --view"
       output = <<-G
        source "file://#{gem_repo1}"
@@ -30,12 +30,12 @@ RSpec.describe "bundle canonical" do
        end
       G
 
-      expect(out).to read_as(strip_whitespace(output))
+      expect(out).to eq(strip_whitespace(output))
       gemfile_should_be <<-G
         source "file://#{gem_repo1}"
         gem "weakling", "~> 0.0.1"
-        gem 'rack-test', :group => [:test]
-        gem 'rack', :group => [:prod, :test]
+        gem "rack-test", :group => :test
+        gem "rack", :groups => [:prod, :test]
       G
     end
   end
