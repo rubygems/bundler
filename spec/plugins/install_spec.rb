@@ -63,6 +63,7 @@ RSpec.describe "bundler plugin install" do
     end
     bundle "plugin install testing --source file://#{gem_repo2}"
 
+    Dir.mkdir ".bundle"
     bundle "check2", "no-color" => false
     expect(out).to eq("mate")
   end
@@ -248,6 +249,7 @@ RSpec.describe "bundler plugin install" do
 
       it "outside the app global plugin is used" do
         Dir.chdir tmp
+        Dir.mkdir ".bundle"
 
         bundle "shout"
         expect(out).to eq("global_one")
