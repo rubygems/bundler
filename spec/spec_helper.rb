@@ -28,12 +28,16 @@ require "bundler/vendored_fileutils"
 require "uri"
 require "digest"
 
-# Delete any copies of Bundler that have been dumped into site_ruby without
-# a gemspec. RubyGems cannot manage that Bundler, and so our tricks to make
-# sure that the correct version of Bundler loads will stop working.
+# Delete the default copy of Bundler that RVM installs for us when running in CI
 require "fileutils"
-Dir.glob(File.join(RbConfig::CONFIG["sitelibdir"], "bundler*")).each do |file|
-  FileUtils.rm_rf(file)
+if ENV.select {|k, _v| k =~ /TRAVIS/ }.any? && Gem::Version.new(Gem::VERSION) > Gem::Version.new("2.0")
+  Dir.glob(File.join(Gem::Specification.default_specifications_dir, "bundler*.gemspec")).each do |file|
+    FileUtils.rm_rf(file)
+  end
+
+  Dir.glob(File.join(RbConfig::CONFIG["sitelibdir"], "bundler*")).each do |file|
+    FileUtils.rm_rf(file)
+  end
 end
 
 if File.expand_path(__FILE__) =~ %r{([^\w/\.-])}
