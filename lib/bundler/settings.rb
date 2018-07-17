@@ -35,6 +35,7 @@ module Bundler
       frozen
       gem.coc
       gem.mit
+      global_path_appends_ruby_scope
       global_gem_cache
       ignore_messages
       init_gems_rb
@@ -225,7 +226,7 @@ module Bundler
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
       if path && !@temporary.key?(key) && !@local_config.key?(key)
-        return Path.new(path, false, false, false)
+        return Path.new(path, Bundler.feature_flag.global_path_appends_ruby_scope?, false, false)
       end
 
       system_path = self["path.system"] || (self[:disable_shared_gems] == false)
