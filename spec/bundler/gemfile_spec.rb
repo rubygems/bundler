@@ -3,7 +3,7 @@
 RSpec.describe Bundler::Gemfile do
   before :each do
     install_gemfile <<-G
-    source "file://#{gem_repo1}"
+      source "file://#{gem_repo1}"
       gem "weakling", "~> 0.0.1"
       gem "rack-test", :group => :test
       gem "rack", :groups => [:prod, :dev]
@@ -37,7 +37,10 @@ RSpec.describe Bundler::Gemfile do
         gem "rspec"
       end
       E
-      expect(subject.groups_wise(a[2][1], a[2][0]).join("\n").gsub(/\n{3,}/, "\n\n")).to eq(strip_whitespace(expected))
+
+      deps = a[2][1]
+      groups = a[2][0]
+      expect(subject.groups_wise(deps, groups).join("\n").gsub(/\n{3,}/, "\n\n")).to eq(strip_whitespace(expected))
     end
   end
 
