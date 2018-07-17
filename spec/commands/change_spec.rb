@@ -20,6 +20,17 @@ RSpec.describe "bundle change" do
       bundle "change rake --group dev1"
 
       expect(out).to include("`rake` could not be found in the Gemfile.")
+      gemfile_should_be <<-G
+        source "file://#{gem_repo1}"
+
+        gem "rack", "~> 1.0", :group => :dev
+        gem "weakling", ">=  0.0.1"
+
+        group :test do
+          gem "rack-test", "= 1.0"
+          gem "rspec"
+        end
+      G
     end
   end
 
