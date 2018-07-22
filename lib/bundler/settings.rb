@@ -220,7 +220,7 @@ module Bundler
       locations
     end
 
-    # for legacy reasons, the ruby scope isnt appended when the setting comes from ENV or the global config,
+    # for legacy reasons, in Bundler 1, the ruby scope isnt appended when the setting comes from ENV or the global config,
     # nor do we respect :disable_shared_gems
     def path
       key  = key_for(:path)
