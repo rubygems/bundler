@@ -246,17 +246,22 @@ module Bundler
     def resolve
       @resolve ||= begin
         last_resolve = converge_locked_specs
-        if Bundler.frozen_bundle?
-          Bundler.ui.debug "Frozen, using resolution from the lockfile"
-          last_resolve
-        elsif !unlocking? && nothing_changed?
-          Bundler.ui.debug("Found no changes, using resolution from the lockfile")
-          last_resolve
-        else
-          # Run a resolve against the locally available gems
-          Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, gem_version_promoter, additional_base_requirements_for_resolve, platforms)
-        end
+        resolve =
+          if Bundler.frozen_bundle?
+            Bundler.ui.debug "Frozen, using resolution from the lockfile"
+            last_resolve
+          elsif !unlocking? && nothing_changed?
+            Bundler.ui.debug("Found no changes, using resolution from the lockfile")
+            last_resolve
+          else
+            # Run a resolve against the locally available gems
+            Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
+            last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, gem_version_promoter, additional_base_requirements_for_resolve, platforms)
+          end
+
+        # filter out gems that _can_ be installed on multiple platforms, but don't need
+        # to be
+        resolve.for(expand_dependencies(dependencies, true), [], false, false, false)
       end
     end
 
