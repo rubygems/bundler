@@ -6,8 +6,7 @@ require "bundler/rubygems_ext"
 
 module Bundler
   class Dependency < Gem::Dependency
-    attr_reader :autorequire
-    attr_reader :groups, :platforms, :gemfile
+    attr_reader :groups, :platforms, :gemfile, :autorequire
 
     PLATFORM_MAP = {
       :ruby     => Gem::Platform::RUBY,
@@ -133,6 +132,10 @@ module Bundler
       super
     rescue NoMethodError
       requirement != ">= 0"
+    end
+
+    def options
+      { :name => @name, :requirement => @requirement, :groups => @groups.reject {|g| g == :default }, :platforms => @platforms, :env => @env, :source => @source }
     end
   end
 end

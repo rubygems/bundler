@@ -14,6 +14,8 @@ module Bundler
 
       raise InvalidOption, "`#{@gem_name}` could not be found in the Gemfile." unless dep
 
+      check_for_unsupported_options(dep)
+
       add_options = {}
 
       initial_gemfile = IO.readlines(Bundler.default_gemfile)
@@ -80,6 +82,12 @@ module Bundler
       else
         add_options["group"] = groups.map(&:to_s).join(",")
       end
+    end
+
+    def check_for_unsupported_options(dep)
+      gem_options = dep.options.delete_if {|_k, v| v.nil? || (v.is_a?(Array) && v.empty?) }
+
+      raise InvalidOption, "`platforms` is not yet supported." if gem_options[:platforms]
     end
   end
 end
