@@ -24,7 +24,7 @@ module Bundler
 
       set_version_options(dep.requirement, add_options)
 
-      add_options["source"] = @options[:source] if @options[:source]
+      set_source_options(dep.options[:source], add_options)
 
       begin
         require "bundler/cli/remove"
@@ -84,10 +84,20 @@ module Bundler
       end
     end
 
+    def set_source_options(source, add_options)
+      add_options["source"] = source.options["remotes"].first if source.is_a?(Bundler::Source)
+
+      add_options["source"] = @options[:source] if @options[:source]
+    end
+
     def check_for_unsupported_options(dep)
       gem_options = dep.options.delete_if {|_k, v| v.nil? || (v.is_a?(Array) && v.empty?) }
 
+      raise InvalidOption, "`git` is not yet supported." if dep.options[:source].is_a?(Bundler::Source::Git)
+
       raise InvalidOption, "`platforms` is not yet supported." if gem_options[:platforms]
+
+      raise InvalidOption, "`env` is not yet supported." if gem_options[:env]
     end
   end
 end

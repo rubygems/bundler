@@ -7,6 +7,7 @@ RSpec.describe "bundle change" do
 
       gem "rack", "~> 1.0", :group => :dev
       gem "weakling", ">=  0.0.1"
+      gem "platform_specific", :platforms => [:jruby]
 
       group :test do
         gem "rack-test", "= 1.0"
@@ -25,6 +26,7 @@ RSpec.describe "bundle change" do
 
         gem "rack", "~> 1.0", :group => :dev
         gem "weakling", ">=  0.0.1"
+        gem "platform_specific", :platforms => [:jruby]
 
         group :test do
           gem "rack-test", "= 1.0"
@@ -34,7 +36,27 @@ RSpec.describe "bundle change" do
     end
   end
 
-  context "without options" do
+  describe "when an unsupported option is present" do
+    it "throws error" do
+      bundle "change platform_specific --group dev1"
+
+      expect(out).to include("`platforms` is not yet supported.")
+      gemfile_should_be <<-G
+        source "file://#{gem_repo1}"
+
+        gem "rack", "~> 1.0", :group => :dev
+        gem "weakling", ">=  0.0.1"
+        gem "platform_specific", :platforms => [:jruby]
+
+        group :test do
+          gem "rack-test", "= 1.0"
+          gem "rspec"
+        end
+      G
+    end
+  end
+
+  describe "without options" do
     it "throws error" do
       bundle "change rack"
 
@@ -51,6 +73,7 @@ RSpec.describe "bundle change" do
           source "file://#{gem_repo1}"
 
           gem "weakling", ">=  0.0.1"
+          gem "platform_specific", :platforms => [:jruby]
 
           group :test do
             gem "rack-test", "= 1.0"
@@ -71,6 +94,7 @@ RSpec.describe "bundle change" do
 
           gem "rack", "~> 1.0", :group => :dev
           gem "weakling", ">=  0.0.1"
+          gem "platform_specific", :platforms => [:jruby]
 
           group :test do
             gem "rspec"
@@ -89,6 +113,7 @@ RSpec.describe "bundle change" do
           source "file://#{gem_repo1}"
 
           gem "weakling", ">=  0.0.1"
+          gem "platform_specific", :platforms => [:jruby]
 
           group :test do
             gem "rack-test", "= 1.0"
@@ -109,6 +134,7 @@ RSpec.describe "bundle change" do
           source "file://#{gem_repo1}"
 
           gem "weakling", ">=  0.0.1"
+          gem "platform_specific", :platforms => [:jruby]
 
           group :test do
             gem "rack-test", "= 1.0"
