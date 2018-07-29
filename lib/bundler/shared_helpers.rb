@@ -344,13 +344,9 @@ module Bundler
 
     def resolve_path(path)
       expanded = File.expand_path(path)
-      return expanded unless File.respond_to?(:realpath)
+      return expanded unless File.respond_to?(:realpath) && File.exist?(expanded)
 
-      while File.exist?(expanded) && File.realpath(expanded) != expanded
-        expanded = File.realpath(expanded)
-      end
-
-      expanded
+      File.realpath(expanded)
     end
 
     def prints_major_deprecations?
