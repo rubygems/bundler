@@ -236,6 +236,47 @@ module Bundler
       end
     end
 
+    desc "sys-install GEM [REQ...]", "Installs the given gem to the system"
+    method_option "conservative", :type => :boolean, :desc =>
+      "Only enter the installation process if the dependency is not yet satisfied"
+    method_option "redownload", :type => :boolean, :desc =>
+      "Force downloading every gem"
+    def sys_install(name, *requirements)
+      env = ENV.clone
+      conservative = options[:conservative]
+
+      ENV["BUNDLE_GEMFILE"] = "Gemfile"
+      requirements << ">= 0" if requirements.empty?
+      dependency = Dependency.new(name, requirements)
+      conservative = dependency.requirement.exact? if options[:conservative].nil?
+      sources = SourceList.new
+      sources.global_rubygems_source = Bundler.rubygems.sources
+
+      Bundler.settings.temporary(:'path.system' => true) do
+        definition = Definition.new(
+          nil, # lockfile
+          [dependency],
+          sources,
+          false # unlock
+        )
+        definition.validate_runtime!
+
+        if conservative && installed_spec = sources.default_source.send(:installed_specs).local_search(dependency).first
+          Bundler.ui.debug "Skipping install since #{installed_spec.full_name} is installed at `#{installed_spec.full_gem_path}`"
+          return
+        end
+
+        installer = Bundler::Installer.install(Bundler.root, definition, options.dup.merge(
+                                                                           :system => true,
+                                                                           :force => options[:redownload],
+                                                                           :skip_lock => true
+        ))
+        Common.output_post_install_messages(installer.post_install_messages)
+      end
+    ensure
+      ENV.replace(env)
+    end
+
     desc "update [OPTIONS]", "Update the current environment"
     long_desc <<-D
       Update will install the newest versions of the gems listed in the Gemfile. Use
@@ -724,7 +765,7 @@ module Bundler
       cmd = current_command
       command_name = cmd.name
       return if PARSEABLE_COMMANDS.include?(command_name)
-      command = ["bundle", command_name] + args
+      command = ["bundle", command_name.tr("_", "-")] + args.map {|a| a =~ /[^a-z0-9_\.-]/i ? a.inspect : a }
       options_to_print = options.dup
       options_to_print.delete_if do |k, v|
         next unless o = cmd.options[k]

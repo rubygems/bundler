@@ -77,7 +77,7 @@ module Bundler
 
         if @definition.dependencies.empty?
           Bundler.ui.warn "The Gemfile specifies no dependencies"
-          lock
+          lock unless options[:skip_lock] || Bundler.frozen_bundle?
           return
         end
 
@@ -91,7 +91,7 @@ module Bundler
         end
         install(options)
 
-        lock unless Bundler.frozen_bundle?
+        lock unless options[:skip_lock] || Bundler.frozen_bundle?
         Standalone.new(options[:standalone], @definition).generate if options[:standalone]
       end
     end
@@ -303,7 +303,7 @@ module Bundler
 
     # returns whether or not a re-resolve was needed
     def resolve_if_needed(options)
-      if !@definition.unlocking? && !options["force"] && !Bundler.settings[:inline] && Bundler.default_lockfile.file?
+      if !@definition.unlocking? && !options["force"] && !Bundler.settings[:inline] && @definition.lockfile && @definition.lockfile.file?
         return false if @definition.nothing_changed? && !@definition.missing_specs?
       end
 

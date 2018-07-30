@@ -122,7 +122,7 @@ module Bundler
 
   def self.with_friendly_errors
     yield
-  rescue SignalException
+  rescue SignalException, SyntaxError
     raise
   rescue Exception => e
     FriendlyErrors.log_error(e)
