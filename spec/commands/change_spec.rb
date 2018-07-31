@@ -80,7 +80,7 @@ RSpec.describe "bundle change" do
             gem "rspec"
           end
 
-          gem "rack", "~> 1.0", :group => [:dev1]
+          gem "rack", "~> 1.0", :group => :dev1
         G
       end
     end
@@ -100,7 +100,7 @@ RSpec.describe "bundle change" do
             gem "rspec"
           end
 
-          gem "rack-test", "= 1.0", :group => [:test1]
+          gem "rack-test", "= 1.0", :group => :test1
         G
       end
     end
@@ -152,7 +152,7 @@ RSpec.describe "bundle change" do
       it "changes version of the gem" do
         bundle! "change rack --version 0.9.1"
 
-        expect(bundled_app("Gemfile").read).to include('gem "rack", "~> 0.9.1", :group => [:dev]')
+        expect(bundled_app("Gemfile").read).to include('gem "rack", "~> 0.9.1", :group => :dev')
       end
     end
 
@@ -169,7 +169,7 @@ RSpec.describe "bundle change" do
       it "adds pessimistic version to gem" do
         bundle! "change rspec --group test1"
 
-        expect(bundled_app("Gemfile").read).to include('gem "rspec", "~> 1.2", :group => [:test1]')
+        expect(bundled_app("Gemfile").read).to include('gem "rspec", "~> 1.2", :group => :test1')
       end
     end
 
@@ -177,7 +177,7 @@ RSpec.describe "bundle change" do
       it "retains the optimistic version prefix" do
         bundle! "change weakling --group dev1"
 
-        expect(bundled_app("Gemfile").read).to include('gem "weakling", ">= 0.0.3", :group => [:dev1]')
+        expect(bundled_app("Gemfile").read).to include('gem "weakling", ">= 0.0.3", :group => :dev1')
       end
     end
   end
@@ -188,7 +188,7 @@ RSpec.describe "bundle change" do
         build_repo2
         bundle! "change rack --source=file://#{gem_repo2}"
 
-        expect(bundled_app("Gemfile").read).to include("gem \"rack\", \"~> 1.0\", :group => [:dev], :source => \"file://#{gem_repo2}\"")
+        expect(bundled_app("Gemfile").read).to include("gem \"rack\", \"~> 1.0\", :group => :dev, :source => \"file://#{gem_repo2}\"")
       end
     end
   end
