@@ -170,6 +170,7 @@ module Bundler
         end
 
         if warning
+          Kernel.send(:require, "etc")
           user_home = tmp_home_path(Etc.getlogin, warning)
           Bundler.ui.warn "#{warning}\nBundler will use `#{user_home}' as your home directory temporarily.\n"
           user_home
