@@ -302,10 +302,23 @@ module Bundler
     end
 
     def version_conflict_message(e)
+      # only show essential conflicts, if possible
+      conflicts = e.conflicts.dup
+      conflicts.delete_if do |_name, conflict|
+        deps = conflict.requirement_trees.map(&:last).flatten(1)
+        !Bundler::VersionRanges.empty?(*Bundler::VersionRanges.for_many(deps.map(&:requirement)))
+      end
+      e.conflicts.replace(conflicts) unless conflicts.empty?
+
+      solver_name = "Bundler"
+      possibility_type = "gem"
       e.message_with_trees(
-        :solver_name => "Bundler",
-        :possibility_type => "gem",
+        :solver_name => solver_name,
+        :possibility_type => possibility_type,
         :reduce_trees => lambda do |trees|
+          # called first, because we want to reduce the amount of work required to find maximal empty sets
+          trees.uniq! {|t| t.flatten.map {|dep| [dep.name, dep.requirement] } }
+
           # bail out if tree size is too big for Array#combination to make any sense
           return trees if trees.size > 15
           maximal = 1.upto(trees.size).map do |size|
@@ -313,12 +326,10 @@ module Bundler
           end.flatten(1).select do |deps|
             Bundler::VersionRanges.empty?(*Bundler::VersionRanges.for_many(deps.map(&:requirement)))
           end.min_by(&:size)
+
           trees.reject! {|t| !maximal.include?(t.last) } if maximal
 
-          trees = trees.sort_by {|t| t.flatten.map(&:to_s) }
-          trees.uniq! {|t| t.flatten.map {|dep| [dep.name, dep.requirement] } }
-
-          trees.sort_by {|t| t.reverse.map(&:name) }
+          trees.sort_by {|t| [t.flatten.map(&:to_s), t.reverse.map(&:name)] }
         end,
         :printable_requirement => lambda {|req| SharedHelpers.pretty_dependency(req) },
         :additional_message_for_conflict => lambda do |o, name, conflict|
@@ -351,7 +362,11 @@ module Bundler
               []
             end.compact.map(&:to_s).uniq.sort
 
-            o << "Could not find gem '#{SharedHelpers.pretty_dependency(conflict.requirement)}'"
+            metadata_requirement = name.end_with?("\0")
+
+            o << "Could not find gem '" unless metadata_requirement
+            o << SharedHelpers.pretty_dependency(conflict.requirement)
+            o << "'" unless metadata_requirement
             if conflict.requirement_trees.first.size > 1
               o << ", which is required by "
               o << "gem '#{SharedHelpers.pretty_dependency(conflict.requirement_trees.first[-2])}',"
@@ -360,12 +375,21 @@ module Bundler
 
             o << if relevant_sources.empty?
                    "in any of the sources.\n"
+                 elsif metadata_requirement
+                   "is not available in #{relevant_sources.join(" or ")}"
                  else
                    "in any of the relevant sources:\n  #{relevant_sources * "\n  "}\n"
                  end
           end
         end,
-        :version_for_spec => lambda {|spec| spec.version }
+        :version_for_spec => lambda {|spec| spec.version },
+        :incompatible_version_message_for_conflict => lambda do |name, _conflict|
+          if name.end_with?("\0")
+            %(#{solver_name} found conflicting requirements for the #{name} version:)
+          else
+            %(#{solver_name} could not find compatible versions for #{possibility_type} "#{name}":)
+          end
+        end
       )
     end
 
