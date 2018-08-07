@@ -11,7 +11,13 @@ module Bundler
       spec
     end
 
-    attr_accessor :stub, :ignored
+    def initialize(*)
+      @_remote_specification = nil
+      super
+    end
+
+    attr_accessor :ignored
+    attr_writer :stub
 
     def source=(source)
       super
@@ -71,14 +77,21 @@ module Bundler
       stub.raw_require_paths
     end
 
+    def stub
+      if !@_remote_specification && @stub.instance_variable_get(:@data) && Gem.loaded_specs[name].equal?(self)
+        _remote_specification
+      end
+      @stub
+    end
+
   private
 
     def _remote_specification
       @_remote_specification ||= begin
-        rs = stub.to_spec
+        rs = @stub.to_spec
         if rs.equal?(self) # happens when to_spec gets the spec from Gem.loaded_specs
-          rs = Gem::Specification.load(loaded_from)
-          Bundler.rubygems.stub_set_spec(stub, rs)
+          rs = Gem::Specification.load(@stub.loaded_from)
+          Bundler.rubygems.stub_set_spec(@stub, rs)
         end
 
         unless rs
