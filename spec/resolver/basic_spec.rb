@@ -157,10 +157,10 @@ Bundler could not find compatible versions for gem "a":
         s.required_ruby_version = "~> 2.0.0"
       end
 
-      gem "ruby\0", "1.8.7"
+      gem "Ruby\0", "1.8.7"
     end
     dep "foo"
-    dep "ruby\0", "1.8.7"
+    dep "Ruby\0", "1.8.7"
 
     deps = []
     @deps.each do |d|

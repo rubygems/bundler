@@ -308,7 +308,7 @@ module Bundler
         deps = conflict.requirement_trees.map(&:last).flatten(1)
         !Bundler::VersionRanges.empty?(*Bundler::VersionRanges.for_many(deps.map(&:requirement)))
       end
-      e.conflicts.replace(conflicts) unless conflicts.empty?
+      e = Molinillo::VersionConflict.new(conflicts, e.specification_provider) unless conflicts.empty?
 
       solver_name = "Bundler"
       possibility_type = "gem"
@@ -329,7 +329,7 @@ module Bundler
 
           trees.reject! {|t| !maximal.include?(t.last) } if maximal
 
-          trees.sort_by {|t| [t.flatten.map(&:to_s), t.reverse.map(&:name)] }
+          trees.sort_by {|t| t.reverse.map(&:name) }
         end,
         :printable_requirement => lambda {|req| SharedHelpers.pretty_dependency(req) },
         :additional_message_for_conflict => lambda do |o, name, conflict|
