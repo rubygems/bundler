@@ -881,7 +881,7 @@ end
       end
     end
 
-    it "should succesfully require 'bundler/setup'" do
+    it "should successfully require 'bundler/setup'" do
       install_gemfile ""
 
       ENV["GEM_PATH"] = symlinked_gem_home.path

@@ -55,7 +55,7 @@ The `rake release:patch` command will automatically handle cherry-picking, and i
 Bundler maintains a list of changes present in each version in the `CHANGELOG.md` file.
 Entries should not be added in pull requests, but are rather written by the Bundler
 maintainers in the [bundler-changelog repo](https://github.com/bundler/bundler-changelog).
-That reposity tracks changes by pull requests, with each entry having an associated version,
+That repository tracks changes by pull requests, with each entry having an associated version,
 PR, section, author(s), issue(s) closed, and message.
 
 Ensure that repo has been updated with all new PRs before releasing a new version,
