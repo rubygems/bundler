@@ -1,6 +1,6 @@
 # Releasing
 
-Bundler users [Semantic Versioning](https://semver.org/).
+Bundler uses [Semantic Versioning](https://semver.org/).
 
 _Note: In the documentation listed below, the *current* minor version number is
 1.11 and the *next* minor version number is 1.12_
