@@ -10,12 +10,12 @@ Interested in adding someone to the team? Here's the process.
 1. The existing team reaches consensus about whether to invite the potential member.
 1. The nominator reaches out to the potential member and invites them to join the team.
 1. After the potential member accepts:
-  - Invite them to the maintainers Slack channel
-  - Add them to the [maintainers team][org_team] on GitHub
-  - Add them to the [Team page][team] on bundler.io, in the [maintainers list][maintainers]
-  - Add them to the [list of team members][list] in `contributors.rake`
-  - Add them to the authors list in `bundler.gemspec`
-  - Add them to the owners list on RubyGems.org by running `gem owner -a EMAIL bundler`
+    - Invite them to the maintainers Slack channel
+    - Add them to the [maintainers team][org_team] on GitHub
+    - Add them to the [Team page][team] on bundler.io, in the [maintainers list][maintainers]
+    - Add them to the [list of team members][list] in `contributors.rake`
+    - Add them to the authors list in `bundler.gemspec`
+    - Add them to the owners list on RubyGems.org by running `gem owner -a EMAIL bundler`
 1. Finally, send them a link to [POLICIES](https://github.com/bundler/bundler/blob/master/doc/POLICIES.md#bundler-policies) as an orientation for being on the team.
 
 ## Removing a team member
