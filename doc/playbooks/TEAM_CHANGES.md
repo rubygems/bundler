@@ -11,6 +11,7 @@ Interested in adding someone to the team? Here's the process.
 1. The nominator reaches out to the potential member and invites them to join the team.
 1. After the potential member accepts:
   - Invite them to the maintainers Slack channel
+  - Add them to the [maintainers team][org_team] on GitHub
   - Add them to the [Team page][team] on bundler.io, in the [maintainers list][maintainers]
   - Add them to the [list of team members][list] in `contributors.rake`
   - Add them to the authors list in `bundler.gemspec`
@@ -24,8 +25,10 @@ When the conditions in [POLICIES](https://github.com/bundler/bundler/blob/master
 1. Remove them from the owners list on RubyGems.org by running `gem owner -r EMAIL bundler`.
 1. Remove their entry on the [Team page][team] on bundler.io, in the [maintainers list][maintainers]
 1. Remove them from the [list of team members][list] in `contributors.rake`
+1. Remove them from the [maintainers team][org_team] on GitHub
 1. Remove them from the maintainers Slack channel
 
+[org_team]: https://github.com/orgs/bundler/teams/maintainers/members
 [team]: https://bundler.io/contributors.html
 [maintainers]: https://github.com/bundler/bundler-site/blob/02483d3f79f243774722b3fc18a471ca77b1c424/source/contributors.html.haml#L25
 [list]: https://github.com/bundler/bundler-site/blob/02483d3f79f243774722b3fc18a471ca77b1c424/lib/tasks/contributors.rake#L8
