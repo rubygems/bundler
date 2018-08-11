@@ -112,4 +112,29 @@ RSpec.describe "bundle install" do
       end
     end
   end
+
+  context "with a Gemfile containing non-US-ASCII characters" do
+    it "reads the Gemfile with the UTF-8 encoding by default" do
+      install_gemfile <<-G
+        str = "Il était une fois ..."
+        puts "The source encoding is: " + str.encoding.name
+      G
+
+      expect(out).to include("The source encoding is: UTF-8")
+      expect(out).not_to include("The source encoding is: ASCII-8BIT")
+      expect(out).to include("Bundle complete!")
+    end
+
+    it "respects the magic encoding comment" do
+      # NOTE: This works thanks to #eval interpreting the magic encoding comment
+      install_gemfile <<-G
+        # encoding: iso-8859-1
+        str = "Il #{"\xE9".b}tait une fois ..."
+        puts "The source encoding is: " + str.encoding.name
+      G
+
+      expect(out).to include("The source encoding is: ISO-8859-1")
+      expect(out).to include("Bundle complete!")
+    end
+  end
 end
