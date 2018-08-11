@@ -61,7 +61,7 @@ module Bundler
     end
 
     def self.read_file(filename)
-      File.read(filename.to_s).strip
+      Bundler.read_file(filename.to_s).strip
     rescue Errno::ENOENT
       "<No #{filename} found>"
     rescue RuntimeError => e
