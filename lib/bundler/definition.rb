@@ -855,8 +855,8 @@ module Bundler
           concat_ruby_version_requirements(locked_ruby_version_object) unless @unlock[:ruby]
         end
         [
-          Dependency.new("ruby\0", ruby_versions),
-          Dependency.new("rubygems\0", Gem::VERSION),
+          Dependency.new("Ruby\0", ruby_versions),
+          Dependency.new("RubyGems\0", Gem::VERSION),
         ]
       end
     end
