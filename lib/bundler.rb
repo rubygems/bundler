@@ -410,7 +410,7 @@ EOF
 
     def read_file(file)
       SharedHelpers.filesystem_access(file, :read) do
-        File.open(file, "rb", &:read)
+        File.open(file, "r:UTF-8", &:read)
       end
     end
 
@@ -431,7 +431,7 @@ EOF
 
     def load_gemspec_uncached(file, validate = false)
       path = Pathname.new(file)
-      contents = File.open(file, "r:UTF-8", &:read)
+      contents = read_file(file)
       spec = if contents.start_with?("---") # YAML header
         eval_yaml_gemspec(path, contents)
       else
