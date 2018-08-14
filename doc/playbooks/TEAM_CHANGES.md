@@ -1,16 +1,16 @@
 # Team changes
 
-This file documents how to add and remove team members. For the rules governing adding and removing team members, see [POLICIES](../POLICIES.md).
+This file documents how to add and remove team members. For the rules governing adding and removing team members, see [POLICIES][policies].
 
 ## Adding a new team member
 
 Interested in adding someone to the team? Here's the process.
 
 1. An existing team member nominates a potential team member to the rest of the team.
-1. The existing team reaches consensus about whether to invite the potential member.
-1. The nominator reaches out to the potential member and invites them to join the team.
-1. The nominator also sends the candidate a link to [POLICIES](https://github.com/bundler/bundler/blob/master/doc/POLICIES.md#bundler-policies) as an orientation for being on the team.
-1. If the potential member accepts:
+2. The existing team reaches consensus about whether to invite the potential member.
+3. The nominator asks the potential member if they would like to join the team.
+4. The nominator also sends the candidate a link to [POLICIES][policies] as an orientation for being on the team.
+5. If the potential member accepts:
     - Invite them to the maintainers Slack channel
     - Add them to the [maintainers team][org_team] on GitHub
     - Add them to the [Team page][team] on bundler.io, in the [maintainers list][maintainers]
@@ -35,6 +35,7 @@ When the conditions in [POLICIES](https://github.com/bundler/bundler/blob/master
 - Remove them from the [maintainers team][org_team] on GitHub
 - Remove them from the maintainers Slack channel
 
+[policies]: https://github.com/bundler/bundler/blob/master/doc/POLICIES.md#bundler-policies
 [org_team]: https://github.com/orgs/bundler/teams/maintainers/members
 [team]: https://bundler.io/contributors.html
 [maintainers]: https://github.com/bundler/bundler-site/blob/02483d3f79f243774722b3fc18a471ca77b1c424/source/contributors.html.haml#L25
