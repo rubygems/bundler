@@ -317,7 +317,7 @@ module Bundler
         :possibility_type => possibility_type,
         :reduce_trees => lambda do |trees|
           # called first, because we want to reduce the amount of work required to find maximal empty sets
-          trees.uniq! {|t| t.flatten.map {|dep| [dep.name, dep.requirement] } }
+          trees = trees.uniq {|t| t.flatten.map {|dep| [dep.name, dep.requirement] } }
 
           # bail out if tree size is too big for Array#combination to make any sense
           return trees if trees.size > 15
