@@ -187,11 +187,6 @@ module Bundler
       out
     end
 
-    def sh_with_code(cmd, &block)
-      outbuf, status = sh_with_code(cmd, &block)
-      [outbuf, (status && status.exitstatus) || -1]
-    end
-
     if RUBY_VERSION >= "1.9"
       def sh_with_status(cmd, &block)
         Bundler.ui.debug(cmd)
