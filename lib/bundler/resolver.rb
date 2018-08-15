@@ -302,6 +302,9 @@ module Bundler
         :solver_name => "Bundler",
         :possibility_type => "gem",
         :reduce_trees => lambda do |trees|
+          # called first, because we want to reduce the amount of work required to find maximal empty sets
+          trees = trees.uniq {|t| t.flatten.map {|dep| [dep.name, dep.requirement] } }
+
           # bail out if tree size is too big for Array#combination to make any sense
           return trees if trees.size > 15
           maximal = 1.upto(trees.size).map do |size|
