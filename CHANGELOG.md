@@ -1,3 +1,24 @@
+## 1.16.4 (2017-08-17)
+
+Changes:
+
+  - Welcome new members to the Bundler core team (@indirect)
+  - Don't mutate original error trees when determining version_conflict_message (@greysteil)
+  - Update vendored Molinillo to 0.6.6 (@segiddins)
+
+Bugfixes:
+
+  - Reword bundle update regression message to be more clear to the user when a gem's version is downgraded ([#6584](https://github.com/bundler/bundler/issues/6584), @ralphbolo)
+  - Respect --conservative flag when updating a dependency group ([#6560](https://github.com/bundler/bundler/issues/6560), @greysteil)
+  - Fix issue where a pre-release version was not being selected when it's specified in the Gemfile ([#6449](https://github.com/bundler/bundler/issues/6449), @akihiro17)
+  - Fix issue where `Etc` was not loaded when getting the user's home dir ([#6640](https://github.com/bundler/bundler/issues/6640), @colby-swandale)
+  - Use UTF-8 for reading files including Gemfile ([#6660](https://github.com/bundler/bundler/issues/6660), @eregon)
+  - Remove unnecessary `while` loop in path resolver helper (@ojab)
+
+Documentation:
+
+  - Document that `bundle show [--paths]` sorts results by name (@kemitchell)
+
 ## 1.16.3 (2018-07-17)
 
 Features:
