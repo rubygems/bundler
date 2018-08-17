@@ -15,6 +15,7 @@ Interested in adding someone to the team? Here's the process.
     - Add them to the [maintainers team][org_team] on GitHub
     - Add them to the [Team page][team] on bundler.io, in the [maintainers list][maintainers]
     - Add them to the [list of team members][list] in `contributors.rake`
+    - Add them to the `HOMU_REVIEWERS` env var in [`@bundlerbot`'s config][heroku]
     - Add them to the authors list in `bundler.gemspec`
     - Add them to the owners list on RubyGems.org by running
       ```
@@ -33,6 +34,7 @@ When the conditions in [POLICIES](https://github.com/bundler/bundler/blob/master
 - Remove their entry on the [Team page][team] on bundler.io, in the [maintainers list][maintainers]
 - Remove them from the [list of team members][list] in `contributors.rake`
 - Remove them from the [maintainers team][org_team] on GitHub
+- Remove them from the `HOMU_REVIEWERS` env var in [`@bundlerbot`'s config][heroku]
 - Remove them from the maintainers Slack channel
 
 [policies]: https://github.com/bundler/bundler/blob/master/doc/POLICIES.md#bundler-policies
@@ -40,3 +42,4 @@ When the conditions in [POLICIES](https://github.com/bundler/bundler/blob/master
 [team]: https://bundler.io/contributors.html
 [maintainers]: https://github.com/bundler/bundler-site/blob/02483d3f79f243774722b3fc18a471ca77b1c424/source/contributors.html.haml#L25
 [list]: https://github.com/bundler/bundler-site/blob/02483d3f79f243774722b3fc18a471ca77b1c424/lib/tasks/contributors.rake#L8
+[heroku]: https://dashboard.heroku.com/apps/bundlerbot-homu/settings
