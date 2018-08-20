@@ -77,8 +77,13 @@ module Bundler
       stub.raw_require_paths
     end
 
+    # @note
+    #   Cannot be an attr_reader that returns @stub, because the stub can pull it's `to_spec`
+    #   from `Gem.loaded_specs`, which can end up being self.
+    #   #_remote_specification has logic to handle this case, so delegate to that in that situation,
+    #   because otherwise we can end up with a stack overflow when calling #missing_extensions?
     def stub
-      if !@_remote_specification && @stub.instance_variable_get(:@data) && Gem.loaded_specs[name].equal?(self)
+      if @_remote_specification.nil? && @stub.instance_variable_get(:@data) && Gem.loaded_specs[name].equal?(self)
         _remote_specification
       end
       @stub
