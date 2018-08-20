@@ -133,7 +133,7 @@ RSpec.describe "bundle install" do
       # NOTE: This works thanks to #eval interpreting the magic encoding comment
       install_gemfile <<-G
         # encoding: iso-8859-1
-        str = "Il #{"\xE9".b}tait une fois ..."
+        str = "Il #{"\xE9".dup.force_encoding("binary")}tait une fois ..."
         puts "The source encoding is: " + str.encoding.name
       G
 
