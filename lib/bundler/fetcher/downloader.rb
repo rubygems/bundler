@@ -27,6 +27,11 @@ module Bundler
             new_uri.password = uri.password
           end
           fetch(new_uri, headers, counter + 1)
+        when Net::HTTPRequestedRangeNotSatisfiable
+          new_headers = headers.dup
+          new_headers.delete("Range")
+          new_headers["Accept-Encoding"] = "gzip"
+          fetch(uri, new_headers)
         when Net::HTTPRequestEntityTooLarge
           raise FallbackError, response.body
         when Net::HTTPUnauthorized
