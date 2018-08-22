@@ -10,7 +10,7 @@ module Bundler
     end
 
     def hash
-      @hash ||= dep.hash
+      @hash ||= [dep, __platform].hash
     end
 
     def ==(other)

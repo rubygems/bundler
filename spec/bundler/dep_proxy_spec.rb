@@ -14,4 +14,9 @@ RSpec.describe Bundler::DepProxy do
     it { expect(subject.eql?(nil)).to be false }
     it { expect(subject.eql?("foobar")).to be false }
   end
+
+  describe "#hash" do
+    it { expect(subject.hash).to eq(same.hash) }
+    it { expect(subject.hash).to eq(other.hash) }
+  end
 end
