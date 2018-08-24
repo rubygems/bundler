@@ -6,6 +6,16 @@ RSpec.describe "bundle exec" do
     system_gems(system_gems_to_install, :path => :bundle_path)
   end
 
+  it "works with --gemfile flag", :focus do
+    create_file "CustomGemfile", <<-G
+      gem "rack"
+    G
+
+    bundle "exec --gemfile CustomGemfile test"
+
+    expect(ENV["BUNDLE_GEMFILE"]).to eq("CustomGemfile")
+  end
+
   it "activates the correct gem" do
     gemfile <<-G
       gem "rack", "0.9.1"
