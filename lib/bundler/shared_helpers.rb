@@ -230,6 +230,11 @@ module Bundler
       filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts contents } }
     end
 
+    def custom_gemfile(gemfile)
+      file = find_file(gemfile).to_s
+      Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", file unless file.nil?
+    end
+
   private
 
     def validate_bundle_path
