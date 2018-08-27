@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.license     = "MIT"
   s.authors     = [
     "André Arko", "Samuel Giddins", "Colby Swandale", "Hiroshi Shibata",
-    "David Rodríguez", "Grey Baker", "Chris Morris", "James Wen", "Tim Moore",
+    "David Rodríguez", "Grey Baker", "Stephanie Morillo", "Chris Morris", "James Wen", "Tim Moore",
     "André Medeiros", "Jessica Lynn Suttles", "Terence Lee", "Carl Lerche",
     "Yehuda Katz"
   ]
