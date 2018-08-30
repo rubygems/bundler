@@ -23,8 +23,6 @@ module Bundler
     def run
       validate_cmd!
       SharedHelpers.set_bundle_environment
-
-      # setting the gemfile if mentioned
       SharedHelpers.custom_gemfile(@options[:gemfile]) unless @options[:gemfile].nil?
 
       if bin_path = Bundler.which(cmd)
