@@ -139,9 +139,13 @@ RSpec.describe Bundler::Env do
         expect(described_class.report).to include("Git         1.2.3 (Apple Git-BS)")
       end
     end
+  end
 
-    it "properly parses version of tools when shelling out to them" do
-      expect(described_class.send(:version_of, "ruby")).to_not include("\n")
+  describe ".version_of" do
+    let(:parsed_version) { described_class.send(:version_of, "ruby") }
+
+    it "strips version of new line characters" do
+      expect(parsed_version).to_not include("\n")
     end
   end
 end
