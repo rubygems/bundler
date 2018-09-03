@@ -561,7 +561,7 @@ RSpec.describe "bundle exec" do
         ex << "raise SignalException, 'SIGTERM'\n"
         ex
       end
-      let(:expected_err) { ENV["TRAVIS"] ? "Terminated" : "" }
+      let(:expected_err) { "Terminated" }
       let(:exit_code) do
         # signal mask 128 + plus signal 15 -> TERM
         # this is specified by C99
