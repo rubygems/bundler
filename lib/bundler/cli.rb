@@ -423,6 +423,7 @@ module Bundler
 
     desc "exec [OPTIONS]", "Run the command in context of the bundle"
     method_option :keep_file_descriptors, :type => :boolean, :default => false
+    method_option :gemfile, :type => :string, :required => false
     long_desc <<-D
       Exec runs a command, providing it access to the gems in the bundle. While using
       bundle exec you can require and call the bundled gems as if they were installed
