@@ -88,7 +88,7 @@ module Bundler
 
     def self.version_of(script)
       return "not installed" unless Bundler.which(script)
-      `#{script} --version`
+      `#{script} --version`.chomp
     end
 
     def self.chruby_version
