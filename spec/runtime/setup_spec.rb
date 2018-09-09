@@ -884,7 +884,11 @@ end
     it "should successfully require 'bundler/setup'" do
       install_gemfile ""
 
-      ruby <<-R, :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
+      ruby <<-'R', :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
+        # Remove any bundler that's not the current bundler from $LOAD_PATH
+        $LOAD_PATH.each do |path|
+          $LOAD_PATH.delete(path) if File.exist?("#{path}/bundler.rb")
+        end
         puts (require 'bundler/setup')
       R
 
