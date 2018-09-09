@@ -1329,9 +1329,6 @@ end
       end
 
       it "activates no gems with bundle exec that is loaded" do
-        # TODO: remove once https://github.com/erikhuda/thor/pull/539 is released
-        exemptions << "io-console"
-
         install_gemfile! ""
         create_file("script.rb", "#!/usr/bin/env ruby\n\n#{code}")
         FileUtils.chmod(0o777, bundled_app("script.rb"))
