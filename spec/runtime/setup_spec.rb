@@ -1303,7 +1303,6 @@ end
       end
 
       let(:code) { strip_whitespace(<<-RUBY) }
-        require "bundler/setup"
         require "pp"
         loaded_specs = Gem.loaded_specs.dup
         #{exemptions.inspect}.each {|s| loaded_specs.delete(s) }
@@ -1318,7 +1317,7 @@ end
 
       it "activates no gems with -rbundler/setup" do
         install_gemfile! ""
-        ruby! code, :env => { :RUBYOPT => activation_warning_hack_rubyopt }
+        ruby! code, :env => { :RUBYOPT => activation_warning_hack_rubyopt + " -rbundler/setup" }
         expect(last_command.stdout).to eq("{}")
       end
 
