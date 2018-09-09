@@ -859,12 +859,12 @@ end
 
   context "with bundler is located in symlinked GEM_HOME" do
     let(:gem_home) { Dir.mktmpdir }
-    let(:symlinked_gem_home) { Tempfile.new("gem_home") }
+    let(:symlinked_gem_home) { Tempfile.new("gem_home").path }
     let(:bundler_dir) { File.expand_path("../../..", __FILE__) }
     let(:bundler_lib) { File.join(bundler_dir, "lib") }
 
     before do
-      FileUtils.ln_sf(gem_home, symlinked_gem_home.path)
+      FileUtils.ln_sf(gem_home, symlinked_gem_home)
       gems_dir = File.join(gem_home, "gems")
       specifications_dir = File.join(gem_home, "specifications")
       Dir.mkdir(gems_dir)
@@ -884,7 +884,7 @@ end
     it "should successfully require 'bundler/setup'" do
       install_gemfile ""
 
-      ruby <<-R, :env => { "GEM_PATH" => symlinked_gem_home.path }, :no_lib => true
+      ruby <<-R, :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
         puts (require 'bundler/setup')
       R
 
