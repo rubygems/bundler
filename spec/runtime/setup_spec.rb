@@ -886,14 +886,7 @@ end
 
       ENV["GEM_PATH"] = symlinked_gem_home.path
 
-      ruby <<-R
-        if $LOAD_PATH.include?("#{bundler_lib}")
-          # We should use bundler from GEM_PATH for this test, so we should
-          # remove path to the bundler source tree
-          $LOAD_PATH.delete("#{bundler_lib}")
-        else
-          raise "We don't have #{bundler_lib} in $LOAD_PATH"
-        end
+      ruby <<-R, :no_lib => true
         puts (require 'bundler/setup')
       R
 
