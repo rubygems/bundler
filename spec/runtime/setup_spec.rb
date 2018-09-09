@@ -884,9 +884,7 @@ end
     it "should successfully require 'bundler/setup'" do
       install_gemfile ""
 
-      ENV["GEM_PATH"] = symlinked_gem_home.path
-
-      ruby <<-R, :no_lib => true
+      ruby <<-R, :env => { "GEM_PATH" => symlinked_gem_home.path }, :no_lib => true
         puts (require 'bundler/setup')
       R
 
