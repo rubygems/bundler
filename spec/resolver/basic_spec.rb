@@ -87,6 +87,18 @@ RSpec.describe "Resolving" do
     should_resolve_as %w[activesupport-3.0.0.beta actionpack-3.0.0.beta rack-1.1 rack-mount-0.6]
   end
 
+  it "prefers non-pre-releases when doing conservative updates" do
+    @index = build_index do
+      gem "mail", "2.7.0"
+      gem "mail", "2.7.1.rc1"
+      gem "RubyGems\0", Gem::VERSION
+    end
+    dep "mail"
+    @locked = locked ["mail", "2.7.0"]
+    @base = locked
+    should_conservative_resolve_and_include [:patch], [], ["mail-2.7.0"]
+  end
+
   it "raises an exception if a child dependency is not resolved" do
     @index = a_unresovable_child_index
     dep "chef_app_error"
