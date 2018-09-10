@@ -51,17 +51,10 @@ namespace :spec do
       deps.delete("rdiscount")
     end
 
-    if Gem::VERSION < "2.0.0"
-      deps.sort_by {|name, _| name }.map do |name, version|
-        gem_install_command = "install --no-ri --no-rdoc --conservative #{name} -v '#{version}'"
-        sh %(#{Gem.ruby} -S gem #{gem_install_command})
-      end
-    else
-      gem_install_command = "install --no-document --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
-        "'#{name}:#{version}'"
-      end.join(" ")
-      sh %(#{Gem.ruby} -S gem #{gem_install_command})
-    end
+    gem_install_command = "install --no-document --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
+      "'#{name}:#{version}'"
+    end.join(" ")
+    sh %(#{Gem.ruby} -S gem #{gem_install_command})
 
     # Download and install gems used inside tests
     $LOAD_PATH.unshift("./spec")
