@@ -59,8 +59,8 @@ All parameters are `OPTIONAL` unless otherwise specified.
 ### VERSION (required)
 
 The version of Ruby that your application requires. If your application
-requires an alternate Ruby engine, such as JRuby or Rubinius, this should be
-the Ruby version that the engine is compatible with.
+requires an alternate Ruby engine, such as JRuby, Rubinius or TruffleRuby, this
+should be the Ruby version that the engine is compatible with.
 
     ruby "1.9.3"
 
@@ -188,22 +188,24 @@ platforms.
 There are a number of `Gemfile` platforms:
 
   * `ruby`:
-    C Ruby (MRI) or Rubinius, but `NOT` Windows
+    C Ruby (MRI), Rubinius or TruffleRuby, but `NOT` Windows
   * `mri`:
-    Same as _ruby_, but not Rubinius
+    Same as _ruby_, but only C Ruby (MRI)
   * `mingw`:
     Windows 32 bit 'mingw32' platform (aka RubyInstaller)
   * `x64_mingw`:
     Windows 64 bit 'mingw32' platform (aka RubyInstaller x64)
   * `rbx`:
-    Same as _ruby_, but only Rubinius (not MRI)
+    Rubinius
   * `jruby`:
     JRuby
+  * `truffleruby`:
+    TruffleRuby
   * `mswin`:
     Windows
 
 You can restrict further by platform and version for all platforms *except* for
-`rbx`, `jruby`, and `mswin`.
+`rbx`, `jruby`, `truffleruby` and `mswin`.
 
 To specify a version in addition to a platform, append the version number without
 the delimiter to the platform. For example, to specify that a gem should only be

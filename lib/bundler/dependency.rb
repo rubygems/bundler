@@ -30,6 +30,7 @@ module Bundler
       :mri_24   => Gem::Platform::RUBY,
       :mri_25   => Gem::Platform::RUBY,
       :rbx      => Gem::Platform::RUBY,
+      :truffleruby => Gem::Platform::RUBY,
       :jruby    => Gem::Platform::JAVA,
       :jruby_18 => Gem::Platform::JAVA,
       :jruby_19 => Gem::Platform::JAVA,
