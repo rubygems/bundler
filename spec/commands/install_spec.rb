@@ -374,13 +374,13 @@ RSpec.describe "bundle install with gem sources" do
     it "gracefully handles error when rubygems server is unavailable" do
       install_gemfile <<-G, :artifice => nil
         source "file://#{gem_repo1}"
-        source "http://localhost:9384" do
+        source "http://0.0.0.0:9384" do
           gem 'foo'
         end
       G
 
       bundle :install, :artifice => nil
-      expect(err).to include("Could not fetch specs from http://localhost:9384/")
+      expect(err).to include("Could not fetch specs from http://0.0.0.0:9384/")
       expect(err).not_to include("file://")
     end
 
