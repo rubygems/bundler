@@ -293,7 +293,12 @@ module Bundler
 
     def set_bundle_variables
       begin
-        Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
+        exe_file = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
+        unless File.exist?(exe_file)
+          exe_file = File.expand_path("../../../exe/bundle", __FILE__)
+        end
+
+        Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", exe_file
       rescue Gem::GemNotFoundException
         Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", File.expand_path("../../../exe/bundle", __FILE__)
       end
