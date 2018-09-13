@@ -24,6 +24,8 @@ module Bundler
     # existing in the referenced source.
     attr_accessor :strict
 
+    attr_accessor :prerelease_specified
+
     # Given a list of locked_specs and a list of gems to unlock creates a
     # GemVersionPromoter instance.
     #
@@ -39,6 +41,7 @@ module Bundler
       @locked_specs = locked_specs
       @unlock_gems = unlock_gems
       @sort_versions = {}
+      @prerelease_specified = {}
     end
 
     # @param value [Symbol] One of three Symbols: :major, :minor or :patch.
@@ -123,6 +126,15 @@ module Bundler
       result = spec_groups.sort do |a, b|
         @a_ver = a.version
         @b_ver = b.version
+
+        unless @prerelease_specified[@gem_name]
+          a_pre = @a_ver.prerelease?
+          b_pre = @b_ver.prerelease?
+
+          next -1 if a_pre && !b_pre
+          next  1 if b_pre && !a_pre
+        end
+
         if major?
           @a_ver <=> @b_ver
         elsif either_version_older_than_locked
