@@ -196,7 +196,7 @@ RSpec.describe "bundle gem" do
     process_file(bundled_app("newgem", "newgem.gemspec")) do |line|
       # Simulate replacing TODOs with real values
       case line
-      when /spec\.metadata\['allowed_push_host'\]/, /spec\.homepage/
+      when /spec\.metadata\["(?:allowed_push_host|homepage_uri|source_code_uri|changelog_uri)"\]/, /spec\.homepage/
         line.gsub(/\=.*$/, "= 'http://example.org'")
       when /spec\.summary/
         line.gsub(/\=.*$/, "= %q{A short summary of my new gem.}")
