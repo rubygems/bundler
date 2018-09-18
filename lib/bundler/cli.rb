@@ -206,8 +206,7 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     deprecated_option "no-cache", :type => :boolean, :banner =>
       "Don't update the existing gem cache."
-    method_option "redownload", :type => :boolean, :aliases =>
-      [Bundler.feature_flag.forget_cli_options? ? nil : "--force"].compact, :banner =>
+    method_option "redownload", :type => :boolean, :aliases => "--force", :banner =>
       "Force downloading every gem."
     deprecated_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
@@ -230,6 +229,7 @@ module Bundler
       "Include gems that are part of the specified named group."
     map "i" => "install"
     def install
+      SharedHelpers.major_deprecation(2, "The `--force` option has been renamed to `--redownload`") if ARGV[1] == "--force"
       require "bundler/cli/install"
       Bundler.settings.temporary(:no_install => false) do
         Install.new(options.dup).run
