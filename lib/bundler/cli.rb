@@ -206,8 +206,7 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     deprecated_option "no-cache", :type => :boolean, :banner =>
       "Don't update the existing gem cache."
-    method_option "redownload", :type => :boolean, :aliases =>
-      [Bundler.feature_flag.forget_cli_options? ? nil : "--force"].compact, :banner =>
+    method_option "redownload", :type => :boolean, :aliases => "--force", :banner =>
       "Force downloading every gem."
     deprecated_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
@@ -230,6 +229,7 @@ module Bundler
       "Include gems that are part of the specified named group."
     map "i" => "install"
     def install
+      SharedHelpers.major_deprecation(2, "The `--force` option has been renamed to `--redownload`") if ARGV.include?("--force")
       require "bundler/cli/install"
       Bundler.settings.temporary(:no_install => false) do
         Install.new(options.dup).run
@@ -256,7 +256,7 @@ module Bundler
       "Only output warnings and errors."
     method_option "source", :type => :array, :banner =>
       "Update a specific source (and all gems associated with it)"
-    method_option "force", :type => :boolean, :banner =>
+    method_option "redownload", :type => :boolean, :aliases => "--force", :banner =>
       "Force downloading every gem."
     method_option "ruby", :type => :boolean, :banner =>
       "Update ruby specified in Gemfile.lock"
@@ -275,6 +275,7 @@ module Bundler
     method_option "all", :type => :boolean, :banner =>
       "Update everything."
     def update(*gems)
+      SharedHelpers.major_deprecation(2, "The `--force` option has been renamed to `--redownload`") if ARGV.include?("--force")
       require "bundler/cli/update"
       Update.new(options, gems).run
     end
