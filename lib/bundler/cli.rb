@@ -229,7 +229,7 @@ module Bundler
       "Include gems that are part of the specified named group."
     map "i" => "install"
     def install
-      SharedHelpers.major_deprecation(2, "The `--force` option has been renamed to `--redownload`") if ARGV[1] == "--force"
+      SharedHelpers.major_deprecation(2, "The `--force` option has been renamed to `--redownload`") if ARGV.include?("--force")
       require "bundler/cli/install"
       Bundler.settings.temporary(:no_install => false) do
         Install.new(options.dup).run
