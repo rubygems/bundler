@@ -54,7 +54,7 @@ RSpec.describe "bundle_ruby", :bundler => "< 2" do
       expect(out).to include("ruby 1.8.7 (rbx 1.2.4)")
     end
 
-    it "handles truffleruby" do
+    it "handles truffleruby", :rubygems => ">= 2.1.0" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         ruby "2.5.1", :engine => 'truffleruby', :engine_version => '1.0.0-rc6'
