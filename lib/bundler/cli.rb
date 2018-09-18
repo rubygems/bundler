@@ -256,7 +256,7 @@ module Bundler
       "Only output warnings and errors."
     method_option "source", :type => :array, :banner =>
       "Update a specific source (and all gems associated with it)"
-    method_option "force", :type => :boolean, :banner =>
+    method_option "redownload", :type => :boolean, :aliases => "--force", :banner =>
       "Force downloading every gem."
     method_option "ruby", :type => :boolean, :banner =>
       "Update ruby specified in Gemfile.lock"
@@ -275,6 +275,7 @@ module Bundler
     method_option "all", :type => :boolean, :banner =>
       "Update everything."
     def update(*gems)
+      SharedHelpers.major_deprecation(2, "The `--force` option has been renamed to `--redownload`") if ARGV.include?("--force")
       require "bundler/cli/update"
       Update.new(options, gems).run
     end
