@@ -60,11 +60,21 @@ RSpec.describe "bundle install" do
     it_behaves_like "an option to force redownloading gems" do
       let(:flag) { "force" }
     end
+
+    it "shows a deprecation" do
+      bundle! :install, :force => true
+      expect(out).to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+    end
   end
 
   describe "with --redownload" do
     it_behaves_like "an option to force redownloading gems" do
       let(:flag) { "redownload" }
+    end
+
+    it "does not show a deprecation" do
+      bundle! :install, :redownload => true
+      expect(out).not_to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
     end
   end
 end
