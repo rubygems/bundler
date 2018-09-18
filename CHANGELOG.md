@@ -1,3 +1,19 @@
+## 1.16.5 (2018-09-18)
+
+Changes:
+
+  - Add support for TruffleRuby (@eregon)
+
+Bugfixes:
+
+  - Avoid printing git errors when checking the version on incorrectly packaged versions of Bundler ([#6453](https://github.com/bundler/bundler/issues/6453), @greysteil)
+  - Fix issue where Bundler does not check the given class when comparing equality in DepProxy (@ChrisBr)
+  - Handle `RangeNotSatisfiable` error in Compact Index (@MaxLap)
+  - Check for initialized `search` variable in `LazySpecification` (@voxik)
+  - Fix LoadError occurring in nested bundle exec calls ([#6537](https://github.com/bundler/bundler/issues/6537), @colby-swandale)
+  - Check that Bundler::Deprecate is not an autoload constant ([#6163](https://github.com/bundler/bundler/issues/6163), @eregon)
+  - Prefer non-pre-release versions when performing a `bundle update --patch` ([#6684](https://github.com/bundler/bundler/issues/6684), @segiddins)
+
 ## 1.16.4 (2018-08-17)
 
 Changes:
