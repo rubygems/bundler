@@ -9,7 +9,8 @@ before_script:
 branches:
   only:
     - master
-    - auto
+    - staging
+    - trying
     - /.+-dev$/
     - /.+-stable$/
 
