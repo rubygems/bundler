@@ -12,7 +12,8 @@ group: deprecated-2017Q4
 branches:
   only:
     - master
-    - auto
+    - staging
+    - trying
     - /.+-dev$/
     - /.+-stable$/
 
