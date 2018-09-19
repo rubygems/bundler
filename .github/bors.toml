@@ -1,1 +1,3 @@
-committer = { name = "Bundlerbot", email = "bot@bundler.io" }
+[committer]
+name = "Bundlerbot"
+email = "bot@bundler.io"
