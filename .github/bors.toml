@@ -2,6 +2,8 @@ status = [
   "continuous-integration/travis-ci/push"
 ]
 
+timeout-sec = 14400
+
 [committer]
 name = "Bundlerbot"
 email = "bot@bundler.io"
