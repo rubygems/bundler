@@ -14,7 +14,7 @@ Bugfixes:
   - Check that Bundler::Deprecate is not an autoload constant ([#6163](https://github.com/bundler/bundler/issues/6163), @eregon)
   - Prefer non-pre-release versions when performing a `bundle update --patch` ([#6684](https://github.com/bundler/bundler/issues/6684), @segiddins)
 
-## 1.16.4 (2017-08-17)
+## 1.16.4 (2018-08-17)
 
 Changes:
 
