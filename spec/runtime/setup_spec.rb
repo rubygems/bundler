@@ -859,12 +859,12 @@ end
 
   context "with bundler is located in symlinked GEM_HOME" do
     let(:gem_home) { Dir.mktmpdir }
-    let(:symlinked_gem_home) { Tempfile.new("gem_home") }
+    let(:symlinked_gem_home) { Tempfile.new("gem_home").path }
     let(:bundler_dir) { File.expand_path("../../..", __FILE__) }
     let(:bundler_lib) { File.join(bundler_dir, "lib") }
 
     before do
-      FileUtils.ln_sf(gem_home, symlinked_gem_home.path)
+      FileUtils.ln_sf(gem_home, symlinked_gem_home)
       gems_dir = File.join(gem_home, "gems")
       specifications_dir = File.join(gem_home, "specifications")
       Dir.mkdir(gems_dir)
@@ -884,15 +884,10 @@ end
     it "should successfully require 'bundler/setup'" do
       install_gemfile ""
 
-      ENV["GEM_PATH"] = symlinked_gem_home.path
-
-      ruby <<-R
-        if $LOAD_PATH.include?("#{bundler_lib}")
-          # We should use bundler from GEM_PATH for this test, so we should
-          # remove path to the bundler source tree
-          $LOAD_PATH.delete("#{bundler_lib}")
-        else
-          raise "We don't have #{bundler_lib} in $LOAD_PATH"
+      ruby <<-'R', :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
+        # Remove any bundler that's not the current bundler from $LOAD_PATH
+        $LOAD_PATH.each do |path|
+          $LOAD_PATH.delete(path) if File.exist?("#{path}/bundler.rb")
         end
         puts (require 'bundler/setup')
       R
