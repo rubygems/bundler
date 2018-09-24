@@ -290,7 +290,7 @@ module Bundler
         if app_config_pathname.absolute?
           app_config_pathname
         else
-          app_config_pathname.expand_path(root)
+          root.join(app_config_pathname)
         end
       else
         root.join(".bundle")
