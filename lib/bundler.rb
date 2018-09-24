@@ -288,13 +288,11 @@ module Bundler
         app_config_pathname = Pathname.new(app_config)
 
         if app_config_pathname.absolute?
-          app_config_pathname
-        else
-          root.join(app_config_pathname)
+          return app_config_pathname
         end
-      else
-        root.join(".bundle")
       end
+
+      root.join(app_config || ".bundle")
     end
 
     def app_cache(custom_path = nil)
