@@ -827,7 +827,7 @@ end
   it "should clean $LOAD_PATH properly" do
     gem_name = "very_simple_binary"
     full_gem_name = gem_name + "-1.0"
-    ext_dir = File.join(tmp("extenstions", full_gem_name))
+    ext_dir = File.join(tmp("extensions", full_gem_name))
 
     install_gem full_gem_name
 
@@ -1298,7 +1298,6 @@ end
       end
 
       let(:code) { strip_whitespace(<<-RUBY) }
-        require "bundler/setup"
         require "pp"
         loaded_specs = Gem.loaded_specs.dup
         #{exemptions.inspect}.each {|s| loaded_specs.delete(s) }
@@ -1313,22 +1312,18 @@ end
 
       it "activates no gems with -rbundler/setup" do
         install_gemfile! ""
-        ruby! code, :env => { :RUBYOPT => activation_warning_hack_rubyopt }
+        ruby! code, :env => { :RUBYOPT => activation_warning_hack_rubyopt + " -rbundler/setup" }
         expect(last_command.stdout).to eq("{}")
       end
 
       it "activates no gems with bundle exec" do
         install_gemfile! ""
-        # ensure we clean out the default gems, bceause bundler's allowed to be activated
         create_file("script.rb", code)
-        bundle! "exec ruby ./script.rb", :env => { :RUBYOPT => activation_warning_hack_rubyopt + " -rbundler/setup" }
+        bundle! "exec ruby ./script.rb", :env => { :RUBYOPT => activation_warning_hack_rubyopt }
         expect(last_command.stdout).to eq("{}")
       end
 
       it "activates no gems with bundle exec that is loaded" do
-        # TODO: remove once https://github.com/erikhuda/thor/pull/539 is released
-        exemptions << "io-console"
-
         install_gemfile! ""
         create_file("script.rb", "#!/usr/bin/env ruby\n\n#{code}")
         FileUtils.chmod(0o777, bundled_app("script.rb"))
