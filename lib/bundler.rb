@@ -368,7 +368,11 @@ EOF
 
         # if any directory is not writable, we need sudo
         files = [path, bin_dir] | Dir[bundle_path.join("build_info/*").to_s] | Dir[bundle_path.join("*").to_s]
-        sudo_needed = files.any? {|f| !File.writable?(f) }
+        unwritable_files = files.reject {|f| File.writable?(f) }
+        sudo_needed = !unwritable_files.empty?
+        if sudo_needed
+          Bundler.ui.warn "Following files may not be writable, so sudo is needed:\n  #{unwritable_files.sort.map(&:to_s).join("\n  ")}"
+        end
       end
 
       @requires_sudo_ran = true
