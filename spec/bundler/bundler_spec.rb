@@ -374,6 +374,49 @@ EOF
     end
   end
 
+  describe "#requires_sudo?" do
+    before do
+      allow(Bundler).to receive(:which).with("sudo").and_return("/usr/bin/sudo")
+      FileUtils.mkdir_p("tmp/vendor/bundle")
+    end
+    after do
+      FileUtils.rm_rf("tmp/vendor/bundle")
+      if Bundler.respond_to?(:remove_instance_variable)
+        Bundler.remove_instance_variable(:@requires_sudo_ran)
+        Bundler.remove_instance_variable(:@requires_sudo)
+      else
+        # TODO: Remove these code when Bundler drops Ruby 1.8.7 support
+        Bundler.send(:remove_instance_variable, :@requires_sudo_ran)
+        Bundler.send(:remove_instance_variable, :@requires_sudo)
+      end
+    end
+    context "writable paths" do
+      it "should return false and display nothing" do
+        allow(Bundler).to receive(:bundle_path).and_return(Pathname("tmp/vendor/bundle"))
+        expect(Bundler.ui).to_not receive(:warn)
+        expect(Bundler.requires_sudo?).to eq(false)
+      end
+    end
+    context "unwritable paths" do
+      before do
+        FileUtils.touch("tmp/vendor/bundle/unwritable1.txt")
+        FileUtils.touch("tmp/vendor/bundle/unwritable2.txt")
+        FileUtils.chmod(0o400, "tmp/vendor/bundle/unwritable1.txt")
+        FileUtils.chmod(0o400, "tmp/vendor/bundle/unwritable2.txt")
+      end
+      it "should return true and display warn message" do
+        allow(Bundler).to receive(:bundle_path).and_return(Pathname("tmp/vendor/bundle"))
+        message = <<-MESSAGE.chomp
+Following files may not be writable, so sudo is needed:
+  tmp/vendor/bundle/unwritable1.txt
+  tmp/vendor/bundle/unwritable2.txt
+MESSAGE
+        expect(Bundler.ui).to receive(:warn).with(message)
+        expect(Bundler.requires_sudo?).to eq(true)
+      end
+    end
+  end
+
   context "user cache dir" do
     let(:home_path)                  { Pathname.new(ENV["HOME"]) }
 
