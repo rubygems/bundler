@@ -6,7 +6,6 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
 `bundle install` [--binstubs[=DIRECTORY]]
                  [--clean]
                  [--deployment]
-                 [--force]
                  [--frozen]
                  [--full-index]
                  [--gemfile=GEMFILE]
@@ -16,6 +15,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--no-prune]
                  [--path PATH]
                  [--quiet]
+                 [--redownload]
                  [--retry=NUMBER]
                  [--shebang]
                  [--standalone[=GROUP[ GROUP...]]]
@@ -64,7 +64,7 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   production or CI use. Please check carefully if you want to have this option
   enabled in your development environment.
 
-* `--force`:
+* `--redownload`:
   Force download every gem, even if the required versions are already available
   locally.
 
