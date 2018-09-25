@@ -286,7 +286,7 @@ module Bundler
         end
       end
 
-      app_config_root.join(app_config || ".bundle")
+      current_config_root.join(app_config || ".bundle")
     end
 
     def app_cache(custom_path = nil)
@@ -684,6 +684,10 @@ EOF
       root
     rescue GemfileNotFound
       Pathname.new(".").expand_path
+    end
+
+    def current_config_root
+      SharedHelpers.config_root
     end
   end
 end

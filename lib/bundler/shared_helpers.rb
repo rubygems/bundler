@@ -20,6 +20,12 @@ module Bundler
       bundle_dir.parent
     end
 
+    def config_root
+      bundle_dir = default_bundle_dir
+
+      bundle_dir ? bundle_dir.parent : Pathname.pwd
+    end
+
     def default_gemfile
       gemfile = find_gemfile
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile

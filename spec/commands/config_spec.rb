@@ -61,8 +61,38 @@ RSpec.describe ".bundle/config" do
       bundle "install", :dir => bundled_app("omg")
 
       expect(bundled_app(".bundle")).not_to exist
-      expect(bundled_app("../foo/config")).to exist
+      expect(bundled_app("omg/../foo/config")).to exist
       expect(the_bundle).to include_gems "rack 1.0.0", :dir => bundled_app("omg")
+    end
+
+    it "is relative to the pwd and not to the gemfile" do
+      FileUtils.mkdir_p bundled_app("omg/gmo")
+
+      gemfile bundled_app("omg/gmo/AnotherGemfile"), <<-G
+        source "#{file_uri_for(gem_repo1)}"
+      G
+
+      bundle "config set --local foo bar", :env => { "BUNDLE_GEMFILE" => bundled_app("omg/gmo/AnotherGemfile").to_s }, :dir => bundled_app("omg")
+
+      expect(bundled_app("omg/gmo/.bundle")).not_to exist
+      expect(bundled_app("omg/.bundle")).to exist
+    end
+
+    it "uses the first existing local config from the pwd and not from the gemfile" do
+      bundle "install"
+
+      FileUtils.mkdir_p bundled_app("omg/gmo")
+
+      bundle "config set --local foo bar", :dir => bundled_app("omg/gmo")
+
+      gemfile bundled_app("omg/gmo/AnotherGemfile"), <<-G
+        source "#{file_uri_for(gem_repo1)}"
+      G
+
+      bundle "config set --local foo baz", :dir => bundled_app("omg")
+      run "puts Bundler.settings[:foo]", :env => { "BUNDLE_GEMFILE" => bundled_app("omg/gmo/AnotherGemfile").to_s }, :dir => bundled_app("omg")
+
+      expect(out).to eq("baz")
     end
   end
 
