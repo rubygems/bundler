@@ -279,7 +279,7 @@ module Bundler
                 rescue GemfileNotFound
                   bundle_dir = default_bundle_dir
                   raise GemfileNotFound, "Could not locate Gemfile or .bundle/ directory" unless bundle_dir
-                  Pathname.new(File.expand_path("..", bundle_dir))
+                  bundle_dir.parent
                 end
     end
 
