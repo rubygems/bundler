@@ -237,7 +237,8 @@ module Bundler
     end
 
     def find_gemfile
-      given = ENV["BUNDLE_GEMFILE"]
+      require_relative "../bundler"
+      given = Bundler.settings[:gemfile]
       return given if given && !given.empty?
       find_file(*gemfile_names)
     end
