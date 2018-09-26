@@ -975,10 +975,10 @@ module Bundler
 
     def additional_base_requirements_for_resolve
       return [] unless @locked_gems && Bundler.feature_flag.only_update_to_newer_versions?
-      dependencies_by_name = dependencies.group_by(&:name)
+      dependencies_by_name = dependencies.inject({}) {|memo, dep| memo.update(dep.name => dep) }
       @locked_gems.specs.reduce({}) do |requirements, locked_spec|
         name = locked_spec.name
-        next requirements if @locked_deps[name] != dependencies_by_name[name]
+        next requirements if @locked_gems.dependencies[name] != dependencies_by_name[name]
         dep = Gem::Dependency.new(name, ">= #{locked_spec.version}")
         requirements[name] = DepProxy.new(dep, locked_spec.platform)
         requirements
