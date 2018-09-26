@@ -1211,6 +1211,7 @@ In Gemfile:
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
+        gem "rack", "0.9.1"
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
@@ -1224,6 +1225,7 @@ In Gemfile:
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
