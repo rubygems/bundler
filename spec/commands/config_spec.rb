@@ -42,7 +42,7 @@ RSpec.describe ".bundle/config" do
     end
   end
 
-  describe "BUNDLE_APP_CONFIG" do
+  describe "location" do
     it "can be moved with an environment variable" do
       ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
       bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
