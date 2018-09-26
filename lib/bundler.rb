@@ -274,13 +274,7 @@ module Bundler
     end
 
     def root
-      @root ||= begin
-                  SharedHelpers.root
-                rescue GemfileNotFound
-                  bundle_dir = default_bundle_dir
-                  raise GemfileNotFound, "Could not locate Gemfile or .bundle/ directory" unless bundle_dir
-                  bundle_dir.parent
-                end
+      @root ||= SharedHelpers.root
     end
 
     def app_config_path
