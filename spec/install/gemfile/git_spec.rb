@@ -922,12 +922,11 @@ RSpec.describe "bundle install with git sources" do
     build_git "foo", :path => lib_path("nested")
     build_git "bar", :path => lib_path("nested")
 
-    gemfile <<-G
+    install_gemfile <<-G
       gem "foo", :git => "#{lib_path("nested")}"
       gem "bar", :git => "#{lib_path("nested")}"
     G
 
-    bundle "install"
     expect(File.read(bundled_app("Gemfile.lock")).scan("GIT").size).to eq(1)
   end
 

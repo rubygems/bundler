@@ -67,12 +67,10 @@ RSpec.describe ".bundle/config" do
 
   describe "global" do
     before(:each) do
-      gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0.0"
       G
-
-      bundle :install
     end
 
     it "is the default" do
@@ -163,12 +161,10 @@ RSpec.describe ".bundle/config" do
 
   describe "local" do
     before(:each) do
-      gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0.0"
       G
-
-      bundle :install
     end
 
     it "can also be set explicitly" do
@@ -223,12 +219,10 @@ RSpec.describe ".bundle/config" do
 
   describe "env" do
     before(:each) do
-      gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0.0"
       G
-
-      bundle :install
     end
 
     it "can set boolean properties via the environment" do
@@ -298,12 +292,10 @@ RSpec.describe ".bundle/config" do
 
   describe "gem mirrors" do
     before(:each) do
-      gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0.0"
       G
-
-      bundle :install
     end
 
     it "configures mirrors using keys with `mirror.`" do
@@ -367,12 +359,10 @@ E
 
   describe "very long lines" do
     before(:each) do
-      gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0.0"
       G
-
-      bundle :install
     end
 
     let(:long_string) do
