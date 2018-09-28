@@ -53,7 +53,19 @@ RSpec.describe ".bundle/config" do
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
 
-    it "can provide a relative path with the environment variable" do
+    it "can provide a relative path with the environment variable, and generates config relative to the Gemfile", :bundler => "< 3" do
+      FileUtils.mkdir_p bundled_app("omg")
+
+      ENV["BUNDLE_APP_CONFIG"] = "../foo"
+      bundle "config set --local path vendor/bundle", :dir => bundled_app("omg")
+      bundle "install", :dir => bundled_app("omg")
+
+      expect(bundled_app(".bundle")).not_to exist
+      expect(bundled_app("../foo/config")).to exist
+      expect(the_bundle).to include_gems "rack 1.0.0"
+    end
+
+    it "can provide a relative path with the environment variable, and generates config relative to the cwd", :bundler => "3" do
       FileUtils.mkdir_p bundled_app("omg")
 
       ENV["BUNDLE_APP_CONFIG"] = "../foo"
@@ -65,7 +77,7 @@ RSpec.describe ".bundle/config" do
       expect(the_bundle).to include_gems "rack 1.0.0", :dir => bundled_app("omg")
     end
 
-    it "is relative to the pwd and not to the gemfile" do
+    it "is relative to the pwd and not to the gemfile", :bundler => "3" do
       FileUtils.mkdir_p bundled_app("omg/gmo")
 
       gemfile bundled_app("omg/gmo/AnotherGemfile"), <<-G
@@ -78,7 +90,7 @@ RSpec.describe ".bundle/config" do
       expect(bundled_app("omg/.bundle")).to exist
     end
 
-    it "uses the first existing local config from the pwd and not from the gemfile" do
+    it "uses the first existing local config from the pwd and not from the gemfile", :bundler => "3" do
       bundle "install"
 
       FileUtils.mkdir_p bundled_app("omg/gmo")
@@ -534,7 +546,7 @@ RSpec.describe "setting gemfile via config" do
       expect(out).to include("NotGemfile")
     end
 
-    it "gets used when requiring bundler/setup" do
+    it "gets used when requiring bundler/setup", :bundler => "3" do
       bundle :install
       code = "puts $LOAD_PATH.count {|path| path =~ /rack/} == 1"
 
