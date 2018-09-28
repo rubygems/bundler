@@ -1009,13 +1009,11 @@ RSpec.describe "bundle install with git sources" do
       install_gemfile <<-G
         gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "#{revision}"
       G
-      bundle "install"
       expect(out).to_not match(/Revision.*does not exist/)
 
       install_gemfile <<-G
         gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "deadbeef"
       G
-      bundle "install"
       expect(out).to include("Revision deadbeef does not exist in the repository")
     end
   end
@@ -1325,7 +1323,6 @@ In Gemfile:
           end
         G
 
-        bundle :install
         expect(last_command.stdboth).to_not include("password1")
         expect(last_command.stdout).to include("Fetching https://user1@github.com/company/private-repo")
       end
@@ -1341,7 +1338,6 @@ In Gemfile:
           end
         G
 
-        bundle :install
         expect(last_command.stdboth).to_not include("oauth_token")
         expect(last_command.stdout).to include("Fetching https://x-oauth-basic@github.com/company/private-repo")
       end
