@@ -294,8 +294,16 @@ module Bundler
         rest = ARGV[1..-1]
         alternative = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
 
+        new_argv = [alternative, *rest]
+
+        if alternative == "list" && rest.include?("--paths")
+          new_argv.delete("--paths")
+        else
+          new_argv = new_argv.map {|arg| arg == "--paths" ? "--path" : arg }
+        end
+
         old_argv = ARGV.join(" ")
-        new_argv = [alternative, *rest].join(" ")
+        new_argv = new_argv.join(" ")
 
         Bundler::SharedHelpers.major_deprecation(2, "use `bundle #{new_argv}` instead of `bundle #{old_argv}`")
       end
