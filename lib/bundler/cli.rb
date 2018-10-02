@@ -292,18 +292,16 @@ module Bundler
     def show(gem_name = nil)
       if ARGV[0] == "show"
         rest = ARGV[1..-1]
-        alternative = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
 
-        new_argv = [alternative, *rest]
+        new_command = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
 
-        if alternative == "list" && rest.include?("--paths")
-          new_argv.delete("--paths")
-        else
-          new_argv = new_argv.map {|arg| arg == "--paths" ? "--path" : arg }
+        new_arguments = rest.map do |arg|
+          next arg if arg != "--paths"
+          next "--path" if new_command == "info"
         end
 
         old_argv = ARGV.join(" ")
-        new_argv = new_argv.join(" ")
+        new_argv = [new_command, *new_arguments.compact].join(" ")
 
         Bundler::SharedHelpers.major_deprecation(2, "use `bundle #{new_argv}` instead of `bundle #{old_argv}`")
       end
