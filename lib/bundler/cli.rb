@@ -17,7 +17,7 @@ module Bundler
     def self.start(*)
       super
     rescue Exception => e
-      Bundler.ui = UI::Shell.new
+      Bundler.ui = UI::Shell.new(:logger => Bundler.ui_logger)
       raise e
     ensure
       Bundler::SharedHelpers.print_major_deprecations!
@@ -48,7 +48,7 @@ module Bundler
     ensure
       self.options ||= {}
       unprinted_warnings = Bundler.ui.unprinted_warnings
-      Bundler.ui = UI::Shell.new(options)
+      Bundler.ui = UI::Shell.new(options.merge(:logger => Bundler.ui_logger))
       Bundler.ui.level = "debug" if options["verbose"]
       unprinted_warnings.each {|w| Bundler.ui.warn(w) }
 

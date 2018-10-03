@@ -5,8 +5,9 @@ module Bundler
     class Silent
       attr_writer :shell
 
-      def initialize
+      def initialize(options = {})
         @warnings = []
+        @logger = options[:logger]
       end
 
       def add_color(string, color)
@@ -14,19 +15,24 @@ module Bundler
       end
 
       def info(message, newline = nil)
+        @logger.log(__method__, msg)
       end
 
       def confirm(message, newline = nil)
+        @logger.log(__method__, msg)
       end
 
       def warn(message, newline = nil)
+        @logger.log(__method__, msg)
         @warnings |= [message]
       end
 
       def error(message, newline = nil)
+        @logger.log(__method__, msg)
       end
 
       def debug(message, newline = nil)
+        @logger.log(__method__, msg)
       end
 
       def debug?
@@ -38,14 +44,11 @@ module Bundler
       end
 
       def ask(message)
+        @logger.log(__method__, msg)
       end
 
       def yes?(msg)
         raise "Cannot ask yes? with a silent shell"
-      end
-
-      def no?
-        raise "Cannot ask no? with a silent shell"
       end
 
       def level=(name)
@@ -55,6 +58,10 @@ module Bundler
       end
 
       def trace(message, newline = nil, force = false)
+        @logger.log(__method__, "#{e.class}: #{e.message}")
+      end
+
+      def log_progress
       end
 
       def silence

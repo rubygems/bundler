@@ -41,11 +41,8 @@ module Bundler
     private
 
       def log_specs(debug_msg)
-        if Bundler.ui.debug?
-          Bundler.ui.debug debug_msg
-        else
-          Bundler.ui.info ".", false
-        end
+        Bundler.ui.log_progress unless Bundler.ui.debug?
+        Bundler.ui.debug debug_msg
       end
     end
   end

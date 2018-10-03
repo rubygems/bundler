@@ -92,7 +92,7 @@ module Bundler
     end
 
     def indicate_progress
-      Bundler.ui.info ".", false unless debug?
+      Bundler.ui.log_progress unless debug?
     end
 
     include Molinillo::SpecificationProvider

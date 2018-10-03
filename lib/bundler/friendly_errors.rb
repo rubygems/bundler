@@ -45,6 +45,10 @@ module Bundler
           "Alternatively, you can increase the amount of memory the JVM is able to use by running Bundler with jruby -J-Xmx1024m -S bundle (JRuby defaults to 500MB)."
       else request_issue_report_for(error)
       end
+
+      if log = Bundler.ui_logger.path
+        Bundler.ui.error "\nThe full bundler log is available in #{log}"
+      end
     rescue
       raise error
     end
@@ -95,7 +99,7 @@ module Bundler
           #{e.backtrace && e.backtrace.join("\n          ").chomp}
         ```
 
-        #{Bundler::Env.report}
+        #{Bundler::Env.report(:print_log => true)}
         --- TEMPLATE END ----------------------------------------------------------------
 
       EOS

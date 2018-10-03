@@ -66,8 +66,21 @@ module Bundler
       @configured ||= configure_gem_home_and_path
     end
 
+    def ui_logger
+      @ui_logger ||= begin
+        io = begin
+          path = tmp.join("output.log")
+          File.open(path, "w")
+        rescue
+          nil
+        end
+
+        UI::Logger.new(io)
+      end
+    end
+
     def ui
-      (defined?(@ui) && @ui) || (self.ui = UI::Silent.new)
+      (defined?(@ui) && @ui) || (self.ui = UI::Silent.new(:logger => ui_logger))
     end
 
     def ui=(ui)

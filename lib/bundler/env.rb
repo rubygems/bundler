@@ -12,6 +12,7 @@ module Bundler
     def self.report(options = {})
       print_gemfile = options.delete(:print_gemfile) { true }
       print_gemspecs = options.delete(:print_gemspecs) { true }
+      print_log = options.delete(:print_log) { false }
 
       out = String.new
       append_formatted_table("Environment", environment, out)
@@ -28,33 +29,41 @@ module Bundler
         out << "```\n"
       end
 
-      return out unless SharedHelpers.in_bundle?
+      if SharedHelpers.in_bundle?
+        if print_gemfile
+          gemfiles = [Bundler.default_gemfile]
+          begin
+            gemfiles = Bundler.definition.gemfiles
+          rescue GemfileNotFound
+            nil
+          end
 
-      if print_gemfile
-        gemfiles = [Bundler.default_gemfile]
-        begin
-          gemfiles = Bundler.definition.gemfiles
-        rescue GemfileNotFound
-          nil
+          out << "\n## Gemfile\n"
+          gemfiles.each do |gemfile|
+            out << "\n### #{Pathname.new(gemfile).relative_path_from(SharedHelpers.pwd)}\n\n"
+            out << "```ruby\n" << read_file(gemfile).chomp << "\n```\n"
+          end
+
+          out << "\n### #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}\n\n"
+          out << "```\n" << read_file(Bundler.default_lockfile).chomp << "\n```\n"
         end
 
-        out << "\n## Gemfile\n"
-        gemfiles.each do |gemfile|
-          out << "\n### #{Pathname.new(gemfile).relative_path_from(SharedHelpers.pwd)}\n\n"
-          out << "```ruby\n" << read_file(gemfile).chomp << "\n```\n"
+        if print_gemspecs
+          dsl = Dsl.new.tap {|d| d.eval_gemfile(Bundler.default_gemfile) }
+          out << "\n## Gemspecs\n" unless dsl.gemspecs.empty?
+          dsl.gemspecs.each do |gs|
+            out << "\n### #{File.basename(gs.loaded_from)}"
+            out << "\n\n```ruby\n" << read_file(gs.loaded_from).chomp << "\n```\n"
+          end
         end
-
-        out << "\n### #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}\n\n"
-        out << "```\n" << read_file(Bundler.default_lockfile).chomp << "\n```\n"
       end
 
-      if print_gemspecs
-        dsl = Dsl.new.tap {|d| d.eval_gemfile(Bundler.default_gemfile) }
-        out << "\n## Gemspecs\n" unless dsl.gemspecs.empty?
-        dsl.gemspecs.each do |gs|
-          out << "\n### #{File.basename(gs.loaded_from)}"
-          out << "\n\n```ruby\n" << read_file(gs.loaded_from).chomp << "\n```\n"
-        end
+      if print_log && log = Bundler.ui_logger.path
+        Bundler.ui_logger.flush
+        out << "\n## Log\n\n"
+        out << "<details><summary>The full bundler log</summary>\n\n"
+        out << "```\n" << read_file(log) << "\n```\n"
+        out << "\n</details>\n"
       end
 
       out

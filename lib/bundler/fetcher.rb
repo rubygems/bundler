@@ -146,7 +146,7 @@ module Bundler
 
       index
     rescue CertificateFailureError
-      Bundler.ui.info "" if gem_names && use_api # newline after dots
+      Bundler.ui.post_log_progress if gem_names && use_api # newline after dots
       raise
     ensure
       Bundler.rubygems.sources = old

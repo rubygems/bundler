@@ -35,7 +35,7 @@ def gemfile(install = false, options = {}, &gemfile)
   require "bundler"
 
   opts = options.dup
-  ui = opts.delete(:ui) { Bundler::UI::Shell.new }
+  ui = opts.delete(:ui) { Bundler::UI::Shell.new(:logger => Bundler.ui_logger) }
   raise ArgumentError, "Unknown options: #{opts.keys.join(", ")}" unless opts.empty?
 
   old_root = Bundler.method(:root)

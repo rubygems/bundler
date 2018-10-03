@@ -16,7 +16,7 @@ module Bundler
 
       print = options[:print]
       ui = Bundler.ui
-      Bundler.ui = UI::Silent.new if print
+      Bundler.ui = UI::Silent.new(:logger => Bundler.ui_logger) if print
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 

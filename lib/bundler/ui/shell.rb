@@ -15,6 +15,7 @@ module Bundler
         end
         @shell = Thor::Base.shell.new
         @level = ENV["DEBUG"] ? "debug" : "info"
+        @logger = options[:logger]
         @warning_history = []
       end
 
@@ -23,14 +24,17 @@ module Bundler
       end
 
       def info(msg, newline = nil)
+        @logger.log(__method__, msg)
         tell_me(msg, nil, newline) if level("info")
       end
 
       def confirm(msg, newline = nil)
+        @logger.log(__method__, msg)
         tell_me(msg, :green, newline) if level("confirm")
       end
 
       def warn(msg, newline = nil)
+        @logger.log(__method__, msg)
         return unless level("warn")
         return if @warning_history.include? msg
         @warning_history << msg
@@ -40,12 +44,14 @@ module Bundler
       end
 
       def error(msg, newline = nil)
+        @logger.log(__method__, msg)
         return unless level("error")
         return tell_err(msg, :red, newline) if Bundler.feature_flag.error_on_stderr?
         tell_me(msg, :red, newline)
       end
 
       def debug(msg, newline = nil)
+        @logger.log(__method__, msg)
         tell_me(msg, nil, newline) if debug?
       end
 
@@ -58,15 +64,12 @@ module Bundler
       end
 
       def ask(msg)
+        @logger.log(__method__, msg)
         @shell.ask(msg)
       end
 
       def yes?(msg)
         @shell.yes?(msg)
-      end
-
-      def no?
-        @shell.no?(msg)
       end
 
       def level=(level)
@@ -83,9 +86,20 @@ module Bundler
       end
 
       def trace(e, newline = nil, force = false)
+        @logger.log(__method__, "#{e.class}: #{e.message}")
         return unless debug? || force
         msg = "#{e.class}: #{e.message}\n#{e.backtrace.join("\n  ")}"
         tell_me(msg, nil, newline)
+      end
+
+      def log_progress
+        return unless level("info")
+        tell_me(".", nil, false)
+      end
+
+      def post_log_progress
+        return if debug?
+        tell_me("", nil, nil)
       end
 
       def silence(&blk)
