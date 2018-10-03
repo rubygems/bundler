@@ -15,6 +15,8 @@ module Bundler
 
     # This error is raised when it looks like the network is down
     class NetworkDownError < HTTPError; end
+    # This error is raised if we should rate limit our requests to the API
+    class TooManyRequestsError < HTTPError; end
     # This error is raised if the API returns a 413 (only printed in verbose)
     class FallbackError < HTTPError; end
     # This is the error raised if OpenSSL fails the cert verification
