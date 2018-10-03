@@ -21,10 +21,10 @@ Gem::Specification.new do |s|
 
   if s.respond_to?(:metadata=)
     s.metadata = {
-      "bug_tracker_uri" => "http://github.com/bundler/bundler/issues",
+      "bug_tracker_uri" => "https://github.com/bundler/bundler/issues",
       "changelog_uri" => "https://github.com/bundler/bundler/blob/master/CHANGELOG.md",
       "homepage_uri" => "https://bundler.io/",
-      "source_code_uri" => "http://github.com/bundler/bundler/",
+      "source_code_uri" => "https://github.com/bundler/bundler/",
     }
   end
 
