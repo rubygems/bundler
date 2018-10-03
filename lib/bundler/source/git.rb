@@ -260,7 +260,7 @@ module Bundler
       end
 
       def requires_checkout?
-        !cached_revision_checked_out? && allow_git_ops? && !local?
+        allow_git_ops? && !local? && !cached_revision_checked_out?
       end
 
       def cached_revision_checked_out?
