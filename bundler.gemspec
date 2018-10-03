@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
     "Yehuda Katz"
   ]
   s.email       = ["team@bundler.io"]
-  s.homepage    = "http://bundler.io"
+  s.homepage    = "https://bundler.io"
   s.summary     = "The best way to manage your application's dependencies"
   s.description = "Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably"
 
