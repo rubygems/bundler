@@ -26,15 +26,11 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    Spec::Rubygems.dev_setup
-
     Spec::Rubygems.install_test_deps
   end
 
   desc "Ensure spec dependencies for running in parallel are installed"
   task :parallel_deps do
-    Spec::Rubygems.dev_setup
-
     Spec::Rubygems.install_parallel_test_deps
   end
 

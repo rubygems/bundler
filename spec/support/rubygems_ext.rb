@@ -29,15 +29,6 @@ module Spec
 
     extend self
 
-    def dev_setup
-      deps = DEV_DEPS
-
-      # JRuby can't build ronn, so we skip that
-      deps.delete("ronn") if RUBY_ENGINE == "jruby"
-
-      install_gems(deps)
-    end
-
     def gem_load(gem_name, bin_container)
       require_relative "rubygems_version_manager"
       RubygemsVersionManager.new(ENV["RGV"]).switch
@@ -96,13 +87,22 @@ module Spec
     def gem_load_and_activate(gem_name, bin_container)
       gem_activate(gem_name)
       load Gem.bin_path(gem_name, bin_container)
-    rescue Gem::LoadError => e
-      abort "We couln't activate #{gem_name} (#{e.requirement}). Run `gem install #{gem_name}:'#{e.requirement}'`"
     end
 
     def gem_activate(gem_name)
       gem_requirement = DEV_DEPS[gem_name]
+      Gem::Specification.reset if RUBY_VERSION < "2.4"
       gem gem_name, gem_requirement
+    rescue Gem::LoadError
+      warn "We couln't activate #{gem_name} (#{gem_requirement}). Installing it..."
+      full_requirement = "#{gem_name}:'#{gem_requirement}'"
+      status = system("gem install #{full_requirement}")
+      if status
+        puts "#{full_requirement} installed. Retrying now..."
+        retry
+      else
+        abort "Failed to install #{full_requirement}"
+      end
     end
 
     def install_gems(gems)
