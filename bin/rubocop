@@ -3,18 +3,8 @@
 
 load File.expand_path("../with_rubygems", __FILE__) if ENV["RGV"]
 
-require "rubygems"
+require_relative "../spec/support/rubygems_ext"
 
-bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
-rubocop = bundler_spec.dependencies.find do |dep|
-  dep.name == "rubocop"
-end
+Spec::Rubygems.safe_activate("rubocop-performance", "= 1.4.0")
 
-rubocop_requirement = rubocop.requirement.to_s
-
-begin
-  gem "rubocop", rubocop_requirement
-  load Gem.bin_path("rubocop", "rubocop")
-rescue Gem::LoadError
-  warn "We couln't activate rubocop (#{rubocop_requirement}). Try `gem install rubocop:'#{rubocop_requirement}'`"
-end
+Spec::Rubygems.safe_load("rubocop", "= 0.72.0", "rubocop")

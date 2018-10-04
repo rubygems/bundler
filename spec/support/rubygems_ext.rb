@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "rubygems/user_interaction"
-require "support/path"
+require_relative "path"
 require "fileutils"
 
 module Spec
@@ -55,6 +55,25 @@ module Spec
       cmd = "#{gem} install #{deps} --no-document --conservative"
       puts cmd
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
+    end
+
+    def self.safe_load(gem_name, gem_requirement, bin_container)
+      safe_activate(gem_name, gem_requirement)
+      load Gem.bin_path(bin_container, gem_name)
+    end
+
+    def self.safe_activate(gem_name, gem_requirement)
+      gem gem_name, gem_requirement
+    rescue Gem::LoadError
+      warn "We couln't activate #{gem_name} (#{gem_requirement}). Installing it..."
+      full_requirement = "#{gem_name}:'#{gem_requirement}'"
+      status = system("gem install #{full_requirement}")
+      if status
+        puts "#{full_requirement} installed. Retrying now..."
+        retry
+      else
+        abort "Failed to install #{full_requirement}"
+      end
     end
   end
 end

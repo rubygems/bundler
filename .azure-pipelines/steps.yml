@@ -20,10 +20,6 @@ steps:
   displayName: 'patch local readline implementation (for https://github.com/bundler/bundler/issues/6907)'
 
 - script: |
-    ruby bin/rake spec:deps
-  displayName: 'ruby bin/rake spec:deps'
-
-- script: |
     gem install --no-document --conservative rspec_junit_formatter
   displayName: 'gem install rspec_junit_formatter'
 

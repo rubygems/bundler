@@ -16,15 +16,11 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
         $ sudo apt-get install bsdmainutils -y
 
-4. Install Bundler's development dependencies:
-
-        $ bin/rake spec:deps
-
-5. Run the test suite, to make sure things are working:
+4. Run the test suite, to make sure things are working:
 
         $ bin/rake spec
 
-6. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias ([follow these instructions](https://www.moncefbelyamani.com/create-aliases-in-bash-profile-to-assign-shortcuts-for-common-terminal-commands/) for adding aliases to your `~/.bashrc` profile):
+5. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias ([follow these instructions](https://www.moncefbelyamani.com/create-aliases-in-bash-profile-to-assign-shortcuts-for-common-terminal-commands/) for adding aliases to your `~/.bashrc` profile):
 
         $ alias dbundle='/path/to/bundler/repo/bin/bundle'
 
