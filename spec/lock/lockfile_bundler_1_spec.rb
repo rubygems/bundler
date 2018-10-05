@@ -201,6 +201,44 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
     G
   end
 
+  it "outputs a warning if the current is older than lockfile's bundler version and using a rubygems binstub", :rubygems => "> 2.7.7" do
+    lockfile <<-L
+      GEM
+        remote: file://localhost#{gem_repo1}/
+        specs:
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+
+      BUNDLED WITH
+         9999
+    L
+
+    gemfile <<-G
+      source "file://localhost#{gem_repo1}"
+    G
+
+    File.open("bundle", "w") do |f|
+      f.puts("#!/usr/bin/ruby")
+      f.puts('load Gem.activate_bin_path("bundler", "bundle", ">= 0.a")')
+    end
+
+    FileUtils.chmod(0o755, "bundle")
+
+    sys_exec "./bundle --version"
+    warning_messages = [
+      "Could not find 'bundler' (9999) required by your #{bundled_app("Gemfile.lock")}",
+      "To update to the lastest version installed on your system, run `bundle update --bundler`.",
+      "To install the missing version, run `gem install bundler:9999`",
+    ]
+
+    warning_messages.each do |message|
+      expect(out).to include(message)
+    end
+  end
+
   it "errors if the current is a major version older than lockfile's bundler version" do
     lockfile <<-L
       GEM
