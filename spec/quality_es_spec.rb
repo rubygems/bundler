@@ -43,14 +43,6 @@ RSpec.describe "La biblioteca si misma" do
     failing_line_message unless failing_line_message.empty?
   end
 
-  RSpec::Matchers.define :be_well_formed do
-    match(&:empty?)
-
-    failure_message do |actual|
-      actual.join("\n")
-    end
-  end
-
   it "mantiene la calidad de lenguaje de la documentación" do
     included = /ronn/
     error_messages = []

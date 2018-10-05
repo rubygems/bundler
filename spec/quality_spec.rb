@@ -96,14 +96,6 @@ RSpec.describe "The library itself" do
     failing_line_message unless failing_line_message.empty?
   end
 
-  RSpec::Matchers.define :be_well_formed do
-    match(&:empty?)
-
-    failure_message do |actual|
-      actual.join("\n")
-    end
-  end
-
   it "has no malformed whitespace" do
     exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE|vcr_cassettes/
     error_messages = []
