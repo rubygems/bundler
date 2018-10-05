@@ -35,7 +35,6 @@ rvm:
   - 2.2.7
   - 2.1.10
   - 2.0.0
-  - 1.9.3
 
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:125 for the list of possible RGV values
@@ -43,7 +42,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.7.4
+  - RGV=v2.7.7
 
 matrix:
   include:
@@ -67,6 +66,8 @@ matrix:
     - rvm: 2.0.0
       env: RGV=v2.0.14
     # Ruby 1.9.3, Rubygems 1.5.3 and up
+    - rvm: 1.9.3
+      env: RGV=v2.7.7
     - rvm: 1.9.3
       env: RGV=v2.2.5
     - rvm: 1.9.3
