@@ -1,3 +1,25 @@
+## 1.16.6 (2018-10-05)
+
+Changes:
+
+  - Add an error message when adding a gem with `bundle add` that's already in the bundle ([#6341](https://github.com/bundler/bundler/issues/6341), @agrim123)
+  - Add Homepage, Source Code and Chanagelog URI metadata fields to the `bundle gem` gemspec template (@walf443)
+
+Bugfixes:
+
+  - Fix issue where updating a gem resulted in the gem's version being downgraded when `BUNDLE_ONLY_UPDATE_TO_NEWER_VERSIONS` was set ([#6529](https://github.com/bundler/bundler/issues/6529), @theflow)
+  - Fix some rescue calls that don't specifiy error type (@utilum)
+  - Fix an issue when the Lockfile would contain platform-specific gems that it didn't need ([#6491](https://github.com/bundler/bundler/issues/6491), @segiddins)
+  - Improve handlding of adding new gems with only a single group to the Gemfile in `bundle add` (@agrim123)
+  - Refactor check for OpenSSL in `bundle env` (@voxik)
+  - Remove an unnecessary assignment in Metadata (@voxik)
+
+Documentation:
+
+  - Update docs to reflect revised guidance to check in Gemfile.lock into version control for gems ([#5879](https://github.com/bundler/bundler/issues/5879), @arbonap)
+  - Add documentation for the `--all` flag in `bundle update` (@agrim123)
+  - Update README to use `bundle add` in usage examples (@hdf1986)
+
 ## 1.16.5 (2018-09-18)
 
 Changes:
