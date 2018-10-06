@@ -1233,6 +1233,103 @@ In Gemfile:
       R
       expect(out).to eq(installed_time)
     end
+
+    it "does not reinstall the extension when changing another gem", :rubygems => ">= 2.3.0" do
+      build_git "foo" do |s|
+        s.add_dependency "rake"
+        s.extensions << "Rakefile"
+        s.write "Rakefile", <<-RUBY
+          task :default do
+            path = File.expand_path("../lib", __FILE__)
+            FileUtils.mkdir_p(path)
+            cur_time = Time.now.to_f.to_s
+            File.open("\#{path}/foo.rb", "w") do |f|
+              f.puts "FOO = \#{cur_time}"
+            end
+          end
+        RUBY
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "0.9.1"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
+      G
+
+      run! <<-R
+        require 'foo'
+        puts FOO
+      R
+
+      installed_time = out
+      expect(installed_time).to match(/\A\d+\.\d+\z/)
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
+      G
+
+      run! <<-R
+        require 'foo'
+        puts FOO
+      R
+      expect(out).to eq(installed_time)
+    end
+
+    it "does reinstall the extension when changing refs", :rubygems => ">= 2.3.0" do
+      build_git "foo" do |s|
+        s.add_dependency "rake"
+        s.extensions << "Rakefile"
+        s.write "Rakefile", <<-RUBY
+          task :default do
+            path = File.expand_path("../lib", __FILE__)
+            FileUtils.mkdir_p(path)
+            cur_time = Time.now.to_f.to_s
+            File.open("\#{path}/foo.rb", "w") do |f|
+              f.puts "FOO = \#{cur_time}"
+            end
+          end
+        RUBY
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
+      G
+
+      run! <<-R
+        require 'foo'
+        puts FOO
+      R
+
+      update_git("foo", :branch => "branch2")
+
+      installed_time = out
+      expect(installed_time).to match(/\A\d+\.\d+\z/)
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}", :branch => "branch2"
+      G
+
+      run! <<-R
+        require 'foo'
+        puts FOO
+      R
+      expect(out).not_to eq(installed_time)
+
+      installed_time = out
+
+      update_git("foo")
+      bundle! "update foo"
+
+      run! <<-R
+        require 'foo'
+        puts FOO
+      R
+      expect(out).not_to eq(installed_time)
+    end
   end
 
   it "ignores git environment variables" do
