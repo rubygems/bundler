@@ -71,17 +71,17 @@ RSpec.describe "bundle executable" do
     it "prints the running command" do
       gemfile ""
       bundle! "info bundler", :verbose => true
-      expect(last_command.stdout).to start_with("Running `bundle info bundler --no-color --verbose` with bundler #{Bundler::VERSION}")
+      expect(last_command.stdout).to start_with("Running `bundle info bundler --verbose` with bundler #{Bundler::VERSION}")
     end
 
     it "doesn't print defaults" do
       install_gemfile! "", :verbose => true
-      expect(last_command.stdout).to start_with("Running `bundle install --no-color --retry 0 --verbose` with bundler #{Bundler::VERSION}")
+      expect(last_command.stdout).to start_with("Running `bundle install --retry 0 --verbose` with bundler #{Bundler::VERSION}")
     end
 
     it "doesn't print defaults" do
       install_gemfile! "", :verbose => true
-      expect(last_command.stdout).to start_with("Running `bundle install --no-color --retry 0 --verbose` with bundler #{Bundler::VERSION}")
+      expect(last_command.stdout).to start_with("Running `bundle install --retry 0 --verbose` with bundler #{Bundler::VERSION}")
     end
   end
 

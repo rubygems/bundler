@@ -290,7 +290,21 @@ module Bundler
     method_option "outdated", :type => :boolean,
                               :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
-      Bundler::SharedHelpers.major_deprecation(2, "use `bundle list` instead of `bundle show`") if ARGV[0] == "show"
+      if ARGV[0] == "show"
+        rest = ARGV[1..-1]
+
+        new_command = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
+
+        new_arguments = rest.map do |arg|
+          next arg if arg != "--paths"
+          next "--path" if new_command == "info"
+        end
+
+        old_argv = ARGV.join(" ")
+        new_argv = [new_command, *new_arguments.compact].join(" ")
+
+        Bundler::SharedHelpers.major_deprecation(2, "use `bundle #{new_argv}` instead of `bundle #{old_argv}`")
+      end
       require "bundler/cli/show"
       Show.new(options, gem_name).run
     end
