@@ -28,11 +28,7 @@ module Spec
     end
 
     def bundler_err
-      if Bundler::VERSION.start_with?("1.")
-        stdout
-      else
-        stderr
-      end
+      stderr
     end
 
     def to_s_verbose

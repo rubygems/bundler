@@ -28,7 +28,6 @@ module Bundler
       disable_platform_warnings
       disable_shared_gems
       disable_version_check
-      error_on_stderr
       force_ruby_platform
       forget_cli_options
       frozen

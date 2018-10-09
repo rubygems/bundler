@@ -35,14 +35,12 @@ module Bundler
         return if @warning_history.include? msg
         @warning_history << msg
 
-        return tell_err(msg, :yellow, newline) if Bundler.feature_flag.error_on_stderr?
-        tell_me(msg, :yellow, newline)
+        tell_err(msg, :yellow, newline)
       end
 
       def error(msg, newline = nil)
         return unless level("error")
-        return tell_err(msg, :red, newline) if Bundler.feature_flag.error_on_stderr?
-        tell_me(msg, :red, newline)
+        tell_err(msg, :red, newline)
       end
 
       def debug(msg, newline = nil)

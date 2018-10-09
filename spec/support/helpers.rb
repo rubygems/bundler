@@ -45,7 +45,7 @@ module Spec
     end
 
     def err
-      Bundler.feature_flag.error_on_stderr? ? last_command.stderr : last_command.stdout
+      last_command.stderr
     end
 
     MAJOR_DEPRECATION = /^\[DEPRECATED\]\s*/.freeze
