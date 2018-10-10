@@ -9,15 +9,15 @@ module Spec
     end
 
     def gemspec
-      @gemspec ||= Pathname.new(File.expand_path(root.join("bundler.gemspec"), __FILE__))
+      @gemspec ||= root.join("bundler.gemspec")
     end
 
     def bindir
-      @bindir ||= Pathname.new(File.expand_path(root.join("exe"), __FILE__))
+      @bindir ||= root.join("exe")
     end
 
     def spec_dir
-      @spec_dir ||= Pathname.new(File.expand_path(root.join("spec"), __FILE__))
+      @spec_dir ||= root.join("spec")
     end
 
     def tmp(*path)
@@ -95,7 +95,7 @@ module Spec
     end
 
     def bundler_path
-      Pathname.new(File.expand_path(root.join("lib"), __FILE__))
+      root.join("lib")
     end
 
     def global_plugin_gem(*args)
