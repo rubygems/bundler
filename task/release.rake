@@ -160,7 +160,7 @@ namespace :release do
     File.open(version_file, "w") {|f| f.write(version_contents) }
 
     commits = `git log --oneline origin/master --`.split("\n").map {|l| l.split(/\s/, 2) }.reverse
-    commits.select! {|_sha, message| message =~ /(Auto merge of|Merge pull request) ##{Regexp.union(*prs)}/ }
+    commits.select! {|_sha, message| message =~ /(Auto merge of|Merge pull request|Merge) ##{Regexp.union(*prs)}/ }
 
     abort "Could not find commits for all PRs" unless commits.size == prs.size
 
@@ -187,7 +187,7 @@ namespace :release do
   task :open_unreleased_prs do
     def prs(on = "master")
       commits = `git log --oneline origin/#{on} --`.split("\n")
-      commits.reverse_each.map {|c| c =~ /(Auto merge of|Merge pull request) #(\d+)/ && $2 }.compact
+      commits.reverse_each.map {|c| c =~ /(Auto merge of|Merge pull request|Merge) #(\d+)/ && $2 }.compact
     end
 
     last_stable = `git ls-remote origin`.split("\n").map {|r| r =~ %r{refs/tags/v([\d.]+)$} && $1 }.compact.map {|v| Gem::Version.create(v) }.max
