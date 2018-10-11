@@ -1,3 +1,19 @@
+## 1.17.0.pre.2 (2018-10-13)
+
+Features:
+
+  - Configure Bundler home, cache, config and plugin directories with `BUNDLE_USER_HOME`, `BUNDLE_USER_CACHE`, `BUNDLE_USER_CONFIG` and `BUNDLE_USER_PLUGIN` env vars ([#4333](https://github.com/bundler/bundler/issues/4333), @gwerbin)
+  - Add `--all` option to `bundle binstubs` that will generate an executable file for all gems with commands in the bundle
+  - Add `bundle remove` command to remove gems from the Gemfile via the CLI
+  - Improve checking file permissions and asking for `sudo` in Bundler when it doesn't need to
+  - Add error message to `bundle add` to check adding duplicate gems to the Gemfile
+  - When asking for `sudo`, Bundler will show a list of folders/files that require elevated permissions to write to.
+
+The following new features are available but are not enabled by default. These are intended to be tested by users for the upcoming release of Bundler 2.
+
+  - Improve deprecation warning message for `bundle show` command
+  - Improve deprecation warning message for the `--force` option in `bundle install`
+
 ## 1.17.0.pre.1 (2018-09-24)
 
 Features:
