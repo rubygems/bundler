@@ -1,3 +1,17 @@
+## 11.7.0.pre.2 (2018-10-11)
+
+Features:
+
+  - Add `--optimistic` and `--strict` options to `bundle add` that sets a version constraint for new gems ([#6553](https://github.com/bundler/bundler/issues/6553), @agrim123)
+  - Add `--gemfile` flag to `bundle update` command ([#5924](https://github.com/bundler/bundler/issues/5924), @ankitkataria)
+
+The following new features are available but are not enabled by default. These are intended to be tested by users for the upcoming release of Bundler 2.
+
+  - Add `--without-group` and `--only-group` options to the new `bundle list` command ([#6564](https://github.com/bundler/bundler/issues/6564), @agrim123)
+  - Append the Ruby scope on global path setting ([#6619](https://github.com/bundler/bundler/issues/6619#issuecomment-405460114), @segiddins)
+  - Improve deprecation warning message for `bundle show` command
+  - Improve deprecation warning message for the `--force` option in `bundle install`
+
 ## 1.17.0.pre.1 (2018-09-24)
 
 Features:
