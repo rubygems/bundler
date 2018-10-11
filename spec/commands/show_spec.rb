@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle show" do
+RSpec.describe "bundle show", :bundler => "< 2", :ruby => ">= 2.0" do
   context "with a standard Gemfile" do
     before :each do
       install_gemfile <<-G
@@ -25,30 +25,56 @@ RSpec.describe "bundle show" do
       expect(bundled_app("Gemfile.lock")).to exist
     end
 
-    it "prints path if gem exists in bundle", :bundler => "< 2" do
+    it "prints path if gem exists in bundle" do
       bundle "show rails"
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints path if gem exists in bundle", :bundler => "2" do
-      bundle "show rails"
-      expect(out).to eq(
-        "[DEPRECATED FOR 2.0] use `bundle info rails` instead of `bundle show rails`\n" +
-        default_bundle_path("gems", "rails-2.3.2").to_s
-      )
+    context "when show command deprecation is enabled" do
+      before { bundle "config major_deprecations yes" }
+
+      it "prints path if gem exists in bundle" do
+        bundle "show rails"
+        expect(out).to eq(
+          "[DEPRECATED FOR 2.0] use `bundle info rails` instead of `bundle show rails`\n" +
+          default_bundle_path("gems", "rails-2.3.2").to_s
+        )
+      end
+
+      it "prints the path to the running bundler" do
+        bundle "show bundler"
+        expect(out).to eq(
+          "[DEPRECATED FOR 2.0] use `bundle info bundler` instead of `bundle show bundler`\n" +
+          root.to_s
+        )
+      end
+
+      it "prints path if gem exists in bundle (with --paths option)" do
+        bundle "show rails --paths"
+        expect(out).to eq(
+          "[DEPRECATED FOR 2.0] use `bundle info rails --path` instead of `bundle show rails --paths`\n" +
+          default_bundle_path("gems", "rails-2.3.2").to_s
+        )
+      end
+
+      it "prints path of all gems in bundle sorted by name" do
+        bundle "show --paths"
+
+        expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
+        expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
+
+        out_lines = out.split("\n")
+        expect(out_lines[0]).to eq("[DEPRECATED FOR 2.0] use `bundle list` instead of `bundle show --paths`")
+
+        # Gem names are the last component of their path.
+        gem_list = out_lines[1..-1].map {|p| p.split("/").last }
+        expect(gem_list).to eq(gem_list.sort)
+      end
     end
 
-    it "prints path if gem exists in bundle (with --paths option)", :bundler => "< 2" do
+    it "prints path if gem exists in bundle (with --paths option)" do
       bundle "show rails --paths"
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
-    end
-
-    it "prints path if gem exists in bundle (with --paths option)", :bundler => "2" do
-      bundle "show rails --paths"
-      expect(out).to eq(
-        "[DEPRECATED FOR 2.0] use `bundle info rails --path` instead of `bundle show rails --paths`\n" +
-        default_bundle_path("gems", "rails-2.3.2").to_s
-      )
     end
 
     it "warns if path no longer exists on disk" do
@@ -60,17 +86,9 @@ RSpec.describe "bundle show" do
         and include(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints the path to the running bundler", :bundler => "< 2" do
+    it "prints the path to the running bundler" do
       bundle "show bundler"
       expect(out).to eq(root.to_s)
-    end
-
-    it "prints the path to the running bundler", :bundler => "2" do
-      bundle "show bundler"
-      expect(out).to eq(
-        "[DEPRECATED FOR 2.0] use `bundle info bundler` instead of `bundle show bundler`\n" +
-        root.to_s
-      )
     end
 
     it "complains if gem not in bundle" do
@@ -78,7 +96,7 @@ RSpec.describe "bundle show" do
       expect(out).to match(/could not find gem 'missing'/i)
     end
 
-    it "prints path of all gems in bundle sorted by name", :bundler => "< 2" do
+    it "prints path of all gems in bundle sorted by name" do
       bundle "show --paths"
 
       expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
@@ -86,20 +104,6 @@ RSpec.describe "bundle show" do
 
       # Gem names are the last component of their path.
       gem_list = out.split.map {|p| p.split("/").last }
-      expect(gem_list).to eq(gem_list.sort)
-    end
-
-    it "prints path of all gems in bundle sorted by name", :bundler => "2" do
-      bundle "show --paths"
-
-      expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
-      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
-
-      out_lines = out.split("\n")
-      expect(out_lines[0]).to eq("[DEPRECATED FOR 2.0] use `bundle list` instead of `bundle show --paths`")
-
-      # Gem names are the last component of their path.
-      gem_list = out_lines[1..-1].map {|p| p.split("/").last }
       expect(gem_list).to eq(gem_list.sort)
     end
 
