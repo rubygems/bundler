@@ -294,7 +294,11 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rails"
 
-        expect(out).to include("Gems could not be removed. rack (>= 0) would also have been removed.")
+        if Gem::VERSION >= "1.6.0"
+          expect(out).to include("Gems could not be removed. rack (>= 0) would also have been removed.")
+        else
+          expect(out).to include("Gems could not be removed. rack (>= 0, runtime) would also have been removed.")
+        end
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
           gem "rack"; gem "rails"
@@ -457,7 +461,11 @@ RSpec.describe "bundle remove" do
         bundle "remove rack"
 
         expect(out).to include("rack was removed.")
-        expect(out).to include("Gems could not be removed. rails (>= 0) would also have been removed.")
+        if Gem::VERSION >= "1.6.0"
+          expect(out).to include("Gems could not be removed. rails (>= 0) would also have been removed.")
+        else
+          expect(out).to include("Gems could not be removed. rails (>= 0, runtime) would also have been removed.")
+        end
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
 
@@ -481,7 +489,11 @@ RSpec.describe "bundle remove" do
 
         bundle "remove rack"
 
-        expect(out).to include("Gems could not be removed. rails (>= 0) would also have been removed.")
+        if Gem::VERSION >= "1.6.0"
+          expect(out).to include("Gems could not be removed. rails (>= 0) would also have been removed.")
+        else
+          expect(out).to include("Gems could not be removed. rails (>= 0, runtime) would also have been removed.")
+        end
         expect(bundled_app("Gemfile-other").read).to include("gem \"rack\"")
         gemfile_should_be <<-G
           source "file://#{gem_repo1}"
