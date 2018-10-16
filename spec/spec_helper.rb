@@ -52,6 +52,12 @@ ENV["THOR_COLUMNS"] = "10000"
 
 Spec::CodeClimate.setup
 
+module Gem
+  def self.ruby= ruby
+    @ruby = ruby
+  end
+end
+
 RSpec.configure do |config|
   config.include Spec::Builders
   config.include Spec::Helpers
@@ -107,6 +113,13 @@ RSpec.configure do |config|
     mocks.allow_message_expectations_on_nil = false
   end
 
+  config.before :suite do
+    if ENV['BUNDLE_RUBY']
+      @orig_ruby = Gem.ruby
+      Gem.ruby = ENV['BUNDLE_RUBY']
+    end
+  end
+
   config.before :all do
     build_repo1
   end
@@ -130,5 +143,11 @@ RSpec.configure do |config|
 
     Dir.chdir(original_wd)
     ENV.replace(original_env)
+  end
+
+  config.after :suite do
+    if ENV['BUNDLE_RUBY']
+      Gem.ruby = @orig_ruby
+    end
   end
 end

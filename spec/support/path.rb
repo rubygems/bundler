@@ -5,19 +5,19 @@ require "pathname"
 module Spec
   module Path
     def root
-      @root ||= Pathname.new(File.expand_path("../../..", __FILE__))
+      @root ||= Pathname.new(for_ruby_core? ? "../../../.." : "../../..").expand_path(__FILE__)
     end
 
     def gemspec
-      @gemspec ||= root.join("bundler.gemspec")
+      @gemspec ||= root.join(for_ruby_core? ? "lib/bundler.gemspec" : "bundler.gemspec")
     end
 
     def bindir
-      @bindir ||= root.join("exe")
+      @bindir ||= root.join(for_ruby_core? ? "bin" : "exe")
     end
 
     def spec_dir
-      @spec_dir ||= root.join("spec")
+      @spec_dir ||= root.join(for_ruby_core? ? "spec/bundler" : "spec")
     end
 
     def tmp(*path)
@@ -111,5 +111,17 @@ module Spec
     end
 
     extend self
+
+    private
+    def for_ruby_core?
+      # avoid to wornings
+      @for_ruby_core ||= nil
+
+      if @for_ruby_core.nil?
+        @for_ruby_core = true & (ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"])
+      else
+        @for_ruby_core
+      end
+    end
   end
 end
