@@ -60,12 +60,12 @@ RSpec.describe "bundle show" do
         and include(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints the path to the running bundler", :bundler => "< 2" do
+    it "prints the path to the running bundler", :ruby_repo, :bundler => "< 2" do
       bundle "show bundler"
       expect(out).to eq(root.to_s)
     end
 
-    it "prints the path to the running bundler", :bundler => "2" do
+    it "prints the path to the running bundler", :ruby_repo, :bundler => "2" do
       bundle "show bundler"
       expect(out).to eq(
         "[DEPRECATED FOR 2.0] use `bundle info bundler` instead of `bundle show bundler`\n" +
