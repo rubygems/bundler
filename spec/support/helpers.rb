@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "open3"
+
 module Spec
   module Helpers
     def reset!
