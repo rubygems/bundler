@@ -274,12 +274,10 @@ module Bundler
 
       until !File.directory?(current) || current == previous
         if ENV["BUNDLE_SPEC_RUN"]
-          if File.file?(File.join(current, "bundler.gemspec"))
-            gemspec = "bundler.gemspec"
-          else
-            # for Ruby Core
-            gemspec = "lib/bundler.gemspec"
-          end
+          gemspec = File.join(current, "bundler.gemspec")
+          # for Ruby Core
+          gemspec = File.join(current, "lib/bundler.gemspec") unless File.file?(gemspec)
+
           # avoid stepping above the tmp directory when testing
           return nil if File.file?(File.join(current, gemspec))
         end
