@@ -308,11 +308,11 @@ module Bundler
         unless File.exist?(exe_file)
           exe_file = File.expand_path("../../../exe/bundle", __FILE__)
         end
+        Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", exe_file
       rescue Gem::GemNotFoundException
         exe_file = File.expand_path("../../../exe/bundle", __FILE__)
         # for Ruby core repository
         exe_file = File.expand_path("../../../../bin/bundle", __FILE__) unless File.exist?(exe_file)
-      ensure
         Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", exe_file
       end
 
