@@ -275,11 +275,11 @@ module Bundler
       until !File.directory?(current) || current == previous
         if ENV["BUNDLE_SPEC_RUN"]
           # avoid stepping above the tmp directory when testing
-          if !!(ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"])
+          gemspec = if ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"]
             # for Ruby Core
-            gemspec = "lib/bundler.gemspec"
+            "lib/bundler.gemspec"
           else
-            gemspec = "bundler.gemspec"
+            "bundler.gemspec"
           end
 
           # avoid stepping above the tmp directory when testing

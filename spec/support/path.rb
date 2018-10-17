@@ -112,7 +112,8 @@ module Spec
 
     extend self
 
-    private
+  private
+
     def for_ruby_core?
       # avoid to wornings
       @for_ruby_core ||= nil
