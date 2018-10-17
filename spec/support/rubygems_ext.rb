@@ -33,17 +33,17 @@ module Spec
 
       ENV["BUNDLE_PATH"] = nil
       ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
-      ENV["PATH"] = [Path.bindir, "#{Path.system_gem_path}/bin", ENV["PATH"]].join(File::PATH_SEPARATOR)
+      ENV["PATH"] = [Path.bindir, Path.system_gem_path.join("bin"), ENV["PATH"]].join(File::PATH_SEPARATOR)
 
       manifest = DEPS.to_a.sort_by(&:first).map {|k, v| "#{k} => #{v}\n" }
-      manifest_path = "#{Path.base_system_gems}/manifest.txt"
+      manifest_path = Path.base_system_gems.join("manifest.txt")
       # it's OK if there are extra gems
-      if !File.exist?(manifest_path) || !(manifest - File.readlines(manifest_path)).empty?
+      if !manifest_path.file? || !(manifest - manifest_path.readlines).empty?
         FileUtils.rm_rf(Path.base_system_gems)
         FileUtils.mkdir_p(Path.base_system_gems)
         puts "installing gems for the tests to use..."
         install_gems(DEPS)
-        File.open(manifest_path, "w") {|f| f << manifest.join }
+        manifest_path.open("w") {|f| f << manifest.join }
       end
 
       ENV["HOME"] = Path.home.to_s
@@ -60,9 +60,9 @@ module Spec
       reqs.map! {|name, req| "'#{name}:#{req}'" }
       deps = reqs.concat(no_reqs).join(" ")
       cmd = if Gem::VERSION < "2.0.0"
-        "gem install #{deps} --no-rdoc --no-ri --conservative"
+        "#{Gem.ruby} -S gem install #{deps} --no-rdoc --no-ri --conservative"
       else
-        "gem install #{deps} --no-document --conservative"
+        "#{Gem.ruby} -S gem install #{deps} --no-document --conservative"
       end
       puts cmd
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")

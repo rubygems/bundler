@@ -5,7 +5,8 @@ $:.unshift File.expand_path("../lib", __FILE__)
 require "shellwords"
 require "benchmark"
 
-RUBYGEMS_REPO = if `cd .. && git remote --verbose 2>/dev/null` =~ /rubygems/i
+NULL_DEVICE = (Gem.win_platform? ? "NUL" : "/dev/null")
+RUBYGEMS_REPO = if `git -C "#{File.expand_path("..")}" remote --verbose 2> #{NULL_DEVICE}` =~ /rubygems/i
   File.expand_path("..")
 else
   File.expand_path("tmp/rubygems")
