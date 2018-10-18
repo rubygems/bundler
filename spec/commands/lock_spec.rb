@@ -89,6 +89,33 @@ RSpec.describe "bundle lock" do
     expect(out).to match(/sources listed in your Gemfile|installed locally/)
   end
 
+  it "works with --gemfile flag" do
+    create_file "CustomGemfile", <<-G
+      source "file://localhost#{repo}"
+      gem "foo"
+    G
+    lockfile = strip_lockfile(normalize_uri_file(<<-L))
+      GEM
+        remote: file://localhost#{repo}/
+        specs:
+          foo (1.0)
+
+      PLATFORMS
+        #{lockfile_platforms}
+
+      DEPENDENCIES
+        foo
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    L
+    bundle "lock --gemfile CustomGemfile"
+
+    expect(out).to match(/Writing lockfile to.+CustomGemfile\.lock/)
+    expect(read_lockfile("CustomGemfile.lock")).to eq(lockfile)
+    expect { read_lockfile }.to raise_error(Errno::ENOENT)
+  end
+
   it "writes to a custom location using --lockfile" do
     bundle "lock --lockfile=lock"
 
