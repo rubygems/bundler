@@ -618,6 +618,8 @@ module Bundler
       "do not attempt to fetch remote gemspecs and use the local gem cache only"
     method_option "print", :type => :boolean, :default => false, :banner =>
       "print the lockfile to STDOUT instead of writing to the file system"
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
     method_option "lockfile", :type => :string, :default => nil, :banner =>
       "the path the lockfile should be written to"
     method_option "full-index", :type => :boolean, :default => false, :banner =>
