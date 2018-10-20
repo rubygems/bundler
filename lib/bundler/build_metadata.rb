@@ -29,13 +29,13 @@ module Bundler
       # commit instance variable then we can't determine its commits SHA.
       git_dir = File.join(File.expand_path("../../..", __FILE__), ".git")
       if File.directory?(git_dir)
-        @git_commit_sha = Dir.chdir(git_dir) { `git rev-parse --short HEAD`.strip.freeze }
+        return @git_commit_sha = Dir.chdir(git_dir) { `git rev-parse --short HEAD`.strip.freeze }
       end
 
       # If Bundler is a submodule in RubyGems, get the submodule commit
       git_sub_dir = File.join(File.expand_path("../../../..", __FILE__), ".git")
       if File.directory?(git_sub_dir)
-        @git_commit_sha = Dir.chdir(git_sub_dir) do
+        return @git_commit_sha = Dir.chdir(git_sub_dir) do
           `git ls-tree --abbrev=8 HEAD bundler | awk '{ print $3 }'`.strip.freeze
         end
       end
