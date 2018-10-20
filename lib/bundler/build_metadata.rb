@@ -36,7 +36,7 @@ module Bundler
       git_sub_dir = File.join(File.expand_path("../../../..", __FILE__), ".git")
       if File.directory?(git_sub_dir)
         return @git_commit_sha = Dir.chdir(git_sub_dir) do
-          `git ls-tree --abbrev=8 HEAD bundler | awk '{ print $3 }'`.strip.freeze
+          `git ls-tree --abbrev=8 HEAD bundler`.split(/\s/).fetch(2, "").strip.freeze
         end
       end
 
