@@ -113,9 +113,11 @@ class Bundler::Thor
     # the script started).
     #
     def relative_to_original_destination_root(path, remove_dot = true)
-      path = path.dup
-      if path.gsub!(@destination_stack[0], ".")
-        remove_dot ? (path[2..-1] || "") : path
+      root = @destination_stack[0]
+      if path.start_with?(root) && [File::SEPARATOR, File::ALT_SEPARATOR, nil, ''].include?(path[0...root.size])
+        path = path.dup
+        path[0...root.size] = '.'
+        remove_dot ? (path[root.size..-1] || "") : path
       else
         path
       end
