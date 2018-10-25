@@ -1,3 +1,49 @@
+## 1.17.0 (2018-10-25)
+
+No new changes.
+
+## 1.17.0.pre.2 (2018-10-13)
+
+Features:
+
+  - Configure Bundler home, cache, config and plugin directories with `BUNDLE_USER_HOME`, `BUNDLE_USER_CACHE`, `BUNDLE_USER_CONFIG` and `BUNDLE_USER_PLUGIN` env vars ([#4333](https://github.com/bundler/bundler/issues/4333), @gwerbin)
+  - Add `--all` option to `bundle binstubs` that will generate an executable file for all gems with commands in the bundle
+  - Add `bundle remove` command to remove gems from the Gemfile via the CLI
+  - Improve checking file permissions and asking for `sudo` in Bundler when it doesn't need to
+  - Add error message to `bundle add` to check adding duplicate gems to the Gemfile
+  - When asking for `sudo`, Bundler will show a list of folders/files that require elevated permissions to write to.
+
+The following new features are available but are not enabled by default. These are intended to be tested by users for the upcoming release of Bundler 2.
+
+  - Improve deprecation warning message for `bundle show` command
+  - Improve deprecation warning message for the `--force` option in `bundle install`
+
+## 1.17.0.pre.1 (2018-09-24)
+
+Features:
+
+  - Check folder/file permissions of the Bundle home directory in the `bundle doctor` command ([#5786](https://github.com/bundler/bundler/issues/5786), @ajwann)
+  - Remove compiled gem extensions when running `bundle clean` ([#5596](https://github.com/bundler/bundler/issues/5596), @akhramov)
+  - Add `--paths` option to `bundle list` command ([#6172](https://github.com/bundler/bundler/issues/6172), @colby-swandale)
+  - Add base error class to gems generated from `bundle gem` ([#6260](https://github.com/bundler/bundler/issues/6260), @christhekeele)
+  - Correctly re-install gem extensions with a git source when running `bundle pristine` ([#6294](https://github.com/bundler/bundler/issues/6294), @wagenet)
+  - Add config option to disable platform warnings ([#6124](https://github.com/bundler/bundler/issues/6124), @agrim123)
+  - Add `--skip-install` option to `bundle add` command to add gems to the Gemfile without installation ([#6511](https://github.com/bundler/bundler/issues/6511), @agrim123)
+  - Add `--only-explicit` option to `bundle outdated` to list only outdated gems in the Gemfile ([#5366](https://github.com/bundler/bundler/issues/5366), @peret)
+  - Support adding multiple gems to the Gemfile with `bundle add` ([#6543](https://github.com/bundler/bundler/issues/6543), @agrim123)
+  - Make registered plugin events easier to manage in the Plugin API (@jules2689)
+  - Add new gem install hooks to the Plugin API (@jules2689)
+  - Add `--optimistic` and `--strict` options to `bundle add` ([#6553](https://github.com/bundler/bundler/issues/6553), @agrim123)
+  - Add `--without-group` and `--only-group` options to `bundle list` ([#6564](https://github.com/bundler/bundler/issues/6564), @agrim123)
+  - Add `--gemfile` option to the `bundle exec` command ([#5924](https://github.com/bundler/bundler/issues/5924), @ankitkataria)
+
+The following new features are available but are not enabled by default. These are intended to be tested by users for the upcoming release of Bundler 2.
+
+  - Make `install --path` relative to the current working directory ([#2048](https://github.com/bundler/bundler/issues/2048), @igorbozato)
+  - Auto-configure job count ([#5808](https://github.com/bundler/bundler/issues/5808), @segiddins)
+  - Use the Gem Version Promoter for major gem updates ([#5993](https://github.com/bundler/bundler/issues/5993), @segiddins)
+  - Add config option to add the Ruby scope to `bundle config path` when configured globally (@segiddins)
+
 ## 1.16.6 (2018-10-05)
 
 Changes:
