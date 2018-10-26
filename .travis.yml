@@ -33,8 +33,6 @@ rvm:
   - 2.4.3
   - 2.3.6
   - 2.2.7
-  - 2.1.10
-  - 2.0.0
 
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:125 for the list of possible RGV values
@@ -55,77 +53,10 @@ matrix:
     # Ruby 2.2, Rubygems 2.4.5 and up
     - rvm: 2.2.6
       env: RGV=v2.4.8
-    # Ruby 2.1, Rubygems 2.2.2 and up
-    - rvm: 2.1.10
-      env: RGV=v2.2.5
-    # Ruby 2.0.0, Rubygems 2.0.0 and up
-    - rvm: 2.0.0
-      env: RGV=v2.2.5
-    - rvm: 2.0.0
-      env: RGV=v2.1.11
-    - rvm: 2.0.0
-      env: RGV=v2.0.14
-    # Ruby 1.9.3, Rubygems 1.5.3 and up
-    - rvm: 1.9.3
-      env: RGV=v2.7.7
-    - rvm: 1.9.3
-      env: RGV=v2.2.5
-    - rvm: 1.9.3
-      env: RGV=v2.1.11
-    - rvm: 1.9.3
-      env: RGV=v2.0.14
-    - rvm: 1.9.3
-      env: RGV=v1.8.29
-    - rvm: 1.9.3
-      env: RGV=v1.7.2
-    - rvm: 1.9.3
-      env: RGV=v1.6.2
-    - rvm: 1.9.3
-      env: RGV=v1.5.3
-
-    - rvm: 1.8.7
-      env: RGV=v2.6.8
-    # Ruby 1.8.7, Rubygems 1.3.6 and up
-    - rvm: 1.8.7
-      env: RGV=v2.2.5
-    # ALLOWED FAILURES
-    # since the great Travis image outage, frequent random segfaults :'(
-    - rvm: 1.8.7
-      env: RGV=v2.0.14
-    - rvm: 1.8.7
-      env: RGV=v1.8.29
-    - rvm: 1.8.7
-      env: RGV=v1.7.2
-    - rvm: 1.8.7
-      env: RGV=v1.6.2
-    - rvm: 1.8.7
-      env: RGV=v1.5.3
-    - rvm: 1.8.7
-      env: RGV=v1.4.2
-    - rvm: 1.8.7
-      env: RGV=v1.3.7
-    - rvm: 1.8.7
-      env: RGV=v1.3.6
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
       env: RGV=master
 
   allow_failures:
-    - rvm: 1.8.7
-      env: RGV=v2.0.14
-    - rvm: 1.8.7
-      env: RGV=v1.8.29
-    - rvm: 1.8.7
-      env: RGV=v1.7.2
-    - rvm: 1.8.7
-      env: RGV=v1.6.2
-    - rvm: 1.8.7
-      env: RGV=v1.5.3
-    - rvm: 1.8.7
-      env: RGV=v1.4.2
-    - rvm: 1.8.7
-      env: RGV=v1.3.7
-    - rvm: 1.8.7
-      env: RGV=v1.3.6
     - rvm: ruby-head
       env: RGV=master
