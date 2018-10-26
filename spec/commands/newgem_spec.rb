@@ -191,8 +191,6 @@ RSpec.describe "bundle gem" do
         line.gsub(/\=.*$/, "= %q{A short summary of my new gem.}")
       when /spec\.description/
         line.gsub(/\=.*$/, "= %q{A longer description of my new gem.}")
-      # Remove exception that prevents public pushes on older RubyGems versions
-      when /raise "RubyGems 2.0 or newer/
       else
         line
       end
