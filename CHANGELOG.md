@@ -1,3 +1,7 @@
+## 1.17.1 (2018-10-25)
+
+ - Convert `Pathname`s to `String`s before sorting them, fixing #6760 and #6758 ([#6761](https://github.com/bundler/bundler/pull/6761), @alexggordon)
+
 ## 1.17.0 (2018-10-25)
 
 No new changes.
