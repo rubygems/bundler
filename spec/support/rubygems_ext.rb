@@ -59,12 +59,7 @@ module Spec
       no_reqs.map!(&:first)
       reqs.map! {|name, req| "'#{name}:#{req}'" }
       deps = reqs.concat(no_reqs).join(" ")
-      gem = Spec::Path.ruby_core? ? ENV["BUNDLE_GEM"] : "#{Gem.ruby} -S gem"
-      cmd = if Gem::VERSION < "2.0.0"
-        "#{gem} install #{deps} --no-rdoc --no-ri --conservative"
-      else
-        "#{gem} install #{deps} --no-document --conservative"
-      end
+      cmd = "#{Gem.ruby} -S gem install #{deps} --no-document --conservative"
       puts cmd
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
     end
