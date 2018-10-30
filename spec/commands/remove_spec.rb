@@ -140,6 +140,30 @@ RSpec.describe "bundle remove" do
       end
     end
 
+    context "when gem to be removed is outside block" do
+      it "does not modify group" do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+
+          gem "rack"
+          group :test do
+            gem "coffee-script-source"
+          end
+        G
+
+        bundle! "remove rack"
+
+        expect(out).to include("rack was removed.")
+        gemfile_should_be <<-G
+          source "file://#{gem_repo1}"
+
+          group :test do
+            gem "coffee-script-source"
+          end
+        G
+      end
+    end
+
     context "when an empty block is also present" do
       it "removes all empty blocks" do
         gemfile <<-G
