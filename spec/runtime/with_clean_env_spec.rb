@@ -16,7 +16,7 @@ RSpec.describe "Bundler.with_env helpers" do
       bundle "install"
     end
 
-    it "should return the PATH present before bundle was activated", :ruby_repo do
+    it "should return the PATH present before bundle was activated" do
       code = "print Bundler.original_env['PATH']"
       path = `getconf PATH`.strip + "#{File::PATH_SEPARATOR}/foo"
       with_path_as(path) do

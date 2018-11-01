@@ -104,11 +104,12 @@ RSpec.describe "The library itself" do
     end
   end
 
-  it "has no malformed whitespace", :ruby_repo do
+  it "has no malformed whitespace" do
     exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE|vcr_cassettes/
     error_messages = []
     Dir.chdir(root) do
-      `git ls-files -z`.split("\x0").each do |filename|
+      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb spec/bundler` : `git ls-files -z -- lib`
+      lib_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_tab_characters(filename)
         error_messages << check_for_extra_spaces(filename)
@@ -117,11 +118,12 @@ RSpec.describe "The library itself" do
     expect(error_messages.compact).to be_well_formed
   end
 
-  it "does not include any leftover debugging or development mechanisms", :ruby_repo do
+  it "does not include any leftover debugging or development mechanisms" do
     exempt = %r{quality_spec.rb|support/helpers|vcr_cassettes|\.md|\.ronn}
     error_messages = []
     Dir.chdir(root) do
-      `git ls-files -z`.split("\x0").each do |filename|
+      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb spec/bundler` : `git ls-files -z -- lib`
+      lib_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_debugging_mechanisms(filename)
       end
@@ -129,11 +131,12 @@ RSpec.describe "The library itself" do
     expect(error_messages.compact).to be_well_formed
   end
 
-  it "does not include any unresolved merge conflicts", :ruby_repo do
+  it "does not include any unresolved merge conflicts" do
     error_messages = []
     exempt = %r{lock/lockfile_(bundler_1_)?spec|quality_spec|vcr_cassettes|\.ronn|lockfile_parser\.rb}
     Dir.chdir(root) do
-      `git ls-files -z`.split("\x0").each do |filename|
+      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb spec/bundler` : `git ls-files -z -- lib`
+      lib_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_git_merge_conflicts(filename)
       end
@@ -141,7 +144,7 @@ RSpec.describe "The library itself" do
     expect(error_messages.compact).to be_well_formed
   end
 
-  it "maintains language quality of the documentation", :ruby_repo do
+  it "maintains language quality of the documentation" do
     included = /ronn/
     error_messages = []
     Dir.chdir(root) do
@@ -154,11 +157,12 @@ RSpec.describe "The library itself" do
     expect(error_messages.compact).to be_well_formed
   end
 
-  it "maintains language quality of sentences used in source code", :ruby_repo do
+  it "maintains language quality of sentences used in source code" do
     error_messages = []
     exempt = /vendor/
     Dir.chdir(root) do
-      `git ls-files -z -- lib`.split("\x0").each do |filename|
+      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
+      lib_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_expendable_words(filename)
         error_messages << check_for_specific_pronouns(filename)
@@ -167,7 +171,7 @@ RSpec.describe "The library itself" do
     expect(error_messages.compact).to be_well_formed
   end
 
-  it "documents all used settings", :ruby_repo do
+  it "documents all used settings" do
     exemptions = %w[
       auto_config_jobs
       cache_command_is_package
@@ -191,7 +195,8 @@ RSpec.describe "The library itself" do
 
     Dir.chdir(root) do
       key_pattern = /([a-z\._-]+)/i
-      `git ls-files -z -- lib`.split("\x0").each do |filename|
+      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
+      lib_files.split("\x0").each do |filename|
         File.readlines(filename).each_with_index do |line, number|
           line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `#{filename}:#{number.succ}`" }
         end
@@ -216,10 +221,10 @@ RSpec.describe "The library itself" do
     expect(documented_settings).to be_sorted
   end
 
-  it "can still be built", :ruby_repo do
+  it "can still be built" do
     Dir.chdir(root) do
       begin
-        gem_command! :build, "bundler.gemspec"
+        gem_command! :build, gemspec
         if Bundler.rubygems.provides?(">= 2.4")
           # there's no way around this warning
           last_command.stderr.sub!(/^YAML safe loading.*/, "")
@@ -230,12 +235,13 @@ RSpec.describe "The library itself" do
         end
       ensure
         # clean up the .gem generated
-        FileUtils.rm("bundler-#{Bundler::VERSION}.gem")
+        path_prefix = ruby_core? ? "lib/" : "./"
+        FileUtils.rm("#{path_prefix}bundler-#{Bundler::VERSION}.gem")
       end
     end
   end
 
-  it "does not contain any warnings", :ruby_repo do
+  it "does not contain any warnings" do
     Dir.chdir(root) do
       exclusions = %w[
         lib/bundler/capistrano.rb
@@ -244,7 +250,8 @@ RSpec.describe "The library itself" do
         lib/bundler/vlad.rb
         lib/bundler/templates/gems.rb
       ]
-      lib_files = `git ls-files -z -- lib`.split("\x0").grep(/\.rb$/) - exclusions
+      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
+      lib_files = lib_files.split("\x0").grep(/\.rb$/) - exclusions
       lib_files.reject! {|f| f.start_with?("lib/bundler/vendor") }
       lib_files.map! {|f| f.chomp(".rb") }
       sys_exec!("ruby -w -Ilib") do |input, _, _|

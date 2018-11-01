@@ -734,7 +734,7 @@ RSpec.describe "bundle clean" do
     expect(vendored_gems("bundler/gems/very_simple_git_binary-1.0-#{revision[0..11]}")).to exist
   end
 
-  it "removes extension directories", :rubygems => "2.2" do
+  it "removes extension directories", :ruby_repo, :rubygems => "2.2" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 

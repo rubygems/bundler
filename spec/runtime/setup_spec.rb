@@ -144,7 +144,7 @@ RSpec.describe "Bundler.setup" do
       expect(rack_load_order).to be > 0
     end
 
-    it "orders the load path correctly when there are dependencies", :ruby_repo do
+    it "orders the load path correctly when there are dependencies" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rails"
@@ -860,7 +860,7 @@ end
   context "with bundler is located in symlinked GEM_HOME" do
     let(:gem_home) { Dir.mktmpdir }
     let(:symlinked_gem_home) { Tempfile.new("gem_home").path }
-    let(:bundler_dir) { File.expand_path("../../..", __FILE__) }
+    let(:bundler_dir) { ruby_core? ? File.expand_path("../../../..", __FILE__) : File.expand_path("../../..", __FILE__) }
     let(:bundler_lib) { File.join(bundler_dir, "lib") }
 
     before do
@@ -872,7 +872,8 @@ end
 
       FileUtils.ln_s(bundler_dir, File.join(gems_dir, "bundler-#{Bundler::VERSION}"))
 
-      gemspec = File.read("#{bundler_dir}/bundler.gemspec").
+      gemspec_file = ruby_core? ? "#{bundler_dir}/lib/bundler.gemspec" : "#{bundler_dir}/bundler.gemspec"
+      gemspec = File.read(gemmspec_file).
                 sub("Bundler::VERSION", %("#{Bundler::VERSION}"))
       gemspec = gemspec.lines.reject {|line| line =~ %r{lib/bundler/version} }.join
 
@@ -881,7 +882,7 @@ end
       end
     end
 
-    it "should successfully require 'bundler/setup'" do
+    it "should successfully require 'bundler/setup'", :ruby_repo do
       install_gemfile ""
 
       ruby <<-'R', :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
@@ -1265,7 +1266,7 @@ end
       expect(out).to eq("undefined\nconstant")
     end
 
-    describe "default gem activation", :ruby_repo do
+    describe "default gem activation" do
       let(:exemptions) do
         if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7") || ENV["RGV"] == "master"
           []
