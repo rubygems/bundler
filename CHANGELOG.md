@@ -1,3 +1,13 @@
+## 2.0.0.pre.1 (2018-11-09)
+
+Breaking Changes:
+
+  - Dropped support for versions of Ruby < 2.3
+  - Dropped support for version of RubyGems < 2.5
+  - Moved error messages from STDOUT to STDERR
+
+Note: To upgrade your Gemfile to Bundler 2 you will need to run `bundle update --bundler`
+
 ## 1.17.1 (2018-10-25)
 
  - Convert `Pathname`s to `String`s before sorting them, fixing #6760 and #6758 ([#6761](https://github.com/bundler/bundler/pull/6761), @alexggordon)
