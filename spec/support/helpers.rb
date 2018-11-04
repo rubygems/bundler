@@ -150,7 +150,7 @@ module Spec
     bang :bundle
 
     def forgotten_command_line_options(options)
-      remembered = Bundler::VERSION.split(".", 2).first == "1"
+      remembered = Bundler.bundler_major_version < 3
       options = options.map do |k, v|
         k = Array(k)[remembered ? 0 : -1]
         v = '""' if v && v.to_s.empty?
