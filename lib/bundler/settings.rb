@@ -40,6 +40,7 @@ module Bundler
       ignore_messages
       init_gems_rb
       list_command
+      lockfile_upgrade_warning
       lockfile_uses_separate_rubygems_sources
       major_deprecations
       no_install
