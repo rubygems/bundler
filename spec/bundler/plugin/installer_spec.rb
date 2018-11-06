@@ -3,10 +3,6 @@
 RSpec.describe Bundler::Plugin::Installer do
   subject(:installer) { Bundler::Plugin::Installer.new }
 
-  before do
-    # allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(Pathname.new("/Gemfile"))
-  end
-
   describe "cli install" do
     it "uses Gem.sources when non of the source is provided" do
       sources = double(:sources)

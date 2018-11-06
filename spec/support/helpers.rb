@@ -227,9 +227,9 @@ module Spec
         yield stdin, stdout, wait_thr if block_given?
         stdin.close
 
-        command_execution.exitstatus = wait_thr && wait_thr.value.exitstatus
         command_execution.stdout = Thread.new { stdout.read }.value.strip
         command_execution.stderr = Thread.new { stderr.read }.value.strip
+        command_execution.exitstatus = wait_thr && wait_thr.value.exitstatus
       end
 
       (@command_executions ||= []) << command_execution
