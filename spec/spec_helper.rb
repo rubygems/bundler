@@ -114,11 +114,13 @@ RSpec.configure do |config|
     mocks.allow_message_expectations_on_nil = false
   end
 
-  config.before :suite do
+  config.around :suite do |example|
     if ENV["BUNDLE_RUBY"]
       @orig_ruby = Gem.ruby
       Gem.ruby = ENV["BUNDLE_RUBY"]
     end
+    example.run
+    Gem.ruby = @orig_ruby if ENV["BUNDLE_RUBY"]
   end
 
   config.before :all do
@@ -146,7 +148,4 @@ RSpec.configure do |config|
     ENV.replace(original_env)
   end
 
-  config.after :suite do
-    Gem.ruby = @orig_ruby if ENV["BUNDLE_RUBY"]
-  end
 end
