@@ -147,5 +147,4 @@ RSpec.configure do |config|
     Dir.chdir(original_wd)
     ENV.replace(original_env)
   end
-
 end
