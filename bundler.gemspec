@@ -1,9 +1,8 @@
 # coding: utf-8
 # frozen_string_literal: true
 
-version = File.expand_path("../lib/bundler/version.rb", __FILE__)
-if File.file?(version)
-  require version
+if File.file?(File.expand_path("../lib/bundler/version.rb", __FILE__))
+  require File.expand_path("../lib/bundler/version.rb", __FILE__)
 else
   # for Ruby core repository
   require File.expand_path("../bundler/version.rb", __FILE__)
