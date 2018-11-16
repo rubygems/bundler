@@ -122,13 +122,13 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.around :suite do |example|
+  config.around :each do |example|
     if ENV["BUNDLE_RUBY"]
-      @orig_ruby = Gem.ruby
+      orig_ruby = Gem.ruby
       Gem.ruby = ENV["BUNDLE_RUBY"]
     end
     example.run
-    Gem.ruby = @orig_ruby if ENV["BUNDLE_RUBY"]
+    Gem.ruby = orig_ruby if ENV["BUNDLE_RUBY"]
   end
 
   config.before :all do
