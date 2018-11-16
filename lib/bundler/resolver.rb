@@ -414,7 +414,7 @@ module Bundler
         msg = msg.join("\n")
 
         raise SecurityError, msg if multisource_disabled
-        Bundler.ui.error "Warning: #{msg}"
+        Bundler.ui.warn "Warning: #{msg}"
       end
     end
   end
