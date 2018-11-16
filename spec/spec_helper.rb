@@ -52,6 +52,12 @@ ENV["THOR_COLUMNS"] = "10000"
 
 Spec::CodeClimate.setup
 
+module Gem
+  def self.ruby=(ruby)
+    @ruby = ruby
+  end
+end
+
 RSpec.configure do |config|
   config.include Spec::Builders
   config.include Spec::Helpers
@@ -93,6 +99,7 @@ RSpec.configure do |config|
   config.filter_run_excluding :git => LessThanProc.with(git_version)
   config.filter_run_excluding :rubygems_master => (ENV["RGV"] != "master")
   config.filter_run_excluding :bundler => LessThanProc.with(Bundler::VERSION.split(".")[0, 2].join("."))
+  config.filter_run_excluding :ruby_repo => !(ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"]).nil?
 
   config.filter_run_when_matching :focus unless ENV["CI"]
 
@@ -105,6 +112,15 @@ RSpec.configure do |config|
 
   config.mock_with :rspec do |mocks|
     mocks.allow_message_expectations_on_nil = false
+  end
+
+  config.around :suite do |example|
+    if ENV["BUNDLE_RUBY"]
+      @orig_ruby = Gem.ruby
+      Gem.ruby = ENV["BUNDLE_RUBY"]
+    end
+    example.run
+    Gem.ruby = @orig_ruby if ENV["BUNDLE_RUBY"]
   end
 
   config.before :all do
