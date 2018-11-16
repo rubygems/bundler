@@ -89,11 +89,11 @@ RSpec.describe Bundler::Plugin::Index do
     it "only registers a gem once for an event" do
       path = lib_path(plugin_name)
       index.register_plugin(plugin_name,
-                            path.to_s,
-                            [path.join("lib").to_s],
-                            commands,
-                            sources,
-                            hooks + hooks)
+        path.to_s,
+        [path.join("lib").to_s],
+        commands,
+        sources,
+        hooks + hooks)
       expect(index.hook_plugins("after-bar")).to eq([plugin_name])
     end
 
