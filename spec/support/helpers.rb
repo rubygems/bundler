@@ -212,7 +212,8 @@ module Spec
         args = args.gsub(/(?=")/, "\\")
         args = %("#{args}")
       end
-      sys_exec("#{Gem.ruby} -rrubygems -S gem --backtrace #{command} #{args}")
+      gem = ENV["BUNDLE_GEM"] || "#{Gem.ruby} -rrubygems -S gem --backtrace"
+      sys_exec("#{gem} #{command} #{args}")
     end
     bang :gem_command
 
@@ -313,7 +314,11 @@ module Spec
       gems.each do |g|
         path = if g == :bundler
           Dir.chdir(root) { gem_command! :build, gemspec.to_s }
-          bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
+          bundler_path = if ruby_core?
+            root + "lib/bundler-#{Bundler::VERSION}.gem"
+          else
+            root + "bundler-#{Bundler::VERSION}.gem"
+          end
         elsif g.to_s =~ %r{\A/.*\.gem\z}
           g
         else
