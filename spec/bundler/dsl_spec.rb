@@ -26,7 +26,7 @@ RSpec.describe Bundler::Dsl do
     end
 
     context "default hosts (git, gist)" do
-      # Note: There is a feature flag that will disabled these soruces by
+      # Note: There is a feature flag that will disable these sources by
       # default
       before { bundle "config skip_default_git_sources false" }
 
