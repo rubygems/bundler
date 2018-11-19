@@ -304,9 +304,8 @@ module Bundler
         #     "https://github.com/#{repo_name}.git"
         #   end
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        # TODO: 2.0 upgrade this setting to the default
-        if Bundler.settings["github.https"]
-          Bundler::SharedHelpers.major_deprecation 2, "The `github.https` setting will be removed"
+        if Bundler.settings["github.https"] || Bundler.feature_flag.github_https_source?
+          Bundler::SharedHelpers.major_deprecation 2, "The `github.https` setting will ba removed" if Bundler.settings["github.https"]
           "https://github.com/#{repo_name}.git"
         else
           "git://github.com/#{repo_name}.git"

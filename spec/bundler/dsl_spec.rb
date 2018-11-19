@@ -25,8 +25,18 @@ RSpec.describe Bundler::Dsl do
       expect { subject.git_source(:example) }.to raise_error(Bundler::InvalidOption)
     end
 
-    context "default hosts (git, gist)", :bundler => "< 2" do
+    context "default hosts (git, gist)" do
+      # Note: There is a feature flag that will disabled these soruces by
+      # default
+      before { bundle "config skip_default_git_sources false" }
+
       it "converts :github to :git" do
+        subject.gem("sparks", :github => "indirect/sparks")
+        github_uri = "https://github.com/indirect/sparks.git"
+        expect(subject.dependencies.first.source.uri).to eq(github_uri)
+      end
+
+      it "converts :github to :git with git scheme", :bundler => "< 2" do
         subject.gem("sparks", :github => "indirect/sparks")
         github_uri = "git://github.com/indirect/sparks.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
@@ -46,7 +56,7 @@ RSpec.describe Bundler::Dsl do
 
       it "converts 'rails' to 'rails/rails'" do
         subject.gem("rails", :github => "rails")
-        github_uri = "git://github.com/rails/rails.git"
+        github_uri = "https://github.com/rails/rails.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
       end
 
