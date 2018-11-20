@@ -11,7 +11,7 @@ RSpec.describe Bundler::SSLCerts::CertificateManager do
 
   # Pretend bundler root is rubygems root
   before do
-    # Backing up rubygems ceriticates
+    # Backing up rubygems certificates
     FileUtils.mv(rubygems_certs_dir, rubygems_certs_dir + ".back") if ruby_core?
 
     FileUtils.mkdir_p(rubygems_certs_dir)
