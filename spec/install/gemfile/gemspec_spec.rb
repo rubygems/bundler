@@ -263,6 +263,20 @@ RSpec.describe "bundle install from an existing gemspec" do
     expect(out).to eq("WIN")
   end
 
+  it "works with only_update_to_newer_versions" do
+    build_lib "omg", "2.0", :path => lib_path("omg")
+
+    install_gemfile <<-G
+      gemspec :path => "#{lib_path("omg")}"
+    G
+
+    build_lib "omg", "1.0", :path => lib_path("omg")
+
+    bundle! :install, :env => { "BUNDLE_BUNDLE_ONLY_UPDATE_TO_NEWER_VERSIONS" => "true" }
+
+    expect(the_bundle).to include_gems "omg 1.0"
+  end
+
   context "in deployment mode" do
     context "when the lockfile was not updated after a change to the gemspec's dependencies" do
       it "reports that installation failed" do

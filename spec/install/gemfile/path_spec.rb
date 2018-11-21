@@ -132,6 +132,20 @@ RSpec.describe "bundle install with explicit source paths" do
     expect(the_bundle).to include_gems "foo 1.0"
   end
 
+  it "works with only_update_to_newer_versions" do
+    build_lib "omg", "2.0", :path => lib_path("omg")
+
+    install_gemfile <<-G
+      gem "omg", :path => "#{lib_path("omg")}"
+    G
+
+    build_lib "omg", "1.0", :path => lib_path("omg")
+
+    bundle! :install, :env => { "BUNDLE_BUNDLE_ONLY_UPDATE_TO_NEWER_VERSIONS" => "true" }
+
+    expect(the_bundle).to include_gems "omg 1.0"
+  end
+
   it "prefers gemspecs closer to the path root" do
     build_lib "premailer", "1.0.0", :path => lib_path("premailer") do |s|
       s.write "gemfiles/ruby187.gemspec", <<-G
