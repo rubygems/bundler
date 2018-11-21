@@ -31,14 +31,6 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
     bundle! "install"
   end
 
-  describe "bundle_ruby" do
-    it "prints a deprecation" do
-      bundle_ruby
-      warnings.gsub! "\nruby #{RUBY_VERSION}", ""
-      expect(warnings).to have_major_deprecation "the bundle_ruby executable has been removed in favor of `bundle platform --ruby`"
-    end
-  end
-
   describe "Bundler" do
     describe ".clean_env" do
       it "is deprecated in favor of .original_env" do
