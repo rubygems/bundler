@@ -759,8 +759,6 @@ module Bundler
         end
       end
 
-      unlock_source_unlocks_spec = Bundler.feature_flag.unlock_source_unlocks_spec?
-
       converged = []
       @locked_specs.each do |s|
         # Replace the locked dependency's source with the equivalent source from the Gemfile
