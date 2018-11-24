@@ -201,6 +201,6 @@ module Bundler
       options[:force] = options[:redownload]
     end
 
-    def warn_ambiguous_gems end
+    def warn_ambiguous_gems; end
   end
 end
