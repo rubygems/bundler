@@ -772,11 +772,6 @@ module Bundler
         next if s.source.nil?
         next if @unlock[:sources].include?(s.source.name)
 
-        # XXX This is a backwards-compatibility fix to preserve the ability to
-        # unlock a single gem by passing its name via `--source`. See issue #3759
-        # TODO: delete in Bundler 2
-        next if unlock_source_unlocks_spec && @unlock[:sources].include?(s.name)
-
         # If the spec is from a path source and it doesn't exist anymore
         # then we unlock it.
 

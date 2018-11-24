@@ -289,26 +289,6 @@ module Bundler
                            :banner => "List the paths of all gems that are required by your Gemfile."
     method_option "outdated", :type => :boolean,
                               :banner => "Show verbose output including whether gems are outdated."
-    def show(gem_name = nil)
-      if ARGV[0] == "show"
-        rest = ARGV[1..-1]
-
-        new_command = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
-
-        new_arguments = rest.map do |arg|
-          next arg if arg != "--paths"
-          next "--path" if new_command == "info"
-        end
-
-        old_argv = ARGV.join(" ")
-        new_argv = [new_command, *new_arguments.compact].join(" ")
-
-        Bundler::SharedHelpers.major_deprecation(2, "use `bundle #{new_argv}` instead of `bundle #{old_argv}`")
-      end
-      require "bundler/cli/show"
-      Show.new(options, gem_name).run
-    end
-    # TODO: 2.0 remove `bundle show`
 
     if Bundler.feature_flag.list_command?
       desc "list", "List all gems in the bundle"
