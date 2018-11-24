@@ -173,6 +173,28 @@ RSpec.describe "bundler plugin install" do
       expect(out).to include("Installed plugin ga-plugin")
       plugin_should_be_installed("ga-plugin")
     end
+
+    context "in deployment mode" do
+      it "installs plugins" do
+        install_gemfile! <<-G
+          source 'file://#{gem_repo2}'
+          gem 'rack', "1.0.0"
+        G
+
+        install_gemfile! <<-G, forgotten_command_line_options(:deployment => true)
+          source 'file://#{gem_repo2}'
+          plugin 'foo'
+          gem 'rack', "1.0.0"
+        G
+
+        expect(out).to include("Installed plugin foo")
+
+        expect(out).to include("Bundle complete!")
+
+        expect(the_bundle).to include_gems("rack 1.0.0")
+        plugin_should_be_installed("foo")
+      end
+    end
   end
 
   context "inline gemfiles" do
