@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+ # frozen_string_literal: true
 
 require "bundler/worker"
 require "bundler/installer/gem_installer"
