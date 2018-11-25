@@ -386,10 +386,6 @@ EOF
       if Bundler.respond_to?(:remove_instance_variable)
         Bundler.remove_instance_variable(:@requires_sudo_ran)
         Bundler.remove_instance_variable(:@requires_sudo)
-      else
-        # TODO: Remove these code when Bundler drops Ruby 1.8.7 support
-        Bundler.send(:remove_instance_variable, :@requires_sudo_ran)
-        Bundler.send(:remove_instance_variable, :@requires_sudo)
       end
     end
     context "writable paths" do
