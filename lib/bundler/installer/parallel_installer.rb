@@ -94,7 +94,7 @@ module Bundler
       # Since `autoload` has the potential for threading issues on 1.8.7
       # TODO:  remove in bundler 2.0
       require "bundler/gem_remote_fetcher" if RUBY_VERSION < "1.9"
-      
+
       check_for_corrupt_lockfile
 
       if @size > 1
