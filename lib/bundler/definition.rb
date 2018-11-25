@@ -425,7 +425,7 @@ module Bundler
       deleted_deps = @locked_deps.values - @dependencies
 
       # Check if it is possible that the source is only changed thing
-      if (new_deps.empty? && deleted_deps.empty?) && (!new_sources.empty? && !deleted_sources.empty?)
+      if new_deps.empty? == deleted_deps.empty?
         new_sources.reject! {|source| (source.path? && source.path.exist?) || equivalent_rubygems_remotes?(source) }
         deleted_sources.reject! {|source| (source.path? && source.path.exist?) || equivalent_rubygems_remotes?(source) }
       end
