@@ -198,7 +198,7 @@ RSpec.describe "major deprecations", :bundler => "< 3" do
     end
 
     context "with github gems" do
-      it "warns about the https change" do
+      it "warns about the https change", :bundler => "3" do
         msg = <<-EOS
 The :github git source is deprecated, and will be removed in Bundler 3.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
 
