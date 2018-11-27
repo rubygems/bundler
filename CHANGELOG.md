@@ -1,3 +1,15 @@
+## 2.0.0.pre.2 (2018-11-27)
+
+Breaking Changes:
+
+  - `:github` source in the Gemfile now defaults to using HTTPS
+
+Changes
+
+  - Add compatibility for Bundler merge into ruby-src
+
+Note: To upgrade your Gemfile to Bundler 2 you will need to run `bundle update --bundler`
+
 ## 2.0.0.pre.1 (2018-11-09)
 
 Breaking Changes:
