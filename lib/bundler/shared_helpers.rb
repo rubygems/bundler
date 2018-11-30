@@ -210,7 +210,7 @@ module Bundler
 
     def md5_available?
       return @md5_available if defined?(@md5_available)
-      require 'openssl'
+      require "openssl"
       @md5_available = if OpenSSL::OPENSSL_FIPS && OpenSSL.fips_mode
         false
       else
