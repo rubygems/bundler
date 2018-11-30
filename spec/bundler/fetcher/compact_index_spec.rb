@@ -59,8 +59,7 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
 
         context "when FIPS-mode is active" do
           before do
-            allow(OpenSSL::Digest::MD5).to receive(:digest).
-              and_raise(OpenSSL::Digest::DigestError)
+            allow(OpenSSL.fips_mode).to return(true)
           end
 
           it "returns false" do
