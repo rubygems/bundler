@@ -25,18 +25,44 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
     end
 
     describe "#available?" do
+      def remove_cached_md5_availability
+        return unless Bundler::SharedHelpers.instance_variable_defined?(:@md5_available)
+        Bundler::SharedHelpers.remove_instance_variable(:@md5_available)
+      end
+
       before do
+        remove_cached_md5_availability
         allow(compact_index).to receive(:compact_index_client).
           and_return(double(:compact_index_client, :update_and_parse_checksums! => true))
       end
+
+      after { remove_cached_md5_availability }
 
       it "returns true" do
         expect(compact_index).to be_available
       end
 
       context "when OpenSSL is not available" do
+        it "returns true" do
+          allow(Bundler::SharedHelpers).to receive(:require).with("openssl").and_raise(LoadError)
+          expect(compact_index).to be_available
+        end
+      end
+
+      context "when OpenSSL is FIPS-enabled", :ruby => ">= 2.0.0" do
+
         before do
-          allow(compact_index).to receive(:require).with("openssl").and_raise(LoadError)
+          stub_const("OpenSSL::OPENSSL_FIPS", true)
+        end
+
+        context "when FIPS-mode is active" do
+          before do
+            allow(OpenSSL).to receive(:fips_mode).and_return(true)
+          end
+
+          it "returns false" do
+            expect(compact_index).to_not be_available
+          end
         end
 
         it "returns true" do
@@ -44,22 +70,16 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
         end
       end
 
-      context "when OpenSSL is FIPS-enabled", :ruby => ">= 2.0.0" do
-        def remove_cached_md5_availability
-          return unless Bundler::SharedHelpers.instance_variable_defined?(:@md5_available)
-          Bundler::SharedHelpers.remove_instance_variable(:@md5_available)
-        end
+      context "when OpenSSL is FIPS-enabled", :ruby => "< 2.0.0" do
 
         before do
-          remove_cached_md5_availability
           stub_const("OpenSSL::OPENSSL_FIPS", true)
         end
 
-        after { remove_cached_md5_availability }
-
         context "when FIPS-mode is active" do
           before do
-            allow(OpenSSL).to receive(:fips_mode).and_return(true)
+            allow(OpenSSL::Digest::MD5).to receive(:digest).
+              and_raise(OpenSSL::Digest::DigestError)
           end
 
           it "returns false" do
