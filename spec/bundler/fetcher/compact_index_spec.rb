@@ -50,7 +50,6 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
       end
 
       context "when OpenSSL is FIPS-enabled", :ruby => ">= 2.0.0" do
-
         before do
           stub_const("OpenSSL::OPENSSL_FIPS", true)
         end
@@ -71,7 +70,6 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
       end
 
       context "when OpenSSL is FIPS-enabled", :ruby => "< 2.0.0" do
-
         before do
           stub_const("OpenSSL::OPENSSL_FIPS", true)
         end

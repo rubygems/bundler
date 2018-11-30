@@ -222,10 +222,10 @@ module Bundler
           OpenSSL::Digest::MD5.digest("")
           true
         end
-        rescue LoadError
-          true
-        rescue OpenSSL::Digest::DigestError
-          false
+      rescue LoadError
+        true
+      rescue OpenSSL::Digest::DigestError
+        false
       end
     end
 
