@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "bundler/uri_credentials_filter.rb"
+
+
 module Bundler
   class LockfileGenerator
     attr_reader :definition
@@ -29,8 +32,15 @@ module Bundler
 
     def add_sources
       definition.send(:sources).lock_sources.each_with_index do |source, idx|
-        out << "\n" unless idx.zero?
+        # Filter out credentials from Gemfile as of Bundler 2.0
+        source.replace_remotes(
+          source.remotes.map do |remote|
+            URICredentialsFilter.credential_filtered_uri(remote)
+          end
+        )
 
+        out << "\n" unless idx.zero?
+        
         # Add the source header
         out << source.to_lock
 
