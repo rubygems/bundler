@@ -32,7 +32,7 @@ module Bundler
     def add_sources
       definition.send(:sources).lock_sources.each_with_index do |source, idx|
         # Filter out credentials from Gemfile as of Bundler 2.0
-        if (source.instance_of? Bundler::Source::Rubygems)
+        if source.instance_of? Bundler::Source::Rubygems
           source.replace_remotes(
             source.remotes.map do |remote|
               URICredentialsFilter.credential_filtered_uri(remote)
