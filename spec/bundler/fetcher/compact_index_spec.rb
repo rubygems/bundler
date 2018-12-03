@@ -69,23 +69,25 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
         end
       end
 
-      context "when OpenSSL is not FIPS-enabled" do
-        context "when FIPS-mode is active" do
-          before do
-            allow(OpenSSL::Digest::MD5).to receive(:digest).
-              and_raise(OpenSSL::Digest::DigestError)
+      if defined?(OpenSSL::OPENSSL_FIPS)
+        context "when OpenSSL is not FIPS-enabled" do
+          context "when FIPS-mode is active" do
+            before do
+              allow(OpenSSL::Digest::MD5).to receive(:digest).
+                and_raise(OpenSSL::Digest::DigestError)
+            end
+
+            it "returns false" do
+              expect(compact_index).to_not be_available
+            end
           end
 
-          it "returns false" do
-            expect(compact_index).to_not be_available
+          it "returns true" do
+            expect(compact_index).to be_available
           end
-        end
-
-        it "returns true" do
-          expect(compact_index).to be_available
         end
       end
-    end if defined?(OpenSSL::OPENSSL_FIPS)
+    end
 
     context "logging" do
       before { allow(compact_index).to receive(:log_specs).and_call_original }
