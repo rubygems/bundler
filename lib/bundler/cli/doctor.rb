@@ -94,12 +94,23 @@ module Bundler
     end
 
   private
+    
+    def ensure_path_exists(path)
+      does_exist = File.exist?(path)
+      unless does_exist
+        Bundler.ui.error "Bundler's home path does not exist. Expected to be at #{path} which does not exist."
+      end
+      does_exist
+    end
 
     def check_home_permissions
       require "find"
       files_not_readable_or_writable = []
       files_not_rw_and_owned_by_different_user = []
       files_not_owned_by_current_user_but_still_rw = []
+      
+      return false unless ensure_path_exists(Bundler.home.to_s)
+      
       Find.find(Bundler.home.to_s).each do |f|
         if !File.writable?(f) || !File.readable?(f)
           if File.stat(f).uid != Process.uid
