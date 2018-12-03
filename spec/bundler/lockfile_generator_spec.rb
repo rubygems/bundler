@@ -2,7 +2,6 @@
 
 RSpec.describe "Bundler::LockfileGenerator" do
   context "Gemfile contains private credentials in source", :bundler => ">= 2" do
-
     it "filters out private token for lockfile" do
       gemfile <<-G
 source "https://my-secret-token:x-oauth-basic@github.com/foo/bar.git"
