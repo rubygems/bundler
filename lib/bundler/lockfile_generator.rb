@@ -2,7 +2,6 @@
 
 require "bundler/uri_credentials_filter.rb"
 
-
 module Bundler
   class LockfileGenerator
     attr_reader :definition
