@@ -40,7 +40,7 @@ module Bundler
         )
 
         out << "\n" unless idx.zero?
-        
+
         # Add the source header
         out << source.to_lock
 
