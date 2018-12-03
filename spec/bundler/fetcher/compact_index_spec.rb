@@ -72,7 +72,7 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
       context "when OpenSSL is FIPS-enabled with OPENSSL_FIPS not available" do
         context "when FIPS-mode is active" do
           before do
-            OpenSSL.send(:remove_const, 'OPENSSL_FIPS') if defined? OpenSSL::OPENSSL_FIPS
+            OpenSSL.send(:remove_const, "OPENSSL_FIPS") if defined? OpenSSL::OPENSSL_FIPS
             allow(OpenSSL::Digest::MD5).to receive(:digest).
               and_raise(OpenSSL::Digest::DigestError)
           end
