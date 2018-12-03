@@ -69,7 +69,7 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
         end
       end
 
-      if defined?(OpenSSL::OPENSSL_FIPS)
+      unless defined?(OpenSSL::OPENSSL_FIPS)
         context "when OpenSSL is not FIPS-enabled" do
           context "when FIPS-mode is active" do
             before do
