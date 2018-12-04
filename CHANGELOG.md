@@ -1,3 +1,7 @@
+## 2.0.0 (2018-12-04)
+
+No changes
+
 ## 2.0.0.pre.2 (2018-11-27)
 
 Breaking Changes:
