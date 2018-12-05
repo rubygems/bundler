@@ -112,6 +112,19 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(exitstatus).to be_zero if exitstatus
   end
 
+  it "has an option for quiet installation" do
+    script <<-RUBY, :artifice => "endpoint"
+      require 'bundler'
+
+      gemfile(true, :quiet => true) do
+        source "https://notaserver.com"
+        gem "activesupport", :require => true
+      end
+    RUBY
+
+    expect(out).to be_empty
+  end
+
   it "raises an exception if passed unknown arguments" do
     script <<-RUBY
       gemfile(true, :arglebargle => true) do
