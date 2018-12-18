@@ -283,7 +283,7 @@ EOF
     # @deprecated Use `original_env` instead
     # @return [Hash] Environment with all bundler-related variables removed
     def clean_env
-      Bundler::SharedHelpers.major_deprecation(2, "`Bundler.clean_env` has weird edge cases, use `.original_env` instead")
+      Bundler::SharedHelpers.major_deprecation(2, "`Bundler.clean_env` has weird edge cases, use `Bundler.original_env` instead")
       env = original_env
 
       if env.key?("BUNDLER_ORIG_MANPATH")
