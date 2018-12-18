@@ -158,6 +158,22 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
+  describe "Bundler.with_unbundled_env" do
+    it "should set ENV to unbundled_env in the block" do
+      expected = Bundler.unbundled_env
+      actual = Bundler.with_unbundled_env { ENV.to_hash }
+      expect(actual).to eq(expected)
+    end
+
+    it "should restore the environment after execution" do
+      Bundler.with_unbundled_env do
+        ENV["FOO"] = "hello"
+      end
+
+      expect(ENV).not_to have_key("FOO")
+    end
+  end
+
   describe "Bundler.clean_system", :ruby => ">= 1.9", :bundler => "< 2" do
     it "runs system inside with_clean_env" do
       Bundler.clean_system(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))

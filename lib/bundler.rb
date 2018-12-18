@@ -324,6 +324,11 @@ EOF
       with_env(clean_env) { yield }
     end
 
+    # Run block with all bundler-related variables removed
+    def with_unbundled_env
+      with_env(unbundled_env) { yield }
+    end
+
     def clean_system(*args)
       with_clean_env { Kernel.system(*args) }
     end
