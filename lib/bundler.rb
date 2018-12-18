@@ -314,10 +314,12 @@ EOF
       env
     end
 
+    # Run block with environment present before Bundler was activated
     def with_original_env
       with_env(original_env) { yield }
     end
 
+    # Run block with all bundler-related variables removed
     def with_clean_env
       with_env(clean_env) { yield }
     end
