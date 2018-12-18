@@ -2,6 +2,7 @@
 
 RSpec.describe "Bundler.with_env helpers" do
   def bundle_exec_ruby!(code, *args)
+    build_bundler_context
     opts = args.last.is_a?(Hash) ? args.pop : {}
     env = opts[:env] ||= {}
     env[:RUBYOPT] ||= "-r#{spec_dir.join("support/hax")}"
@@ -9,13 +10,13 @@ RSpec.describe "Bundler.with_env helpers" do
     bundle! "exec '#{Gem.ruby}' -e #{code}", *args
   end
 
-  describe "Bundler.original_env" do
-    before do
-      bundle "config path vendor/bundle"
-      gemfile ""
-      bundle "install"
-    end
+  def build_bundler_context
+    bundle "config path vendor/bundle"
+    gemfile ""
+    bundle "install"
+  end
 
+  describe "Bundler.original_env" do
     it "should return the PATH present before bundle was activated" do
       code = "print Bundler.original_env['PATH']"
       path = `getconf PATH`.strip + "#{File::PATH_SEPARATOR}/foo"
@@ -46,6 +47,7 @@ RSpec.describe "Bundler.with_env helpers" do
       RB
       path = `getconf PATH`.strip + File::PATH_SEPARATOR + File.dirname(Gem.ruby)
       with_path_as(path) do
+        build_bundler_context
         bundle! "exec '#{Gem.ruby}' #{bundled_app("exe.rb")} 2", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
       end
       expect(err).to eq <<-EOS.strip
@@ -58,7 +60,7 @@ RSpec.describe "Bundler.with_env helpers" do
     it "removes variables that bundler added", :ruby_repo do
       original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")', :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" })
       code = 'puts Bundler.original_env.to_a.map {|e| e.join("=") }.sort.join("\n")'
-      bundle! "exec '#{Gem.ruby}' -e #{code.dump}", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+      bundle_exec_ruby! code.dump
       expect(out).to eq original
     end
   end
