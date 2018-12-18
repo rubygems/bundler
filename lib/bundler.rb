@@ -319,9 +319,15 @@ EOF
       with_env(original_env) { yield }
     end
 
-    # Run block with all bundler-related variables removed
+    # @deprecated Use `with_unbundled_env` instead
     def with_clean_env
-      with_env(clean_env) { yield }
+      Bundler::SharedHelpers.major_deprecation(
+        2,
+        "`Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
+      )
+
+      with_env(unbundled_env) { yield }
     end
 
     # Run block with all bundler-related variables removed

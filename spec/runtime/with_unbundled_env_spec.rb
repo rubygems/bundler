@@ -143,8 +143,8 @@ RSpec.describe "Bundler.with_env helpers" do
   end
 
   describe "Bundler.with_clean_env" do
-    it "should set ENV to clean_env in the block" do
-      expected = Bundler.clean_env
+    it "should set ENV to unbundled_env in the block" do
+      expected = Bundler.unbundled_env
       actual = Bundler.with_clean_env { ENV.to_hash }
       expect(actual).to eq(expected)
     end
