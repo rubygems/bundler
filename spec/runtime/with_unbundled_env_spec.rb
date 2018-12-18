@@ -63,7 +63,7 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.unbundled_env", :bundler => "< 2" do
+  describe "Bundler.unbundled_env" do
     before do
       bundle "config path vendor/bundle"
       gemfile ""
@@ -116,7 +116,7 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.with_clean_env", :bundler => "< 2" do
+  describe "Bundler.with_clean_env" do
     it "should set ENV to clean_env in the block" do
       expected = Bundler.clean_env
       actual = Bundler.with_clean_env { ENV.to_hash }
