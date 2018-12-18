@@ -63,7 +63,7 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.clean_env", :bundler => "< 2" do
+  describe "Bundler.unbundled_env", :bundler => "< 2" do
     before do
       bundle "config path vendor/bundle"
       gemfile ""
@@ -71,28 +71,28 @@ RSpec.describe "Bundler.with_env helpers" do
     end
 
     it "should delete BUNDLE_PATH" do
-      code = "print Bundler.clean_env.has_key?('BUNDLE_PATH')"
+      code = "print Bundler.unbundled_env.has_key?('BUNDLE_PATH')"
       ENV["BUNDLE_PATH"] = "./foo"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).to eq "false"
     end
 
     it "should remove '-rbundler/setup' from RUBYOPT" do
-      code = "print Bundler.clean_env['RUBYOPT']"
+      code = "print Bundler.unbundled_env['RUBYOPT']"
       ENV["RUBYOPT"] = "-W2 -rbundler/setup"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).not_to include("-rbundler/setup")
     end
 
     it "should clean up RUBYLIB", :ruby_repo do
-      code = "print Bundler.clean_env['RUBYLIB']"
+      code = "print Bundler.unbundled_env['RUBYLIB']"
       ENV["RUBYLIB"] = root.join("lib").to_s + File::PATH_SEPARATOR + "/foo"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).to eq("/foo")
     end
 
     it "should restore the original MANPATH" do
-      code = "print Bundler.clean_env['MANPATH']"
+      code = "print Bundler.unbundled_env['MANPATH']"
       ENV["MANPATH"] = "/foo"
       ENV["BUNDLER_ORIG_MANPATH"] = "/foo-original"
       bundle_exec_ruby! code.dump

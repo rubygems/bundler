@@ -280,10 +280,19 @@ EOF
       ORIGINAL_ENV.clone
     end
 
-    # @deprecated Use `original_env` instead
-    # @return [Hash] Environment with all bundler-related variables removed
+    # @deprecated Use `unbundled_env` instead
     def clean_env
-      Bundler::SharedHelpers.major_deprecation(2, "`Bundler.clean_env` has weird edge cases, use `Bundler.original_env` instead")
+      Bundler::SharedHelpers.major_deprecation(
+        2,
+        "`Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
+      )
+
+      unbundled_env
+    end
+
+    # @return [Hash] Environment with all bundler-related variables removed
+    def unbundled_env
       env = original_env
 
       if env.key?("BUNDLER_ORIG_MANPATH")
