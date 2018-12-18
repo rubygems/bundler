@@ -10,7 +10,6 @@ module Bundler
       end
     end
 
-
     attr_reader :options
 
     def initialize(gem, options = {})
