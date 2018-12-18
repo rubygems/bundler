@@ -65,15 +65,7 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.unbundled_env" do
-    let(:modified_env) { "Bundler.unbundled_env" }
-
-    before do
-      bundle "config path vendor/bundle"
-      gemfile ""
-      bundle "install"
-    end
-
+  shared_examples_for "an unbundling helper" do
     it "should delete BUNDLE_PATH" do
       code = "print #{modified_env}.has_key?('BUNDLE_PATH')"
       ENV["BUNDLE_PATH"] = "./foo"
@@ -102,6 +94,18 @@ RSpec.describe "Bundler.with_env helpers" do
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).to include("/foo-original")
     end
+  end
+
+  describe "Bundler.unbundled_env" do
+    let(:modified_env) { "Bundler.unbundled_env" }
+
+    it_behaves_like "an unbundling helper"
+  end
+
+  describe "Bundler.clean_env" do
+    let(:modified_env) { "Bundler.clean_env" }
+
+    it_behaves_like "an unbundling helper"
   end
 
   describe "Bundler.with_original_env" do
