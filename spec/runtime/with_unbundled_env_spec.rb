@@ -78,7 +78,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "print #{modified_env}.has_key?('BUNDLE_PATH')"
       ENV["BUNDLE_PATH"] = "./foo"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).to eq "false"
+      expect(last_command.stdboth).to include "false"
     end
 
     it "should remove '-rbundler/setup' from RUBYOPT" do
@@ -92,7 +92,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "print #{modified_env}['RUBYLIB']"
       ENV["RUBYLIB"] = root.join("lib").to_s + File::PATH_SEPARATOR + "/foo"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).to eq("/foo")
+      expect(last_command.stdboth).to include("/foo")
     end
 
     it "should restore the original MANPATH" do
@@ -100,7 +100,7 @@ RSpec.describe "Bundler.with_env helpers" do
       ENV["MANPATH"] = "/foo"
       ENV["BUNDLER_ORIG_MANPATH"] = "/foo-original"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).to eq("/foo-original")
+      expect(last_command.stdboth).to include("/foo-original")
     end
   end
 
