@@ -106,6 +106,24 @@ RSpec.describe "Bundler.with_env helpers" do
     let(:modified_env) { "Bundler.clean_env" }
 
     it_behaves_like "an unbundling helper"
+
+    it "prints a deprecation", :bundler => 2 do
+      code = "Bundler.clean_env"
+      bundle_exec_ruby! code.dump
+      expect(last_command.stdboth).to include(
+        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
+      )
+    end
+
+    it "does not print a deprecation", :bundler => "< 2" do
+      code = "Bundler.clean_env"
+      bundle_exec_ruby! code.dump
+      expect(last_command.stdboth).not_to include(
+        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
+      )
+    end
   end
 
   describe "Bundler.with_original_env" do
