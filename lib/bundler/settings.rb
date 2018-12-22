@@ -282,8 +282,7 @@ module Bundler
 
     def allow_sudo?
       key = key_for(:path)
-      path_configured = @temporary.key?(key) || @local_config.key?(key)
-      !path_configured
+      @temporary.key?(key) || @local_config.key?(key)
     end
 
     def ignore_config?
