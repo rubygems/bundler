@@ -3,11 +3,11 @@
 Bugfixes:
 
  - Fix a Bundler error when installing gems on old versions of RubyGems ([#6839](https://github.com/bundler/bundler/issues/6839), @colby-swandale)
- - Fix an rare issue where Bundler was removing itself after a `bundle clean` ([#6829](https://github.com/bundler/bundler/issues/6829), @colby-swandale)
+ - Fix a rare issue where Bundler was removing itself after a `bundle clean` ([#6829](https://github.com/bundler/bundler/issues/6829), @colby-swandale)
 
 Documentation:
 
-  - add entry for `bundle remove` command to the main Bundler manual page
+  - Add entry for the `bundle remove` command to the main Bundler manual page
 
 ## 1.17.2 (2018-12-11)
 
