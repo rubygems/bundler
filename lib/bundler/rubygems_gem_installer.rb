@@ -10,6 +10,13 @@ module Bundler
       end
     end
 
+    attr_reader :options
+
+    def initialize(gem, options = {})
+      @options = {}
+      super
+    end
+
     def check_executable_overwrite(filename)
       # Bundler needs to install gems regardless of binstub overwriting
     end
