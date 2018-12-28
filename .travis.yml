@@ -32,6 +32,7 @@ rvm:
   - 2.5.3
   - 2.4.5
   - 2.3.8
+  - 2.6.0
 
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:125 for the list of possible RGV values
@@ -39,21 +40,13 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.7.7
+  - RGV=v3.0.1
 
 matrix:
   include:
     # 3.x mode
     - rvm: 2.5.3
-      env: RGV=v2.7.7 BUNDLER_SPEC_SUB_VERSION=3.0.0
-    # Ruby 2.4, Rubygems 2.6 and up
-    - rvm: 2.4.5
-      env: RGV=v2.6.14
-    # Ruby 2.3, Rubygems 2.5 and up
-    - rvm: 2.3.8
-      env: RGV=v2.5.2
-    - rvm: 2.3.8
-      env: RGV=v2.6.14
+      env: RGV=v3.0.1 BUNDLER_SPEC_SUB_VERSION=3.0.0
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
       env: RGV=master
