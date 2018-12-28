@@ -8,8 +8,6 @@ rescue LoadError
   require File.expand_path("../bundler/version", __FILE__)
 end
 
-require "shellwords"
-
 Gem::Specification.new do |s|
   s.name        = "bundler"
   s.version     = Bundler::VERSION
@@ -49,7 +47,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ronn",       "~> 0.7.3"
   s.add_development_dependency "rspec",      "~> 3.6"
 
-  s.files = `git -C #{Shellwords.escape File.dirname(__FILE__)} ls-files -z`.split("\x0").select {|f| f.match(%r{^(lib|exe)/}) }
+  s.files = IO.popen(["git", "-C", File.dirname(__FILE__), "ls-files", "-z"], &:read).split("\x0").select {|f| f.match(%r{^(lib|exe)/}) }
 
   # we don't check in man pages, but we need to ship them because
   # we use them to generate the long-form help for each command.
