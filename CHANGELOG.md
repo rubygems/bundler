@@ -1,3 +1,13 @@
+## 2.0.0.pre.3 (2018-12-28)
+
+Breaking Changes:
+
+  - Bundler 2 now requires RubyGems 3.0.0 at minimum
+
+Changes:
+
+  - Import changes from Bundler 1.17.3 release
+
 ## 2.0.0.pre.2 (2018-11-27)
 
 Breaking Changes:
