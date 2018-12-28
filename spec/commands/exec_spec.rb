@@ -800,10 +800,11 @@ __FILE__: #{path.to_s.inspect}
       it "overrides disable_shared_gems so bundler can be found" do
         skip "bundler 1.16.x is not support with Ruby 2.6 on Travis CI" if RUBY_VERSION >= "2.6"
 
+        system_gems :bundler
         file = bundled_app("file_that_bundle_execs.rb")
         create_file(file, <<-RB)
           #!#{Gem.ruby}
-          puts `bundle exec echo foo`
+          puts `#{system_bundle_bin_path} exec echo foo`
         RB
         file.chmod(0o777)
         bundle! "exec #{file}", :system_bundler => true

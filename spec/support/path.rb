@@ -90,6 +90,10 @@ module Spec
       tmp("gems/system", *path)
     end
 
+    def system_bundle_bin_path
+      system_gem_path("bin/bundle")
+    end
+
     def lib_path(*args)
       tmp("libs", *args)
     end
