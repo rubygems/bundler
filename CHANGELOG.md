@@ -1,4 +1,4 @@
-## 2.0.0.pre.3 (2018-12-28)
+## 2.0.0.pre.3 (2018-12-30)
 
 Breaking Changes:
 
@@ -6,7 +6,10 @@ Breaking Changes:
 
 Changes:
 
+  - Ruby 2.6 compatibility fixes (@segiddins)
   - Import changes from Bundler 1.17.3 release
+
+Note: To upgrade your Gemfile to Bundler 2 you will need to run `bundle update --bundler`
 
 ## 2.0.0.pre.2 (2018-11-27)
 
