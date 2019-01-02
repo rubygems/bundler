@@ -3,7 +3,7 @@
 require "bundler/compatibility_guard"
 
 require "pathname"
-require "rubygems"
+require "rubygems" unless Object.const_defined? :Gem
 
 require "bundler/version"
 require "bundler/constants"

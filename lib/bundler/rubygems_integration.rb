@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "monitor"
-require "rubygems"
+require "rubygems" unless Object.const_defined? :Gem
 require "rubygems/config_file"
 
 module Bundler

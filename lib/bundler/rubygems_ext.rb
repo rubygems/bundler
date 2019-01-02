@@ -7,8 +7,7 @@ if defined?(Gem::QuickLoader)
   Gem::QuickLoader.load_full_rubygems_library
 end
 
-require "rubygems"
-require "rubygems/specification"
+require "rubygems" unless Object.const_defined? :Gem
 
 begin
   # Possible use in Gem::Specification#source below and require

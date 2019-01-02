@@ -11,7 +11,7 @@ module Bundler
 
   def self.overwrite_loaded_gem_version
     begin
-      require "rubygems"
+      require "rubygems" unless Object.const_defined? :Gem
     rescue LoadError
       return
     end

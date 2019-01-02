@@ -1,6 +1,6 @@
 # frozen_string_literal: false
 
-require "rubygems"
+require "rubygems" unless Object.const_defined? :Gem
 require "bundler/version"
 
 if Bundler::VERSION.split(".").first.to_i >= 2
