@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
 
   if s.version >= Gem::Version.new("2.a".dup)
     s.required_ruby_version     = ">= 2.3.0"
-    s.required_rubygems_version = ">= 3.0.0"
+    s.required_rubygems_version = ">= 2.5.0"
   else
     s.required_ruby_version     = ">= 1.8.7"
     s.required_rubygems_version = ">= 1.3.6"
