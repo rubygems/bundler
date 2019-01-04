@@ -12,9 +12,19 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
         $ brew install graphviz groff
 
-3. You may also have to install the `bsdmainutils` package on linux if your distribution does not include the `col` command.
+    And for Windows:
+
+        [gnuwin32.sourceforge.net/packages/groff.htm](http://gnuwin32.sourceforge.net/packages/groff.htm)
+
+3. If your operating system doesn't include the `col` command by default:
+
+    On Linux install `bsdmainutils` package:
 
         $ sudo apt-get install bsdmainutils -y
+
+    On Windows it is included in `util-linux-ng`:
+
+        [gnuwin32.sourceforge.net/packages/util-linux-ng.htm](http://gnuwin32.sourceforge.net/packages/util-linux-ng.htm)
 
 4. Install Bundler's development dependencies:
 
