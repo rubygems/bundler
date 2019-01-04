@@ -49,10 +49,6 @@ jobs:
     - rvm: 2.6.0
       script: rake rubocop
       stage: linting
-    # 3.x mode
-    - rvm: 2.5.3
-      env: RGV=v3.0.1 BUNDLER_SPEC_SUB_VERSION=3.0.0
-      stage: test
     # Ruby 2.5, Rubygems 2.7 and up
     - rvm: 2.5.3
       env: RGV=v2.7.7
