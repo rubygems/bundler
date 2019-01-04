@@ -7,9 +7,8 @@ steps:
 
   
 - script: |
-    gem uninstall rake
-  displayName: 'remove rake (Windows only)'
-  condition: eq(variables['Agent.OS'], 'Windows_NT')
+    rake --version
+  displayName: 'rake --version'
 
 - script: |
     ruby bin/rake spec:deps
