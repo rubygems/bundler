@@ -330,7 +330,7 @@ E
       expect(out).to eq("1")
     end
 
-    it "doesn't duplicate quotes around values", :if => (RUBY_VERSION >= "2.1") do
+    it "doesn't duplicate quotes around values" do
       bundled_app(".bundle").mkpath
       File.open(bundled_app(".bundle/config"), "w") do |f|
         f.write 'BUNDLE_FOO: "$BUILD_DIR"'

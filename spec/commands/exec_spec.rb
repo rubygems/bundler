@@ -716,7 +716,7 @@ __FILE__: #{path.to_s.inspect}
           end
         RUBY
 
-        it "receives the signal", :ruby => ">= 1.9.3" do
+        it "receives the signal" do
           bundle!("exec #{path}") do |_, o, thr|
             o.gets # Consumes 'Started' and ensures that thread has started
             Process.kill("INT", thr.pid)
