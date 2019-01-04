@@ -20,8 +20,8 @@ RSpec.describe ".bundle/config" do
 
       context "with global config" do
         it "prints config assigned to local scope" do
-          bundle "config --local foo bar2"
-          bundle "config --parseable"
+          bundle "config set --local foo bar2"
+          bundle "config list --parseable"
           expect(out).to include("foo=bar2")
         end
       end
@@ -110,16 +110,16 @@ RSpec.describe ".bundle/config" do
     end
 
     it "can be deleted" do
-      bundle "config --global foo global"
-      bundle "config --delete foo"
+      bundle "config set --global foo global"
+      bundle "config unset foo"
 
       run "puts Bundler.settings[:foo] == nil"
       expect(out).to eq("true")
     end
 
     it "warns when overriding" do
-      bundle "config --global foo previous"
-      bundle "config --global foo global"
+      bundle "config set --global foo previous"
+      bundle "config set --global foo global"
       expect(out).to match(/You are replacing the current global value of foo/)
 
       run "puts Bundler.settings[:foo]"
@@ -142,7 +142,7 @@ RSpec.describe ".bundle/config" do
     end
 
     it "saves with parseable option" do
-      bundle "config --global --parseable foo value"
+      bundle "config set --global --parseable foo value"
       expect(out).to eq("foo=value")
       run "puts Bundler.settings['foo']"
       expect(out).to eq("value")
@@ -151,7 +151,7 @@ RSpec.describe ".bundle/config" do
     context "when replacing a current value with the parseable flag" do
       before { bundle "config --global foo value" }
       it "prints the current value in a parseable format" do
-        bundle "config --global --parseable foo value2"
+        bundle "config set --global --parseable foo value2"
         expect(out).to eq "foo=value2"
         run "puts Bundler.settings['foo']"
         expect(out).to eq("value2")
@@ -186,16 +186,16 @@ RSpec.describe ".bundle/config" do
     end
 
     it "can be deleted" do
-      bundle "config --local foo local"
-      bundle "config --delete foo"
+      bundle "config set --local foo local"
+      bundle "config unset foo"
 
       run "puts Bundler.settings[:foo] == nil"
       expect(out).to eq("true")
     end
 
     it "warns when overriding" do
-      bundle "config --local foo previous"
-      bundle "config --local foo local"
+      bundle "config set --local foo previous"
+      bundle "config set --local foo local"
       expect(out).to match(/You are replacing the current local value of foo/)
 
       run "puts Bundler.settings[:foo]"
@@ -209,8 +209,8 @@ RSpec.describe ".bundle/config" do
     end
 
     it "can be deleted with parseable option" do
-      bundle "config --local foo value"
-      bundle "config --delete --parseable foo"
+      bundle "config set --local foo value"
+      bundle "config unset --parseable foo"
       expect(out).to eq ""
       run "puts Bundler.settings['foo'] == nil"
       expect(out).to eq("true")
@@ -262,29 +262,29 @@ RSpec.describe ".bundle/config" do
 
   describe "parseable option" do
     it "prints an empty string" do
-      bundle "config foo --parseable"
+      bundle "config get foo --parseable"
 
       expect(out).to eq ""
     end
 
     it "only prints the value of the config" do
-      bundle "config foo local"
-      bundle "config foo --parseable"
+      bundle "config set foo local"
+      bundle "config get --parseable foo"
 
       expect(out).to eq "foo=local"
     end
 
     it "can print global config" do
-      bundle "config --global bar value"
-      bundle "config bar --parseable"
+      bundle "config set --global bar value"
+      bundle "config get --parseable bar"
 
       expect(out).to eq "bar=value"
     end
 
     it "prefers local config over global" do
-      bundle "config --local bar value2"
-      bundle "config --global bar value"
-      bundle "config bar --parseable"
+      bundle "config set --local bar value2"
+      bundle "config set --global bar value"
+      bundle "config get bar --parseable"
 
       expect(out).to eq "bar=value2"
     end
