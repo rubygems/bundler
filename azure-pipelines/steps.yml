@@ -1,0 +1,14 @@
+steps:
+
+- task: UseRubyVersion@0
+  inputs:
+    versionSpec: '>= 2.5'
+  condition: not(eq(variables['Agent.OS'], 'Darwin')) # not possible on Mac
+
+- script: |
+    ruby bin/rake spec:deps
+  displayName: 'ruby bin/rake spec:deps'
+
+- script: |
+    ruby bin/rake spec
+  displayName: 'ruby bin/rake spec'
