@@ -1,3 +1,9 @@
+## 2.0.1 (2019-01-04)
+
+Changes:
+
+  - Relaxed RubyGems requirement to `>= 2.5.0` ([#6867](https://github.com/bundler/bundler/pull/6867))
+
 ## 2.0.0 (2019-01-03)
 
 No new changes
