@@ -2,7 +2,7 @@ steps:
 
 - task: UseRubyVersion@0
   inputs:
-    versionSpec: '>= 2.4'
+    versionSpec: '= 2.4'
   condition: not(eq(variables['Agent.OS'], 'Darwin')) # not possible on Mac
 
   
