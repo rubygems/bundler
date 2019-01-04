@@ -15,5 +15,5 @@ steps:
   displayName: 'ruby bin/rake spec:deps'
 
 - script: |
-    ruby bin/rake spec
-  displayName: 'ruby bin/rake spec'
+    ruby bin/rspec
+  displayName: 'ruby bin/rspec'

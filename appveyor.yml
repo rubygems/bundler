@@ -33,4 +33,4 @@ before_test:
 build: off
 
 test_script:
-  - ruby bin/rake spec
+  - ruby bin/rspec
