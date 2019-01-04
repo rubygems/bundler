@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle install", :bundler => "< 3" do
+RSpec.describe "bundle install" do
   before :each do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -61,24 +61,24 @@ RSpec.describe "bundle install", :bundler => "< 3" do
       let(:flag) { "force" }
     end
 
-    it "shows a deprecation when single flag passed", :bundler => 2 do
+    it "shows a deprecation when single flag passed", :bundler => 3 do
       bundle! "install --force"
       expect(out).to include "[DEPRECATED FOR 3.0] The `--force` option has been renamed to `--redownload`"
     end
 
-    it "shows a deprecation when multiple flags passed", :bundler => 2 do
+    it "shows a deprecation when multiple flags passed", :bundler => 3 do
       bundle! "install --no-color --force"
       expect(out).to include "[DEPRECATED FOR 3.0] The `--force` option has been renamed to `--redownload`"
     end
 
-    it "does not show a deprecation when single flag passed", :bundler => "< 2" do
+    it "does not show a deprecation when single flag passed", :bundler => "< 3" do
       bundle! "install --force"
-      expect(out).not_to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(out).not_to include "[DEPRECATED FOR 3.0] The `--force` option has been renamed to `--redownload`"
     end
 
-    it "does not show a deprecation when multiple flags passed", :bundler => "< 2" do
+    it "does not show a deprecation when multiple flags passed", :bundler => "< 3" do
       bundle! "install --no-color --force"
-      expect(out).not_to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(out).not_to include "[DEPRECATED FOR 3.0] The `--force` option has been renamed to `--redownload`"
     end
   end
 
@@ -89,12 +89,12 @@ RSpec.describe "bundle install", :bundler => "< 3" do
 
     it "does not show a deprecation when single flag passed" do
       bundle! "install --redownload"
-      expect(out).not_to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(out).not_to include "[DEPRECATED FOR 3.0] The `--force` option has been renamed to `--redownload`"
     end
 
     it "does not show a deprecation when single multiple flags passed" do
       bundle! "install --no-color --redownload"
-      expect(out).not_to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(out).not_to include "[DEPRECATED FOR 3.0] The `--force` option has been renamed to `--redownload`"
     end
   end
 end

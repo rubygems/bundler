@@ -60,7 +60,7 @@ module Spec
       end
     end
 
-    MAJOR_DEPRECATION = /^\[DEPRECATED FOR 2\.0\]\s*/
+    MAJOR_DEPRECATION = /^\[DEPRECATED FOR 3\.0\]\s*/
 
     RSpec::Matchers.define :lack_errors do
       diffable

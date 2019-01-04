@@ -212,7 +212,7 @@ RSpec.describe "install with --deployment or --frozen" do
       expect(out).not_to include("* rack-obama")
     end
 
-    it "explodes with the --frozen flag if you make a change and don't check in the lockfile", :bundler => "< 2" do
+    it "explodes with the --frozen flag if you make a change and don't check in the lockfile", :bundler => "< 3" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"

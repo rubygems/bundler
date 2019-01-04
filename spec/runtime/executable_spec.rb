@@ -129,7 +129,7 @@ RSpec.describe "Running bin/* commands" do
     expect(bundled_app("bin/rackup")).to exist
   end
 
-  it "rewrites bins on --binstubs (to maintain backwards compatibility)", :bundler => "< 2" do
+  it "rewrites bins on --binstubs (to maintain backwards compatibility)", :bundler => "< 3" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"

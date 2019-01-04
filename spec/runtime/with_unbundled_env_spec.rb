@@ -107,20 +107,20 @@ RSpec.describe "Bundler.with_env helpers" do
 
     it_behaves_like "an unbundling helper"
 
-    it "prints a deprecation", :bundler => 2 do
+    it "prints a deprecation", :bundler => 3 do
       code = "Bundler.clean_env"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).to include(
-        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "[DEPRECATED FOR 3.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
       )
     end
 
-    it "does not print a deprecation", :bundler => "< 2" do
+    it "does not print a deprecation", :bundler => "< 3" do
       code = "Bundler.clean_env"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).not_to include(
-        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "[DEPRECATED FOR 3.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
       )
     end
@@ -157,20 +157,20 @@ RSpec.describe "Bundler.with_env helpers" do
       expect(ENV).not_to have_key("FOO")
     end
 
-    it "prints a deprecation", :bundler => 2 do
+    it "prints a deprecation", :bundler => 3 do
       code = "Bundler.with_clean_env {}"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).to include(
-        "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
+        "[DEPRECATED FOR 3.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
       )
     end
 
-    it "does not print a deprecation", :bundler => "< 2" do
+    it "does not print a deprecation", :bundler => "< 3" do
       code = "Bundler.with_clean_env {}"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).not_to include(
-        "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
+        "[DEPRECATED FOR 3.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
       )
     end
@@ -192,14 +192,14 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.clean_system", :bundler => "< 3" do
+  describe "Bundler.clean_system" do
     it "runs system inside with_clean_env" do
       Bundler.clean_system(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
       expect($?.exitstatus).to eq(42)
     end
   end
 
-  describe "Bundler.clean_exec", :bundler => "< 3" do
+  describe "Bundler.clean_exec" do
     it "runs exec inside with_clean_env" do
       pid = Kernel.fork do
         Bundler.clean_exec(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
