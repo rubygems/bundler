@@ -97,7 +97,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
     expect(lockfile).to include(rubygems_version("activesupport", "~> 3.0"))
   end
 
-  it "is able to update a top-level dependency when there is a conflict on a shared transitive child", :ruby => "2.1" do
+  it "is able to update a top-level dependency when there is a conflict on a shared transitive child" do
     # from https://github.com/bundler/bundler/issues/5031
 
     gemfile <<-G
