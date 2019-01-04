@@ -13,6 +13,7 @@ RSpec.describe Bundler::Definition do
       subject { Bundler::Definition.new(nil, [], Bundler::SourceList.new, []) }
 
       it "raises an PermissionError with explanation" do
+        allow(File).to receive(:open).and_call_original
         expect(File).to receive(:open).with("Gemfile.lock", "wb").
           and_raise(Errno::EACCES)
         expect { subject.lock("Gemfile.lock") }.
@@ -23,6 +24,7 @@ RSpec.describe Bundler::Definition do
       subject { Bundler::Definition.new(nil, [], Bundler::SourceList.new, []) }
 
       it "raises a TemporaryResourceError with explanation" do
+        allow(File).to receive(:open).and_call_original
         expect(File).to receive(:open).with("Gemfile.lock", "wb").
           and_raise(Errno::EAGAIN)
         expect { subject.lock("Gemfile.lock") }.
