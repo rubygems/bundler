@@ -1,5 +1,5 @@
 begin
-  require "readline"
+  #require "readline"
 rescue LoadError
 end
 
