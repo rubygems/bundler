@@ -119,7 +119,7 @@ module Bundler
     end
 
     def environment
-      SharedHelpers.major_deprecation 2, "Bundler.environment has been removed in favor of Bundler.load"
+      SharedHelpers.major_deprecation 3, "Bundler.environment has been removed in favor of Bundler.load"
       load
     end
 
@@ -283,7 +283,7 @@ EOF
     # @deprecated Use `unbundled_env` instead
     def clean_env
       Bundler::SharedHelpers.major_deprecation(
-        2,
+        3,
         "`Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
       )

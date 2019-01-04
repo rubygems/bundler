@@ -28,6 +28,18 @@ require "bundler/vendored_fileutils"
 require "uri"
 require "digest"
 
+# Delete the default copy of Bundler that RVM installs for us when running in CI
+require "fileutils"
+if ENV.select {|k, _v| k =~ /TRAVIS/ }.any? && Gem::Version.new(Gem::VERSION) > Gem::Version.new("2.0")
+  Dir.glob(File.join(Gem::Specification.default_specifications_dir, "bundler*.gemspec")).each do |file|
+    FileUtils.rm_rf(file)
+  end
+
+  Dir.glob(File.join(RbConfig::CONFIG["sitelibdir"], "bundler*")).each do |file|
+    FileUtils.rm_rf(file)
+  end
+end
+
 if File.expand_path(__FILE__) =~ %r{([^\w/\.:\-])}
   abort "The bundler specs cannot be run from a path that contains special characters (particularly #{$1.inspect})"
 end
