@@ -39,9 +39,9 @@ RSpec.describe "Bundler.with_env helpers" do
       create_file("exe.rb", <<-'RB')
         count = ARGV.first.to_i
         exit if count < 0
-        STDERR.puts "#{count} #{ENV["PATH"].end_with?(":/foo")}"
+        STDERR.puts "#{count} #{ENV["PATH"].end_with?("#{File::PATH_SEPARATOR}/foo")}"
         if count == 2
-          ENV["PATH"] = "#{ENV["PATH"]}:/foo"
+          ENV["PATH"] = "#{ENV["PATH"]}#{File::PATH_SEPARATOR}/foo"
         end
         exec(Gem.ruby, __FILE__, (count - 1).to_s)
       RB

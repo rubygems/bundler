@@ -355,7 +355,7 @@ module Spec
     end
 
     def with_path_added(path)
-      with_path_as(path.to_s + ":" + ENV["PATH"]) do
+      with_path_as(path.to_s + File::PATH_SEPARATOR + ENV["PATH"]) do
         yield
       end
     end
@@ -366,7 +366,7 @@ module Spec
         f.puts "#!/usr/bin/env ruby\nSTDERR.puts 'This is not the git you are looking for'\nexit 1"
       end
 
-      ENV["PATH"] = "#{tmp("broken_path")}:#{ENV["PATH"]}"
+      ENV["PATH"] = "#{tmp("broken_path")}#{File::PATH_SEPARATOR}#{ENV["PATH"]}"
     end
 
     def with_fake_man

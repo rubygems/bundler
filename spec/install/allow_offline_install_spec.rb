@@ -63,7 +63,7 @@ RSpec.describe "bundle install with :allow_offline_install" do
       end
 
       old_path = ENV["PATH"]
-      ENV["PATH"] = "#{tmp("broken_path")}:#{ENV["PATH"]}"
+      ENV["PATH"] = "#{tmp("broken_path")}#{File::PATH_SEPARATOR}#{ENV["PATH"]}"
       yield if block_given?
     ensure
       ENV["PATH"] = old_path if block_given?
