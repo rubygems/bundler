@@ -1,6 +1,15 @@
 language: ruby
 script: rake spec:travis
 before_script:
+  # fix Travis trunk build as of 2019-01-05
+  - |
+    rv="$(ruby -e 'STDOUT.write RUBY_VERSION')";
+    if [ "$rv" = "2.7.0" ]; then
+      lib="$(ruby -e 'STDOUT.write RbConfig::CONFIG["sitelibdir"]')";
+      echo "Processing 2.7.0 - $lib";
+      rm -rf $lib/rubygems;
+      rm -f  $lib/rubygems.rb $lib/ubygems.rb;
+    fi
   - travis_retry rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
   - travis_retry rake spec:travis:deps
   - travis_retry rake man:build
