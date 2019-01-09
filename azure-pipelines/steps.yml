@@ -1,0 +1,25 @@
+steps:
+
+- task: UseRubyVersion@0
+  inputs:
+    versionSpec: '= 2.4'
+
+- script: |
+    ruby -v
+    ridk version
+  displayName: 'ruby -v + ridk version'
+
+- script: |
+    ruby bin/rake spec:deps
+  displayName: 'ruby bin/rake spec:deps'
+
+- script: |
+    ruby bin/rspec --format progress -r rspec_junit_formatter --format RspecJunitFormatter -o rspec/bundler-junit-results.xml 
+  displayName: 'ruby bin/rspec'
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: rspec/bundler-junit-results.xml
+  displayName: Publish test results
+  condition: succeededOrFailed()
