@@ -41,7 +41,7 @@ end
 
 $debug = false
 
-Spec::Manpages.setup
+Spec::Manpages.setup unless Gem.win_platform?
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
 ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
