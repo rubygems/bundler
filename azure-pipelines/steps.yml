@@ -10,6 +10,12 @@ steps:
   displayName: 'ruby -v + ridk version'
 
 - script: |
+    mkdir tmp
+    cd tmp
+    mkdir home
+  displayName: 'work around readline crash'
+
+- script: |
     ruby bin/rake spec:deps
   displayName: 'ruby bin/rake spec:deps'
 
