@@ -1,8 +1,12 @@
 # coding: utf-8
 # frozen_string_literal: true
 
-require File.expand_path("../lib/bundler/version", __FILE__)
-require "shellwords"
+begin
+  require File.expand_path("../lib/bundler/version", __FILE__)
+rescue LoadError
+  # for Ruby core repository
+  require File.expand_path("../bundler/version", __FILE__)
+end
 
 Gem::Specification.new do |s|
   s.name        = "bundler"
@@ -43,7 +47,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ronn",       "~> 0.7.3"
   s.add_development_dependency "rspec",      "~> 3.6"
 
-  s.files = `git -C #{Shellwords.escape File.dirname(__FILE__)} ls-files -z`.split("\x0").select {|f| f.match(%r{^(lib|exe)/}) }
+  base_dir = File.dirname(__FILE__).gsub(%r{([^A-Za-z0-9_\-.,:\/@\n])}, "\\\\\\1")
+  s.files = IO.popen("git -C #{base_dir} ls-files -z", &:read).split("\x0").select {|f| f.match(%r{^(lib|exe)/}) }
 
   # we don't check in man pages, but we need to ship them because
   # we use them to generate the long-form help for each command.

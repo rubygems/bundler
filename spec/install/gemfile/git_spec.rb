@@ -922,12 +922,11 @@ RSpec.describe "bundle install with git sources" do
     build_git "foo", :path => lib_path("nested")
     build_git "bar", :path => lib_path("nested")
 
-    gemfile <<-G
+    install_gemfile <<-G
       gem "foo", :git => "#{lib_path("nested")}"
       gem "bar", :git => "#{lib_path("nested")}"
     G
 
-    bundle "install"
     expect(File.read(bundled_app("Gemfile.lock")).scan("GIT").size).to eq(1)
   end
 
@@ -1010,13 +1009,11 @@ RSpec.describe "bundle install with git sources" do
       install_gemfile <<-G
         gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "#{revision}"
       G
-      bundle "install"
       expect(out).to_not match(/Revision.*does not exist/)
 
       install_gemfile <<-G
         gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "deadbeef"
       G
-      bundle "install"
       expect(out).to include("Revision deadbeef does not exist in the repository")
     end
   end
@@ -1099,7 +1096,7 @@ RSpec.describe "bundle install with git sources" do
   end
 
   context "with an extension" do
-    it "installs the extension" do
+    it "installs the extension", :ruby_repo do
       build_git "foo" do |s|
         s.add_dependency "rake"
         s.extensions << "Rakefile"
@@ -1131,7 +1128,7 @@ RSpec.describe "bundle install with git sources" do
       expect(out).to eq(Pathname.glob(default_bundle_path("bundler/gems/extensions/**/foo-1.0-*")).first.to_s)
     end
 
-    it "does not use old extension after ref changes" do
+    it "does not use old extension after ref changes", :ruby_repo do
       git_reader = build_git "foo", :no_default => true do |s|
         s.extensions = ["ext/extconf.rb"]
         s.write "ext/extconf.rb", <<-RUBY
@@ -1193,7 +1190,7 @@ In Gemfile:
       expect(out).not_to include("gem install foo")
     end
 
-    it "does not reinstall the extension", :rubygems => ">= 2.3.0" do
+    it "does not reinstall the extension", :ruby_repo, :rubygems => ">= 2.3.0" do
       build_git "foo" do |s|
         s.add_dependency "rake"
         s.extensions << "Rakefile"
@@ -1423,7 +1420,6 @@ In Gemfile:
           end
         G
 
-        bundle :install
         expect(last_command.stdboth).to_not include("password1")
         expect(last_command.stdout).to include("Fetching https://user1@github.com/company/private-repo")
       end
@@ -1439,7 +1435,6 @@ In Gemfile:
           end
         G
 
-        bundle :install
         expect(last_command.stdboth).to_not include("oauth_token")
         expect(last_command.stdout).to include("Fetching https://x-oauth-basic@github.com/company/private-repo")
       end

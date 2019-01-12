@@ -5,7 +5,8 @@ $:.unshift File.expand_path("../lib", __FILE__)
 require "shellwords"
 require "benchmark"
 
-RUBYGEMS_REPO = if `cd .. && git remote --verbose 2>/dev/null` =~ /rubygems/i
+NULL_DEVICE = (Gem.win_platform? ? "NUL" : "/dev/null")
+RUBYGEMS_REPO = if `git -C "#{File.expand_path("..")}" remote --verbose 2> #{NULL_DEVICE}` =~ /rubygems/i
   File.expand_path("..")
 else
   File.expand_path("tmp/rubygems")
@@ -50,17 +51,10 @@ namespace :spec do
       deps.delete("rdiscount")
     end
 
-    if Gem::VERSION < "2.0.0"
-      deps.sort_by {|name, _| name }.map do |name, version|
-        gem_install_command = "install --no-ri --no-rdoc --conservative #{name} -v '#{version}'"
-        sh %(#{Gem.ruby} -S gem #{gem_install_command})
-      end
-    else
-      gem_install_command = "install --no-document --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
-        "'#{name}:#{version}'"
-      end.join(" ")
-      sh %(#{Gem.ruby} -S gem #{gem_install_command})
-    end
+    gem_install_command = "install --no-document --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
+      "'#{name}:#{version}'"
+    end.join(" ")
+    sh %(#{Gem.ruby} -S gem #{gem_install_command})
 
     # Download and install gems used inside tests
     $LOAD_PATH.unshift("./spec")
@@ -147,7 +141,7 @@ begin
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
       branches = %w[master]
-      releases = %w[v2.5.2 v2.6.14 v2.7.7]
+      releases = %w[v2.5.2 v2.6.14 v2.7.7 v3.0.1]
       (branches + releases).each do |rg|
         desc "Run specs with RubyGems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
@@ -212,11 +206,6 @@ begin
 
       # disallow making network requests on CI
       ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
-
-      if RUBY_VERSION >= "2.0.0"
-        puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
-        Rake::Task["rubocop"].invoke
-      end
 
       puts "\n\e[1;33m[Travis CI] Running bundler specs against RubyGems #{rg}\e[m\n\n"
       specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }

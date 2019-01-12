@@ -2,6 +2,7 @@
 
 RSpec.describe "Bundler.with_env helpers" do
   def bundle_exec_ruby!(code, *args)
+    build_bundler_context
     opts = args.last.is_a?(Hash) ? args.pop : {}
     env = opts[:env] ||= {}
     env[:RUBYOPT] ||= "-r#{spec_dir.join("support/hax")}"
@@ -9,13 +10,13 @@ RSpec.describe "Bundler.with_env helpers" do
     bundle! "exec '#{Gem.ruby}' -e #{code}", *args
   end
 
-  describe "Bundler.original_env" do
-    before do
-      bundle "config path vendor/bundle"
-      gemfile ""
-      bundle "install"
-    end
+  def build_bundler_context
+    bundle "config path vendor/bundle"
+    gemfile ""
+    bundle "install"
+  end
 
+  describe "Bundler.original_env" do
     it "should return the PATH present before bundle was activated" do
       code = "print Bundler.original_env['PATH']"
       path = `getconf PATH`.strip + "#{File::PATH_SEPARATOR}/foo"
@@ -34,7 +35,7 @@ RSpec.describe "Bundler.with_env helpers" do
       end
     end
 
-    it "works with nested bundle exec invocations" do
+    it "works with nested bundle exec invocations", :ruby_repo do
       create_file("exe.rb", <<-'RB')
         count = ARGV.first.to_i
         exit if count < 0
@@ -46,6 +47,7 @@ RSpec.describe "Bundler.with_env helpers" do
       RB
       path = `getconf PATH`.strip + File::PATH_SEPARATOR + File.dirname(Gem.ruby)
       with_path_as(path) do
+        build_bundler_context
         bundle! "exec '#{Gem.ruby}' #{bundled_app("exe.rb")} 2", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
       end
       expect(err).to eq <<-EOS.strip
@@ -55,48 +57,72 @@ RSpec.describe "Bundler.with_env helpers" do
       EOS
     end
 
-    it "removes variables that bundler added" do
+    it "removes variables that bundler added", :ruby_repo do
       original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")', :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" })
       code = 'puts Bundler.original_env.to_a.map {|e| e.join("=") }.sort.join("\n")'
-      bundle! "exec '#{Gem.ruby}' -e #{code.dump}", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+      bundle_exec_ruby! code.dump
       expect(out).to eq original
     end
   end
 
-  describe "Bundler.clean_env", :bundler => "< 2" do
-    before do
-      bundle "config path vendor/bundle"
-      gemfile ""
-      bundle "install"
-    end
-
+  shared_examples_for "an unbundling helper" do
     it "should delete BUNDLE_PATH" do
-      code = "print Bundler.clean_env.has_key?('BUNDLE_PATH')"
+      code = "print #{modified_env}.has_key?('BUNDLE_PATH')"
       ENV["BUNDLE_PATH"] = "./foo"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).to eq "false"
+      expect(last_command.stdboth).to include "false"
     end
 
     it "should remove '-rbundler/setup' from RUBYOPT" do
-      code = "print Bundler.clean_env['RUBYOPT']"
+      code = "print #{modified_env}['RUBYOPT']"
       ENV["RUBYOPT"] = "-W2 -rbundler/setup"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).not_to include("-rbundler/setup")
     end
 
-    it "should clean up RUBYLIB" do
-      code = "print Bundler.clean_env['RUBYLIB']"
+    it "should clean up RUBYLIB", :ruby_repo do
+      code = "print #{modified_env}['RUBYLIB']"
       ENV["RUBYLIB"] = root.join("lib").to_s + File::PATH_SEPARATOR + "/foo"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).to eq("/foo")
+      expect(last_command.stdboth).to include("/foo")
     end
 
     it "should restore the original MANPATH" do
-      code = "print Bundler.clean_env['MANPATH']"
+      code = "print #{modified_env}['MANPATH']"
       ENV["MANPATH"] = "/foo"
       ENV["BUNDLER_ORIG_MANPATH"] = "/foo-original"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).to eq("/foo-original")
+      expect(last_command.stdboth).to include("/foo-original")
+    end
+  end
+
+  describe "Bundler.unbundled_env" do
+    let(:modified_env) { "Bundler.unbundled_env" }
+
+    it_behaves_like "an unbundling helper"
+  end
+
+  describe "Bundler.clean_env" do
+    let(:modified_env) { "Bundler.clean_env" }
+
+    it_behaves_like "an unbundling helper"
+
+    it "prints a deprecation", :bundler => 2 do
+      code = "Bundler.clean_env"
+      bundle_exec_ruby! code.dump
+      expect(last_command.stdboth).to include(
+        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
+      )
+    end
+
+    it "does not print a deprecation", :bundler => "< 2" do
+      code = "Bundler.clean_env"
+      bundle_exec_ruby! code.dump
+      expect(last_command.stdboth).not_to include(
+        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
+      )
     end
   end
 
@@ -116,15 +142,49 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.with_clean_env", :bundler => "< 2" do
-    it "should set ENV to clean_env in the block" do
-      expected = Bundler.clean_env
+  describe "Bundler.with_clean_env" do
+    it "should set ENV to unbundled_env in the block" do
+      expected = Bundler.unbundled_env
       actual = Bundler.with_clean_env { ENV.to_hash }
       expect(actual).to eq(expected)
     end
 
     it "should restore the environment after execution" do
       Bundler.with_clean_env do
+        ENV["FOO"] = "hello"
+      end
+
+      expect(ENV).not_to have_key("FOO")
+    end
+
+    it "prints a deprecation", :bundler => 2 do
+      code = "Bundler.with_clean_env {}"
+      bundle_exec_ruby! code.dump
+      expect(last_command.stdboth).to include(
+        "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
+      )
+    end
+
+    it "does not print a deprecation", :bundler => "< 2" do
+      code = "Bundler.with_clean_env {}"
+      bundle_exec_ruby! code.dump
+      expect(last_command.stdboth).not_to include(
+        "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
+      )
+    end
+  end
+
+  describe "Bundler.with_unbundled_env" do
+    it "should set ENV to unbundled_env in the block" do
+      expected = Bundler.unbundled_env
+      actual = Bundler.with_unbundled_env { ENV.to_hash }
+      expect(actual).to eq(expected)
+    end
+
+    it "should restore the environment after execution" do
+      Bundler.with_unbundled_env do
         ENV["FOO"] = "hello"
       end
 

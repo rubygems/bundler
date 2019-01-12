@@ -27,12 +27,10 @@ module Bundler
     SOURCE       = [GIT, GEM, PATH, PLUGIN].freeze
 
     SECTIONS_BY_VERSION_INTRODUCED = {
-      # The strings have to be dup'ed for old RG on Ruby 2.3+
-      # TODO: remove dup in Bundler 2.0
-      Gem::Version.create("1.0".dup) => [DEPENDENCIES, PLATFORMS, GIT, GEM, PATH].freeze,
-      Gem::Version.create("1.10".dup) => [BUNDLED].freeze,
-      Gem::Version.create("1.12".dup) => [RUBY].freeze,
-      Gem::Version.create("1.13".dup) => [PLUGIN].freeze,
+      Gem::Version.create("1.0") => [DEPENDENCIES, PLATFORMS, GIT, GEM, PATH].freeze,
+      Gem::Version.create("1.10") => [BUNDLED].freeze,
+      Gem::Version.create("1.12") => [RUBY].freeze,
+      Gem::Version.create("1.13") => [PLUGIN].freeze,
     }.freeze
 
     KNOWN_SECTIONS = SECTIONS_BY_VERSION_INTRODUCED.values.flatten.freeze

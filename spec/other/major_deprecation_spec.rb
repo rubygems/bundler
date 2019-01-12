@@ -41,10 +41,12 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
 
   describe "Bundler" do
     describe ".clean_env" do
-      it "is deprecated in favor of .original_env" do
+      it "is deprecated in favor of .unbundled_env" do
         source = "Bundler.clean_env"
         bundle "exec ruby -e #{source.dump}"
-        expect(warnings).to have_major_deprecation "`Bundler.clean_env` has weird edge cases, use `.original_env` instead"
+        expect(warnings).to have_major_deprecation \
+          "`Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+          "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
       end
     end
 

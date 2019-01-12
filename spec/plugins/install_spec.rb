@@ -122,6 +122,24 @@ RSpec.describe "bundler plugin install" do
       expect(out).to include("Installed plugin foo")
       plugin_should_be_installed("foo")
     end
+
+    it "installs form a local git source" do
+      build_git "foo" do |s|
+        s.write "plugins.rb"
+      end
+
+      bundle "plugin install foo --local_git #{lib_path("foo-1.0")}"
+
+      expect(out).to include("Installed plugin foo")
+      plugin_should_be_installed("foo")
+    end
+
+    it "raises an error when both git and local git sources are specified" do
+      bundle "plugin install foo --local_git /phony/path/project --git git@gitphony.com:/repo/project"
+
+      expect(exitstatus).not_to eq(0) if exitstatus
+      expect(out).to eq("Remote and local plugin git sources can't be both specified")
+    end
   end
 
   context "Gemfile eval" do
@@ -172,6 +190,28 @@ RSpec.describe "bundler plugin install" do
 
       expect(out).to include("Installed plugin ga-plugin")
       plugin_should_be_installed("ga-plugin")
+    end
+
+    context "in deployment mode" do
+      it "installs plugins" do
+        install_gemfile! <<-G
+          source 'file://#{gem_repo2}'
+          gem 'rack', "1.0.0"
+        G
+
+        install_gemfile! <<-G, forgotten_command_line_options(:deployment => true)
+          source 'file://#{gem_repo2}'
+          plugin 'foo'
+          gem 'rack', "1.0.0"
+        G
+
+        expect(out).to include("Installed plugin foo")
+
+        expect(out).to include("Bundle complete!")
+
+        expect(the_bundle).to include_gems("rack 1.0.0")
+        plugin_should_be_installed("foo")
+      end
     end
   end
 

@@ -280,10 +280,19 @@ EOF
       ORIGINAL_ENV.clone
     end
 
-    # @deprecated Use `original_env` instead
-    # @return [Hash] Environment with all bundler-related variables removed
+    # @deprecated Use `unbundled_env` instead
     def clean_env
-      Bundler::SharedHelpers.major_deprecation(2, "`Bundler.clean_env` has weird edge cases, use `.original_env` instead")
+      Bundler::SharedHelpers.major_deprecation(
+        2,
+        "`Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
+      )
+
+      unbundled_env
+    end
+
+    # @return [Hash] Environment with all bundler-related variables removed
+    def unbundled_env
       env = original_env
 
       if env.key?("BUNDLER_ORIG_MANPATH")
@@ -305,12 +314,25 @@ EOF
       env
     end
 
+    # Run block with environment present before Bundler was activated
     def with_original_env
       with_env(original_env) { yield }
     end
 
+    # @deprecated Use `with_unbundled_env` instead
     def with_clean_env
-      with_env(clean_env) { yield }
+      Bundler::SharedHelpers.major_deprecation(
+        2,
+        "`Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
+      )
+
+      with_env(unbundled_env) { yield }
+    end
+
+    # Run block with all bundler-related variables removed
+    def with_unbundled_env
+      with_env(unbundled_env) { yield }
     end
 
     def clean_system(*args)
@@ -371,7 +393,7 @@ EOF
         unwritable_files = files.reject {|f| File.writable?(f) }
         sudo_needed = !unwritable_files.empty?
         if sudo_needed
-          Bundler.ui.warn "Following files may not be writable, so sudo is needed:\n  #{unwritable_files.sort.map(&:to_s).join("\n  ")}"
+          Bundler.ui.warn "Following files may not be writable, so sudo is needed:\n  #{unwritable_files.map(&:to_s).sort.join("\n  ")}"
         end
       end
 

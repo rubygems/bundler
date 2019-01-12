@@ -6,18 +6,8 @@ RSpec.describe "bundle gem" do
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
   end
 
-  def remove_push_guard(gem_name)
-    # Remove exception that prevents public pushes on older RubyGems versions
-    if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
-      path = "#{gem_name}/#{gem_name}.gemspec"
-      content = File.read(path).sub(/raise "RubyGems 2\.0 or newer.*/, "")
-      File.open(path, "w") {|f| f.write(content) }
-    end
-  end
-
-  def execute_bundle_gem(gem_name, flag = "", to_remove_push_guard = true)
+  def execute_bundle_gem(gem_name, flag = "")
     bundle! "gem #{gem_name} #{flag}"
-    remove_push_guard(gem_name) if to_remove_push_guard
     # reset gemspec cache for each test because of commit 3d4163a
     Bundler.clear_gemspec_cache
   end
@@ -96,7 +86,7 @@ RSpec.describe "bundle gem" do
 
   shared_examples_for "--coc flag" do
     before do
-      execute_bundle_gem(gem_name, "--coc", false)
+      execute_bundle_gem(gem_name, "--coc")
     end
     it "generates a gem skeleton with MIT license" do
       gem_skeleton_assertions(gem_name)
@@ -113,7 +103,7 @@ RSpec.describe "bundle gem" do
 
   shared_examples_for "--no-coc flag" do
     before do
-      execute_bundle_gem(gem_name, "--no-coc", false)
+      execute_bundle_gem(gem_name, "--no-coc")
     end
     it "generates a gem skeleton without Code of Conduct" do
       gem_skeleton_assertions(gem_name)
@@ -149,7 +139,6 @@ RSpec.describe "bundle gem" do
         reset!
         in_app_root
         bundle "gem #{gem_name}"
-        remove_push_guard(gem_name)
       end
 
       it "contribute URL set to [USERNAME]" do
@@ -202,16 +191,16 @@ RSpec.describe "bundle gem" do
         line.gsub(/\=.*$/, "= %q{A short summary of my new gem.}")
       when /spec\.description/
         line.gsub(/\=.*$/, "= %q{A longer description of my new gem.}")
-      # Remove exception that prevents public pushes on older RubyGems versions
-      when /raise "RubyGems 2.0 or newer/
-        line.gsub(/.*/, "") if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
       else
         line
       end
     end
 
     Dir.chdir(bundled_app("newgem")) do
-      system_gems ["rake-10.0.2", :bundler], :path => :bundle_path
+      gems = ["rake-10.0.2", :bundler]
+      # for Ruby core repository, Ruby 2.6+ has bundler as standard library.
+      gems.delete(:bundler) if ruby_core?
+      system_gems gems, :path => :bundle_path
       bundle! "exec rake build"
     end
 
@@ -295,7 +284,6 @@ RSpec.describe "bundle gem" do
         reset!
         in_app_root
         bundle "gem #{gem_name}"
-        remove_push_guard(gem_name)
       end
 
       it_should_behave_like "git config is absent"
@@ -327,7 +315,7 @@ RSpec.describe "bundle gem" do
       end
 
       Dir.chdir(bundled_app(gem_name)) do
-        sys_exec("rake")
+        sys_exec(rake)
         expect(out).to include("SUCCESS")
       end
     end
@@ -394,7 +382,6 @@ RSpec.describe "bundle gem" do
       end
 
       it "depends on a specific version of rspec", :rubygems => ">= 1.8.1" do
-        remove_push_guard(gem_name)
         rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "rspec" }
         expect(rspec_dep).to be_specific
       end
@@ -445,7 +432,6 @@ RSpec.describe "bundle gem" do
       end
 
       it "depends on a specific version of minitest", :rubygems => ">= 1.8.1" do
-        remove_push_guard(gem_name)
         rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "minitest" }
         expect(rspec_dep).to be_specific
       end
@@ -589,7 +575,6 @@ RSpec.describe "bundle gem" do
         reset!
         in_app_root
         bundle "gem #{gem_name}"
-        remove_push_guard(gem_name)
       end
 
       it_should_behave_like "git config is absent"
@@ -612,7 +597,7 @@ RSpec.describe "bundle gem" do
       end
 
       Dir.chdir(bundled_app(gem_name)) do
-        sys_exec("rake")
+        sys_exec(rake)
         expect(out).to include("SUCCESS")
       end
     end

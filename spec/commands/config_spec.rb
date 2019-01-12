@@ -1,13 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe ".bundle/config" do
-  before :each do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "rack", "1.0.0"
-    G
-  end
-
   describe "config" do
     before { bundle "config foo bar" }
 
@@ -42,7 +35,14 @@ RSpec.describe ".bundle/config" do
     end
   end
 
-  describe "BUNDLE_APP_CONFIG" do
+  describe "location" do
+    before :each do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+      G
+    end
+
     it "can be moved with an environment variable" do
       ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
       bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
@@ -66,7 +66,12 @@ RSpec.describe ".bundle/config" do
   end
 
   describe "global" do
-    before(:each) { bundle :install }
+    before(:each) do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+      G
+    end
 
     it "is the default" do
       bundle "config foo global"
@@ -155,7 +160,12 @@ RSpec.describe ".bundle/config" do
   end
 
   describe "local" do
-    before(:each) { bundle :install }
+    before(:each) do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+      G
+    end
 
     it "can also be set explicitly" do
       bundle "config --local foo local"
@@ -208,7 +218,12 @@ RSpec.describe ".bundle/config" do
   end
 
   describe "env" do
-    before(:each) { bundle :install }
+    before(:each) do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+      G
+    end
 
     it "can set boolean properties via the environment" do
       ENV["BUNDLE_FROZEN"] = "true"
@@ -276,7 +291,12 @@ RSpec.describe ".bundle/config" do
   end
 
   describe "gem mirrors" do
-    before(:each) { bundle :install }
+    before(:each) do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+      G
+    end
 
     it "configures mirrors using keys with `mirror.`" do
       bundle "config --local mirror.http://gems.example.org http://gem-mirror.example.org"
@@ -338,7 +358,12 @@ E
   end
 
   describe "very long lines" do
-    before(:each) { bundle :install }
+    before(:each) do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+      G
+    end
 
     let(:long_string) do
       "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib " \

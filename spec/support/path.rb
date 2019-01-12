@@ -5,19 +5,19 @@ require "pathname"
 module Spec
   module Path
     def root
-      @root ||= Pathname.new(File.expand_path("../../..", __FILE__))
+      @root ||= Pathname.new(ruby_core? ? "../../../.." : "../../..").expand_path(__FILE__)
     end
 
     def gemspec
-      @gemspec ||= Pathname.new(File.expand_path(root.join("bundler.gemspec"), __FILE__))
+      @gemspec ||= root.join(ruby_core? ? "lib/bundler.gemspec" : "bundler.gemspec")
     end
 
     def bindir
-      @bindir ||= Pathname.new(File.expand_path(root.join("exe"), __FILE__))
+      @bindir ||= root.join(ruby_core? ? "libexec" : "exe")
     end
 
     def spec_dir
-      @spec_dir ||= Pathname.new(File.expand_path(root.join("spec"), __FILE__))
+      @spec_dir ||= root.join(ruby_core? ? "spec/bundler" : "spec")
     end
 
     def tmp(*path)
@@ -90,12 +90,16 @@ module Spec
       tmp("gems/system", *path)
     end
 
+    def system_bundle_bin_path
+      system_gem_path("bin/bundle")
+    end
+
     def lib_path(*args)
       tmp("libs", *args)
     end
 
     def bundler_path
-      Pathname.new(File.expand_path(root.join("lib"), __FILE__))
+      root.join("lib")
     end
 
     def global_plugin_gem(*args)
@@ -108,6 +112,17 @@ module Spec
 
     def tmpdir(*args)
       tmp "tmpdir", *args
+    end
+
+    def ruby_core?
+      # avoid to wornings
+      @ruby_core ||= nil
+
+      if @ruby_core.nil?
+        @ruby_core = true & (ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"])
+      else
+        @ruby_core
+      end
     end
 
     extend self

@@ -8,6 +8,7 @@ RSpec.describe "bundle update" do
       source "file://#{gem_repo2}"
       gem "activesupport"
       gem "rack-obama"
+      gem "platform_specific"
     G
   end
 
@@ -116,8 +117,8 @@ RSpec.describe "bundle update" do
       expect(out).to include "Could not find gem 'halting-problem-solver'"
     end
     it "should suggest alternatives" do
-      bundle "update active-support"
-      expect(out).to include "Did you mean activesupport?"
+      bundle "update platformspecific"
+      expect(out).to include "Did you mean platform_specific?"
     end
   end
 

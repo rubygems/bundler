@@ -104,7 +104,7 @@ module Spec
       bundle_bin = options.delete("bundle_bin") || bindir.join("bundle")
 
       if system_bundler = options.delete(:system_bundler)
-        bundle_bin = "-S bundle"
+        bundle_bin = system_bundle_bin_path
       end
 
       env = options.delete(:env) || {}
@@ -212,9 +212,14 @@ module Spec
         args = args.gsub(/(?=")/, "\\")
         args = %("#{args}")
       end
-      sys_exec("#{Gem.ruby} -rrubygems -S gem --backtrace #{command} #{args}")
+      gem = ENV["BUNDLE_GEM"] || "#{Gem.ruby} -rrubygems -S gem --backtrace"
+      sys_exec("#{gem} #{command} #{args}")
     end
     bang :gem_command
+
+    def rake
+      "#{Gem.ruby} -S #{ENV["GEM_PATH"]}/bin/rake"
+    end
 
     def sys_exec(cmd)
       command_execution = CommandExecution.new(cmd.to_s, Dir.pwd)
@@ -223,9 +228,9 @@ module Spec
         yield stdin, stdout, wait_thr if block_given?
         stdin.close
 
-        command_execution.exitstatus = wait_thr && wait_thr.value.exitstatus
         command_execution.stdout = Thread.new { stdout.read }.value.strip
         command_execution.stderr = Thread.new { stderr.read }.value.strip
+        command_execution.exitstatus = wait_thr && wait_thr.value.exitstatus
       end
 
       (@command_executions ||= []) << command_execution
@@ -309,7 +314,11 @@ module Spec
       gems.each do |g|
         path = if g == :bundler
           Dir.chdir(root) { gem_command! :build, gemspec.to_s }
-          bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
+          bundler_path = if ruby_core?
+            root + "lib/bundler-#{Bundler::VERSION}.gem"
+          else
+            root + "bundler-#{Bundler::VERSION}.gem"
+          end
         elsif g.to_s =~ %r{\A/.*\.gem\z}
           g
         else
@@ -318,11 +327,8 @@ module Spec
 
         raise "OMG `#{path}` does not exist!" unless File.exist?(path)
 
-        if Gem::VERSION < "2.0.0"
-          gem_command! :install, "--no-rdoc --no-ri --ignore-dependencies '#{path}'"
-        else
-          gem_command! :install, "--no-document --ignore-dependencies '#{path}'"
-        end
+        gem_command! :install, "--no-document --ignore-dependencies '#{path}'"
+
         bundler_path && bundler_path.rmtree
       end
     end

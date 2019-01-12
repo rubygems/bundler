@@ -33,7 +33,7 @@ RSpec.describe "bundle exec" do
     expect(out).to eq("1.0.0")
   end
 
-  it "works when running from a random directory" do
+  it "works when running from a random directory", :ruby_repo do
     install_gemfile <<-G
       gem "rack"
     G
@@ -226,7 +226,7 @@ RSpec.describe "bundle exec" do
     expect(out).to include("bundler: exec needs a command to run")
   end
 
-  it "raises a helpful error when exec'ing to something outside of the bundle", :rubygems => ">= 2.5.2" do
+  it "raises a helpful error when exec'ing to something outside of the bundle", :ruby_repo, :rubygems => ">= 2.5.2" do
     bundle! "config clean false" # want to keep the rackup binstub
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
@@ -342,7 +342,7 @@ RSpec.describe "bundle exec" do
   end
 
   describe "with gem executables" do
-    describe "run from a random directory" do
+    describe "run from a random directory", :ruby_repo do
       before(:each) do
         install_gemfile <<-G
           gem "rack"
@@ -445,7 +445,7 @@ RSpec.describe "bundle exec" do
     expect(out).to include("Installing foo 1.0")
   end
 
-  describe "with gems bundled via :path with invalid gemspecs" do
+  describe "with gems bundled via :path with invalid gemspecs", :ruby_repo do
     it "outputs the gemspec validation errors", :rubygems => ">= 1.7.2" do
       build_lib "foo"
 
@@ -633,7 +633,7 @@ RSpec.describe "bundle exec" do
       it_behaves_like "it runs"
     end
 
-    context "when the file uses the current ruby shebang" do
+    context "when the file uses the current ruby shebang", :ruby_repo do
       let(:shebang) { "#!#{Gem.ruby}" }
       it_behaves_like "it runs"
     end
@@ -800,10 +800,11 @@ __FILE__: #{path.to_s.inspect}
       it "overrides disable_shared_gems so bundler can be found" do
         skip "bundler 1.16.x is not support with Ruby 2.6 on Travis CI" if RUBY_VERSION >= "2.6"
 
+        system_gems :bundler
         file = bundled_app("file_that_bundle_execs.rb")
         create_file(file, <<-RB)
           #!#{Gem.ruby}
-          puts `bundle exec echo foo`
+          puts `#{system_bundle_bin_path} exec echo foo`
         RB
         file.chmod(0o777)
         bundle! "exec #{file}", :system_bundler => true

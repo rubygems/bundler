@@ -227,7 +227,7 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
    is used, defaults to vendor/bundle.
 * `path.system` (`BUNDLE_PATH__SYSTEM`):
    Whether Bundler will install gems into the default system path (`Gem.dir`).
-* `path_relative_to_cwd` (`PATH_RELATIVE_TO_CWD`)
+* `path_relative_to_cwd` (`BUNDLE_PATH_RELATIVE_TO_CWD`)
    Makes `--path` relative to the CWD instead of the `Gemfile`.
 * `plugins` (`BUNDLE_PLUGINS`):
    Enable Bundler's experimental plugin system.
@@ -381,3 +381,17 @@ This is especially useful for private repositories on hosts such as Github,
 where you can use personal OAuth tokens:
 
     export BUNDLE_GITHUB__COM=abcd0123generatedtoken:x-oauth-basic
+
+
+## CONFIGURE BUNDLER DIRECTORIES
+
+Bundler's home, config, cache and plugin directories are able to be configured
+through environment variables. The default location for Bundler's home directory is
+`~/.bundle`, which all directories inherit from by default. The following
+outlines the available environment variables and their default values
+
+    BUNDLE_USER_HOME : $HOME/.bundle
+    BUNDLE_USER_CACHE : $BUNDLE_USER_HOME/cache
+    BUNDLE_USER_CONFIG : $BUNDLE_USER_HOME/config
+    BUNDLE_USER_PLUGIN : $BUNDLE_USER_HOME/plugin
+

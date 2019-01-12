@@ -2,7 +2,7 @@
 
 require "bundler/vendored_fileutils"
 
-RSpec.describe "bundle pristine" do
+RSpec.describe "bundle pristine", :ruby_repo do
   before :each do
     build_lib "baz", :path => bundled_app do |s|
       s.version = "1.0.0"
@@ -48,9 +48,7 @@ RSpec.describe "bundle pristine" do
       bundle! "install"
       bundle! "pristine", :system_bundler => true
       bundle! "-v", :system_bundler => true
-      # An old rubygems couldn't handle a correct version of vendoered bundler.
-      bundler_version = Gem::VERSION < "2.1" ? "1.16.0" : Bundler::VERSION
-      expect(out).to end_with(bundler_version)
+      expect(out).to end_with(Bundler::VERSION)
     end
   end
 
