@@ -9,6 +9,11 @@ RSpec.describe "bundle info" do
       G
     end
 
+    it "prints the gems dependent on the gem in argument" do
+      bundle "info rails"
+      expect(out).to include "\tDependents:\n\t\tNone"
+    end
+
     it "prints information about the current gem" do
       bundle "info rails"
       expect(out).to include "* rails (2.3.2)
