@@ -13,6 +13,14 @@ module Bundler
 
       begin
         definition = Bundler.definition
+
+        if options[:deployment]
+          definition.resolve_remotely!
+          final_lockfile = definition.to_lock.split(/(?<=\n)/).to_set
+          current_lockfile = IO.readlines(Bundler.default_lockfile).to_set
+          diff = (current_lockfile ^ final_lockfile).to_a.join
+        end
+
         definition.validate_runtime!
         not_installed = definition.missing_specs
       rescue GemNotFound, VersionConflict
@@ -30,8 +38,13 @@ module Bundler
         Bundler.ui.error "This bundle has been frozen, but there is no #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} present"
         exit 1
       else
-        Bundler.load.lock(:preserve_unknown_sections => true) unless options[:"dry-run"]
-        Bundler.ui.info "The Gemfile's dependencies are satisfied"
+        Bundler.load.lock(:preserve_unknown_sections => true) unless options[:"dry-run"] || options[:deployment]
+
+        if options[:deployment]
+          puts diff
+        else
+          Bundler.ui.info "The Gemfile's dependencies are satisfied"
+        end
       end
     end
   end

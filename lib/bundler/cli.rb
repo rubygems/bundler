@@ -155,6 +155,8 @@ module Bundler
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME).#{" Bundler will remember this value for future installs on this machine" unless Bundler.feature_flag.forget_cli_options?}"
+    method_option "deployment", :type => :boolean, :required => false, :default => false, :banner =>
+      "To Check the difference in the existing and new gemfile if deployed"
     map "c" => "check"
     def check
       require "bundler/cli/check"
