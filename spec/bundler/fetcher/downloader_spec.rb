@@ -91,6 +91,15 @@ RSpec.describe Bundler::Fetcher::Downloader do
         expect { subject.fetch(uri, options, counter) }.
           to raise_error(Bundler::Fetcher::FallbackError, "Net::HTTPNotFound: http://www.uri-to-fetch.com/api/v2/endpoint")
       end
+
+      context "when the there are credentials provided in the request" do
+        let(:uri) { URI("http://username:password@www.uri-to-fetch.com/api/v2/endpoint") }
+
+        it "should raise a Bundler::Fetcher::FallbackError that doesn't contain the password" do
+          expect { subject.fetch(uri, options, counter) }.
+            to raise_error(Bundler::Fetcher::FallbackError, "Net::HTTPNotFound: http://username@www.uri-to-fetch.com/api/v2/endpoint")
+        end
+      end
     end
 
     context "when the request response is some other type" do
