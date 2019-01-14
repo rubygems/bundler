@@ -16,6 +16,7 @@ require "bundler/version"
 require "bundler/constants"
 require "bundler/current_ruby"
 require "bundler/build_metadata"
+require "bundler/diff"
 
 module Bundler
   environment_preserver = EnvironmentPreserver.new(ENV, EnvironmentPreserver::BUNDLER_KEYS)

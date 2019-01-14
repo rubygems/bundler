@@ -14,12 +14,17 @@ module Bundler
       begin
         definition = Bundler.definition
 
+        ui = Bundler.ui
+        Bundler.ui = UI::Silent.new
+
         if options[:deployment]
           definition.resolve_remotely!
-          final_lockfile = definition.to_lock.split(/(?<=\n)/).to_set
-          current_lockfile = IO.readlines(Bundler.default_lockfile).to_set
-          diff = (current_lockfile ^ final_lockfile).to_a.join
+          final_lockfile = definition.to_lock
+          current_lockfile = IO.readlines(Bundler.default_lockfile).join
+          diff = Bundler::Diff.new(current_lockfile, final_lockfile)
         end
+
+        Bundler.ui = ui
 
         definition.validate_runtime!
         not_installed = definition.missing_specs
