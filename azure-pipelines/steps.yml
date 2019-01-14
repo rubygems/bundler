@@ -13,7 +13,11 @@ steps:
     mkdir tmp
     cd tmp
     mkdir home
-  displayName: 'work around readline crash'
+  displayName: 'work around readline crash (for https://github.com/bundler/bundler/issues/6902)'
+
+- script: |
+    git apply --ignore-space-change --ignore-whitespace azure-pipelines\rbreadline.diff --directory=C:/hostedtoolcache/windows/Ruby/2.4.3/x64/lib/ruby/site_ruby --unsafe-paths
+  displayName: 'patch local readline implementation (for https://github.com/bundler/bundler/issues/6907)'
 
 - script: |
     ruby bin/rake spec:deps
