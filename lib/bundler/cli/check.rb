@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "tempfile"
+
 module Bundler
   class CLI::Check
     attr_reader :options

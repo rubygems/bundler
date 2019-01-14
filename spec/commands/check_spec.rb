@@ -12,6 +12,23 @@ RSpec.describe "bundle check" do
     expect(out).to include("The Gemfile's dependencies are satisfied")
   end
 
+  it "should return diff of lockfiles with --deployment flag" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+        gem "rack"
+    G
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "foo"
+    G
+
+    bundle "check --deployment"
+    expect(out).to include "+    foo (1.0)\n"
+    expect(out).to include "+  foo\n"
+  end
+
   it "works with the --gemfile flag when not in the directory" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
