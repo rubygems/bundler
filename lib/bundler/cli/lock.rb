@@ -23,7 +23,7 @@ module Bundler
       update = options[:update]
       if update.is_a?(Array) # unlocking specific gems
         Bundler::CLI::Common.ensure_all_gems_in_lockfile!(update)
-        update = { :gems => update, :lock_shared_dependencies => options[:conservative] }
+        update = { :gems => update, :lock_shared_dependencies => options[:conservative], :bundler => options[:bundler] }
       end
       definition = Bundler.definition(update)
 
