@@ -4,7 +4,7 @@ RSpec.describe Bundler::Fetcher::Downloader do
   let(:connection)     { double(:connection) }
   let(:redirect_limit) { 5 }
   let(:uri)            { URI("http://www.uri-to-fetch.com/api/v2/endpoint") }
-  let(:uri_with_creds) { URI("http://user:password@uri-to-fetch.com/api/v2/endpoint")}
+  let(:uri_with_creds) { URI("http://user:password@uri-to-fetch.com/api/v2/endpoint") }
   let(:options)        { double(:options) }
 
   subject { described_class.new(connection, redirect_limit) }
@@ -89,7 +89,7 @@ RSpec.describe Bundler::Fetcher::Downloader do
 
         it "should raise a Bundler::Fetcher::BadAuthenticationError that doesn't contain the password" do
           expect { subject.fetch(uri, options, counter) }.
-            to raise_error(Bundler::Fetcher::BadAuthenticationError, %r{Bad username or password for www.uri-to-fetch.com})
+            to raise_error(Bundler::Fetcher::BadAuthenticationError, /Bad username or password for www.uri-to-fetch.com/)
         end
       end
     end
