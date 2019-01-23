@@ -14,6 +14,9 @@ module Bundler
       require "rubygems"
     rescue LoadError
       return
+    rescue StandardError => e
+      # We don't need Bundler's dependencies solely for VERSION in the gemspec.
+      raise unless defined?(Bundler::GemNotFound) && e.is_a?(Bundler::GemNotFound)
     end
     return unless bundler_spec = Gem.loaded_specs["bundler"]
     return if bundler_spec.version == VERSION
