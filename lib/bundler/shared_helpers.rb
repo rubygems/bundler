@@ -374,8 +374,7 @@ module Bundler
 
     def prints_major_deprecations?
       require "bundler"
-      deprecation_release = Bundler::VERSION.split(".").drop(1).include?("99")
-      return false if !deprecation_release && !Bundler.settings[:major_deprecations]
+      return false unless Bundler.settings[:major_deprecations]
       require "bundler/deprecate"
       return false if Bundler::Deprecate.skip
       true

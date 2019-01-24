@@ -4,22 +4,6 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
   let(:warnings) { last_command.bundler_err } # change to err in 2.0
   let(:warnings_without_version_messages) { warnings.gsub(/#{Spec::Matchers::MAJOR_DEPRECATION}Bundler will only support ruby(gems)? >= .*/, "") }
 
-  context "in a .99 version" do
-    before do
-      simulate_bundler_version "1.99.1"
-      bundle "config unset major_deprecations"
-    end
-
-    it "prints major deprecations without being configured" do
-      ruby <<-R
-        require "bundler"
-        Bundler::SharedHelpers.major_deprecation(Bundler::VERSION)
-      R
-
-      expect(warnings).to have_major_deprecation("1.99.1")
-    end
-  end
-
   before do
     bundle "config set major_deprecations true"
 
