@@ -9,7 +9,6 @@ module Bundler
     autoload :Validator, "bundler/settings/validator"
 
     BOOL_KEYS = %w[
-      patch
       allow_bundler_dependency_conflicts
       allow_deployment_source_credential_changes
       allow_offline_install
@@ -46,6 +45,7 @@ module Bundler
       no_install
       no_prune
       only_update_to_newer_versions
+      patch
       path_relative_to_cwd
       path.system
       plugins
@@ -77,10 +77,10 @@ module Bundler
 
     DEFAULT_CONFIG = {
       :disable_version_check => true,
+      :patch => false,
       :redirect => 5,
       :retry => 3,
       :timeout => 10,
-      :patch => false,
     }.freeze
 
     def initialize(root = nil)
