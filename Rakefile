@@ -92,6 +92,10 @@ namespace :spec do
     releases = %w[v2.5.2 v2.6.14 v2.7.10 v3.0.6]
     (branches + releases).each do |rg|
       desc "Run specs with RubyGems #{rg}"
+      task "parallel_#{rg}" do
+        sh("bin/parallel_rspec spec/")
+      end
+
       task rg do
         sh("bin/rspec --format progress")
       end
@@ -112,7 +116,7 @@ namespace :spec do
 
     desc "Run specs under a RubyGems checkout (set RGV=path)"
     task "co" do
-      sh("bin/rspec --format progress")
+      sh("bin/parallel_rspec spec/")
     end
 
     namespace "co" do
@@ -142,9 +146,7 @@ namespace :spec do
     ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
 
     puts "\n\e[1;33m[Travis CI] Running bundler specs against RubyGems #{rg}\e[m\n\n"
-    specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
-
-    Rake::Task["spec:rubygems:#{rg}"].reenable
+    specs = safe_task { Rake::Task["spec:rubygems:parallel_#{rg}"].invoke }
 
     puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against RubyGems #{rg}\e[m\n\n"
     sudos = system("sudo -E rake spec:rubygems:#{rg}:sudo")
