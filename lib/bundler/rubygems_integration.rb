@@ -459,7 +459,7 @@ module Bundler
         end
 
         unless spec.name == gem_name
-          Bundler::SharedHelpers.major_deprecation 2,
+          warn \
             "Bundler is using a binstub that was created for a different gem (#{spec.name}).\n" \
             "You should run `bundle binstub #{gem_name}` " \
             "to work around a system/bundle conflict."

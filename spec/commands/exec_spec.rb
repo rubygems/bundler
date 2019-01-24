@@ -217,6 +217,35 @@ RSpec.describe "bundle exec" do
     end
   end
 
+  it "warns about executable conflicts" do
+    build_repo2 do
+      build_gem "rack_two", "1.0.0" do |s|
+        s.executables = "rackup"
+      end
+    end
+
+    bundle "config set path.system true"
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", "0.9.1"
+    G
+
+    Dir.chdir bundled_app2 do
+      install_gemfile bundled_app2("Gemfile"), <<-G
+        source "file://#{gem_repo2}"
+        gem "rack_two", "1.0.0"
+      G
+    end
+
+    bundle! "exec rackup"
+
+    expect(last_command.stderr).to eq(
+      "Bundler is using a binstub that was created for a different gem (rack).\n" \
+      "You should run `bundle binstub rack_two` to work around a system/bundle conflict."
+    )
+  end
+
   it "handles gems installed with --without" do
     install_gemfile <<-G, forgotten_command_line_options(:without => "middleware")
       source "file://#{gem_repo1}"
