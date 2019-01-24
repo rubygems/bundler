@@ -772,8 +772,8 @@ RSpec.describe "the lockfile format", :bundler => "2" do
             actionpack (= 2.3.2)
             activerecord (= 2.3.2)
             activeresource (= 2.3.2)
-            rake (= 10.0.2)
-          rake (10.0.2)
+            rake (= 12.3.2)
+          rake (12.3.2)
 
       PLATFORMS
         #{lockfile_platforms}
