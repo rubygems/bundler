@@ -9,29 +9,84 @@ RSpec.describe "bundle show", :bundler => "< 3", :ruby => ">= 2.0" do
       G
     end
 
-    it "creates a Gemfile.lock if one did not exist" do
-      FileUtils.rm("Gemfile.lock")
+    context "when show command deprecation is disabled" do
+      before { bundle "config --local major_deprecations no" }
 
-      bundle "show"
+      it "creates a Gemfile.lock if one did not exist" do
+        FileUtils.rm("Gemfile.lock")
 
-      expect(bundled_app("Gemfile.lock")).to exist
-    end
+        bundle "show"
 
-    it "creates a Gemfile.lock when invoked with a gem name" do
-      FileUtils.rm("Gemfile.lock")
+        expect(bundled_app("Gemfile.lock")).to exist
+      end
 
-      bundle "show rails"
+      it "creates a Gemfile.lock when invoked with a gem name" do
+        FileUtils.rm("Gemfile.lock")
 
-      expect(bundled_app("Gemfile.lock")).to exist
-    end
+        bundle "show rails"
 
-    it "prints path if gem exists in bundle" do
-      bundle "show rails"
-      expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
+        expect(bundled_app("Gemfile.lock")).to exist
+      end
+
+      it "prints path if gem exists in bundle" do
+        bundle "show rails"
+        expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
+      end
+
+      it "prints path if gem exists in bundle (with --paths option)" do
+        bundle "show rails --paths"
+        expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
+      end
+
+      it "warns if path no longer exists on disk" do
+        FileUtils.rm_rf(default_bundle_path("gems", "rails-2.3.2"))
+
+        bundle "show rails"
+
+        expect(out).to match(/has been deleted/i).
+          and include(default_bundle_path("gems", "rails-2.3.2").to_s)
+      end
+
+      it "prints the path to the running bundler" do
+        bundle "show bundler"
+        expect(out).to eq(root.to_s)
+      end
+
+      it "complains if gem not in bundle" do
+        bundle "show missing"
+        expect(out).to match(/could not find gem 'missing'/i)
+      end
+
+      it "prints path of all gems in bundle sorted by name" do
+        bundle "show --paths"
+
+        expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
+        expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
+
+        # Gem names are the last component of their path.
+        gem_list = out.split.map {|p| p.split("/").last }
+        expect(gem_list).to eq(gem_list.sort)
+      end
+
+      it "prints summary of gems" do
+        bundle "show --verbose"
+
+        loaded_bundler_spec = Bundler.load.specs["bundler"]
+        expected = if !loaded_bundler_spec.empty?
+          loaded_bundler_spec[0].homepage
+        else
+          "No website available."
+        end
+
+        expect(out).to include("* actionmailer (2.3.2)")
+        expect(out).to include("\tSummary:  This is just a fake gem for testing")
+        expect(out).to include("\tHomepage: #{expected}")
+        expect(out).to include("\tStatus:   Up to date")
+      end
     end
 
     context "when show command deprecation is enabled" do
-      before { bundle "config major_deprecations yes" }
+      before { bundle "config --local major_deprecations yes" }
 
       it "prints path if gem exists in bundle" do
         bundle "show rails"
@@ -70,57 +125,6 @@ RSpec.describe "bundle show", :bundler => "< 3", :ruby => ">= 2.0" do
         gem_list = out_lines[1..-1].map {|p| p.split("/").last }
         expect(gem_list).to eq(gem_list.sort)
       end
-    end
-
-    it "prints path if gem exists in bundle (with --paths option)" do
-      bundle "show rails --paths"
-      expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
-    end
-
-    it "warns if path no longer exists on disk" do
-      FileUtils.rm_rf(default_bundle_path("gems", "rails-2.3.2"))
-
-      bundle "show rails"
-
-      expect(out).to match(/has been deleted/i).
-        and include(default_bundle_path("gems", "rails-2.3.2").to_s)
-    end
-
-    it "prints the path to the running bundler" do
-      bundle "show bundler"
-      expect(out).to eq(root.to_s)
-    end
-
-    it "complains if gem not in bundle" do
-      bundle "show missing"
-      expect(out).to match(/could not find gem 'missing'/i)
-    end
-
-    it "prints path of all gems in bundle sorted by name" do
-      bundle "show --paths"
-
-      expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
-      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
-
-      # Gem names are the last component of their path.
-      gem_list = out.split.map {|p| p.split("/").last }
-      expect(gem_list).to eq(gem_list.sort)
-    end
-
-    it "prints summary of gems" do
-      bundle "show --verbose"
-
-      loaded_bundler_spec = Bundler.load.specs["bundler"]
-      expected = if !loaded_bundler_spec.empty?
-        loaded_bundler_spec[0].homepage
-      else
-        "No website available."
-      end
-
-      expect(out).to include("* actionmailer (2.3.2)")
-      expect(out).to include("\tSummary:  This is just a fake gem for testing")
-      expect(out).to include("\tHomepage: #{expected}")
-      expect(out).to include("\tStatus:   Up to date")
     end
   end
 

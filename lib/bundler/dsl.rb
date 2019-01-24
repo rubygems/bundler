@@ -194,7 +194,7 @@ module Bundler
               "    end\n\n"
 
         raise DeprecatedError, msg if Bundler.feature_flag.disable_multisource?
-        SharedHelpers.major_deprecation(3, msg.strip)
+        SharedHelpers.major_deprecation(2, msg.strip)
       end
 
       source_options = normalize_hash(options).merge(
@@ -456,7 +456,7 @@ repo_name ||= user_name
     def normalize_source(source)
       case source
       when :gemcutter, :rubygems, :rubyforge
-        Bundler::SharedHelpers.major_deprecation 3, "The source :#{source} is deprecated because HTTP " \
+        Bundler::SharedHelpers.major_deprecation 2, "The source :#{source} is deprecated because HTTP " \
           "requests are insecure.\nPlease change your source to 'https://" \
           "rubygems.org' if possible, or 'http://rubygems.org' if not."
         "http://rubygems.org"
@@ -480,7 +480,7 @@ repo_name ||= user_name
         end
         raise GemfileEvalError, msg
       else
-        Bundler::SharedHelpers.major_deprecation 3, "Your Gemfile contains multiple primary sources. " \
+        Bundler::SharedHelpers.major_deprecation 2, "Your Gemfile contains multiple primary sources. " \
           "Using `source` more than once without a block is a security risk, and " \
           "may result in installing unexpected gems. To resolve this warning, use " \
           "a block to indicate which gems should come from the secondary source. " \

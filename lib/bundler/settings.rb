@@ -113,7 +113,7 @@ module Bundler
           "bundle config #{key} #{Array(value).join(":")}"
         end
 
-        Bundler::SharedHelpers.major_deprecation 3,\
+        Bundler::SharedHelpers.major_deprecation 2,\
           "flags passed to commands " \
           "will no longer be automatically remembered. Instead please set flags " \
           "you want remembered between commands using `bundle config " \

@@ -119,7 +119,7 @@ module Bundler
     end
 
     def environment
-      SharedHelpers.major_deprecation 3, "Bundler.environment has been removed in favor of Bundler.load"
+      SharedHelpers.major_deprecation 2, "Bundler.environment has been removed in favor of Bundler.load"
       load
     end
 

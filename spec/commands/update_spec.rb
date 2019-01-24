@@ -937,7 +937,7 @@ RSpec.describe "bundle update conservative" do
     it "raises if too many flags are provided" do
       bundle "update --patch --minor", :all => bundle_update_requires_all?
 
-      expect(last_command.bundler_err).to eq "Provide only one of the following options: minor, patch"
+      expect(last_command.bundler_err).to include "Provide only one of the following options: minor, patch"
     end
   end
 end
