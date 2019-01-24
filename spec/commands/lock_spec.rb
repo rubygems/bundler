@@ -38,8 +38,8 @@ RSpec.describe "bundle lock" do
             actionpack (= 2.3.2)
             activerecord (= 2.3.2)
             activeresource (= 2.3.2)
-            rake (= 10.0.2)
-          rake (10.0.2)
+            rake (= 12.3.2)
+          rake (12.3.2)
           with_license (1.0)
 
       PLATFORMS
@@ -133,7 +133,7 @@ RSpec.describe "bundle lock" do
   end
 
   it "update specific gems using --update" do
-    lockfile @lockfile.gsub("2.3.2", "2.3.1").gsub("10.0.2", "10.0.1")
+    lockfile @lockfile.gsub("2.3.2", "2.3.1").gsub("12.3.2", "10.0.1")
 
     bundle "lock --update rails rake"
 
