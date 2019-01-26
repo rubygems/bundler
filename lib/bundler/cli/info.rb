@@ -74,8 +74,9 @@ module Bundler
     end
 
     def specs_as_tree(specs)
-      specs.each_with_object({}) do |spec, hash|
+      specs.inject({}) do |hash, spec|
         hash[spec.name] = spec
+        hash
       end
     end
 
