@@ -5,13 +5,14 @@ RSpec.describe "bundle info" do
     before do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
+        gem "rake"
         gem "rails"
       G
     end
 
     it "prints the gems dependent on the gem in argument" do
-      bundle "info rails"
-      expect(out).to include "\tDependents:\n\t\tNone"
+      bundle "info rake"
+      expect(out).to include "\tDependents:\n\t\trails (= 10.0.2)"
     end
 
     it "prints information about the current gem" do
