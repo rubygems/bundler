@@ -12,7 +12,7 @@ RSpec.describe "bundle info" do
 
     it "prints the gems dependent on the gem in argument" do
       bundle "info rake"
-      expect(out).to include "\tDependents:\n\t\trails (= 10.0.2)"
+      expect(out).to include "\tDependents:\n\t\trails"
     end
 
     it "prints information about the current gem" do
