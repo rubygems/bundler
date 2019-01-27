@@ -80,7 +80,7 @@ module Bundler
 
     def self.configure_gem_version_promoter(definition, options)
       patch_level = patch_level_options(options)
-      patch_level.append(:patch) if patch_level.empty? && Bundler.settings[:prefer_patch]
+      patch_level << :patch if patch_level.empty? && Bundler.settings[:prefer_patch]
       raise InvalidOption, "Provide only one of the following options: #{patch_level.join(", ")}" unless patch_level.length <= 1
 
       definition.gem_version_promoter.tap do |gvp|
