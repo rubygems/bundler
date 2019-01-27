@@ -45,11 +45,11 @@ module Bundler
       no_install
       no_prune
       only_update_to_newer_versions
-      patch
       path_relative_to_cwd
       path.system
       plugins
       prefer_gems_rb
+      prefer_patch
       print_only_version_number
       setup_makes_kernel_gem_public
       silence_root_warning
@@ -77,7 +77,7 @@ module Bundler
 
     DEFAULT_CONFIG = {
       :disable_version_check => true,
-      :patch => false,
+      :prefer_patch => false,
       :redirect => 5,
       :retry => 3,
       :timeout => 10,

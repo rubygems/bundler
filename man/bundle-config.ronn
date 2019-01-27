@@ -220,8 +220,6 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
 * `only_update_to_newer_versions` (`BUNDLE_ONLY_UPDATE_TO_NEWER_VERSIONS`):
    During `bundle update`, only resolve to newer versions of the gems in the
    lockfile.
-* `patch` (BUNDLE_PATCH):
-   Whether to use patch update level, by default set to false.
 * `path` (`BUNDLE_PATH`):
    The location on disk where all gems in your bundle will be located regardless
    of `$GEM_HOME` or `$GEM_PATH` values. Bundle gems not found in this location
@@ -235,6 +233,8 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
    Enable Bundler's experimental plugin system.
 * `prefer_gems_rb` (`BUNDLE_PREFER_GEMS_RB`)
    Prefer `gems.rb` to `Gemfile` when Bundler is searching for a Gemfile.
+* `prefer_patch` (BUNDLE_PREFER_PATCH):
+   Prefer updating only to next patch version during updates. Makes `bundle update` calls equivalent to `bundler update --patch`.
 * `print_only_version_number` (`BUNDLE_PRINT_ONLY_VERSION_NUMBER`)
    Print only version number from `bundler --version`.
 * `redirect` (`BUNDLE_REDIRECT`):
