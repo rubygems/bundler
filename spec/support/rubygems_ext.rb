@@ -19,7 +19,7 @@ module Spec
         "compact_index" => "~> 0.11.0",
         "sinatra" => "~> 1.4.7",
         # Rake version has to be consistent for tests to pass
-        "rake" => "10.0.2",
+        "rake" => "12.3.2",
         # 3.0.0 breaks 1.9.2 specs
         "builder" => "2.1.2",
       }

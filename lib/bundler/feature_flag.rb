@@ -19,7 +19,7 @@ module Bundler
     def self.settings_method(name, key, &default)
       define_method(name) do
         value = Bundler.settings[key]
-        value = instance_eval(&default) if value.nil? && !default.nil?
+        value = instance_eval(&default) if value.nil?
         value
       end
     end

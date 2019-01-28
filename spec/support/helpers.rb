@@ -174,11 +174,6 @@ module Spec
       bundle(cmd, options)
     end
 
-    def bundle_ruby(options = {})
-      options["bundle_bin"] = bindir.join("bundle_ruby")
-      bundle("", options)
-    end
-
     def ruby(ruby, options = {})
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
       ruby = ruby.gsub(/["`\$]/) {|m| "\\#{m}" }

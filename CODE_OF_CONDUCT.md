@@ -61,7 +61,7 @@ Once the admins get involved, they will follow a documented series of steps and 
 
 You may get in touch with the Bundler admin team through any of the following methods:
 
-- Email [the Bundler maintainers](http://bundler.io/contributors.html) as a group at [team@bundler.io](mailto:team@bundler.io).
+- Email [the Bundler maintainers](https://bundler.io/contributors.html) as a group at [team@bundler.io](mailto:team@bundler.io).
 - Directly message any maintainer in private (through Slack, Twitter, email, or other available option) if that is more comfortable
 
 ### Further Enforcement

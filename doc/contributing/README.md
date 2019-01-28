@@ -1,6 +1,6 @@
 # Bundler Contributor Guidelines
 
-Thank you for your interest in making Bundler better! We welcome contributions from everyone. Dozens of contributors like you have submitted feature improvements, fixed bugs, and written new documentation. [Join the Bundler Slack community](http://slack.bundler.io/) to connect with the Bundler core team and other contributors like you.
+Thank you for your interest in making Bundler better! We welcome contributions from everyone. Dozens of contributors like you have submitted feature improvements, fixed bugs, and written new documentation. [Join the Bundler Slack community](https://slack.bundler.io/) to connect with the Bundler core team and other contributors like you.
 
 Before submitting a contribution, read through the following guidelines:
 

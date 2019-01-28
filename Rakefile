@@ -43,7 +43,6 @@ namespace :spec do
     deps = Hash[bundler_spec.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
-    deps["rubocop"] ||= "= 0.50.0" if RUBY_VERSION >= "2.0.0" # can't go in the gemspec because of the ruby version requirement
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
@@ -95,13 +94,9 @@ begin
   RSpec::Core::RakeTask.new
   task :spec => "man:build"
 
-  if RUBY_VERSION >= "2.0.0"
-    # can't go in the gemspec because of the ruby version requirement
-    gem "rubocop", "= 0.50.0"
-    require "rubocop/rake_task"
-    rubocop = RuboCop::RakeTask.new
-    rubocop.options = ["--parallel"]
-  end
+  require "rubocop/rake_task"
+  rubocop = RuboCop::RakeTask.new
+  rubocop.options = ["--parallel"]
 
   namespace :spec do
     task :clean do
