@@ -25,10 +25,10 @@ Please open a ticket with [Heroku](https://www.heroku.com) if you're having trou
 
 ## Other problems
 
-First, figure out exactly what it is that you're trying to do (see [XY Problem](http://xyproblem.info/)). Then, go to the [Bundler documentation website](http://bundler.io) and see if we have instructions on how to do that.
+First, figure out exactly what it is that you're trying to do (see [XY Problem](http://xyproblem.info/)). Then, go to the [Bundler documentation website](https://bundler.io) and see if we have instructions on how to do that.
 
 Second, check [the compatibility
-list](http://bundler.io/compatibility.html), and make sure that the version of Bundler that you are using works with the versions of Ruby and RubyGems that you are using. To see your versions:
+list](https://bundler.io/compatibility.html), and make sure that the version of Bundler that you are using works with the versions of Ruby and RubyGems that you are using. To see your versions:
 
     # Bundler version
     bundle -v
