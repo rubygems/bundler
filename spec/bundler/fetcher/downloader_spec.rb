@@ -4,7 +4,6 @@ RSpec.describe Bundler::Fetcher::Downloader do
   let(:connection)     { double(:connection) }
   let(:redirect_limit) { 5 }
   let(:uri)            { URI("http://www.uri-to-fetch.com/api/v2/endpoint") }
-  let(:uri_with_creds) { URI("http://user:password@uri-to-fetch.com/api/v2/endpoint") }
   let(:options)        { double(:options) }
 
   subject { described_class.new(connection, redirect_limit) }
