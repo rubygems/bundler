@@ -1,6 +1,6 @@
 # Contributing to Bundler
 
-Welcome to Bundler! We are so happy that you're here. We know joining a new open source project can be daunting, so here's a quick overview of what you can expect from this documentation.
+Thank you for your interest in making Bundler better! We welcome contributions from everyone. Dozens of contributors like you have submitted feature improvements, fixed bugs, and written new documentation. [Join the Bundler Slack community](https://slack.bundler.io/) to connect with the Bundler core team and other contributors like you.
 
 *Something missing?* Send us a [pull request](../development/PULL_REQUESTS.md)!
 

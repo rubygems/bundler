@@ -226,7 +226,7 @@ Bundler could not find compatible versions for gem "a":
       # dependencies and since the dependency of the selected foo gem changes, the latest matching
       # dependency of "bar", "~> 2.1" -- bar-2.1.1 -- is selected. This is not a bug and follows
       # the long-standing documented Conservative Updating behavior of bundle install.
-      # http://bundler.io/v1.12/man/bundle-install.1.html#CONSERVATIVE-UPDATING
+      # https://bundler.io/v1.12/man/bundle-install.1.html#CONSERVATIVE-UPDATING
       should_conservative_resolve_and_include :patch, ["foo"], %w[foo-1.4.5 bar-2.1.1]
     end
 

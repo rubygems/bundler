@@ -53,11 +53,11 @@ $ bin/rspec ./spec/commands/help_spec.rb
 $ bin/rspec ./spec/quality_spec.rb
 ```
 
-# Writing docs for [the Bundler documentation site](bundler.io)
+# Writing docs for [the Bundler documentation site](https://bundler.io)
 
-If you'd like to submit a pull request for any of the primary commands or utilities on [the Bundler documentation site](bundler.io), please follow the instructions above for writing documentation for man pages from the `bundler/bundler` repository. They are the same in each case.
+If you'd like to submit a pull request for any of the primary commands or utilities on [the Bundler documentation site](https://bundler.io), please follow the instructions above for writing documentation for man pages from the `bundler/bundler` repository. They are the same in each case.
 
-Note: Editing `.ronn` files from the `bundler/bundler` repository for the primary commands and utilities documentation is all you need 🎉. There is no need to manually change anything in the `bundler/bundler-site` repository, because the man pages and the docs for primary commands and utilities on [the Bundler documentation site](bundler.io) are one in the same. They are generated automatically from the `bundler/bundler` repository's `.ronn` files from the `rake man/build` command. In other words, after updating `.ronn` file and running `rake man/build` in `bundler`, `.ronn` files map to the auto-generated files in the `source/man` directory of `bundler-site`.
+Note: Editing `.ronn` files from the `bundler/bundler` repository for the primary commands and utilities documentation is all you need 🎉. There is no need to manually change anything in the `bundler/bundler-site` repository, because the man pages and the docs for primary commands and utilities on [the Bundler documentation site](https://bundler.io) are one in the same. They are generated automatically from the `bundler/bundler` repository's `.ronn` files from the `rake man/build` command. In other words, after updating `.ronn` file and running `rake man/build` in `bundler`, `.ronn` files map to the auto-generated files in the `source/man` directory of `bundler-site`.
 
 Additionally, if you'd like to add a guide or tutorial: in the `bundler/bundler-site` repository, go to `/bundler-site/source/current_version_of_bundler/guides` and add [a new Markdown file](https://guides.github.com/features/mastering-markdown/) (with an extension ending in `.md`). Be sure to correctly format the title of your new guide, like so:
 ```

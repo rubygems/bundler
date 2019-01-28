@@ -29,7 +29,7 @@ bundle install
 bundle exec rspec
 ```
 
-See [bundler.io](http://bundler.io) for the full documentation.
+See [bundler.io](https://bundler.io) for the full documentation.
 
 ### Troubleshooting
 
