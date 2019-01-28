@@ -5,9 +5,9 @@ Code needs explanation, and sometimes those who know the code well have trouble 
 Currently, Bundler has two main sources of documentation:
 
 1. built-in `help` (including usage information and man pages)
-2. [Bundler documentation site](http://bundler.io)
+2. [Bundler documentation site](https://bundler.io)
 
-If you have a suggestion or proposed change for [bundler.io](http://bundler.io), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
+If you have a suggestion or proposed change for [bundler.io](https://bundler.io), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
 Not sure where to write documentation? In general, follow these guidelines:
 
