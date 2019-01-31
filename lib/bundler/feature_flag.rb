@@ -50,7 +50,7 @@ module Bundler
     settings_flag(:prefer_gems_rb) { bundler_2_mode? }
     settings_flag(:print_only_version_number) { bundler_2_mode? }
     settings_flag(:setup_makes_kernel_gem_public) { !bundler_2_mode? }
-    settings_flag(:skip_default_git_sources) { bundler_2_mode? }
+    settings_flag(:skip_default_git_sources) { bundler_3_mode? }
     settings_flag(:specific_platform) { bundler_2_mode? }
     settings_flag(:suppress_install_using_messages) { bundler_2_mode? }
     settings_flag(:unlock_source_unlocks_spec) { !bundler_2_mode? }

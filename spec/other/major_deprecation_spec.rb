@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "major deprecations", :bundler => "< 2" do
+RSpec.describe "major deprecations" do
   let(:warnings) { last_command.bundler_err } # change to err in 2.0
 
   before do
@@ -145,27 +145,31 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
     end
 
     context "with github gems" do
-      it "warns about the https change" do
-        msg = <<-EOS
-The :github git source is deprecated, and will be removed in Bundler 2.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
+      let(:msg) do
+        <<-EOS
+The :github git source is deprecated, and will be removed in Bundler 3.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
 
     git_source(:github) {|repo_name| "https://github.com/\#{repo_name}.git" }
 
         EOS
-        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, msg)
+      end
+
+      it "warns about future removal" do
+        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(3, msg)
         subject.gem("sparks", :github => "indirect/sparks")
       end
 
-      it "upgrades to https on request" do
-        Bundler.settings.temporary "github.https" => true
-        msg = <<-EOS
-The :github git source is deprecated, and will be removed in Bundler 2.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
+      it "downgrades to http on request" do
+        Bundler.settings.temporary "github.https" => false
+        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(3, msg)
+        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, "Setting `github.https` to false is deprecated and won't be supported in the future.")
+        subject.gem("sparks", :github => "indirect/sparks")
+        github_uri = "git://github.com/indirect/sparks.git"
+        expect(subject.dependencies.first.source.uri).to eq(github_uri)
+      end
 
-    git_source(:github) {|repo_name| "https://github.com/\#{repo_name}.git" }
-
-        EOS
-        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, msg)
-        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, "The `github.https` setting will be removed")
+      it "uses https by default" do
+        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(3, msg)
         subject.gem("sparks", :github => "indirect/sparks")
         github_uri = "https://github.com/indirect/sparks.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
@@ -176,7 +180,7 @@ The :github git source is deprecated, and will be removed in Bundler 2.0. Change
       it "warns about removal" do
         allow(Bundler.ui).to receive(:deprecate)
         msg = <<-EOS
-The :bitbucket git source is deprecated, and will be removed in Bundler 2.0. Add this code to the top of your Gemfile to ensure it continues to work:
+The :bitbucket git source is deprecated, and will be removed in Bundler 3.0. Add this code to the top of your Gemfile to ensure it continues to work:
 
     git_source(:bitbucket) do |repo_name|
       user_name, repo_name = repo_name.split("/")
@@ -185,7 +189,7 @@ The :bitbucket git source is deprecated, and will be removed in Bundler 2.0. Add
     end
 
         EOS
-        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, msg)
+        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(3, msg)
         subject.gem("not-really-a-gem", :bitbucket => "mcorp/flatlab-rails")
       end
     end
@@ -194,10 +198,10 @@ The :bitbucket git source is deprecated, and will be removed in Bundler 2.0. Add
       it "warns about removal" do
         allow(Bundler.ui).to receive(:deprecate)
         msg = "The :gist git source is deprecated, and will be removed " \
-          "in Bundler 2.0. Add this code to the top of your Gemfile to ensure it " \
+          "in Bundler 3.0. Add this code to the top of your Gemfile to ensure it " \
           "continues to work:\n\n    git_source(:gist) {|repo_name| " \
           "\"https://gist.github.com/\#{repo_name}.git\" }\n\n"
-        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, msg)
+        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(3, msg)
         subject.gem("not-really-a-gem", :gist => "1234")
       end
     end

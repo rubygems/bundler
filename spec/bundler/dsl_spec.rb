@@ -44,7 +44,7 @@ RSpec.describe Bundler::Dsl do
 
       it "converts :github to :git" do
         subject.gem("sparks", :github => "indirect/sparks")
-        github_uri = "git://github.com/indirect/sparks.git"
+        github_uri = "https://github.com/indirect/sparks.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
       end
 
@@ -62,7 +62,7 @@ RSpec.describe Bundler::Dsl do
 
       it "converts 'rails' to 'rails/rails'" do
         subject.gem("rails", :github => "rails")
-        github_uri = "git://github.com/rails/rails.git"
+        github_uri = "https://github.com/rails/rails.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
       end
 
@@ -79,7 +79,7 @@ RSpec.describe Bundler::Dsl do
       end
     end
 
-    context "default git sources", :bundler => "2" do
+    context "default git sources", :bundler => "3" do
       it "has none" do
         expect(subject.instance_variable_get(:@git_sources)).to eq({})
       end
@@ -245,7 +245,7 @@ RSpec.describe Bundler::Dsl do
     #   gem 'spree_api'
     #   gem 'spree_backend'
     # end
-    describe "#github", :bundler => "< 2" do
+    describe "#github", :bundler => "< 3" do
       it "from github" do
         spree_gems = %w[spree_core spree_api spree_backend]
         subject.github "spree" do
@@ -253,12 +253,12 @@ RSpec.describe Bundler::Dsl do
         end
 
         subject.dependencies.each do |d|
-          expect(d.source.uri).to eq("git://github.com/spree/spree.git")
+          expect(d.source.uri).to eq("https://github.com/spree/spree.git")
         end
       end
     end
 
-    describe "#github", :bundler => "2" do
+    describe "#github", :bundler => "3" do
       it "from github" do
         expect do
           spree_gems = %w[spree_core spree_api spree_backend]
