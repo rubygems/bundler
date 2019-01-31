@@ -15,7 +15,7 @@ bundle list --name-only
 
 bundle list --paths
 
-bundle list --without-group test
+bundle list --without-group test[,other_group,...]
 
 bundle list --only-group dev
 
@@ -28,6 +28,6 @@ bundle list --only-group dev --paths
 * `--paths`:
   Print the path to each gem in the bundle.
 * `--without-group`:
-  Print all gems expect from a group.
+  Print all gems expect from 1 or multiple groups.
 * `--only-group`:
   Print gems from a particular group.
