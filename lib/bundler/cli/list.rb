@@ -31,8 +31,16 @@ module Bundler
 
   private
 
+    def without_groups
+      @without_groups ||= @options["without-group"].split(/\s*,\s*/)
+    end
+
     def verify_group_exists(groups)
-      raise InvalidOption, "`#{@options["without-group"]}` group could not be found." if @options["without-group"] && !groups.include?(@options["without-group"].to_sym)
+      if @options["without-group"]
+        without_groups.each do |without_group|
+          raise InvalidOption, "`#{without_group}` group could not be found." unless groups.include?(without_group.to_sym)
+        end
+      end
 
       raise InvalidOption, "`#{@options["only-group"]}` group could not be found." if @options["only-group"] && !groups.include?(@options["only-group"].to_sym)
     end
@@ -45,13 +53,14 @@ module Bundler
 
       show_groups =
         if @options["without-group"]
-          groups.reject {|g| g == @options["without-group"].to_sym }
+          without_groups.inject(groups) do |memo, without_group|
+            memo.reject {|g| g == without_group.to_sym }
+          end
         elsif @options["only-group"]
           groups.select {|g| g == @options["only-group"].to_sym }
         else
           groups
         end.map(&:to_sym)
-
       definition.specs_for(show_groups)
     end
   end

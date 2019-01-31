@@ -43,6 +43,30 @@ RSpec.describe "bundle list", :bundler => "2" do
         expect(out).to eq "`random` group could not be found."
       end
     end
+
+    describe "with multiple without-groups" do
+      before do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+
+          gem "rack"
+          gem "rspec", :group => [:test]
+          gem "rails", :group => [:development]
+          gem "git_test", group: %i[test development]
+          gem "rspec_in_context", group: %i[production development]
+        G
+      end
+
+      it "removes all the needed gems" do
+        bundle! 'list --without-group "development, test"'
+
+        expect(out).to include(/rack/)
+        expect(out).to include(/rspec_in_context/)
+        expect(out).not_to include(/rails/)
+        expect(out).not_to include(/git_test/)
+        expect(out).not_to include(/rspec/)
+      end
+    end
   end
 
   describe "with only-group option" do
