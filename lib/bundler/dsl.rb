@@ -290,25 +290,11 @@ module Bundler
         warn_deprecated_git_source(:github, <<-'RUBY'.strip, 'Change any "reponame" :github sources to "username/reponame".')
 "https://github.com/#{repo_name}.git"
         RUBY
-        # It would be better to use https instead of the git protocol, but this
-        # can break deployment of existing locked bundles when switching between
-        # different versions of Bundler. The change will be made in 2.0, which
-        # does not guarantee compatibility with the 1.x series.
-        #
-        # See https://github.com/bundler/bundler/pull/2569 for discussion
-        #
-        # This can be overridden by adding this code to your Gemfiles:
-        #
-        #   git_source(:github) do |repo_name|
-        #     repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        #     "https://github.com/#{repo_name}.git"
-        #   end
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        # TODO: 2.0 upgrade this setting to the default
-        if Bundler.settings["github.https"]
-          Bundler::SharedHelpers.major_deprecation 3, "The `github.https` setting will be removed"
+        if Bundler.feature_flag.github_https?
           "https://github.com/#{repo_name}.git"
         else
+          Bundler::SharedHelpers.major_deprecation 3, "Setting `github.https` to false is deprecated and won't be supported in the future."
           "git://github.com/#{repo_name}.git"
         end
       end
