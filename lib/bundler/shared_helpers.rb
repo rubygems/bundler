@@ -3,6 +3,7 @@
 require "bundler/compatibility_guard"
 
 require "pathname"
+require "rbconfig"
 require "rubygems"
 
 require "bundler/version"
