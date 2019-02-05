@@ -22,6 +22,8 @@ Strategies for triaging a ticket:
   * If you're having trouble replicating their issue with your current environment, slowly try to incorporate the user's environment setup. As in, this is where you begin matching their environment. For example, try switching to the user's version of Ruby, RubyGems, RVM, et cetera, step by step.
   * Is the user running the latest version of bundler? If not, ask them to update by running `gem install bundler`. There's a chance that the newest version of bundler has already solved their problem.
 
+If the issue still requires user information, apply the label "user feedback required". This will help identify stale issues in the future.
+
 If you can't reproduce the issue, chances are good that the bug has been fixed already (hurrah!). That's a good time to post to the ticket explaining what you did and how it worked.
 
 If you can reproduce an issue, you're well on your way to fixing it. :)
@@ -40,3 +42,12 @@ Everyone is welcome and encouraged to fix any open bug, improve an error message
 ## Duplicates!
 
 Finally, the ticket may be a duplicate of another older ticket. If you notice a ticket is a duplicate, simply comment on the ticket noting the original ticket’s number. For example, you could say “This is a duplicate of issue #42, and can be closed”.
+
+## Stale issues
+
+Any issue that is waiting for more information is what we could consider "stale". And the process is:
+
+1. If the issue is not updated in a while (2-4 weeks), we usually leave a comment saying "Hey :wave:, is this still a problem for you?".
+2. If they don't respond within a week or two, then we will close the ticket.
+3. If they do respond and they say it's still an issue, then we'll remind we are waiting for more information.
+4. If the user doesn't provide the required information after being reminded, the ticket will be closed.
