@@ -27,7 +27,7 @@ addons:
       secure: "TrzIv116JLGUxm6PAUskCYrv8KTDguncKROVwbnjVPKTGDAgoDderd8JUdDEXrKoZ9qGLD2TPYKExt9/QDl71E+qHdWnVqWv4HKCUk2P9z/VLKzHuggOUBkCXiJUhjywUieCJhI3N92bfq2EjSBbu2/OFHqWOjLQ+QCooTEBjv8="
 
 rvm:
-  - 2.6.0
+  - 2.6.1
   - 2.5.3
   - 2.4.5
   - 2.3.8
@@ -46,7 +46,7 @@ env:
 
 jobs:
   include:
-    - rvm: 2.6.0
+    - rvm: 2.6.1
       script: rake rubocop
       stage: linting
     # Ruby 2.5, Rubygems 2.7 and up
@@ -75,7 +75,7 @@ jobs:
       env: RGV=master
       stage: test
     # 1.x mode (we want to keep stuff passing in 1.x mode for now)
-    - rvm: 2.6.0
+    - rvm: 2.6.1
       env: RGV=v2.7.7 BUNDLER_SPEC_SUB_VERSION=1.98
       stage: test
 
