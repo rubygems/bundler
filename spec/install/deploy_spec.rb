@@ -129,11 +129,11 @@ RSpec.describe "install with --deployment or --frozen" do
       G
 
       bundle :install, forgotten_command_line_options(:deployment => true)
-      expect(out).to include("deployment mode")
-      expect(out).to include("You have added to the Gemfile")
-      expect(out).to include("* rack-obama")
-      expect(out).not_to include("You have deleted from the Gemfile")
-      expect(out).not_to include("You have changed in the Gemfile")
+      expect(err).to include("deployment mode")
+      expect(err).to include("You have added to the Gemfile")
+      expect(err).to include("* rack-obama")
+      expect(err).not_to include("You have deleted from the Gemfile")
+      expect(err).not_to include("You have changed in the Gemfile")
     end
 
     it "works if a path gem is missing but is in a without group" do
@@ -162,7 +162,7 @@ RSpec.describe "install with --deployment or --frozen" do
       FileUtils.rm_r lib_path("path_gem-1.0")
 
       bundle :install, forgotten_command_line_options(:path => ".bundle", :deployment => true)
-      expect(out).to include("The path `#{lib_path("path_gem-1.0")}` does not exist.")
+      expect(err).to include("The path `#{lib_path("path_gem-1.0")}` does not exist.")
     end
 
     it "can have --frozen set via an environment variable", :bundler => "< 2" do
@@ -190,11 +190,11 @@ RSpec.describe "install with --deployment or --frozen" do
 
       ENV["BUNDLE_DEPLOYMENT"] = "true"
       bundle "install"
-      expect(out).to include("deployment mode")
-      expect(out).to include("You have added to the Gemfile")
-      expect(out).to include("* rack-obama")
-      expect(out).not_to include("You have deleted from the Gemfile")
-      expect(out).not_to include("You have changed in the Gemfile")
+      expect(err).to include("deployment mode")
+      expect(err).to include("You have added to the Gemfile")
+      expect(err).to include("* rack-obama")
+      expect(err).not_to include("You have deleted from the Gemfile")
+      expect(err).not_to include("You have changed in the Gemfile")
     end
 
     it "can have --frozen set to false via an environment variable" do
@@ -220,11 +220,11 @@ RSpec.describe "install with --deployment or --frozen" do
       G
 
       bundle :install, forgotten_command_line_options(:frozen => true)
-      expect(out).to include("deployment mode")
-      expect(out).to include("You have added to the Gemfile")
-      expect(out).to include("* rack-obama (= 1.1)")
-      expect(out).not_to include("You have deleted from the Gemfile")
-      expect(out).not_to include("You have changed in the Gemfile")
+      expect(err).to include("deployment mode")
+      expect(err).to include("You have added to the Gemfile")
+      expect(err).to include("* rack-obama (= 1.1)")
+      expect(err).not_to include("You have deleted from the Gemfile")
+      expect(err).not_to include("You have changed in the Gemfile")
     end
 
     it "explodes if you remove a gem and don't check in the lockfile" do
@@ -234,10 +234,10 @@ RSpec.describe "install with --deployment or --frozen" do
       G
 
       bundle :install, forgotten_command_line_options(:deployment => true)
-      expect(out).to include("deployment mode")
-      expect(out).to include("You have added to the Gemfile:\n* activesupport\n\n")
-      expect(out).to include("You have deleted from the Gemfile:\n* rack")
-      expect(out).not_to include("You have changed in the Gemfile")
+      expect(err).to include("deployment mode")
+      expect(err).to include("You have added to the Gemfile:\n* activesupport\n\n")
+      expect(err).to include("You have deleted from the Gemfile:\n* rack")
+      expect(err).not_to include("You have changed in the Gemfile")
     end
 
     it "explodes if you add a source" do
@@ -247,9 +247,9 @@ RSpec.describe "install with --deployment or --frozen" do
       G
 
       bundle :install, forgotten_command_line_options(:deployment => true)
-      expect(out).to include("deployment mode")
-      expect(out).to include("You have added to the Gemfile:\n* source: git://hubz.com (at master)")
-      expect(out).not_to include("You have changed in the Gemfile")
+      expect(err).to include("deployment mode")
+      expect(err).to include("You have added to the Gemfile:\n* source: git://hubz.com (at master)")
+      expect(err).not_to include("You have changed in the Gemfile")
     end
 
     it "explodes if you unpin a source" do
@@ -266,10 +266,10 @@ RSpec.describe "install with --deployment or --frozen" do
       G
 
       bundle :install, forgotten_command_line_options(:deployment => true)
-      expect(out).to include("deployment mode")
-      expect(out).to include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master@#{revision_for(lib_path("rack-1.0"))[0..6]}")
-      expect(out).not_to include("You have added to the Gemfile")
-      expect(out).not_to include("You have changed in the Gemfile")
+      expect(err).to include("deployment mode")
+      expect(err).to include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master@#{revision_for(lib_path("rack-1.0"))[0..6]}")
+      expect(err).not_to include("You have added to the Gemfile")
+      expect(err).not_to include("You have changed in the Gemfile")
     end
 
     it "explodes if you unpin a source, leaving it pinned somewhere else" do
@@ -289,10 +289,10 @@ RSpec.describe "install with --deployment or --frozen" do
       G
 
       bundle :install, forgotten_command_line_options(:deployment => true)
-      expect(out).to include("deployment mode")
-      expect(out).to include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master@#{revision_for(lib_path("rack"))[0..6]})`")
-      expect(out).not_to include("You have added to the Gemfile")
-      expect(out).not_to include("You have deleted from the Gemfile")
+      expect(err).to include("deployment mode")
+      expect(err).to include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master@#{revision_for(lib_path("rack"))[0..6]})`")
+      expect(err).not_to include("You have added to the Gemfile")
+      expect(err).not_to include("You have deleted from the Gemfile")
     end
 
     context "when replacing a host with the same host with credentials" do
@@ -327,7 +327,7 @@ RSpec.describe "install with --deployment or --frozen" do
       it "prevents the replace by default" do
         bundle :install, forgotten_command_line_options(:deployment => true)
 
-        expect(out).to match(/The list of sources changed/)
+        expect(err).to match(/The list of sources changed/)
       end
 
       context "when allow_deployment_source_credential_changes is true" do
@@ -346,7 +346,7 @@ RSpec.describe "install with --deployment or --frozen" do
         it "prevents the replace" do
           bundle :install, forgotten_command_line_options(:deployment => true)
 
-          expect(out).to match(/The list of sources changed/)
+          expect(err).to match(/The list of sources changed/)
         end
       end
 
@@ -366,7 +366,7 @@ RSpec.describe "install with --deployment or --frozen" do
         it "prevents the replace" do
           bundle :install, forgotten_command_line_options(:deployment => true)
 
-          expect(out).to match(/The list of sources changed/)
+          expect(err).to match(/The list of sources changed/)
         end
       end
     end

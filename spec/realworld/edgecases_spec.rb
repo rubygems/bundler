@@ -376,7 +376,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
       source 'https://rubygems.org'
       gem "resque-scheduler", "2.2.0"
     G
-    expect(out).to include("You have one or more invalid gemspecs that need to be fixed.")
-    expect(out).to include("resque-scheduler 2.2.0 has an invalid gemspec")
+    expect(err).to include("You have one or more invalid gemspecs that need to be fixed.")
+    expect(err).to include("resque-scheduler 2.2.0 has an invalid gemspec")
   end
 end

@@ -81,7 +81,7 @@ RSpec.describe "bundle help" do
     with_fake_man do
       bundle "instill -h"
     end
-    expect(out).to include('Could not find command "instill".')
+    expect(err).to include('Could not find command "instill".')
   end
 
   it "is called when only using the --help flag" do

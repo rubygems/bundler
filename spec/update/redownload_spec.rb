@@ -11,12 +11,12 @@ RSpec.describe "bundle update" do
   describe "with --force" do
     it "shows a deprecation when single flag passed", :bundler => 2 do
       bundle! "update rack --force"
-      expect(out).to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(err).to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
     end
 
     it "shows a deprecation when multiple flags passed", :bundler => 2 do
       bundle! "update rack --no-color --force"
-      expect(out).to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(err).to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
     end
 
     it "does not show a deprecation when single flag passed", :bundler => "< 2" do

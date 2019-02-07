@@ -250,7 +250,7 @@ RSpec.describe "bundle install" do
       G
 
       bundle :install, forgotten_command_line_options(:path => "bundle")
-      expect(out).to include("file already exists")
+      expect(err).to include("file already exists")
     end
   end
 end

@@ -59,7 +59,7 @@ RSpec.describe "bundle binstubs <gem>" do
 
       bundle "binstubs"
       expect(exitstatus).to eq(1) if exitstatus
-      expect(out).to include("`bundle binstubs` needs at least one gem to run.")
+      expect(err).to include("`bundle binstubs` needs at least one gem to run.")
     end
 
     it "displays an error when used with --all and gems" do
@@ -278,7 +278,7 @@ RSpec.describe "bundle binstubs <gem>" do
       bundle "binstubs doesnt_exist"
 
       expect(exitstatus).to eq(7) if exitstatus
-      expect(out).to include("Could not find gem 'doesnt_exist'.")
+      expect(err).to include("Could not find gem 'doesnt_exist'.")
     end
   end
 
@@ -350,8 +350,8 @@ RSpec.describe "bundle binstubs <gem>" do
 
       expect(bundled_app("bin/rackup")).to exist
       expect(File.read(bundled_app("bin/rackup"))).to eq("OMG")
-      expect(out).to include("Skipped rackup")
-      expect(out).to include("overwrite skipped stubs, use --force")
+      expect(err).to include("Skipped rackup")
+      expect(err).to include("overwrite skipped stubs, use --force")
     end
 
     context "when using --force" do
@@ -382,8 +382,8 @@ RSpec.describe "bundle binstubs <gem>" do
       G
 
       bundle "binstubs rack-obama"
-      expect(out).to include("rack-obama has no executables")
-      expect(out).to include("rack has: rackup")
+      expect(err).to include("rack-obama has no executables")
+      expect(err).to include("rack has: rackup")
     end
 
     it "works if child gems don't have bins" do
@@ -393,7 +393,7 @@ RSpec.describe "bundle binstubs <gem>" do
       G
 
       bundle "binstubs actionpack"
-      expect(out).to include("no executables for the gem actionpack")
+      expect(err).to include("no executables for the gem actionpack")
     end
 
     it "works if the gem has development dependencies" do
@@ -403,7 +403,7 @@ RSpec.describe "bundle binstubs <gem>" do
       G
 
       bundle "binstubs with_development_dependency"
-      expect(out).to include("no executables for the gem with_development_dependency")
+      expect(err).to include("no executables for the gem with_development_dependency")
     end
   end
 

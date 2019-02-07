@@ -297,7 +297,7 @@ RSpec.describe "bundle install from an existing gemspec" do
 
         bundle :install, forgotten_command_line_options(:deployment => true)
 
-        expect(out).to include("changed")
+        expect(err).to include("changed")
       end
     end
   end

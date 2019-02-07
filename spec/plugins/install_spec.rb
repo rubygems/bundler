@@ -11,7 +11,7 @@ RSpec.describe "bundler plugin install" do
   it "shows proper message when gem in not found in the source" do
     bundle "plugin install no-foo --source file://#{gem_repo1}"
 
-    expect(out).to include("Could not find")
+    expect(err).to include("Could not find")
     plugin_should_not_be_installed("no-foo")
   end
 
@@ -86,7 +86,7 @@ RSpec.describe "bundler plugin install" do
 
       bundle "plugin install charlie --source file://#{gem_repo2}"
 
-      expect(out).to include("plugins.rb was not found")
+      expect(err).to include("plugins.rb was not found")
 
       expect(global_plugin_gem("charlie-1.0")).not_to be_directory
 
@@ -138,7 +138,7 @@ RSpec.describe "bundler plugin install" do
       bundle "plugin install foo --local_git /phony/path/project --git git@gitphony.com:/repo/project"
 
       expect(exitstatus).not_to eq(0) if exitstatus
-      expect(out).to eq("Remote and local plugin git sources can't be both specified")
+      expect(err).to eq("Remote and local plugin git sources can't be both specified")
     end
   end
 

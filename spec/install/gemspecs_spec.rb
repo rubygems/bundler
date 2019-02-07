@@ -129,8 +129,8 @@ RSpec.describe "bundle install" do
         gemspec
       G
 
-      expect(out).to include("Ruby patchlevel")
-      expect(out).to include("but your Gemfile specified")
+      expect(err).to include("Ruby patchlevel")
+      expect(err).to include("but your Gemfile specified")
       expect(exitstatus).to eq(18) if exitstatus
     end
 
@@ -146,8 +146,8 @@ RSpec.describe "bundle install" do
         gemspec
       G
 
-      expect(out).to include("Ruby version")
-      expect(out).to include("but your Gemfile specified")
+      expect(err).to include("Ruby version")
+      expect(err).to include("but your Gemfile specified")
       expect(exitstatus).to eq(18) if exitstatus
     end
   end

@@ -14,7 +14,7 @@ RSpec.describe "bundle list", :bundler => "2" do
     it "raises an error" do
       bundle "list --name-only --paths"
 
-      expect(out).to eq "The `--name-only` and `--paths` options cannot be used together"
+      expect(err).to eq "The `--name-only` and `--paths` options cannot be used together"
     end
   end
 
@@ -22,7 +22,7 @@ RSpec.describe "bundle list", :bundler => "2" do
     it "raises an error" do
       bundle "list --without-group dev --only-group test"
 
-      expect(out).to eq "The `--only-group` and `--without-group` options cannot be used together"
+      expect(err).to eq "The `--only-group` and `--without-group` options cannot be used together"
     end
   end
 
@@ -40,7 +40,7 @@ RSpec.describe "bundle list", :bundler => "2" do
       it "raises an error" do
         bundle "list --without-group random"
 
-        expect(out).to eq "`random` group could not be found."
+        expect(err).to eq "`random` group could not be found."
       end
     end
   end
@@ -59,7 +59,7 @@ RSpec.describe "bundle list", :bundler => "2" do
       it "raises an error" do
         bundle "list --only-group random"
 
-        expect(out).to eq "`random` group could not be found."
+        expect(err).to eq "`random` group could not be found."
       end
     end
   end

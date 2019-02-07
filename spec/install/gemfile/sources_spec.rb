@@ -40,7 +40,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
       it "errors when disable_multisource is set" do
         bundle "config disable_multisource true"
         bundle :install
-        expect(out).to include("Each source after the first must include a block")
+        expect(err).to include("Each source after the first must include a block")
         expect(exitstatus).to eq(4) if exitstatus
       end
     end
@@ -348,7 +348,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
           it "does not find the dependency" do
             bundle :install
-            expect(out).to include("Could not find gem 'rack', which is required by gem 'depends_on_rack', in any of the relevant sources")
+            expect(err).to include("Could not find gem 'rack', which is required by gem 'depends_on_rack', in any of the relevant sources")
           end
         end
 
@@ -388,7 +388,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
       it "does not install the gem" do
         bundle :install
-        expect(out).to include("Could not find gem 'not_in_repo1'")
+        expect(err).to include("Could not find gem 'not_in_repo1'")
       end
     end
 

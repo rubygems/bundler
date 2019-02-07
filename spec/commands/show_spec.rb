@@ -25,30 +25,24 @@ RSpec.describe "bundle show" do
       expect(bundled_app("Gemfile.lock")).to exist
     end
 
-    it "prints path if gem exists in bundle", :bundler => "< 2" do
+    it "prints path if gem exists in bundle" do
       bundle "show rails"
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints path if gem exists in bundle", :bundler => "2" do
+    it "prints deprecation", :bundler => "2" do
       bundle "show rails"
-      expect(out).to eq(
-        "[DEPRECATED FOR 2.0] use `bundle info rails` instead of `bundle show rails`\n" +
-        default_bundle_path("gems", "rails-2.3.2").to_s
-      )
+      expect(err).to eq("[DEPRECATED FOR 2.0] use `bundle info rails` instead of `bundle show rails`")
     end
 
-    it "prints path if gem exists in bundle (with --paths option)", :bundler => "< 2" do
+    it "prints path if gem exists in bundle (with --paths option)" do
       bundle "show rails --paths"
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints path if gem exists in bundle (with --paths option)", :bundler => "2" do
+    it "prints deprecation when called with a gem and the --paths option", :bundler => "2" do
       bundle "show rails --paths"
-      expect(out).to eq(
-        "[DEPRECATED FOR 2.0] use `bundle info rails --path` instead of `bundle show rails --paths`\n" +
-        default_bundle_path("gems", "rails-2.3.2").to_s
-      )
+      expect(err).to eq("[DEPRECATED FOR 2.0] use `bundle info rails --path` instead of `bundle show rails --paths`")
     end
 
     it "warns if path no longer exists on disk" do
@@ -56,29 +50,25 @@ RSpec.describe "bundle show" do
 
       bundle "show rails"
 
-      expect(out).to match(/has been deleted/i).
-        and include(default_bundle_path("gems", "rails-2.3.2").to_s)
+      expect(err).to match(/has been deleted/i)
+      expect(err).to match(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints the path to the running bundler", :bundler => "< 2" do
+    it "prints the path to the running bundler" do
       bundle "show bundler"
       expect(out).to eq(root.to_s)
     end
 
-    it "prints the path to the running bundler", :bundler => "2" do
+    it "prints deprecation when called with bundler", :bundler => "2" do
       bundle "show bundler"
-      expect(out).to eq(
-        "[DEPRECATED FOR 2.0] use `bundle info bundler` instead of `bundle show bundler`\n" +
-        root.to_s
-      )
+      expect(err).to eq("[DEPRECATED FOR 2.0] use `bundle info bundler` instead of `bundle show bundler`")
     end
-
     it "complains if gem not in bundle" do
       bundle "show missing"
-      expect(out).to match(/could not find gem 'missing'/i)
+      expect(err).to match(/could not find gem 'missing'/i)
     end
 
-    it "prints path of all gems in bundle sorted by name", :bundler => "< 2" do
+    it "prints path of all gems in bundle sorted by name" do
       bundle "show --paths"
 
       expect(out).to include(default_bundle_path("gems", "rake-12.3.2").to_s)
@@ -89,18 +79,10 @@ RSpec.describe "bundle show" do
       expect(gem_list).to eq(gem_list.sort)
     end
 
-    it "prints path of all gems in bundle sorted by name", :bundler => "2" do
+    it "prints a deprecation when called with the --paths option", :bundler => 2 do
       bundle "show --paths"
 
-      expect(out).to include(default_bundle_path("gems", "rake-12.3.2").to_s)
-      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
-
-      out_lines = out.split("\n")
-      expect(out_lines[0]).to eq("[DEPRECATED FOR 2.0] use `bundle list` instead of `bundle show --paths`")
-
-      # Gem names are the last component of their path.
-      gem_list = out_lines[1..-1].map {|p| p.split("/").last }
-      expect(gem_list).to eq(gem_list.sort)
+      expect(err).to eq("[DEPRECATED FOR 2.0] use `bundle list` instead of `bundle show --paths`")
     end
 
     it "prints summary of gems" do
@@ -200,7 +182,7 @@ RSpec.describe "bundle show" do
       invalid_regexp = "[]"
 
       bundle "show #{invalid_regexp}"
-      expect(out).to include("Could not find gem '#{invalid_regexp}'.")
+      expect(err).to include("Could not find gem '#{invalid_regexp}'.")
     end
   end
 

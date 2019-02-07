@@ -41,11 +41,11 @@ module Spec
     end
 
     def out
-      last_command.stdboth
+      last_command.stdout
     end
 
     def err
-      last_command.stderr
+      Bundler.feature_flag.error_on_stderr? ? last_command.stderr : last_command.stdout
     end
 
     def exitstatus

@@ -22,7 +22,7 @@ RSpec.describe "compact index api" do
     G
 
     bundle :install, :artifice => "compact_index"
-    expect(out).to include("' sinatra' is not a valid gem name because it contains whitespace.")
+    expect(err).to include("' sinatra' is not a valid gem name because it contains whitespace.")
   end
 
   it "should handle nested dependencies" do
@@ -226,7 +226,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     G
 
     bundle :install, :artifice => "compact_index_redirects"
-    expect(out).to match(/Too many redirects/)
+    expect(err).to match(/Too many redirects/)
   end
 
   context "when --full-index is specified" do
@@ -691,14 +691,14 @@ The checksum of /versions does not match the checksum provided by the server! So
 
       it "shows instructions if auth is not provided for the source" do
         bundle :install, :artifice => "compact_index_strict_basic_authentication"
-        expect(out).to include("bundle config #{source_hostname} username:password")
+        expect(err).to include("bundle config #{source_hostname} username:password")
       end
 
       it "fails if authentication has already been provided, but failed" do
         bundle "config #{source_hostname} #{user}:wrong"
 
         bundle :install, :artifice => "compact_index_strict_basic_authentication"
-        expect(out).to include("Bad username or password")
+        expect(err).to include("Bad username or password")
       end
     end
 
@@ -737,7 +737,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       G
 
       bundle :install, :env => { "RUBYOPT" => "-I#{bundled_app("broken_ssl")}" }
-      expect(out).to include("OpenSSL")
+      expect(err).to include("OpenSSL")
     end
   end
 
@@ -757,7 +757,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       G
 
       bundle :install
-      expect(out).to match(/could not verify the SSL certificate/i)
+      expect(err).to match(/could not verify the SSL certificate/i)
     end
   end
 
@@ -858,7 +858,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack"
     G
     expect(exitstatus).to eq(15) if exitstatus
-    expect(out).to end_with(<<-E.strip)
+    expect(err).to end_with(<<-E.strip)
       The request uri `htps://index.rubygems.org/versions` has an invalid scheme (`htps`). Did you mean `http` or `https`?
     E
   end
@@ -871,7 +871,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       G
 
       expect(exitstatus).to eq(19) if exitstatus
-      expect(out).
+      expect(err).
         to  include("Bundler cannot continue installing rack (1.0.0).").
         and include("The checksum for the downloaded `rack-1.0.0.gem` does not match the checksum given by the server.").
         and include("This means the contents of the downloaded gem is different from what was uploaded to the server, and could be a potential security issue.").
@@ -890,7 +890,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         gem "rack"
       G
       expect(exitstatus).to eq(5) if exitstatus
-      expect(out).to include("The given checksum for rack-1.0.0 (\"checksum!\") is not a valid SHA256 hexdigest nor base64digest")
+      expect(err).to include("The given checksum for rack-1.0.0 (\"checksum!\") is not a valid SHA256 hexdigest nor base64digest")
     end
 
     it "does not raise when disable_checksum_validation is set" do

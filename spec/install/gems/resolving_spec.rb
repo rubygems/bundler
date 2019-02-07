@@ -187,8 +187,8 @@ RSpec.describe "bundle install with install-time dependencies" do
         gem 'require_rubygems'
       G
 
-      expect(out).to_not include("Gem::InstallError: require_rubygems requires RubyGems version > 9000")
-      expect(out).to include("require_rubygems-1.0 requires rubygems version > 9000, which is incompatible with the current version, #{Gem::VERSION}")
+      expect(err).to_not include("Gem::InstallError: require_rubygems requires RubyGems version > 9000")
+      expect(err).to include("require_rubygems-1.0 requires rubygems version > 9000, which is incompatible with the current version, #{Gem::VERSION}")
     end
   end
 end
