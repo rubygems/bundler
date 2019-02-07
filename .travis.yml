@@ -42,7 +42,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v3.0.1
+  - RGV=v3.0.2
 
 jobs:
   include:
