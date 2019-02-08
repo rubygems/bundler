@@ -137,14 +137,14 @@ RSpec.describe "bundle binstubs <gem>" do
 
         before do
           gemfile <<-G
-            source "file:///Users/colby/Projects/bundler/tmp/gems/remote2"
+            source "https://rubygems.org"
             gem "rack"
             gem "prints_loaded_gems"
           G
 
           lockfile <<-G
           GEM
-            remote: file:///Users/colby/Projects/bundler/tmp/gems/remote2/
+            remote: https://rubygems.org
             specs:
               prints_loaded_gems (1.0)
               rack (1.2)
