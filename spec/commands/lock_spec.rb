@@ -360,3 +360,24 @@ RSpec.describe "bundle lock" do
     end
   end
 end
+
+RSpec.describe "bundle update --bundler" do
+  it "updates the bundler version in the lockfile without re-resolving" do
+    build_repo4 do
+      build_gem "rack", "1.0"
+    end
+
+    install_gemfile! <<-G
+      source "file:#{gem_repo4}"
+      gem "rack"
+    G
+    lockfile lockfile.sub(/(^\s*)#{Bundler::VERSION}($)/, '\11.0.0\2')
+
+    FileUtils.rm_r gem_repo4
+
+    bundle! :update, :bundler => true, :verbose => true
+    expect(the_bundle).to include_gem "rack 1.0"
+
+    expect(the_bundle.locked_gems.bundler_version).to eq v(Bundler::VERSION)
+  end
+end
