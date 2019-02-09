@@ -1,4 +1,5 @@
 language: ruby
+dist: xenial
 script: rake spec:travis
 before_script:
   - travis_retry rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
