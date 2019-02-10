@@ -93,14 +93,14 @@ RSpec.describe "bundle exec" do
       expect(out).to eq("Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec.")
     end
 
-    expect(err).to lack_errors
+    expect(err).to be_empty
   end
 
   it "accepts --keep-file-descriptors" do
     install_gemfile ""
     bundle "exec --keep-file-descriptors echo foobar"
 
-    expect(err).to lack_errors
+    expect(err).to be_empty
   end
 
   it "can run a command named --verbose" do

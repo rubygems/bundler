@@ -90,7 +90,7 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(out).to include("Installing activesupport")
     err.gsub! %r{.*lib/sinatra/base\.rb:\d+: warning: constant ::Fixnum is deprecated$}, ""
     err.strip!
-    expect(err).to lack_errors
+    expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 

@@ -204,7 +204,7 @@ RSpec.describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(err).to lack_errors
+      expect(err).to be_empty
 
       run <<-RUBY
         require 'foo'
@@ -234,7 +234,7 @@ RSpec.describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(err).to lack_errors
+      expect(err).to be_empty
 
       run! <<-RUBY
         require 'foo'
@@ -270,7 +270,7 @@ RSpec.describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(err).to lack_errors
+      expect(err).to be_empty
 
       run! <<-RUBY
         require 'foo'

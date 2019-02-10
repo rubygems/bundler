@@ -62,13 +62,6 @@ module Spec
 
     MAJOR_DEPRECATION = /^\[DEPRECATED FOR 2\.0\]\s*/
 
-    RSpec::Matchers.define :lack_errors do
-      diffable
-      match do |actual|
-        actual.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "") == ""
-      end
-    end
-
     RSpec::Matchers.define :eq_err do |expected|
       diffable
       match do |actual|

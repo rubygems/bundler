@@ -198,7 +198,7 @@ RSpec.describe "Bundler.require" do
       RUBY
       ruby(cmd)
 
-      expect(err).to lack_errors
+      expect(err).to be_empty
     end
 
     it "does not mangle explicitly given requires" do
@@ -432,7 +432,7 @@ RSpec.describe "Bundler.require with platform specific dependencies" do
     G
 
     run "Bundler.require"
-    expect(err).to lack_errors
+    expect(err).to be_empty
   end
 
   it "requires gems pinned to multiple platforms, including the current one" do
@@ -447,6 +447,6 @@ RSpec.describe "Bundler.require with platform specific dependencies" do
     run "Bundler.require; puts RACK"
 
     expect(out).to eq("1.0.0")
-    expect(err).to lack_errors
+    expect(err).to be_empty
   end
 end

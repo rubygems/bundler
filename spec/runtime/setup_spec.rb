@@ -16,7 +16,7 @@ RSpec.describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      expect(err).to lack_errors
+      expect(err).to be_empty
       expect(out).to eq("1.0.0")
     end
   end
@@ -42,7 +42,7 @@ RSpec.describe "Bundler.setup" do
           puts "WIN"
         end
       RUBY
-      expect(err).to lack_errors
+      expect(err).to be_empty
       expect(out).to eq("WIN")
     end
 
@@ -55,7 +55,7 @@ RSpec.describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      expect(err).to lack_errors
+      expect(err).to be_empty
       expect(out).to eq("1.0.0")
     end
 
@@ -69,7 +69,7 @@ RSpec.describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      expect(err).to lack_errors
+      expect(err).to be_empty
       expect(out).to eq("1.0.0")
     end
 
@@ -87,7 +87,7 @@ RSpec.describe "Bundler.setup" do
           puts "FAIL"
         end
       RUBY
-      expect(err).to lack_errors
+      expect(err).to be_empty
       expect(out).to match("WIN")
     end
 
@@ -361,7 +361,7 @@ RSpec.describe "Bundler.setup" do
           end
         R
 
-        expect(err).to lack_errors
+        expect(err).to be_empty
       end
 
       it "replaces #gem but raises when the version is wrong" do
@@ -387,7 +387,7 @@ RSpec.describe "Bundler.setup" do
           end
         R
 
-        expect(err).to lack_errors
+        expect(err).to be_empty
       end
     end
 
@@ -701,7 +701,7 @@ RSpec.describe "Bundler.setup" do
           end
         R
 
-        expect(err).to lack_errors
+        expect(err).to be_empty
       end
     end
   end
@@ -764,7 +764,7 @@ end
     ENV["GEM_HOME"] = ""
     bundle %(exec ruby -e "require 'set'")
 
-    expect(err).to lack_errors
+    expect(err).to be_empty
   end
 
   describe "$MANPATH" do
@@ -933,7 +933,7 @@ end
           require 'foo'
         R
       end
-      expect(err).to lack_errors
+      expect(err).to be_empty
     end
 
     it "should make sure the Bundler.root is really included in the path relative to the Gemfile" do
@@ -958,7 +958,7 @@ end
         R
       end
 
-      expect(err).to lack_errors
+      expect(err).to be_empty
     end
   end
 
@@ -1108,7 +1108,7 @@ end
         Bundler.load
       RUBY
 
-      expect(err).to lack_errors
+      expect(err).to be_empty
       expect(out).to eq("")
     end
   end
@@ -1120,7 +1120,7 @@ end
       G
 
       bundle %(exec ruby -e "require 'bundler'; Bundler.setup")
-      expect(err).to lack_errors
+      expect(err).to be_empty
     end
   end
 
