@@ -863,7 +863,7 @@ G
       G
 
       bundle "exec rackup"
-      expect(out).to eq("0.9.1")
+      expect(out).to include("0.9.1")
     end
 
     it "activates the correct gem when ruby version matches any engine" do
@@ -876,7 +876,7 @@ G
         G
 
         bundle "exec rackup"
-        expect(out).to eq("0.9.1")
+        expect(out).to include("0.9.1")
       end
     end
 
