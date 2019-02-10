@@ -47,7 +47,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ronn",       "~> 0.7.3"
   s.add_development_dependency "rspec",      "~> 3.6"
   s.add_development_dependency "rubocop",    "= 0.50.0"
-  s.add_development_dependency "rspec_junit_formatter", "~> 0.2.3"
 
   base_dir = File.dirname(__FILE__).gsub(%r{([^A-Za-z0-9_\-.,:\/@\n])}, "\\\\\\1")
   s.files = IO.popen("git -C #{base_dir} ls-files -z", &:read).split("\x0").select {|f| f.match(%r{^(lib|exe)/}) }
