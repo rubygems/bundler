@@ -24,7 +24,7 @@ steps:
   displayName: 'ruby bin/rake spec:deps'
 
 - script: |
-    ruby bin/rspec --format progress -r rspec_junit_formatter --format RspecJunitFormatter -o rspec/bundler-junit-results.xml 
+    ruby bin/rspec --format progress -r rspec_junit_formatter --format RspecJunitFormatter -o rspec/bundler-junit-results.xml || exit 0
   displayName: 'ruby bin/rspec'
 
 - task: PublishTestResults@2
