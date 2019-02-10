@@ -93,14 +93,14 @@ RSpec.describe "bundle exec" do
       expect(out).to eq("Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec.")
     end
 
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
   end
 
   it "accepts --keep-file-descriptors" do
     install_gemfile ""
     bundle "exec --keep-file-descriptors echo foobar"
 
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
   end
 
   it "can run a command named --verbose" do
@@ -465,8 +465,8 @@ RSpec.describe "bundle exec" do
 
       bundle "exec irb"
 
-      expect(err).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
-      expect(err).to match('"TODO" is not a summary')
+      expect(last_command.stderr).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
+      expect(last_command.stderr).to match('"TODO" is not a summary')
     end
   end
 

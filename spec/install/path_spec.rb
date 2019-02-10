@@ -226,7 +226,7 @@ RSpec.describe "bundle install" do
       vendored_gems("extensions").rmtree
 
       run "require 'very_simple_binary_c'"
-      expect(err).to include("Bundler::GemNotFound")
+      expect(last_command.stderr).to include("Bundler::GemNotFound")
 
       bundle :install, forgotten_command_line_options(:path => "./vendor/bundle")
 

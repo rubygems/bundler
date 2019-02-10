@@ -77,7 +77,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
         bundle :install, :env => { "DEBUG_RESOLVER" => "1" }
 
-        expect(err).to include("Creating possibility state for net_c")
+        expect(last_command.stderr).to include("Creating possibility state for net_c")
       end
     end
 
@@ -91,7 +91,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
         bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
 
-        expect(err).to include(" net_b").
+        expect(last_command.stderr).to include(" net_b").
           and include("Starting resolution").
           and include("Finished resolution").
           and include("Attempting to activate")

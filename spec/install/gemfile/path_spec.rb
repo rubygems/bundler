@@ -313,7 +313,7 @@ RSpec.describe "bundle install with explicit source paths" do
     install_gemfile <<-G
       gem 'foo', '1.0', :path => "#{lib_path("foo-1.0")}"
     G
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
   end
 
   it "removes the .gem file after installing" do
@@ -575,7 +575,7 @@ RSpec.describe "bundle install with explicit source paths" do
 
       bundle :install,
         :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq_err("Ran pre-install hook: foo-1.0")
+      expect(last_command.stderr).to eq_err("Ran pre-install hook: foo-1.0")
     end
 
     it "runs post-install hooks" do
@@ -595,7 +595,7 @@ RSpec.describe "bundle install with explicit source paths" do
 
       bundle :install,
         :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq_err("Ran post-install hook: foo-1.0")
+      expect(last_command.stderr).to eq_err("Ran post-install hook: foo-1.0")
     end
 
     it "complains if the install hook fails" do

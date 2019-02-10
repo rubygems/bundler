@@ -291,8 +291,8 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
       G
     end
 
-    expect(err).to include("Warning: the lockfile is being updated to Bundler " \
-                          "9999999, after which you will be unable to return to Bundler 1.")
+    expect(last_command.stderr).to include("Warning: the lockfile is being updated to Bundler " \
+                                           "9999999, after which you will be unable to return to Bundler 1.")
 
     lockfile_should_be <<-G
       GEM

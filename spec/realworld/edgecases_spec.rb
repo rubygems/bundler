@@ -26,7 +26,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
       gem "linecache", "0.46"
     G
     bundle :lock
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to eq(0) if exitstatus
   end
 
@@ -241,7 +241,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
 
     bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
     expect(err).not_to include("Could not find rake")
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
   end
 
   it "checks out git repos when the lockfile is corrupted" do

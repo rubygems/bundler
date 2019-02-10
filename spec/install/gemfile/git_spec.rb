@@ -204,7 +204,7 @@ RSpec.describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(err).to be_empty
+      expect(last_command.stderr).to be_empty
 
       run <<-RUBY
         require 'foo'
@@ -234,7 +234,7 @@ RSpec.describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(err).to be_empty
+      expect(last_command.stderr).to be_empty
 
       run! <<-RUBY
         require 'foo'
@@ -270,7 +270,7 @@ RSpec.describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(err).to be_empty
+      expect(last_command.stderr).to be_empty
 
       run! <<-RUBY
         require 'foo'
@@ -1051,7 +1051,7 @@ RSpec.describe "bundle install with git sources" do
 
       bundle :install,
         :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq_err("Ran pre-install hook: foo-1.0")
+      expect(last_command.stderr).to eq_err("Ran pre-install hook: foo-1.0")
     end
 
     it "runs post-install hooks" do
@@ -1071,7 +1071,7 @@ RSpec.describe "bundle install with git sources" do
 
       bundle :install,
         :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq_err("Ran post-install hook: foo-1.0")
+      expect(last_command.stderr).to eq_err("Ran post-install hook: foo-1.0")
     end
 
     it "complains if the install hook fails" do

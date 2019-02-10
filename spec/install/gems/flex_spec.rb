@@ -188,7 +188,7 @@ RSpec.describe "bundle flex_install" do
       ruby <<-RUBY
         require 'bundler/setup'
       RUBY
-      expect(err).to match(/could not find gem 'rack-obama/i)
+      expect(last_command.stderr).to match(/could not find gem 'rack-obama/i)
     end
 
     it "suggests bundle update when the Gemfile requires different versions than the lock" do
