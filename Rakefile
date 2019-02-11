@@ -73,7 +73,7 @@ namespace :spec do
       sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
 
       # Install the gems with a consistent version of RubyGems
-      sh "gem update --system 2.6.13"
+      sh "gem update --system 3.0.2"
 
       # Fix incorrect default gem specifications on ruby 2.6.1. Can be removed
       # when 2.6.2 is released and we start testing against it
