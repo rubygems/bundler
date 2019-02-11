@@ -5,15 +5,17 @@ load File.expand_path("../with_rubygems", __FILE__) if ENV["RGV"]
 
 require "rubygems"
 
-bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
-bundler_spec.dependencies.each do |dep|
-  begin
-    gem dep.name, dep.requirement
-  rescue Gem::LoadError => e
-    $stderr.puts "#{e.message} (#{e.class})"
+unless ARGV[0] == "spec:deps"
+  bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
+  bundler_spec.dependencies.each do |dep|
+    begin
+      gem dep.name, dep.requirement
+    rescue Gem::LoadError => e
+      $stderr.puts "#{e.message} (#{e.class})"
+    end
   end
-end
 
-Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
+  Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
+end
 
 load Gem.bin_path("rake", "rake")
