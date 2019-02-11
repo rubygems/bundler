@@ -804,7 +804,6 @@ end
     let(:gem_home) { Dir.mktmpdir }
     let(:symlinked_gem_home) { Tempfile.new("gem_home").path }
     let(:bundler_dir) { ruby_core? ? File.expand_path("../../../..", __FILE__) : File.expand_path("../../..", __FILE__) }
-    let(:bundler_lib) { File.join(bundler_dir, "lib") }
 
     before do
       FileUtils.ln_sf(gem_home, symlinked_gem_home)
