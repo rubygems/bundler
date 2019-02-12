@@ -38,7 +38,7 @@ RSpec.describe "bundle exec" do
       gem "rack"
     G
 
-    bundle "exec 'cd #{tmp("gems")} && rackup'", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+    bundle "exec 'cd #{tmp("gems")} && rackup'"
 
     expect(out).to include("1.0.0")
   end
@@ -51,7 +51,7 @@ RSpec.describe "bundle exec" do
 
   it "works when exec'ing to ruby" do
     install_gemfile 'gem "rack"'
-    bundle "exec ruby -e 'puts %{hi}'", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+    bundle "exec ruby -e 'puts %{hi}'"
     expect(out).to eq("hi")
   end
 
@@ -85,9 +85,7 @@ RSpec.describe "bundle exec" do
     G
 
     install_gemfile ""
-    with_env_vars "RUBYOPT" => "-r#{spec_dir.join("support/hax")}" do
-      sys_exec "#{Gem.ruby} #{command.path}"
-    end
+    sys_exec "#{Gem.ruby} #{command.path}"
 
     if Bundler.current_ruby.ruby_2?
       expect(out).to eq("")
@@ -248,7 +246,7 @@ RSpec.describe "bundle exec" do
     G
     [true, false].each do |l|
       bundle! "config disable_exec_load #{l}"
-      bundle "exec rackup", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+      bundle "exec rackup"
       expect(last_command.stderr).to include "rack is not part of the bundle. Add it to your Gemfile."
     end
   end
@@ -350,14 +348,14 @@ RSpec.describe "bundle exec" do
       end
 
       it "works when unlocked" do
-        bundle "exec 'cd #{tmp("gems")} && rackup'", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+        bundle "exec 'cd #{tmp("gems")} && rackup'"
         expect(out).to eq("1.0.0")
         expect(out).to include("1.0.0")
       end
 
       it "works when locked" do
         expect(the_bundle).to be_locked
-        bundle "exec 'cd #{tmp("gems")} && rackup'", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+        bundle "exec 'cd #{tmp("gems")} && rackup'"
         expect(out).to include("1.0.0")
       end
     end
@@ -483,7 +481,7 @@ RSpec.describe "bundle exec" do
       Bundler.rubygems.extend(Monkey)
       G
       bundle "install --deployment"
-      bundle "exec ruby -e '`#{bindir.join("bundler")} -v`; puts $?.success?'", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+      bundle "exec ruby -e '`#{bindir.join("bundler")} -v`; puts $?.success?'"
       expect(out).to match("true")
     end
   end
@@ -523,7 +521,7 @@ RSpec.describe "bundle exec" do
     let(:expected) { [exec, args, rack, process].join("\n") }
     let(:expected_err) { "" }
 
-    subject { bundle "exec #{path} arg1 arg2", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" } }
+    subject { bundle "exec #{path} arg1 arg2" }
 
     shared_examples_for "it runs" do
       it "like a normally executed executable" do

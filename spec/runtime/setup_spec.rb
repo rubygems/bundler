@@ -125,7 +125,7 @@ RSpec.describe "Bundler.setup" do
         gem "rack"
       G
 
-      ENV["RUBYOPT"] = "-Idash_i_dir"
+      ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -Idash_i_dir"
       ENV["RUBYLIB"] = "rubylib_dir"
 
       ruby <<-RUBY
@@ -139,8 +139,7 @@ RSpec.describe "Bundler.setup" do
       rack_load_order = load_path.index {|path| path.include?("rack") }
 
       expect(err).to eq("")
-      expect(load_path[1]).to include "dash_i_dir"
-      expect(load_path[2]).to include "rubylib_dir"
+      expect(load_path).to include(a_string_ending_with("dash_i_dir"), "rubylib_dir")
       expect(rack_load_order).to be > 0
     end
 
@@ -763,7 +762,7 @@ end
     G
 
     ENV["GEM_HOME"] = ""
-    bundle %(exec ruby -e "require 'set'"), :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+    bundle %(exec ruby -e "require 'set'")
 
     expect(err).to lack_errors
   end
@@ -1120,7 +1119,7 @@ end
         gem "bundler", :path => "#{File.expand_path("..", lib)}"
       G
 
-      bundle %(exec ruby -e "require 'bundler'; Bundler.setup"), :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+      bundle %(exec ruby -e "require 'bundler'; Bundler.setup")
       expect(err).to lack_errors
     end
   end
