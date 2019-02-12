@@ -140,6 +140,83 @@ RSpec.describe "bundle exec" do
     end
   end
 
+  context "with default gems" do
+    let(:system_gems_to_install) { [] }
+
+    let(:default_irb_version) { ruby "gem 'irb', '< 999999'; require 'irb'; puts IRB::VERSION" }
+
+    context "when not specified in Gemfile" do
+      before do
+        skip "irb isn't a default gem" if default_irb_version.empty?
+
+        install_gemfile ""
+      end
+
+      it "uses version provided by ruby" do
+        bundle! "exec irb --version"
+
+        expect(out).to include(default_irb_version)
+        expect(last_command.stderr).to be_empty
+      end
+    end
+
+    context "when specified in Gemfile directly" do
+      let(:specified_irb_version) { "0.9.6" }
+
+      before do
+        skip "irb isn't a default gem" if default_irb_version.empty?
+
+        build_repo2 do
+          build_gem "irb", specified_irb_version do |s|
+            s.executables = "irb"
+          end
+        end
+
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "irb", "#{specified_irb_version}"
+        G
+      end
+
+      it "uses version specified" do
+        bundle! "exec irb --version"
+
+        expect(out).to include(specified_irb_version)
+        expect(last_command.stderr).to be_empty
+      end
+    end
+
+    context "when specified in Gemfile indirectly" do
+      let(:indirect_irb_version) { "0.9.6" }
+
+      before do
+        skip "irb isn't a default gem" if default_irb_version.empty?
+
+        build_repo2 do
+          build_gem "irb", indirect_irb_version do |s|
+            s.executables = "irb"
+          end
+
+          build_gem "gem_depending_on_old_irb" do |s|
+            s.add_dependency "irb", indirect_irb_version
+          end
+        end
+
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "gem_depending_on_old_irb"
+        G
+
+        bundle! "exec irb --version"
+      end
+
+      it "uses resolved version" do
+        expect(out).to include(indirect_irb_version)
+        expect(last_command.stderr).to be_empty
+      end
+    end
+  end
+
   it "handles gems installed with --without" do
     install_gemfile <<-G, forgotten_command_line_options(:without => "middleware")
       source "file://#{gem_repo1}"
