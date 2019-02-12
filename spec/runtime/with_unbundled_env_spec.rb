@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe "Bundler.with_env helpers" do
-  def bundle_exec_ruby!(code, *args)
+  def bundle_exec_ruby!(code)
     build_bundler_context
-    opts = args.last.is_a?(Hash) ? args.pop : {}
-    opts[:env] ||= {}
-    args.push opts
-    bundle! "exec '#{Gem.ruby}' -e #{code}", *args
+    bundle! "exec '#{Gem.ruby}' -e #{code}"
   end
 
   def build_bundler_context
