@@ -8,9 +8,7 @@ module Spec
     DEPS = begin
       deps = {
         # artifice doesn't support rack 2.x now.
-        # TODO: revert to `< 2` once https://github.com/rack/rack/issues/1168 is
-        # addressed
-        "rack" => "1.6.6",
+        "rack" => "< 2.0",
         # rack-test 0.7.0 dropped 1.8.7 support
         # https://github.com/rack-test/rack-test/issues/193#issuecomment-314230318
         "rack-test" => "< 0.7.0",
