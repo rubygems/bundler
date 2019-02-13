@@ -9,9 +9,7 @@ module Spec
       deps = {
         # artifice doesn't support rack 2.x now.
         "rack" => "< 2.0",
-        # rack-test 0.7.0 dropped 1.8.7 support
-        # https://github.com/rack-test/rack-test/issues/193#issuecomment-314230318
-        "rack-test" => "< 0.7.0",
+        "rack-test" => "~> 1.1",
         "artifice" => "~> 0.6.0",
         "compact_index" => "~> 0.11.0",
         "sinatra" => "~> 1.4.7",
