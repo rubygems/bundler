@@ -7,7 +7,6 @@ module Spec
   module Rubygems
     DEPS = begin
       deps = {
-        # rack 2.x requires Ruby version >= 2.2.2.
         # artifice doesn't support rack 2.x now.
         # TODO: revert to `< 2` once https://github.com/rack/rack/issues/1168 is
         # addressed
