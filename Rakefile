@@ -44,11 +44,8 @@ namespace :spec do
       [d.name, d.requirement.to_s]
     end]
 
-    # JRuby can't build ronn or rdiscount, so we skip that
-    if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
-      deps.delete("ronn")
-      deps.delete("rdiscount")
-    end
+    # JRuby can't build ronn, so we skip that
+    deps.delete("ronn") if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
 
     gem_install_command = "install --no-document --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
       "'#{name}:#{version}'"
