@@ -15,8 +15,7 @@ module Spec
         "sinatra" => "~> 1.4.7",
         # Rake version has to be consistent for tests to pass
         "rake" => "12.3.2",
-        # 3.0.0 breaks 1.9.2 specs
-        "builder" => "2.1.2",
+        "builder" => "~> 3.2",
       }
       # ruby-graphviz is used by the viz tests
       deps["ruby-graphviz"] = nil if RUBY_VERSION >= "1.9.3"
