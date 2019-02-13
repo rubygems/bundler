@@ -6,26 +6,19 @@ require "support/path" unless defined?(Spec::Path)
 module Spec
   module Rubygems
     DEPS = begin
-      deps = {
-        # rack 2.x requires Ruby version >= 2.2.2.
+      {
         # artifice doesn't support rack 2.x now.
-        # TODO: revert to `< 2` once https://github.com/rack/rack/issues/1168 is
-        # addressed
-        "rack" => "1.6.6",
-        # rack-test 0.7.0 dropped 1.8.7 support
-        # https://github.com/rack-test/rack-test/issues/193#issuecomment-314230318
-        "rack-test" => "< 0.7.0",
+        "rack" => "< 2.0",
+        "rack-test" => "~> 1.1",
         "artifice" => "~> 0.6.0",
         "compact_index" => "~> 0.11.0",
         "sinatra" => "~> 1.4.7",
         # Rake version has to be consistent for tests to pass
         "rake" => "12.3.2",
-        # 3.0.0 breaks 1.9.2 specs
-        "builder" => "2.1.2",
+        "builder" => "~> 3.2",
+        # ruby-graphviz is used by the viz tests
+        "ruby-graphviz" => nil,
       }
-      # ruby-graphviz is used by the viz tests
-      deps["ruby-graphviz"] = nil if RUBY_VERSION >= "1.9.3"
-      deps
     end
 
     def self.setup
