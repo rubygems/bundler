@@ -1,13 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe "Bundler.with_env helpers" do
-  def bundle_exec_ruby!(code, *args)
+  def bundle_exec_ruby!(code)
     build_bundler_context
-    opts = args.last.is_a?(Hash) ? args.pop : {}
-    env = opts[:env] ||= {}
-    env[:RUBYOPT] ||= "-r#{spec_dir.join("support/hax")}"
-    args.push opts
-    bundle! "exec '#{Gem.ruby}' -e #{code}", *args
+    bundle! "exec '#{Gem.ruby}' -e #{code}"
   end
 
   def build_bundler_context
@@ -48,7 +44,7 @@ RSpec.describe "Bundler.with_env helpers" do
       path = `getconf PATH`.strip + File::PATH_SEPARATOR + File.dirname(Gem.ruby)
       with_path_as(path) do
         build_bundler_context
-        bundle! "exec '#{Gem.ruby}' #{bundled_app("exe.rb")} 2", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+        bundle! "exec '#{Gem.ruby}' #{bundled_app("exe.rb")} 2"
       end
       expect(err).to eq <<-EOS.strip
 2 false
@@ -58,7 +54,7 @@ RSpec.describe "Bundler.with_env helpers" do
     end
 
     it "removes variables that bundler added", :ruby_repo do
-      original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")', :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" })
+      original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")')
       code = 'puts Bundler.original_env.to_a.map {|e| e.join("=") }.sort.join("\n")'
       bundle_exec_ruby! code.dump
       expect(out).to eq original
@@ -75,7 +71,7 @@ RSpec.describe "Bundler.with_env helpers" do
 
     it "should remove '-rbundler/setup' from RUBYOPT" do
       code = "print #{modified_env}['RUBYOPT']"
-      ENV["RUBYOPT"] = "-W2 -rbundler/setup"
+      ENV["RUBYOPT"] = "-W2 -rbundler/setup #{ENV["RUBYOPT"]}"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).not_to include("-rbundler/setup")
     end
