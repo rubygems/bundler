@@ -63,22 +63,22 @@ RSpec.describe "bundle install" do
 
     it "shows a deprecation when single flag passed", :bundler => 2 do
       bundle! "install --force"
-      expect(err).to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(err).to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
     end
 
     it "shows a deprecation when multiple flags passed", :bundler => 2 do
       bundle! "install --no-color --force"
-      expect(err).to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(err).to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
     end
 
     it "does not show a deprecation when single flag passed", :bundler => "< 2" do
       bundle! "install --force"
-      expect(out).not_to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(out).not_to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
     end
 
     it "does not show a deprecation when multiple flags passed", :bundler => "< 2" do
       bundle! "install --no-color --force"
-      expect(out).not_to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(out).not_to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
     end
   end
 
@@ -89,12 +89,12 @@ RSpec.describe "bundle install" do
 
     it "does not show a deprecation when single flag passed" do
       bundle! "install --redownload"
-      expect(err).not_to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(err).not_to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
     end
 
     it "does not show a deprecation when single multiple flags passed" do
       bundle! "install --no-color --redownload"
-      expect(err).not_to include "[DEPRECATED FOR 2.0] The `--force` option has been renamed to `--redownload`"
+      expect(err).not_to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
     end
   end
 end

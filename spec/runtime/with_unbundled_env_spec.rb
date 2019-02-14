@@ -107,7 +107,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "Bundler.clean_env"
       bundle_exec_ruby! code.dump
       expect(err).to include(
-        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "[DEPRECATED] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
       )
     end
@@ -116,7 +116,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "Bundler.clean_env"
       bundle_exec_ruby! code.dump
       expect(out).not_to include(
-        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
+        "[DEPRECATED] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
       )
     end
@@ -157,7 +157,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "Bundler.with_clean_env {}"
       bundle_exec_ruby! code.dump
       expect(err).to include(
-        "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
+        "[DEPRECATED] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
       )
     end
@@ -166,7 +166,7 @@ RSpec.describe "Bundler.with_env helpers" do
       code = "Bundler.with_clean_env {}"
       bundle_exec_ruby! code.dump
       expect(out).not_to include(
-        "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
+        "[DEPRECATED] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
       )
     end
