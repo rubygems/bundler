@@ -64,7 +64,7 @@ module Bundler
     end
 
     def install
-      spec.source.install(spec, :force => force, :ensure_builtin_gems_cached => standalone, :build_args => Array(spec_settings))
+      spec.source.install(spec, :force => force, :ensure_builtin_gems_cached => true, :build_args => Array(spec_settings))
     end
 
     def install_with_settings
