@@ -286,7 +286,7 @@ RSpec.describe "bundle clean" do
     bundle :clean
 
     expect(exitstatus).to eq(15) if exitstatus
-    expect(out).to include("--force")
+    expect(err).to include("--force")
   end
 
   # handling bundle clean upgrade path from the pre's
@@ -516,8 +516,8 @@ RSpec.describe "bundle clean" do
 
       bundle :clean, :force => true
 
-      expect(out).to include(system_gem_path.to_s)
-      expect(out).to include("grant write permissions")
+      expect(err).to include(system_gem_path.to_s)
+      expect(err).to include("grant write permissions")
 
       sys_exec "gem list"
       expect(out).to include("foo (1.0)")

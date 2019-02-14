@@ -60,11 +60,11 @@ RSpec.describe "bundle executable" do
       G
 
       bundle :install, :env => { "RUBYGEMS_GEMDEPS" => "foo" }
-      expect(out).to include("RUBYGEMS_GEMDEPS")
-      expect(out).to include("conflict with Bundler")
+      expect(err).to include("RUBYGEMS_GEMDEPS")
+      expect(err).to include("conflict with Bundler")
 
       bundle :install, :env => { "RUBYGEMS_GEMDEPS" => "" }
-      expect(out).not_to include("RUBYGEMS_GEMDEPS")
+      expect(err).not_to include("RUBYGEMS_GEMDEPS")
     end
   end
 

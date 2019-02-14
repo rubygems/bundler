@@ -8,7 +8,7 @@ RSpec.describe "bundle install" do
         gem 'rails', '~> 4.0.0'
         gem 'rails', '~> 4.0.0'
       G
-      expect(out).to include("more than once")
+      expect(err).to include("more than once")
     end
   end
 
@@ -65,7 +65,7 @@ RSpec.describe "bundle install" do
       G
 
       bundle :install
-      expect(out).to match(/You passed :lib as an option for gem 'rack', but it is invalid/)
+      expect(err).to match(/You passed :lib as an option for gem 'rack', but it is invalid/)
     end
   end
 

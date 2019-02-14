@@ -20,7 +20,7 @@ RSpec.describe "bundle info" do
     context "given a gem that is not installed" do
       it "prints missing gem error" do
         bundle "info foo"
-        expect(out).to eq "Could not find gem 'foo'."
+        expect(err).to eq "Could not find gem 'foo'."
       end
     end
 

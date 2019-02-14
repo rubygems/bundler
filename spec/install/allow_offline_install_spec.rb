@@ -19,7 +19,7 @@ RSpec.describe "bundle install with :allow_offline_install" do
         source "http://testgemserver.local"
         gem "rack-obama"
       G
-      expect(out).to include("Could not reach host testgemserver.local.")
+      expect(err).to include("Could not reach host testgemserver.local.")
       expect(the_bundle).to_not be_locked
     end
   end
@@ -77,7 +77,7 @@ RSpec.describe "bundle install with :allow_offline_install" do
       G
 
       break_git_remote_ops! { bundle! :update, :all => true }
-      expect(out).to include("Using cached git data because of network errors")
+      expect(err).to include("Using cached git data because of network errors")
       expect(the_bundle).to be_locked
 
       break_git_remote_ops! do
@@ -85,7 +85,7 @@ RSpec.describe "bundle install with :allow_offline_install" do
           gem "a", :git => #{git.path.to_s.dump}, :branch => "new_branch"
         G
       end
-      expect(out).to include("Using cached git data because of network errors")
+      expect(err).to include("Using cached git data because of network errors")
       expect(the_bundle).to be_locked
     end
   end

@@ -158,20 +158,20 @@ RSpec.describe "when using sudo", :sudo => true do
 
     it "warns against that" do
       bundle :install, :sudo => true
-      expect(out).to include(warning)
+      expect(err).to include(warning)
     end
 
     context "when ENV['BUNDLE_SILENCE_ROOT_WARNING'] is set" do
       it "skips the warning" do
         bundle :install, :sudo => :preserve_env, :env => { "BUNDLE_SILENCE_ROOT_WARNING" => true }
-        expect(out).to_not include(warning)
+        expect(err).to_not include(warning)
       end
     end
 
     context "when silence_root_warning = false" do
       it "warns against that" do
         bundle :install, :sudo => true, :env => { "BUNDLE_SILENCE_ROOT_WARNING" => "false" }
-        expect(out).to include(warning)
+        expect(err).to include(warning)
       end
     end
   end

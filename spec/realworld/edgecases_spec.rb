@@ -26,7 +26,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
       gem "linecache", "0.46"
     G
     bundle :lock
-    expect(err).to lack_errors
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to eq(0) if exitstatus
   end
 
@@ -241,7 +241,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
 
     bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
     expect(err).not_to include("Could not find rake")
-    expect(err).to lack_errors
+    expect(last_command.stderr).to be_empty
   end
 
   it "checks out git repos when the lockfile is corrupted" do
@@ -368,7 +368,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
     L
 
     bundle! :lock
-    expect(last_command.stderr).to lack_errors
+    expect(last_command.stderr).to be_empty
   end
 
   it "outputs a helpful error message when gems have invalid gemspecs" do
@@ -376,7 +376,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
       source 'https://rubygems.org'
       gem "resque-scheduler", "2.2.0"
     G
-    expect(out).to include("You have one or more invalid gemspecs that need to be fixed.")
-    expect(out).to include("resque-scheduler 2.2.0 has an invalid gemspec")
+    expect(err).to include("You have one or more invalid gemspecs that need to be fixed.")
+    expect(err).to include("resque-scheduler 2.2.0 has an invalid gemspec")
   end
 end

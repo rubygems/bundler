@@ -86,7 +86,7 @@ RSpec.describe "bundle lock" do
   it "does not fetch remote specs when using the --local option" do
     bundle "lock --update --local"
 
-    expect(out).to match(/sources listed in your Gemfile|installed locally/)
+    expect(err).to match(/sources listed in your Gemfile|installed locally/)
   end
 
   it "works with --gemfile flag" do
@@ -144,7 +144,7 @@ RSpec.describe "bundle lock" do
     lockfile @lockfile
 
     bundle "lock --update blahblah"
-    expect(out).to eq("Could not find gem 'blahblah'.")
+    expect(err).to eq("Could not find gem 'blahblah'.")
 
     expect(read_lockfile).to eq(@lockfile)
   end
@@ -225,7 +225,7 @@ RSpec.describe "bundle lock" do
 
   it "warns when adding an unknown platform" do
     bundle "lock --add-platform foobarbaz"
-    expect(out).to include("The platform `foobarbaz` is unknown to RubyGems and adding it will likely lead to resolution errors")
+    expect(err).to include("The platform `foobarbaz` is unknown to RubyGems and adding it will likely lead to resolution errors")
   end
 
   it "allows removing platforms" do

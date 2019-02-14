@@ -262,7 +262,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
 
     expect(last_command).to be_failure
-    expect(out).to include("You must use Bundler 9999999 or greater with this lockfile.")
+    expect(err).to include("You must use Bundler 9999999 or greater with this lockfile.")
   end
 
   it "warns when updating bundler major version" do
@@ -290,7 +290,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
       G
     end
 
-    expect(out).to include("Warning: the lockfile is being updated to Bundler " \
+    expect(err).to include("Warning: the lockfile is being updated to Bundler " \
                           "9999999, after which you will be unable to return to Bundler 1.")
 
     lockfile_should_be <<-G
@@ -1162,7 +1162,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
 
     expect(bundled_app("Gemfile.lock")).not_to exist
-    expect(out).to include "rack (= 1.0) and rack (= 1.1)"
+    expect(err).to include "rack (= 1.0) and rack (= 1.1)"
   end
 
   it "raises if two different sources are used" do
@@ -1173,7 +1173,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     G
 
     expect(bundled_app("Gemfile.lock")).not_to exist
-    expect(out).to include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
+    expect(err).to include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
   end
 
   it "works correctly with multiple version dependencies" do
@@ -1321,7 +1321,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
       gem "rack_middleware"
     G
 
-    expect(out).to include("Downloading rack_middleware-1.0 revealed dependencies not in the API or the lockfile (#{Gem::Dependency.new("rack", "= 0.9.1")}).").
+    expect(err).to include("Downloading rack_middleware-1.0 revealed dependencies not in the API or the lockfile (#{Gem::Dependency.new("rack", "= 0.9.1")}).").
       and include("Either installing with `--full-index` or running `bundle update rack_middleware` should fix the problem.")
   end
 

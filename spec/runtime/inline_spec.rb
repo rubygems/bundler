@@ -67,7 +67,7 @@ RSpec.describe "bundler/inline#gemfile" do
       puts "success"
     RUBY
 
-    expect(err).to include "Could not find gem 'eleven'"
+    expect(last_command.stderr).to include "Could not find gem 'eleven'"
     expect(out).not_to include "success"
 
     script <<-RUBY
@@ -90,7 +90,7 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(out).to include("Installing activesupport")
     err.gsub! %r{.*lib/sinatra/base\.rb:\d+: warning: constant ::Fixnum is deprecated$}, ""
     err.strip!
-    expect(err).to lack_errors
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -134,7 +134,7 @@ RSpec.describe "bundler/inline#gemfile" do
 
       puts "success"
     RUBY
-    expect(err).to include "Unknown options: arglebargle"
+    expect(last_command.stderr).to include "Unknown options: arglebargle"
     expect(out).not_to include "success"
   end
 
@@ -165,7 +165,7 @@ RSpec.describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to eq("1.0.0")
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -183,7 +183,7 @@ RSpec.describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to eq("1.0.0\n2.0.0")
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -203,7 +203,7 @@ RSpec.describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to eq("two\nfour")
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -240,7 +240,7 @@ RSpec.describe "bundler/inline#gemfile" do
       RUBY
     end
 
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -258,7 +258,7 @@ RSpec.describe "bundler/inline#gemfile" do
       RUBY
     end
 
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 

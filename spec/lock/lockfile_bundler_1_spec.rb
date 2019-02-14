@@ -181,7 +181,7 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
 
     warning_message = "the running version of Bundler (9999999.0.0) is older " \
                       "than the version that created the lockfile (9999999.1.0)"
-    expect(out.scan(warning_message).size).to eq(1)
+    expect(last_command.stderr.scan(warning_message).size).to eq(1)
 
     lockfile_should_be <<-G
       GEM
@@ -263,7 +263,7 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
     G
 
     expect(exitstatus > 0) if exitstatus
-    expect(out).to include("You must use Bundler 9999999 or greater with this lockfile.")
+    expect(err).to include("You must use Bundler 9999999 or greater with this lockfile.")
   end
 
   it "warns when updating bundler major version" do
@@ -291,8 +291,8 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
       G
     end
 
-    expect(out).to include("Warning: the lockfile is being updated to Bundler " \
-                          "9999999, after which you will be unable to return to Bundler 1.")
+    expect(last_command.stderr).to include("Warning: the lockfile is being updated to Bundler " \
+                                           "9999999, after which you will be unable to return to Bundler 1.")
 
     lockfile_should_be <<-G
       GEM
@@ -1123,7 +1123,7 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
     G
 
     expect(bundled_app("Gemfile.lock")).not_to exist
-    expect(out).to include "rack (= 1.0) and rack (= 1.1)"
+    expect(err).to include "rack (= 1.0) and rack (= 1.1)"
   end
 
   it "raises if two different sources are used" do
@@ -1134,7 +1134,7 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
     G
 
     expect(bundled_app("Gemfile.lock")).not_to exist
-    expect(out).to include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
+    expect(err).to include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
   end
 
   it "works correctly with multiple version dependencies" do
@@ -1282,7 +1282,7 @@ RSpec.describe "the lockfile format", :bundler => "< 2" do
       gem "rack_middleware"
     G
 
-    expect(out).to include("Downloading rack_middleware-1.0 revealed dependencies not in the API or the lockfile (#{Gem::Dependency.new("rack", "= 0.9.1")}).").
+    expect(err).to include("Downloading rack_middleware-1.0 revealed dependencies not in the API or the lockfile (#{Gem::Dependency.new("rack", "= 0.9.1")}).").
       and include("Either installing with `--full-index` or running `bundle update rack_middleware` should fix the problem.")
   end
 

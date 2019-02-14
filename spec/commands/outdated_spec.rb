@@ -398,7 +398,7 @@ RSpec.describe "bundle outdated" do
   describe "with invalid gem name" do
     it "returns could not find gem name" do
       bundle "outdated invalid_gem_name"
-      expect(out).to include("Could not find gem 'invalid_gem_name'.")
+      expect(err).to include("Could not find gem 'invalid_gem_name'.")
     end
 
     it "returns non-zero exit code" do
@@ -434,10 +434,10 @@ RSpec.describe "bundle outdated" do
 
       bundle "outdated"
       expect(last_command).to be_failure
-      expect(out).to include("You are trying to check outdated gems in deployment mode.")
-      expect(out).to include("Run `bundle outdated` elsewhere.")
-      expect(out).to include("If this is a development machine, remove the ")
-      expect(out).to include("Gemfile freeze\nby running `bundle install --no-deployment`.")
+      expect(err).to include("You are trying to check outdated gems in deployment mode.")
+      expect(err).to include("Run `bundle outdated` elsewhere.")
+      expect(err).to include("If this is a development machine, remove the ")
+      expect(err).to include("Gemfile freeze\nby running `bundle install --no-deployment`.")
     end
   end
 
@@ -457,10 +457,10 @@ RSpec.describe "bundle outdated" do
 
       bundle "outdated"
       expect(last_command).to be_failure
-      expect(out).to include("You are trying to check outdated gems in deployment mode.")
-      expect(out).to include("Run `bundle outdated` elsewhere.")
-      expect(out).to include("If this is a development machine, remove the ")
-      expect(out).to include("Gemfile freeze\nby running `bundle config --delete deployment`.")
+      expect(err).to include("You are trying to check outdated gems in deployment mode.")
+      expect(err).to include("Run `bundle outdated` elsewhere.")
+      expect(err).to include("If this is a development machine, remove the ")
+      expect(err).to include("Gemfile freeze\nby running `bundle config --delete deployment`.")
     end
   end
 

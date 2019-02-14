@@ -93,14 +93,14 @@ RSpec.describe "bundle exec" do
       expect(out).to eq("Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec.")
     end
 
-    expect(err).to lack_errors
+    expect(last_command.stderr).to be_empty
   end
 
   it "accepts --keep-file-descriptors" do
     install_gemfile ""
     bundle "exec --keep-file-descriptors echo foobar"
 
-    expect(err).to lack_errors
+    expect(last_command.stderr).to be_empty
   end
 
   it "can run a command named --verbose" do
@@ -199,8 +199,8 @@ RSpec.describe "bundle exec" do
 
     bundle "exec foobarbaz"
     expect(exitstatus).to eq(127) if exitstatus
-    expect(out).to include("bundler: command not found: foobarbaz")
-    expect(out).to include("Install missing gem executables with `bundle install`")
+    expect(err).to include("bundler: command not found: foobarbaz")
+    expect(err).to include("Install missing gem executables with `bundle install`")
   end
 
   it "errors nicely when the argument is not executable" do
@@ -211,7 +211,7 @@ RSpec.describe "bundle exec" do
     bundle "exec touch foo"
     bundle "exec ./foo"
     expect(exitstatus).to eq(126) if exitstatus
-    expect(out).to include("bundler: not executable: ./foo")
+    expect(err).to include("bundler: not executable: ./foo")
   end
 
   it "errors nicely when no arguments are passed" do
@@ -221,7 +221,7 @@ RSpec.describe "bundle exec" do
 
     bundle "exec"
     expect(exitstatus).to eq(128) if exitstatus
-    expect(out).to include("bundler: exec needs a command to run")
+    expect(err).to include("bundler: exec needs a command to run")
   end
 
   it "raises a helpful error when exec'ing to something outside of the bundle", :ruby_repo, :rubygems => ">= 2.5.2" do
@@ -465,8 +465,8 @@ RSpec.describe "bundle exec" do
 
       bundle "exec irb"
 
-      expect(err).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
-      expect(err).to match('"TODO" is not a summary')
+      expect(last_command.stderr).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
+      expect(last_command.stderr).to match('"TODO" is not a summary')
     end
   end
 
@@ -662,7 +662,8 @@ RSpec.describe "bundle exec" do
       end
 
       let(:exit_code) { Bundler::GemNotFound.new.status_code }
-      let(:expected) { <<-EOS.strip }
+      let(:expected) { "" }
+      let(:expected_err) { <<-EOS.strip }
 \e[31mCould not find gem 'rack (= 2)' in locally installed gems.
 The source contains 'rack' at: 1.0.0\e[0m
 \e[33mRun `bundle install` to install missing gems.\e[0m

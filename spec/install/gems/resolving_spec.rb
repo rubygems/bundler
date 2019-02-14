@@ -77,7 +77,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
         bundle :install, :env => { "DEBUG_RESOLVER" => "1" }
 
-        expect(err).to include("Creating possibility state for net_c")
+        expect(last_command.stderr).to include("Creating possibility state for net_c")
       end
     end
 
@@ -91,7 +91,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
         bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
 
-        expect(err).to include(" net_b").
+        expect(last_command.stderr).to include(" net_b").
           and include("Starting resolution").
           and include("Finished resolution").
           and include("Attempting to activate")
@@ -187,8 +187,8 @@ RSpec.describe "bundle install with install-time dependencies" do
         gem 'require_rubygems'
       G
 
-      expect(out).to_not include("Gem::InstallError: require_rubygems requires RubyGems version > 9000")
-      expect(out).to include("require_rubygems-1.0 requires rubygems version > 9000, which is incompatible with the current version, #{Gem::VERSION}")
+      expect(err).to_not include("Gem::InstallError: require_rubygems requires RubyGems version > 9000")
+      expect(err).to include("require_rubygems-1.0 requires rubygems version > 9000, which is incompatible with the current version, #{Gem::VERSION}")
     end
   end
 end

@@ -77,13 +77,13 @@ RSpec.describe "bundle update" do
     it "errors when passed nothing" do
       install_gemfile! ""
       bundle :update
-      expect(out).to eq("To update everything, pass the `--all` flag.")
+      expect(err).to eq("To update everything, pass the `--all` flag.")
     end
 
     it "errors when passed --all and another option" do
       install_gemfile! ""
       bundle "update --all foo"
-      expect(out).to eq("Cannot specify --all along with specific options.")
+      expect(err).to eq("Cannot specify --all along with specific options.")
     end
 
     it "updates everything when passed --all" do
@@ -114,11 +114,11 @@ RSpec.describe "bundle update" do
   describe "with an unknown dependency" do
     it "should inform the user" do
       bundle "update halting-problem-solver"
-      expect(out).to include "Could not find gem 'halting-problem-solver'"
+      expect(err).to include "Could not find gem 'halting-problem-solver'"
     end
     it "should suggest alternatives" do
       bundle "update platformspecific"
-      expect(out).to include "Did you mean platform_specific?"
+      expect(err).to include "Did you mean platform_specific?"
     end
   end
 
@@ -299,7 +299,7 @@ RSpec.describe "bundle update" do
     it "should suggest different command when frozen is set globally", :bundler => "2" do
       bundle! "config --global deployment true"
       bundle "update", :all => bundle_update_requires_all?
-      expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m).
+      expect(err).to match(/You are trying to install in deployment mode after changing.your Gemfile/m).
         and match(/freeze \nby running `bundle config --delete deployment`./m)
     end
   end
@@ -639,7 +639,7 @@ RSpec.describe "bundle update" do
     G
 
     bundle "update nonexisting"
-    expect(out).to include("This Bundle hasn't been installed yet. Run `bundle install` to update and install the bundled gems.")
+    expect(err).to include("This Bundle hasn't been installed yet. Run `bundle install` to update and install the bundled gems.")
     expect(exitstatus).to eq(22) if exitstatus
   end
 end
@@ -719,7 +719,7 @@ RSpec.describe "bundle update --ruby" do
     it "shows a helpful error message" do
       bundle "update --ruby"
 
-      expect(out).to include("Your Ruby version is 2.2.2, but your Gemfile specified ~> 2.1.0")
+      expect(err).to include("Your Ruby version is 2.2.2, but your Gemfile specified ~> 2.1.0")
     end
   end
 

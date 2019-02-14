@@ -268,27 +268,27 @@ G
 
   def should_be_ruby_version_incorrect
     expect(exitstatus).to eq(18) if exitstatus
-    expect(out).to be_include("Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}")
+    expect(err).to be_include("Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}")
   end
 
   def should_be_engine_incorrect
     expect(exitstatus).to eq(18) if exitstatus
-    expect(out).to be_include("Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}")
+    expect(err).to be_include("Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}")
   end
 
   def should_be_engine_version_incorrect
     expect(exitstatus).to eq(18) if exitstatus
-    expect(out).to be_include("Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}")
+    expect(err).to be_include("Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}")
   end
 
   def should_be_patchlevel_incorrect
     expect(exitstatus).to eq(18) if exitstatus
-    expect(out).to be_include("Your Ruby patchlevel is #{RUBY_PATCHLEVEL}, but your Gemfile specified #{not_local_patchlevel}")
+    expect(err).to be_include("Your Ruby patchlevel is #{RUBY_PATCHLEVEL}, but your Gemfile specified #{not_local_patchlevel}")
   end
 
   def should_be_patchlevel_fixnum
     expect(exitstatus).to eq(18) if exitstatus
-    expect(out).to be_include("The Ruby patchlevel in your Gemfile must be a string")
+    expect(err).to be_include("The Ruby patchlevel in your Gemfile must be a string")
   end
 
   context "bundle install" do
@@ -863,7 +863,7 @@ G
       G
 
       bundle "exec rackup"
-      expect(out).to eq("0.9.1")
+      expect(out).to include("0.9.1")
     end
 
     it "activates the correct gem when ruby version matches any engine" do
@@ -876,7 +876,7 @@ G
         G
 
         bundle "exec rackup"
-        expect(out).to eq("0.9.1")
+        expect(out).to include("0.9.1")
       end
     end
 

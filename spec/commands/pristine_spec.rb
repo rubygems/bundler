@@ -88,7 +88,7 @@ RSpec.describe "bundle pristine", :ruby_repo do
 
       bundle "pristine"
       expect(File.read(changed_file)).to include(diff)
-      expect(out).to include("Cannot pristine #{spec.name} (#{spec.version}#{spec.git_version}). Gem is sourced from local path.")
+      expect(err).to include("Cannot pristine #{spec.name} (#{spec.version}#{spec.git_version}). Gem is sourced from local path.")
     end
 
     it "reinstall gemspec dependency" do
@@ -111,7 +111,7 @@ RSpec.describe "bundle pristine", :ruby_repo do
       FileUtils.touch(changes_txt)
       expect(changes_txt).to be_file
       bundle "pristine"
-      expect(out).to include("Cannot pristine #{spec.name} (#{spec.version}#{spec.git_version}). Gem is sourced from local path.")
+      expect(err).to include("Cannot pristine #{spec.name} (#{spec.version}#{spec.git_version}). Gem is sourced from local path.")
       expect(changes_txt).to be_file
     end
   end
@@ -135,8 +135,8 @@ RSpec.describe "bundle pristine", :ruby_repo do
 
       bundle! "pristine foo bar weakling"
 
-      expect(out).to include("Cannot pristine bar (1.0). Gem is sourced from local path.").
-        and include("Installing weakling 1.0")
+      expect(err).to include("Cannot pristine bar (1.0). Gem is sourced from local path.")
+      expect(out).to include("Installing weakling 1.0")
 
       expect(weakling_changes_txt).not_to be_file
       expect(foo_changes_txt).not_to be_file
@@ -145,7 +145,7 @@ RSpec.describe "bundle pristine", :ruby_repo do
 
     it "raises when one of them is not in the lockfile" do
       bundle "pristine abcabcabc"
-      expect(out).to include("Could not find gem 'abcabcabc'.")
+      expect(err).to include("Could not find gem 'abcabcabc'.")
     end
   end
 

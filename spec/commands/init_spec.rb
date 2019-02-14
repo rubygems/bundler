@@ -26,7 +26,7 @@ RSpec.describe "bundle init" do
 
     it "notifies the user that an existing Gemfile already exists" do
       bundle :init
-      expect(out).to include("Gemfile already exists")
+      expect(err).to include("Gemfile already exists")
     end
   end
 
@@ -43,7 +43,7 @@ RSpec.describe "bundle init" do
 
     it "notifies the user that an existing gems.rb already exists" do
       bundle :init
-      expect(out).to include("gems.rb already exists")
+      expect(err).to include("gems.rb already exists")
     end
   end
 
@@ -77,7 +77,7 @@ RSpec.describe "bundle init" do
         bundle :init
       end
 
-      expect(out).to include("directory is not writable")
+      expect(err).to include("directory is not writable")
       expect(Dir[bundled_app("#{subdir}/*")]).to be_empty
     end
   end

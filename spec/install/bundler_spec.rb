@@ -167,7 +167,7 @@ RSpec.describe "bundle install" do
           gem "requires_nonexistant_bundler"
         G
 
-        expect(out).to include "requires_nonexistant_bundler (1.0) has dependency bundler (= 99.99.99.99), " \
+        expect(err).to include "requires_nonexistant_bundler (1.0) has dependency bundler (= 99.99.99.99), " \
                                "which is unsatisfied by the current bundler version #{Bundler::VERSION}, so the dependency is being ignored"
 
         expect(the_bundle).to include_gems "bundler #{Bundler::VERSION}", "requires_nonexistant_bundler 1.0"

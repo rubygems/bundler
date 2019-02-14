@@ -213,9 +213,9 @@ RSpec.describe "bundle package" do
       G
       subject
       expect(exitstatus).to eq(16) if exitstatus
-      expect(out).to include("deployment mode")
-      expect(out).to include("You have added to the Gemfile")
-      expect(out).to include("* rack-obama")
+      expect(err).to include("deployment mode")
+      expect(err).to include("You have added to the Gemfile")
+      expect(err).to include("* rack-obama")
       bundle "env"
       expect(out).to include("frozen").or include("deployment")
     end
@@ -266,7 +266,7 @@ RSpec.describe "bundle install with gem sources" do
       end
 
       bundle :install
-      expect(err).to lack_errors
+      expect(last_command.stderr).to be_empty
       expect(the_bundle).to include_gems "rack 1.0"
     end
 

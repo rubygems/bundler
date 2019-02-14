@@ -15,7 +15,7 @@ RSpec.describe "bundle install" do
         gem "yaml_spec"
       G
       bundle :install
-      expect(err).to lack_errors
+      expect(last_command.stderr).to be_empty
     end
 
     it "still installs correctly when using path" do
@@ -24,7 +24,7 @@ RSpec.describe "bundle install" do
       install_gemfile <<-G
         gem 'yaml_spec', :path => "#{lib_path("yaml_spec-1.0")}"
       G
-      expect(err).to lack_errors
+      expect(last_command.stderr).to be_empty
     end
   end
 
@@ -129,8 +129,8 @@ RSpec.describe "bundle install" do
         gemspec
       G
 
-      expect(out).to include("Ruby patchlevel")
-      expect(out).to include("but your Gemfile specified")
+      expect(err).to include("Ruby patchlevel")
+      expect(err).to include("but your Gemfile specified")
       expect(exitstatus).to eq(18) if exitstatus
     end
 
@@ -146,8 +146,8 @@ RSpec.describe "bundle install" do
         gemspec
       G
 
-      expect(out).to include("Ruby version")
-      expect(out).to include("but your Gemfile specified")
+      expect(err).to include("Ruby version")
+      expect(err).to include("but your Gemfile specified")
       expect(exitstatus).to eq(18) if exitstatus
     end
   end

@@ -66,8 +66,8 @@ RSpec.describe "bundle install with explicit source paths" do
     install_gemfile <<-G
       gem 'foo', :path => "~#{username}/#{relative_path}"
     G
-    expect(out).to match("There was an error while trying to use the path `~#{username}/#{relative_path}`.")
-    expect(out).to match("user #{username} doesn't exist")
+    expect(err).to match("There was an error while trying to use the path `~#{username}/#{relative_path}`.")
+    expect(err).to match("user #{username} doesn't exist")
   end
 
   it "expands paths relative to Bundler.root" do
@@ -183,11 +183,11 @@ RSpec.describe "bundle install with explicit source paths" do
       gem "foo", :path => "#{lib_path("foo-1.0")}"
     G
 
-    expect(out).to_not include("ERROR REPORT")
-    expect(out).to_not include("Your Gemfile has no gem server sources.")
-    expect(out).to match(/is not valid. Please fix this gemspec./)
-    expect(out).to match(/The validation error was 'missing value for attribute version'/)
-    expect(out).to match(/You have one or more invalid gemspecs that need to be fixed/)
+    expect(err).to_not include("ERROR REPORT")
+    expect(err).to_not include("Your Gemfile has no gem server sources.")
+    expect(err).to match(/is not valid. Please fix this gemspec./)
+    expect(err).to match(/The validation error was 'missing value for attribute version'/)
+    expect(err).to match(/You have one or more invalid gemspecs that need to be fixed/)
   end
 
   it "supports gemspec syntax" do
@@ -274,7 +274,7 @@ RSpec.describe "bundle install with explicit source paths" do
     G
 
     expect(exitstatus).to eq(15) if exitstatus
-    expect(out).to match(/There are multiple gemspecs/)
+    expect(err).to match(/There are multiple gemspecs/)
   end
 
   it "allows :name to be specified to resolve ambiguity" do
@@ -313,7 +313,7 @@ RSpec.describe "bundle install with explicit source paths" do
     install_gemfile <<-G
       gem 'foo', '1.0', :path => "#{lib_path("foo-1.0")}"
     G
-    expect(err).to lack_errors
+    expect(last_command.stderr).to be_empty
   end
 
   it "removes the .gem file after installing" do
@@ -575,7 +575,7 @@ RSpec.describe "bundle install with explicit source paths" do
 
       bundle :install,
         :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq_err("Ran pre-install hook: foo-1.0")
+      expect(last_command.stderr).to eq_err("Ran pre-install hook: foo-1.0")
     end
 
     it "runs post-install hooks" do
@@ -595,7 +595,7 @@ RSpec.describe "bundle install with explicit source paths" do
 
       bundle :install,
         :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq_err("Ran post-install hook: foo-1.0")
+      expect(last_command.stderr).to eq_err("Ran post-install hook: foo-1.0")
     end
 
     it "complains if the install hook fails" do
@@ -615,7 +615,7 @@ RSpec.describe "bundle install with explicit source paths" do
 
       bundle :install,
         :requires => [lib_path("install_hooks.rb")]
-      expect(out).to include("failed for foo-1.0")
+      expect(err).to include("failed for foo-1.0")
     end
 
     it "loads plugins from the path gem" do
