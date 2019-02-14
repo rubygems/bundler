@@ -106,7 +106,7 @@ RSpec.describe "Bundler.with_env helpers" do
     it "prints a deprecation", :bundler => 2 do
       code = "Bundler.clean_env"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).to include(
+      expect(err).to include(
         "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
       )
@@ -115,7 +115,7 @@ RSpec.describe "Bundler.with_env helpers" do
     it "does not print a deprecation", :bundler => "< 2" do
       code = "Bundler.clean_env"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).not_to include(
+      expect(out).not_to include(
         "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
       )
@@ -156,7 +156,7 @@ RSpec.describe "Bundler.with_env helpers" do
     it "prints a deprecation", :bundler => 2 do
       code = "Bundler.with_clean_env {}"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).to include(
+      expect(err).to include(
         "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
       )
@@ -165,7 +165,7 @@ RSpec.describe "Bundler.with_env helpers" do
     it "does not print a deprecation", :bundler => "< 2" do
       code = "Bundler.with_clean_env {}"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).not_to include(
+      expect(out).not_to include(
         "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
         "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
       )
