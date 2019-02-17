@@ -19,7 +19,6 @@ module Spec
       # artifice doesn't support rack 2.x now.
       "rack" => "< 2.0",
       "rack-test" => "~> 1.1",
-      "artifice" => "~> 0.6.0",
       "compact_index" => "~> 0.11.0",
       "sinatra" => "~> 1.4.7",
       # Rake version has to be consistent for tests to pass

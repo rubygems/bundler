@@ -3,9 +3,9 @@
 require File.expand_path("../../path.rb", __FILE__)
 include Spec::Path
 
-$LOAD_PATH.unshift(*Dir[Spec::Path.base_system_gems.join("gems/{artifice,rack,tilt,sinatra}-*/lib")].map(&:to_s))
+$LOAD_PATH.unshift(*Dir[Spec::Path.base_system_gems.join("gems/{rack,tilt,sinatra}-*/lib")].map(&:to_s))
 
-require "artifice"
+require File.expand_path("../../artifice.rb", __FILE__)
 require "sinatra/base"
 
 Artifice.deactivate
