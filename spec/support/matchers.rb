@@ -121,6 +121,14 @@ module Spec
       end
     end
 
+    RSpec::Matchers.define :be_well_formed do
+      match(&:empty?)
+
+      failure_message do |actual|
+        actual.join("\n")
+      end
+    end
+
     define_compound_matcher :read_as, [exist] do |file_contents|
       diffable
 
