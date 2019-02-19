@@ -76,6 +76,7 @@ module Bundler
     ].freeze
 
     DEFAULT_CONFIG = {
+      :major_deprecations => true,
       :disable_version_check => true,
       :prefer_patch => false,
       :redirect => 5,
