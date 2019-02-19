@@ -25,7 +25,7 @@ RSpec.describe "bundle update" do
         gem 'rack'
       G
 
-      bundle "config --local gemfile #{bundled_app("NotGemfile")}"
+      bundle "config set --local gemfile #{bundled_app("NotGemfile")}"
       bundle! :install
     end
 

@@ -221,9 +221,9 @@ module Bundler
     def check_for_deployment_mode
       return unless Bundler.frozen_bundle?
       suggested_command = if Bundler.settings.locations("frozen")[:global]
-        "bundle config --delete frozen"
+        "bundle config unset frozen"
       elsif Bundler.settings.locations("deployment").keys.&([:global, :local]).any?
-        "bundle config --delete deployment"
+        "bundle config unset deployment"
       else
         "bundle install --no-deployment"
       end

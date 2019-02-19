@@ -441,7 +441,7 @@ RSpec.describe "bundle outdated" do
     end
   end
 
-  context "after bundle config deployment true" do
+  context "after bundle config set deployment true" do
     before do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -449,7 +449,7 @@ RSpec.describe "bundle outdated" do
         gem "rack"
         gem "foo"
       G
-      bundle! "config deployment true"
+      bundle! "config set deployment true"
     end
 
     it "outputs a helpful message about being in deployment mode" do
@@ -460,7 +460,7 @@ RSpec.describe "bundle outdated" do
       expect(err).to include("You are trying to check outdated gems in deployment mode.")
       expect(err).to include("Run `bundle outdated` elsewhere.")
       expect(err).to include("If this is a development machine, remove the ")
-      expect(err).to include("Gemfile freeze\nby running `bundle config --delete deployment`.")
+      expect(err).to include("Gemfile freeze\nby running `bundle config unset deployment`.")
     end
   end
 

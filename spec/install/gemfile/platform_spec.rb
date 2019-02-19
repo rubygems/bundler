@@ -250,7 +250,7 @@ RSpec.describe "bundle install across platforms" do
 
     expect(out).to include "Unable to use the platform-specific (universal-darwin) version of facter (2.4.6) " \
       "because it has different dependencies from the ruby version. " \
-      "To use the platform-specific version of the gem, run `bundle config specific_platform true` and install again."
+      "To use the platform-specific version of the gem, run `bundle config set specific_platform true` and install again."
 
     expect(the_bundle).to include_gem "facter 2.4.6"
     expect(the_bundle).not_to include_gem "CFPropertyList"

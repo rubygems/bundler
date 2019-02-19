@@ -109,15 +109,15 @@ module Bundler
         value
       else
         command = if value.nil?
-          "bundle config --delete #{key}"
+          "bundle config unset #{key}"
         else
-          "bundle config #{key} #{Array(value).join(":")}"
+          "bundle config set #{key} #{Array(value).join(":")}"
         end
 
         Bundler::SharedHelpers.major_deprecation 2,\
           "flags passed to commands " \
           "will no longer be automatically remembered. Instead please set flags " \
-          "you want remembered between commands using `bundle config " \
+          "you want remembered between commands using `bundle config set " \
           "<setting name> <setting value>`, i.e. `#{command}`"
 
         set_local(key, value)

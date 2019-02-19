@@ -399,7 +399,7 @@ RSpec.describe "bundle gem" do
       before do
         reset!
         in_app_root
-        bundle "config gem.test rspec"
+        bundle "config set gem.test rspec"
         bundle "gem #{gem_name}"
       end
 
@@ -414,7 +414,7 @@ RSpec.describe "bundle gem" do
       before do
         reset!
         in_app_root
-        bundle "config gem.test rspec"
+        bundle "config set gem.test rspec"
         bundle "gem #{gem_name} --test=minitest"
       end
 
@@ -458,7 +458,7 @@ RSpec.describe "bundle gem" do
       before do
         reset!
         in_app_root
-        bundle "config gem.test minitest"
+        bundle "config set gem.test minitest"
         bundle "gem #{gem_name}"
       end
 
@@ -850,7 +850,7 @@ Usage: "bundle gem NAME [OPTIONS]"
     it "asks about MIT license" do
       global_config "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
 
-      bundle :config
+      bundle "config list"
 
       bundle "gem foobar" do |input, _, _|
         input.puts "yes"

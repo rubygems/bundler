@@ -2,7 +2,7 @@
 
 RSpec.describe "bundle install with :allow_offline_install" do
   before do
-    bundle "config allow_offline_install true"
+    bundle "config set allow_offline_install true"
   end
 
   context "with no cached data locally" do
