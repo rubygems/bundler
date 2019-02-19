@@ -646,8 +646,6 @@ RSpec.describe "bundle clean" do
 
     bundle :install
 
-    bundle "configuration --delete path"
-
     bundle "clean --dry-run"
 
     expect(out).not_to include("Removing foo (1.0)")
