@@ -1,0 +1,33 @@
+steps:
+
+- script: |
+    bin/rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
+
+  displayName: Override version
+
+- script: |
+    bin/rake spec:deps
+
+  displayName: Install dependencies
+
+- script: |
+    bin/rake spec:rubygems:clone_rubygems_3.0.2
+
+  displayName: Clone rubygems
+
+- script: |
+    gem install --no-document --conservative rspec_junit_formatter
+
+  displayName: Install test results formatter
+
+- script: |
+    ruby -r rspec_junit_formatter bin/rspec --format progress --format RspecJunitFormatter -o rspec/bundler-junit-results.xml
+
+  displayName: Run specs
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: rspec/bundler-junit-results.xml
+  displayName: Publish test results
+  condition: succeededOrFailed()
