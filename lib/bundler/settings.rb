@@ -120,7 +120,9 @@ module Bundler
           "flags passed to commands " \
           "will no longer be automatically remembered. Instead please set flags " \
           "you want remembered between commands using `bundle config set " \
-          "<setting name> <setting value>`, i.e. `#{command}`"
+          "<setting name> <setting value>`, i.e. `#{command}`. Once you are " \
+          "ready for the new behavior, use `bundle config set forget_cli_options " \
+          "true` to get rid of this message"
 
         set_local(key, value)
       end
