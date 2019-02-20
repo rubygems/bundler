@@ -153,7 +153,7 @@ RSpec.describe "bundle pristine", :ruby_repo do
     let(:very_simple_binary) { Bundler.definition.specs["very_simple_binary"].first }
     let(:c_ext_dir)          { Pathname.new(very_simple_binary.full_gem_path).join("ext") }
     let(:build_opt)          { "--with-ext-lib=#{c_ext_dir}" }
-    before { bundle "config build.very_simple_binary -- #{build_opt}" }
+    before { bundle "config set build.very_simple_binary -- #{build_opt}" }
 
     # This just verifies that the generated Makefile from the c_ext gem makes
     # use of the build_args from the bundle config
@@ -170,7 +170,7 @@ RSpec.describe "bundle pristine", :ruby_repo do
     let(:git_with_ext) { Bundler.definition.specs["git_with_ext"].first }
     let(:c_ext_dir)          { Pathname.new(git_with_ext.full_gem_path).join("ext") }
     let(:build_opt)          { "--with-ext-lib=#{c_ext_dir}" }
-    before { bundle "config build.git_with_ext -- #{build_opt}" }
+    before { bundle "config set build.git_with_ext -- #{build_opt}" }
 
     # This just verifies that the generated Makefile from the c_ext gem makes
     # use of the build_args from the bundle config

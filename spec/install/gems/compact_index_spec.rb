@@ -652,7 +652,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       end
 
       it "reads authentication details by host name from bundle config" do
-        bundle "config #{source_hostname} #{user}:#{password}"
+        bundle "config set #{source_hostname} #{user}:#{password}"
 
         bundle! :install, :artifice => "compact_index_strict_basic_authentication"
 
@@ -662,7 +662,7 @@ The checksum of /versions does not match the checksum provided by the server! So
 
       it "reads authentication details by full url from bundle config" do
         # The trailing slash is necessary here; Fetcher canonicalizes the URI.
-        bundle "config #{source_uri}/ #{user}:#{password}"
+        bundle "config set #{source_uri}/ #{user}:#{password}"
 
         bundle! :install, :artifice => "compact_index_strict_basic_authentication"
 
@@ -671,7 +671,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       end
 
       it "should use the API" do
-        bundle "config #{source_hostname} #{user}:#{password}"
+        bundle "config set #{source_hostname} #{user}:#{password}"
         bundle! :install, :artifice => "compact_index_strict_basic_authentication"
         expect(out).to include("Fetching gem metadata from #{source_uri}")
         expect(the_bundle).to include_gems "rack 1.0.0"
@@ -683,7 +683,7 @@ The checksum of /versions does not match the checksum provided by the server! So
           gem "rack"
         G
 
-        bundle "config #{source_hostname} otheruser:wrong"
+        bundle "config set #{source_hostname} otheruser:wrong"
 
         bundle! :install, :artifice => "compact_index_strict_basic_authentication"
         expect(the_bundle).to include_gems "rack 1.0.0"
@@ -691,11 +691,11 @@ The checksum of /versions does not match the checksum provided by the server! So
 
       it "shows instructions if auth is not provided for the source" do
         bundle :install, :artifice => "compact_index_strict_basic_authentication"
-        expect(err).to include("bundle config #{source_hostname} username:password")
+        expect(err).to include("bundle config set #{source_hostname} username:password")
       end
 
       it "fails if authentication has already been provided, but failed" do
-        bundle "config #{source_hostname} #{user}:wrong"
+        bundle "config set #{source_hostname} #{user}:wrong"
 
         bundle :install, :artifice => "compact_index_strict_basic_authentication"
         expect(err).to include("Bad username or password")
@@ -879,7 +879,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         and include("1. delete the downloaded gem located at: `#{default_bundle_path}/gems/rack-1.0.0/rack-1.0.0.gem`").
         and include("2. run `bundle install`").
         and include("If you wish to continue installing the downloaded gem, and are certain it does not pose a security issue despite the mismatching checksum, do the following:").
-        and include("1. run `bundle config disable_checksum_validation true` to turn off checksum verification").
+        and include("1. run `bundle config set disable_checksum_validation true` to turn off checksum verification").
         and include("2. run `bundle install`").
         and match(/\(More info: The expected SHA256 checksum was "#{"ab" * 22}", but the checksum for the downloaded gem was ".+?"\.\)/)
     end

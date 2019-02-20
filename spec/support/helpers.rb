@@ -161,9 +161,9 @@ module Spec
       return Hash[options] if remembered
       options.each do |k, v|
         if v.nil?
-          bundle! "config --delete #{k}"
+          bundle! "config unset #{k}"
         else
-          bundle! "config --local #{k} #{v}"
+          bundle! "config set --local #{k} #{v}"
         end
       end
       {}

@@ -322,7 +322,7 @@ RSpec.describe "bundle clean" do
   it "does not call clean automatically when using system gems" do
     bundle! "config path.system true"
 
-    bundle! :config
+    bundle! "config list"
 
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
@@ -650,8 +650,6 @@ RSpec.describe "bundle clean" do
 
     bundle :install
 
-    bundle "configuration --delete path"
-
     bundle "clean --dry-run"
 
     expect(out).not_to include("Removing foo (1.0)")
@@ -671,7 +669,7 @@ RSpec.describe "bundle clean" do
     G
 
     bundle "install", forgotten_command_line_options(:path => "vendor/bundle", :clean => false)
-    bundle "config dry_run false"
+    bundle "config set dry_run false"
 
     gemfile <<-G
       source "file://#{gem_repo1}"

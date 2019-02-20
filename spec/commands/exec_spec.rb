@@ -438,7 +438,7 @@ RSpec.describe "bundle exec" do
       gem "foo"
     G
 
-    bundle "config auto_install 1"
+    bundle "config set auto_install 1"
     bundle "exec rackup"
     expect(out).to include("Installing foo 1.0")
   end
@@ -684,7 +684,7 @@ The source contains 'rack' at: 1.0.0\e[0m
       let(:process) { "PROCESS: ruby #{path} arg1 arg2" }
 
       before do
-        bundle "config disable_exec_load true"
+        bundle "config set disable_exec_load true"
       end
 
       it_behaves_like "it runs"

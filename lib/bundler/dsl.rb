@@ -474,7 +474,7 @@ repo_name ||= user_name
           "should come from that source"
         unless Bundler.feature_flag.bundler_2_mode?
           msg += ". To downgrade this error to a warning, run " \
-            "`bundle config --delete disable_multisource`"
+            "`bundle config unset disable_multisource`"
         end
         raise GemfileEvalError, msg
       else
@@ -482,7 +482,7 @@ repo_name ||= user_name
           "Using `source` more than once without a block is a security risk, and " \
           "may result in installing unexpected gems. To resolve this warning, use " \
           "a block to indicate which gems should come from the secondary source. " \
-          "To upgrade this warning to an error, run `bundle config " \
+          "To upgrade this warning to an error, run `bundle config set " \
           "disable_multisource true`."
       end
     end

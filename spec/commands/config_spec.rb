@@ -2,10 +2,10 @@
 
 RSpec.describe ".bundle/config" do
   describe "config" do
-    before { bundle "config foo bar" }
+    before { bundle "config set foo bar" }
 
     it "prints a detailed report of local and user configuration" do
-      bundle "config"
+      bundle "config list"
 
       expect(out).to include("Settings are listed in order of priority. The top value will be used")
       expect(out).to include("foo\nSet for the current user")
@@ -14,21 +14,21 @@ RSpec.describe ".bundle/config" do
 
     context "given --parseable flag" do
       it "prints a minimal report of local and user configuration" do
-        bundle "config --parseable"
+        bundle "config list --parseable"
         expect(out).to include("foo=bar")
       end
 
       context "with global config" do
         it "prints config assigned to local scope" do
-          bundle "config --local foo bar2"
-          bundle "config --parseable"
+          bundle "config set --local foo bar2"
+          bundle "config list --parseable"
           expect(out).to include("foo=bar2")
         end
       end
 
       context "with env overwrite" do
         it "prints config with env" do
-          bundle "config --parseable", :env => { "BUNDLE_FOO" => "bar3" }
+          bundle "config list --parseable", :env => { "BUNDLE_FOO" => "bar3" }
           expect(out).to include("foo=bar3")
         end
       end
@@ -74,21 +74,21 @@ RSpec.describe ".bundle/config" do
     end
 
     it "is the default" do
-      bundle "config foo global"
+      bundle "config set foo global"
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("global")
     end
 
     it "can also be set explicitly" do
-      bundle! "config --global foo global"
+      bundle! "config set --global foo global"
       run! "puts Bundler.settings[:foo]"
       expect(out).to eq("global")
     end
 
     it "has lower precedence than local" do
-      bundle "config --local  foo local"
+      bundle "config set --local  foo local"
 
-      bundle "config --global foo global"
+      bundle "config set --global foo global"
       expect(out).to match(/Your application has set foo to "local"/)
 
       run "puts Bundler.settings[:foo]"
@@ -99,7 +99,7 @@ RSpec.describe ".bundle/config" do
       begin
         ENV["BUNDLE_FOO"] = "env"
 
-        bundle "config --global foo global"
+        bundle "config set --global foo global"
         expect(out).to match(/You have a bundler environment variable for foo set to "env"/)
 
         run "puts Bundler.settings[:foo]"
@@ -110,16 +110,16 @@ RSpec.describe ".bundle/config" do
     end
 
     it "can be deleted" do
-      bundle "config --global foo global"
-      bundle "config --delete foo"
+      bundle "config set --global foo global"
+      bundle "config unset foo"
 
       run "puts Bundler.settings[:foo] == nil"
       expect(out).to eq("true")
     end
 
     it "warns when overriding" do
-      bundle "config --global foo previous"
-      bundle "config --global foo global"
+      bundle "config set --global foo previous"
+      bundle "config set --global foo global"
       expect(out).to match(/You are replacing the current global value of foo/)
 
       run "puts Bundler.settings[:foo]"
@@ -127,8 +127,8 @@ RSpec.describe ".bundle/config" do
     end
 
     it "does not warn when using the same value twice" do
-      bundle "config --global foo value"
-      bundle "config --global foo value"
+      bundle "config set --global foo value"
+      bundle "config set --global foo value"
       expect(out).not_to match(/You are replacing the current global value of foo/)
 
       run "puts Bundler.settings[:foo]"
@@ -136,22 +136,22 @@ RSpec.describe ".bundle/config" do
     end
 
     it "expands the path at time of setting" do
-      bundle "config --global local.foo .."
+      bundle "config set --global local.foo .."
       run "puts Bundler.settings['local.foo']"
       expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
     end
 
     it "saves with parseable option" do
-      bundle "config --global --parseable foo value"
+      bundle "config set --global --parseable foo value"
       expect(out).to eq("foo=value")
       run "puts Bundler.settings['foo']"
       expect(out).to eq("value")
     end
 
     context "when replacing a current value with the parseable flag" do
-      before { bundle "config --global foo value" }
+      before { bundle "config set --global foo value" }
       it "prints the current value in a parseable format" do
-        bundle "config --global --parseable foo value2"
+        bundle "config set --global --parseable foo value2"
         expect(out).to eq "foo=value2"
         run "puts Bundler.settings['foo']"
         expect(out).to eq("value2")
@@ -168,7 +168,7 @@ RSpec.describe ".bundle/config" do
     end
 
     it "can also be set explicitly" do
-      bundle "config --local foo local"
+      bundle "config set --local foo local"
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("local")
     end
@@ -176,7 +176,7 @@ RSpec.describe ".bundle/config" do
     it "has higher precedence than env" do
       begin
         ENV["BUNDLE_FOO"] = "env"
-        bundle "config --local foo local"
+        bundle "config set --local foo local"
 
         run "puts Bundler.settings[:foo]"
         expect(out).to eq("local")
@@ -186,16 +186,16 @@ RSpec.describe ".bundle/config" do
     end
 
     it "can be deleted" do
-      bundle "config --local foo local"
-      bundle "config --delete foo"
+      bundle "config set --local foo local"
+      bundle "config unset foo"
 
       run "puts Bundler.settings[:foo] == nil"
       expect(out).to eq("true")
     end
 
     it "warns when overriding" do
-      bundle "config --local foo previous"
-      bundle "config --local foo local"
+      bundle "config set --local foo previous"
+      bundle "config set --local foo local"
       expect(out).to match(/You are replacing the current local value of foo/)
 
       run "puts Bundler.settings[:foo]"
@@ -203,14 +203,14 @@ RSpec.describe ".bundle/config" do
     end
 
     it "expands the path at time of setting" do
-      bundle "config --local local.foo .."
+      bundle "config set --local local.foo .."
       run "puts Bundler.settings['local.foo']"
       expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
     end
 
     it "can be deleted with parseable option" do
-      bundle "config --local foo value"
-      bundle "config --delete --parseable foo"
+      bundle "config set --local foo value"
+      bundle "config unset --parseable foo"
       expect(out).to eq ""
       run "puts Bundler.settings['foo'] == nil"
       expect(out).to eq("true")
@@ -262,29 +262,29 @@ RSpec.describe ".bundle/config" do
 
   describe "parseable option" do
     it "prints an empty string" do
-      bundle "config foo --parseable"
+      bundle "config get foo --parseable"
 
       expect(out).to eq ""
     end
 
     it "only prints the value of the config" do
-      bundle "config foo local"
-      bundle "config foo --parseable"
+      bundle "config set foo local"
+      bundle "config get foo --parseable"
 
       expect(out).to eq "foo=local"
     end
 
     it "can print global config" do
-      bundle "config --global bar value"
-      bundle "config bar --parseable"
+      bundle "config set --global bar value"
+      bundle "config get bar --parseable"
 
       expect(out).to eq "bar=value"
     end
 
     it "prefers local config over global" do
-      bundle "config --local bar value2"
-      bundle "config --global bar value"
-      bundle "config bar --parseable"
+      bundle "config set --local bar value2"
+      bundle "config set --global bar value"
+      bundle "config get bar --parseable"
 
       expect(out).to eq "bar=value2"
     end
@@ -299,7 +299,7 @@ RSpec.describe ".bundle/config" do
     end
 
     it "configures mirrors using keys with `mirror.`" do
-      bundle "config --local mirror.http://gems.example.org http://gem-mirror.example.org"
+      bundle "config set --local mirror.http://gems.example.org http://gem-mirror.example.org"
       run(<<-E)
 Bundler.settings.gem_mirrors.each do |k, v|
   puts "\#{k} => \#{v}"
@@ -317,13 +317,13 @@ E
     end
 
     it "saves quotes" do
-      bundle "config foo something\\'"
+      bundle "config set foo something\\'"
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("something'")
     end
 
     it "doesn't return quotes around values", :ruby => "1.9" do
-      bundle "config foo '1'"
+      bundle "config set foo '1'"
       run "puts Bundler.settings.send(:global_config_file).read"
       expect(out).to include('"1"')
       run "puts Bundler.settings[:foo]"
@@ -336,7 +336,7 @@ E
         f.write 'BUNDLE_FOO: "$BUILD_DIR"'
       end
 
-      bundle "config bar baz"
+      bundle "config set bar baz"
       run "puts Bundler.settings.send(:local_config_file).read"
 
       # Starting in Ruby 2.1, YAML automatically adds double quotes
@@ -345,12 +345,12 @@ E
     end
 
     it "doesn't duplicate quotes around long wrapped values" do
-      bundle "config foo #{long_string}"
+      bundle "config set foo #{long_string}"
 
       run "puts Bundler.settings[:foo]"
       expect(out).to eq(long_string)
 
-      bundle "config bar baz"
+      bundle "config set bar baz"
 
       run "puts Bundler.settings[:foo]"
       expect(out).to eq(long_string)
@@ -376,13 +376,13 @@ E
     end
 
     it "doesn't wrap values" do
-      bundle "config foo #{long_string}"
+      bundle "config set foo #{long_string}"
       run "puts Bundler.settings[:foo]"
       expect(out).to match(long_string)
     end
 
     it "can read wrapped unquoted values" do
-      bundle "config foo #{long_string_without_special_characters}"
+      bundle "config set foo #{long_string_without_special_characters}"
       run "puts Bundler.settings[:foo]"
       expect(out).to match(long_string_without_special_characters)
     end
@@ -485,7 +485,7 @@ RSpec.describe "setting gemfile via config" do
         G
       end
 
-      bundle "config --local gemfile #{bundled_app("NotGemfile")}"
+      bundle "config set --local gemfile #{bundled_app("NotGemfile")}"
       expect(File.exist?(".bundle/config")).to eq(true)
 
       bundle "config"

@@ -7,7 +7,7 @@ RSpec.describe "Bundler.with_env helpers" do
   end
 
   def build_bundler_context
-    bundle "config path vendor/bundle"
+    bundle "config set path vendor/bundle"
     gemfile ""
     bundle "install"
   end

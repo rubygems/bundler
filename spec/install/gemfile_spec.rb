@@ -35,7 +35,7 @@ RSpec.describe "bundle install" do
         gem 'rack'
       G
 
-      bundle "config --local gemfile #{bundled_app("NotGemfile")}"
+      bundle "config set --local gemfile #{bundled_app("NotGemfile")}"
     end
     it "uses the gemfile to install" do
       bundle "install"

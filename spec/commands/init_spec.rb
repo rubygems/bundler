@@ -144,7 +144,7 @@ RSpec.describe "bundle init" do
   end
 
   context "when init_gems_rb setting is enabled" do
-    before { bundle "config init_gems_rb true" }
+    before { bundle "config set init_gems_rb true" }
 
     context "given --gemspec option", :bundler => "< 2" do
       let(:spec_file) { tmp.join("test.gemspec") }

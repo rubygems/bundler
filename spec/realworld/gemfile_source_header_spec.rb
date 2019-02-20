@@ -8,7 +8,7 @@ RSpec.describe "fetching dependencies with a mirrored source", :realworld => tru
 
   before do
     setup_server
-    bundle "config --local mirror.#{mirror} #{original}"
+    bundle "config set --local mirror.#{mirror} #{original}"
   end
 
   after do

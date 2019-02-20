@@ -7,7 +7,7 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
   context "in a .99 version" do
     before do
       simulate_bundler_version "1.99.1"
-      bundle "config --delete major_deprecations"
+      bundle "config unset major_deprecations"
     end
 
     it "prints major deprecations without being configured" do
@@ -21,7 +21,7 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
   end
 
   before do
-    bundle "config major_deprecations true"
+    bundle "config set major_deprecations true"
 
     create_file "gems.rb", <<-G
       source "file:#{gem_repo1}"

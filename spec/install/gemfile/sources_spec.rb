@@ -25,7 +25,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
           gem "rack-obama"
           gem "rack"
         G
-        bundle "config major_deprecations true"
+        bundle "config set major_deprecations true"
       end
 
       it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first", :bundler => "< 2" do
@@ -38,7 +38,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
       end
 
       it "errors when disable_multisource is set" do
-        bundle "config disable_multisource true"
+        bundle "config set disable_multisource true"
         bundle :install
         expect(err).to include("Each source after the first must include a block")
         expect(exitstatus).to eq(4) if exitstatus
@@ -55,7 +55,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
           gem "rack-obama"
           gem "rack", "1.0.0" # force it to install the working version in repo1
         G
-        bundle "config major_deprecations true"
+        bundle "config set major_deprecations true"
       end
 
       it "warns about ambiguous gems, but installs anyway", :bundler => "< 2" do
@@ -249,7 +249,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
           end
 
           it "installs from the other source and warns about ambiguous gems", :bundler => "< 2" do
-            bundle "config major_deprecations true"
+            bundle "config set major_deprecations true"
             bundle :install
             expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
             expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")

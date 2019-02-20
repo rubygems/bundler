@@ -27,14 +27,14 @@ RSpec.describe Bundler::Dsl do
 
     context "github_https feature flag" do
       it "is true when github.https is true" do
-        bundle "config github.https true"
+        bundle "config set github.https true"
         expect(Bundler.feature_flag.github_https?).to eq "true"
       end
     end
 
     context "default hosts (git, gist)", :bundler => "< 2" do
       context "when github.https config is true" do
-        before { bundle "config github.https true" }
+        before { bundle "config set github.https true" }
         it "converts :github to :git using https" do
           subject.gem("sparks", :github => "indirect/sparks")
           github_uri = "https://github.com/indirect/sparks.git"

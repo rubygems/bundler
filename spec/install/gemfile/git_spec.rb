@@ -497,7 +497,7 @@ RSpec.describe "bundle install with git sources" do
       expect(lockfile1).not_to eq(lockfile0)
     end
 
-    it "explodes if given path does not exist on install" do
+    it "explodes and gives correct solution if given path does not exist on install" do
       build_git "rack", "0.8"
 
       install_gemfile <<-G
@@ -508,9 +508,17 @@ RSpec.describe "bundle install with git sources" do
       bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
       expect(err).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
+
+      solution = "config unset local.rack"
+      expect(err).to match(/Run `bundle #{solution}` to remove the local override/)
+
+      bundle solution
+      bundle :install
+
+      expect(last_command.stderr).to be_empty
     end
 
-    it "explodes if branch is not given on install" do
+    it "explodes and gives correct solution if branch is not given on install" do
       build_git "rack", "0.8"
       FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
 
@@ -521,7 +529,15 @@ RSpec.describe "bundle install with git sources" do
 
       bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
-      expect(err).to match(/cannot use local override/i)
+      expect(err).to match(/Cannot use local override for rack-0.8 at #{Regexp.escape(lib_path('local-rack').to_s)} because :branch is not specified in Gemfile/)
+
+      solution = "config unset local.rack"
+      expect(err).to match(/Specify a branch or run `bundle #{solution}` to remove the local override/)
+
+      bundle solution
+      bundle :install
+
+      expect(last_command.stderr).to be_empty
     end
 
     it "does not explode if disable_local_branch_check is given" do

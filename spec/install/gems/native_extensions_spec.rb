@@ -37,7 +37,7 @@ RSpec.describe "installing a gem with native extensions", :ruby_repo do
       gem "c_extension"
     G
 
-    bundle "config build.c_extension --with-c_extension=hello"
+    bundle "config set build.c_extension --with-c_extension=hello"
     bundle "install"
 
     expect(out).not_to include("extconf.rb failed")

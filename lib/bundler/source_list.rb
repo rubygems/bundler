@@ -150,7 +150,7 @@ module Bundler
       if source.uri =~ /^git\:/
         Bundler.ui.warn "The git source `#{source.uri}` uses the `git` protocol, " \
           "which transmits data without encryption. Disable this warning with " \
-          "`bundle config git.allow_insecure true`, or switch to the `https` " \
+          "`bundle config set git.allow_insecure true`, or switch to the `https` " \
           "protocol to keep your data secure."
       end
     end

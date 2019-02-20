@@ -293,14 +293,14 @@ RSpec.describe "bundle update" do
       bundle! "config --global frozen 1"
       bundle "update", :all => bundle_update_requires_all?
       expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m).
-        and match(/freeze \nby running `bundle config --delete frozen`./m)
+        and match(/freeze \nby running `bundle config unset frozen`./m)
     end
 
     it "should suggest different command when frozen is set globally", :bundler => "2" do
       bundle! "config --global deployment true"
       bundle "update", :all => bundle_update_requires_all?
       expect(err).to match(/You are trying to install in deployment mode after changing.your Gemfile/m).
-        and match(/freeze \nby running `bundle config --delete deployment`./m)
+        and match(/freeze \nby running `bundle config unset deployment`./m)
     end
   end
 

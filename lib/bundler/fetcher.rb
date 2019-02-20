@@ -44,7 +44,7 @@ module Bundler
         remote_uri = filter_uri(remote_uri)
         super "Authentication is required for #{remote_uri}.\n" \
           "Please supply credentials for this source. You can do this by running:\n" \
-          " bundle config #{remote_uri} username:password"
+          " bundle config set #{remote_uri} username:password"
       end
     end
     # This error is raised if HTTP authentication is provided, but incorrect.
