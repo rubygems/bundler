@@ -521,7 +521,7 @@ RSpec.describe "bundle install with git sources" do
 
       bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
-      expect(err).to match(/cannot use local override/i)
+      expect(err).to match(/Cannot use local override for rack-0.8 at #{Regexp.escape(lib_path('local-rack').to_s)} because :branch is not specified in Gemfile/)
     end
 
     it "does not explode if disable_local_branch_check is given" do
