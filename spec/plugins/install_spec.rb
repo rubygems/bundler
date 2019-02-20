@@ -22,6 +22,18 @@ RSpec.describe "bundler plugin install" do
     plugin_should_be_installed("foo")
   end
 
+  context "plugin is already installed" do
+    before do
+      bundle "plugin install foo --source file://#{gem_repo2}"
+    end
+
+    it "doesn't install plugin again" do
+      bundle "plugin install foo --source file://#{gem_repo2}"
+      expect(out).not_to include("Installing plugin foo")
+      expect(out).not_to include("Installed plugin foo")
+    end
+  end
+
   it "installs multiple plugins" do
     bundle "plugin install foo kung-foo --source file://#{gem_repo2}"
 
@@ -165,7 +177,7 @@ RSpec.describe "bundler plugin install" do
         build_plugin "foo", "1.1.0"
       end
 
-      install_gemfile <<-G
+      gemfile <<-G
         source 'file://#{gem_repo2}'
         plugin 'foo', "1.0"
       G
