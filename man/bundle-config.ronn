@@ -47,7 +47,7 @@ config unset disable_multisource` downgrades this error to a warning.
 
 Flags passed to `bundle install` or the Bundler runtime,
 such as `--path foo` or `--without production`, are not remembered between commands.
-If these options must be remembered,they must be set using `bundle config`
+If these options must be remembered, they must be set using `bundle config`
 (e.g., `bundle config set path foo`).
 
 The options that can be configured are:
