@@ -45,7 +45,12 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
         bundle! "install"
       end
 
-      it "warns when no options are given" do
+      it "does not warn when no options are given", :bundler => "< 2" do
+        bundle! "update"
+        expect(warnings).not_to have_major_deprecation
+      end
+
+      it "warns when no options are given", :bundler => "2" do
         bundle! "update"
         expect(warnings).to have_major_deprecation a_string_including("Pass --all to `bundle update` to update everything")
       end
