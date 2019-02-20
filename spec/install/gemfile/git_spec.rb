@@ -510,7 +510,7 @@ RSpec.describe "bundle install with git sources" do
       expect(err).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
 
       solution = "config unset local.rack"
-      expect(err).to match(/Check `bundle #{solution}` to remove the local override/)
+      expect(err).to match(/Run `bundle #{solution}` to remove the local override/)
 
       bundle solution
       bundle :install
@@ -532,7 +532,7 @@ RSpec.describe "bundle install with git sources" do
       expect(err).to match(/Cannot use local override for rack-0.8 at #{Regexp.escape(lib_path('local-rack').to_s)} because :branch is not specified in Gemfile/)
 
       solution = "config unset local.rack"
-      expect(err).to match(/Specify a branch or use `bundle #{solution}` to remove the local override/)
+      expect(err).to match(/Specify a branch or run `bundle #{solution}` to remove the local override/)
 
       bundle solution
       bundle :install

@@ -124,13 +124,13 @@ module Bundler
 
         unless options["branch"] || Bundler.settings[:disable_local_branch_check]
           raise GitError, "Cannot use local override for #{name} at #{path} because " \
-            ":branch is not specified in Gemfile. Specify a branch or use " \
+            ":branch is not specified in Gemfile. Specify a branch or run " \
             "`bundle config unset local.#{override_for(original_path)}` to remove the local override"
         end
 
         unless path.exist?
           raise GitError, "Cannot use local override for #{name} because #{path} " \
-            "does not exist. Check `bundle config unset local.#{override_for(original_path)}` to remove the local override"
+            "does not exist. Run `bundle config unset local.#{override_for(original_path)}` to remove the local override"
         end
 
         set_local!(path)
