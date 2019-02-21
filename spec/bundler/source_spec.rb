@@ -59,11 +59,6 @@ RSpec.describe Bundler::Source do
           context "with color" do
             before { Bundler.ui = Bundler::UI::Shell.new }
 
-            puts "#" * 30
-            puts "shell: #{Thor::Base.shell.new.inspect}"
-            puts "stdout: #{$stdout.tty?}"
-            puts "#" * 30
-
             it "should return a string with the spec name and version and locked spec version" do
               expect(subject.version_message(spec)).to eq("nokogiri >= 1.6\e[32m (was < 1.5)\e[0m")
             end
