@@ -86,7 +86,6 @@ namespace :spec do
 
       $LOAD_PATH.unshift("./spec")
       require "support/rubygems_ext"
-      Spec::Rubygems::DEPS["codeclimate-test-reporter"] = "~> 0.6.0" if RUBY_VERSION >= "2.2.0"
 
       # Install the other gem deps, etc
       Rake::Task["spec:deps"].invoke

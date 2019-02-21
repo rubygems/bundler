@@ -3,6 +3,9 @@
 # https://help.github.com/articles/ignoring-files and find useful gitignore
 # samples at https://github.com/github/gitignore
 
+# coverage reports
+/coverage/
+
 # files created by running the specs
 /tmp/
 

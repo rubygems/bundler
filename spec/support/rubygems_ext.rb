@@ -18,6 +18,7 @@ module Spec
         "builder" => "~> 3.2",
         # ruby-graphviz is used by the viz tests
         "ruby-graphviz" => nil,
+        "simplecov" => "0.16.1",
       }
     end
 
