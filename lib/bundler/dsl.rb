@@ -304,7 +304,6 @@ module Bundler
         #     "https://github.com/#{repo_name}.git"
         #   end
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        # TODO: 2.0 upgrade this setting to the default
         if Bundler.feature_flag.github_https?
           Bundler::SharedHelpers.major_deprecation 2, "The `github.https` setting will be removed"
           "https://github.com/#{repo_name}.git"
@@ -313,14 +312,12 @@ module Bundler
         end
       end
 
-      # TODO: 2.0 remove this deprecated git source
       git_source(:gist) do |repo_name|
         warn_deprecated_git_source(:gist, '"https://gist.github.com/#{repo_name}.git"')
 
         "https://gist.github.com/#{repo_name}.git"
       end
 
-      # TODO: 2.0 remove this deprecated git source
       git_source(:bitbucket) do |repo_name|
         warn_deprecated_git_source(:bitbucket, <<-'RUBY'.strip)
 user_name, repo_name = repo_name.split("/")
@@ -488,7 +485,6 @@ repo_name ||= user_name
     end
 
     def warn_deprecated_git_source(name, replacement, additional_message = nil)
-      # TODO: 2.0 remove deprecation
       additional_message &&= " #{additional_message}"
       replacement = if replacement.count("\n").zero?
         "{|repo_name| #{replacement} }"
