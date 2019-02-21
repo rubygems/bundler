@@ -28,7 +28,7 @@ RSpec.describe Bundler::Dsl do
     context "github_https feature flag" do
       it "is true when github.https is true" do
         bundle "config set github.https true"
-        expect(Bundler.feature_flag.github_https?).to eq "true"
+        expect(Bundler.feature_flag.github_https?).to eq true
       end
     end
 

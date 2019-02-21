@@ -172,6 +172,7 @@ RSpec.describe "The library itself" do
       forget_cli_options
       gem.coc
       gem.mit
+      github.https
       inline
       lockfile_uses_separate_rubygems_sources
       use_gem_version_promoter_for_major_updates
