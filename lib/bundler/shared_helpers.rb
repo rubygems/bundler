@@ -374,7 +374,7 @@ module Bundler
 
     def prints_major_deprecations?
       require "bundler"
-      return false unless Bundler.settings[:major_deprecations]
+      return false if Bundler.settings[:silence_deprecations]
       require "bundler/deprecate"
       return false if Bundler::Deprecate.skip
       true
