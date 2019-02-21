@@ -38,7 +38,7 @@ module Bundler
     settings_flag(:deployment_means_frozen) { bundler_2_mode? }
     settings_flag(:disable_multisource) { bundler_2_mode? }
     settings_flag(:error_on_stderr) { bundler_2_mode? }
-    settings_flag(:forget_cli_options) { bundler_2_mode? }
+    settings_flag(:forget_cli_options) { bundler_3_mode? }
     settings_flag(:global_path_appends_ruby_scope) { bundler_2_mode? }
     settings_flag(:global_gem_cache) { bundler_2_mode? }
     settings_flag(:init_gems_rb) { bundler_2_mode? }
