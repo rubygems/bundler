@@ -71,7 +71,7 @@ RSpec.describe "major deprecations" do
     end
   end
 
-  context "when bundle is run" do
+  context "when bundle install is run" do
     it "should not warn about gems.rb" do
       create_file "gems.rb", <<-G
         source "file://#{gem_repo1}"
