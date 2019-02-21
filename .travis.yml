@@ -1,9 +1,11 @@
 language: ruby
 dist: xenial
 script: rake spec:travis
-before_script:
+before_install:
   - travis_retry rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
+install:
   - travis_retry rake spec:travis:deps
+after_install:
   - travis_retry rake man:build
   - travis_retry rake spec:rubygems:clone_rubygems_$RGV
 
@@ -48,6 +50,8 @@ env:
 jobs:
   include:
     - rvm: 2.6.1
+      after_install: skip
+      before_script: skip
       script: rake rubocop
       stage: linting
     # Ruby 2.5, Rubygems 2.7
