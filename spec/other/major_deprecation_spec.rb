@@ -5,8 +5,6 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
   let(:warnings_without_version_messages) { warnings.gsub(/#{Spec::Matchers::MAJOR_DEPRECATION}Bundler will only support ruby(gems)? >= .*/, "") }
 
   before do
-    bundle "config set major_deprecations true"
-
     create_file "gems.rb", <<-G
       source "file:#{gem_repo1}"
       ruby #{RUBY_VERSION.dump}
