@@ -117,7 +117,7 @@ module Bundler
         end
 
         unless Bundler.settings[:forget_cli_options] == false
-          Bundler::SharedHelpers.major_deprecation 2,\
+          Bundler::SharedHelpers.major_deprecation 3,\
             "flags passed to commands " \
             "will no longer be automatically remembered. Instead please set flags " \
             "you want remembered between commands using `bundle config set " \

@@ -61,11 +61,6 @@ module Bundler
       end
     end
 
-    def self.deprecated_option(*args, &blk)
-      return if Bundler.feature_flag.forget_cli_options?
-      method_option(*args, &blk)
-    end
-
     check_unknown_options!(:except => [:config, :exec])
     stop_on_unknown_option! :exec
 
@@ -142,7 +137,7 @@ module Bundler
       Gemfile to a gem with a gemspec, the --gemspec option will automatically add each
       dependency listed in the gemspec file to the newly created Gemfile.
     D
-    deprecated_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
+    method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
     def init
       require "bundler/cli/init"
       Init.new(options.dup).run
@@ -188,13 +183,13 @@ module Bundler
 
       If the bundle has already been installed, bundler will tell you so and then exit.
     D
-    deprecated_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
+    method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
-    deprecated_option "clean", :type => :boolean, :banner =>
+    method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
-    deprecated_option "deployment", :type => :boolean, :banner =>
+    method_option "deployment", :type => :boolean, :banner =>
       "Install using defaults tuned for deployment environments"
-    deprecated_option "frozen", :type => :boolean, :banner =>
+    method_option "frozen", :type => :boolean, :banner =>
       "Do not allow the Gemfile.lock to be updated after this install"
     method_option "full-index", :type => :boolean, :banner =>
       "Fall back to using the single-file index of all gems"
@@ -204,32 +199,37 @@ module Bundler
       "Specify the number of jobs to run in parallel"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
-    deprecated_option "no-cache", :type => :boolean, :banner =>
+    method_option "no-cache", :type => :boolean, :banner =>
       "Don't update the existing gem cache."
     method_option "redownload", :type => :boolean, :aliases => "--force", :banner =>
       "Force downloading every gem."
-    deprecated_option "no-prune", :type => :boolean, :banner =>
+    method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
-    deprecated_option "path", :type => :string, :banner =>
+    method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
-    deprecated_option "shebang", :type => :string, :banner =>
+    method_option "shebang", :type => :string, :banner =>
       "Specify a different shebang executable name than the default (usually 'ruby')"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
       "Make a bundle that can work without the Bundler runtime"
-    deprecated_option "system", :type => :boolean, :banner =>
+    method_option "system", :type => :boolean, :banner =>
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policy_keys.join("|")
-    deprecated_option "without", :type => :array, :banner =>
+    method_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
-    deprecated_option "with", :type => :array, :banner =>
+    method_option "with", :type => :array, :banner =>
       "Include gems that are part of the specified named group."
     map "i" => "install"
     def install
       SharedHelpers.major_deprecation(2, "The `--force` option has been renamed to `--redownload`") if ARGV.include?("--force")
+
+      %w[clean deployment frozen no-cache no-prune path shebang system without with].each do |option|
+        remembered_flag_deprecation(option)
+      end
+
       require "bundler/cli/install"
       Bundler.settings.temporary(:no_install => false) do
         Install.new(options.dup).run
@@ -785,6 +785,23 @@ module Bundler
       Bundler.ui.warn "The latest bundler is #{latest}, but you are currently running #{current}.\n#{suggestion}"
     rescue RuntimeError
       nil
+    end
+
+    def remembered_flag_deprecation(name)
+      option = current_command.options[name]
+      flag_name = option.switch_name
+
+      name_index = ARGV.find {|arg| flag_name == arg }
+      return unless name_index
+
+      value = options[name]
+      value = "#{value.join(" ")}" if option.type == :array
+
+      Bundler::SharedHelpers.major_deprecation 2,\
+        "The `#{flag_name}` flag is deprecated because it relied on being " \
+        "remembered accross bundler invokations, which bundler will no longer " \
+        "do in future versions. Instead please use `bundle config #{name} " \
+        "'#{value}'`, and stop using this flag"
     end
   end
 end
