@@ -60,6 +60,10 @@ RSpec.describe Bundler::Source do
             before { Bundler.ui = Bundler::UI::Shell.new }
 
             it "should return a string with the spec name and version and locked spec version" do
+              puts "#" * 30
+              puts "stdout: #{$stdout.inspect}"
+              puts "tty: #{$stdout.tty?}"
+              puts "#" * 30
               expect(subject.version_message(spec)).to eq("nokogiri >= 1.6\e[32m (was < 1.5)\e[0m")
             end
           end

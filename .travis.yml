@@ -7,14 +7,6 @@ before_script:
   - travis_retry rake man:build
   - travis_retry rake spec:rubygems:clone_rubygems_$RGV
 
-branches:
-  only:
-    - master
-    - staging
-    - trying
-    - /.+-dev$/
-    - /.+-stable$/
-
 notifications:
   slack:
     on_success: change
