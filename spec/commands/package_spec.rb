@@ -182,7 +182,7 @@ RSpec.describe "bundle package" do
   end
 
   context "with --all-platforms" do
-    it "puts the gems in vendor/cache even for other rubies", :ruby => "2.1" do
+    it "puts the gems in vendor/cache even for other rubies" do
       gemfile <<-D
         source "file://#{gem_repo1}"
         gem 'rack', :platforms => :ruby_19
