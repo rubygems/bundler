@@ -210,9 +210,6 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
    The number of gems Bundler can install in parallel. Defaults to 1.
 * `list_command` (`BUNDLE_LIST_COMMAND`)
    Enable new list command feature
-* `major_deprecations` (`BUNDLE_MAJOR_DEPRECATIONS`):
-   Whether Bundler should print deprecation warnings for behavior that will
-   be changed in the next major version.
 * `no_install` (`BUNDLE_NO_INSTALL`):
    Whether `bundle package` should skip installing gems.
 * `no_prune` (`BUNDLE_NO_PRUNE`):
@@ -247,6 +244,9 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
 * `shebang` (`BUNDLE_SHEBANG`):
    The program name that should be invoked for generated binstubs. Defaults to
    the ruby install name used to generate the binstub.
+* `silence_deprecations` (`BUNDLE_SILENCE_DEPRECATIONS`):
+   Whether Bundler should silence deprecation warnings for behavior that will
+   be changed in the next major version.
 * `silence_root_warning` (`BUNDLE_SILENCE_ROOT_WARNING`):
    Silence the warning Bundler prints when installing gems as root.
 * `skip_default_git_sources` (`BUNDLE_SKIP_DEFAULT_GIT_SOURCES`):

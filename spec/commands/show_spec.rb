@@ -32,7 +32,7 @@ RSpec.describe "bundle show" do
 
     it "prints deprecation", :bundler => "2" do
       bundle "show rails"
-      expect(err).to eq("[DEPRECATED FOR 2.0] use `bundle info rails` instead of `bundle show rails`")
+      expect(err).to eq("[DEPRECATED] use `bundle info rails` instead of `bundle show rails`")
     end
 
     it "prints path if gem exists in bundle (with --paths option)" do
@@ -42,7 +42,7 @@ RSpec.describe "bundle show" do
 
     it "prints deprecation when called with a gem and the --paths option", :bundler => "2" do
       bundle "show rails --paths"
-      expect(err).to eq("[DEPRECATED FOR 2.0] use `bundle info rails --path` instead of `bundle show rails --paths`")
+      expect(err).to eq("[DEPRECATED] use `bundle info rails --path` instead of `bundle show rails --paths`")
     end
 
     it "warns if path no longer exists on disk" do
@@ -61,7 +61,7 @@ RSpec.describe "bundle show" do
 
     it "prints deprecation when called with bundler", :bundler => "2" do
       bundle "show bundler"
-      expect(err).to eq("[DEPRECATED FOR 2.0] use `bundle info bundler` instead of `bundle show bundler`")
+      expect(err).to eq("[DEPRECATED] use `bundle info bundler` instead of `bundle show bundler`")
     end
     it "complains if gem not in bundle" do
       bundle "show missing"
@@ -82,7 +82,7 @@ RSpec.describe "bundle show" do
     it "prints a deprecation when called with the --paths option", :bundler => 2 do
       bundle "show --paths"
 
-      expect(err).to eq("[DEPRECATED FOR 2.0] use `bundle list` instead of `bundle show --paths`")
+      expect(err).to eq("[DEPRECATED] use `bundle list` instead of `bundle show --paths`")
     end
 
     it "prints summary of gems" do

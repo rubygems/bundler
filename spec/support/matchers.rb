@@ -60,7 +60,7 @@ module Spec
       end
     end
 
-    MAJOR_DEPRECATION = /^\[DEPRECATED FOR 2\.0\]\s*/
+    MAJOR_DEPRECATION = /^\[DEPRECATED\]\s*/
 
     RSpec::Matchers.define :eq_err do |expected|
       diffable
