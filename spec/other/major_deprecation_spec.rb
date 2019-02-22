@@ -33,13 +33,6 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
     end
 
     shared_examples_for "environmental deprecations" do |trigger|
-      describe "ruby version", :ruby => "< 2.0" do
-        it "requires a newer ruby version" do
-          instance_eval(&trigger)
-          expect(warnings).to have_major_deprecation "Bundler will only support ruby >= 2.0, you are running #{RUBY_VERSION}"
-        end
-      end
-
       describe "rubygems version", :rubygems => "< 2.0" do
         it "requires a newer rubygems version" do
           instance_eval(&trigger)
