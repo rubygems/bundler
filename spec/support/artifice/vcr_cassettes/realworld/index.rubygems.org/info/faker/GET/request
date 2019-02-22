@@ -1,7 +1,7 @@
 > GET /info/faker
 > accept-encoding: gzip
 > accept: */*
-> user-agent: bundler/1.15.0.pre.2 rubygems/2.6.11 ruby/2.4.1 (x86_64-apple-darwin16.5.0) command/install options/jobs,spec_run,trampoline_disable,plugins ab677b2f2db78951
+> user-agent: bundler/2.0.0.dev rubygems/3.1.0.pre1 ruby/2.6.1 (x86_64-pc-linux-gnu) command/install options/no_install,jobs,spec_run a258cf11dfed5fa6
 > connection: keep-alive
 > keep-alive: 30
 > host: index.rubygems.org
