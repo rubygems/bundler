@@ -149,7 +149,7 @@ G
       expect(out).to eq("ruby 1.8.7 (rbx 1.2.4)")
     end
 
-    it "handles truffleruby", :rubygems => ">= 2.1.0" do
+    it "handles truffleruby" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         ruby "2.5.1", :engine => 'truffleruby', :engine_version => '1.0.0-rc6'

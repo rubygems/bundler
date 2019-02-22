@@ -224,7 +224,7 @@ RSpec.describe "bundle exec" do
     expect(err).to include("bundler: exec needs a command to run")
   end
 
-  it "raises a helpful error when exec'ing to something outside of the bundle", :ruby_repo, :rubygems => ">= 2.5.2" do
+  it "raises a helpful error when exec'ing to something outside of the bundle", :ruby_repo do
     bundle! "config clean false" # want to keep the rackup binstub
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
@@ -234,20 +234,6 @@ RSpec.describe "bundle exec" do
       bundle! "config disable_exec_load #{l}"
       bundle "exec rackup"
       expect(last_command.stderr).to include "can't find executable rackup for gem rack. rack is not currently included in the bundle, perhaps you meant to add it to your Gemfile?"
-    end
-  end
-
-  # Different error message on old RG versions (before activate_bin_path) because they
-  # called `Kernel#gem` directly
-  it "raises a helpful error when exec'ing to something outside of the bundle", :rubygems => "< 2.5.2" do
-    install_gemfile! <<-G
-      source "file://#{gem_repo1}"
-      gem "with_license"
-    G
-    [true, false].each do |l|
-      bundle! "config disable_exec_load #{l}"
-      bundle "exec rackup"
-      expect(last_command.stderr).to include "rack is not part of the bundle. Add it to your Gemfile."
     end
   end
 
@@ -444,7 +430,7 @@ RSpec.describe "bundle exec" do
   end
 
   describe "with gems bundled via :path with invalid gemspecs", :ruby_repo do
-    it "outputs the gemspec validation errors", :rubygems => ">= 1.7.2" do
+    it "outputs the gemspec validation errors" do
       build_lib "foo"
 
       gemspec = lib_path("foo-1.0").join("foo.gemspec").to_s

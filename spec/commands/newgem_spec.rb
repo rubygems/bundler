@@ -289,7 +289,7 @@ RSpec.describe "bundle gem" do
       it_should_behave_like "git config is absent"
     end
 
-    it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
+    it "sets gemspec metadata['allowed_push_host']" do
       expect(generated_gem.gemspec.metadata["allowed_push_host"]).
         to match(/mygemserver\.com/)
     end
@@ -381,7 +381,7 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
       end
 
-      it "depends on a specific version of rspec", :rubygems => ">= 1.8.1" do
+      it "depends on a specific version of rspec" do
         rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "rspec" }
         expect(rspec_dep).to be_specific
       end
@@ -431,7 +431,7 @@ RSpec.describe "bundle gem" do
         bundle "gem #{gem_name} --test=minitest"
       end
 
-      it "depends on a specific version of minitest", :rubygems => ">= 1.8.1" do
+      it "depends on a specific version of minitest" do
         rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "minitest" }
         expect(rspec_dep).to be_specific
       end

@@ -727,7 +727,7 @@ RSpec.describe "Bundler.setup" do
     expect(out).to be_empty
   end
 
-  it "does not load all gemspecs", :rubygems => ">= 2.3" do
+  it "does not load all gemspecs" do
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
       gem "rack"

@@ -75,7 +75,7 @@ RSpec.shared_examples "bundle install --standalone" do
       G
     end
 
-    it "generates a bundle/bundler/setup.rb with the proper paths", :rubygems => "2.4" do
+    it "generates a bundle/bundler/setup.rb with the proper paths" do
       expected_path = bundled_app("bundle/bundler/setup.rb")
       extension_line = File.read(expected_path).each_line.find {|line| line.include? "/extensions/" }.strip
       expect(extension_line).to start_with '$:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/extensions/'
