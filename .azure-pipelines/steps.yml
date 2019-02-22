@@ -6,8 +6,9 @@ steps:
 
 - script: |
     ruby -v
+    gem -v
     ridk version
-  displayName: 'ruby -v + ridk version'
+  displayName: 'ruby -v + gem -v + ridk version'
 
 - script: |
     mkdir tmp
