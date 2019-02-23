@@ -4,13 +4,6 @@ $:.unshift File.expand_path("..", __FILE__)
 $:.unshift File.expand_path("../../lib", __FILE__)
 
 require "rubygems"
-module Gem
-  if defined?(@path_to_default_spec_map)
-    @path_to_default_spec_map.delete_if do |_path, spec|
-      spec.name == "bundler"
-    end
-  end
-end
 
 begin
   require File.expand_path("../support/path.rb", __FILE__)
