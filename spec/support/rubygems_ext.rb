@@ -47,8 +47,6 @@ module Spec
 
     def self.install_gems(gems)
       reqs, no_reqs = gems.partition {|_, req| !req.nil? && !req.split(" ").empty? }
-      # TODO: remove when we drop ruby 1.8.7-2.2.2 support
-      reqs = reqs.sort_by {|name, _| name == "rack" ? 0 : 1 }.sort_by {|name, _| name =~ /rack/ ? 0 : 1 }
       no_reqs.map!(&:first)
       reqs.map! {|name, req| "'#{name}:#{req}'" }
       deps = reqs.concat(no_reqs).join(" ")
