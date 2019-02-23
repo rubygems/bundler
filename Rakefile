@@ -97,7 +97,6 @@ begin
 
   desc "Run specs"
   RSpec::Core::RakeTask.new
-  task :spec => "man:build"
 
   require "rubocop/rake_task"
   rubocop = RuboCop::RakeTask.new
