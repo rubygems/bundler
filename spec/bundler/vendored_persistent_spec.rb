@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "spec_helper"
 require "bundler/vendored_persistent"
 
 RSpec.describe Bundler::PersistentHTTP do
