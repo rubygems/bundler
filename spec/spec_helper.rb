@@ -3,19 +3,6 @@
 $:.unshift File.expand_path("..", __FILE__)
 $:.unshift File.expand_path("../../lib", __FILE__)
 
-require "rubygems"
-
-begin
-  require File.expand_path("../support/path.rb", __FILE__)
-  spec = Gem::Specification.load(Spec::Path.gemspec.to_s)
-  rspec = spec.dependencies.find {|d| d.name == "rspec" }
-  gem "rspec", rspec.requirement.to_s
-  require "rspec"
-  require "diff/lcs"
-rescue LoadError
-  abort "Run rake spec:deps to install development dependencies"
-end
-
 require "bundler/psyched_yaml"
 require "bundler/vendored_fileutils"
 require "uri"
