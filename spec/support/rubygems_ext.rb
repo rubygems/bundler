@@ -2,6 +2,7 @@
 
 require "rubygems/user_interaction"
 require "support/path"
+require "fileutils"
 
 module Spec
   module Rubygems
