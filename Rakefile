@@ -176,7 +176,7 @@ begin
           puts "RUBYOPT=#{ENV["RUBYOPT"]}"
         end
 
-        task rg => ["man:build", "clone_rubygems_#{rg}"]
+        task rg => ["clone_rubygems_#{rg}"]
         task "rubygems:all" => rg
       end
 
