@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "rubygems/user_interaction"
-require "support/path" unless defined?(Spec::Path)
+require "support/path"
 
 module Spec
   module Rubygems
