@@ -6,10 +6,17 @@ load File.expand_path("../with_rubygems", __FILE__) if ENV["RGV"]
 require "rubygems"
 
 bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
-bundler_spec.dependencies.each do |dep|
-  gem dep.name, dep.requirement
+rspec = bundler_spec.development_dependencies.find do |dep|
+  dep.name == "rspec"
 end
 
-Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
+rspec_requirement = rspec.requirement.to_s
 
-load Gem.bin_path("rspec-core", "rspec")
+begin
+  gem "rspec", rspec_requirement
+  Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
+
+  load Gem.bin_path("rspec-core", "rspec")
+rescue Gem::LoadError
+  warn "We couln't activate rspec (#{rspec_requirement}). Try `gem install rspec:'#{rspec_requirement}'`"
+end
