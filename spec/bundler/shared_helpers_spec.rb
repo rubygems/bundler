@@ -288,7 +288,7 @@ RSpec.describe Bundler::SharedHelpers do
       )
     end
 
-    context "with a jruby path_separator regex", :ruby => "1.9" do
+    context "with a jruby path_separator regex" do
       # In versions of jruby that supported ruby 1.8, the path separator was the standard File::PATH_SEPARATOR
       let(:regex) { Regexp.new("(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):") }
       it "does not exit if bundle path is the standard uri path" do
@@ -455,7 +455,7 @@ RSpec.describe Bundler::SharedHelpers do
       end
     end
 
-    context "system throws Errno::ENOTSUP", :ruby => "1.9" do
+    context "system throws Errno::ENOTSUP" do
       let(:file_op_block) { proc {|_path| raise Errno::ENOTSUP } }
 
       it "raises a OperationNotSupportedError" do

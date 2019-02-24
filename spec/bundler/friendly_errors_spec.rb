@@ -16,7 +16,7 @@ RSpec.describe Bundler, "friendly errors" do
       FileUtils.rm(Gem.configuration.config_file_name)
     end
 
-    it "reports a relevant friendly error message", :ruby => ">= 1.9", :rubygems => "< 2.5.0" do
+    it "reports a relevant friendly error message", :rubygems => "< 2.5.0" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
@@ -31,7 +31,7 @@ RSpec.describe Bundler, "friendly errors" do
       expect(exitstatus).to eq(25) if exitstatus
     end
 
-    it "reports a relevant friendly error message", :ruby => ">= 1.9", :rubygems => ">= 2.5.0" do
+    it "reports a relevant friendly error message", :rubygems => ">= 2.5.0" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"

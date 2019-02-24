@@ -322,7 +322,7 @@ E
       expect(out).to eq("something'")
     end
 
-    it "doesn't return quotes around values", :ruby => "1.9" do
+    it "doesn't return quotes around values" do
       bundle "config set foo '1'"
       run "puts Bundler.settings.send(:global_config_file).read"
       expect(out).to include('"1"')
@@ -330,7 +330,7 @@ E
       expect(out).to eq("1")
     end
 
-    it "doesn't duplicate quotes around values", :if => (RUBY_VERSION >= "2.1") do
+    it "doesn't duplicate quotes around values" do
       bundled_app(".bundle").mkpath
       File.open(bundled_app(".bundle/config"), "w") do |f|
         f.write 'BUNDLE_FOO: "$BUILD_DIR"'

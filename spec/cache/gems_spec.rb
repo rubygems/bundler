@@ -83,7 +83,7 @@ RSpec.describe "bundle cache" do
     it_behaves_like "when there are only gemsources"
   end
 
-  describe "when there is a built-in gem", :ruby => "2.0" do
+  describe "when there is a built-in gem" do
     before :each do
       build_repo2 do
         build_gem "builtin_gem", "1.0.2"
