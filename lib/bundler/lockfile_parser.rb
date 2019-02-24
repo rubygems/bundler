@@ -107,9 +107,9 @@ module Bundler
       when 0
         if current_version < bundler_version
           Bundler.ui.warn "Warning: the running version of Bundler (#{current_version}) is older " \
-               "than the version that created the lockfile (#{bundler_version}). We suggest you " \
-               "upgrade to the latest version of Bundler by running `gem " \
-               "install bundler#{prerelease_text}`.\n"
+               "than the version that created the lockfile (#{bundler_version}). We suggest you to " \
+               "upgrade to the version that created the lockfile by running `gem install " \
+               "bundler:#{bundler_version}#{prerelease_text}`.\n"
         end
       end
     end

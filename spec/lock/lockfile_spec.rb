@@ -180,7 +180,9 @@ RSpec.describe "the lockfile format", :bundler => "2" do
     end
 
     warning_message = "the running version of Bundler (9999999.0.0) is older " \
-                      "than the version that created the lockfile (9999999.1.0)"
+                      "than the version that created the lockfile (9999999.1.0). " \
+                      "We suggest you to upgrade to the version that created the " \
+                      "lockfile by running `gem install bundler:9999999.1.0`."
     expect(last_command.bundler_err).to include warning_message
 
     lockfile_should_be <<-G
