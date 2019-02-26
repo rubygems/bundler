@@ -218,7 +218,11 @@ The :bitbucket git source is deprecated, and will be removed in Bundler 2.0. Add
       bundle! :show
     end
 
-    it "prints a deprecation warning" do
+    it "does not print a deprecation warning", :bundler => "< 2" do
+      expect(warnings).not_to have_major_deprecation
+    end
+
+    it "prints a deprecation warning", :bundler => "2" do
       expect(warnings).to have_major_deprecation a_string_including("use `bundle list` instead of `bundle show`")
     end
   end
