@@ -54,11 +54,11 @@ RSpec.describe "bundle install with gems on multiple sources" do
           gem "rack-obama"
           gem "rack", "1.0.0" # force it to install the working version in repo1
         G
+
+        bundle :install
       end
 
       it "warns about ambiguous gems, but installs anyway", :bundler => "< 2" do
-        bundle :install
-
         expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
         expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
         expect(out).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo1}"))
@@ -244,10 +244,11 @@ RSpec.describe "bundle install with gems on multiple sources" do
                 gem "depends_on_rack"
               end
             G
+
+            bundle :install
           end
 
           it "installs from the other source and warns about ambiguous gems", :bundler => "< 2" do
-            bundle :install
             expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
             expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
             expect(out).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo2}"))
