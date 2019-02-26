@@ -88,7 +88,7 @@ RSpec.describe "when using sudo", :sudo => true do
       expect(the_bundle).to include_gems "rack 1.0"
     end
 
-    it "installs extensions/ compiled by RubyGems 2.2", :rubygems => "2.2" do
+    it "installs extensions/" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "very_simple_binary"

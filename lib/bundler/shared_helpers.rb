@@ -159,13 +159,9 @@ module Bundler
         next if gemfiles.empty?
         break false if gemfiles.size == 1
       end
-      if multiple_gemfiles && Bundler.bundler_major_version == 1
-        Bundler::SharedHelpers.major_deprecation 2, \
-          "gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock."
-      end
-
-      return if Bundler.rubygems.provides?(">= 2")
-      major_deprecation(2, "Bundler will only support rubygems >= 2.0, you are running #{Bundler.rubygems.version}")
+      return unless multiple_gemfiles && Bundler.bundler_major_version == 1
+      Bundler::SharedHelpers.major_deprecation 2, \
+        "gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock."
     end
 
     def trap(signal, override = false, &block)

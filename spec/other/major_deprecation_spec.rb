@@ -2,7 +2,7 @@
 
 RSpec.describe "major deprecations", :bundler => "< 2" do
   let(:warnings) { last_command.bundler_err } # change to err in 2.0
-  let(:warnings_without_version_messages) { warnings.gsub(/#{Spec::Matchers::MAJOR_DEPRECATION}Bundler will only support ruby(gems)? >= .*/, "") }
+  let(:warnings_without_version_messages) { warnings.gsub(/#{Spec::Matchers::MAJOR_DEPRECATION}Bundler will only support ruby >= .*/, "") }
 
   before do
     create_file "gems.rb", <<-G
@@ -30,27 +30,6 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
         bundle "exec ruby -e #{source.dump}"
         expect(warnings).to have_major_deprecation "Bundler.environment has been removed in favor of Bundler.load"
       end
-    end
-
-    shared_examples_for "environmental deprecations" do |trigger|
-      describe "rubygems version", :rubygems => "< 2.0" do
-        it "requires a newer rubygems version" do
-          instance_eval(&trigger)
-          expect(warnings).to have_major_deprecation "Bundler will only support rubygems >= 2.0, you are running #{Gem::VERSION}"
-        end
-      end
-    end
-
-    describe "-rbundler/setup" do
-      it_behaves_like "environmental deprecations", proc { ruby "require 'bundler/setup'" }
-    end
-
-    describe "Bundler.setup" do
-      it_behaves_like "environmental deprecations", proc { ruby "require 'bundler'; Bundler.setup" }
-    end
-
-    describe "bundle check" do
-      it_behaves_like "environmental deprecations", proc { bundle :check }
     end
 
     describe "bundle update --quiet" do

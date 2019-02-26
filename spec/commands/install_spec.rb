@@ -384,7 +384,7 @@ RSpec.describe "bundle install with gem sources" do
       expect(err).not_to include("file://")
     end
 
-    it "fails gracefully when downloading an invalid specification from the full index", :rubygems => "2.5" do
+    it "fails gracefully when downloading an invalid specification from the full index" do
       build_repo2 do
         build_gem "ajp-rails", "0.0.0", :gemspec => false, :skip_validation => true do |s|
           bad_deps = [["ruby-ajp", ">= 0.2.0"], ["rails", ">= 0.14"]]

@@ -226,14 +226,10 @@ RSpec.describe "The library itself" do
           gem_command! :build, gemspec
         end
 
-        if Bundler.rubygems.provides?(">= 2.4")
-          # there's no way around this warning
-          last_command.stderr.sub!(/^YAML safe loading.*/, "")
+        # there's no way around this warning
+        last_command.stderr.sub!(/^YAML safe loading.*/, "")
 
-          # older rubygems have weird warnings, and we won't actually be using them
-          # to build the gem for releases anyways
-          expect(last_command.stderr).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
-        end
+        expect(last_command.stderr).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
       ensure
         # clean up the .gem generated
         FileUtils.rm("bundler-#{Bundler::VERSION}.gem")

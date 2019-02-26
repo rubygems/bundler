@@ -167,7 +167,7 @@ RSpec.describe "bundle install with explicit source paths" do
     expect(the_bundle).to include_gems "premailer 1.0.0"
   end
 
-  it "warns on invalid specs", :rubygems => "1.7" do
+  it "warns on invalid specs" do
     build_lib "foo"
 
     gemspec = lib_path("foo-1.0").join("foo.gemspec").to_s

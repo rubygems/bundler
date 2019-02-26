@@ -863,7 +863,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     E
   end
 
-  describe "checksum validation", :rubygems => ">= 2.3.0" do
+  describe "checksum validation" do
     it "raises when the checksum does not match" do
       install_gemfile <<-G, :artifice => "compact_index_wrong_gem_checksum"
         source "#{source_uri}"

@@ -239,7 +239,7 @@ RSpec.describe "bundle install from an existing gemspec" do
     expect(the_bundle).to include_gems "foo 1.0.0"
   end
 
-  it "does not break Gem.finish_resolve with conflicts", :rubygems => ">= 2" do
+  it "does not break Gem.finish_resolve with conflicts" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.version = "1.0.0"
       s.add_dependency "bar", "= 1.0.0"

@@ -10,14 +10,14 @@ RSpec.describe Bundler::GemInstaller do
   subject { described_class.new(spec, installer) }
 
   context "spec_settings is nil" do
-    it "invokes install method with empty build_args", :rubygems => ">= 2" do
+    it "invokes install method with empty build_args" do
       allow(spec_source).to receive(:install).with(spec, :force => false, :ensure_builtin_gems_cached => false, :build_args => [])
       subject.install_from_spec
     end
   end
 
   context "spec_settings is build option" do
-    it "invokes install method with build_args", :rubygems => ">= 2" do
+    it "invokes install method with build_args" do
       allow(Bundler.settings).to receive(:[]).with(:bin)
       allow(Bundler.settings).to receive(:[]).with(:inline)
       allow(Bundler.settings).to receive(:[]).with(:forget_cli_options)
