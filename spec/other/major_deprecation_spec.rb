@@ -61,7 +61,7 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
     end
 
     describe "bundle install --binstubs" do
-      it "should output a deprecation warning" do
+      xit "should output a deprecation warning" do
         gemfile <<-G
           gem 'rack'
         G
@@ -83,7 +83,7 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
       expect(warnings_without_version_messages).not_to have_major_deprecation
     end
 
-    it "should print a Gemfile deprecation warning" do
+    xit "should print a Gemfile deprecation warning" do
       create_file "gems.rb"
       install_gemfile! <<-G
         source "file://#{gem_repo1}"
@@ -95,7 +95,7 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
     end
 
     context "with flags" do
-      it "should print a deprecation warning about autoremembering flags" do
+      xit "should print a deprecation warning about autoremembering flags" do
         install_gemfile <<-G, :path => "vendor/bundle"
           source "file://#{gem_repo1}"
           gem "rack"
