@@ -90,14 +90,12 @@ namespace :spec do
   end
 end
 
+desc "Run specs"
+task :spec do
+  sh("bin/rspec")
+end
+
 begin
-  rspec = bundler_spec.development_dependencies.find {|d| d.name == "rspec" }
-  gem "rspec", rspec.requirement.to_s
-  require "rspec/core/rake_task"
-
-  desc "Run specs"
-  RSpec::Core::RakeTask.new
-
   require "rubocop/rake_task"
   rubocop = RuboCop::RakeTask.new
   rubocop.options = ["--parallel"]
@@ -143,9 +141,8 @@ begin
       releases = %w[v2.5.2 v2.6.14 v2.7.9 v3.0.3]
       (branches + releases).each do |rg|
         desc "Run specs with RubyGems #{rg}"
-        RSpec::Core::RakeTask.new(rg) do |t|
-          t.rspec_opts = %w[--format progress --color]
-          t.ruby_opts  = %w[-w]
+        task rg do
+          sh("bin/rspec")
         end
 
         # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
@@ -184,9 +181,8 @@ begin
       end
 
       desc "Run specs under a RubyGems checkout (set RG=path)"
-      RSpec::Core::RakeTask.new("co") do |t|
-        t.rspec_opts = %w[--format documentation --color]
-        t.ruby_opts  = %w[-w]
+      task "co" do
+        sh("bin/rspec")
       end
 
       task "setup_co" do
@@ -235,10 +231,6 @@ begin
     end
   end
 rescue LoadError
-  task :spec do
-    abort "Run `rake spec:deps` to be able to run the specs"
-  end
-
   task :rubocop do
     abort "Run `rake spec:deps` to be able to run rubocop"
   end
