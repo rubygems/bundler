@@ -41,7 +41,6 @@ RSpec.describe "major deprecations", :bundler => "< 2" do
 
     describe "bundle update" do
       before do
-        create_file("gems.rb", "")
         bundle! "install"
       end
 
