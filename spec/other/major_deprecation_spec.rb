@@ -2,7 +2,6 @@
 
 RSpec.describe "major deprecations" do
   let(:warnings) { err }
-  let(:warnings_without_version_messages) { warnings.gsub(/#{Spec::Matchers::MAJOR_DEPRECATION}Bundler will only support ruby >= .*/, "") }
 
   before do
     create_file "gems.rb", <<-G
@@ -35,7 +34,7 @@ RSpec.describe "major deprecations" do
     describe "bundle update --quiet" do
       it "does not print any deprecations" do
         bundle :update, :quiet => true
-        expect(warnings_without_version_messages).not_to have_major_deprecation
+        expect(warnings).not_to have_major_deprecation
       end
     end
 
@@ -56,7 +55,7 @@ RSpec.describe "major deprecations" do
 
       it "does not warn when --all is passed" do
         bundle! "update --all"
-        expect(warnings_without_version_messages).not_to have_major_deprecation
+        expect(warnings).not_to have_major_deprecation
       end
     end
 
@@ -80,7 +79,7 @@ RSpec.describe "major deprecations" do
       G
 
       bundle :install
-      expect(warnings_without_version_messages).not_to have_major_deprecation
+      expect(warnings).not_to have_major_deprecation
     end
 
     xit "should print a Gemfile deprecation warning" do
@@ -126,7 +125,7 @@ RSpec.describe "major deprecations" do
         Bundler.setup
       RUBY
 
-      expect(warnings_without_version_messages).to have_major_deprecation("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
+      expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
     end
   end
 
