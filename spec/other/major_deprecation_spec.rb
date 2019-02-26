@@ -213,8 +213,6 @@ The :bitbucket git source is deprecated, and will be removed in Bundler 2.0. Add
 
       bundle! :show
 
-      warnings.gsub!(/gems included.*?\[DEPRECATED/im, "[DEPRECATED")
-
       expect(warnings).to have_major_deprecation a_string_including("use `bundle list` instead of `bundle show`")
     end
   end
