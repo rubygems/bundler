@@ -393,19 +393,19 @@ RSpec.describe Bundler::SourceList do
 
     it "returns all sources, without combining rubygems sources", :bundler => "2" do
       expect(source_list.lock_sources).to eq [
+        Bundler::Source::Git.new("uri" => "git://first-git.org/path.git"),
+        Bundler::Source::Git.new("uri" => "git://second-git.org/path.git"),
+        Bundler::Source::Git.new("uri" => "git://third-git.org/path.git"),
+        ASourcePlugin.new("uri" => "https://second-plugin.org/random"),
+        ASourcePlugin.new("uri" => "https://third-bar.org/foo"),
+        Bundler::Source::Path.new("path" => "/first/path/to/gem"),
+        Bundler::Source::Path.new("path" => "/second/path/to/gem"),
+        Bundler::Source::Path.new("path" => "/third/path/to/gem"),
         Bundler::Source::Rubygems.new,
         Bundler::Source::Rubygems.new("remotes" => ["https://duplicate-rubygems.org"]),
         Bundler::Source::Rubygems.new("remotes" => ["https://first-rubygems.org"]),
         Bundler::Source::Rubygems.new("remotes" => ["https://second-rubygems.org"]),
         Bundler::Source::Rubygems.new("remotes" => ["https://third-rubygems.org"]),
-        Bundler::Source::Git.new("uri" => "git://first-git.org/path.git"),
-        Bundler::Source::Git.new("uri" => "git://second-git.org/path.git"),
-        Bundler::Source::Git.new("uri" => "git://third-git.org/path.git"),
-        Bundler::Source::Path.new("path" => "/first/path/to/gem"),
-        Bundler::Source::Path.new("path" => "/second/path/to/gem"),
-        Bundler::Source::Path.new("path" => "/third/path/to/gem"),
-        ASourcePlugin.new("uri" => "https://second-plugin.org/random"),
-        ASourcePlugin.new("uri" => "https://third-bar.org/foo"),
       ]
     end
   end
