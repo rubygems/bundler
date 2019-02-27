@@ -68,7 +68,7 @@ jobs:
       stage: test
     # 1.x mode (we want to keep stuff passing in 1.x mode for now)
     - rvm: 2.6.1
-      env: RGV=v2.7.8 BUNDLER_SPEC_SUB_VERSION=1.98
+      env: RGV=v3.0.2 BUNDLER_SPEC_SUB_VERSION=1.98
       stage: test
 
   allow_failures:
