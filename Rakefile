@@ -172,8 +172,7 @@ namespace :spec do
         end
 
         puts "Checked out rubygems '#{rg}' at #{hash}"
-        ENV["RUBYOPT"] = "-I#{File.join(RUBYGEMS_REPO, "lib")} #{rubyopt}"
-        puts "RUBYOPT=#{ENV["RUBYOPT"]}"
+        ENV["RGV"] = rg
       end
 
       task rg => ["clone_rubygems_#{rg}"]
