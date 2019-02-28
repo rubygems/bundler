@@ -228,6 +228,10 @@ RSpec.describe "The library itself" do
 
         # there's no way around this warning
         last_command.stderr.sub!(/^YAML safe loading.*/, "")
+        last_command.stderr.sub!("WARNING:  No cert chain found. Please consider signing your gem to improve security.", "")
+        last_command.stderr.sub!("See https://guides.rubygems.org/security for more information.", "")
+        last_command.stderr.sub!("WARNING:  See http://guides.rubygems.org/specification-reference/ for help", "")
+        last_command.stderr.sub!("\n\n", "")
 
         expect(last_command.stderr).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
       ensure
