@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   class Source
     class Path < Source
@@ -35,10 +36,12 @@ module Bundler
       end
 
       def remote!
+        @local_specs = nil
         @allow_remote = true
       end
 
       def cached!
+        @local_specs = nil
         @allow_cached = true
       end
 
@@ -63,7 +66,7 @@ module Bundler
 
       def eql?(other)
         return unless other.class == self.class
-        expand(@original_path) == expand(other.original_path) &&
+        expanded_original_path == other.expanded_original_path &&
           version == other.version
       end
 
@@ -74,14 +77,14 @@ module Bundler
       end
 
       def install(spec, options = {})
-        Bundler.ui.info "Using #{version_message(spec)} from #{self}"
+        print_using_message "Using #{version_message(spec)} from #{self}"
         generate_bin(spec, :disable_extensions => true)
         nil # no post-install message
       end
 
       def cache(spec, custom_path = nil)
         app_cache_path = app_cache_path(custom_path)
-        return unless Bundler.settings[:cache_all]
+        return unless Bundler.feature_flag.cache_all?
         return if expand(@original_path).to_s.index(root_path.to_s + "/") == 0
 
         unless @original_path.exist?
@@ -113,8 +116,8 @@ module Bundler
         Bundler.root
       end
 
-      def is_a_path?
-        instance_of?(Path)
+      def expanded_original_path
+        @expanded_original_path ||= expand(original_path)
       end
 
     private
@@ -144,18 +147,28 @@ module Bundler
         SharedHelpers.in_bundle? && app_cache_path.exist?
       end
 
+      def load_gemspec(file)
+        return unless spec = Bundler.load_gemspec(file)
+        Bundler.rubygems.set_installed_by_version(spec)
+        spec
+      end
+
+      def validate_spec(spec)
+        Bundler.rubygems.validate(spec)
+      end
+
       def load_spec_files
         index = Index.new
 
         if File.directory?(expanded_path)
           # We sort depth-first since `<<` will override the earlier-found specs
           Dir["#{expanded_path}/#{@glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }.each do |file|
-            next unless spec = Bundler.load_gemspec(file)
+            next unless spec = load_gemspec(file)
             spec.source = self
-            Bundler.rubygems.set_installed_by_version(spec)
+
             # Validation causes extension_dir to be calculated, which depends
             # on #source, so we validate here instead of load_gemspec
-            Bundler.rubygems.validate(spec)
+            validate_spec(spec)
             index << spec
           end
 
@@ -214,7 +227,8 @@ module Bundler
           spec,
           :env_shebang => false,
           :disable_extensions => options[:disable_extensions],
-          :build_args => options[:build_args]
+          :build_args => options[:build_args],
+          :bundler_extension_cache_path => extension_cache_path(spec)
         )
         installer.post_install
       rescue Gem::InvalidSpecificationException => e
@@ -228,7 +242,7 @@ module Bundler
                           "to modify their .gemspec so it can work with `gem build`."
         end
 
-        Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
+        Bundler.ui.warn "The validation message from RubyGems was:\n  #{e.message}"
       end
     end
   end

@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+module Bundler
+  VERSION = "1.98".freeze
+end
+
+load File.expand_path("../bundle", __FILE__)

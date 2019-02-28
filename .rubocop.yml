@@ -21,16 +21,31 @@ Lint/EndAlignment:
 Lint/UnusedMethodArgument:
   Enabled: false
 
-# Style
+Lint/ScriptPermission:
+  Exclude:
+    - 'lib/bundler/templates/Executable'
 
-Style/AccessModifierIndentation:
+# Layout
+
+Layout/AccessModifierIndentation:
   EnforcedStyle: outdent
+
+Layout/AlignParameters:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+
+Layout/SpaceInsideBlockBraces:
+  SpaceBeforeBlockParameters: false
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+# Style
 
 Style/Alias:
   EnforcedStyle: prefer_alias_method
-
-Style/AlignParameters:
-  EnforcedStyle: with_fixed_indentation
 
 Style/FrozenStringLiteralComment:
   EnforcedStyle: always
@@ -38,17 +53,11 @@ Style/FrozenStringLiteralComment:
 Style/MultilineBlockChain:
   Enabled: false
 
-Style/MultilineOperationIndentation:
-  EnforcedStyle: indented
-
 Style/PerlBackrefs:
   Enabled: false
 
 Style/SingleLineBlockParams:
   Enabled: false
-
-Style/SpaceInsideBlockBraces:
-  SpaceBeforeBlockParameters: false
 
 Style/TrivialAccessors:
   Enabled: false
@@ -83,9 +92,6 @@ Style/HashSyntax:
 Style/Lambda:
   Enabled: false
 
-Style/DotPosition:
-  EnforcedStyle: trailing
-
 Style/EachWithObject:
   Enabled: false
 
@@ -96,6 +102,9 @@ Style/TrailingCommaInArguments:
   Enabled: false
 
 Performance/FlatMap:
+  Enabled: false
+
+Security/YAMLLoad:
   Enabled: false
 
 # Metrics
@@ -120,6 +129,9 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/ParameterLists:
+  Enabled: false
+
+Metrics/BlockLength:
   Enabled: false
 
 # It will be obvious which code is complex, Rubocop should only lint simple

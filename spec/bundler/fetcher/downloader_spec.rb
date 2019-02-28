@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe Bundler::Fetcher::Downloader do
   let(:connection)     { double(:connection) }
@@ -89,7 +88,17 @@ RSpec.describe Bundler::Fetcher::Downloader do
       let(:http_response) { Net::HTTPNotFound.new("1.1", 404, "Not Found") }
 
       it "should raise a Bundler::Fetcher::FallbackError with Net::HTTPNotFound" do
-        expect { subject.fetch(uri, options, counter) }.to raise_error(Bundler::Fetcher::FallbackError, "Net::HTTPNotFound")
+        expect { subject.fetch(uri, options, counter) }.
+          to raise_error(Bundler::Fetcher::FallbackError, "Net::HTTPNotFound: http://www.uri-to-fetch.com/api/v2/endpoint")
+      end
+
+      context "when the there are credentials provided in the request" do
+        let(:uri) { URI("http://username:password@www.uri-to-fetch.com/api/v2/endpoint") }
+
+        it "should raise a Bundler::Fetcher::FallbackError that doesn't contain the password" do
+          expect { subject.fetch(uri, options, counter) }.
+            to raise_error(Bundler::Fetcher::FallbackError, "Net::HTTPNotFound: http://username@www.uri-to-fetch.com/api/v2/endpoint")
+        end
       end
     end
 
@@ -222,7 +231,7 @@ RSpec.describe Bundler::Fetcher::Downloader do
 
         it "should raise a Bundler::HTTPError" do
           expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
-            "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint")
+            "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint (other error about network)")
         end
 
         context "when the there are credentials provided in the request" do
@@ -233,7 +242,7 @@ RSpec.describe Bundler::Fetcher::Downloader do
 
           it "should raise a Bundler::HTTPError that doesn't contain the password" do
             expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
-              "Network error while fetching http://username@www.uri-to-fetch.com/api/v2/endpoint")
+              "Network error while fetching http://username@www.uri-to-fetch.com/api/v2/endpoint (other error about network)")
           end
         end
       end
@@ -243,7 +252,7 @@ RSpec.describe Bundler::Fetcher::Downloader do
 
         it "should raise a Bundler::Fetcher::HTTPError" do
           expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
-            "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint")
+            "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint (#{message})")
         end
       end
     end

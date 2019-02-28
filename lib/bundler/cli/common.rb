@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   module CLI::Common
     def self.output_post_install_messages(messages)
@@ -14,15 +15,15 @@ module Bundler
     end
 
     def self.output_without_groups_message
-      return unless Bundler.settings.without.any?
+      return if Bundler.settings[:without].empty?
       Bundler.ui.confirm without_groups_message
     end
 
     def self.without_groups_message
-      groups = Bundler.settings.without
+      groups = Bundler.settings[:without]
       group_list = [groups[0...-1].join(", "), groups[-1..-1]].
         reject {|s| s.to_s.empty? }.join(" and ")
-      group_str = (groups.size == 1) ? "group" : "groups"
+      group_str = groups.size == 1 ? "group" : "groups"
       "Gems in the #{group_str} #{group_list} were not installed."
     end
 
@@ -70,17 +71,34 @@ module Bundler
       message
     end
 
+    def self.ensure_all_gems_in_lockfile!(names, locked_gems = Bundler.locked_gems)
+      locked_names = locked_gems.specs.map(&:name).uniq
+      names.-(locked_names).each do |g|
+        raise GemNotFound, gem_not_found_message(g, locked_names)
+      end
+    end
+
     def self.configure_gem_version_promoter(definition, options)
       patch_level = patch_level_options(options)
+      patch_level << :patch if patch_level.empty? && Bundler.settings[:prefer_patch]
       raise InvalidOption, "Provide only one of the following options: #{patch_level.join(", ")}" unless patch_level.length <= 1
+
       definition.gem_version_promoter.tap do |gvp|
         gvp.level = patch_level.first || :major
-        gvp.strict = options[:strict] || options["update-strict"]
+        gvp.strict = options[:strict] || options["update-strict"] || options["filter-strict"]
       end
     end
 
     def self.patch_level_options(options)
       [:major, :minor, :patch].select {|v| options.keys.include?(v.to_s) }
+    end
+
+    def self.clean_after_install?
+      clean = Bundler.settings[:clean]
+      return clean unless clean.nil?
+      clean ||= Bundler.feature_flag.auto_clean_without_path? && Bundler.settings[:path].nil?
+      clean &&= !Bundler.use_system_gems?
+      clean
     end
   end
 end

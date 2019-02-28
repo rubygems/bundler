@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "bundler/shared_helpers"
 require "shellwords"
 
@@ -18,7 +19,7 @@ module Spec
 
     def build_repo1
       build_repo gem_repo1 do
-        build_gem "rack", %w(0.9.1 1.0.0) do |s|
+        build_gem "rack", %w[0.9.1 1.0.0] do |s|
           s.executables = "rackup"
           s.post_install_message = "Rack's post install message"
         end
@@ -39,7 +40,7 @@ module Spec
 
         build_gem "rails", "2.3.2" do |s|
           s.executables = "rails"
-          s.add_dependency "rake",           "10.0.2"
+          s.add_dependency "rake",           "12.3.2"
           s.add_dependency "actionpack",     "2.3.2"
           s.add_dependency "activerecord",   "2.3.2"
           s.add_dependency "actionmailer",   "2.3.2"
@@ -57,7 +58,7 @@ module Spec
         build_gem "activeresource", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activesupport", %w(1.2.3 2.3.2 2.3.5)
+        build_gem "activesupport", %w[1.2.3 2.3.2 2.3.5]
 
         build_gem "activemerchant" do |s|
           s.add_dependency "activesupport", ">= 2.0.0"
@@ -97,6 +98,14 @@ module Spec
         build_gem "platform_specific" do |s|
           s.platform = "x86-mswin32"
           s.write "lib/platform_specific.rb", "PLATFORM_SPECIFIC = '1.0.0 MSWIN'"
+        end
+
+        build_gem "platform_specific" do |s|
+          s.platform = "x86-mingw32"
+        end
+
+        build_gem "platform_specific" do |s|
+          s.platform = "x64-mingw32"
         end
 
         build_gem "platform_specific" do |s|
@@ -181,6 +190,7 @@ module Spec
         end
 
         build_gem "very_simple_binary", &:add_c_extension
+        build_gem "simple_binary", &:add_c_extension
 
         build_gem "bundler", "0.9" do |s|
           s.executables = "bundle"
@@ -200,12 +210,7 @@ module Spec
         # The yard gem iterates over Gem.source_index looking for plugins
         build_gem "yard" do |s|
           s.write "lib/yard.rb", <<-Y
-            if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("1.8.10")
-              specs = Gem::Specification
-            else
-              specs = Gem.source_index.find_name('')
-            end
-            specs.each do |gem|
+            Gem::Specification.sort_by(&:name).each do |gem|
               puts gem.full_name
             end
           Y
@@ -256,7 +261,7 @@ module Spec
         end
 
         # Capistrano did this (at least until version 2.5.10)
-        # Rubygems 2.2 doesn't allow the specifying of a dependency twice
+        # RubyGems 2.2 doesn't allow the specifying of a dependency twice
         # See https://github.com/rubygems/rubygems/commit/03dbac93a3396a80db258d9bc63500333c25bd2f
         build_gem "double_deps", "1.0", :skip_validation => true do |s|
           s.add_dependency "net-ssh", ">= 1.0.0"
@@ -390,7 +395,7 @@ module Spec
       index
     end
 
-    def build_spec(name, version, platform = nil, &block)
+    def build_spec(name, version = "0.0.1", platform = nil, &block)
       Array(version).map do |v|
         Gem::Specification.new do |s|
           s.name     = name
@@ -562,17 +567,24 @@ module Spec
         write "ext/extconf.rb", <<-RUBY
           require "mkmf"
 
+
           # exit 1 unless with_config("simple")
 
-          extension_name = "very_simple_binary_c"
-          dir_config extension_name
+          extension_name = "#{name}_c"
+          if extra_lib_dir = with_config("ext-lib")
+            # add extra libpath if --with-ext-lib is
+            # passed in as a build_arg
+            dir_config extension_name, nil, extra_lib_dir
+          else
+            dir_config extension_name
+          end
           create_makefile extension_name
         RUBY
-        write "ext/very_simple_binary.c", <<-C
+        write "ext/#{name}.c", <<-C
           #include "ruby.h"
 
-          void Init_very_simple_binary_c() {
-            rb_define_module("VerySimpleBinaryInC");
+          void Init_#{name}_c() {
+            rb_define_module("#{Builders.constantize(name)}_IN_C");
           }
         C
       end
@@ -584,7 +596,7 @@ module Spec
           @spec.rubygems_version = options[:rubygems_version]
           def @spec.mark_version; end
 
-          def @spec.validate; end
+          def @spec.validate(*); end
         end
 
         case options[:gemspec]
@@ -636,6 +648,7 @@ module Spec
           `git add *`
           `git config user.email "lol@wut.com"`
           `git config user.name "lolwut"`
+          `git config commit.gpgsign false`
           `git commit -m 'OMG INITIAL COMMIT'`
         end
       end
@@ -659,6 +672,7 @@ module Spec
       def _build(options)
         libpath = options[:path] || _default_path
         update_gemspec = options[:gemspec] || false
+        source = options[:source] || "git@#{libpath}"
 
         Dir.chdir(libpath) do
           silently "git checkout master"
@@ -684,7 +698,7 @@ module Spec
           _default_files.keys.each do |path|
             _default_files[path] += "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
-          super(options.merge(:path => libpath, :gemspec => update_gemspec))
+          super(options.merge(:path => libpath, :gemspec => update_gemspec, :source => source))
           `git add *`
           `git commit -m "BUMP"`
         end
@@ -716,18 +730,21 @@ module Spec
     class GemBuilder < LibBuilder
       def _build(opts)
         lib_path = super(opts.merge(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default]))
+        destination = opts[:path] || _default_path
         Dir.chdir(lib_path) do
-          destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)
 
           @spec.authors = ["that guy"] if !@spec.authors || @spec.authors.empty?
 
           Bundler.rubygems.build(@spec, opts[:skip_validation])
-          if opts[:to_system]
-            `gem install --ignore-dependencies --no-ri --no-rdoc #{@spec.full_name}.gem`
-          else
-            FileUtils.mv("#{@spec.full_name}.gem", opts[:path] || _default_path)
-          end
+        end
+        gem_path = File.expand_path("#{@spec.full_name}.gem", lib_path)
+        if opts[:to_system]
+          @context.system_gems gem_path, :keep_path => true
+        elsif opts[:to_bundle]
+          @context.system_gems gem_path, :path => :bundle_path, :keep_path => true
+        else
+          FileUtils.mv(gem_path, destination)
         end
       end
 

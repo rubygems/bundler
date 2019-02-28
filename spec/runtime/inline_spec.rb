@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundler/inline#gemfile" do
   def script(code, options = {})
@@ -44,17 +43,14 @@ RSpec.describe "bundler/inline#gemfile" do
     build_lib "eight", "1.0.0" do |s|
       s.write "lib/eight.rb", "puts 'eight'"
     end
-
-    build_lib "four", "1.0.0" do |s|
-      s.write "lib/four.rb", "puts 'four'"
-    end
   end
 
   it "requires the gems" do
     script <<-RUBY
       gemfile do
-        path "#{lib_path}"
-        gem "two"
+        path "#{lib_path}" do
+          gem "two"
+        end
       end
     RUBY
 
@@ -63,14 +59,15 @@ RSpec.describe "bundler/inline#gemfile" do
 
     script <<-RUBY
       gemfile do
-        path "#{lib_path}"
-        gem "eleven"
+        path "#{lib_path}" do
+          gem "eleven"
+        end
       end
 
       puts "success"
     RUBY
 
-    expect(err).to include "Could not find gem 'eleven'"
+    expect(last_command.stderr).to include "Could not find gem 'eleven'"
     expect(out).not_to include "success"
 
     script <<-RUBY
@@ -93,7 +90,7 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(out).to include("Installing activesupport")
     err.gsub! %r{.*lib/sinatra/base\.rb:\d+: warning: constant ::Fixnum is deprecated$}, ""
     err.strip!
-    expect(err).to lack_errors
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -111,8 +108,21 @@ RSpec.describe "bundler/inline#gemfile" do
       end
     RUBY
 
-    expect(out).to eq("CONFIRMED!")
+    expect(out).to eq("CONFIRMED!\nCONFIRMED!")
     expect(exitstatus).to be_zero if exitstatus
+  end
+
+  it "has an option for quiet installation" do
+    script <<-RUBY, :artifice => "endpoint"
+      require 'bundler'
+
+      gemfile(true, :quiet => true) do
+        source "https://notaserver.com"
+        gem "activesupport", :require => true
+      end
+    RUBY
+
+    expect(out).to be_empty
   end
 
   it "raises an exception if passed unknown arguments" do
@@ -124,7 +134,7 @@ RSpec.describe "bundler/inline#gemfile" do
 
       puts "success"
     RUBY
-    expect(err).to include "Unknown options: arglebargle"
+    expect(last_command.stderr).to include "Unknown options: arglebargle"
     expect(out).not_to include "success"
   end
 
@@ -133,8 +143,9 @@ RSpec.describe "bundler/inline#gemfile" do
       require 'bundler'
       options = { :ui => Bundler::UI::Shell.new }
       gemfile(false, options) do
-        path "#{lib_path}"
-        gem "two"
+        path "#{lib_path}" do
+          gem "two"
+        end
       end
       puts "OKAY" if options.key?(:ui)
     RUBY
@@ -154,7 +165,7 @@ RSpec.describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to eq("1.0.0")
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -172,7 +183,7 @@ RSpec.describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to eq("1.0.0\n2.0.0")
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -192,7 +203,7 @@ RSpec.describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to eq("two\nfour")
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -229,7 +240,7 @@ RSpec.describe "bundler/inline#gemfile" do
       RUBY
     end
 
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end
 
@@ -247,7 +258,22 @@ RSpec.describe "bundler/inline#gemfile" do
       RUBY
     end
 
-    expect(err).to be_empty
+    expect(last_command.stderr).to be_empty
     expect(exitstatus).to be_zero if exitstatus
+  end
+
+  it "installs inline gems when BUNDLE_BIN is set" do
+    ENV["BUNDLE_BIN"] = "/usr/local/bundle/bin"
+
+    script <<-RUBY
+      gemfile do
+        source "file://#{gem_repo1}"
+        gem "rack" # has the rackup executable
+      end
+
+      puts RACK
+    RUBY
+    expect(last_command).to be_success
+    expect(last_command.stdout).to eq "1.0.0"
   end
 end

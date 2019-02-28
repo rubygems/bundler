@@ -1,14 +1,14 @@
 # frozen_string_literal: true
-require "spec_helper"
+
 require "thread"
 
-RSpec.describe "fetching dependencies with a mirrored source", :realworld => true, :rubygems => ">= 2.0" do
+RSpec.describe "fetching dependencies with a mirrored source", :realworld => true do
   let(:mirror) { "https://server.example.org" }
   let(:original) { "http://127.0.0.1:#{@port}" }
 
   before do
     setup_server
-    bundle "config --local mirror.#{mirror} #{original}"
+    bundle "config set --local mirror.#{mirror} #{original}"
   end
 
   after do
@@ -23,7 +23,7 @@ RSpec.describe "fetching dependencies with a mirrored source", :realworld => tru
       gem 'weakling'
     G
 
-    bundle :install
+    bundle :install, :artifice => nil
 
     expect(out).to include("Installing weakling")
     expect(out).to include("Bundle complete")

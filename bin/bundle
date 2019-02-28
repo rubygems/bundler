@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "rubygems"
+bundler_gemspec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
+bundler_gemspec.instance_variable_set(:@full_gem_path, File.expand_path("../..", __FILE__))
+bundler_gemspec.activate if bundler_gemspec.respond_to?(:activate)
+load File.expand_path("../../exe/bundle", __FILE__)

@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+
 class LessThanProc < Proc
   attr_accessor :present
 
   def self.with(present)
     provided = Gem::Version.new(present.dup)
     new do |required|
-      if required =~ /[=><~]/
+      if required.is_a?(String) && required =~ /[=><~]/
         !Gem::Requirement.new(required).satisfied_by?(provided)
       else
         provided < Gem::Version.new(required)

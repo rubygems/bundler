@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle install" do
   context "with gem sources" do
@@ -128,7 +127,7 @@ RSpec.describe "bundle install" do
         gem "rack"
       G
 
-      bundle "config ignore_messages.rack true"
+      bundle "config set ignore_messages.rack true"
 
       bundle :install
       expect(out).not_to include("Post-install message")
@@ -142,7 +141,7 @@ RSpec.describe "bundle install" do
         gem "rack"
       G
 
-      bundle "config ignore_messages true"
+      bundle "config set ignore_messages true"
 
       bundle :install
       expect(out).not_to include("Post-install message")

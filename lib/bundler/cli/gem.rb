@@ -1,7 +1,13 @@
 # frozen_string_literal: true
+
 require "pathname"
 
 module Bundler
+  class CLI
+    Bundler.require_thor_actions
+    include Thor::Actions
+  end
+
   class CLI::Gem
     TEST_FRAMEWORK_VERSIONS = {
       "rspec" => "3.0",
@@ -13,7 +19,10 @@ module Bundler
     def initialize(options, gem_name, thor)
       @options = options
       @gem_name = resolve_name(gem_name)
+
       @thor = thor
+      thor.behavior = :invoke
+      thor.destination_root = nil
 
       @name = @gem_name
       @target = SharedHelpers.pwd.join(gem_name)
@@ -29,9 +38,11 @@ module Bundler
       constant_name = name.gsub(/-[_-]*(?![_-]|$)/) { "::" }.gsub(/([_-]+|(::)|^)(.|$)/) { $2.to_s + $3.upcase }
       constant_array = constant_name.split("::")
 
-      git_author_name = `git config user.name`.chomp
-      github_username = `git config github.user`.chomp
-      git_user_email = `git config user.email`.chomp
+      git_installed = Bundler.git_present?
+
+      git_author_name = git_installed ? `git config user.name`.chomp : ""
+      github_username = git_installed ? `git config github.user`.chomp : ""
+      git_user_email = git_installed ? `git config user.email`.chomp : ""
 
       config = {
         :name             => name,
@@ -52,7 +63,6 @@ module Bundler
 
       templates = {
         "Gemfile.tt" => "Gemfile",
-        "gitignore.tt" => ".gitignore",
         "lib/newgem.rb.tt" => "lib/#{namespaced_path}.rb",
         "lib/newgem/version.rb.tt" => "lib/#{namespaced_path}/version.rb",
         "newgem.gemspec.tt" => "#{name}.gemspec",
@@ -62,16 +72,18 @@ module Bundler
         "bin/setup.tt" => "bin/setup"
       }
 
-      executables = %w(
+      executables = %w[
         bin/console
         bin/setup
-      )
+      ]
+
+      templates.merge!("gitignore.tt" => ".gitignore") if Bundler.git_present?
 
       if test_framework = ask_and_set_test_framework
         config[:test] = test_framework
         config[:test_framework_version] = TEST_FRAMEWORK_VERSIONS[test_framework]
 
-        templates.merge!(".travis.yml.tt" => ".travis.yml")
+        templates.merge!("travis.yml.tt" => ".travis.yml")
 
         case test_framework
         when "rspec"
@@ -93,7 +105,7 @@ module Bundler
       if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
         "This means that any other developer or company will be legally allowed to use your code " \
         "for free as long as they admit you created it. You can read more about the MIT license " \
-        "at http://choosealicense.com/licenses/mit.")
+        "at https://choosealicense.com/licenses/mit.")
         config[:mit] = true
         Bundler.ui.info "MIT License enabled in config"
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
@@ -106,7 +118,7 @@ module Bundler
         "of enforcing it, so be sure that you are prepared to do that. Be sure that your email " \
         "address is specified as a contact in the generated code of conduct so that people know " \
         "who to contact in case of a violation. For suggestions about " \
-        "how to enforce codes of conduct, see http://bit.ly/coc-enforcement.")
+        "how to enforce codes of conduct, see https://bit.ly/coc-enforcement.")
         config[:coc] = true
         Bundler.ui.info "Code of conduct enabled in config"
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
@@ -130,19 +142,25 @@ module Bundler
       end
 
       executables.each do |file|
-        path = target.join(file)
-        executable = (path.stat.mode | 0o111)
-        path.chmod(executable)
+        SharedHelpers.filesystem_access(target.join(file)) do |path|
+          executable = (path.stat.mode | 0o111)
+          path.chmod(executable)
+        end
       end
 
-      Bundler.ui.info "Initializing git repo in #{target}"
-      Dir.chdir(target) do
-        `git init`
-        `git add .`
+      if Bundler.git_present?
+        Bundler.ui.info "Initializing git repo in #{target}"
+        Dir.chdir(target) do
+          `git init`
+          `git add .`
+        end
       end
 
       # Open gemspec in editor
       open_editor(options["edit"], target.join("#{name}.gemspec")) if options[:edit]
+
+      Bundler.ui.info "Gem '#{name}' was successfully created. " \
+        "For more information on making a RubyGem visit https://bundler.io/guides/creating_gem.html"
     rescue Errno::EEXIST => e
       raise GenericSystemCallError.new(e, "There was a conflict while creating the new gem.")
     end

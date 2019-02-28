@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe Bundler::Fetcher::CompactIndex do
   let(:downloader)  { double(:downloader) }
@@ -45,8 +44,18 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
         end
       end
 
-      context "when OpenSSL is FIPS-enabled", :ruby => ">= 2.0.0" do
-        before { stub_const("OpenSSL::OPENSSL_FIPS", true) }
+      context "when OpenSSL is FIPS-enabled" do
+        def remove_cached_md5_availability
+          return unless Bundler::SharedHelpers.instance_variable_defined?(:@md5_available)
+          Bundler::SharedHelpers.remove_instance_variable(:@md5_available)
+        end
+
+        before do
+          remove_cached_md5_availability
+          stub_const("OpenSSL::OPENSSL_FIPS", true)
+        end
+
+        after { remove_cached_md5_availability }
 
         context "when FIPS-mode is active" do
           before do

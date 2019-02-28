@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle outdated" do
   before :each do
@@ -136,6 +135,17 @@ RSpec.describe "bundle outdated" do
       expect(out).to include("activesupport")
       expect(out).to include("duradura")
     end
+
+    it "returns a sorted list of outdated gems from one group => 'test'" do
+      test_group_option("test", 2)
+
+      expect(out).not_to include("===== Group default =====")
+      expect(out).not_to include("terranova (")
+
+      expect(out).to include("===== Group development, test =====")
+      expect(out).to include("activesupport")
+      expect(out).to include("duradura")
+    end
   end
 
   describe "with --groups option" do
@@ -187,6 +197,23 @@ RSpec.describe "bundle outdated" do
   end
 
   describe "with --local option" do
+    it "uses local cache to return a list of outdated gems" do
+      update_repo2 do
+        build_gem "activesupport", "2.3.4"
+      end
+
+      bundle! "config clean false"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", "2.3.4"
+      G
+
+      bundle "outdated --local"
+
+      expect(out).to include("activesupport (newest 2.3.5, installed 2.3.4, requested = 2.3.4)")
+    end
+
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)
 
@@ -286,14 +313,15 @@ RSpec.describe "bundle outdated" do
     end
   end
 
-  describe "with --strict option" do
+  filter_strict_option = Bundler.feature_flag.bundler_2_mode? ? :"filter-strict" : :strict
+  describe "with --#{filter_strict_option} option" do
     it "only reports gems that have a newer version that matches the specified dependency version requirements" do
       update_repo2 do
         build_gem "activesupport", "3.0"
         build_gem "weakling", "0.0.5"
       end
 
-      bundle "outdated --strict"
+      bundle :outdated, filter_strict_option => true
 
       expect(out).to_not include("activesupport (newest")
       expect(out).to include("(newest 0.0.5, installed 0.0.3, requested ~> 0.0.1)")
@@ -305,7 +333,7 @@ RSpec.describe "bundle outdated" do
         gem "rack_middleware", "1.0"
       G
 
-      bundle "outdated --strict"
+      bundle :outdated, filter_strict_option => true
 
       expect(out).to_not include("rack (1.2")
     end
@@ -319,11 +347,11 @@ RSpec.describe "bundle outdated" do
         G
 
         update_repo2 do
-          build_gem "activesupport", %w(2.4.0 3.0.0)
+          build_gem "activesupport", %w[2.4.0 3.0.0]
           build_gem "weakling", "0.0.5"
         end
 
-        bundle "outdated --strict --filter-patch"
+        bundle :outdated, filter_strict_option => true, "filter-patch" => true
 
         expect(out).to_not include("activesupport (newest")
         expect(out).to include("(newest 0.0.5, installed 0.0.3")
@@ -337,11 +365,11 @@ RSpec.describe "bundle outdated" do
         G
 
         update_repo2 do
-          build_gem "activesupport", %w(2.3.9)
+          build_gem "activesupport", %w[2.3.9]
           build_gem "weakling", "0.1.5"
         end
 
-        bundle "outdated --strict --filter-minor"
+        bundle :outdated, filter_strict_option => true, "filter-minor" => true
 
         expect(out).to_not include("activesupport (newest")
         expect(out).to include("(newest 0.1.5, installed 0.0.3")
@@ -355,11 +383,11 @@ RSpec.describe "bundle outdated" do
         G
 
         update_repo2 do
-          build_gem "activesupport", %w(2.4.0 2.5.0)
+          build_gem "activesupport", %w[2.4.0 2.5.0]
           build_gem "weakling", "1.1.5"
         end
 
-        bundle "outdated --strict --filter-major"
+        bundle :outdated, filter_strict_option => true, "filter-major" => true
 
         expect(out).to_not include("activesupport (newest")
         expect(out).to include("(newest 1.1.5, installed 0.0.3")
@@ -370,7 +398,7 @@ RSpec.describe "bundle outdated" do
   describe "with invalid gem name" do
     it "returns could not find gem name" do
       bundle "outdated invalid_gem_name"
-      expect(out).to include("Could not find gem 'invalid_gem_name'.")
+      expect(err).to include("Could not find gem 'invalid_gem_name'.")
     end
 
     it "returns non-zero exit code" do
@@ -391,9 +419,9 @@ RSpec.describe "bundle outdated" do
     expect(out).to include("Installing foo 1.0")
   end
 
-  context "after bundle install --deployment" do
+  context "after bundle install --deployment", :bundler => "< 2" do
     before do
-      install_gemfile <<-G, :deployment => true
+      install_gemfile <<-G, forgotten_command_line_options(:deployment => true)
         source "file://#{gem_repo2}"
 
         gem "rack"
@@ -405,11 +433,34 @@ RSpec.describe "bundle outdated" do
       update_repo2 { build_gem "activesupport", "3.0" }
 
       bundle "outdated"
-      expect(exitstatus).to_not be_zero if exitstatus
-      expect(out).to include("You are trying to check outdated gems in deployment mode.")
-      expect(out).to include("Run `bundle outdated` elsewhere.")
-      expect(out).to include("If this is a development machine, remove the ")
-      expect(out).to include("Gemfile freeze\nby running `bundle install --no-deployment`.")
+      expect(last_command).to be_failure
+      expect(err).to include("You are trying to check outdated gems in deployment mode.")
+      expect(err).to include("Run `bundle outdated` elsewhere.")
+      expect(err).to include("If this is a development machine, remove the ")
+      expect(err).to include("Gemfile freeze\nby running `bundle install --no-deployment`.")
+    end
+  end
+
+  context "after bundle config set deployment true" do
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "rack"
+        gem "foo"
+      G
+      bundle! "config set deployment true"
+    end
+
+    it "outputs a helpful message about being in deployment mode" do
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "outdated"
+      expect(last_command).to be_failure
+      expect(err).to include("You are trying to check outdated gems in deployment mode.")
+      expect(err).to include("Run `bundle outdated` elsewhere.")
+      expect(err).to include("If this is a development machine, remove the ")
+      expect(err).to include("Gemfile freeze\nby running `bundle config unset deployment`.")
     end
   end
 
@@ -471,6 +522,21 @@ RSpec.describe "bundle outdated" do
       end
     end
 
+    it_behaves_like "version update is detected"
+  end
+
+  context "when on a new machine" do
+    before do
+      simulate_new_machine
+
+      update_git "foo", :path => lib_path("foo")
+      update_repo2 do
+        build_gem "activesupport", "3.3.5"
+        build_gem "weakling", "0.8.0"
+      end
+    end
+
+    subject { bundle "outdated" }
     it_behaves_like "version update is detected"
   end
 
@@ -599,9 +665,9 @@ RSpec.describe "bundle outdated" do
     context "without update-strict" do
       before do
         build_repo4 do
-          build_gem "patch", %w(1.0.0 1.0.1)
-          build_gem "minor", %w(1.0.0 1.0.1 1.1.0)
-          build_gem "major", %w(1.0.0 1.0.1 1.1.0 2.0.0)
+          build_gem "patch", %w[1.0.0 1.0.1]
+          build_gem "minor", %w[1.0.0 1.0.1 1.1.0]
+          build_gem "major", %w[1.0.0 1.0.1 1.1.0 2.0.0]
         end
 
         # establish a lockfile set to 1.0.0
@@ -659,17 +725,17 @@ RSpec.describe "bundle outdated" do
     context "with update-strict" do
       before do
         build_repo4 do
-          build_gem "foo", %w(1.4.3 1.4.4) do |s|
+          build_gem "foo", %w[1.4.3 1.4.4] do |s|
             s.add_dependency "bar", "~> 2.0"
           end
-          build_gem "foo", %w(1.4.5 1.5.0) do |s|
+          build_gem "foo", %w[1.4.5 1.5.0] do |s|
             s.add_dependency "bar", "~> 2.1"
           end
-          build_gem "foo", %w(1.5.1) do |s|
+          build_gem "foo", %w[1.5.1] do |s|
             s.add_dependency "bar", "~> 3.0"
           end
-          build_gem "bar", %w(2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0)
-          build_gem "qux", %w(1.0.0 1.1.0 2.0.0)
+          build_gem "bar", %w[2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0]
+          build_gem "qux", %w[1.0.0 1.1.0 2.0.0]
         end
 
         # establish a lockfile set to 1.4.3
@@ -696,6 +762,33 @@ RSpec.describe "bundle outdated" do
         expect(out).to include("bar (newest 2.0.5")
         expect(out).not_to include("qux (newest")
       end
+    end
+  end
+
+  describe "with --only-explicit" do
+    it "does not report outdated dependent gems" do
+      build_repo4 do
+        build_gem "weakling", %w[0.2 0.3] do |s|
+          s.add_dependency "bar", "~> 2.1"
+        end
+        build_gem "bar", %w[2.1 2.2]
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem 'weakling', '0.2'
+        gem 'bar', '2.1'
+      G
+
+      gemfile  <<-G
+        source "file://#{gem_repo4}"
+        gem 'weakling'
+      G
+
+      bundle "outdated --only-explicit"
+
+      expect(out).to include("weakling (newest 0.3")
+      expect(out).not_to include("bar (newest 2.2")
     end
   end
 end

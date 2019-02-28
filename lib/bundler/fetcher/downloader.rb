@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   class Fetcher
     class Downloader
@@ -10,10 +11,10 @@ module Bundler
         @redirect_limit = redirect_limit
       end
 
-      def fetch(uri, options = {}, counter = 0)
+      def fetch(uri, headers = {}, counter = 0)
         raise HTTPError, "Too many redirects" if counter >= redirect_limit
 
-        response = request(uri, options)
+        response = request(uri, headers)
         Bundler.ui.debug("HTTP #{response.code} #{response.message} #{uri}")
 
         case response
@@ -25,23 +26,28 @@ module Bundler
             new_uri.user = uri.user
             new_uri.password = uri.password
           end
-          fetch(new_uri, options, counter + 1)
+          fetch(new_uri, headers, counter + 1)
+        when Net::HTTPRequestedRangeNotSatisfiable
+          new_headers = headers.dup
+          new_headers.delete("Range")
+          new_headers["Accept-Encoding"] = "gzip"
+          fetch(uri, new_headers)
         when Net::HTTPRequestEntityTooLarge
           raise FallbackError, response.body
         when Net::HTTPUnauthorized
           raise AuthenticationRequiredError, uri.host
         when Net::HTTPNotFound
-          raise FallbackError, "Net::HTTPNotFound"
+          raise FallbackError, "Net::HTTPNotFound: #{URICredentialsFilter.credential_filtered_uri(uri)}"
         else
           raise HTTPError, "#{response.class}#{": #{response.body}" unless response.body.empty?}"
         end
       end
 
-      def request(uri, options)
+      def request(uri, headers)
         validate_uri_scheme!(uri)
 
         Bundler.ui.debug "HTTP GET #{uri}"
-        req = Net::HTTP::Get.new uri.request_uri, options
+        req = Net::HTTP::Get.new uri.request_uri, headers
         if uri.user
           user = CGI.unescape(uri.user)
           password = uri.password ? CGI.unescape(uri.password) : nil
@@ -58,9 +64,10 @@ module Bundler
         case e.message
         when /host down:/, /getaddrinfo: nodename nor servname provided/
           raise NetworkDownError, "Could not reach host #{uri.host}. Check your network " \
-          "connection and try again."
+            "connection and try again."
         else
-          raise HTTPError, "Network error while fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+          raise HTTPError, "Network error while fetching #{URICredentialsFilter.credential_filtered_uri(uri)}" \
+            " (#{e})"
         end
       end
 

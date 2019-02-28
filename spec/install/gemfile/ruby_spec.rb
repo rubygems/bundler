@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "ruby requirement" do
   def locked_ruby_version
@@ -104,6 +103,6 @@ RSpec.describe "ruby requirement" do
       gem "rack"
     G
 
-    expect(out).to include("There was an error parsing") # i.e. DSL error, not error template
+    expect(err).to include("There was an error parsing") # i.e. DSL error, not error template
   end
 end

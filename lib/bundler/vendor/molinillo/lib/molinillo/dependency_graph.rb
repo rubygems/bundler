@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'set'
 require 'tsort'
 
@@ -132,7 +133,8 @@ module Bundler::Molinillo
       vertices.each do |name, vertex|
         other_vertex = other.vertex_named(name)
         return false unless other_vertex
-        return false unless other_vertex.successors.map(&:name).to_set == vertex.successors.map(&:name).to_set
+        return false unless vertex.payload == other_vertex.payload
+        return false unless other_vertex.successors.to_set == vertex.successors.to_set
       end
     end
 
@@ -146,8 +148,8 @@ module Bundler::Molinillo
       vertex = add_vertex(name, payload, root)
       vertex.explicit_requirements << requirement if root
       parent_names.each do |parent_name|
-        parent_node = vertex_named(parent_name)
-        add_edge(parent_node, vertex, requirement)
+        parent_vertex = vertex_named(parent_name)
+        add_edge(parent_vertex, vertex, requirement)
       end
       vertex
     end

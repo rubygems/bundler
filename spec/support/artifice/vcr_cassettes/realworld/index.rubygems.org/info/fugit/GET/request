@@ -1,0 +1,7 @@
+> GET /info/fugit
+> accept-encoding: gzip
+> accept: */*
+> user-agent: bundler/2.0.0.dev rubygems/3.1.0.pre1 ruby/2.6.1 (x86_64-pc-linux-gnu) command/install options/retry,no_install,path,spec_run 4001db3dbc9e7104
+> connection: keep-alive
+> keep-alive: 30
+> host: index.rubygems.org

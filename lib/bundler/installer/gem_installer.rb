@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   class GemInstaller
     attr_reader :spec, :standalone, :worker, :force, :installer
@@ -20,7 +21,7 @@ module Bundler
       raise
     rescue Errno::ENOSPC
       return false, out_of_space_message
-    rescue => e
+    rescue StandardError => e
       return false, specific_failure_message(e)
     end
 
@@ -43,7 +44,14 @@ module Bundler
     end
 
     def gem_install_message
-      "Make sure that `gem install #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      source = spec.source
+      return unless source.respond_to?(:remotes)
+
+      if source.remotes.size == 1
+        "Make sure that `gem install #{spec.name} -v '#{spec.version}' --source '#{source.remotes.first}'` succeeds before bundling."
+      else
+        "Make sure that `gem install #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      end
     end
 
     def spec_settings
@@ -65,6 +73,8 @@ module Bundler
     end
 
     def generate_executable_stubs
+      return if Bundler.feature_flag.forget_cli_options?
+      return if Bundler.settings[:inline]
       if Bundler.settings[:bin] && standalone
         installer.generate_standalone_bundler_executable_stubs(spec)
       elsif Bundler.settings[:bin]

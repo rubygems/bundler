@@ -1,7 +1,8 @@
 [![Version     ](https://img.shields.io/gem/v/bundler.svg?style=flat)](https://rubygems.org/gems/bundler)
 [![Build Status](https://img.shields.io/travis/bundler/bundler/master.svg?style=flat)](https://travis-ci.org/bundler/bundler)
-[![Code Climate](https://img.shields.io/codeclimate/github/bundler/bundler.svg?style=flat)](https://codeclimate.com/github/bundler/bundler)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability/bundler/bundler.svg?style=flat)](https://codeclimate.com/github/bundler/bundler)
 [![Inline docs ](http://inch-ci.org/github/bundler/bundler.svg?style=flat)](http://inch-ci.org/github/bundler/bundler)
+[![Slack       ](http://bundler-slackin.herokuapp.com/badge.svg)](http://bundler-slackin.herokuapp.com)
 
 # Bundler: a gem to bundle gems
 
@@ -11,33 +12,30 @@ It does this by managing the gems that the application depends on. Given a list 
 
 ### Installation and usage
 
-To install:
+To install (or update to the latest version):
 
 ```
 gem install bundler
 ```
 
-Bundler is most commonly used to manage your application's dependencies. To use it for this:
+To install a prerelease version (if one is available), run `gem install bundler --pre`. To uninstall Bundler, run `gem uninstall bundler`.
+
+Bundler is most commonly used to manage your application's dependencies. For example, these commands will allow you to use Bundler to manage the `rspec` gem for your application:
 
 ```
 bundle init
-echo 'gem "rspec"' >> Gemfile
+bundle add rspec
 bundle install
 bundle exec rspec
 ```
 
-See [bundler.io](http://bundler.io) for the full documentation.
+See [bundler.io](https://bundler.io) for the full documentation.
 
 ### Troubleshooting
 
 For help with common problems, see [TROUBLESHOOTING](doc/TROUBLESHOOTING.md).
 
 Still stuck? Try [filing an issue](doc/contributing/ISSUES.md).
-
-### Supporting
-
-<a href="https://rubytogether.org/"><img src="https://rubytogether.org/images/rubies.svg" width=200></a><br/>
-Bundler is maintained by <a href="https://rubytogether.org/">Ruby Together</a>, a grassroots initiative committed to supporting the critical Ruby infrastructure you rely on. Contribute today <a href="https://rubytogether.org/developers">as an individual</a> or even better, <a href="https://rubytogether.org/companies">as a company</a>, and ensure that Bundler, RubyGems, and other shared tooling is around for years to come.
 
 ### Other questions
 
@@ -47,8 +45,21 @@ To get in touch with the Bundler core team and other Bundler users, please see [
 
 ### Contributing
 
-If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [our documentation section](doc/README.md).
+If you'd like to contribute to Bundler, that's awesome, and we <3 you. We've put together [the Bundler contributor guide](https://github.com/bundler/bundler/blob/master/doc/contributing/README.md) with all of the information you need to get started.
+
+If you'd like to request a substantial change to Bundler or to the Bundler documentation, refer to the [Bundler RFC process](https://github.com/bundler/rfcs) for more information.
+
+While some Bundler contributors are compensated by Ruby Together, the project maintainers make decisions independent of Ruby Together. As a project, we welcome contributions regardless of the author’s affiliation with Ruby Together.
+
+### Supporting
+
+<a href="https://rubytogether.org/"><img src="https://rubytogether.org/images/rubies.svg" width="150"></a><br>
+<a href="https://rubytogether.org/">Ruby Together</a> pays some Bundler maintainers for their ongoing work. As a grassroots initiative committed to supporting the critical Ruby infrastructure you rely on, Ruby Together is funded entirely by the Ruby community. Contribute today <a href="https://rubytogether.org/developers">as an individual</a> or (better yet) <a href="https://rubytogether.org/companies">as a company</a> to ensure that Bundler, RubyGems, and other shared tooling is around for years to come.
 
 ### Code of Conduct
 
 Everyone interacting in the Bundler project’s codebases, issue trackers, chat rooms, and mailing lists is expected to follow the [Bundler code of conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md).
+
+### License
+
+Bundler is available under an [MIT License](https://github.com/bundler/bundler/blob/master/LICENSE.md).

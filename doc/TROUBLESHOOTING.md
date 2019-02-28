@@ -9,11 +9,11 @@ Certain operating systems such as MacOS and Ubuntu have versions of Ruby that re
     ERROR:  While executing gem ... (Gem::FilePermissionError)
       You don't have write permissions for the /Library/Ruby/Gems/2.0.0 directory.
 
-There are multiple ways to solve this issue. You can install bundler with elevated privilges using `sudo` or `su`.
+There are multiple ways to solve this issue. You can install bundler with elevated privileges using `sudo` or `su`.
 
     sudo gem install bundler
 
-If you cannot elevated your privileges or do not want to globally install Bundler, you can use the `--user-install` option.
+If you cannot elevate your privileges or do not want to globally install Bundler, you can use the `--user-install` option.
 
     gem install bundler --user-install
 
@@ -25,10 +25,10 @@ Please open a ticket with [Heroku](https://www.heroku.com) if you're having trou
 
 ## Other problems
 
-First, figure out exactly what it is that you're trying to do (see [XY Problem](http://xyproblem.info/)). Then, go to the [Bundler documentation website](http://bundler.io) and see if we have instructions on how to do that.
+First, figure out exactly what it is that you're trying to do (see [XY Problem](http://xyproblem.info/)). Then, go to the [Bundler documentation website](https://bundler.io) and see if we have instructions on how to do that.
 
 Second, check [the compatibility
-list](http://bundler.io/compatibility.html), and make sure that the version of Bundler that you are using works with the versions of Ruby and Rubygems that you are using. To see your versions:
+list](https://bundler.io/compatibility.html), and make sure that the version of Bundler that you are using works with the versions of Ruby and RubyGems that you are using. To see your versions:
 
     # Bundler version
     bundle -v
@@ -36,10 +36,13 @@ list](http://bundler.io/compatibility.html), and make sure that the version of B
     # Ruby version
     ruby -v
 
-    # Rubygems version
+    # RubyGems version
     gem -v
 
 If these instructions don't work, or you can't find any appropriate instructions, you can try these troubleshooting steps:
+
+    # Update to the latest version of bundler
+    gem install bundler
 
     # Remove user-specific gems and git repos
     rm -rf ~/.bundle/ ~/.gem/bundler/ ~/.gems/cache/bundler/

@@ -8,11 +8,11 @@ bundle-exec(1) -- Execute a command in the context of the bundle
 ## DESCRIPTION
 
 This command executes the command, making all gems specified in the
-`Gemfile(5)` available to `require` in Ruby programs.
+[`Gemfile(5)`][Gemfile(5)] available to `require` in Ruby programs.
 
 Essentially, if you would normally have run something like
 `rspec spec/my_spec.rb`, and you want to use the gems specified
-in the `Gemfile(5)` and installed via [bundle install(1)][bundle-install], you
+in the [`Gemfile(5)`][Gemfile(5)] and installed via [bundle install(1)](bundle-install.1.html), you
 should run `bundle exec rspec spec/my_spec.rb`.
 
 Note that `bundle exec` does not require that an executable is
@@ -27,7 +27,7 @@ available on your shell's `$PATH`.
 
 ## BUNDLE INSTALL --BINSTUBS
 
-If you use the `--binstubs` flag in [bundle install(1)][bundle-install], Bundler will
+If you use the `--binstubs` flag in [bundle install(1)](bundle-install.1.html), Bundler will
 automatically create a directory (which defaults to `app_root/bin`)
 containing all of the executables available from gems in the bundle.
 
@@ -62,6 +62,13 @@ It also modifies Rubygems:
 * Override `Gem.bin_path` to use the gems in the bundle,
   making system executables work
 * Add all gems in the bundle into Gem.loaded_specs
+
+Finally, `bundle exec` also implicitly modifies `Gemfile.lock` if the lockfile
+and the Gemfile do not match. Bundler needs the Gemfile to determine things
+such as a gem's groups, `autorequire`, and platforms, etc., and that
+information isn't stored in the lockfile. The Gemfile and lockfile must be
+synced in order to `bundle exec` successfully, so `bundle exec`
+updates the lockfile beforehand.
 
 ### Loading
 

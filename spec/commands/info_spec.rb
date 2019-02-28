@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle info" do
   context "info from specific gem in gemfile" do
@@ -21,11 +20,11 @@ RSpec.describe "bundle info" do
     context "given a gem that is not installed" do
       it "prints missing gem error" do
         bundle "info foo"
-        expect(out).to eq "Could not find gem 'foo'."
+        expect(err).to eq "Could not find gem 'foo'."
       end
     end
 
-    context "given a default gem shippped in ruby" do
+    context "given a default gem shippped in ruby", :ruby_repo do
       it "prints information about the default gem", :if => (RUBY_VERSION >= "2.0") do
         bundle "info rdoc"
         expect(out).to include("* rdoc")

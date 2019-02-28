@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+
 require "bundler/current_ruby"
 
 module Bundler
   class CLI::Exec
     attr_reader :options, :args, :cmd
 
-    RESERVED_SIGNALS = %w(SEGV BUS ILL FPE VTALRM KILL STOP).freeze
+    TRAPPED_SIGNALS = %w[INT].freeze
 
     def initialize(options, args)
       @options = options
@@ -69,15 +70,14 @@ module Bundler
       ui = Bundler.ui
       Bundler.ui = nil
       require "bundler/setup"
-      signals = Signal.list.keys - RESERVED_SIGNALS
-      signals.each {|s| trap(s, "DEFAULT") }
+      TRAPPED_SIGNALS.each {|s| trap(s, "DEFAULT") }
       Kernel.load(file)
-    rescue SystemExit
+    rescue SystemExit, SignalException
       raise
     rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = ui
       Bundler.ui.error "bundler: failed to load command: #{cmd} (#{file})"
-      backtrace = e.backtrace.take_while {|bt| !bt.start_with?(__FILE__) }
+      backtrace = e.backtrace ? e.backtrace.take_while {|bt| !bt.start_with?(__FILE__) } : []
       abort "#{e.class}: #{e.message}\n  #{backtrace.join("\n  ")}"
     end
 
@@ -89,6 +89,7 @@ module Bundler
       possibilities = [
         "#!/usr/bin/env ruby\n",
         "#!/usr/bin/env jruby\n",
+        "#!/usr/bin/env truffleruby\n",
         "#!#{Gem.ruby}\n",
       ]
 

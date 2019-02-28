@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bundler
   # General purpose class for retrying code that may fail
   class Retry
@@ -34,7 +35,7 @@ module Bundler
   private
 
     def run(&block)
-      @failed      = false
+      @failed = false
       @current_run += 1
       @result = block.call
     rescue => e

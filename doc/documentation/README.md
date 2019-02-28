@@ -5,9 +5,9 @@ Code needs explanation, and sometimes those who know the code well have trouble 
 Currently, Bundler has two main sources of documentation:
 
 1. built-in `help` (including usage information and man pages)
-2. [Bundler documentation site](http://bundler.io)
+2. [Bundler documentation site](https://bundler.io)
 
-If you have a suggestion or proposed change for [bundler.io](http://bundler.io), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
+If you have a suggestion or proposed change for [bundler.io](https://bundler.io), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
 Not sure where to write documentation? In general, follow these guidelines:
 
@@ -16,14 +16,16 @@ Not sure where to write documentation? In general, follow these guidelines:
 
 If you are unsure where to begin, ping [@feministy](https://github.com/feministy) or [@indirect](https://github.com/indirect) in the Bundler Slack ([get an invite here](../contributing/GETTING_HELP.md)).
 
-## [Writing docs for man pages)](WRITING.md)
+## [Writing docs for man pages](WRITING.md)
 
-If you’d like to submit a patch to the man pages, you're in the right place! Details on editing and previewing changes to man pages can be found here.
+If you’d like to submit a patch to the man pages, you're in the right place! Details on editing and previewing changes to man pages can be found [here](WRITING.md).
 
 ## [Documentation vision](VISION.md)
 
-Just like Bundler, we have a grand plan (really, a wish list of sorts) for Bundler documentation. Preview our hopes and dreams for our documentation here.
+Just like Bundler, we have a grand plan (really, a wish list of sorts) for Bundler documentation. Preview our hopes and dreams for our documentation [here](VISION.md).
 
 ## Translations
 
 We don't currently have any translations, but please reach out to us if you would like to help get this going.
+
+Please feel free to reach out to [@arbonap](https://github.com/arbonap) if you'd like to help localize Bundler in Spanish.

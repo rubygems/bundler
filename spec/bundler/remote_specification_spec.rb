@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe Bundler::RemoteSpecification do
   let(:name)         { "foo" }
@@ -129,7 +128,7 @@ RSpec.describe Bundler::RemoteSpecification do
 
   describe "#__swap__" do
     let(:spec) { double(:spec, :dependencies => []) }
-    let(:new_spec) { double(:new_spec, :runtime_dependencies => []) }
+    let(:new_spec) { double(:new_spec, :dependencies => [], :runtime_dependencies => []) }
 
     before { subject.instance_variable_set(:@_remote_specification, spec) }
 

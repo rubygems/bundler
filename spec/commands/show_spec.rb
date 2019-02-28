@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle show" do
   context "with a standard Gemfile" do
@@ -31,34 +30,59 @@ RSpec.describe "bundle show" do
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
+    it "prints deprecation", :bundler => "2" do
+      bundle "show rails"
+      expect(err).to eq("[DEPRECATED] use `bundle info rails` instead of `bundle show rails`")
+    end
+
+    it "prints path if gem exists in bundle (with --paths option)" do
+      bundle "show rails --paths"
+      expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
+    end
+
+    it "prints deprecation when called with a gem and the --paths option", :bundler => "2" do
+      bundle "show rails --paths"
+      expect(err).to eq("[DEPRECATED] use `bundle info rails --path` instead of `bundle show rails --paths`")
+    end
+
     it "warns if path no longer exists on disk" do
-      FileUtils.rm_rf("#{system_gem_path}/gems/rails-2.3.2")
+      FileUtils.rm_rf(default_bundle_path("gems", "rails-2.3.2"))
 
       bundle "show rails"
 
-      expect(out).to match(/has been deleted/i)
-      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
+      expect(err).to match(/has been deleted/i)
+      expect(err).to match(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
     it "prints the path to the running bundler" do
       bundle "show bundler"
-      expect(out).to eq(File.expand_path("../../../", __FILE__))
+      expect(out).to eq(root.to_s)
     end
 
+    it "prints deprecation when called with bundler", :bundler => "2" do
+      bundle "show bundler"
+      expect(err).to eq("[DEPRECATED] use `bundle info bundler` instead of `bundle show bundler`")
+    end
     it "complains if gem not in bundle" do
       bundle "show missing"
-      expect(out).to match(/could not find gem 'missing'/i)
+      expect(err).to match(/could not find gem 'missing'/i)
     end
 
     it "prints path of all gems in bundle sorted by name" do
       bundle "show --paths"
 
-      expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
+      expect(out).to include(default_bundle_path("gems", "rake-12.3.2").to_s)
       expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
 
       # Gem names are the last component of their path.
       gem_list = out.split.map {|p| p.split("/").last }
       expect(gem_list).to eq(gem_list.sort)
+    end
+
+    it "prints a deprecation when called with the --paths option", :bundler => 2 do
+      bundle "show --paths"
+
+      expect(err).to eq("[DEPRECATED] use `bundle list` instead of `bundle show --paths`")
     end
 
     it "prints summary of gems" do
@@ -111,7 +135,7 @@ RSpec.describe "bundle show" do
       expect(out).to include("foo (1.0 #{sha[0..6]})")
     end
 
-    it "handles when a version is a '-' prerelease", :rubygems => "2.1" do
+    it "handles when a version is a '-' prerelease" do
       @git = build_git("foo", "1.0.0-beta.1", :path => lib_path("foo"))
       install_gemfile <<-G
         gem "foo", "1.0.0-beta.1", :git => "#{lib_path("foo")}"
@@ -133,7 +157,7 @@ RSpec.describe "bundle show" do
 
     it "does not output git errors" do
       bundle :show
-      expect(err).to lack_errors
+      expect(last_command.stderr).to eq_err("")
     end
   end
 
@@ -143,7 +167,7 @@ RSpec.describe "bundle show" do
       gem "foo"
     G
 
-    bundle "config auto_install 1"
+    bundle "config set auto_install 1"
     bundle :show
     expect(out).to include("Installing foo 1.0")
   end
@@ -158,7 +182,7 @@ RSpec.describe "bundle show" do
       invalid_regexp = "[]"
 
       bundle "show #{invalid_regexp}"
-      expect(out).to include("Could not find gem '#{invalid_regexp}'.")
+      expect(err).to include("Could not find gem '#{invalid_regexp}'.")
     end
   end
 

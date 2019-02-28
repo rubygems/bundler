@@ -1,9 +1,10 @@
 # frozen_string_literal: true
+
 require "shellwords"
 require "tempfile"
 module Bundler
   class Source
-    class Git < Path
+    class Git
       class GitNotInstalledError < GitError
         def initialize
           msg = String.new
@@ -62,7 +63,7 @@ module Bundler
           begin
             @revision ||= find_local_revision
           rescue GitCommandError
-            raise MissingGitRevisionError.new(ref, uri)
+            raise MissingGitRevisionError.new(ref, URICredentialsFilter.credential_filtered_uri(uri))
           end
 
           @revision
@@ -90,18 +91,21 @@ module Bundler
         end
 
         def checkout
-          if path.exist?
-            return if has_revision_cached?
-            Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
-            in_path do
-              git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*")
-            end
-          else
-            Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+          return if path.exist? && has_revision_cached?
+          extra_ref = "#{Shellwords.shellescape(ref)}:#{Shellwords.shellescape(ref)}" if ref && ref.start_with?("refs/")
+
+          Bundler.ui.info "Fetching #{URICredentialsFilter.credential_filtered_uri(uri)}"
+
+          unless path.exist?
             SharedHelpers.filesystem_access(path.dirname) do |p|
               FileUtils.mkdir_p(p)
             end
             git_retry %(clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet)
+            return unless extra_ref
+          end
+
+          in_path do
+            git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*" #{extra_ref})
           end
         end
 
@@ -127,12 +131,17 @@ module Bundler
           # method 2
           SharedHelpers.chdir(destination) do
             git_retry %(fetch --force --quiet --tags "#{path}")
-            git "reset --hard #{@revision}"
+
+            begin
+              git "reset --hard #{@revision}"
+            rescue GitCommandError
+              raise MissingGitRevisionError.new(@revision, URICredentialsFilter.credential_filtered_uri(uri))
+            end
 
             if submodules
               git_retry "submodule update --init --recursive"
             elsif Gem::Version.create(version) >= Gem::Version.create("2.9.0")
-              git_retry "submodule deinit --all"
+              git_retry "submodule deinit --all --force"
             end
           end
         end
@@ -149,7 +158,7 @@ module Bundler
         end
 
         def git_retry(command)
-          Bundler::Retry.new("`git #{command}`", GitNotAllowedError).attempts do
+          Bundler::Retry.new("`git #{URICredentialsFilter.credential_filtered_string(command, uri)}`", GitNotAllowedError).attempts do
             git(command)
           end
         end
@@ -217,6 +226,7 @@ module Bundler
 
         def in_path(&blk)
           checkout unless path.exist?
+          _ = URICredentialsFilter # load it before we chdir
           SharedHelpers.chdir(path, &blk)
         end
 
@@ -243,7 +253,7 @@ module Bundler
           ensure
             STDERR.reopen backup_stderr
           end
-          $stderr.puts URICredentialsFilter.credential_filtered_string(captured_err, uri) if uri && !captured_err.empty?
+          Bundler.ui.warn URICredentialsFilter.credential_filtered_string(captured_err, uri) if uri && !captured_err.empty?
           return_value
         end
       end

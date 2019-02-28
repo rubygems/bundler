@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe Bundler::SharedHelpers do
   let(:ext_lock_double) { double(:ext_lock) }
@@ -29,6 +28,16 @@ RSpec.describe Bundler::SharedHelpers do
         expect { subject.default_gemfile }.to raise_error(
           Bundler::GemfileNotFound, "Could not locate Gemfile"
         )
+      end
+    end
+
+    context "Gemfile is not an absolute path" do
+      before { ENV["BUNDLE_GEMFILE"] = "Gemfile" }
+
+      let(:expected_gemfile_path) { Pathname.new("Gemfile").expand_path }
+
+      it "returns the Gemfile path" do
+        expect(subject.default_gemfile).to eq(expected_gemfile_path)
       end
     end
   end
@@ -102,7 +111,7 @@ RSpec.describe Bundler::SharedHelpers do
       context "currently in directory with a Gemfile" do
         before { File.new("Gemfile", "w") }
 
-        it "returns path of the bundle gemfile" do
+        it "returns path of the bundle Gemfile" do
           expect(subject.in_bundle?).to eq("#{bundled_app}/Gemfile")
         end
       end
@@ -252,6 +261,62 @@ RSpec.describe Bundler::SharedHelpers do
       subject.set_bundle_environment
     end
 
+    it "ignores if bundler_ruby_lib is same as rubylibdir" do
+      allow(Bundler::SharedHelpers).to receive(:bundler_ruby_lib).and_return(RbConfig::CONFIG["rubylibdir"])
+
+      subject.set_bundle_environment
+
+      paths = (ENV["RUBYLIB"]).split(File::PATH_SEPARATOR)
+      expect(paths.count(RbConfig::CONFIG["rubylibdir"])).to eq(0)
+    end
+
+    it "exits if bundle path contains the unix-like path separator" do
+      if Gem.respond_to?(:path_separator)
+        allow(Gem).to receive(:path_separator).and_return(":")
+      else
+        stub_const("File::PATH_SEPARATOR", ":".freeze)
+      end
+      allow(Bundler).to receive(:bundle_path) { Pathname.new("so:me/dir/bin") }
+      expect { subject.send(:validate_bundle_path) }.to raise_error(
+        Bundler::PathError,
+        "Your bundle path contains text matching \":\", which is the " \
+        "path separator for your system. Bundler cannot " \
+        "function correctly when the Bundle path contains the " \
+        "system's PATH separator. Please change your " \
+        "bundle path to not match \":\".\nYour current bundle " \
+        "path is '#{Bundler.bundle_path}'."
+      )
+    end
+
+    context "with a jruby path_separator regex" do
+      # In versions of jruby that supported ruby 1.8, the path separator was the standard File::PATH_SEPARATOR
+      let(:regex) { Regexp.new("(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):") }
+      it "does not exit if bundle path is the standard uri path" do
+        allow(Bundler.rubygems).to receive(:path_separator).and_return(regex)
+        allow(Bundler).to receive(:bundle_path) { Pathname.new("uri:classloader:/WEB-INF/gems") }
+        expect { subject.send(:validate_bundle_path) }.not_to raise_error
+      end
+
+      it "exits if bundle path contains another directory" do
+        allow(Bundler.rubygems).to receive(:path_separator).and_return(regex)
+        allow(Bundler).to receive(:bundle_path) {
+          Pathname.new("uri:classloader:/WEB-INF/gems:other/dir")
+        }
+
+        expect { subject.send(:validate_bundle_path) }.to raise_error(
+          Bundler::PathError,
+          "Your bundle path contains text matching " \
+          "/(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/, which is the " \
+          "path separator for your system. Bundler cannot " \
+          "function correctly when the Bundle path contains the " \
+          "system's PATH separator. Please change your " \
+          "bundle path to not match " \
+          "/(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/." \
+          "\nYour current bundle path is '#{Bundler.bundle_path}'."
+        )
+      end
+    end
+
     context "ENV['PATH'] does not exist" do
       before { ENV.delete("PATH") }
 
@@ -322,6 +387,17 @@ RSpec.describe Bundler::SharedHelpers do
       it_behaves_like "ENV['RUBYLIB'] gets set correctly"
     end
 
+    context "bundle executable in ENV['BUNDLE_BIN_PATH'] does not exist" do
+      before { ENV["BUNDLE_BIN_PATH"] = "/does/not/exist" }
+      before { Bundler.rubygems.replace_bin_path [], [] }
+
+      it "sets BUNDLE_BIN_PATH to the bundle executable file" do
+        subject.set_bundle_environment
+        bundle_exe = ruby_core? ? "../../../../exe/bundle" : "../../../exe/bundle"
+        expect(ENV["BUNDLE_BIN_PATH"]).to eq(File.expand_path(bundle_exe, __FILE__))
+      end
+    end
+
     context "ENV['RUBYLIB'] already contains the bundler's ruby version lib path" do
       let(:ruby_lib_path) { "stubbed_ruby_lib_dir" }
 
@@ -379,7 +455,7 @@ RSpec.describe Bundler::SharedHelpers do
       end
     end
 
-    context "system throws Errno::ENOTSUP", :ruby => "1.9" do
+    context "system throws Errno::ENOTSUP" do
       let(:file_op_block) { proc {|_path| raise Errno::ENOTSUP } }
 
       it "raises a OperationNotSupportedError" do

@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "spec_helper"
+
 require "bundler/ssl_certs/certificate_manager"
 
 RSpec.describe Bundler::SSLCerts::CertificateManager do
@@ -11,13 +11,18 @@ RSpec.describe Bundler::SSLCerts::CertificateManager do
 
   # Pretend bundler root is rubygems root
   before do
+    # Backing up rubygems certificates
+    FileUtils.mv(rubygems_certs_dir, rubygems_certs_dir + ".back") if ruby_core?
+
     FileUtils.mkdir_p(rubygems_certs_dir)
     FileUtils.touch(stub_cert)
   end
 
   after do
-    rubygems_dir = File.join(root.to_s, "lib", "rubygems")
-    FileUtils.rm_rf(rubygems_dir)
+    FileUtils.rm_rf(rubygems_certs_dir)
+
+    # Restore rubygems certificates
+    FileUtils.mv(rubygems_certs_dir + ".back", rubygems_certs_dir) if ruby_core?
   end
 
   describe "#update_from" do
@@ -72,17 +77,17 @@ RSpec.describe Bundler::SSLCerts::CertificateManager do
     context "when certificate manager is not up to date" do
       before do
         allow(subject).to receive(:up_to_date?).and_return(false)
-        allow(FileUtils).to receive(:rm)
-        allow(FileUtils).to receive(:cp)
+        allow(bundler_fileutils).to receive(:rm)
+        allow(bundler_fileutils).to receive(:cp)
       end
 
       it "should remove the current bundler certs" do
-        expect(FileUtils).to receive(:rm).with(subject.bundler_certs)
+        expect(bundler_fileutils).to receive(:rm).with(subject.bundler_certs)
         subject.update!
       end
 
       it "should copy the rubygems certs into bundler certs" do
-        expect(FileUtils).to receive(:cp).with(subject.rubygems_certs, subject.bundler_cert_path)
+        expect(bundler_fileutils).to receive(:cp).with(subject.rubygems_certs, subject.bundler_cert_path)
         subject.update!
       end
 

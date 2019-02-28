@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "rubygems/dependency"
 require "bundler/shared_helpers"
 require "bundler/rubygems_ext"
@@ -6,8 +7,7 @@ require "bundler/rubygems_ext"
 module Bundler
   class Dependency < Gem::Dependency
     attr_reader :autorequire
-    attr_reader :groups
-    attr_reader :platforms
+    attr_reader :groups, :platforms, :gemfile
 
     PLATFORM_MAP = {
       :ruby     => Gem::Platform::RUBY,
@@ -29,6 +29,7 @@ module Bundler
       :mri_24   => Gem::Platform::RUBY,
       :mri_25   => Gem::Platform::RUBY,
       :rbx      => Gem::Platform::RUBY,
+      :truffleruby => Gem::Platform::RUBY,
       :jruby    => Gem::Platform::JAVA,
       :jruby_18 => Gem::Platform::JAVA,
       :jruby_19 => Gem::Platform::JAVA,
@@ -86,20 +87,19 @@ module Bundler
       @platforms      = Array(options["platforms"])
       @env            = options["env"]
       @should_include = options.fetch("should_include", true)
+      @gemfile        = options["gemfile"]
 
       @autorequire = Array(options["require"] || []) if options.key?("require")
     end
 
+    # Returns the platforms this dependency is valid for, in the same order as
+    # passed in the `valid_platforms` parameter
     def gem_platforms(valid_platforms)
       return valid_platforms if @platforms.empty?
 
-      platforms = []
-      @platforms.each do |p|
-        platform = PLATFORM_MAP[p]
-        next unless valid_platforms.include?(platform)
-        platforms |= [platform]
-      end
-      platforms
+      @gem_platforms ||= @platforms.map {|pl| PLATFORM_MAP[pl] }.compact.uniq
+
+      valid_platforms & @gem_platforms
     end
 
     def should_include?

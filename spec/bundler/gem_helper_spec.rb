@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "spec_helper"
+
 require "rake"
 require "bundler/gem_helper"
 
@@ -29,15 +29,6 @@ RSpec.describe Bundler::GemHelper do
     end
 
     context "interpolates the name" do
-      before do
-        # Remove exception that prevents public pushes on older RubyGems versions
-        if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
-          content = File.read(app_gemspec_path)
-          content.sub!(/raise "RubyGems 2\.0 or newer.*/, "")
-          File.open(app_gemspec_path, "w") {|f| f.write(content) }
-        end
-      end
-
       it "when there is only one gemspec" do
         expect(subject.gemspec.name).to eq(app_name)
       end
@@ -72,20 +63,13 @@ RSpec.describe Bundler::GemHelper do
     let(:app_version) { "0.1.0" }
     let(:app_gem_dir) { app_path.join("pkg") }
     let(:app_gem_path) { app_gem_dir.join("#{app_name}-#{app_version}.gem") }
-    let(:app_gemspec_content) { remove_push_guard(File.read(app_gemspec_path)) }
+    let(:app_gemspec_content) { File.read(app_gemspec_path) }
 
     before(:each) do
       content = app_gemspec_content.gsub("TODO: ", "")
       content.sub!(/homepage\s+= ".*"/, 'homepage = ""')
+      content.gsub!(/spec\.metadata.+\n/, "")
       File.open(app_gemspec_path, "w") {|file| file << content }
-    end
-
-    def remove_push_guard(gemspec_content)
-      # Remove exception that prevents public pushes on older RubyGems versions
-      if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
-        gemspec_content.sub!(/raise "RubyGems 2\.0 or newer.*/, "")
-      end
-      gemspec_content
     end
 
     it "uses a shell UI for output" do
@@ -105,8 +89,8 @@ RSpec.describe Bundler::GemHelper do
 
       context "defines Rake tasks" do
         let(:task_names) do
-          %w(build install release release:guard_clean
-             release:source_control_push release:rubygem_push)
+          %w[build install release release:guard_clean
+             release:source_control_push release:rubygem_push]
         end
 
         context "before installation" do
@@ -197,6 +181,7 @@ RSpec.describe Bundler::GemHelper do
           `git init`
           `git config user.email "you@example.com"`
           `git config user.name "name"`
+          `git config commit.gpgsign false`
           `git config push.default simple`
         end
 
@@ -253,6 +238,96 @@ RSpec.describe Bundler::GemHelper do
           end
 
           Rake.application["release"].invoke
+        end
+      end
+    end
+
+    describe "release:rubygem_push" do
+      let!(:rake_application) { Rake.application }
+
+      before(:each) do
+        Rake.application = Rake::Application.new
+        subject.install
+        allow(subject).to receive(:sh)
+      end
+
+      after(:each) do
+        Rake.application = rake_application
+      end
+
+      before do
+        Dir.chdir(app_path) do
+          `git init`
+          `git config user.email "you@example.com"`
+          `git config user.name "name"`
+          `git config push.default simple`
+        end
+
+        # silence messages
+        allow(Bundler.ui).to receive(:confirm)
+        allow(Bundler.ui).to receive(:error)
+
+        credentials = double("credentials", "file?" => true)
+        allow(Bundler.user_home).to receive(:join).
+          with(".gem/credentials").and_return(credentials)
+      end
+
+      describe "success messaging" do
+        context "No allowed_push_host set" do
+          before do
+            allow(subject).to receive(:allowed_push_host).and_return(nil)
+          end
+
+          around do |example|
+            orig_host = ENV["RUBYGEMS_HOST"]
+            ENV["RUBYGEMS_HOST"] = rubygems_host_env
+
+            example.run
+
+            ENV["RUBYGEMS_HOST"] = orig_host
+          end
+
+          context "RUBYGEMS_HOST env var is set" do
+            let(:rubygems_host_env) { "https://custom.env.gemhost.com" }
+
+            it "should report successful push to the host from the environment" do
+              mock_confirm_message "Pushed #{app_name} #{app_version} to #{rubygems_host_env}"
+
+              Rake.application["release:rubygem_push"].invoke
+            end
+          end
+
+          context "RUBYGEMS_HOST env var is not set" do
+            let(:rubygems_host_env) { nil }
+
+            it "should report successful push to rubygems.org" do
+              mock_confirm_message "Pushed #{app_name} #{app_version} to rubygems.org"
+
+              Rake.application["release:rubygem_push"].invoke
+            end
+          end
+
+          context "RUBYGEMS_HOST env var is an empty string" do
+            let(:rubygems_host_env) { "" }
+
+            it "should report successful push to rubygems.org" do
+              mock_confirm_message "Pushed #{app_name} #{app_version} to rubygems.org"
+
+              Rake.application["release:rubygem_push"].invoke
+            end
+          end
+        end
+
+        context "allowed_push_host set in gemspec" do
+          before do
+            allow(subject).to receive(:allowed_push_host).and_return("https://my.gemhost.com")
+          end
+
+          it "should report successful push to the allowed gem host" do
+            mock_confirm_message "Pushed #{app_name} #{app_version} to https://my.gemhost.com"
+
+            Rake.application["release:rubygem_push"].invoke
+          end
         end
       end
     end

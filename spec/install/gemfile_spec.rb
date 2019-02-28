@@ -1,5 +1,5 @@
+# encoding: utf-8
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle install" do
   context "with duplicated gems" do
@@ -8,7 +8,7 @@ RSpec.describe "bundle install" do
         gem 'rails', '~> 4.0.0'
         gem 'rails', '~> 4.0.0'
       G
-      expect(out).to include("more than once")
+      expect(err).to include("more than once")
     end
   end
 
@@ -21,6 +21,8 @@ RSpec.describe "bundle install" do
 
       bundle :install, :gemfile => bundled_app("NotGemfile")
 
+      # Specify BUNDLE_GEMFILE for `the_bundle`
+      # to retrieve the proper Gemfile
       ENV["BUNDLE_GEMFILE"] = "NotGemfile"
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
@@ -33,11 +35,11 @@ RSpec.describe "bundle install" do
         gem 'rack'
       G
 
-      bundle "config --local gemfile #{bundled_app("NotGemfile")}"
+      bundle "config set --local gemfile #{bundled_app("NotGemfile")}"
     end
     it "uses the gemfile to install" do
       bundle "install"
-      bundle "show"
+      bundle "list"
 
       expect(out).to include("rack (1.0.0)")
     end
@@ -45,7 +47,7 @@ RSpec.describe "bundle install" do
       bundled_app("subdir").mkpath
       Dir.chdir(bundled_app("subdir")) do
         bundle "install"
-        bundle "show"
+        bundle "list"
 
         expect(out).to include("rack (1.0.0)")
       end
@@ -63,7 +65,23 @@ RSpec.describe "bundle install" do
       G
 
       bundle :install
-      expect(out).to match(/You passed :lib as an option for gem 'rack', but it is invalid/)
+      expect(err).to match(/You passed :lib as an option for gem 'rack', but it is invalid/)
+    end
+  end
+
+  context "with prefer_gems_rb set" do
+    before { bundle! "config prefer_gems_rb true" }
+
+    it "prefers gems.rb to Gemfile" do
+      create_file("gems.rb", "gem 'bundler'")
+      create_file("Gemfile", "raise 'wrong Gemfile!'")
+
+      bundle! :install
+
+      expect(bundled_app("gems.rb")).to be_file
+      expect(bundled_app("Gemfile.lock")).not_to be_file
+
+      expect(the_bundle).to include_gem "bundler #{Bundler::VERSION}"
     end
   end
 
@@ -93,6 +111,35 @@ RSpec.describe "bundle install" do
           expect(the_bundle).to include_gems "rack 1.0.0"
         end
       end
+    end
+  end
+
+  context "with a Gemfile containing non-US-ASCII characters" do
+    it "reads the Gemfile with the UTF-8 encoding by default" do
+      skip "Ruby 1.8 has no encodings" if RUBY_VERSION < "1.9"
+
+      install_gemfile <<-G
+        str = "Il était une fois ..."
+        puts "The source encoding is: " + str.encoding.name
+      G
+
+      expect(out).to include("The source encoding is: UTF-8")
+      expect(out).not_to include("The source encoding is: ASCII-8BIT")
+      expect(out).to include("Bundle complete!")
+    end
+
+    it "respects the magic encoding comment" do
+      skip "Ruby 1.8 has no encodings" if RUBY_VERSION < "1.9"
+
+      # NOTE: This works thanks to #eval interpreting the magic encoding comment
+      install_gemfile <<-G
+        # encoding: iso-8859-1
+        str = "Il #{"\xE9".dup.force_encoding("binary")}tait une fois ..."
+        puts "The source encoding is: " + str.encoding.name
+      G
+
+      expect(out).to include("The source encoding is: ISO-8859-1")
+      expect(out).to include("Bundle complete!")
     end
   end
 end

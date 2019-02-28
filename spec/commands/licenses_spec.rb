@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle licenses" do
   before :each do
@@ -13,7 +12,7 @@ RSpec.describe "bundle licenses" do
   it "prints license information for all gems in the bundle" do
     bundle "licenses"
 
-    expect(out).to include("bundler: Unknown")
+    expect(err).to include("bundler: Unknown")
     expect(out).to include("with_license: MIT")
   end
 
@@ -25,7 +24,7 @@ RSpec.describe "bundle licenses" do
       gem "foo"
     G
 
-    bundle "config auto_install 1"
+    bundle "config set auto_install 1"
     bundle :licenses
     expect(out).to include("Installing foo 1.0")
   end

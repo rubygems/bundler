@@ -1,7 +1,7 @@
 # frozen_string_literal: true
-require "fileutils"
+
+require "bundler/vendored_fileutils"
 require "stringio"
-require "tmpdir"
 require "zlib"
 
 module Bundler
@@ -22,6 +22,7 @@ module Bundler
 
       def initialize(fetcher)
         @fetcher = fetcher
+        require "tmpdir"
       end
 
       def update(local_path, remote_path, retrying = nil)
@@ -32,9 +33,18 @@ module Bundler
 
           # first try to fetch any new bytes on the existing file
           if retrying.nil? && local_path.file?
-            FileUtils.cp local_path, local_temp_path
+            SharedHelpers.filesystem_access(local_temp_path) do
+              FileUtils.cp local_path, local_temp_path
+            end
             headers["If-None-Match"] = etag_for(local_temp_path)
-            headers["Range"] = "bytes=#{local_temp_path.size}-"
+            headers["Range"] =
+              if local_temp_path.size.nonzero?
+                # Subtract a byte to ensure the range won't be empty.
+                # Avoids 416 (Range Not Satisfiable) responses.
+                "bytes=#{local_temp_path.size - 1}-"
+              else
+                "bytes=#{local_temp_path.size}-"
+              end
           else
             # Fastly ignores Range when Accept-Encoding: gzip is set
             headers["Accept-Encoding"] = "gzip"
@@ -48,12 +58,15 @@ module Bundler
             content = Zlib::GzipReader.new(StringIO.new(content)).read
           end
 
-          mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
           SharedHelpers.filesystem_access(local_temp_path) do
-            local_temp_path.open(mode) {|f| f << content }
+            if response.is_a?(Net::HTTPPartialContent) && local_temp_path.size.nonzero?
+              local_temp_path.open("a") {|f| f << slice_body(content, 1..-1) }
+            else
+              local_temp_path.open("w") {|f| f << content }
+            end
           end
 
-          response_etag = response["ETag"].gsub(%r{\AW/}, "")
+          response_etag = (response["ETag"] || "").gsub(%r{\AW/}, "")
           if etag_for(local_temp_path) == response_etag
             SharedHelpers.filesystem_access(local_path) do
               FileUtils.mv(local_temp_path, local_path)
@@ -67,11 +80,26 @@ module Bundler
 
           update(local_path, remote_path, :retrying)
         end
+      rescue Errno::EACCES
+        raise Bundler::PermissionError,
+          "Bundler does not have write access to create a temp directory " \
+          "within #{Dir.tmpdir}. Bundler must have write access to your " \
+          "systems temp directory to function properly. "
+      rescue Zlib::GzipFile::Error
+        raise Bundler::HTTPError
       end
 
       def etag_for(path)
         sum = checksum_for_file(path)
         sum ? %("#{sum}") : nil
+      end
+
+      def slice_body(body, range)
+        if body.respond_to?(:byteslice)
+          body.byteslice(range)
+        else # pre-1.9.3
+          body.unpack("@#{range.first}a#{range.end + 1}").first
+        end
       end
 
       def checksum_for_file(path)
@@ -80,7 +108,7 @@ module Bundler
         # because we need to preserve \n line endings on windows when calculating
         # the checksum
         SharedHelpers.filesystem_access(path, :read) do
-          Digest::MD5.hexdigest(IO.read(path))
+          SharedHelpers.digest(:MD5).hexdigest(IO.read(path))
         end
       end
     end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "set"
 
 module Bundler
@@ -58,17 +59,23 @@ module Bundler
     # Search this index's specs, and any source indexes that this index knows
     # about, returning all of the results.
     def search(query, base = nil)
+      sort_specs(unsorted_search(query, base))
+    end
+
+    def unsorted_search(query, base)
       results = local_search(query, base)
-      seen = results.map(&:full_name).to_set
+
+      seen = results.map(&:full_name).to_set unless @sources.empty?
 
       @sources.each do |source|
-        source.search(query, base).each do |spec|
+        source.unsorted_search(query, base).each do |spec|
           results << spec if seen.add?(spec.full_name)
         end
       end
 
-      sort_specs(results)
+      results
     end
+    protected :unsorted_search
 
     def self.sort_specs(specs)
       specs.sort_by do |s|
@@ -105,6 +112,13 @@ module Bundler
         spec_sets.values.each(&blk)
       end
       sources.each {|s| s.each(&blk) }
+      self
+    end
+
+    def spec_names
+      names = specs.keys + sources.map(&:spec_names)
+      names.uniq!
+      names
     end
 
     # returns a list of the dependencies
@@ -183,14 +197,6 @@ module Bundler
           else
             dependency.matches_spec?(spec) && Gem::Platform.match(spec.platform)
           end
-        end
-
-        wants_prerelease = dependency.requirement.prerelease?
-        wants_prerelease ||= base && base.any? {|base_spec| base_spec.version.prerelease? }
-        only_prerelease = specs.all? {|spec| spec.version.prerelease? }
-
-        unless wants_prerelease || only_prerelease
-          found.reject! {|spec| spec.version.prerelease? }
         end
 
         found

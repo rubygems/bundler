@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "forwardable"
 require "support/the_bundle"
 module Spec
@@ -59,14 +60,7 @@ module Spec
       end
     end
 
-    MAJOR_DEPRECATION = /^\[DEPRECATED FOR 2\.0\]\s*/
-
-    RSpec::Matchers.define :lack_errors do
-      diffable
-      match do |actual|
-        actual.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "") == ""
-      end
-    end
+    MAJOR_DEPRECATION = /^\[DEPRECATED\]\s*/
 
     RSpec::Matchers.define :eq_err do |expected|
       diffable
@@ -78,7 +72,12 @@ module Spec
     RSpec::Matchers.define :have_major_deprecation do |expected|
       diffable
       match do |actual|
-        actual.split(MAJOR_DEPRECATION).any? do |d|
+        deprecations = actual.split(MAJOR_DEPRECATION)
+
+        return !expected.nil? if deprecations.size <= 1
+        return true if expected.nil?
+
+        deprecations.any? do |d|
           !d.empty? && values_match?(expected, d.strip)
         end
       end
@@ -105,6 +104,28 @@ module Spec
       match do |actual|
         actual = actual.split(/\s+/) if actual.is_a?(String)
         args.all? {|arg| actual.include?(arg) } && actual.uniq.size == actual.size
+      end
+    end
+
+    RSpec::Matchers.define :be_sorted do
+      diffable
+      attr_reader :expected
+      match do |actual|
+        expected = block_arg ? actual.sort_by(&block_arg) : actual.sort
+        actual.==(expected).tap do
+          # HACK: since rspec won't show a diff when everything is a string
+          differ = RSpec::Support::Differ.new
+          @actual = differ.send(:object_to_string, actual)
+          @expected = differ.send(:object_to_string, expected)
+        end
+      end
+    end
+
+    RSpec::Matchers.define :be_well_formed do
+      match(&:empty?)
+
+      failure_message do |actual|
+        actual.join("\n")
       end
     end
 
@@ -135,8 +156,8 @@ module Spec
           rescue => e
             next "#{name} is not installed:\n#{indent(e)}"
           end
-          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
-          actual_version, actual_platform = out.strip.split(/\s+/, 2)
+          last_command.stdout.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
+          actual_version, actual_platform = last_command.stdout.strip.split(/\s+/, 2)
           unless Gem::Version.new(actual_version) == Gem::Version.new(version)
             next "#{name} was expected to be at version #{version} but was #{actual_version}"
           end
@@ -150,8 +171,8 @@ module Spec
           rescue
             next "#{name} does not have a source defined:\n#{indent(e)}"
           end
-          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
-          unless out.strip == source
+          last_command.stdout.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
+          unless last_command.stdout.strip == source
             next "Expected #{name} (#{version}) to be installed from `#{source}`, was actually from `#{out}`"
           end
         end.compact
@@ -176,9 +197,9 @@ module Spec
           rescue => e
             next "checking for #{name} failed:\n#{e}"
           end
-          next if out == "WIN"
+          next if last_command.stdout == "WIN"
           next "expected #{name} to not be installed, but it was" if version.nil?
-          if Gem::Version.new(out) == Gem::Version.new(version)
+          if Gem::Version.new(last_command.stdout) == Gem::Version.new(version)
             next "expected #{name} (#{version}) not to be installed, but it was"
           end
         end.compact
@@ -216,7 +237,11 @@ module Spec
     end
 
     def lockfile_should_be(expected)
-      expect(bundled_app("Gemfile.lock")).to read_as(strip_whitespace(expected))
+      expect(bundled_app("Gemfile.lock")).to read_as(normalize_uri_file(strip_whitespace(expected)))
+    end
+
+    def gemfile_should_be(expected)
+      expect(bundled_app("Gemfile")).to read_as(strip_whitespace(expected))
     end
   end
 end

@@ -1,15 +1,16 @@
 # frozen_string_literal: true
+
 require "bundler/vendored_thor"
 
 module Bundler
   module UI
     class Shell
-      LEVELS = %w(silent error warn confirm info debug).freeze
+      LEVELS = %w[silent error warn confirm info debug].freeze
 
       attr_writer :shell
 
       def initialize(options = {})
-        if options["no-color"] || !STDOUT.tty?
+        if options["no-color"] || !$stdout.tty?
           Thor::Base.shell = Thor::Shell::Basic
         end
         @shell = Thor::Base.shell.new
@@ -30,26 +31,30 @@ module Bundler
       end
 
       def warn(msg, newline = nil)
+        return unless level("warn")
         return if @warning_history.include? msg
         @warning_history << msg
-        tell_me(msg, :yellow, newline) if level("warn")
+
+        return tell_err(msg, :yellow, newline) if Bundler.feature_flag.error_on_stderr?
+        tell_me(msg, :yellow, newline)
       end
 
       def error(msg, newline = nil)
-        tell_me(msg, :red, newline) if level("error")
+        return unless level("error")
+        return tell_err(msg, :red, newline) if Bundler.feature_flag.error_on_stderr?
+        tell_me(msg, :red, newline)
       end
 
       def debug(msg, newline = nil)
-        tell_me(msg, nil, newline) if level("debug")
+        tell_me(msg, nil, newline) if debug?
       end
 
       def debug?
-        # needs to be false instead of nil to be newline param to other methods
-        level("debug") ? true : false
+        level("debug")
       end
 
       def quiet?
-        LEVELS.index(@level) <= LEVELS.index("warn")
+        level("quiet")
       end
 
       def ask(msg)
@@ -66,11 +71,15 @@ module Bundler
 
       def level=(level)
         raise ArgumentError unless LEVELS.include?(level.to_s)
-        @level = level
+        @level = level.to_s
       end
 
       def level(name = nil)
-        name ? LEVELS.index(name) <= LEVELS.index(@level) : @level
+        return @level unless name
+        unless index = LEVELS.index(name)
+          raise "#{name.inspect} is not a valid level"
+        end
+        index <= LEVELS.index(@level)
       end
 
       def trace(e, newline = nil, force = false)
@@ -100,6 +109,13 @@ module Bundler
       end
 
       def tell_err(message, color = nil, newline = nil)
+        return if @shell.send(:stderr).closed?
+
+        newline ||= message.to_s !~ /( |\t)\Z/
+        message = word_wrap(message) if newline.is_a?(Hash) && newline[:wrap]
+
+        color = nil if color && !$stderr.tty?
+
         buffer = @shell.send(:prepare_message, message, *color)
         buffer << "\n" if newline && !message.to_s.end_with?("\n")
 

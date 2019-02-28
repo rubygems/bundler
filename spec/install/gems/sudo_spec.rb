@@ -1,10 +1,10 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "when using sudo", :sudo => true do
   describe "and BUNDLE_PATH is writable" do
     context "but BUNDLE_PATH/build_info is not writable" do
       before do
+        bundle! "config path.system true"
         subdir = system_gem_path("cache")
         subdir.mkpath
         sudo "chmod u-w #{subdir}"
@@ -25,6 +25,7 @@ RSpec.describe "when using sudo", :sudo => true do
 
   describe "and GEM_HOME is owned by root" do
     before :each do
+      bundle! "config path.system true"
       chown_system_gems_to_root
     end
 
@@ -51,6 +52,8 @@ RSpec.describe "when using sudo", :sudo => true do
     end
 
     it "installs when BUNDLE_PATH is owned by root" do
+      bundle! "config global_path_appends_ruby_scope false" # consistency in tests between 1.x and 2.x modes
+
       bundle_path = tmp("owned_by_root")
       FileUtils.mkdir_p bundle_path
       sudo "chown -R root #{bundle_path}"
@@ -67,6 +70,8 @@ RSpec.describe "when using sudo", :sudo => true do
     end
 
     it "installs when BUNDLE_PATH does not exist" do
+      bundle! "config global_path_appends_ruby_scope false" # consistency in tests between 1.x and 2.x modes
+
       root_path = tmp("owned_by_root")
       FileUtils.mkdir_p root_path
       sudo "chown -R root #{root_path}"
@@ -83,7 +88,7 @@ RSpec.describe "when using sudo", :sudo => true do
       expect(the_bundle).to include_gems "rack 1.0"
     end
 
-    it "installs extensions/ compiled by Rubygems 2.2", :rubygems => "2.2" do
+    it "installs extensions/" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "very_simple_binary"
@@ -128,6 +133,7 @@ RSpec.describe "when using sudo", :sudo => true do
 
   describe "and GEM_HOME is not writable" do
     it "installs" do
+      bundle! "config path.system true"
       gem_home = tmp("sudo_gem_home")
       sudo "mkdir -p #{gem_home}"
       sudo "chmod ugo-w #{gem_home}"
@@ -152,27 +158,20 @@ RSpec.describe "when using sudo", :sudo => true do
 
     it "warns against that" do
       bundle :install, :sudo => true
-      expect(out).to include(warning)
+      expect(err).to include(warning)
     end
 
     context "when ENV['BUNDLE_SILENCE_ROOT_WARNING'] is set" do
       it "skips the warning" do
         bundle :install, :sudo => :preserve_env, :env => { "BUNDLE_SILENCE_ROOT_WARNING" => true }
-        expect(out).to_not include(warning)
-      end
-    end
-
-    context "when silence_root_warning is passed as an option" do
-      it "skips the warning" do
-        bundle :install, :sudo => true, :silence_root_warning => true
-        expect(out).to_not include(warning)
+        expect(err).to_not include(warning)
       end
     end
 
     context "when silence_root_warning = false" do
       it "warns against that" do
-        bundle :install, :sudo => true, :silence_root_warning => false
-        expect(out).to include(warning)
+        bundle :install, :sudo => true, :env => { "BUNDLE_SILENCE_ROOT_WARNING" => "false" }
+        expect(err).to include(warning)
       end
     end
   end

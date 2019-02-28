@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle install across platforms" do
   it "maintains the same lockfile if all gems are compatible across platforms" do
@@ -74,6 +73,149 @@ RSpec.describe "bundle install across platforms" do
     expect(the_bundle).not_to include_gems "weakling"
   end
 
+  it "does not keep unneeded platforms for gems that are used" do
+    build_repo4 do
+      build_gem "empyrean", "0.1.0"
+      build_gem "coderay", "1.1.2"
+      build_gem "method_source", "0.9.0"
+      build_gem("spoon", "0.0.6") {|s| s.add_runtime_dependency "ffi" }
+      build_gem "pry", "0.11.3" do |s|
+        s.platform = "java"
+        s.add_runtime_dependency "coderay", "~> 1.1.0"
+        s.add_runtime_dependency "method_source", "~> 0.9.0"
+        s.add_runtime_dependency "spoon", "~> 0.0"
+      end
+      build_gem "pry", "0.11.3" do |s|
+        s.add_runtime_dependency "coderay", "~> 1.1.0"
+        s.add_runtime_dependency "method_source", "~> 0.9.0"
+      end
+      build_gem("ffi", "1.9.23") {|s| s.platform = "java" }
+      build_gem("ffi", "1.9.23")
+    end
+
+    simulate_platform java
+
+    install_gemfile! <<-G
+      source "file://localhost/#{gem_repo4}"
+
+      gem "empyrean", "0.1.0"
+      gem "pry"
+    G
+
+    expect(the_bundle.lockfile).to read_as normalize_uri_file(strip_whitespace(<<-L))
+      GEM
+        remote: file://localhost/#{gem_repo4}/
+        specs:
+          coderay (1.1.2)
+          empyrean (0.1.0)
+          ffi (1.9.23-java)
+          method_source (0.9.0)
+          pry (0.11.3-java)
+            coderay (~> 1.1.0)
+            method_source (~> 0.9.0)
+            spoon (~> 0.0)
+          spoon (0.0.6)
+            ffi
+
+      PLATFORMS
+        java
+
+      DEPENDENCIES
+        empyrean (= 0.1.0)
+        pry
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    L
+
+    bundle! "lock --add-platform ruby"
+
+    good_lockfile = strip_whitespace(<<-L)
+      GEM
+        remote: file://localhost/#{gem_repo4}/
+        specs:
+          coderay (1.1.2)
+          empyrean (0.1.0)
+          ffi (1.9.23-java)
+          method_source (0.9.0)
+          pry (0.11.3)
+            coderay (~> 1.1.0)
+            method_source (~> 0.9.0)
+          pry (0.11.3-java)
+            coderay (~> 1.1.0)
+            method_source (~> 0.9.0)
+            spoon (~> 0.0)
+          spoon (0.0.6)
+            ffi
+
+      PLATFORMS
+        java
+        ruby
+
+      DEPENDENCIES
+        empyrean (= 0.1.0)
+        pry
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    L
+
+    expect(the_bundle.lockfile).to read_as normalize_uri_file(good_lockfile)
+
+    bad_lockfile = strip_whitespace <<-L
+      GEM
+        remote: file://localhost/#{gem_repo4}/
+        specs:
+          coderay (1.1.2)
+          empyrean (0.1.0)
+          ffi (1.9.23)
+          ffi (1.9.23-java)
+          method_source (0.9.0)
+          pry (0.11.3)
+            coderay (~> 1.1.0)
+            method_source (~> 0.9.0)
+          pry (0.11.3-java)
+            coderay (~> 1.1.0)
+            method_source (~> 0.9.0)
+            spoon (~> 0.0)
+          spoon (0.0.6)
+            ffi
+
+      PLATFORMS
+        java
+        ruby
+
+      DEPENDENCIES
+        empyrean (= 0.1.0)
+        pry
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
+    L
+
+    aggregate_failures do
+      lockfile bad_lockfile
+      bundle! :install
+      expect(the_bundle.lockfile).to read_as normalize_uri_file(good_lockfile)
+
+      lockfile bad_lockfile
+      bundle! :update, :all => true
+      expect(the_bundle.lockfile).to read_as normalize_uri_file(good_lockfile)
+
+      lockfile bad_lockfile
+      bundle! "update ffi"
+      expect(the_bundle.lockfile).to read_as normalize_uri_file(good_lockfile)
+
+      lockfile bad_lockfile
+      bundle! "update empyrean"
+      expect(the_bundle.lockfile).to read_as normalize_uri_file(good_lockfile)
+
+      lockfile bad_lockfile
+      bundle! :lock
+      expect(the_bundle.lockfile).to read_as normalize_uri_file(good_lockfile)
+    end
+  end
+
   it "works the other way with gems that have different dependencies" do
     simulate_platform "ruby"
     install_gemfile <<-G
@@ -88,7 +230,7 @@ RSpec.describe "bundle install across platforms" do
     expect(the_bundle).to include_gems "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
   end
 
-  it "works with gems that have extra platform-specific runtime dependencies" do
+  it "works with gems that have extra platform-specific runtime dependencies", :bundler => "< 2" do
     simulate_platform x64_mac
 
     update_repo2 do
@@ -108,7 +250,7 @@ RSpec.describe "bundle install across platforms" do
 
     expect(out).to include "Unable to use the platform-specific (universal-darwin) version of facter (2.4.6) " \
       "because it has different dependencies from the ruby version. " \
-      "To use the platform-specific version of the gem, run `bundle config specific_platform true` and install again."
+      "To use the platform-specific version of the gem, run `bundle config set specific_platform true` and install again."
 
     expect(the_bundle).to include_gem "facter 2.4.6"
     expect(the_bundle).not_to include_gem "CFPropertyList"
@@ -121,12 +263,12 @@ RSpec.describe "bundle install across platforms" do
       gem "rack", "1.0.0"
     G
 
-    bundle "install --path vendor/bundle"
+    bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
 
     new_version = Gem::ConfigMap[:ruby_version] == "1.8" ? "1.9.1" : "1.8"
     FileUtils.mv(vendored_gems, bundled_app("vendor/bundle", Gem.ruby_engine, new_version))
 
-    bundle "install --path vendor/bundle"
+    bundle! :install
     expect(vendored_gems("gems/rack-1.0.0")).to exist
   end
 end
@@ -200,7 +342,7 @@ RSpec.describe "bundle install with platform conditionals" do
       end
     G
 
-    bundle :show
+    bundle :list
     expect(exitstatus).to eq(0) if exitstatus
   end
 
@@ -243,9 +385,28 @@ RSpec.describe "bundle install with platform conditionals" do
 
     bundle! "install"
 
-    expect(out).to include <<-O.strip
+    expect(err).to include <<-O.strip
 The dependency #{Gem::Dependency.new("rack", ">= 0")} will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.
     O
+  end
+
+  context "when disable_platform_warnings is true" do
+    before { bundle! "config disable_platform_warnings true" }
+
+    it "does not print the warning when a dependency is unused on any platform" do
+      simulate_platform "ruby"
+      simulate_ruby_engine "ruby"
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "rack", :platform => [:mingw, :mswin, :x64_mingw, :jruby]
+      G
+
+      bundle! "install"
+
+      expect(out).not_to match(/The dependency (.*) will be unused/)
+    end
   end
 end
 

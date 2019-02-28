@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "command plugins" do
   before do
@@ -50,7 +49,7 @@ RSpec.describe "command plugins" do
     bundle "plugin install the-echoer --source file://#{gem_repo2}"
     expect(out).to include("Installed plugin the-echoer")
 
-    bundle "echo tacos tofu lasange", "no-color" => false
+    bundle "echo tacos tofu lasange"
     expect(out).to eq("You gave me tacos, tofu, lasange")
   end
 
@@ -74,8 +73,8 @@ RSpec.describe "command plugins" do
 
     expect(out).not_to include("Installed plugin copycat")
 
-    expect(out).to include("Failed to install plugin")
+    expect(err).to include("Failed to install plugin")
 
-    expect(out).to include("Command(s) `mahcommand` declared by copycat are already registered.")
+    expect(err).to include("Command(s) `mahcommand` declared by copycat are already registered.")
   end
 end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle flex_install" do
   it "installs the gems as expected" do
@@ -189,13 +188,11 @@ RSpec.describe "bundle flex_install" do
       ruby <<-RUBY
         require 'bundler/setup'
       RUBY
-      expect(err).to match(/could not find gem 'rack-obama/i)
+      expect(last_command.stderr).to match(/could not find gem 'rack-obama/i)
     end
 
     it "suggests bundle update when the Gemfile requires different versions than the lock" do
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
-        Fetching source index from file:#{gem_repo2}/
-        Resolving dependencies...
         Bundler could not find compatible versions for gem "rack":
           In snapshot (Gemfile.lock):
             rack (= 0.9.1)
@@ -212,7 +209,7 @@ RSpec.describe "bundle flex_install" do
       E
 
       bundle :install, :retry => 0
-      expect(out).to eq(nice_error)
+      expect(last_command.bundler_err).to end_with(nice_error)
     end
   end
 
@@ -236,9 +233,9 @@ RSpec.describe "bundle flex_install" do
         bundle "install"
       end.not_to change { File.read(bundled_app("Gemfile.lock")) }
 
-      expect(out).to include("rack = 0.9.1")
-      expect(out).to include("locked at 1.0.0")
-      expect(out).to include("bundle update rack")
+      expect(err).to include("rack = 0.9.1")
+      expect(err).to include("locked at 1.0.0")
+      expect(err).to include("bundle update rack")
     end
 
     it "should work when you update" do
@@ -247,27 +244,62 @@ RSpec.describe "bundle flex_install" do
   end
 
   describe "when adding a new source" do
-    it "updates the lockfile" do
+    it "updates the lockfile", :bundler => "< 2" do
       build_repo2
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
+      install_gemfile! <<-G
+        source "file://localhost#{gem_repo1}"
         gem "rack"
       G
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
+      install_gemfile! <<-G
+        source "file://localhost#{gem_repo1}"
+        source "file://localhost#{gem_repo2}"
         gem "rack"
       G
 
       lockfile_should_be <<-L
       GEM
-        remote: file:#{gem_repo1}/
-        remote: file:#{gem_repo2}/
+        remote: file://localhost#{gem_repo1}/
+        remote: file://localhost#{gem_repo2}/
         specs:
           rack (1.0.0)
 
       PLATFORMS
         ruby
+
+      DEPENDENCIES
+        rack
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+      L
+    end
+
+    it "updates the lockfile", :bundler => "2" do
+      build_repo2
+      install_gemfile! <<-G
+        source "file://localhost#{gem_repo1}"
+        gem "rack"
+      G
+
+      install_gemfile! <<-G
+        source "file://localhost#{gem_repo1}"
+        source "file://localhost#{gem_repo2}" do
+        end
+        gem "rack"
+      G
+
+      lockfile_should_be <<-L
+      GEM
+        remote: file://localhost#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      GEM
+        remote: file://localhost#{gem_repo2}/
+        specs:
+
+      PLATFORMS
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
@@ -313,7 +345,7 @@ RSpec.describe "bundle flex_install" do
         gem "capybara", "0.3.9"
       G
 
-      expect(out).to include("Gemfile.lock")
+      expect(err).to include("Gemfile.lock")
     end
   end
 end

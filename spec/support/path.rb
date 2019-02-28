@@ -1,10 +1,23 @@
 # frozen_string_literal: true
+
 require "pathname"
 
 module Spec
   module Path
     def root
-      @root ||= Pathname.new(File.expand_path("../../..", __FILE__))
+      @root ||= Pathname.new(ruby_core? ? "../../../.." : "../../..").expand_path(__FILE__)
+    end
+
+    def gemspec
+      @gemspec ||= root.join(ruby_core? ? "lib/bundler/bundler.gemspec" : "bundler.gemspec")
+    end
+
+    def bindir
+      @bindir ||= root.join(ruby_core? ? "libexec" : "exe")
+    end
+
+    def spec_dir
+      @spec_dir ||= root.join(ruby_core? ? "spec/bundler" : "spec")
     end
 
     def tmp(*path)
@@ -16,7 +29,11 @@ module Spec
     end
 
     def default_bundle_path(*path)
-      system_gem_path(*path)
+      if Bundler::VERSION.split(".").first.to_i < 2
+        system_gem_path(*path)
+      else
+        bundled_app(*[".bundle", ENV.fetch("BUNDLER_SPEC_RUBY_ENGINE", Gem.ruby_engine), Gem::ConfigMap[:ruby_version], *path].compact)
+      end
     end
 
     def bundled_app(*path)
@@ -73,12 +90,16 @@ module Spec
       tmp("gems/system", *path)
     end
 
+    def system_bundle_bin_path
+      system_gem_path("bin/bundle")
+    end
+
     def lib_path(*args)
       tmp("libs", *args)
     end
 
     def bundler_path
-      Pathname.new(File.expand_path("../../../lib", __FILE__))
+      root.join("lib")
     end
 
     def global_plugin_gem(*args)
@@ -91,6 +112,17 @@ module Spec
 
     def tmpdir(*args)
       tmp "tmpdir", *args
+    end
+
+    def ruby_core?
+      # avoid to wornings
+      @ruby_core ||= nil
+
+      if @ruby_core.nil?
+        @ruby_core = true & (ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"])
+      else
+        @ruby_core
+      end
     end
 
     extend self

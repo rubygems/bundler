@@ -1,38 +1,29 @@
-# Contributing to Bundler
+# Bundler Contributor Guidelines
 
-Welcome to Bundler! We are so happy that you're here. We know it can be daunting to joining a new open source project, so here's a quick overview of what you can expect from this documentation.
+Thank you for your interest in making Bundler better! We welcome contributions from everyone. Dozens of contributors like you have submitted feature improvements, fixed bugs, and written new documentation. [Join the Bundler Slack community](https://slack.bundler.io/) to connect with the Bundler core team and other contributors like you.
 
-*Something missing?* Send us a [pull request](../development/PULL_REQUESTS.md)!
+Before submitting a contribution, read through the following guidelines:
 
-**Recommended first steps**
+* [Bundler Code of Conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md) (By participating in Bundler, you agree to abide by the terms laid out in the CoC.)
+* [Issue Reporting Guidelines](https://github.com/bundler/bundler/blob/master/doc/contributing/ISSUES.md)
+* [Pull Request Guidelines](https://github.com/bundler/bundler/blob/master/doc/development/PULL_REQUESTS.md)
 
-- Join us in the Bundler slack! Generate an invite [here](http://slack.bundler.io/)
-- *If you're interested in helping with code:*
-  - Get a quick overview of our [development process](../development/README.md)
-  - [Setup your machine for development](../development/SETUP.md)
-  - Checkout [How you can help: your first contributions!](HOW_YOU_CAN_HELP.md) for a list of suggestions to get started
-- *If you're interested in helping with documentation:*
-  - Read up on [how documentation works for Bundler](../documentation/README.md)
-  - Learn about our [documentation vision](../documentation/VISION.md)
+And be sure to [set up your development environment](https://github.com/bundler/bundler/blob/master/doc/development/SETUP.md).
 
-You can start learning about Bundler by reading [the documentation](http://bundler.io). If you want, you can also read a (lengthy) explanation of [why Bundler exists and what it does](http://bundler.io/rationale.html).
+## Feature Requests
 
-##[How you can help: your first contributions!](HOW_YOU_CAN_HELP.md)
+To request substantial changes to Bundler and/or Bundler documentation, please refer to the [README](https://github.com/bundler/rfcs/blob/master/README.md) in the [RFC repository](https://github.com/bundler/rfcs) for instructions.
 
-A detailed overview of how to get started contributing to Bundler, including a long list of suggestions for your first project.
+## Contributing to Bundler
 
-##[Bug triage](BUG_TRIAGE.md)
+Here are the different ways you can start contributing to the Bundler project:
 
-Want to take a stab at processing issues? Start here.
+* [First contribution suggestions](https://github.com/bundler/bundler/blob/master/doc/contributing/HOW_YOU_CAN_HELP.md)
+* [Adding new features](https://github.com/bundler/bundler/blob/master/doc/development/NEW_FEATURES.md)
+* [Triaging bugs](https://github.com/bundler/bundler/blob/master/doc/contributing/BUG_TRIAGE.md)
+* [Writing documentation](https://github.com/bundler/bundler/blob/master/doc/documentation/WRITING.md)
+* [Community engagement](https://github.com/bundler/bundler/blob/master/doc/contributing/COMMUNITY.md)
 
-##[Getting help](GETTING_HELP.md)
+## Supporting Bundler
 
-How to get in touch with folks who can help when you're stuck. Don't worry! This happens to all of us. We're really nice, we promise.
-
-##[Filing issues](ISSUES.md)
-
-We see a lot of issues in the Bundler repo! Use this guide to file informative, actionable issues.
-
-##[Community](COMMUNITY.md)
-
-Learn more about our goals for the Bundler community and the ways you can help us build better together.
+[Ruby Together](https://rubytogether.org/) pays some Bundler maintainers for their work, funded directly by the Ruby community. If you’d like to support Bundler with a financial contribution, [become an individual sponsor](https://rubytogether.org/developers#plans). We also welcome financial [contributions from companies](https://rubytogether.org/companies#plans), too! (You can also support us through [Open Collective](https://opencollective.com/rubytogether).)

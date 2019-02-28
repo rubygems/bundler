@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
 
-RSpec.describe "installing a gem with native extensions" do
+RSpec.describe "installing a gem with native extensions", :ruby_repo do
   it "installs" do
     build_repo2 do
       build_gem "c_extension" do |s|
@@ -38,7 +37,7 @@ RSpec.describe "installing a gem with native extensions" do
       gem "c_extension"
     G
 
-    bundle "config build.c_extension --with-c_extension=hello"
+    bundle "config set build.c_extension --with-c_extension=hello"
     bundle "install"
 
     expect(out).not_to include("extconf.rb failed")
@@ -84,7 +83,6 @@ RSpec.describe "installing a gem with native extensions" do
     G
 
     expect(out).not_to include("extconf.rb failed")
-    expect(out).to include("Using c_extension 1.0")
 
     run! "Bundler.require; puts CExtension.new.its_true"
     expect(out).to eq("true")

@@ -1,8 +1,8 @@
 # Docs: Contributing and developing Bundler
 
-_If you're looking for documentation on how to use Bundler: visit [bundler.io](http://bundler.io/), or run `bundle help` from the command line. You may also be interested in [troubleshooting common issues](TROUBLESHOOTING.md) found when using Bundler._
+_If you're looking for documentation on how to use Bundler: visit [bundler.io](https://bundler.io/), or run `bundle help` from the command line. You may also be interested in [troubleshooting common issues](TROUBLESHOOTING.md) found when using Bundler._
 
-Bundler welcomes contributions from *everyone*. While contributing, please follow the project [code of conduct](http://bundler.io/conduct.html), so that everyone can be included.
+Bundler welcomes contributions from *everyone*. While contributing, please follow the project [code of conduct](https://bundler.io/conduct.html), so that everyone can be included. Maintainers are expected to work together with the community in accordance with [our project policies](POLICIES.md).
 
 If you'd like to help make Bundler better, you totally rock! Thanks for helping us make Bundler better.
 

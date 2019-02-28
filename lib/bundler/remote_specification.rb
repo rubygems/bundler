@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "uri"
 
 module Bundler
@@ -11,6 +12,7 @@ module Bundler
     include Comparable
 
     attr_reader :name, :version, :platform
+    attr_writer :dependencies
     attr_accessor :source, :remote
 
     def initialize(name, version, platform, spec_fetcher)
@@ -18,6 +20,7 @@ module Bundler
       @version      = Gem::Version.create version
       @platform     = platform
       @spec_fetcher = spec_fetcher
+      @dependencies = nil
     end
 
     # Needed before installs, since the arch matters then and quick
@@ -49,13 +52,7 @@ module Bundler
     # once the remote gem is downloaded, the backend specification will
     # be swapped out.
     def __swap__(spec)
-      without_type = proc {|d| Gem::Dependency.new(d.name, d.requirements_list) }
-      if (extra_deps = spec.runtime_dependencies.map(&without_type).-(dependencies.map(&without_type))) && extra_deps.any?
-        Bundler.ui.debug "#{full_name} from #{remote} has corrupted API dependencies (API returned #{dependencies}, real spec has (#{spec.runtime_dependencies}))"
-        raise APIResponseMismatchError,
-          "Downloading #{full_name} revealed dependencies not in the API (#{extra_deps.map(&without_type).map(&:to_s).join(", ")})." \
-          "\nInstalling with `--full-index` should fix the problem."
-      end
+      SharedHelpers.ensure_same_dependencies(self, dependencies, spec.dependencies)
       @_remote_specification = spec
     end
 
@@ -76,7 +73,28 @@ module Bundler
       "#<#{self.class} name=#{name} version=#{version} platform=#{platform}>"
     end
 
+    def dependencies
+      @dependencies ||= begin
+        deps = method_missing(:dependencies)
+
+        # allow us to handle when the specs dependencies are an array of array of string
+        # see https://github.com/bundler/bundler/issues/5797
+        deps = deps.map {|d| d.is_a?(Gem::Dependency) ? d : Gem::Dependency.new(*d) }
+
+        deps
+      end
+    end
+
+    def git_version
+      return unless loaded_from && source.is_a?(Bundler::Source::Git)
+      " #{source.revision[0..6]}"
+    end
+
   private
+
+    def to_ary
+      nil
+    end
 
     def _remote_specification
       @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])

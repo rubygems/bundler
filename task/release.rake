@@ -1,5 +1,51 @@
 # frozen_string_literal: true
+
+require "bundler/gem_tasks"
+task :build => ["build_metadata", "man:build", "generate_files"] do
+  Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
+end
+task :release => ["man:require", "man:build", "release:verify_github", "build_metadata"]
+
 namespace :release do
+  def gh_api_post(opts)
+    gem "netrc", "~> 0.11.0"
+    require "netrc"
+    require "net/http"
+    require "json"
+    _username, token = Netrc.read["api.github.com"]
+
+    host = opts.fetch(:host) { "https://api.github.com/" }
+    path = opts.fetch(:path)
+    uri = URI.join(host, path)
+    uri.query = [uri.query, "access_token=#{token}"].compact.join("&")
+    headers = {
+      "Content-Type" => "application/json",
+      "Accept" => "application/vnd.github.v3+json",
+      "Authorization" => "token #{token}",
+    }.merge(opts.fetch(:headers, {}))
+    body = opts.fetch(:body) { nil }
+
+    response = if body
+      Net::HTTP.post(uri, body.to_json, headers)
+    else
+      Net::HTTP.get_response(uri)
+    end
+
+    if response.code.to_i >= 400
+      raise "#{uri}\n#{response.inspect}\n#{begin
+                                              JSON.parse(response.body)
+                                            rescue JSON::ParseError
+                                              response.body
+                                            end}"
+    end
+    JSON.parse(response.body)
+  end
+
+  task :verify_github do
+    require "pp"
+    gh_api_post :path => "/user"
+  end
+
   def confirm(prompt = "")
     loop do
       print(prompt)
@@ -32,12 +78,52 @@ namespace :release do
     parsed_response
   end
 
+  def release_notes(version)
+    title_token = "## "
+    current_version_title = "#{title_token}#{version}"
+    current_minor_title = "#{title_token}#{version.segments[0, 2].join(".")}"
+    text = File.open("CHANGELOG.md", "r:UTF-8", &:read)
+    lines = text.split("\n")
+
+    current_version_index = lines.find_index {|line| line.strip =~ /^#{current_version_title}($|\b)/ }
+    unless current_version_index
+      raise "Update the changelog for the last version (#{version})"
+    end
+    current_version_index += 1
+    previous_version_lines = lines[current_version_index.succ...-1]
+    previous_version_index = current_version_index + (
+      previous_version_lines.find_index {|line| line.start_with?(title_token) && !line.start_with?(current_minor_title) } ||
+      lines.count
+    )
+
+    relevant = lines[current_version_index..previous_version_index]
+
+    relevant.join("\n").strip
+  end
+
+  task :github, :version do |_t, args|
+    version = Gem::Version.new(args.version)
+    tag = "v#{version}"
+
+    gh_api_post :path => "/repos/bundler/bundler/releases",
+                :body => {
+                  :tag_name => tag,
+                  :name => tag,
+                  :body => release_notes(version),
+                  :prerelease => version.prerelease?,
+                }
+  end
+
+  task :release do |args|
+    Rake::Task["release:github"].invoke(args.version)
+  end
+
   desc "Make a patch release with the PRs from master in the patch milestone"
   task :patch, :version do |_t, args|
     version = args.version
 
     version ||= begin
-      version = BUNDLER_SPEC.version
+      version = bundler_spec.version
       segments = version.segments
       if segments.last.is_a?(String)
         segments << "1"
@@ -47,7 +133,7 @@ namespace :release do
       segments.join(".")
     end
 
-    confirm "You are about to release #{version}, currently #{BUNDLER_SPEC.version}"
+    confirm "You are about to release #{version}, currently #{bundler_spec.version}"
 
     milestones = gh_api_request(:path => "repos/bundler/bundler/milestones?state=open")
     unless patch_milestone = milestones.find {|m| m["title"] == version }
@@ -58,7 +144,13 @@ namespace :release do
       abort "#{pr["html_url"]} hasn't been closed yet!" unless pr["state"] == "closed"
       next unless pr["pull_request"]
       pr["number"].to_s
-    end.compact
+    end
+    prs.compact!
+
+    bundler_spec.version = version
+
+    branch = version.split(".", 3)[0, 2].push("stable").join("-")
+    sh("git", "checkout", branch)
 
     version_file = "lib/bundler/version.rb"
     version_contents = File.read(version_file)
@@ -67,17 +159,13 @@ namespace :release do
     end
     File.open(version_file, "w") {|f| f.write(version_contents) }
 
-    BUNDLER_SPEC.version = version
-
-    branch = version.split(".", 3)[0, 2].push("stable").join("-")
-    sh("git", "checkout", branch)
-
     commits = `git log --oneline origin/master --`.split("\n").map {|l| l.split(/\s/, 2) }.reverse
-    commits.select! {|_sha, message| message =~ /(Auto merge of|Merge pull request) ##{Regexp.union(*prs)}/ }
+    commits.select! {|_sha, message| message =~ /(Auto merge of|Merge pull request|Merge) ##{Regexp.union(*prs)}/ }
 
     abort "Could not find commits for all PRs" unless commits.size == prs.size
 
-    unless system("git", "cherry-pick", "-x", "-m", "1", *commits.map(&:first))
+    if commits.any? && !system("git", "cherry-pick", "-x", "-m", "1", *commits.map(&:first))
+      warn "Opening a new shell to fix the cherry-pick errors"
       abort unless system("zsh")
     end
 
@@ -99,7 +187,7 @@ namespace :release do
   task :open_unreleased_prs do
     def prs(on = "master")
       commits = `git log --oneline origin/#{on} --`.split("\n")
-      commits.reverse_each.map {|c| c =~ /(Auto merge of|Merge pull request) #(\d+)/ && $2 }.compact
+      commits.reverse_each.map {|c| c =~ /(Auto merge of|Merge pull request|Merge) #(\d+)/ && $2 }.compact
     end
 
     last_stable = `git ls-remote origin`.split("\n").map {|r| r =~ %r{refs/tags/v([\d.]+)$} && $1 }.compact.map {|v| Gem::Version.create(v) }.max
