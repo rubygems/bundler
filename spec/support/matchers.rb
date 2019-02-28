@@ -74,8 +74,7 @@ module Spec
       match do |actual|
         deprecations = actual.split(MAJOR_DEPRECATION)
 
-        return !expected.nil? if deprecations.size <= 1
-        return true if expected.nil?
+        return !expected.nil? if deprecations.empty?
 
         deprecations.any? do |d|
           !d.empty? && values_match?(expected, d.strip)

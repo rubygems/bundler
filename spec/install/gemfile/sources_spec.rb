@@ -15,7 +15,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
       end
     end
 
-    context "with multiple toplevel sources" do
+    context "with multiple toplevel sources", :bundler => "< 2" do
       let(:repo3_rack_version) { "1.0.0" }
 
       before do
@@ -27,12 +27,17 @@ RSpec.describe "bundle install with gems on multiple sources" do
         G
       end
 
-      it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first", :bundler => "< 2" do
+      xit "shows a deprecation" do
         bundle :install
 
-        expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
-        expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
-        expect(out).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo1}"))
+        expect(err).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
+      end
+
+      it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first" do
+        bundle :install
+
+        expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
+        expect(err).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo1}"))
         expect(the_bundle).to include_gems("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
       end
 
@@ -44,7 +49,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
       end
     end
 
-    context "when different versions of the same gem are in multiple sources" do
+    context "when different versions of the same gem are in multiple sources", :bundler => "< 2" do
       let(:repo3_rack_version) { "1.2" }
 
       before do
@@ -54,14 +59,17 @@ RSpec.describe "bundle install with gems on multiple sources" do
           gem "rack-obama"
           gem "rack", "1.0.0" # force it to install the working version in repo1
         G
+
+        bundle :install
       end
 
-      it "warns about ambiguous gems, but installs anyway", :bundler => "< 2" do
-        bundle :install
+      xit "shows a deprecation" do
+        expect(err).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
+      end
 
-        expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
-        expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
-        expect(out).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo1}"))
+      it "warns about ambiguous gems, but installs anyway" do
+        expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
+        expect(err).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo1}"))
         expect(the_bundle).to include_gems("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
       end
     end
@@ -235,7 +243,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
           end
         end
 
-        context "and in yet another source" do
+        context "and in yet another source", :bundler => "< 2" do
           before do
             gemfile <<-G
               source "file://localhost#{gem_repo1}"
@@ -244,18 +252,22 @@ RSpec.describe "bundle install with gems on multiple sources" do
                 gem "depends_on_rack"
               end
             G
+
+            bundle :install
           end
 
-          it "installs from the other source and warns about ambiguous gems", :bundler => "< 2" do
-            bundle :install
-            expect(out).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
-            expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
-            expect(out).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo2}"))
+          xit "shows a deprecation" do
+            expect(err).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
+          end
+
+          it "installs from the other source and warns about ambiguous gems" do
+            expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
+            expect(err).to include(normalize_uri_file("Installed from: file://localhost#{gem_repo2}"))
             expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
 
-        context "and only the dependency is pinned" do
+        context "and only the dependency is pinned", :bundler => "< 2" do
           before do
             # need this to be broken to check for correct source ordering
             build_repo gem_repo2 do
@@ -273,10 +285,10 @@ RSpec.describe "bundle install with gems on multiple sources" do
             G
           end
 
-          it "installs the dependency from the pinned source without warning", :bundler => "< 2" do
+          it "installs the dependency from the pinned source without warning" do
             bundle :install
 
-            expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+            expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
             expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
 
             # In https://github.com/bundler/bundler/issues/3585 this failed
@@ -284,7 +296,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
             system_gems []
             bundle :install
 
-            expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+            expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
             expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
@@ -329,7 +341,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
           it "installs all gems without warning" do
             bundle :install
-            expect(out).not_to include("Warning")
+            expect(err).not_to include("Warning")
             expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
           end
         end
@@ -364,7 +376,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
           it "installs the dependency from the top-level source without warning" do
             bundle :install
-            expect(out).not_to include("Warning")
+            expect(err).not_to include("Warning")
             expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0", "unrelated_gem 1.0.0")
           end
         end
@@ -453,7 +465,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
 
     it "installs the gems without any warning" do
       bundle :install
-      expect(out).not_to include("Warning")
+      expect(err).not_to include("Warning")
       expect(the_bundle).to include_gems("rack 1.0.0")
     end
   end
@@ -631,7 +643,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
         gem "depends_on_rack"
       G
       expect(last_command).to be_failure
-      expect(last_command.stderr).to eq normalize_uri_file(strip_whitespace(<<-EOS).strip)
+      expect(err).to eq normalize_uri_file(strip_whitespace(<<-EOS).strip)
         The gem 'rack' was found in multiple relevant sources.
           * rubygems repository file://localhost#{gem_repo1}/ or installed locally
           * rubygems repository file://localhost#{gem_repo4}/ or installed locally
