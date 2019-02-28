@@ -108,7 +108,7 @@ RSpec.describe "major deprecations" do
   end
 
   context "when Bundler.setup is run in a ruby script" do
-    it "should print a single deprecation warning" do
+    before do
       create_file "gems.rb"
       install_gemfile! <<-G
         source "file://#{gem_repo1}"
@@ -124,7 +124,9 @@ RSpec.describe "major deprecations" do
         Bundler.setup
         Bundler.setup
       RUBY
+    end
 
+    it "should print a single deprecation warning" do
       expect(warnings).to have_major_deprecation("gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock.")
     end
   end
