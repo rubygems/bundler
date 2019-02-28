@@ -27,10 +27,12 @@ module Bundler
     long_desc <<-D
       Uninstalls given list of plugins. To uninstall all the plugins, use -all option.
    D
-    method_option "all", :type => :string, :default => nil, :banner =>
+    method_option "all", :type => :boolean, :default => nil, :banner =>
       "Uninstalls all the  installed plugins. If no plugin is installed then it does nothing."
     def uninstall(*plugins)
       Bundler::Plugin.uninstall(plugins, options)
+    end
+
     desc "list", "List the installed plugins and available commands"
     def list
       Bundler::Plugin.list
