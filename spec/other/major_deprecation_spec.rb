@@ -170,6 +170,15 @@ RSpec.describe "major deprecations" do
   end
 
   xdescribe Bundler::Dsl do
+    let(:msg) do
+      <<-EOS
+The :github git source is deprecated, and will be removed in Bundler 2.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
+
+    git_source(:github) {|repo_name| "https://github.com/\#{repo_name}.git" }
+
+      EOS
+    end
+
     before do
       @rubygems = double("rubygems")
       allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }
@@ -177,24 +186,12 @@ RSpec.describe "major deprecations" do
 
     context "with github gems" do
       it "warns about the https change" do
-        msg = <<-EOS
-The :github git source is deprecated, and will be removed in Bundler 2.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
-
-    git_source(:github) {|repo_name| "https://github.com/\#{repo_name}.git" }
-
-        EOS
         expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, msg)
         subject.gem("sparks", :github => "indirect/sparks")
       end
 
       it "upgrades to https on request" do
         Bundler.settings.temporary "github.https" => true
-        msg = <<-EOS
-The :github git source is deprecated, and will be removed in Bundler 2.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
-
-    git_source(:github) {|repo_name| "https://github.com/\#{repo_name}.git" }
-
-        EOS
         expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, msg)
         expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, "The `github.https` setting will be removed")
         subject.gem("sparks", :github => "indirect/sparks")
