@@ -111,7 +111,7 @@ RSpec.describe "major deprecations" do
     end
 
     context "with flags" do
-      xit "should print a deprecation warning about autoremembering flags" do
+      it "should print a deprecation warning about autoremembering flags", :bundler => "3" do
         install_gemfile <<-G, :path => "vendor/bundle"
           source "file://#{gem_repo1}"
           gem "rack"
