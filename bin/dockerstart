@@ -1,0 +1,5 @@
+#!/bin/bash
+
+bin/rake spec:deps
+
+echo "alias dbundle='/home/bin/bundle'" >> ~/.bashrc
