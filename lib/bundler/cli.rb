@@ -795,7 +795,7 @@ module Bundler
       return unless name_index
 
       value = options[name]
-      value = "#{value.join(" ")}" if option.type == :array
+      value = value.join(" ").to_s if option.type == :array
 
       Bundler::SharedHelpers.major_deprecation 2,\
         "The `#{flag_name}` flag is deprecated because it relied on being " \
