@@ -169,7 +169,7 @@ RSpec.describe "major deprecations" do
     end
   end
 
-  xdescribe Bundler::Dsl do
+  describe Bundler::Dsl do
     let(:msg) do
       <<-EOS
 The :github git source is deprecated, and will be removed in Bundler 2.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
@@ -185,12 +185,20 @@ The :github git source is deprecated, and will be removed in Bundler 2.0. Change
     end
 
     context "with github gems" do
-      it "warns about the https change" do
-        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, msg)
+      xit "warns about the https change" do
+        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, "The `github.https` setting will be removed")
         subject.gem("sparks", :github => "indirect/sparks")
       end
 
-      it "upgrades to https on request" do
+      it "upgrades to https by default", :bundler => "2" do
+        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, msg)
+        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, "The `github.https` setting will be removed")
+        subject.gem("sparks", :github => "indirect/sparks")
+        github_uri = "https://github.com/indirect/sparks.git"
+        expect(subject.dependencies.first.source.uri).to eq(github_uri)
+      end
+
+      it "upgrades to https on request", :bundler => "< 2" do
         Bundler.settings.temporary "github.https" => true
         expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, msg)
         expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(2, "The `github.https` setting will be removed")
