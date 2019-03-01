@@ -28,6 +28,18 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
         $ alias dbundle='/path/to/bundler/repo/bin/bundle'
 
+## Development setup with Docker
+
+1. [Fork the Bundler repo](https://github.com/bundler/bundler), and clone the fork onto your machine. ([Follow this tutorial](https://help.github.com/articles/fork-a-repo/) for instructions on forking a repo.)
+
+2. Build the docker image from root.
+
+        $ docker build -t bundler .
+
+3. Enter the container and start coding.
+
+        $ docker run -it -v $PWD:/home bundler bash        
+
 ## Debugging with `pry`
 
 To dive into the code with Pry: `RUBYOPT=-rpry dbundle` to require pry and then run commands.
