@@ -100,7 +100,7 @@ RSpec.describe Bundler::Dsl do
       end
     end
 
-    context "default git sources", :bundler => "3" do
+    context "default git sources", :bundler => "4" do
       it "has none" do
         expect(subject.instance_variable_get(:@git_sources)).to eq({})
       end
@@ -293,6 +293,19 @@ RSpec.describe Bundler::Dsl do
     end
 
     describe "#github", :bundler => "3" do
+      it "from github" do
+        spree_gems = %w[spree_core spree_api spree_backend]
+        subject.github "spree" do
+          spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
+        end
+
+        subject.dependencies.each do |d|
+          expect(d.source.uri).to eq("https://github.com/spree/spree.git")
+        end
+      end
+    end
+
+    describe "#github", :bundler => "4" do
       it "from github" do
         expect do
           spree_gems = %w[spree_core spree_api spree_backend]
