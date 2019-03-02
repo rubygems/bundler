@@ -2,7 +2,7 @@ inherit_from:
   - .rubocop_todo.yml
 
 AllCops:
-  TargetRubyVersion: 1.9
+  TargetRubyVersion: 2.3
   Exclude:
     - tmp/**/*
     - lib/bundler/vendor/**/*
@@ -13,10 +13,6 @@ AllCops:
 # They are idiomatic
 Lint/AssignmentInCondition:
   Enabled: false
-
-Lint/EndAlignment:
-  EnforcedStyleAlignWith: variable
-  AutoCorrect: true
 
 Lint/UnusedMethodArgument:
   Enabled: false
@@ -32,6 +28,10 @@ Layout/AccessModifierIndentation:
 
 Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+  AutoCorrect: true
 
 Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
@@ -74,7 +74,10 @@ Style/StringLiteralsInInterpolation:
 
 # Having these make it easier to *not* forget to add one when adding a new
 # value and you can simply copy the previous line.
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 
 Style/TrailingUnderscoreVariable:
