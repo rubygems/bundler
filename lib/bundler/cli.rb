@@ -101,11 +101,11 @@ module Bundler
                              :desc => "Specify the number of times you wish to attempt network commands"
     class_option "verbose", :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
 
-    def help(cli = nil)
-      case cli
+    def help(topic = nil)
+      case topic
       when "gemfile" then command = "gemfile"
       when nil       then command = "bundle"
-      else command = "bundle-#{cli}"
+      else command = "bundle-#{topic}"
       end
 
       man_path  = File.expand_path("../../../man", __FILE__)
@@ -119,7 +119,7 @@ module Bundler
         else
           puts File.read("#{man_path}/#{File.basename(man_pages[command])}.txt")
         end
-      elsif command_path = Bundler.which("bundler-#{cli}")
+      elsif command_path = Bundler.which("bundler-#{topic}")
         Kernel.exec(command_path, "--help")
       else
         super
