@@ -18,18 +18,18 @@ module Bundler
 
       no_specific_gems = gems.empty? && sources.empty? && groups.empty? && !options[:ruby] && !options[:bundler]
 
-      if no_specific_gems && !options[:all]
-        if Bundler.feature_flag.update_requires_all_flag?
-          raise InvalidOption, "To update everything, pass the `--all` flag."
-        end
-        SharedHelpers.major_deprecation 2, "Pass --all to `bundle update` to update everything"
-      elsif !no_specific_gems && options[:all]
-        raise InvalidOption, "Cannot specify --all along with specific options."
-      end
-
       if no_specific_gems
+        if !options[:all] && Bundler.feature_flag.update_requires_all_flag?
+          require "bundler/cli/help"
+          Bundler::CLI::Help.new("update").run
+        elsif !options[:all]
+          SharedHelpers.major_deprecation 2, "Pass --all to `bundle update` to update everything"
+        end
+
         # We're doing a full update
         Bundler.definition(true)
+      elsif options[:all]
+        raise InvalidOption, "Cannot specify --all along with specific options."
       else
         unless Bundler.default_lockfile.exist?
           raise GemfileLockNotFound, "This Bundle hasn't been installed yet. " \

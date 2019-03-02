@@ -74,10 +74,11 @@ RSpec.describe "bundle update" do
   context "when update_requires_all_flag is set" do
     before { bundle! "config update_requires_all_flag true" }
 
-    it "errors when passed nothing" do
+    it "shows usage instructions when passed nothing" do
       install_gemfile! ""
       bundle :update
-      expect(err).to eq("To update everything, pass the `--all` flag.")
+      expect(out).to include("bundle-update - Update your gems to the latest available versions")
+      expect(err).to be_empty
     end
 
     it "errors when passed --all and another option" do
