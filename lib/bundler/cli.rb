@@ -101,29 +101,10 @@ module Bundler
                              :desc => "Specify the number of times you wish to attempt network commands"
     class_option "verbose", :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
 
-    def help(topic = nil)
-      case topic
-      when "gemfile" then command = "gemfile"
-      when nil       then command = "bundle"
-      else command = "bundle-#{topic}"
-      end
-
-      man_path  = File.expand_path("../../../man", __FILE__)
-      man_pages = Hash[Dir.glob(File.join(man_path, "*")).grep(/.*\.\d*\Z/).collect do |f|
-        [File.basename(f, ".*"), f]
-      end]
-
-      if man_pages.include?(command)
-        if Bundler.which("man") && man_path !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          Kernel.exec "man #{man_pages[command]}"
-        else
-          puts File.read("#{man_path}/#{File.basename(man_pages[command])}.txt")
-        end
-      elsif command_path = Bundler.which("bundler-#{topic}")
-        Kernel.exec(command_path, "--help")
-      else
-        super
-      end
+    def help(topic = nil, plain = nil)
+      return super if plain
+      require "bundler/cli/help"
+      Help.new(topic, self).run
     end
 
     def self.handle_no_command_error(command, has_namespace = $thor_runner)
