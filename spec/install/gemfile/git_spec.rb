@@ -221,7 +221,7 @@ RSpec.describe "bundle install with git sources" do
       end
 
       Dir.chdir(lib_path("foo-1.0")) do
-        `git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1`
+        `git update-ref -m "Bundler Spec!" refs/bundler/1 master~1`
       end
 
       # want to ensure we don't fallback to HEAD
@@ -257,7 +257,7 @@ RSpec.describe "bundle install with git sources" do
       end
 
       Dir.chdir(lib_path("foo-1.0")) do
-        `git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1`
+        `git update-ref -m "Bundler Spec!" refs/bundler/1 master~1`
       end
 
       # want to ensure we don't fallback to HEAD
@@ -282,7 +282,7 @@ RSpec.describe "bundle install with git sources" do
 
     it "does not download random non-head refs" do
       Dir.chdir(lib_path("foo-1.0")) do
-        sys_exec!("git update-ref -m 'Bundler Spec!' refs/bundler/1 master~1")
+        sys_exec!('git update-ref -m "Bundler Spec!" refs/bundler/1 master~1')
       end
 
       bundle! "config global_gem_cache true"
@@ -1163,7 +1163,7 @@ RSpec.describe "bundle install with git sources" do
               void Init_foo() { rb_define_global_function("foo", &foo, 0); }
             C
           end
-          `git commit -m 'commit for iteration #{i}' ext/foo.c`
+          `git commit -m "commit for iteration #{i}" ext/foo.c`
         end
         git_commit_sha = git_reader.ref_for("HEAD")
 
