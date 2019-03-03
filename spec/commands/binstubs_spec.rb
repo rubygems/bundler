@@ -133,7 +133,7 @@ RSpec.describe "bundle binstubs <gem>" do
 
       context "when BUNDLER_VERSION is set" do
         it "runs the correct version of bundler" do
-          sys_exec "#{bundled_app("bin/bundle")} install", { 'BUNDLER_VERSION' => '999.999.999' }
+          sys_exec "#{bundled_app("bin/bundle")} install", "BUNDLER_VERSION" => "999.999.999"
           expect(exitstatus).to eq(42) if exitstatus
           expect(last_command.stderr).to include("Activating bundler (999.999.999) failed:").
             and include("To install the version of bundler this project requires, run `gem install bundler -v '999.999.999'`")
