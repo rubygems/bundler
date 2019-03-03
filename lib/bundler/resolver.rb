@@ -279,10 +279,10 @@ module Bundler
           versions_with_platforms = specs.map {|s| [s.version, s.platform] }
           message = String.new("Could not find gem '#{SharedHelpers.pretty_dependency(requirement)}' in #{source}#{cache_message}.\n")
           message << if versions_with_platforms.any?
-                       "The source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
-                     else
-                       "The source does not contain any versions of '#{name}'"
-                     end
+            "The source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
+          else
+            "The source does not contain any versions of '#{name}'"
+          end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
             "listed in your Gemfile#{cache_message}."
@@ -375,12 +375,12 @@ module Bundler
             o << " "
 
             o << if relevant_sources.empty?
-                   "in any of the sources.\n"
-                 elsif metadata_requirement
-                   "is not available in #{relevant_sources.join(" or ")}"
-                 else
-                   "in any of the relevant sources:\n  #{relevant_sources * "\n  "}\n"
-                 end
+              "in any of the sources.\n"
+            elsif metadata_requirement
+              "is not available in #{relevant_sources.join(" or ")}"
+            else
+              "in any of the relevant sources:\n  #{relevant_sources * "\n  "}\n"
+            end
           end
         end,
         :version_for_spec => lambda {|spec| spec.version },
