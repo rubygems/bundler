@@ -649,7 +649,7 @@ module Spec
           `git config user.email "lol@wut.com"`
           `git config user.name "lolwut"`
           `git config commit.gpgsign false`
-          `git commit -m 'OMG INITIAL COMMIT'`
+          `git commit -m "OMG INITIAL COMMIT"`
         end
       end
     end
