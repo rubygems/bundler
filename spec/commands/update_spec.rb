@@ -12,7 +12,7 @@ RSpec.describe "bundle update" do
     G
   end
 
-  describe "with no arguments", :bundler => "< 2" do
+  describe "with no arguments", :bundler => "< 3" do
     it "updates the entire bundle" do
       update_repo2 do
         build_gem "activesupport", "3.0"
@@ -32,6 +32,18 @@ RSpec.describe "bundle update" do
       G
       bundle "update"
       expect(bundled_app("Gemfile.lock")).to exist
+    end
+  end
+
+  describe "with no arguments", :bundler => "3" do
+    it "does not update the entire bundle" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+      end
+
+      bundle "update"
+      expect(out).not_to include("Bundle updated!")
+      expect(the_bundle).not_to include_gems "rack 1.2", "activesupport 3.0"
     end
   end
 
