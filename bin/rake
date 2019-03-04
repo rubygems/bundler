@@ -5,17 +5,18 @@ load File.expand_path("../with_rubygems", __FILE__) if ENV["RGV"]
 
 require "rubygems"
 
-unless ARGV[0] == "spec:deps"
-  bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
-  bundler_spec.dependencies.each do |dep|
-    begin
-      gem dep.name, dep.requirement
-    rescue Gem::LoadError => e
-      warn "#{e.message} (#{e.class})"
-    end
-  end
-
-  Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
+bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
+rake = bundler_spec.development_dependencies.find do |dep|
+  dep.name == "rake"
 end
 
-load Gem.bin_path("rake", "rake")
+rake_requirement = rake.requirement.to_s
+
+begin
+  gem "rake", rake_requirement
+  Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
+
+  load Gem.bin_path("rake", "rake")
+rescue Gem::LoadError
+  warn "We couln't activate rake (#{rake_requirement}). Run `gem install rake:'#{rake_requirement}'`"
+end
