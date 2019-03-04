@@ -595,17 +595,6 @@ Style/StderrPuts:
 Style/SymbolArray:
   EnforcedStyle: brackets
 
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline.
-# SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInHashLiteral:
-  Exclude:
-    - 'lib/bundler/cli/gem.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/graph.rb'
-    - 'spec/support/artifice/endpoint.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 Style/UnneededCondition:

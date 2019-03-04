@@ -226,7 +226,7 @@ module Bundler
         "GO_SERVER_URL" => "go",
         "SNAP_CI" => "snap",
         "CI_NAME" => ENV["CI_NAME"],
-        "CI" => "ci"
+        "CI" => "ci",
       }
       env_cis.find_all {|env, _| ENV[env] }.map {|_, ci| ci }
     end
