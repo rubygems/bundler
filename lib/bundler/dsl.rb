@@ -45,7 +45,7 @@ module Bundler
       @gemfiles << expanded_gemfile_path
       contents ||= Bundler.read_file(@gemfile.to_s)
       instance_eval(contents.dup.untaint, gemfile.to_s, 1)
-    rescue Exception => e
+    rescue Exception => e # rubocop:disable Lint/RescueException
       message = "There was an error " \
         "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \
         "`#{File.basename gemfile.to_s}`: #{e.message}"

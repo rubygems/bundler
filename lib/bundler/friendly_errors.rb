@@ -123,7 +123,7 @@ module Bundler
     yield
   rescue SignalException
     raise
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     FriendlyErrors.log_error(e)
     exit FriendlyErrors.exit_status(e)
   end

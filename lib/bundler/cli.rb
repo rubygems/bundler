@@ -16,7 +16,7 @@ module Bundler
 
     def self.start(*)
       super
-    rescue Exception => e
+    rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = UI::Shell.new
       raise e
     ensure

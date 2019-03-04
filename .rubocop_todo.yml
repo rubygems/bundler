@@ -162,15 +162,6 @@ Lint/NestedMethodDefinition:
     - 'lib/bundler/inline.rb'
     - 'spec/support/builders.rb'
 
-# Offense count: 5
-Lint/RescueException:
-  Exclude:
-    - 'lib/bundler/cli.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/worker.rb'
-
 # Offense count: 2
 Lint/ShadowedException:
   Exclude:
