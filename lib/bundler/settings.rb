@@ -421,7 +421,7 @@ module Bundler
       )
       \2 # matching closing quote
       $
-    }xo
+    }xo.freeze
 
     def load_config(config_file)
       return {} if !config_file || ignore_config?
@@ -444,7 +444,7 @@ module Bundler
         (https?.*?) # URI
         (\.#{Regexp.union(PER_URI_OPTIONS)})? # optional suffix key
         \z
-      /ix
+      /ix.freeze
 
     # TODO: duplicates Rubygems#normalize_uri
     # TODO: is this the correct place to validate mirror URIs?

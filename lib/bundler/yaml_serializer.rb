@@ -32,7 +32,7 @@ module Bundler
       (.*) # value
       \1 # matching closing quote
       $
-    /xo
+    /xo.freeze
 
     HASH_REGEX = /
       ^
@@ -45,7 +45,7 @@ module Bundler
       (.*) # value
       \3 # matching closing quote
       $
-    /xo
+    /xo.freeze
 
     def load(str)
       res = {}

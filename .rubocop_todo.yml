@@ -473,19 +473,6 @@ Style/MultilineIfModifier:
     - 'lib/bundler/runtime.rb'
     - 'lib/bundler/source/rubygems.rb'
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: literals, strict
-Style/MutableConstant:
-  Exclude:
-    - 'lib/bundler/cli/doctor.rb'
-    - 'lib/bundler/lockfile_parser.rb'
-    - 'lib/bundler/ruby_version.rb'
-    - 'lib/bundler/settings.rb'
-    - 'lib/bundler/yaml_serializer.rb'
-    - 'spec/support/matchers.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 # Configuration parameters: AutoCorrect, EnforcedStyle, IgnoredMethods.
