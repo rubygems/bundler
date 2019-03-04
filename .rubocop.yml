@@ -50,6 +50,9 @@ Style/Alias:
 Style/FrozenStringLiteralComment:
   EnforcedStyle: always
 
+Style/GuardClause:
+  Enabled: false
+
 Style/MultilineBlockChain:
   Enabled: false
 

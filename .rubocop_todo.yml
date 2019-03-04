@@ -386,21 +386,6 @@ Style/GlobalVars:
     - 'lib/bundler/cli.rb'
     - 'spec/spec_helper.rb'
 
-# Offense count: 11
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Exclude:
-    - 'lib/bundler/cli/cache.rb'
-    - 'lib/bundler/cli/install.rb'
-    - 'lib/bundler/cli/outdated.rb'
-    - 'lib/bundler/cli/package.rb'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/installer.rb'
-    - 'lib/bundler/runtime.rb'
-    - 'lib/bundler/source/path/installer.rb'
-    - 'lib/bundler/source_list.rb'
-    - 'spec/support/sometimes.rb'
-
 # Offense count: 108
 # Cop supports --auto-correct.
 Style/IfUnlessModifier:

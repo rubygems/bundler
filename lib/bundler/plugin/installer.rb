@@ -43,16 +43,11 @@ module Bundler
 
     private
 
-      # Rubocop misunderstands the semantics of this method, assuming an `else` code block
-      # that doesn't exist. See https://github.com/bbatsov/rubocop/issues/5702.
-      #
-      # rubocop:disable Style/GuardClause
       def check_sources_consistency!(options)
         if options.key?(:git) && options.key?(:local_git)
           raise InvalidOption, "Remote and local plugin git sources can't be both specified"
         end
       end
-      # rubocop:enable Style/GuardClause
 
       def install_git(names, version, options)
         uri = options.delete(:git)
