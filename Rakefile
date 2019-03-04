@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 $:.unshift File.expand_path("../lib", __FILE__)
-require "shellwords"
 require "benchmark"
 
 NULL_DEVICE = (Gem.win_platform? ? "NUL" : "/dev/null")
