@@ -14,7 +14,7 @@ RSpec.describe Bundler::SharedHelpers do
     before { ENV["BUNDLE_GEMFILE"] = "/path/Gemfile" }
 
     context "Gemfile is present" do
-      let(:expected_gemfile_path) { Pathname.new("/path/Gemfile") }
+      let(:expected_gemfile_path) { Pathname.new("/path/Gemfile").expand_path }
 
       it "returns the Gemfile path" do
         expect(subject.default_gemfile).to eq(expected_gemfile_path)
