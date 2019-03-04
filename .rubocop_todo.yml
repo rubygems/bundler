@@ -595,16 +595,6 @@ Style/StderrPuts:
 Style/SymbolArray:
   EnforcedStyle: brackets
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline.
-# SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInArrayLiteral:
-  Exclude:
-    - 'lib/bundler/gem_helpers.rb'
-    - 'lib/bundler/ruby_version.rb'
-    - 'lib/bundler/similarity_detector.rb'
-
 # Offense count: 6
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyleForMultiline.
