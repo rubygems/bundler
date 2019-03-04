@@ -15,13 +15,6 @@ def bundler_spec
   @bundler_spec ||= Gem::Specification.load("bundler.gemspec")
 end
 
-def safe_task(&block)
-  yield
-  true
-rescue StandardError
-  false
-end
-
 # Benchmark task execution
 module Rake
   class Task
@@ -42,6 +35,13 @@ task :spec do
 end
 
 namespace :spec do
+  def safe_task(&block)
+    yield
+    true
+  rescue StandardError
+    false
+  end
+
   desc "Ensure spec dependencies are installed"
   task :deps do
     deps = Hash[bundler_spec.development_dependencies.map do |d|
