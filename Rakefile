@@ -18,7 +18,7 @@ end
 def safe_task(&block)
   yield
   true
-rescue
+rescue StandardError
   false
 end
 

@@ -545,21 +545,6 @@ Style/RedundantReturn:
   Exclude:
     - 'lib/bundler/installer/gem_installer.rb'
 
-# Offense count: 13
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: implicit, explicit
-Style/RescueStandardError:
-  Exclude:
-    - 'Rakefile'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'lib/bundler/retry.rb'
-    - 'lib/bundler/source/rubygems.rb'
-    - 'spec/support/artifice/compact_index.rb'
-    - 'spec/support/helpers.rb'
-    - 'spec/support/matchers.rb'
-
 # Offense count: 35
 # Cop supports --auto-correct.
 # Configuration parameters: ConvertCodeThatCanStartToReturnNil, Whitelist.

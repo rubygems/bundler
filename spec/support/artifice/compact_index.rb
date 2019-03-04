@@ -21,7 +21,7 @@ class CompactIndexAPI < Endpoint
       headers "Surrogate-Control" => "max-age=2592000, stale-while-revalidate=60"
       content_type "text/plain"
       requested_range_for(response_body)
-    rescue => e
+    rescue StandardError => e
       puts e
       puts e.backtrace
       raise
@@ -83,7 +83,7 @@ class CompactIndexAPI < Endpoint
             end
             checksum = begin
                          Digest(:SHA256).file("#{GEM_REPO}/gems/#{spec.original_name}.gem").base64digest
-                       rescue
+                       rescue StandardError
                          nil
                        end
             CompactIndex::GemVersion.new(spec.version.version, spec.platform.to_s, checksum, nil,
