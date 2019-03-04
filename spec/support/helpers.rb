@@ -318,7 +318,7 @@ module Spec
             Dir.chdir(root) { gem_command! :build, gemspec.to_s }
           end
           bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
-        elsif g.to_s =~ %r{\A[A-Z]?:/.*\.gem\z}
+        elsif g.to_s =~ %r{\A(?:[A-Z]:)?/.*\.gem\z}
           g
         else
           "#{gem_repo}/gems/#{g}.gem"
