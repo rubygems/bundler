@@ -70,28 +70,10 @@ Layout/ClosingHeredocIndentation:
     - 'spec/lock/lockfile_spec.rb'
     - 'spec/other/platform_spec.rb'
 
-# Offense count: 5
-# Cop supports --auto-correct.
-Layout/ElseAlignment:
-  Exclude:
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'lib/bundler/source/path.rb'
-
 # Offense count: 290
 # Cop supports --auto-correct.
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleAlignWith, AutoCorrect, Severity.
-# SupportedStylesAlignWith: keyword, variable, start_of_line
-Layout/EndAlignment:
-  Exclude:
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'lib/bundler/source/path.rb'
 
 # Offense count: 10
 # Cop supports --auto-correct.
@@ -106,15 +88,6 @@ Layout/IndentArray:
 # SupportedStyles: auto_detection, squiggly, active_support, powerpack, unindent
 Layout/IndentHeredoc:
   Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: Width, IgnoredPatterns.
-Layout/IndentationWidth:
-  Exclude:
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'lib/bundler/source/path.rb'
 
 # Offense count: 3
 # Cop supports --auto-correct.
@@ -621,27 +594,6 @@ Style/StderrPuts:
 # SupportedStyles: percent, brackets
 Style/SymbolArray:
   EnforcedStyle: brackets
-
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline.
-# SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInArrayLiteral:
-  Exclude:
-    - 'lib/bundler/gem_helpers.rb'
-    - 'lib/bundler/ruby_version.rb'
-    - 'lib/bundler/similarity_detector.rb'
-
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline.
-# SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInHashLiteral:
-  Exclude:
-    - 'lib/bundler/cli/gem.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/graph.rb'
-    - 'spec/support/artifice/endpoint.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
