@@ -370,18 +370,6 @@ Style/EmptyMethod:
     - 'lib/bundler/ui/silent.rb'
     - 'spec/support/artifice/fail.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-Style/Encoding:
-  Exclude:
-    - 'Rakefile'
-    - 'bundler.gemspec'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'spec/bundler/bundler_spec.rb'
-    - 'spec/install/gemfile_spec.rb'
-    - 'spec/install/gemspecs_spec.rb'
-    - 'spec/quality_es_spec.rb'
-
 # Offense count: 2
 Style/EvalWithLocation:
   Exclude:
