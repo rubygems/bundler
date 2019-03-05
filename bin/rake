@@ -11,7 +11,7 @@ unless ARGV[0] == "spec:deps"
     begin
       gem dep.name, dep.requirement
     rescue Gem::LoadError => e
-      $stderr.puts "#{e.message} (#{e.class})"
+      warn "#{e.message} (#{e.class})"
     end
   end
 

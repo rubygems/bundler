@@ -569,7 +569,7 @@ module Spec
       tries = 0
       sleep 0.5
       TCPSocket.new(host, port)
-    rescue => e
+    rescue StandardError => e
       raise(e) if tries > (seconds * 2)
       tries += 1
       retry
@@ -579,7 +579,7 @@ module Spec
       port = 21_453
       begin
         port += 1 while TCPSocket.new("127.0.0.1", port)
-      rescue
+      rescue StandardError
         false
       end
       port

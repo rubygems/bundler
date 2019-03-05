@@ -162,15 +162,6 @@ Lint/NestedMethodDefinition:
     - 'lib/bundler/inline.rb'
     - 'spec/support/builders.rb'
 
-# Offense count: 5
-Lint/RescueException:
-  Exclude:
-    - 'lib/bundler/cli.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/worker.rb'
-
 # Offense count: 2
 Lint/ShadowedException:
   Exclude:
@@ -370,18 +361,6 @@ Style/EmptyMethod:
     - 'lib/bundler/ui/silent.rb'
     - 'spec/support/artifice/fail.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-Style/Encoding:
-  Exclude:
-    - 'Rakefile'
-    - 'bundler.gemspec'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'spec/bundler/bundler_spec.rb'
-    - 'spec/install/gemfile_spec.rb'
-    - 'spec/install/gemspecs_spec.rb'
-    - 'spec/quality_es_spec.rb'
-
 # Offense count: 2
 Style/EvalWithLocation:
   Exclude:
@@ -406,21 +385,6 @@ Style/GlobalVars:
   Exclude:
     - 'lib/bundler/cli.rb'
     - 'spec/spec_helper.rb'
-
-# Offense count: 11
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Exclude:
-    - 'lib/bundler/cli/cache.rb'
-    - 'lib/bundler/cli/install.rb'
-    - 'lib/bundler/cli/outdated.rb'
-    - 'lib/bundler/cli/package.rb'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/installer.rb'
-    - 'lib/bundler/runtime.rb'
-    - 'lib/bundler/source/path/installer.rb'
-    - 'lib/bundler/source_list.rb'
-    - 'spec/support/sometimes.rb'
 
 # Offense count: 108
 # Cop supports --auto-correct.
@@ -485,19 +449,6 @@ Style/MultilineIfModifier:
     - 'lib/bundler/runtime.rb'
     - 'lib/bundler/source/rubygems.rb'
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: literals, strict
-Style/MutableConstant:
-  Exclude:
-    - 'lib/bundler/cli/doctor.rb'
-    - 'lib/bundler/lockfile_parser.rb'
-    - 'lib/bundler/ruby_version.rb'
-    - 'lib/bundler/settings.rb'
-    - 'lib/bundler/yaml_serializer.rb'
-    - 'spec/support/matchers.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 # Configuration parameters: AutoCorrect, EnforcedStyle, IgnoredMethods.
@@ -557,36 +508,12 @@ Style/RedundantReturn:
   Exclude:
     - 'lib/bundler/installer/gem_installer.rb'
 
-# Offense count: 13
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: implicit, explicit
-Style/RescueStandardError:
-  Exclude:
-    - 'Rakefile'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'lib/bundler/retry.rb'
-    - 'lib/bundler/source/rubygems.rb'
-    - 'spec/support/artifice/compact_index.rb'
-    - 'spec/support/helpers.rb'
-    - 'spec/support/matchers.rb'
-
 # Offense count: 35
 # Cop supports --auto-correct.
 # Configuration parameters: ConvertCodeThatCanStartToReturnNil, Whitelist.
 # Whitelist: present?, blank?, presence, try, try!
 Style/SafeNavigation:
   Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/StderrPuts:
-  Exclude:
-    - 'bin/rake'
-    - 'lib/bundler/graph.rb'
-    - 'spec/support/artifice/compact_index_api_missing.rb'
-    - 'spec/support/artifice/endpoint_api_missing.rb'
 
 # Offense count: 57
 # Cop supports --auto-correct.

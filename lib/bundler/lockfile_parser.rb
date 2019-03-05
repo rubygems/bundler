@@ -23,7 +23,7 @@ module Bundler
     PATH         = "PATH".freeze
     PLUGIN       = "PLUGIN SOURCE".freeze
     SPECS        = "  specs:".freeze
-    OPTIONS      = /^  ([a-z]+): (.*)$/i
+    OPTIONS      = /^  ([a-z]+): (.*)$/i.freeze
     SOURCE       = [GIT, GEM, PATH, PLUGIN].freeze
 
     SECTIONS_BY_VERSION_INTRODUCED = {
@@ -183,7 +183,7 @@ module Bundler
       (?:-(.*))?\))?                                     # Optional platform
       (!)?                                               # Optional pinned marker
       $                                                  # Line end
-    /xo
+    /xo.freeze
 
     def parse_dependency(line)
       return unless line =~ NAME_VERSION

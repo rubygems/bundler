@@ -172,13 +172,13 @@ module Bundler
 
     def name_for_explicit_dependency_source
       Bundler.default_gemfile.basename.to_s
-    rescue
+    rescue StandardError
       "Gemfile"
     end
 
     def name_for_locking_dependency_source
       Bundler.default_lockfile.basename.to_s
-    rescue
+    rescue StandardError
       "Gemfile.lock"
     end
 

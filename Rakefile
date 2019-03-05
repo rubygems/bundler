@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 # frozen_string_literal: true
 
 $:.unshift File.expand_path("../lib", __FILE__)
@@ -19,7 +18,7 @@ end
 def safe_task(&block)
   yield
   true
-rescue
+rescue StandardError
   false
 end
 
