@@ -6,7 +6,7 @@ Artifice.deactivate
 
 class CompactIndexRateLimited < CompactIndexAPI
   class RequestCounter
-    def self.init
+    def self.queue
       @queue ||= Queue.new
     end
 
@@ -24,7 +24,7 @@ class CompactIndexRateLimited < CompactIndexAPI
   end
 
   configure do
-    RequestCounter.init
+    RequestCounter.queue
   end
 
   get "/info/:name" do

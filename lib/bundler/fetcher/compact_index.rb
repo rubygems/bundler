@@ -40,12 +40,12 @@ module Bundler
           log_specs "Looking up gems #{remaining_gems.inspect}"
 
           deps = begin
-            parallel_compact_index_client.dependencies(remaining_gems)
-          rescue TooManyRequestsError
-            @bundle_worker.stop if @bundle_worker
-            @bundle_worker = nil # reset it.  Not sure if necessary
-            serial_compact_index_client.dependencies(remaining_gems)
-          end
+                   parallel_compact_index_client.dependencies(remaining_gems)
+                 rescue TooManyRequestsError
+                   @bundle_worker.stop if @bundle_worker
+                   @bundle_worker = nil # reset it.  Not sure if necessary
+                   serial_compact_index_client.dependencies(remaining_gems)
+                 end
           next_gems = deps.map {|d| d[3].map(&:first).flatten(1) }.flatten(1).uniq
           deps.each {|dep| gem_info << dep }
           complete_gems.concat(deps.map(&:first)).uniq!
