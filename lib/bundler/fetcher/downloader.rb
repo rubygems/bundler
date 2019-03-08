@@ -34,6 +34,8 @@ module Bundler
           fetch(uri, new_headers)
         when Net::HTTPRequestEntityTooLarge
           raise FallbackError, response.body
+        when Net::HTTPTooManyRequests
+          raise TooManyRequestsError, response.body
         when Net::HTTPUnauthorized
           raise AuthenticationRequiredError, uri.host
         when Net::HTTPNotFound

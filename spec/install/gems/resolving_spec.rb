@@ -117,6 +117,26 @@ RSpec.describe "bundle install with install-time dependencies" do
         expect(out).to_not include("rack-9001.0.0 requires ruby version > 9000")
         expect(the_bundle).to include_gems("rack 1.2")
       end
+
+      it "installs the older version under rate limiting conditions" do
+        build_repo4 do
+          build_gem "rack", "9001.0.0" do |s|
+            s.required_ruby_version = "> 9000"
+          end
+          build_gem "rack", "1.2"
+          build_gem "foo1", "1.0"
+        end
+
+        install_gemfile <<-G, :artifice => "compact_index_rate_limited", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo4 }
+          ruby "#{RUBY_VERSION}"
+          source "http://localgemserver.test/"
+          gem 'rack'
+          gem 'foo1'
+        G
+
+        expect(out).to_not include("rack-9001.0.0 requires ruby version > 9000")
+        expect(the_bundle).to include_gems("rack 1.2")
+      end
     end
 
     context "allows no gems" do
