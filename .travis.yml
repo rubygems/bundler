@@ -43,7 +43,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v3.0.2
+  - RGV=v3.0.3
 
 jobs:
   include:
@@ -68,7 +68,7 @@ jobs:
       stage: test
     # 1.x mode (we want to keep stuff passing in 1.x mode for now)
     - rvm: 2.6.1
-      env: RGV=v3.0.2 BUNDLER_SPEC_SUB_VERSION=1.98
+      env: RGV=v3.0.3 BUNDLER_SPEC_SUB_VERSION=1.98
       stage: test
 
   allow_failures:

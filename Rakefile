@@ -69,7 +69,7 @@ namespace :spec do
       sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
 
       # Install the gems with a consistent version of RubyGems
-      sh "gem update --system 3.0.2"
+      sh "gem update --system 3.0.3"
 
       # Fix incorrect default gem specifications on ruby 2.6.1. Can be removed
       # when 2.6.2 is released and we start testing against it
@@ -139,7 +139,7 @@ begin
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
       branches = %w[master]
-      releases = %w[v2.5.2 v2.6.14 v2.7.8 v3.0.2]
+      releases = %w[v2.5.2 v2.6.14 v2.7.8 v3.0.3]
       (branches + releases).each do |rg|
         desc "Run specs with RubyGems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
