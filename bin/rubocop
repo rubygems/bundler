@@ -14,8 +14,6 @@ rubocop_requirement = rubocop.requirement.to_s
 
 begin
   gem "rubocop", rubocop_requirement
-  Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
-
   load Gem.bin_path("rubocop", "rubocop")
 rescue Gem::LoadError
   warn "We couln't activate rubocop (#{rubocop_requirement}). Try `gem install rubocop:'#{rubocop_requirement}'`"

@@ -14,8 +14,6 @@ rspec_requirement = rspec.requirement.to_s
 
 begin
   gem "rspec", rspec_requirement
-  Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
-
   load Gem.bin_path("rspec-core", "rspec")
 rescue Gem::LoadError
   warn "We couln't activate rspec (#{rspec_requirement}). Try `gem install rspec:'#{rspec_requirement}'`"

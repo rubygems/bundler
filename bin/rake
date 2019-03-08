@@ -14,8 +14,6 @@ rake_requirement = rake.requirement.to_s
 
 begin
   gem "rake", rake_requirement
-  Gem.finish_resolve if Gem.respond_to?(:finish_resolve)
-
   load Gem.bin_path("rake", "rake")
 rescue Gem::LoadError
   warn "We couln't activate rake (#{rake_requirement}). Run `gem install rake:'#{rake_requirement}'`"
