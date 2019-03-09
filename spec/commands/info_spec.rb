@@ -31,7 +31,6 @@ RSpec.describe "bundle info" do
     end
 
     it "prints the path to the running bundler" do
-      skip "'bundle info bundler --path' currently prints a different (incorrect) path from the old alternative 'bundle show rails'"
       bundle "info bundler --path"
       expect(out).to eq(root.to_s)
     end
