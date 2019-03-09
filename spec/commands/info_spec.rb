@@ -9,7 +9,7 @@ RSpec.describe "bundle info" do
       G
     end
 
-    it "prints information about the current gem" do
+    it "prints information if gem exists in bundle" do
       bundle "info rails"
       expect(out).to include "* rails (2.3.2)
 \tSummary: This is just a fake gem for testing
@@ -17,11 +17,9 @@ RSpec.describe "bundle info" do
 \tPath: #{default_bundle_path("gems", "rails-2.3.2")}"
     end
 
-    context "given a gem that is not installed" do
-      it "prints missing gem error" do
-        bundle "info foo"
-        expect(err).to eq "Could not find gem 'foo'."
-      end
+    it "complains if gem not in bundle" do
+      bundle "info missing"
+      expect(err).to eq("Could not find gem 'missing'.")
     end
 
     context "given a default gem shippped in ruby", :ruby_repo do
