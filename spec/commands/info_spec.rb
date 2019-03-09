@@ -13,8 +13,8 @@ RSpec.describe "bundle info" do
       bundle "info rails"
       expect(out).to include "* rails (2.3.2)
 \tSummary: This is just a fake gem for testing
-\tHomepage: http://example.com"
-      expect(out).to match(%r{Path\: .*\/rails\-2\.3\.2})
+\tHomepage: http://example.com
+\tPath: #{default_bundle_path("gems", "rails-2.3.2")}"
     end
 
     context "given a gem that is not installed" do
@@ -50,7 +50,7 @@ RSpec.describe "bundle info" do
     context "given --path option" do
       it "prints the path to the gem" do
         bundle "info rails"
-        expect(out).to match(%r{.*\/rails\-2\.3\.2})
+        expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
       end
     end
   end
