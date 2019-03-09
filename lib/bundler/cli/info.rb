@@ -9,6 +9,11 @@ module Bundler
     end
 
     def run
+      Bundler.ui.silence do
+        Bundler.definition.validate_runtime!
+        Bundler.load.lock
+      end
+
       spec = spec_for_gem(gem_name)
 
       spec_not_found(gem_name) unless spec

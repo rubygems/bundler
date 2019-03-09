@@ -10,8 +10,6 @@ RSpec.describe "bundle info" do
     end
 
     it "creates a Gemfile.lock when invoked with a gem name" do
-      skip "'bundle info rails' does not create a lock file automatically like 'bundle show rails' does"
-
       FileUtils.rm("Gemfile.lock")
 
       bundle "info rails"
