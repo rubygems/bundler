@@ -46,12 +46,5 @@ RSpec.describe "bundle info" do
         expect(out).to_not include("Homepage:")
       end
     end
-
-    context "given --path option" do
-      it "prints the path to the gem" do
-        bundle "info rails"
-        expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
-      end
-    end
   end
 end
