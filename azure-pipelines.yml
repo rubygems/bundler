@@ -8,6 +8,8 @@ jobs:
 - job: RawLinux
   pool:
     vmImage: 'ubuntu-16.04'
+  variables:
+    VSTS_SETUP_DOCKERGROUP: true
   container: registry.gitlab.com/deivid-rodriguez/docker/ruby:2.6.1-ubuntu
   steps:
     - template: .azure-pipelines/steps-linux.yml
@@ -15,6 +17,8 @@ jobs:
 - job: RVM
   pool:
     vmImage: 'ubuntu-16.04'
+  variables:
+    VSTS_SETUP_DOCKERGROUP: true
   container: registry.gitlab.com/deivid-rodriguez/docker/rvm:2.6.1
   steps:
     - script: rvm use 2.6.1
