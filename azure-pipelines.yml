@@ -5,14 +5,14 @@ jobs:
   steps:
   - template: .azure-pipelines/steps.yml
 
-- job: Linux - raw
+- job: RawLinux
   pool:
     vmImage: 'ubuntu-16.04'
   container: registry.gitlab.com/deivid-rodriguez/docker/ruby:2.6.1-ubuntu
   steps:
     - template: .azure-pipelines/steps-linux.yml
 
-- job: Linux - rvm
+- job: RVM
   pool:
     vmImage: 'ubuntu-16.04'
   container: registry.gitlab.com/deivid-rodriguez/docker/rvm:2.6.1
