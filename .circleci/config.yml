@@ -1,0 +1,103 @@
+---
+
+version: 2.1
+
+executors:
+  test:
+    parameters:
+      version:
+        type: string
+
+      version_manager:
+        type: string
+
+    docker:
+      - image: registry.gitlab.com/deivid-rodriguez/docker/<< parameters.version_manager >>:<< parameters.version >>-ubuntu
+
+jobs:
+  spec:
+    parameters:
+      executor:
+        type: executor
+
+    executor: << parameters.executor >>
+
+    steps:
+      - checkout
+
+      - run:
+          name: Override version
+          command: bin/rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
+
+      - run:
+          name: Install dependencies
+          command: bin/rake spec:deps
+
+      - run:
+          name: Clone rubygems
+          command: bin/rake spec:rubygems:clone_rubygems_3.0.3
+
+      - run:
+          name: Run specs
+          command: bin/rspec --format progress
+
+workflows:
+  version: 2
+
+  test:
+    jobs:
+      - spec:
+          name: 2.3-ruby
+          executor:
+            name: test
+            version: 2.3.8
+            version_manager: ruby
+
+      - spec:
+          name: 2.3-rvm
+          executor:
+            name: test
+            version: 2.3.8
+            version_manager: rvm
+
+      - spec:
+          name: 2.4-ruby
+          executor:
+            name: test
+            version: 2.4.5
+            version_manager: ruby
+
+      - spec:
+          name: 2.4-rvm
+          executor:
+            name: test
+            version: 2.4.5
+            version_manager: rvm
+
+      - spec:
+          name: 2.5-ruby
+          executor:
+            name: test
+            version: 2.5.3
+            version_manager: ruby
+
+      - spec:
+          name: 2.5-rvm
+          executor:
+            name: test
+            version: 2.5.3
+            version_manager: rvm
+
+      - spec:
+          name: 2.6-ruby
+          executor:
+            name: test
+            version: 2.6.1
+            version_manager: ruby
+
+      - spec:
+          name: 2.6-rvm
+          executor:
+            name: test
+            version: 2.6.1
+            version_manager: rvm
