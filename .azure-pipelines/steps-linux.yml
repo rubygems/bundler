@@ -1,6 +1,11 @@
 steps:
 
 - script: |
+    sudo -EH -u ruby ruby --version
+
+  displayName: Show ruby version
+
+- script: |
     sudo -EH -u ruby bin/rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
 
   displayName: Override version
