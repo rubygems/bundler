@@ -157,11 +157,16 @@ module Bundler
       multiple_gemfiles = search_up(".") do |dir|
         gemfiles = gemfile_names.select {|gf| File.file? File.expand_path(gf, dir) }
         next if gemfiles.empty?
-        break false if gemfiles.size == 1
+        break gemfiles.size != 1
       end
-      return unless multiple_gemfiles && Bundler.bundler_major_version == 1
-      Bundler::SharedHelpers.major_deprecation 2, \
-        "gems.rb and gems.locked will be preferred to Gemfile and Gemfile.lock."
+      return unless multiple_gemfiles
+      diagnosis = "Multiple gemfiles (gems.rb and Gemfile) detected."
+      advice = if Bundler.feature_flag.prefer_gems_rb?
+        "Make sure you remove Gemfile and Gemfile.lock since bundler is ignoring them in favor of gems.rb and gems.rb.locked."
+      else
+        "The gems.rb and gems.rb.locked files are currently ignored, but they will get used as soon as you delete your Gemfile and Gemfile.lock files."
+      end
+      Bundler.ui.warn [diagnosis, advice].join(" ")
     end
 
     def trap(signal, override = false, &block)
