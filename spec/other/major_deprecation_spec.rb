@@ -111,7 +111,7 @@ RSpec.describe "major deprecations" do
     end
 
     context "with flags" do
-      xit "should print a deprecation warning about autoremembering flags" do
+      it "should print a deprecation warning about autoremembering flags", :bundler => "3" do
         install_gemfile <<-G, :path => "vendor/bundle"
           source "file://#{gem_repo1}"
           gem "rack"
@@ -120,6 +120,42 @@ RSpec.describe "major deprecations" do
         expect(warnings).to have_major_deprecation a_string_including(
           "flags passed to commands will no longer be automatically remembered."
         )
+      end
+
+      {
+        :clean => true,
+        :deployment => true,
+        :frozen => true,
+        :"no-cache" => true,
+        :"no-prune" => true,
+        :path => "vendor/bundle",
+        :shebang => "ruby27",
+        :system => true,
+        :without => "development",
+        :with => "development",
+      }.each do |name, value|
+        flag_name = "--#{name}"
+
+        context "with the #{flag_name} flag", :bundler => "2" do
+          it "should print a deprecation warning" do
+            bundle "install #{flag_name} #{value}"
+
+            expect(warnings).to have_major_deprecation(
+              "The `#{flag_name}` flag is deprecated because it relied on " \
+              "being remembered accross bundler invokations, which bundler " \
+              "will no longer do in future versions. Instead please use " \
+              "`bundle config #{name} '#{value}'`, and stop using this flag"
+            )
+          end
+        end
+
+        context "with the #{flag_name} flag", :bundler => "< 2" do
+          it "should not print a deprecation warning" do
+            bundle "install #{flag_name} #{value}"
+
+            expect(warnings).not_to have_major_deprecation
+          end
+        end
       end
     end
   end
