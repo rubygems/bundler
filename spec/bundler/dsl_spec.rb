@@ -28,24 +28,51 @@ RSpec.describe Bundler::Dsl do
     context "github_https feature flag" do
       it "is true when github.https is true" do
         bundle "config set github.https true"
-        expect(Bundler.feature_flag.github_https?).to eq "true"
+        expect(Bundler.feature_flag.github_https?).to eq true
       end
     end
 
-    context "default hosts (git, gist)", :bundler => "< 2" do
-      context "when github.https config is true" do
-        before { bundle "config set github.https true" }
-        it "converts :github to :git using https" do
-          subject.gem("sparks", :github => "indirect/sparks")
-          github_uri = "https://github.com/indirect/sparks.git"
+    shared_examples_for "the github DSL" do |protocol|
+      context "when full repo is used" do
+        let(:repo) { "indirect/sparks" }
+
+        it "converts :github to URI using #{protocol}" do
+          subject.gem("sparks", :github => repo)
+          github_uri = "#{protocol}://github.com/#{repo}.git"
           expect(subject.dependencies.first.source.uri).to eq(github_uri)
         end
       end
 
-      it "converts :github to :git" do
-        subject.gem("sparks", :github => "indirect/sparks")
-        github_uri = "git://github.com/indirect/sparks.git"
-        expect(subject.dependencies.first.source.uri).to eq(github_uri)
+      context "when shortcut repo is used" do
+        let(:repo) { "rails" }
+
+        it "converts :github to URI using #{protocol}" do
+          subject.gem("sparks", :github => repo)
+          github_uri = "#{protocol}://github.com/#{repo}/#{repo}.git"
+          expect(subject.dependencies.first.source.uri).to eq(github_uri)
+        end
+      end
+    end
+
+    context "default hosts (git, gist)" do
+      context "when github.https config is true" do
+        before { bundle "config set github.https true" }
+
+        it_behaves_like "the github DSL", "https"
+      end
+
+      context "when github.https config is false" do
+        before { bundle "config set github.https false" }
+
+        it_behaves_like "the github DSL", "git"
+      end
+
+      context "by default", :bundler => "< 2" do
+        it_behaves_like "the github DSL", "git"
+      end
+
+      context "by default", :bundler => "2" do
+        it_behaves_like "the github DSL", "https"
       end
 
       it "converts numeric :gist to :git" do
@@ -57,12 +84,6 @@ RSpec.describe Bundler::Dsl do
       it "converts :gist to :git" do
         subject.gem("not-really-a-gem", :gist => "2859988")
         github_uri = "https://gist.github.com/2859988.git"
-        expect(subject.dependencies.first.source.uri).to eq(github_uri)
-      end
-
-      it "converts 'rails' to 'rails/rails'" do
-        subject.gem("rails", :github => "rails")
-        github_uri = "git://github.com/rails/rails.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
       end
 
@@ -79,7 +100,7 @@ RSpec.describe Bundler::Dsl do
       end
     end
 
-    context "default git sources", :bundler => "2" do
+    context "default git sources", :bundler => "4" do
       it "has none" do
         expect(subject.instance_variable_get(:@git_sources)).to eq({})
       end
@@ -259,6 +280,32 @@ RSpec.describe Bundler::Dsl do
     end
 
     describe "#github", :bundler => "2" do
+      it "from github" do
+        spree_gems = %w[spree_core spree_api spree_backend]
+        subject.github "spree" do
+          spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
+        end
+
+        subject.dependencies.each do |d|
+          expect(d.source.uri).to eq("https://github.com/spree/spree.git")
+        end
+      end
+    end
+
+    describe "#github", :bundler => "3" do
+      it "from github" do
+        spree_gems = %w[spree_core spree_api spree_backend]
+        subject.github "spree" do
+          spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
+        end
+
+        subject.dependencies.each do |d|
+          expect(d.source.uri).to eq("https://github.com/spree/spree.git")
+        end
+      end
+    end
+
+    describe "#github", :bundler => "4" do
       it "from github" do
         expect do
           spree_gems = %w[spree_core spree_api spree_backend]

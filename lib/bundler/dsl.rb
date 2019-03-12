@@ -290,37 +290,21 @@ module Bundler
         warn_deprecated_git_source(:github, <<-'RUBY'.strip, 'Change any "reponame" :github sources to "username/reponame".')
 "https://github.com/#{repo_name}.git"
         RUBY
-        # It would be better to use https instead of the git protocol, but this
-        # can break deployment of existing locked bundles when switching between
-        # different versions of Bundler. The change will be made in 2.0, which
-        # does not guarantee compatibility with the 1.x series.
-        #
-        # See https://github.com/bundler/bundler/pull/2569 for discussion
-        #
-        # This can be overridden by adding this code to your Gemfiles:
-        #
-        #   git_source(:github) do |repo_name|
-        #     repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        #     "https://github.com/#{repo_name}.git"
-        #   end
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        # TODO: 2.0 upgrade this setting to the default
         if Bundler.feature_flag.github_https?
-          Bundler::SharedHelpers.major_deprecation 2, "The `github.https` setting will be removed"
           "https://github.com/#{repo_name}.git"
         else
+          Bundler::SharedHelpers.major_deprecation 2, "Setting `github.https` to false is deprecated and won't be supported in the future."
           "git://github.com/#{repo_name}.git"
         end
       end
 
-      # TODO: 2.0 remove this deprecated git source
       git_source(:gist) do |repo_name|
         warn_deprecated_git_source(:gist, '"https://gist.github.com/#{repo_name}.git"')
 
         "https://gist.github.com/#{repo_name}.git"
       end
 
-      # TODO: 2.0 remove this deprecated git source
       git_source(:bitbucket) do |repo_name|
         warn_deprecated_git_source(:bitbucket, <<-'RUBY'.strip)
 user_name, repo_name = repo_name.split("/")
@@ -488,7 +472,6 @@ repo_name ||= user_name
     end
 
     def warn_deprecated_git_source(name, replacement, additional_message = nil)
-      # TODO: 2.0 remove deprecation
       additional_message &&= " #{additional_message}"
       replacement = if replacement.count("\n").zero?
         "{|repo_name| #{replacement} }"
@@ -496,8 +479,8 @@ repo_name ||= user_name
         "do |repo_name|\n#{replacement.to_s.gsub(/^/, "      ")}\n    end"
       end
 
-      Bundler::SharedHelpers.major_deprecation 2, <<-EOS
-The :#{name} git source is deprecated, and will be removed in Bundler 2.0.#{additional_message} Add this code to the top of your Gemfile to ensure it continues to work:
+      Bundler::SharedHelpers.major_deprecation 3, <<-EOS
+The :#{name} git source is deprecated, and will be removed in the future.#{additional_message} Add this code to the top of your Gemfile to ensure it continues to work:
 
     git_source(:#{name}) #{replacement}
 
