@@ -229,10 +229,12 @@ The :bitbucket git source is deprecated, and will be removed in Bundler 3.0. Add
     context "with gist gems" do
       it "warns about removal" do
         allow(Bundler.ui).to receive(:deprecate)
-        msg = "The :gist git source is deprecated, and will be removed " \
-          "in Bundler 3.0. Add this code to the top of your Gemfile to ensure it " \
-          "continues to work:\n\n    git_source(:gist) {|repo_name| " \
-          "\"https://gist.github.com/\#{repo_name}.git\" }\n\n"
+        msg = <<-EOS
+The :gist git source is deprecated, and will be removed in Bundler 3.0. Add this code to the top of your Gemfile to ensure it continues to work:
+
+    git_source(:gist) {|repo_name| "https://gist.github.com/\#{repo_name}.git" }
+
+        EOS
         expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(3, msg)
         subject.gem("not-really-a-gem", :gist => "1234")
       end
