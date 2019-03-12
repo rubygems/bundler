@@ -172,7 +172,7 @@ RSpec.describe "major deprecations" do
   describe Bundler::Dsl do
     let(:msg) do
       <<-EOS
-The :github git source is deprecated, and will be removed in Bundler 3.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
+The :github git source is deprecated, and will be removed in the future. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
 
     git_source(:github) {|repo_name| "https://github.com/\#{repo_name}.git" }
 
@@ -212,7 +212,7 @@ The :github git source is deprecated, and will be removed in Bundler 3.0. Change
       it "warns about removal" do
         allow(Bundler.ui).to receive(:deprecate)
         msg = <<-EOS
-The :bitbucket git source is deprecated, and will be removed in Bundler 3.0. Add this code to the top of your Gemfile to ensure it continues to work:
+The :bitbucket git source is deprecated, and will be removed in the future. Add this code to the top of your Gemfile to ensure it continues to work:
 
     git_source(:bitbucket) do |repo_name|
       user_name, repo_name = repo_name.split("/")
@@ -230,7 +230,7 @@ The :bitbucket git source is deprecated, and will be removed in Bundler 3.0. Add
       it "warns about removal" do
         allow(Bundler.ui).to receive(:deprecate)
         msg = <<-EOS
-The :gist git source is deprecated, and will be removed in Bundler 3.0. Add this code to the top of your Gemfile to ensure it continues to work:
+The :gist git source is deprecated, and will be removed in the future. Add this code to the top of your Gemfile to ensure it continues to work:
 
     git_source(:gist) {|repo_name| "https://gist.github.com/\#{repo_name}.git" }
 
