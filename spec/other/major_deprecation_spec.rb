@@ -3,16 +3,16 @@
 RSpec.describe "major deprecations" do
   let(:warnings) { err }
 
-  before do
-    create_file "gems.rb", <<-G
-      source "file:#{gem_repo1}"
-      ruby #{RUBY_VERSION.dump}
-      gem "rack"
-    G
-    bundle! "install"
-  end
-
   describe "Bundler" do
+    before do
+      create_file "gems.rb", <<-G
+        source "file:#{gem_repo1}"
+        ruby #{RUBY_VERSION.dump}
+        gem "rack"
+      G
+      bundle! "install"
+    end
+
     describe ".clean_env" do
       it "is deprecated in favor of .unbundled_env" do
         source = "Bundler.clean_env"
@@ -61,10 +61,6 @@ RSpec.describe "major deprecations" do
 
     describe "bundle install --binstubs" do
       xit "should output a deprecation warning" do
-        gemfile <<-G
-          gem 'rack'
-        G
-
         bundle :install, :binstubs => true
         expect(warnings).to have_major_deprecation a_string_including("The --binstubs option will be removed")
       end
@@ -111,12 +107,14 @@ RSpec.describe "major deprecations" do
     end
 
     context "with flags" do
-      it "should print a deprecation warning about autoremembering flags", :bundler => "3" do
+      before do
         install_gemfile <<-G, :path => "vendor/bundle"
           source "file://#{gem_repo1}"
           gem "rack"
         G
+      end
 
+      it "should print a deprecation warning about autoremembering flags", :bundler => "3" do
         expect(warnings).to have_major_deprecation a_string_including(
           "flags passed to commands will no longer be automatically remembered."
         )
