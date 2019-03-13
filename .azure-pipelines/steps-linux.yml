@@ -1,34 +1,22 @@
 steps:
 
 - script: |
-    sudo -iEH -u ruby ruby --version
-
-  displayName: Show ruby version
-
-- script: |
-    sudo -iEH -u ruby pwd
-    sudo -iEH -u ruby echo $(Build.SourcesDirectory)
-    sudo -iEH -u ruby cd $(Build.SourcesDirectory)
-
-  displayName: Switch to code
-
-- script: |
     sudo -iEH -u ruby bash -c "cd $(Build.SourcesDirectory) && bin/rake spec:deps"
 
   displayName: Install dependencies
 
 - script: |
-    sudo -iEH -u ruby bin/rake spec:rubygems:clone_rubygems_3.0.2
+    sudo -iEH -u ruby bash -c "cd $(Build.SourcesDirectory) && bin/rake spec:rubygems:clone_rubygems_3.0.2"
 
   displayName: Clone rubygems
 
 - script: |
-    sudo -iEH -u ruby gem install --no-document --conservative rspec_junit_formatter
+    sudo -iEH -u ruby bash -c "cd $(Build.SourcesDirectory) && gem install --no-document --conservative rspec_junit_formatter"
 
   displayName: Install test results formatter
 
 - script: |
-    sudo -iEH -u ruby -r rspec_junit_formatter bin/rspec --format progress --format RspecJunitFormatter -o rspec/bundler-junit-results.xml
+    sudo -iEH -u ruby bash -c "cd $(Build.SourcesDirectory) && ruby -r rspec_junit_formatter bin/rspec --format progress --format RspecJunitFormatter -o rspec/bundler-junit-results.xml"
 
   displayName: Run specs
 
