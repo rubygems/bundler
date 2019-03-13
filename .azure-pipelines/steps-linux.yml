@@ -6,6 +6,13 @@ steps:
   displayName: Show ruby version
 
 - script: |
+    sudo -iEH -u ruby pwd
+    sudo -iEH -u ruby echo $(Build.SourcesDirectory)
+    sudo -iEH -u ruby cd $(Build.SourcesDirectory)
+
+  displayName: Switch to code
+
+- script: |
     sudo -iEH -u ruby bin/rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
 
   displayName: Override version
