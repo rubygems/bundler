@@ -4,13 +4,6 @@ $:.unshift File.expand_path("..", __FILE__)
 $:.unshift File.expand_path("../../lib", __FILE__)
 
 require "rubygems"
-module Gem
-  if defined?(@path_to_default_spec_map)
-    @path_to_default_spec_map.delete_if do |_path, spec|
-      spec.name == "bundler"
-    end
-  end
-end
 
 begin
   require File.expand_path("../support/path.rb", __FILE__)
@@ -43,7 +36,6 @@ $debug = false
 
 Spec::Manpages.setup unless Gem.win_platform?
 Spec::Rubygems.setup
-FileUtils.rm_rf(Spec::Path.gem_repo1)
 ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
 ENV["BUNDLE_SPEC_RUN"] = "true"
 

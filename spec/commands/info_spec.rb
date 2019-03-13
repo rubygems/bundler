@@ -34,7 +34,7 @@ RSpec.describe "bundle info" do
 
     context "when gem does not have homepage" do
       before do
-        build_repo1 do
+        build_repo2 do
           build_gem "rails", "2.3.2" do |s|
             s.executables = "rails"
             s.summary = "Just another test gem"
