@@ -1,32 +1,32 @@
 steps:
 
 - script: |
-    sudo -EH -u ruby ruby --version
+    sudo -iEH -u ruby ruby --version
 
   displayName: Show ruby version
 
 - script: |
-    sudo -EH -u ruby bin/rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
+    sudo -iEH -u ruby bin/rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
 
   displayName: Override version
 
 - script: |
-    sudo -EH -u ruby bin/rake spec:deps
+    sudo -iEH -u ruby bin/rake spec:deps
 
   displayName: Install dependencies
 
 - script: |
-    sudo -EH -u ruby bin/rake spec:rubygems:clone_rubygems_3.0.2
+    sudo -iEH -u ruby bin/rake spec:rubygems:clone_rubygems_3.0.2
 
   displayName: Clone rubygems
 
 - script: |
-    sudo -EH -u ruby gem install --no-document --conservative rspec_junit_formatter
+    sudo -iEH -u ruby gem install --no-document --conservative rspec_junit_formatter
 
   displayName: Install test results formatter
 
 - script: |
-    sudo -EH -u ruby -r rspec_junit_formatter bin/rspec --format progress --format RspecJunitFormatter -o rspec/bundler-junit-results.xml
+    sudo -iEH -u ruby -r rspec_junit_formatter bin/rspec --format progress --format RspecJunitFormatter -o rspec/bundler-junit-results.xml
 
   displayName: Run specs
 
