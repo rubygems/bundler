@@ -6,7 +6,7 @@ steps:
   displayName: Install dependencies
 
 - script: |
-    sudo -iEH -u ruby bash -c "cd $(Build.SourcesDirectory) && bin/rake spec:rubygems:clone_rubygems_3.0.2"
+    sudo -iEH -u ruby bash -c "cd $(Build.SourcesDirectory) && bin/rake spec:rubygems:clone_rubygems_v3.0.3"
 
   displayName: Clone rubygems
 
