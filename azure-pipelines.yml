@@ -8,9 +8,7 @@ jobs:
 - job: RawLinux
   pool:
     vmImage: 'ubuntu-16.04'
-  container:
-    image: registry.gitlab.com/deivid-rodriguez/docker/ruby:2.6.1-ubuntu
-    options: --workdir "$(Build.SourcesDirectory)"
+  container: registry.gitlab.com/deivid-rodriguez/docker/ruby:2.6.1-ubuntu
   steps:
     - template: .azure-pipelines/steps-linux.yml
 

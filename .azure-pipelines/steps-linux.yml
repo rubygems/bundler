@@ -13,12 +13,7 @@ steps:
   displayName: Switch to code
 
 - script: |
-    sudo -iEH -u ruby bin/rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
-
-  displayName: Override version
-
-- script: |
-    sudo -iEH -u ruby bin/rake spec:deps
+    sudo -iEH -u ruby bash -c "cd $(Build.SourcesDirectory) && bin/rake spec:deps"
 
   displayName: Install dependencies
 
