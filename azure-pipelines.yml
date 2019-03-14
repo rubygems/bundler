@@ -8,7 +8,7 @@ jobs:
 - job: RawLinux
   pool:
     vmImage: 'ubuntu-16.04'
-  container: registry.gitlab.com/deivid-rodriguez/docker/ruby:2.6.2-ubuntu
+  container: registry.gitlab.com/deivid-rodriguez/docker/bundler:2.6.2
   steps:
     - template: .azure-pipelines/steps-linux.yml
 
