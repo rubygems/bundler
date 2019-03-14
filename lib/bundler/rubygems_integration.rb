@@ -411,26 +411,6 @@ module Bundler
       end
     end
 
-    def stub_source_index(specs)
-      Gem::SourceIndex.send(:alias_method, :old_initialize, :initialize)
-      redefine_method(Gem::SourceIndex, :initialize) do |*args|
-        @gems = {}
-        # You're looking at this thinking: Oh! This is how I make those
-        # rubygems deprecations go away!
-        #
-        # You'd be correct BUT using of this method in production code
-        # must be approved by the rubygems team itself!
-        #
-        # This is your warning. If you use this and don't have approval
-        # we can't protect you.
-        #
-        Deprecate.skip_during do
-          self.spec_dirs = *args
-          add_specs(*specs)
-        end
-      end
-    end
-
     # Used to make bin stubs that are not created by bundler work
     # under bundler. The new Gem.bin_path only considers gems in
     # +specs+
@@ -620,115 +600,6 @@ module Bundler
       end
     end
 
-    # RubyGems 1.4 through 1.6
-    class Legacy < RubygemsIntegration
-      def initialize
-        super
-        backport_base_dir
-        backport_cache_file
-        backport_spec_file
-        backport_yaml_initialize
-      end
-
-      def stub_rubygems(specs)
-        # RubyGems versions lower than 1.7 use SourceIndex#from_gems_in
-        source_index_class = (class << Gem::SourceIndex; self; end)
-        redefine_method(source_index_class, :from_gems_in) do |*args|
-          Gem::SourceIndex.new.tap do |source_index|
-            source_index.spec_dirs = *args
-            source_index.add_specs(*specs)
-          end
-        end
-      end
-
-      def all_specs
-        Gem.source_index.gems.values
-      end
-
-      def find_name(name)
-        Gem.source_index.find_name(name)
-      end
-
-      def validate(spec)
-        # These versions of RubyGems always validate in "packaging" mode,
-        # which is too strict for the kinds of checks we care about. As a
-        # result, validation is disabled on versions of RubyGems below 1.7.
-      end
-
-      def post_reset_hooks
-        []
-      end
-
-      def reset
-      end
-    end
-
-    # RubyGems versions 1.3.6 and 1.3.7
-    class Ancient < Legacy
-      def initialize
-        super
-        backport_segment_generation
-      end
-    end
-
-    # RubyGems 1.7
-    class Transitional < Legacy
-      def stub_rubygems(specs)
-        stub_source_index(specs)
-      end
-
-      def validate(spec)
-        # Missing summary is downgraded to a warning in later versions,
-        # so we set it to an empty string to prevent an exception here.
-        spec.summary ||= ""
-        RubygemsIntegration.instance_method(:validate).bind(self).call(spec)
-      end
-    end
-
-    # RubyGems 1.8.5-1.8.19
-    class Modern < RubygemsIntegration
-      def stub_rubygems(specs)
-        Gem::Specification.all = specs
-
-        Gem.post_reset do
-          Gem::Specification.all = specs
-        end
-
-        stub_source_index(specs)
-      end
-
-      def all_specs
-        Gem::Specification.to_a
-      end
-
-      def find_name(name)
-        Gem::Specification.find_all_by_name name
-      end
-    end
-
-    # RubyGems 1.8.0 to 1.8.4
-    class AlmostModern < Modern
-      # RubyGems [>= 1.8.0, < 1.8.5] has a bug that changes Gem.dir whenever
-      # you call Gem::Installer#install with an :install_dir set. We have to
-      # change it back for our sudo mode to work.
-      def preserve_paths
-        old_dir = gem_dir
-        old_path = gem_path
-        yield
-        Gem.use_paths(old_dir, old_path)
-      end
-    end
-
-    # RubyGems 1.8.20+
-    class MoreModern < Modern
-      # RubyGems 1.8.20 and adds the skip_validation parameter, so that's
-      # when we start passing it through.
-      def build(spec, skip_validation = false)
-        require "rubygems/builder"
-        Gem::Builder.new(spec).build(skip_validation)
-      end
-    end
-
     # RubyGems 2.0
     class Future < RubygemsIntegration
       def stub_rubygems(specs)
@@ -894,22 +765,6 @@ module Bundler
   end
 
   def self.rubygems
-    @rubygems ||= if RubygemsIntegration.provides?(">= 2.1.0")
-      RubygemsIntegration::MoreFuture.new
-    elsif RubygemsIntegration.provides?(">= 1.99.99")
-      RubygemsIntegration::Future.new
-    elsif RubygemsIntegration.provides?(">= 1.8.20")
-      RubygemsIntegration::MoreModern.new
-    elsif RubygemsIntegration.provides?(">= 1.8.5")
-      RubygemsIntegration::Modern.new
-    elsif RubygemsIntegration.provides?(">= 1.8.0")
-      RubygemsIntegration::AlmostModern.new
-    elsif RubygemsIntegration.provides?(">= 1.7.0")
-      RubygemsIntegration::Transitional.new
-    elsif RubygemsIntegration.provides?(">= 1.4.0")
-      RubygemsIntegration::Legacy.new
-    else # RubyGems 1.3.6 and 1.3.7
-      RubygemsIntegration::Ancient.new
-    end
+    @rubygems ||= RubygemsIntegration::MoreFuture.new
   end
 end
