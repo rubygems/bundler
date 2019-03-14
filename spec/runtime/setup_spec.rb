@@ -650,62 +650,6 @@ RSpec.describe "Bundler.setup" do
     end
   end
 
-  # Unfortunately, gem_prelude does not record the information about
-  # activated gems, so this test cannot work on 1.9 :(
-  if RUBY_VERSION < "1.9"
-    describe "preactivated gems" do
-      it "raises an exception if a pre activated gem conflicts with the bundle" do
-        system_gems "thin-1.0", "rack-1.0.0"
-        build_gem "thin", "1.1", :to_system => true do |s|
-          s.add_dependency "rack"
-        end
-
-        gemfile <<-G
-          gem "thin", "1.0"
-        G
-
-        ruby <<-R
-          require 'rubygems'
-          gem "thin"
-          require 'bundler'
-          begin
-            Bundler.setup
-            puts "FAIL"
-          rescue Gem::LoadError => e
-            puts e.message
-          end
-        R
-
-        expect(out).to eq("You have already activated thin 1.1, but your Gemfile requires thin 1.0. Prepending `bundle exec` to your command may solve this.")
-      end
-
-      it "version_requirement is now deprecated in rubygems 1.4.0+" do
-        system_gems "thin-1.0", "rack-1.0.0"
-        build_gem "thin", "1.1", :to_system => true do |s|
-          s.add_dependency "rack"
-        end
-
-        gemfile <<-G
-          gem "thin", "1.0"
-        G
-
-        ruby <<-R
-          require 'rubygems'
-          gem "thin"
-          require 'bundler'
-          begin
-            Bundler.setup
-            puts "FAIL"
-          rescue Gem::LoadError => e
-            puts e.message
-          end
-        R
-
-        expect(last_command.stderr).to be_empty
-      end
-    end
-  end
-
   # RubyGems returns loaded_from as a string
   it "has loaded_from as a string on all specs" do
     build_git "foo"
@@ -1091,7 +1035,7 @@ end
 
       expect(err.lines.map(&:chomp)).to include(
         a_string_starting_with("[!] There was an error while loading `bar.gemspec`:"),
-        RUBY_VERSION >= "1.9" ? a_string_starting_with("Does it try to require a relative path? That's been removed in Ruby 1.9.") : "",
+        a_string_starting_with("Does it try to require a relative path? That's been removed in Ruby 1.9."),
         " #  from #{default_bundle_path "bundler", "gems", "bar-1.0-#{ref[0, 12]}", "bar.gemspec"}:1",
         " >  require 'foobarbaz'"
       )

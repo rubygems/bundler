@@ -115,8 +115,6 @@ RSpec.describe "bundle install" do
 
   context "with a Gemfile containing non-US-ASCII characters" do
     it "reads the Gemfile with the UTF-8 encoding by default" do
-      skip "Ruby 1.8 has no encodings" if RUBY_VERSION < "1.9"
-
       install_gemfile <<-G
         str = "Il était une fois ..."
         puts "The source encoding is: " + str.encoding.name
@@ -128,8 +126,6 @@ RSpec.describe "bundle install" do
     end
 
     it "respects the magic encoding comment" do
-      skip "Ruby 1.8 has no encodings" if RUBY_VERSION < "1.9"
-
       # NOTE: This works thanks to #eval interpreting the magic encoding comment
       install_gemfile <<-G
         # encoding: iso-8859-1
