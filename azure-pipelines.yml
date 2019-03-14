@@ -8,16 +8,16 @@ jobs:
 - job: RawLinux
   pool:
     vmImage: 'ubuntu-16.04'
-  container: registry.gitlab.com/deivid-rodriguez/docker/ruby:2.6.1-ubuntu
+  container: registry.gitlab.com/deivid-rodriguez/docker/ruby:2.6.2-ubuntu
   steps:
     - template: .azure-pipelines/steps-linux.yml
 
 - job: RVM
   pool:
     vmImage: 'ubuntu-16.04'
-  container: registry.gitlab.com/deivid-rodriguez/docker/rvm:2.6.1
+  container: registry.gitlab.com/deivid-rodriguez/docker/rvm:2.6.2
   steps:
-    - script: sudo -u ruby rvm use 2.6.1
+    - script: sudo -u ruby rvm use 2.6.2
       displayName: Switch to a ruby
 
     - template: .azure-pipelines/steps-linux.yml
