@@ -14,9 +14,16 @@ RSpec.describe "major deprecations" do
     end
 
     describe ".clean_env" do
-      it "is deprecated in favor of .unbundled_env" do
+      before do
         source = "Bundler.clean_env"
         bundle "exec ruby -e #{source.dump}"
+      end
+
+      it "is not deprecated", :bundler => "< 2" do
+        expect(warnings).not_to have_major_deprecation
+      end
+
+      it "is deprecated in favor of .unbundled_env", :bundler => "2" do
         expect(warnings).to have_major_deprecation \
           "`Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
           "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
@@ -24,9 +31,16 @@ RSpec.describe "major deprecations" do
     end
 
     describe ".environment" do
-      it "is deprecated in favor of .load" do
+      before do
         source = "Bundler.environment"
         bundle "exec ruby -e #{source.dump}"
+      end
+
+      it "is not deprecated", :bundler => "< 2" do
+        expect(warnings).not_to have_major_deprecation
+      end
+
+      it "is deprecated in favor of .load", :bundler => "2" do
         expect(warnings).to have_major_deprecation "Bundler.environment has been removed in favor of Bundler.load"
       end
     end
@@ -191,11 +205,17 @@ RSpec.describe "major deprecations" do
   end
 
   context "when `bundler/deployment` is required in a ruby script" do
-    it "should print a capistrano deprecation warning" do
+    before do
       ruby(<<-RUBY)
         require 'bundler/deployment'
       RUBY
+    end
 
+    it "should not print a capistrano deprecation warning", :bundler => "< 2" do
+      expect(warnings).not_to have_major_deprecation
+    end
+
+    it "should print a capistrano deprecation warning", :bundler => "2" do
       expect(warnings).to have_major_deprecation("Bundler no longer integrates " \
                              "with Capistrano, but Capistrano provides " \
                              "its own integration with Bundler via the " \
