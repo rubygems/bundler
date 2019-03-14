@@ -116,6 +116,19 @@ RSpec.describe "bundle info" do
     end
   end
 
+  context "with a valid regexp for gem name" do
+    it "presents alternatives" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rack-obama"
+      G
+
+      bundle "info rac"
+      expect(out).to eq "1 : rack\n2 : rack-obama\n0 : - exit -\n>"
+    end
+  end
+
   context "with an invalid regexp for gem name" do
     it "does not find the gem" do
       install_gemfile <<-G

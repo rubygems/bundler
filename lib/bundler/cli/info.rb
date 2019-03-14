@@ -25,7 +25,7 @@ module Bundler
 
     def spec_for_gem(gem_name)
       spec = Bundler.definition.specs.find {|s| s.name == gem_name }
-      spec || default_gem_spec(gem_name)
+      spec || default_gem_spec(gem_name) || Bundler::CLI::Common.select_spec(gem_name, :regex_match)
     end
 
     def default_gem_spec(gem_name)
