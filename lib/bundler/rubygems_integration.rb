@@ -119,7 +119,7 @@ module Bundler
     end
 
     def configuration
-      require_relative "psyched_yaml"
+      require "yaml"
       Gem.configuration
     rescue Gem::SystemExitException, LoadError => e
       Bundler.ui.error "#{e.class}: #{e.message}"
@@ -267,7 +267,7 @@ module Bundler
 
     def spec_from_gem(path, policy = nil)
       require "rubygems/security"
-      require_relative "psyched_yaml"
+      require "yaml"
       gem_from_path(path, security_policies[policy]).spec
     rescue Gem::Package::FormatError
       raise GemspecError, "Could not read gem at #{path}. It may be corrupted."

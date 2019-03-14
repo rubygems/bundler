@@ -37,7 +37,7 @@ RSpec.describe Bundler do
         context "with Psych as YAML::Engine" do
           it "raises a GemspecError after YAML load throws Psych::SyntaxError" do
             orig_yamler = YAML::ENGINE.yamler
-            YAML::ENGINE.yamler = "psych"
+            YAML::ENGINE.yamler = "yaml"
 
             expect { subject }.to raise_error(Bundler::GemspecError)
 

@@ -139,7 +139,7 @@ module Bundler
 
           data = index_f.read
 
-          require_relative "psyched_yaml"
+          require "yaml"
           index = YAML.load(data)
 
           @commands.merge!(index["commands"])
@@ -162,7 +162,7 @@ module Bundler
           "sources"      => @sources,
         }
 
-        require_relative "psyched_yaml"
+        require "yaml"
         SharedHelpers.filesystem_access(index_file) do |index_f|
           FileUtils.mkdir_p(index_f.dirname)
           File.open(index_f, "w") {|f| f.puts YAML.dump(index) }

@@ -44,7 +44,7 @@ class Object
       begin
         # this has to be done up front because psych will try to load a .jar
         # if it thinks its on jruby
-        require "psych"
+        require "yaml"
       rescue LoadError
         nil
       end
