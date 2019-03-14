@@ -157,7 +157,7 @@ RSpec.describe "bundle show" do
 
     it "does not output git errors" do
       bundle :show
-      expect(last_command.stderr).to eq_err("")
+      expect(err_without_deprecations).to be_empty
     end
   end
 
