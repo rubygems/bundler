@@ -16,9 +16,10 @@ module Bundler
 
       spec = spec_for_gem(gem_name)
 
-      spec_not_found(gem_name) unless spec
-      return print_gem_path(spec) if @options[:path]
-      print_gem_info(spec)
+      if spec
+        return print_gem_path(spec) if @options[:path]
+        print_gem_info(spec)
+      end
     end
 
   private
