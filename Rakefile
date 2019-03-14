@@ -49,7 +49,7 @@ namespace :spec do
     gem_install_command = "install --no-document --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
       "'#{name}:#{version}'"
     end.join(" ")
-    sh %(#{Gem.ruby} -S gem #{gem_install_command})
+    sh "gem #{gem_install_command}"
 
     # Download and install gems used inside tests
     $LOAD_PATH.unshift("./spec")
