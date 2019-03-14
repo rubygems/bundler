@@ -2,6 +2,7 @@
 
 require "bundler/vendored_persistent"
 require "cgi"
+require "rbconfig"
 require "securerandom"
 require "zlib"
 
@@ -295,7 +296,13 @@ module Bundler
         end
       else
         store.set_default_paths
-        certs = File.expand_path("../ssl_certs/*/*.pem", __FILE__)
+
+        rubygems_certs_dir = File.expand_path("../../rubygems/ssl_certs", __FILE__)
+        unless File.exists?(rubygems_certs_dir)
+          rubygems_certs_dir = File.join(RbConfig::CONFIG["rubylibdir"], "rubygems", "ssl_certs")
+        end
+        certs = File.join(rubygems_certs_dir, "*", "*.pem")
+
         Dir.glob(certs).each {|c| store.add_file c }
       end
       store
