@@ -51,6 +51,11 @@ namespace :spec do
     end.join(" ")
     sh "gem #{gem_install_command}"
 
+    # Fix incorrect default etc gem specification file list on ruby 2.6.2.
+    if RUBY_VERSION == "2.6.2"
+      sh "gem install etc:1.0.1 --default"
+    end
+
     # Download and install gems used inside tests
     $LOAD_PATH.unshift("./spec")
     require "support/rubygems_ext"
@@ -70,11 +75,6 @@ namespace :spec do
 
       # Install the gems with a consistent version of RubyGems
       sh "gem update --system 3.0.3"
-
-      # Fix incorrect default etc gem specification file list on ruby 2.6.2.
-      if RUBY_VERSION == "2.6.2"
-        sh "gem install etc:1.0.1 --default"
-      end
 
       $LOAD_PATH.unshift("./spec")
       require "support/rubygems_ext"
