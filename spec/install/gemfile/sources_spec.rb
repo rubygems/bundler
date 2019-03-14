@@ -30,7 +30,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
       xit "shows a deprecation" do
         bundle :install
 
-        expect(err).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
+        expect(deprecations).to include("Your Gemfile contains multiple primary sources.")
       end
 
       it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first" do
@@ -64,7 +64,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
       end
 
       xit "shows a deprecation" do
-        expect(err).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
+        expect(deprecations).to include("Your Gemfile contains multiple primary sources.")
       end
 
       it "warns about ambiguous gems, but installs anyway" do
@@ -257,7 +257,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
           end
 
           xit "shows a deprecation" do
-            expect(err).to have_major_deprecation a_string_including("Your Gemfile contains multiple primary sources.")
+            expect(deprecations).to include("Your Gemfile contains multiple primary sources.")
           end
 
           it "installs from the other source and warns about ambiguous gems" do

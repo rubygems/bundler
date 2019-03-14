@@ -54,6 +54,10 @@ module Spec
       last_command.stderr.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "")
     end
 
+    def deprecations
+      err.split("\n").select {|l| l =~ MAJOR_DEPRECATION }.join("\n").split(MAJOR_DEPRECATION)
+    end
+
     def exitstatus
       last_command.exitstatus
     end

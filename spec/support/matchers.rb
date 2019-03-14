@@ -62,19 +62,6 @@ module Spec
 
     MAJOR_DEPRECATION = /^\[DEPRECATED\]\s*/.freeze
 
-    RSpec::Matchers.define :have_major_deprecation do |expected|
-      diffable
-      match do |actual|
-        deprecations = actual.split(MAJOR_DEPRECATION)
-
-        return !expected.nil? if deprecations.empty?
-
-        deprecations.any? do |d|
-          !d.empty? && values_match?(expected, d.strip)
-        end
-      end
-    end
-
     RSpec::Matchers.define :have_dep do |*args|
       dep = Bundler::Dependency.new(*args)
 
