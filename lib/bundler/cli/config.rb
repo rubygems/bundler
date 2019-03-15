@@ -14,7 +14,7 @@ module Bundler
     scope_options
     method_option :delete, :type => :boolean, :banner => "delete"
     def base(name = nil, *value)
-      SharedHelpers.major_deprecation 3,
+      SharedHelpers.major_deprecation 2,
         "Using the `config` command without a subcommand [list, get, set, unset]"
       Base.new(options, name, value, self).run
     end

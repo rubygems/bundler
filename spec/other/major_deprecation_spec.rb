@@ -52,6 +52,20 @@ RSpec.describe "major deprecations" do
       end
     end
 
+    describe "bundle config" do
+      before do
+        bundle! "config"
+      end
+
+      it "does not warn when no options are given", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "warns when no options are given", :bundler => "2" do
+        expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset]")
+      end
+    end
+
     describe "bundle update" do
       before do
         bundle! "install"
