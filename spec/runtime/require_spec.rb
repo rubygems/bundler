@@ -121,7 +121,7 @@ RSpec.describe "Bundler.require" do
       Bundler.require
     R
 
-    expect(last_command.stderr).to eq_err("ZOMG LOAD ERROR")
+    expect(err_without_deprecations).to eq("ZOMG LOAD ERROR")
   end
 
   it "displays a helpful message if the required gem throws an error" do
@@ -160,7 +160,7 @@ RSpec.describe "Bundler.require" do
     RUBY
     run(cmd)
 
-    expect(last_command.stderr).to eq_err("ZOMG LOAD ERROR: cannot load such file -- load-bar")
+    expect(err_without_deprecations).to eq("ZOMG LOAD ERROR: cannot load such file -- load-bar")
   end
 
   describe "with namespaced gems" do
@@ -211,7 +211,7 @@ RSpec.describe "Bundler.require" do
       load_error_run <<-R, "jquery-rails"
         Bundler.require
       R
-      expect(last_command.stderr).to eq_err("ZOMG LOAD ERROR")
+      expect(err_without_deprecations).to eq("ZOMG LOAD ERROR")
     end
 
     it "handles the case where regex fails" do
@@ -234,7 +234,7 @@ RSpec.describe "Bundler.require" do
       RUBY
       run(cmd)
 
-      expect(last_command.stderr).to eq_err("ZOMG LOAD ERROR")
+      expect(err_without_deprecations).to eq("ZOMG LOAD ERROR")
     end
 
     it "doesn't swallow the error when the library has an unrelated error" do
@@ -258,7 +258,7 @@ RSpec.describe "Bundler.require" do
       RUBY
       run(cmd)
 
-      expect(last_command.stderr).to eq_err("ZOMG LOAD ERROR: cannot load such file -- load-bar")
+      expect(err_without_deprecations).to eq("ZOMG LOAD ERROR: cannot load such file -- load-bar")
     end
   end
 
@@ -366,7 +366,7 @@ RSpec.describe "Bundler.require" do
         load_error_run <<-R, "no_such_file_omg"
           Bundler.require
         R
-        expect(last_command.stderr).to eq_err("ZOMG LOAD ERROR")
+        expect(err_without_deprecations).to eq("ZOMG LOAD ERROR")
       end
     end
   end

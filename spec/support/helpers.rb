@@ -48,6 +48,16 @@ module Spec
       Bundler.feature_flag.error_on_stderr? ? last_command.stderr : last_command.stdout
     end
 
+    MAJOR_DEPRECATION = /^\[DEPRECATED\]\s*/.freeze
+
+    def err_without_deprecations
+      last_command.stderr.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "")
+    end
+
+    def deprecations
+      err.split("\n").select {|l| l =~ MAJOR_DEPRECATION }.join("\n").split(MAJOR_DEPRECATION)
+    end
+
     def exitstatus
       last_command.exitstatus
     end

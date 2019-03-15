@@ -1067,7 +1067,7 @@ RSpec.describe "bundle install with git sources" do
 
       bundle :install,
         :requires => [lib_path("install_hooks.rb")]
-      expect(last_command.stderr).to eq_err("Ran pre-install hook: foo-1.0")
+      expect(err_without_deprecations).to eq("Ran pre-install hook: foo-1.0")
     end
 
     it "runs post-install hooks" do
@@ -1087,7 +1087,7 @@ RSpec.describe "bundle install with git sources" do
 
       bundle :install,
         :requires => [lib_path("install_hooks.rb")]
-      expect(last_command.stderr).to eq_err("Ran post-install hook: foo-1.0")
+      expect(err_without_deprecations).to eq("Ran post-install hook: foo-1.0")
     end
 
     it "complains if the install hook fails" do

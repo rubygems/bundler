@@ -60,28 +60,6 @@ module Spec
       end
     end
 
-    MAJOR_DEPRECATION = /^\[DEPRECATED\]\s*/.freeze
-
-    RSpec::Matchers.define :eq_err do |expected|
-      diffable
-      match do |actual|
-        actual.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "") == expected
-      end
-    end
-
-    RSpec::Matchers.define :have_major_deprecation do |expected|
-      diffable
-      match do |actual|
-        deprecations = actual.split(MAJOR_DEPRECATION)
-
-        return !expected.nil? if deprecations.empty?
-
-        deprecations.any? do |d|
-          !d.empty? && values_match?(expected, d.strip)
-        end
-      end
-    end
-
     RSpec::Matchers.define :have_dep do |*args|
       dep = Bundler::Dependency.new(*args)
 
@@ -155,7 +133,6 @@ module Spec
           rescue StandardError => e
             next "#{name} is not installed:\n#{indent(e)}"
           end
-          last_command.stdout.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
           actual_version, actual_platform = last_command.stdout.strip.split(/\s+/, 2)
           unless Gem::Version.new(actual_version) == Gem::Version.new(version)
             next "#{name} was expected to be at version #{version} but was #{actual_version}"
@@ -170,7 +147,6 @@ module Spec
           rescue StandardError
             next "#{name} does not have a source defined:\n#{indent(e)}"
           end
-          last_command.stdout.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
           unless last_command.stdout.strip == source
             next "Expected #{name} (#{version}) to be installed from `#{source}`, was actually from `#{out}`"
           end
