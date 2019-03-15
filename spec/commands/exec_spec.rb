@@ -537,11 +537,6 @@ RSpec.describe "bundle exec" do
       let(:executable) do
         ex = super()
         ex << "\n"
-        if LessThanProc.with(RUBY_VERSION).call("1.9")
-          # Ruby < 1.9 needs a flush for a exit by signal, later
-          # rubies do not
-          ex << "STDOUT.flush\n"
-        end
         ex << "raise SignalException, 'SIGTERM'\n"
         ex
       end
@@ -560,13 +555,8 @@ RSpec.describe "bundle exec" do
       let(:exit_code) { 0 }
       let(:expected) { "#{path} is empty" }
       let(:expected_err) { "" }
-      if LessThanProc.with(RUBY_VERSION).call("1.9")
-        # Kernel#exec in ruby < 1.9 will raise Errno::ENOEXEC if the command content is empty,
-        # even if the command is set as an executable.
-        pending "Kernel#exec is different"
-      else
-        it_behaves_like "it runs"
-      end
+
+      it_behaves_like "it runs"
     end
 
     context "the executable is empty", :bundler => "2" do
@@ -694,21 +684,13 @@ __FILE__: #{path.to_s.inspect}
       context "when the path is relative" do
         let(:path) { super().relative_path_from(bundled_app) }
 
-        if LessThanProc.with(RUBY_VERSION).call("1.9")
-          pending "relative paths have ./ __FILE__"
-        else
-          it_behaves_like "it runs"
-        end
+        it_behaves_like "it runs"
       end
 
       context "when the path is relative with a leading ./" do
         let(:path) { Pathname.new("./#{super().relative_path_from(Pathname.pwd)}") }
 
-        if LessThanProc.with(RUBY_VERSION).call("< 1.9")
-          pending "relative paths with ./ have absolute __FILE__"
-        else
-          it_behaves_like "it runs"
-        end
+        pending "relative paths with ./ have absolute __FILE__"
       end
     end
 
