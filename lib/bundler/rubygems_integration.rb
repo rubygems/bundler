@@ -198,20 +198,12 @@ module Bundler
       Gem::ConfigMap
     end
 
-    def repository_subdirectories
-      %w[cache doc gems specifications]
-    end
-
     def clear_paths
       Gem.clear_paths
     end
 
     def bin_path(gem, bin, ver)
       Gem.bin_path(gem, bin, ver)
-    end
-
-    def path_separator
-      File::PATH_SEPARATOR
     end
 
     def preserve_paths
@@ -248,34 +240,10 @@ module Bundler
       EXT_LOCK
     end
 
-    def fetch_specs(all, pre, &blk)
-      require "rubygems/spec_fetcher"
-      specs = Gem::SpecFetcher.new.list(all, pre)
-      specs.each { yield } if block_given?
-      specs
-    end
-
     def fetch_prerelease_specs
       fetch_specs(false, true)
     rescue Gem::RemoteFetcher::FetchError
       {} # if we can't download them, there aren't any
-    end
-
-    # TODO: This is for older versions of RubyGems... should we support the
-    # X-Gemfile-Source header on these old versions?
-    # Maybe the newer implementation will work on older RubyGems?
-    # It seems difficult to keep this implementation and still send the header.
-    def fetch_all_remote_specs(remote)
-      old_sources = Bundler.rubygems.sources
-      Bundler.rubygems.sources = [remote.uri.to_s]
-      # Fetch all specs, minus prerelease specs
-      spec_list = fetch_specs(true, false)
-      # Then fetch the prerelease specs
-      fetch_prerelease_specs.each {|k, v| spec_list[k].concat(v) }
-
-      spec_list.values.first
-    ensure
-      Bundler.rubygems.sources = old_sources
     end
 
     def with_build_args(args)
@@ -288,15 +256,6 @@ module Bundler
           self.build_args = old_args
         end
       end
-    end
-
-    def install_with_build_args(args)
-      with_build_args(args) { yield }
-    end
-
-    def gem_from_path(path, policy = nil)
-      require "rubygems/format"
-      Gem::Format.from_file_by_path(path, policy)
     end
 
     def spec_from_gem(path, policy = nil)
@@ -317,21 +276,8 @@ module Bundler
       end
     end
 
-    def build(spec, skip_validation = false)
-      require "rubygems/builder"
-      Gem::Builder.new(spec).build
-    end
-
     def build_gem(gem_dir, spec)
       build(spec)
-    end
-
-    def download_gem(spec, uri, path)
-      uri = Bundler.settings.mirror_for(uri)
-      fetcher = Gem::RemoteFetcher.new(configuration[:http_proxy])
-      Bundler::Retry.new("download gem from #{uri}").attempts do
-        fetcher.download(spec, uri, path)
-      end
     end
 
     def security_policy_keys
@@ -612,14 +558,6 @@ module Bundler
         redefine_method((class << Gem; self; end), :finish_resolve) do |*|
           []
         end
-      end
-
-      def all_specs
-        Gem::Specification.to_a
-      end
-
-      def find_name(name)
-        Gem::Specification.find_all_by_name name
       end
 
       def fetch_specs(source, remote, name)
