@@ -20,6 +20,7 @@ module Bundler
 
     def initialize
       @replaced_methods = {}
+      backport_ext_builder_monitor
     end
 
     def version
@@ -303,12 +304,27 @@ module Bundler
       end
     end
 
-    def binstubs_call_gem?
-      true
-    end
+    if provides?(">= 2.5.2")
+      # RubyGems-generated binstubs call Kernel#gem
+      def binstubs_call_gem?
+        false
+      end
 
-    def stubs_provide_full_functionality?
-      false
+      # only 2.5.2+ has all of the stub methods we want to use, and since this
+      # is a performance optimization _only_,
+      # we'll restrict ourselves to the most
+      # recent RG versions instead of all versions that have stubs
+      def stubs_provide_full_functionality?
+        true
+      end
+    else
+      def binstubs_call_gem?
+        true
+      end
+
+      def stubs_provide_full_functionality?
+        false
+      end
     end
 
     def replace_gem(specs, specs_by_name)
@@ -546,160 +562,137 @@ module Bundler
       end
     end
 
-    # RubyGems 2.1.0
-    class MoreFuture < RubygemsIntegration
-      def stub_rubygems(specs)
+    def stub_rubygems(specs)
+      Gem::Specification.all = specs
+
+      Gem.post_reset do
         Gem::Specification.all = specs
+      end
 
-        Gem.post_reset do
-          Gem::Specification.all = specs
+      redefine_method((class << Gem; self; end), :finish_resolve) do |*|
+        []
+      end
+    end
+
+    def fetch_specs(source, remote, name)
+      path = source + "#{name}.#{Gem.marshal_version}.gz"
+      fetcher = gem_remote_fetcher
+      fetcher.headers = { "X-Gemfile-Source" => remote.original_uri.to_s } if remote.original_uri
+      string = fetcher.fetch_path(path)
+      Bundler.load_marshal(string)
+    rescue Gem::RemoteFetcher::FetchError => e
+      # it's okay for prerelease to fail
+      raise e unless name == "prerelease_specs"
+    end
+
+    def fetch_all_remote_specs(remote)
+      source = remote.uri.is_a?(URI) ? remote.uri : URI.parse(source.to_s)
+
+      specs = fetch_specs(source, remote, "specs")
+      pres = fetch_specs(source, remote, "prerelease_specs") || []
+
+      specs.concat(pres)
+    end
+
+    def download_gem(spec, uri, path)
+      uri = Bundler.settings.mirror_for(uri)
+      fetcher = gem_remote_fetcher
+      fetcher.headers = { "X-Gemfile-Source" => spec.remote.original_uri.to_s } if spec.remote.original_uri
+      Bundler::Retry.new("download gem from #{uri}").attempts do
+        fetcher.download(spec, uri, path)
+      end
+    end
+
+    def gem_remote_fetcher
+      require "resolv"
+      proxy = configuration[:http_proxy]
+      dns = Resolv::DNS.new
+      Bundler::GemRemoteFetcher.new(proxy, dns)
+    end
+
+    def gem_from_path(path, policy = nil)
+      require "rubygems/package"
+      p = Gem::Package.new(path)
+      p.security_policy = policy if policy
+      p
+    end
+
+    def build(spec, skip_validation = false)
+      require "rubygems/package"
+      Gem::Package.build(spec, skip_validation)
+    end
+
+    def repository_subdirectories
+      Gem::REPOSITORY_SUBDIRECTORIES
+    end
+
+    def install_with_build_args(args)
+      yield
+    end
+
+    def path_separator
+      Gem.path_separator
+    end
+
+    def all_specs
+      require "bundler/remote_specification"
+      Gem::Specification.stubs.map do |stub|
+        StubSpecification.from_stub(stub)
+      end
+    end
+
+    def backport_ext_builder_monitor
+      # So we can avoid requiring "rubygems/ext" in its entirety
+      Gem.module_eval <<-RB, __FILE__, __LINE__ + 1
+        module Ext
+        end
+      RB
+
+      require "rubygems/ext/builder"
+
+      Gem::Ext::Builder.class_eval do
+        unless const_defined?(:CHDIR_MONITOR)
+          const_set(:CHDIR_MONITOR, EXT_LOCK)
         end
 
-        redefine_method((class << Gem; self; end), :finish_resolve) do |*|
-          []
-        end
+        remove_const(:CHDIR_MUTEX) if const_defined?(:CHDIR_MUTEX)
+        const_set(:CHDIR_MUTEX, const_get(:CHDIR_MONITOR))
       end
+    end
 
-      def fetch_specs(source, remote, name)
-        path = source + "#{name}.#{Gem.marshal_version}.gz"
-        fetcher = gem_remote_fetcher
-        fetcher.headers = { "X-Gemfile-Source" => remote.original_uri.to_s } if remote.original_uri
-        string = fetcher.fetch_path(path)
-        Bundler.load_marshal(string)
-      rescue Gem::RemoteFetcher::FetchError => e
-        # it's okay for prerelease to fail
-        raise e unless name == "prerelease_specs"
+    if Gem::Specification.respond_to?(:stubs_for)
+      def find_name(name)
+        Gem::Specification.stubs_for(name).map(&:to_spec)
       end
-
-      def fetch_all_remote_specs(remote)
-        source = remote.uri.is_a?(URI) ? remote.uri : URI.parse(source.to_s)
-
-        specs = fetch_specs(source, remote, "specs")
-        pres = fetch_specs(source, remote, "prerelease_specs") || []
-
-        specs.concat(pres)
+    else
+      def find_name(name)
+        Gem::Specification.stubs.find_all do |spec|
+          spec.name == name
+        end.map(&:to_spec)
       end
+    end
 
-      def download_gem(spec, uri, path)
-        uri = Bundler.settings.mirror_for(uri)
-        fetcher = gem_remote_fetcher
-        fetcher.headers = { "X-Gemfile-Source" => spec.remote.original_uri.to_s } if spec.remote.original_uri
-        Bundler::Retry.new("download gem from #{uri}").attempts do
-          fetcher.download(spec, uri, path)
-        end
+    if Gem::Specification.respond_to?(:default_stubs)
+      def default_stubs
+        Gem::Specification.default_stubs("*.gemspec")
       end
-
-      def gem_remote_fetcher
-        require "resolv"
-        proxy = configuration[:http_proxy]
-        dns = Resolv::DNS.new
-        Bundler::GemRemoteFetcher.new(proxy, dns)
+    else
+      def default_stubs
+        Gem::Specification.send(:default_stubs, "*.gemspec")
       end
+    end
 
-      def gem_from_path(path, policy = nil)
-        require "rubygems/package"
-        p = Gem::Package.new(path)
-        p.security_policy = policy if policy
-        p
-      end
-
-      def build(spec, skip_validation = false)
-        require "rubygems/package"
-        Gem::Package.build(spec, skip_validation)
-      end
-
-      def repository_subdirectories
-        Gem::REPOSITORY_SUBDIRECTORIES
-      end
-
-      def install_with_build_args(args)
-        yield
-      end
-
-      def path_separator
-        Gem.path_separator
-      end
-
-      def initialize
-        super
-        backport_ext_builder_monitor
-      end
-
-      def all_specs
-        require "bundler/remote_specification"
-        Gem::Specification.stubs.map do |stub|
-          StubSpecification.from_stub(stub)
-        end
-      end
-
-      def backport_ext_builder_monitor
-        # So we can avoid requiring "rubygems/ext" in its entirety
-        Gem.module_eval <<-RB, __FILE__, __LINE__ + 1
-          module Ext
-          end
-        RB
-
-        require "rubygems/ext/builder"
-
-        Gem::Ext::Builder.class_eval do
-          unless const_defined?(:CHDIR_MONITOR)
-            const_set(:CHDIR_MONITOR, EXT_LOCK)
-          end
-
-          remove_const(:CHDIR_MUTEX) if const_defined?(:CHDIR_MUTEX)
-          const_set(:CHDIR_MUTEX, const_get(:CHDIR_MONITOR))
-        end
-      end
-
-      if Gem::Specification.respond_to?(:stubs_for)
-        def find_name(name)
-          Gem::Specification.stubs_for(name).map(&:to_spec)
-        end
-      else
-        def find_name(name)
-          Gem::Specification.stubs.find_all do |spec|
-            spec.name == name
-          end.map(&:to_spec)
-        end
-      end
-
-      if Gem::Specification.respond_to?(:default_stubs)
-        def default_stubs
-          Gem::Specification.default_stubs("*.gemspec")
-        end
-      else
-        def default_stubs
-          Gem::Specification.send(:default_stubs, "*.gemspec")
-        end
-      end
-
-      def use_gemdeps(gemfile)
-        ENV["BUNDLE_GEMFILE"] ||= File.expand_path(gemfile)
-        require "bundler/gemdeps"
-        runtime = Bundler.setup
-        Bundler.ui = nil
-        activated_spec_names = runtime.requested_specs.map(&:to_spec).sort_by(&:name)
-        [Gemdeps.new(runtime), activated_spec_names]
-      end
-
-      if provides?(">= 2.5.2")
-        # RubyGems-generated binstubs call Kernel#gem
-        def binstubs_call_gem?
-          false
-        end
-
-        # only 2.5.2+ has all of the stub methods we want to use, and since this
-        # is a performance optimization _only_,
-        # we'll restrict ourselves to the most
-        # recent RG versions instead of all versions that have stubs
-        def stubs_provide_full_functionality?
-          true
-        end
-      end
+    def use_gemdeps(gemfile)
+      ENV["BUNDLE_GEMFILE"] ||= File.expand_path(gemfile)
+      require "bundler/gemdeps"
+      runtime = Bundler.setup
+      Bundler.ui = nil
+      activated_spec_names = runtime.requested_specs.map(&:to_spec).sort_by(&:name)
+      [Gemdeps.new(runtime), activated_spec_names]
     end
   end
 
   def self.rubygems
-    @rubygems ||= RubygemsIntegration::MoreFuture.new
+    @rubygems ||= RubygemsIntegration.new
   end
 end
