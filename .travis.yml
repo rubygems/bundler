@@ -29,7 +29,7 @@ addons:
 
 rvm:
   - 2.6.2
-  - 2.5.4
+  - 2.5.5
   - 2.4.5
   - 2.3.8
 
@@ -51,7 +51,7 @@ jobs:
       script: rake rubocop
       stage: linting
     # Ruby 2.5, Rubygems 2.7
-    - rvm: 2.5.4
+    - rvm: 2.5.5
       env: RGV=v2.7.9
       stage: test
     # Ruby 2.4, Rubygems 2.6
