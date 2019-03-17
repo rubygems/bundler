@@ -128,12 +128,6 @@ RSpec.describe "major deprecations" do
         G
       end
 
-      it "should print a deprecation warning about autoremembering flags", :bundler => "3" do
-        expect(deprecations).to include(
-          "flags passed to commands will no longer be automatically remembered."
-        )
-      end
-
       {
         :clean => true,
         :deployment => true,
