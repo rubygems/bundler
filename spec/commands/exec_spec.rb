@@ -79,7 +79,7 @@ RSpec.describe "bundle exec" do
         require 'tempfile'
         io = Tempfile.new("io-test-fd")
         args = %W[#{Gem.ruby} -I#{lib} #{bindir.join("bundle")} exec --keep-file-descriptors #{Gem.ruby} #{command.path} \#{io.to_i}]
-        args << { io.to_i => io } if RUBY_VERSION >= "2.0"
+        args << { io.to_i => io }
         exec(*args)
       end
     G
@@ -87,12 +87,7 @@ RSpec.describe "bundle exec" do
     install_gemfile ""
     sys_exec "#{Gem.ruby} #{command.path}"
 
-    if Bundler.current_ruby.ruby_2?
-      expect(out).to eq("")
-    else
-      expect(out).to eq("Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec.")
-    end
-
+    expect(out).to eq("")
     expect(last_command.stderr).to be_empty
   end
 
@@ -500,7 +495,7 @@ RSpec.describe "bundle exec" do
     let(:rack) { "RACK: 1.0.0" }
     let(:process) do
       title = "PROCESS: #{path}"
-      title += " arg1 arg2" if RUBY_VERSION >= "2.1"
+      title += " arg1 arg2"
       title
     end
     let(:exit_code) { 0 }

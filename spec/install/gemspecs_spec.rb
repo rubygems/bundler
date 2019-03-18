@@ -64,8 +64,6 @@ RSpec.describe "bundle install" do
   end
 
   it "reads gemspecs respecting their encoding" do
-    skip "Unicode is not supported on Ruby 1.x without extra work" if RUBY_VERSION < "2.0"
-
     create_file "version.rb", <<-RUBY
       module Persistent💎
         VERSION = "0.0.1"
