@@ -25,7 +25,7 @@ module Bundler
             # REE seems to be very agressive with when it magically removes
             # tempfiles
             t.unlink if t.path && File.exist?(t.path)
-          rescue => e
+          rescue StandardError => e
             warn "#{e.class}: #{e}"
             warn e.backtrace.join("\n")
           end
