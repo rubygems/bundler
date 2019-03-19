@@ -128,12 +128,6 @@ RSpec.describe "major deprecations" do
         G
       end
 
-      it "should print a deprecation warning about autoremembering flags", :bundler => "3" do
-        expect(deprecations).to include(
-          "flags passed to commands will no longer be automatically remembered."
-        )
-      end
-
       {
         :clean => true,
         :deployment => true,
@@ -153,7 +147,7 @@ RSpec.describe "major deprecations" do
             bundle "install #{flag_name} #{value}"
 
             expect(deprecations).to include(
-              "The `#{flag_name}` flag is deprecated because it relied on " \
+              "The `#{flag_name}` flag is deprecated because it relies on " \
               "being remembered accross bundler invokations, which bundler " \
               "will no longer do in future versions. Instead please use " \
               "`bundle config #{name} '#{value}'`, and stop using this flag"
