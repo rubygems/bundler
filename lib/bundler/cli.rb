@@ -296,17 +296,21 @@ module Bundler
         if ARGV[0] == "show"
           rest = ARGV[1..-1]
 
-          new_command = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
+          if flag = rest.find{|arg| ["--verbose", "--outdated"].include?(arg) }
+            Bundler::SharedHelpers.major_deprecation(2, "the `#{flag}` flag to `bundle show` was undocumented and will be removed without replacement")
+          else
+            new_command = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
 
-          new_arguments = rest.map do |arg|
-            next arg if arg != "--paths"
-            next "--path" if new_command == "info"
+            new_arguments = rest.map do |arg|
+              next arg if arg != "--paths"
+              next "--path" if new_command == "info"
+            end
+
+            old_argv = ARGV.join(" ")
+            new_argv = [new_command, *new_arguments.compact].join(" ")
+
+            Bundler::SharedHelpers.major_deprecation(2, "use `bundle #{new_argv}` instead of `bundle #{old_argv}`")
           end
-
-          old_argv = ARGV.join(" ")
-          new_argv = [new_command, *new_arguments.compact].join(" ")
-
-          Bundler::SharedHelpers.major_deprecation(2, "use `bundle #{new_argv}` instead of `bundle #{old_argv}`")
         end
         require "bundler/cli/show"
         Show.new(options, gem_name).run

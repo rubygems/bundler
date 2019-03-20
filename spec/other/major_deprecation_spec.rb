@@ -486,6 +486,34 @@ The :gist git source is deprecated, and will be removed in the future. Add this 
       end
     end
 
+    context "with --outdated flag" do
+      before do
+        bundle! "show --outdated"
+      end
+
+      it "does not print a deprecation warning", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "prints a deprecation warning informing about its removal", :bundler => "2" do
+        expect(deprecations).to include("the `--outdated` flag to `bundle show` was undocumented and will be removed without replacement")
+      end
+    end
+
+    context "with --verbose flag" do
+      before do
+        bundle! "show --verbose"
+      end
+
+      it "does not print a deprecation warning", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "prints a deprecation warning informing about its removal", :bundler => "2" do
+        expect(deprecations).to include("the `--verbose` flag to `bundle show` was undocumented and will be removed without replacement")
+      end
+    end
+
     context "with a gem argument" do
       before do
         bundle! "show rack"
