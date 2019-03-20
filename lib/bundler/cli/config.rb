@@ -14,8 +14,20 @@ module Bundler
     scope_options
     method_option :delete, :type => :boolean, :banner => "delete"
     def base(name = nil, *value)
-      SharedHelpers.major_deprecation 3,
-        "Using the `config` command without a subcommand [list, get, set, unset]"
+      new_args =
+        if ARGV.size == 1
+          ["config", "list"]
+        elsif ARGV.include?("--delete")
+          ARGV.map {|arg| arg == "--delete" ? "unset" : arg }
+        elsif ARGV.include?("--global") || ARGV.include?("--local") || ARGV.size == 3
+          ["config", "set", *ARGV[1..-1]]
+        else
+          ["config", "get", ARGV[1]]
+        end
+
+      SharedHelpers.major_deprecation 2,
+        "Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle #{new_args.join(" ")}` instead."
+
       Base.new(options, name, value, self).run
     end
 

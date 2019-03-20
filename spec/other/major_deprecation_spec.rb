@@ -52,6 +52,120 @@ RSpec.describe "major deprecations" do
       end
     end
 
+    describe "bundle config" do
+      describe "old list interface" do
+        before do
+          bundle! "config"
+        end
+
+        it "does not warn", :bundler => "< 2" do
+          expect(deprecations).to be_empty
+        end
+
+        it "warns", :bundler => "2" do
+          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config list` instead.")
+        end
+      end
+
+      describe "old get interface" do
+        before do
+          bundle! "config waka"
+        end
+
+        it "does not warn", :bundler => "< 2" do
+          expect(deprecations).to be_empty
+        end
+
+        it "warns", :bundler => "2" do
+          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config get waka` instead.")
+        end
+      end
+
+      describe "old set interface" do
+        before do
+          bundle! "config waka wakapun"
+        end
+
+        it "does not warn", :bundler => "< 2" do
+          expect(deprecations).to be_empty
+        end
+
+        it "warns", :bundler => "2" do
+          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config set waka wakapun` instead.")
+        end
+      end
+
+      describe "old set interface with --local" do
+        before do
+          bundle! "config --local waka wakapun"
+        end
+
+        it "does not warn", :bundler => "< 2" do
+          expect(deprecations).to be_empty
+        end
+
+        it "warns", :bundler => "2" do
+          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config set --local waka wakapun` instead.")
+        end
+      end
+
+      describe "old set interface with --global" do
+        before do
+          bundle! "config --global waka wakapun"
+        end
+
+        it "does not warn", :bundler => "< 2" do
+          expect(deprecations).to be_empty
+        end
+
+        it "warns", :bundler => "2" do
+          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config set --global waka wakapun` instead.")
+        end
+      end
+
+      describe "old unset interface" do
+        before do
+          bundle! "config --delete waka"
+        end
+
+        it "does not warn", :bundler => "< 2" do
+          expect(deprecations).to be_empty
+        end
+
+        it "warns", :bundler => "2" do
+          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config unset waka` instead.")
+        end
+      end
+
+      describe "old unset interface with --local" do
+        before do
+          bundle! "config --delete --local waka"
+        end
+
+        it "does not warn", :bundler => "< 2" do
+          expect(deprecations).to be_empty
+        end
+
+        it "warns", :bundler => "2" do
+          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config unset --local waka` instead.")
+        end
+      end
+
+      describe "old unset interface with --global" do
+        before do
+          bundle! "config --delete --global waka"
+        end
+
+        it "does not warn", :bundler => "< 2" do
+          expect(deprecations).to be_empty
+        end
+
+        it "warns", :bundler => "2" do
+          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config unset --global waka` instead.")
+        end
+      end
+    end
+
     describe "bundle update" do
       before do
         bundle! "install"
