@@ -391,7 +391,7 @@ The dependency #{Gem::Dependency.new("rack", ">= 0")} will be unused by any of t
   end
 
   context "when disable_platform_warnings is true" do
-    before { bundle! "config disable_platform_warnings true" }
+    before { bundle! "config set disable_platform_warnings true" }
 
     it "does not print the warning when a dependency is unused on any platform" do
       simulate_platform "ruby"

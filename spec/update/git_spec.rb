@@ -208,7 +208,7 @@ RSpec.describe "bundle update" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       bundle "update rack"
       expect(out).to include("Bundle updated!")
     end

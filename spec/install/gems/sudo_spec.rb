@@ -4,7 +4,7 @@ RSpec.describe "when using sudo", :sudo => true do
   describe "and BUNDLE_PATH is writable" do
     context "but BUNDLE_PATH/build_info is not writable" do
       before do
-        bundle! "config path.system true"
+        bundle! "config set path.system true"
         subdir = system_gem_path("cache")
         subdir.mkpath
         sudo "chmod u-w #{subdir}"
@@ -25,7 +25,7 @@ RSpec.describe "when using sudo", :sudo => true do
 
   describe "and GEM_HOME is owned by root" do
     before :each do
-      bundle! "config path.system true"
+      bundle! "config set path.system true"
       chown_system_gems_to_root
     end
 
@@ -52,7 +52,7 @@ RSpec.describe "when using sudo", :sudo => true do
     end
 
     it "installs when BUNDLE_PATH is owned by root" do
-      bundle! "config global_path_appends_ruby_scope false" # consistency in tests between 1.x and 2.x modes
+      bundle! "config set global_path_appends_ruby_scope false" # consistency in tests between 1.x and 2.x modes
 
       bundle_path = tmp("owned_by_root")
       FileUtils.mkdir_p bundle_path
@@ -70,7 +70,7 @@ RSpec.describe "when using sudo", :sudo => true do
     end
 
     it "installs when BUNDLE_PATH does not exist" do
-      bundle! "config global_path_appends_ruby_scope false" # consistency in tests between 1.x and 2.x modes
+      bundle! "config set global_path_appends_ruby_scope false" # consistency in tests between 1.x and 2.x modes
 
       root_path = tmp("owned_by_root")
       FileUtils.mkdir_p root_path
@@ -133,7 +133,7 @@ RSpec.describe "when using sudo", :sudo => true do
 
   describe "and GEM_HOME is not writable" do
     it "installs" do
-      bundle! "config path.system true"
+      bundle! "config set path.system true"
       gem_home = tmp("sudo_gem_home")
       sudo "mkdir -p #{gem_home}"
       sudo "chmod ugo-w #{gem_home}"

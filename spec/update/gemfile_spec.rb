@@ -48,7 +48,7 @@ RSpec.describe "bundle update" do
   end
 
   context "with prefer_gems_rb set" do
-    before { bundle! "config prefer_gems_rb true" }
+    before { bundle! "config set prefer_gems_rb true" }
 
     it "prefers gems.rb to Gemfile" do
       create_file("gems.rb", "gem 'bundler'")

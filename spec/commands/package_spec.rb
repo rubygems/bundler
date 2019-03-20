@@ -217,7 +217,7 @@ RSpec.describe "bundle package" do
     subject { bundle :package, forgotten_command_line_options(:frozen => true) }
 
     it "tries to install with frozen" do
-      bundle! "config deployment true"
+      bundle! "config set deployment true"
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"

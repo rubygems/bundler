@@ -80,9 +80,9 @@ Usage: "bundle inject GEM VERSION"
     before do
       bundle "install"
       if Bundler.feature_flag.bundler_2_mode?
-        bundle! "config --local deployment true"
+        bundle! "config set --local deployment true"
       else
-        bundle! "config --local frozen true"
+        bundle! "config set --local frozen true"
       end
     end
 

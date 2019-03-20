@@ -331,7 +331,7 @@ RSpec.describe "install with --deployment or --frozen" do
       end
 
       context "when allow_deployment_source_credential_changes is true" do
-        before { bundle! "config allow_deployment_source_credential_changes true" }
+        before { bundle! "config set allow_deployment_source_credential_changes true" }
 
         it "allows the replace" do
           bundle :install, forgotten_command_line_options(:deployment => true)
@@ -341,7 +341,7 @@ RSpec.describe "install with --deployment or --frozen" do
       end
 
       context "when allow_deployment_source_credential_changes is false" do
-        before { bundle! "config allow_deployment_source_credential_changes false" }
+        before { bundle! "config set allow_deployment_source_credential_changes false" }
 
         it "prevents the replace" do
           bundle :install, forgotten_command_line_options(:deployment => true)
@@ -374,7 +374,7 @@ RSpec.describe "install with --deployment or --frozen" do
     it "remembers that the bundle is frozen at runtime" do
       bundle! :lock
 
-      bundle! "config deployment true"
+      bundle! "config set deployment true"
 
       gemfile <<-G
         source "file://#{gem_repo1}"

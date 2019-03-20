@@ -126,7 +126,7 @@ RSpec.describe "bundle install" do
     end
 
     it "can install dependencies with newer bundler version with system gems" do
-      bundle! "config path.system true"
+      bundle! "config set path.system true"
       install_gemfile! <<-G
         source "file://#{gem_repo2}"
         gem "rails", "3.0"
@@ -139,8 +139,8 @@ RSpec.describe "bundle install" do
     end
 
     it "can install dependencies with newer bundler version with a local path" do
-      bundle! "config path .bundle"
-      bundle! "config global_path_appends_ruby_scope true"
+      bundle! "config set path .bundle"
+      bundle! "config set global_path_appends_ruby_scope true"
       install_gemfile! <<-G
         source "file://#{gem_repo2}"
         gem "rails", "3.0"
@@ -153,7 +153,7 @@ RSpec.describe "bundle install" do
     end
 
     context "with allow_bundler_dependency_conflicts set" do
-      before { bundle! "config allow_bundler_dependency_conflicts true" }
+      before { bundle! "config set allow_bundler_dependency_conflicts true" }
 
       it "are forced to the current bundler version with warnings when no compatible version is found" do
         build_repo4 do

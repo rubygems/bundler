@@ -127,7 +127,7 @@ end
         gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
       G
 
-      bundle %(config local.foo #{lib_path("foo-1.0")})
+      bundle %(config set local.foo #{lib_path("foo-1.0")})
       bundle "install"
       bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
