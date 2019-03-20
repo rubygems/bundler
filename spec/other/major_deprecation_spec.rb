@@ -74,9 +74,16 @@ RSpec.describe "major deprecations" do
     end
 
     describe "bundle install --binstubs" do
-      xit "should output a deprecation warning" do
+      before do
         bundle :install, :binstubs => true
-        expect(deprecations).to include("The --binstubs option will be removed")
+      end
+
+      it "should print no deprecations", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "should output a deprecation warning", :bundler => "2" do
+        expect(deprecations).to include("The --binstubs option will be removed in favor of `bundle binstubs`")
       end
     end
   end
