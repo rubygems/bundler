@@ -237,7 +237,7 @@ RSpec.describe "gemcutter's dependency API" do
         gem "rack"
       G
 
-      bundle! "update --full-index", :artifice => "endpoint", :all => bundle_update_requires_all?
+      bundle! "update --full-index", :artifice => "endpoint", :all => true
       expect(out).to include("Fetching source index from #{source_uri}")
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
