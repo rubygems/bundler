@@ -5,12 +5,11 @@ RSpec.describe "major deprecations" do
 
   describe "Bundler" do
     before do
-      create_file "gems.rb", <<-G
+      install_gemfile! <<-G
         source "file:#{gem_repo1}"
         ruby #{RUBY_VERSION.dump}
         gem "rack"
       G
-      bundle! "install"
     end
 
     describe ".clean_env" do
