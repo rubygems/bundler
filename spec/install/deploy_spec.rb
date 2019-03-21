@@ -323,7 +323,7 @@ RSpec.describe "install with --deployment or --frozen" do
           rack
         G
 
-        bundle! "config set deployment true"
+        bundle! "config set --local deployment true"
       end
 
       it "prevents the replace by default" do
@@ -376,7 +376,7 @@ RSpec.describe "install with --deployment or --frozen" do
     it "remembers that the bundle is frozen at runtime" do
       bundle! :lock
 
-      bundle! "config set deployment true"
+      bundle! "config set --local deployment true"
 
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -414,7 +414,7 @@ You have deleted from the Gemfile:
       expect(out).to include("Updating files in vendor/cache")
 
       simulate_new_machine
-      bundle! "config set deployment true"
+      bundle! "config set --local deployment true"
       bundle! "install --verbose"
       expect(out).not_to include("You are trying to install in deployment mode after changing your Gemfile")
       expect(out).not_to include("You have added to the Gemfile")
