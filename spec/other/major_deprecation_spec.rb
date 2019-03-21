@@ -7,7 +7,6 @@ RSpec.describe "major deprecations" do
     before do
       install_gemfile! <<-G
         source "file:#{gem_repo1}"
-        ruby #{RUBY_VERSION.dump}
         gem "rack"
       G
     end
