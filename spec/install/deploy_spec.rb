@@ -322,10 +322,12 @@ RSpec.describe "install with --deployment or --frozen" do
         DEPENDENCIES
           rack
         G
+
+        bundle! "config set deployment true"
       end
 
       it "prevents the replace by default" do
-        bundle :install, forgotten_command_line_options(:deployment => true)
+        bundle :install
 
         expect(err).to match(/The list of sources changed/)
       end
@@ -334,7 +336,7 @@ RSpec.describe "install with --deployment or --frozen" do
         before { bundle! "config set allow_deployment_source_credential_changes true" }
 
         it "allows the replace" do
-          bundle :install, forgotten_command_line_options(:deployment => true)
+          bundle :install
 
           expect(out).to match(/#{success_message}/)
         end
@@ -344,7 +346,7 @@ RSpec.describe "install with --deployment or --frozen" do
         before { bundle! "config set allow_deployment_source_credential_changes false" }
 
         it "prevents the replace" do
-          bundle :install, forgotten_command_line_options(:deployment => true)
+          bundle :install
 
           expect(err).to match(/The list of sources changed/)
         end
@@ -354,7 +356,7 @@ RSpec.describe "install with --deployment or --frozen" do
         before { ENV["BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES"] = "true" }
 
         it "allows the replace" do
-          bundle :install, forgotten_command_line_options(:deployment => true)
+          bundle :install
 
           expect(out).to match(/#{success_message}/)
         end
@@ -364,7 +366,7 @@ RSpec.describe "install with --deployment or --frozen" do
         before { ENV["BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES"] = "false" }
 
         it "prevents the replace" do
-          bundle :install, forgotten_command_line_options(:deployment => true)
+          bundle :install
 
           expect(err).to match(/The list of sources changed/)
         end
@@ -412,7 +414,8 @@ You have deleted from the Gemfile:
       expect(out).to include("Updating files in vendor/cache")
 
       simulate_new_machine
-      bundle! "install --verbose", forgotten_command_line_options(:deployment => true)
+      bundle! "config set deployment true"
+      bundle! "install --verbose"
       expect(out).not_to include("You are trying to install in deployment mode after changing your Gemfile")
       expect(out).not_to include("You have added to the Gemfile")
       expect(out).not_to include("You have deleted from the Gemfile")
