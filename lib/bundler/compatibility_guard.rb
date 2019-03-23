@@ -1,6 +1,5 @@
 # frozen_string_literal: false
 
-require "rubygems"
 require "bundler/version"
 
 if Bundler::VERSION.split(".").first.to_i >= 2
