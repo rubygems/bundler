@@ -7,7 +7,6 @@ if defined?(Gem::QuickLoader)
   Gem::QuickLoader.load_full_rubygems_library
 end
 
-require "rubygems"
 require "rubygems/specification"
 
 begin
