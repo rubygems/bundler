@@ -29,7 +29,7 @@ ENV["BUNDLE_SPEC_RUN"] = "true"
 # Don't wrap output in tests
 ENV["THOR_COLUMNS"] = "10000"
 
-Spec::SimpleCov.setup
+require "simplecov"
 
 module Gem
   def self.ruby=(ruby)
