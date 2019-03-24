@@ -34,8 +34,6 @@ stages:
   - linting
   - test
 
-# Rubygems versions MUST be available as rake tasks
-# see Rakefile:125 for the list of possible RGV values
 env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master BUNDLER_SPEC_SUB_VERSION=3.0.0
