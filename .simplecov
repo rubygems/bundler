@@ -8,7 +8,9 @@ else
   "regular_specs"
 end
 
-SimpleCov.command_name command_name
+SimpleCov.formatter = SimpleCov::Formatter::SimpleFormatter
+
+SimpleCov.command_name "#{command_name}_#{$$}"
 
 SimpleCov.start do
   add_filter "/bin/"

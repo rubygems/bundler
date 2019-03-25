@@ -121,6 +121,7 @@ module Spec
       env["PATH"].gsub!("#{Path.root}/exe", "") if env["PATH"] && system_bundler
 
       requires = options.delete(:requires) || []
+      requires << "support/coverage"
       requires << "support/hax"
 
       artifice = options.delete(:artifice) do
@@ -137,6 +138,7 @@ module Spec
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
 
       load_path = []
+      load_path += Dir[Path.base_system_gems.join("gems/{simplecov,docile}*/lib")].map(&:to_s)
       load_path << lib unless system_bundler
       load_path << spec
       load_path_str = "-I#{load_path.join(File::PATH_SEPARATOR)}"
