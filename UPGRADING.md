@@ -4,7 +4,7 @@
 
 The following is a summary of the changes that we plan to introduce in Bundler
 3, why we will be making those changes, and what the deprecation process will
-look like. All this deprecations will be printed by default in the upcoming
+look like. All these deprecations will be printed by default in the upcoming
 Bundler 2.1 release.
 
 If you don't want to deal with deprecations right now and want to toggle them
@@ -49,16 +49,16 @@ that we plan to make to this set of commands and options.
 * The `--force` flag to `bundle install` and `bundle update` has been renamed to `--redownload`.
 
   This is just a simple renaming of the flag, to make more apparent what it
-  actually does. This flag forces redownloading very gem, it doesn't "force"
+  actually does. This flag forces redownloading every gem, it doesn't "force"
   anything else.
 
 * `bundle viz` will be removed and extracted to a plugin.
 
   This is the only bundler command requiring external dependencies, both an OS
   dependency (the `graphviz` package) a gem dependency (the `ruby-graphviz`
-  gem). Remove these dependencies make development easier and it was also seen
-  by the bundler team as an opportunity to develop a [bundler plugin] that it's
-  officially maintained by the bundler team, and that users can take as a
+  gem). Removing these dependencies will make development easier and it was also
+  seen by the bundler team as an opportunity to develop a [bundler plugin] that
+  it's officially maintained by the bundler team, and that users can take as a
   reference to develop their own plugins. The plugin contains the same code as
   the old core command, the only difference being that the command is now
   implemented as `bundle graph` which is much easier to understand. Have a look
@@ -80,8 +80,9 @@ that we plan to make to this set of commands and options.
   [NOTE: I'm not elaborating on this change yet because I have hesitations about
   it which I've mentioned in https://github.com/bundler/bundler/pull/7008. After
   reading up on it a bit more and seeing that it all starts with "many people
-  think that they should run bundle update after git pull". Why is this? Isn't
-  this a documentation issue that shouldn't make us change bundler?]
+  think that they should run bundle update after git pull", I wonder even more.
+  Why is this? Isn't this a documentation issue that shouldn't make us change
+  bundler?]
 
 * The `bundle install` command will no longer accept a `--binstubs` flag.
 
@@ -109,9 +110,9 @@ that we plan to make to this set of commands and options.
 
 * The `bundle inject` command is deprecated and replaced with `bundle add`.
 
-  We believe the new command fits the user's mental model better and it support
+  We believe the new command fits the user's mental model better and it supports
   a wider set of use cases. The interface supported by `bundle inject` works
-  exactly the same in `bundle add`, so it's should be easy to migrate to the new
+  exactly the same in `bundle add`, so it should be easy to migrate to the new
   command.
 
 #### Helper deprecations
@@ -186,10 +187,10 @@ that we plan to make to this set of commands and options.
 * Deployment helpers for `vlad` and `capistrano` are being removed.
 
   These are natural deprecations since the `vlad` tool has had no activity for
-  years whereas `capistrano` capistrano 3 has built-in Bundler integration in
-  the form of the `capistrano-bundler` gem, and everyone using Capistrano 3
-  should be using that instead. If for some reason, you are still using
-  Capistrano 2, feel free to copy the Capistrano tasks out of the Bundler 2 file
+  years whereas `capistrano` 3 has built-in Bundler integration in the form of
+  the `capistrano-bundler` gem, and everyone using Capistrano 3 should be
+  already using that instead. If for some reason, you are still using Capistrano
+  2, feel free to copy the Capistrano tasks out of the Bundler 2 file
   `bundler/deployment.rb` and put them into your app.
 
   In general, we don't want to maintain integrations for every deployment system
