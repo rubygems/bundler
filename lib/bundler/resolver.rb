@@ -2,7 +2,6 @@
 
 module Bundler
   class Resolver
-    require "rubygems/resolver/molinillo"
     require "bundler/resolver/spec_group"
 
     # Figures out the best possible configuration of gems that satisfies
