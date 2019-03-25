@@ -2,7 +2,7 @@
 
 module Bundler
   class Resolver
-    require "bundler/vendored_molinillo"
+    require "rubygems/resolver/molinillo"
     require "bundler/resolver/spec_group"
 
     # Figures out the best possible configuration of gems that satisfies
@@ -27,9 +27,9 @@ module Bundler
       @index = index
       @source_requirements = source_requirements
       @base = base
-      @resolver = Molinillo::Resolver.new(self, self)
+      @resolver = Gem::Resolver::Molinillo::Resolver.new(self, self)
       @search_for = {}
-      @base_dg = Molinillo::DependencyGraph.new
+      @base_dg = Gem::Resolver::Molinillo::DependencyGraph.new
       @base.each do |ls|
         dep = Dependency.new(ls.name, ls.version)
         @base_dg.add_vertex(ls.name, DepProxy.new(dep, ls.platform), true)
@@ -54,10 +54,10 @@ module Bundler
         reject {|sg| sg.name.end_with?("\0") }.
         map(&:to_specs).
         flatten
-    rescue Molinillo::VersionConflict => e
+    rescue Gem::Resolver::Molinillo::VersionConflict => e
       message = version_conflict_message(e)
       raise VersionConflict.new(e.conflicts.keys.uniq, message)
-    rescue Molinillo::CircularDependencyError => e
+    rescue Gem::Resolver::Molinillo::CircularDependencyError => e
       names = e.dependencies.sort_by(&:name).map {|d| "gem '#{d.name}'" }
       raise CyclicDependencyError, "Your bundle requires gems that depend" \
         " on each other, creating an infinite loop. Please remove" \
@@ -65,7 +65,7 @@ module Bundler
         " and try again."
     end
 
-    include Molinillo::UI
+    include Gem::Resolver::Molinillo::UI
 
     # Conveys debug information to the user.
     #
@@ -95,7 +95,7 @@ module Bundler
       Bundler.ui.info ".", false unless debug?
     end
 
-    include Molinillo::SpecificationProvider
+    include Gem::Resolver::Molinillo::SpecificationProvider
 
     def dependencies_for(specification)
       specification.dependencies_for_activated_platforms
@@ -309,7 +309,7 @@ module Bundler
         deps = conflict.requirement_trees.map(&:last).flatten(1)
         !Bundler::VersionRanges.empty?(*Bundler::VersionRanges.for_many(deps.map(&:requirement)))
       end
-      e = Molinillo::VersionConflict.new(conflicts, e.specification_provider) unless conflicts.empty?
+      e = Gem::Resolver::Molinillo::VersionConflict.new(conflicts, e.specification_provider) unless conflicts.empty?
 
       solver_name = "Bundler"
       possibility_type = "gem"

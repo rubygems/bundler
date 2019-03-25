@@ -300,13 +300,6 @@ end
 begin
   require "automatiek"
 
-  Automatiek::RakeTask.new("molinillo") do |lib|
-    lib.download = { :github => "https://github.com/CocoaPods/Molinillo" }
-    lib.namespace = "Molinillo"
-    lib.prefix = "Bundler"
-    lib.vendor_lib = "lib/bundler/vendor/molinillo"
-  end
-
   Automatiek::RakeTask.new("thor") do |lib|
     lib.download = { :github => "https://github.com/erikhuda/thor" }
     lib.namespace = "Thor"
@@ -340,7 +333,6 @@ begin
 rescue LoadError
   namespace :vendor do
     task(:fileutils) { abort "Install the automatiek gem to be able to vendor gems." }
-    task(:molinillo) { abort "Install the automatiek gem to be able to vendor gems." }
     task(:thor) { abort "Install the automatiek gem to be able to vendor gems." }
     task("net-http-persistent") { abort "Install the automatiek gem to be able to vendor gems." }
   end
