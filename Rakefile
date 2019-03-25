@@ -309,12 +309,20 @@ begin
   require "automatiek"
 rescue LoadError
   namespace :vendor do
+    desc "Vendor a specific version of molinillo"
     task(:molinillo) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+
+    desc "Vendor a specific version of fileutils"
     task(:fileutils) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+
+    desc "Vendor a specific version of thor"
     task(:thor) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+
+    desc "Vendor a specific version of net-http-persistent"
     task(:"net-http-persistent") { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
   end
 else
+  desc "Vendor a specific version of molinillo"
   Automatiek::RakeTask.new("molinillo") do |lib|
     lib.download = { :github => "https://github.com/CocoaPods/Molinillo" }
     lib.namespace = "Molinillo"
@@ -322,6 +330,7 @@ else
     lib.vendor_lib = "lib/bundler/vendor/molinillo"
   end
 
+  desc "Vendor a specific version of thor"
   Automatiek::RakeTask.new("thor") do |lib|
     lib.download = { :github => "https://github.com/erikhuda/thor" }
     lib.namespace = "Thor"
@@ -329,6 +338,7 @@ else
     lib.vendor_lib = "lib/bundler/vendor/thor"
   end
 
+  desc "Vendor a specific version of fileutils"
   Automatiek::RakeTask.new("fileutils") do |lib|
     lib.download = { :github => "https://github.com/ruby/fileutils" }
     lib.namespace = "FileUtils"
@@ -336,6 +346,7 @@ else
     lib.vendor_lib = "lib/bundler/vendor/fileutils"
   end
 
+  desc "Vendor a specific version of net-http-persistent"
   Automatiek::RakeTask.new("net-http-persistent") do |lib|
     lib.download = { :github => "https://github.com/drbrain/net-http-persistent" }
     lib.namespace = "Net::HTTP::Persistent"
