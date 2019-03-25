@@ -10,8 +10,8 @@ else
   File.expand_path("tmp/rubygems")
 end
 
-def bundler_spec
-  @bundler_spec ||= Gem::Specification.load("bundler.gemspec")
+def development_dependencies
+  @development_dependencies ||= Gem::Specification.load("bundler.gemspec").development_dependencies
 end
 
 # Benchmark task execution
@@ -43,7 +43,7 @@ namespace :spec do
 
   desc "Ensure spec dependencies are installed"
   task :deps do
-    deps = Hash[bundler_spec.development_dependencies.map do |d|
+    deps = Hash[development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
 
@@ -228,7 +228,7 @@ task :rubocop do
 end
 
 namespace :man do
-  ronn_dep = bundler_spec.development_dependencies.find do |dep|
+  ronn_dep = development_dependencies.find do |dep|
     dep.name == "ronn"
   end
 
