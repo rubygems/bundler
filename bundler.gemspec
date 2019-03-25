@@ -44,6 +44,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ronn",       "~> 0.7.3"
   s.add_development_dependency "rspec",      "~> 3.6"
   s.add_development_dependency "rubocop",    "= 0.65.0"
+  s.add_development_dependency "simplecov",  "= 0.16.1"
 
   s.files = Dir.glob("{lib,exe}/**/*", File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
 
