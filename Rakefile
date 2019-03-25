@@ -297,9 +297,24 @@ namespace :man do
   end
 end
 
-begin
-  require "automatiek"
+automatiek_dep = development_dependencies.find do |dep|
+  dep.name == "automatiek"
+end
 
+automatiek_requirement = automatiek_dep.requirement.to_s
+
+begin
+  gem "automatiek", automatiek_requirement
+
+  require "automatiek"
+rescue LoadError
+  namespace :vendor do
+    task(:molinillo) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:fileutils) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:thor) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:"net-http-persistent") { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+  end
+else
   Automatiek::RakeTask.new("molinillo") do |lib|
     lib.download = { :github => "https://github.com/CocoaPods/Molinillo" }
     lib.namespace = "Molinillo"
@@ -336,13 +351,6 @@ begin
       end
     end
     lib.send(:extend, mixin)
-  end
-rescue LoadError
-  namespace :vendor do
-    task(:fileutils) { abort "Install the automatiek gem to be able to vendor gems." }
-    task(:molinillo) { abort "Install the automatiek gem to be able to vendor gems." }
-    task(:thor) { abort "Install the automatiek gem to be able to vendor gems." }
-    task("net-http-persistent") { abort "Install the automatiek gem to be able to vendor gems." }
   end
 end
 
