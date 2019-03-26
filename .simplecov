@@ -13,6 +13,8 @@ SimpleCov.formatter = SimpleCov::Formatter::SimpleFormatter
 SimpleCov.command_name "#{command_name}_#{$$}"
 
 SimpleCov.start do
+  root __dir__
+
   add_filter "/bin/"
   add_filter "/lib/bundler/vendor/"
   add_filter "/man/"
