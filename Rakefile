@@ -10,8 +10,8 @@ else
   File.expand_path("tmp/rubygems")
 end
 
-def bundler_spec
-  @bundler_spec ||= Gem::Specification.load("bundler.gemspec")
+def development_dependencies
+  @development_dependencies ||= Gem::Specification.load("bundler.gemspec").development_dependencies
 end
 
 # Benchmark task execution
@@ -43,7 +43,7 @@ namespace :spec do
 
   desc "Ensure spec dependencies are installed"
   task :deps do
-    deps = Hash[bundler_spec.development_dependencies.map do |d|
+    deps = Hash[development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
 
@@ -228,7 +228,7 @@ task :rubocop do
 end
 
 namespace :man do
-  ronn_dep = bundler_spec.development_dependencies.find do |dep|
+  ronn_dep = development_dependencies.find do |dep|
     dep.name == "ronn"
   end
 
@@ -297,9 +297,32 @@ namespace :man do
   end
 end
 
-begin
-  require "automatiek"
+automatiek_dep = development_dependencies.find do |dep|
+  dep.name == "automatiek"
+end
 
+automatiek_requirement = automatiek_dep.requirement.to_s
+
+begin
+  gem "automatiek", automatiek_requirement
+
+  require "automatiek"
+rescue LoadError
+  namespace :vendor do
+    desc "Vendor a specific version of molinillo"
+    task(:molinillo) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+
+    desc "Vendor a specific version of fileutils"
+    task(:fileutils) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+
+    desc "Vendor a specific version of thor"
+    task(:thor) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+
+    desc "Vendor a specific version of net-http-persistent"
+    task(:"net-http-persistent") { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+  end
+else
+  desc "Vendor a specific version of molinillo"
   Automatiek::RakeTask.new("molinillo") do |lib|
     lib.download = { :github => "https://github.com/CocoaPods/Molinillo" }
     lib.namespace = "Molinillo"
@@ -307,6 +330,7 @@ begin
     lib.vendor_lib = "lib/bundler/vendor/molinillo"
   end
 
+  desc "Vendor a specific version of thor"
   Automatiek::RakeTask.new("thor") do |lib|
     lib.download = { :github => "https://github.com/erikhuda/thor" }
     lib.namespace = "Thor"
@@ -314,6 +338,7 @@ begin
     lib.vendor_lib = "lib/bundler/vendor/thor"
   end
 
+  desc "Vendor a specific version of fileutils"
   Automatiek::RakeTask.new("fileutils") do |lib|
     lib.download = { :github => "https://github.com/ruby/fileutils" }
     lib.namespace = "FileUtils"
@@ -321,6 +346,7 @@ begin
     lib.vendor_lib = "lib/bundler/vendor/fileutils"
   end
 
+  desc "Vendor a specific version of net-http-persistent"
   Automatiek::RakeTask.new("net-http-persistent") do |lib|
     lib.download = { :github => "https://github.com/drbrain/net-http-persistent" }
     lib.namespace = "Net::HTTP::Persistent"
@@ -336,13 +362,6 @@ begin
       end
     end
     lib.send(:extend, mixin)
-  end
-rescue LoadError
-  namespace :vendor do
-    task(:fileutils) { abort "Install the automatiek gem to be able to vendor gems." }
-    task(:molinillo) { abort "Install the automatiek gem to be able to vendor gems." }
-    task(:thor) { abort "Install the automatiek gem to be able to vendor gems." }
-    task("net-http-persistent") { abort "Install the automatiek gem to be able to vendor gems." }
   end
 end
 
