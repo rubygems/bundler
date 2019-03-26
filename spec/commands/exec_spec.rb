@@ -502,7 +502,7 @@ RSpec.describe "bundle exec" do
     let(:expected) { [exec, args, rack, process].join("\n") }
     let(:expected_err) { "" }
 
-    subject { bundle "exec #{path} arg1 arg2" }
+    subject { bundle "exec #{path} arg1 arg2", :no_cov => true }
 
     shared_examples_for "it runs" do
       it "like a normally executed executable" do
