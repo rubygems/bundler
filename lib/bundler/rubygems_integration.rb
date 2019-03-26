@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "monitor"
-require "rubygems/config_file"
 
 module Bundler
   class RubygemsIntegration
