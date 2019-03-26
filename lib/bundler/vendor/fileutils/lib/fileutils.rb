@@ -1082,11 +1082,6 @@ module Bundler::FileUtils
   end
   module_function :chown_R
 
-  begin
-    require 'etc'
-  rescue LoadError # rescue LoadError for miniruby
-  end
-
   def fu_get_uid(user)   #:nodoc:
     return nil unless user
     case user
@@ -1095,6 +1090,7 @@ module Bundler::FileUtils
     when /\A\d+\z/
       user.to_i
     else
+      require 'etc'
       Etc.getpwnam(user) ? Etc.getpwnam(user).uid : nil
     end
   end
@@ -1108,6 +1104,7 @@ module Bundler::FileUtils
     when /\A\d+\z/
       group.to_i
     else
+      require 'etc'
       Etc.getgrnam(group) ? Etc.getgrnam(group).gid : nil
     end
   end
