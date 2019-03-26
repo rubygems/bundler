@@ -77,11 +77,6 @@ namespace :spec do
       # Install the gems with a consistent version of RubyGems
       sh "gem update --system 3.0.3"
 
-      # Fix incorrect default etc gem specification file list on ruby 2.6.2 and 2.5.4
-      if RUBY_VERSION == "2.6.2" || RUBY_VERSION == "2.5.4"
-        sh "gem install etc:1.0.1 --default"
-      end
-
       $LOAD_PATH.unshift("./spec")
       require "support/rubygems_ext"
       Spec::Rubygems::DEPS["codeclimate-test-reporter"] = "~> 0.6.0" if RUBY_VERSION >= "2.2.0"
