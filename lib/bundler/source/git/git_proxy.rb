@@ -105,7 +105,11 @@ module Bundler
             SharedHelpers.filesystem_access(path.dirname) do |p|
               FileUtils.mkdir_p(p)
             end
-            git_retry %(clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet)
+            if remote?(uri)
+              git_retry %(clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --quiet --depth 1)
+            else
+              git_retry %(clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet)
+            end
             return unless extra_ref
           end
 
@@ -217,7 +221,7 @@ module Bundler
 
         # Adds credentials to the URI as Fetcher#configured_uri_for does
         def configured_uri_for(uri)
-          if /https?:/ =~ uri
+          if remote?(uri)
             remote = URI(uri)
             config_auth = Bundler.settings[remote.to_s] || Bundler.settings[remote.host]
             remote.userinfo ||= config_auth
@@ -225,6 +229,10 @@ module Bundler
           else
             uri
           end
+        end
+
+        def remote?(uri)
+          /https?:/ =~ uri
         end
 
         def allow?
