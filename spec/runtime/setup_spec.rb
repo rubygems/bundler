@@ -1213,7 +1213,7 @@ end
 
     describe "default gem activation" do
       let(:exemptions) do
-        if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7") || ENV["RGV"] == "master"
+        if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7")
           []
         else
           %w[io-console openssl]
