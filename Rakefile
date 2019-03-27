@@ -126,7 +126,7 @@ namespace :spec do
     (branches + releases).each do |rg|
       desc "Run specs with RubyGems #{rg}"
       task rg do
-        sh("bin/rspec --format progress --color")
+        sh("bin/rspec --format progress")
       end
 
       # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
