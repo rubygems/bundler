@@ -148,6 +148,11 @@ namespace :spec do
       sh("bin/rspec --format progress")
     end
 
+    namespace "co" do
+      task :sudo => ["set_sudo", "co", "clean_sudo"]
+      task :realworld => ["set_realworld", "co"]
+    end
+
     task "setup_co" do
       rg = File.expand_path ENV["RG"]
       puts "Running specs against RubyGems in #{rg}..."
