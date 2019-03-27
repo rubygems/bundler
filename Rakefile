@@ -79,13 +79,6 @@ namespace :spec do
         sh "gem install bundler:1.17.2 --default"
       end
 
-      # Fix incorrect default gem specifications on ruby 2.6.1. Can be removed
-      # when 2.6.2 is released and we start testing against it
-      if RUBY_VERSION == "2.6.1"
-        sh "gem install etc:1.0.1 --default"
-        sh "gem install bundler:1.17.2 --default"
-      end
-
       $LOAD_PATH.unshift("./spec")
       require "support/rubygems_ext"
       Spec::Rubygems::DEPS["codeclimate-test-reporter"] = "~> 0.6.0" if RUBY_VERSION >= "2.2.0"
