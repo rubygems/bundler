@@ -188,20 +188,90 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.clean_system", :bundler => "< 2" do
-    it "runs system inside with_clean_env" do
-      Bundler.clean_system(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
-      expect($?.exitstatus).to eq(42)
+  describe "Bundler.original_system" do
+    it "runs system inside with_original_env" do
+      code = 'exit Bundler.original_system(%(test "\$BUNDLE_FOO" = "bar"))'
+      lib = File.expand_path("../../lib", __dir__)
+      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib} -rbundler -e '#{code}'")
+      expect($?.exitstatus).to eq(0)
     end
   end
 
-  describe "Bundler.clean_exec", :bundler => "< 2" do
+  describe "Bundler.clean_system" do
+    it "runs system inside with_clean_env" do
+      code = 'exit Bundler.clean_system(%(test "\$BUNDLE_FOO" = "bar"))'
+      lib = File.expand_path("../../lib", __dir__)
+      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib} -rbundler -e '#{code}'")
+      expect($?.exitstatus).to eq(1)
+    end
+  end
+
+  describe "Bundler.unbundled_system" do
+    it "runs system inside with_unbundled_env" do
+      code = 'exit Bundler.clean_system(%(test "\$BUNDLE_FOO" = "bar"))'
+      lib = File.expand_path("../../lib", __dir__)
+      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib} -rbundler -e '#{code}'")
+      expect($?.exitstatus).to eq(1)
+    end
+  end
+
+  describe "Bundler.original_exec" do
+    let(:code) do
+      <<~RUBY
+        Process.fork do
+          exit Bundler.original_exec(%(test "\$BUNDLE_FOO" = "bar"))
+        end
+
+        _, status = Process.wait2
+
+        exit(status.exitstatus)
+      RUBY
+    end
+
+    it "runs exec inside with_original_env" do
+      lib = File.expand_path("../../lib", __dir__)
+      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib} -rbundler -e '#{code}'")
+      expect($?.exitstatus).to eq(0)
+    end
+  end
+
+  describe "Bundler.clean_exec" do
+    let(:code) do
+      <<~RUBY
+        Process.fork do
+          exit Bundler.clean_exec(%(test "\$BUNDLE_FOO" = "bar"))
+        end
+
+        _, status = Process.wait2
+
+        exit(status.exitstatus)
+      RUBY
+    end
+
     it "runs exec inside with_clean_env" do
-      pid = Kernel.fork do
-        Bundler.clean_exec(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
-      end
-      Process.wait(pid)
-      expect($?.exitstatus).to eq(42)
+      lib = File.expand_path("../../lib", __dir__)
+      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib} -rbundler -e '#{code}'")
+      expect($?.exitstatus).to eq(1)
+    end
+  end
+
+  describe "Bundler.unbundled_exec" do
+    let(:code) do
+      <<~RUBY
+        Process.fork do
+          exit Bundler.unbundled_exec(%(test "\$BUNDLE_FOO" = "bar"))
+        end
+
+        _, status = Process.wait2
+
+        exit(status.exitstatus)
+      RUBY
+    end
+
+    it "runs exec inside with_clean_env" do
+      lib = File.expand_path("../../lib", __dir__)
+      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib} -rbundler -e '#{code}'")
+      expect($?.exitstatus).to eq(1)
     end
   end
 end

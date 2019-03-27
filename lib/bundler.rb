@@ -335,12 +335,46 @@ EOF
       with_env(unbundled_env) { yield }
     end
 
-    def clean_system(*args)
-      with_clean_env { Kernel.system(*args) }
+    # Run subcommand with the environment present before Bundler was activated
+    def original_system(*args)
+      with_original_env { Kernel.system(*args) }
     end
 
+    # @deprecated Use `unbundled_system` instead
+    def clean_system(*args)
+      Bundler::SharedHelpers.major_deprecation(
+        2,
+        "`Bundler.clean_system` has been deprecated in favor of `Bundler.unbundled_system`. " \
+        "If you instead want to run the command in the environment before bundler was originally loaded, use `Bundler.original_system`"
+      )
+
+      with_env(unbundled_env) { Kernel.system(*args) }
+    end
+
+    # Run subcommand in an environment with all bundler related variables removed
+    def unbundled_system(*args)
+      with_unbundled_env { Kernel.system(*args) }
+    end
+
+    # Run a `Kernel.exec` to a subcommand with the environment present before Bundler was activated
+    def original_exec(*args)
+      with_original_env { Kernel.exec(*args) }
+    end
+
+    # @deprecated Use `unbundled_exec` instead
     def clean_exec(*args)
-      with_clean_env { Kernel.exec(*args) }
+      Bundler::SharedHelpers.major_deprecation(
+        2,
+        "`Bundler.clean_exec` has been deprecated in favor of `Bundler.unbundled_exec`. " \
+        "If you instead want to exec to a command in the environment before bundler was originally loaded, use `Bundler.original_exec`"
+      )
+
+      with_env(unbundled_env) { Kernel.exec(*args) }
+    end
+
+    # Run a `Kernel.exec` to a subcommand in an environment with all bundler related variables removed
+    def unbundled_exec(*args)
+      with_env(unbundled_env) { Kernel.exec(*args) }
     end
 
     def local_platform
