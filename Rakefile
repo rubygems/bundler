@@ -135,31 +135,11 @@ namespace :spec do
         task :realworld => ["set_realworld", rg]
       end
 
-      task "clone_rubygems_#{rg}" do
-        unless File.directory?(RUBYGEMS_REPO)
-          system("git clone https://github.com/rubygems/rubygems.git tmp/rubygems")
-        end
-        hash = nil
-
-        if RUBYGEMS_REPO.start_with?(Dir.pwd)
-          Dir.chdir(RUBYGEMS_REPO) do
-            system("git remote update")
-            if rg == "master"
-              system("git checkout origin/master")
-            else
-              system("git checkout #{rg}") || raise("Unknown RubyGems ref #{rg}")
-            end
-            hash = `git rev-parse HEAD`.chomp
-          end
-        elsif rg != "master"
-          raise "need to be running against master with bundler as a submodule"
-        end
-
-        puts "Checked out rubygems '#{rg}' at #{hash}"
+      task "set_rubygems_#{rg}" do
         ENV["RGV"] = rg
       end
 
-      task rg => ["clone_rubygems_#{rg}"]
+      task rg => ["set_rubygems_#{rg}"]
       task "rubygems:all" => rg
     end
 
