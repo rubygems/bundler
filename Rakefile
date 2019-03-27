@@ -119,7 +119,6 @@ namespace :spec do
 
   # RubyGems specs by version
   namespace :rubygems do
-    rubyopt = ENV["RUBYOPT"]
     # When editing this list, also edit .travis.yml!
     branches = %w[master]
     releases = %w[v2.5.2 v2.6.14 v2.7.9 v3.0.3]
@@ -143,7 +142,7 @@ namespace :spec do
       task "rubygems:all" => rg
     end
 
-    desc "Run specs under a RubyGems checkout (set RG=path)"
+    desc "Run specs under a RubyGems checkout (set RGV=path)"
     task "co" do
       sh("bin/rspec --format progress")
     end
@@ -154,9 +153,7 @@ namespace :spec do
     end
 
     task "setup_co" do
-      rg = File.expand_path ENV["RG"]
-      puts "Running specs against RubyGems in #{rg}..."
-      ENV["RUBYOPT"] = "-I#{rg} #{rubyopt}"
+      ENV["RGV"] = RUBYGEMS_REPO
     end
 
     task "co" => "setup_co"
@@ -166,6 +163,8 @@ namespace :spec do
   desc "Run the tests on Travis CI against a RubyGem version (using ENV['RGV'])"
   task :travis do
     rg = ENV["RGV"] || raise("RubyGems version is required on Travis!")
+
+    rg = "co" if File.directory?(File.expand_path(ENV["RGV"]))
 
     # disallow making network requests on CI
     ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
