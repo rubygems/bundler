@@ -770,4 +770,43 @@ RSpec.describe "bundle clean" do
     expect(very_simple_binary_extensions_dir).not_to exist
     expect(simple_binary_extensions_dir).to exist
   end
+
+  it "removes git extension directories", :ruby_repo do
+    build_git "very_simple_git_binary", &:add_c_extension
+
+    revision = revision_for(lib_path("very_simple_git_binary-1.0"))
+    short_revision = revision[0..11]
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "very_simple_git_binary", :git => "#{lib_path("very_simple_git_binary-1.0")}", :ref => "#{revision}"
+    G
+
+    bundle! "install", forgotten_command_line_options(:path => "vendor/bundle")
+
+    very_simple_binary_extensions_dir =
+      Pathname.glob("#{vendored_gems}/bundler/gems/extensions/*/*/very_simple_git_binary-1.0-#{short_revision}").first
+
+    expect(very_simple_binary_extensions_dir).to exist
+
+    gemfile <<-G
+      gem "very_simple_git_binary", :git => "#{lib_path("very_simple_git_binary-1.0")}", :ref => "#{revision}"
+    G
+
+    bundle! "install"
+    bundle! :clean
+    expect(out).to include("Removing thin (1.0)")
+    expect(very_simple_binary_extensions_dir).to exist
+
+    gemfile <<-G
+    G
+
+    bundle! "install"
+    bundle! :clean
+    expect(out).to eq("Removing very_simple_git_binary-1.0 (#{short_revision})")
+
+    expect(very_simple_binary_extensions_dir).not_to exist
+  end
 end
