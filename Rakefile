@@ -145,7 +145,7 @@ namespace :spec do
 
     desc "Run specs under a RubyGems checkout (set RG=path)"
     task "co" do
-      sh("bin/rspec")
+      sh("bin/rspec --format progress")
     end
 
     task "setup_co" do
