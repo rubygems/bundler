@@ -792,3 +792,13 @@ RSpec.describe "bundle outdated" do
     end
   end
 end
+
+
+describe "with --source" do
+      bundle "outdated --source #{source}"
+      expect(out).to include("Bundle source !")
+      # Gem names are one per-line, between "*" and their parenthesized version.
+      gem_list = out.split("\n").map {|g| g[/\* (.*) \(/, 1] }.compact
+      expect(gem_list).to eq(gem_list.sort)
+      expect(gem_list.size).to eq gems_list_size
+end  
