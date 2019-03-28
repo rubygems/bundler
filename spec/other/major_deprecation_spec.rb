@@ -30,6 +30,24 @@ RSpec.describe "major deprecations" do
       end
     end
 
+    describe ".with_clean_env" do
+      before do
+        source = "Bundler.with_clean_env {}"
+        bundle "exec ruby -e #{source.dump}"
+      end
+
+      it "is not deprecated", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "is deprecated in favor of .unbundled_env", :bundler => "2" do
+        expect(deprecations).to include(
+          "`Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
+          "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
+        )
+      end
+    end
+
     describe ".environment" do
       before do
         source = "Bundler.environment"
