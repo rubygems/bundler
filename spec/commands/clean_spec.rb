@@ -322,16 +322,12 @@ RSpec.describe "bundle clean" do
   it "does not call clean automatically when using system gems" do
     bundle! "config set path.system true"
 
-    bundle! "config list"
-
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "rack"
     G
-
-    bundle! "info thin"
 
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
