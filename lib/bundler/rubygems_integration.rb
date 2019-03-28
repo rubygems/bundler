@@ -442,14 +442,10 @@ module Bundler
         raise ArgumentError, "you must supply exec_name" unless exec_name
 
         spec_with_name = specs_by_name[gem_name]
-        spec =
-          if spec_with_name && spec_with_name.executables.include?(exec_name)
-            spec_with_name
-          else
-            specs.find {|s| s.executables.include?(exec_name) }
-          end
+        matching_specs_by_exec_name = specs.select {|s| s.executables.include?(exec_name) }
+        spec = matching_specs_by_exec_name.delete(spec_with_name)
 
-        unless spec
+        unless spec || !matching_specs_by_exec_name.empty?
           message = "can't find executable #{exec_name} for gem #{gem_name}"
           if spec_with_name.nil?
             message += ". #{gem_name} is not currently included in the bundle, " \
@@ -458,12 +454,22 @@ module Bundler
           raise Gem::Exception, message
         end
 
-        unless spec.name == gem_name
+        unless spec
+          spec = matching_specs_by_exec_name.shift
           warn \
             "Bundler is using a binstub that was created for a different gem (#{spec.name}).\n" \
             "You should run `bundle binstub #{gem_name}` " \
             "to work around a system/bundle conflict."
         end
+
+        unless matching_specs_by_exec_name.empty?
+          conflicting_names = matching_specs_by_exec_name.map(&:name).join(", ")
+          warn \
+            "The `#{exec_name}` executable in the `#{spec.name}` gem is being loaded, but it's also present in other gems (#{conflicting_names}).\n" \
+            "If you meant to run the executable for another gem, make sure you use a project specific binstub (`bundle binstub <gem_name>`).\n" \
+            "If you plan to actually use _both_ conflicting executables, generate binstubs for both and disambiguate their names."
+        end
+
         spec
       end
 

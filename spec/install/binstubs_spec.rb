@@ -35,9 +35,18 @@ RSpec.describe "bundle install", :bundler => "< 3" do
       G
     end
 
-    it "loads the correct spec's executable" do
+    it "warns about the situation" do
       gembin("rackup")
-      expect(out).to eq("1.2")
+
+      expect(last_command.stderr).to include(
+        "The `rackup` executable in the `fake` gem is being loaded, but it's also present in other gems (rack).\n" \
+        "If you meant to run the executable for another gem, make sure you use a project specific binstub (`bundle binstub <gem_name>`).\n" \
+        "If you plan to actually use _both_ conflicting executables, generate binstubs for both and disambiguate their names."
+      ).or include(
+        "The `rackup` executable in the `rack` gem is being loaded, but it's also present in other gems (fake).\n" \
+        "If you meant to run the executable for another gem, make sure you use a project specific binstub (`bundle binstub <gem_name>`).\n" \
+        "If you plan to actually use _both_ conflicting executables, generate binstubs for both and disambiguate their names."
+      )
     end
   end
 end
