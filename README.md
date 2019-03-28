@@ -48,7 +48,7 @@ If you'd like to contribute to Bundler, that's awesome, and we <3 you. We've put
 
 If you'd like to request a substantial change to Bundler or to the Bundler documentation, refer to the [Bundler RFC process](https://github.com/bundler/rfcs) for more information.
 
-While some Bundler contributors are compensated by Ruby Together, the project maintainers make decisions independent of Ruby Together. As a project, we welcome contributions regardless of the author’s affiliation with Ruby Together.
+While some Bundler contributors are compensated by Ruby Together, the project maintainers make decisions independent of Ruby Together. As a project, we welcome contributions regardless of the author's affiliation with Ruby Together.
 
 ### Supporting
 
@@ -57,7 +57,7 @@ While some Bundler contributors are compensated by Ruby Together, the project ma
 
 ### Code of Conduct
 
-Everyone interacting in the Bundler project’s codebases, issue trackers, chat rooms, and mailing lists is expected to follow the [Bundler code of conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Bundler project's codebases, issue trackers, chat rooms, and mailing lists is expected to follow the [Bundler code of conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md).
 
 ### License
 

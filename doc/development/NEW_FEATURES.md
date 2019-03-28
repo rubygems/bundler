@@ -7,4 +7,4 @@ If you would like to add a new feature to Bundler, please follow these steps:
   3. Commit the code and at least one test covering your changes to a feature branch in your fork.
   4. Send us a [pull request](PULL_REQUESTS.md) from your feature branch.
 
-If you don't hear back immediately, don’t get discouraged! We all have day jobs, but we respond to most tickets within a day or two.
+If you don't hear back immediately, don't get discouraged! We all have day jobs, but we respond to most tickets within a day or two.
