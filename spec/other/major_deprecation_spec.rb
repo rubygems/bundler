@@ -48,6 +48,42 @@ RSpec.describe "major deprecations" do
       end
     end
 
+    describe ".clean_system" do
+      before do
+        source = "Bundler.clean_system('ls')"
+        bundle "exec ruby -e #{source.dump}"
+      end
+
+      it "is not deprecated", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "is deprecated in favor of .unbundled_system", :bundler => "2" do
+        expect(deprecations).to include(
+          "`Bundler.clean_system` has been deprecated in favor of `Bundler.unbundled_system`. " \
+          "If you instead want to run the command in the environment before bundler was originally loaded, use `Bundler.original_system`"
+        )
+      end
+    end
+
+    describe ".clean_exec" do
+      before do
+        source = "Bundler.clean_exec('ls')"
+        bundle "exec ruby -e #{source.dump}"
+      end
+
+      it "is not deprecated", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "is deprecated in favor of .unbundled_exec", :bundler => "2" do
+        expect(deprecations).to include(
+          "`Bundler.clean_exec` has been deprecated in favor of `Bundler.unbundled_exec`. " \
+          "If you instead want to exec to a command in the environment before bundler was originally loaded, use `Bundler.original_exec`"
+        )
+      end
+    end
+
     describe ".environment" do
       before do
         source = "Bundler.environment"
