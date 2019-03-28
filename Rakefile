@@ -134,11 +134,11 @@ namespace :spec do
         task :realworld => ["set_realworld", rg]
       end
 
-      task "set_rubygems_#{rg}" do
+      task "set_#{rg}" do
         ENV["RGV"] = rg
       end
 
-      task rg => ["set_rubygems_#{rg}"]
+      task rg => ["set_#{rg}"]
       task "rubygems:all" => rg
     end
 
