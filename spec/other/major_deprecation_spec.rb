@@ -470,16 +470,34 @@ The :gist git source is deprecated, and will be removed in the future. Add this 
         source "file://#{gem_repo1}"
         gem "rack"
       G
-
-      bundle! :show
     end
 
-    it "does not print a deprecation warning", :bundler => "< 2" do
-      expect(deprecations).to be_empty
+    context "without flags" do
+      before do
+        bundle! :show
+      end
+
+      it "does not print a deprecation warning", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "prints a deprecation warning recommending `bundle list`", :bundler => "2" do
+        expect(deprecations).to include("use `bundle list` instead of `bundle show`")
+      end
     end
 
-    it "prints a deprecation warning", :bundler => "2" do
-      expect(deprecations).to include("use `bundle list` instead of `bundle show`")
+    context "with a gem argument" do
+      before do
+        bundle! "show rack"
+      end
+
+      it "does not print a deprecation warning", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "prints a deprecation warning recommending `bundle info`", :bundler => "2" do
+        expect(deprecations).to include("use `bundle info rack` instead of `bundle show rack`")
+      end
     end
   end
 
