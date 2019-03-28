@@ -368,12 +368,6 @@ task :override_version do
   File.open(version_file, "w") {|f| f << contents }
 end
 
-desc "Update vendored SSL certs to match the certs vendored by RubyGems"
-task :update_certs => "spec:rubygems:clone_rubygems_master" do
-  require "bundler/ssl_certs/certificate_manager"
-  Bundler::SSLCerts::CertificateManager.update_from!(RUBYGEMS_REPO)
-end
-
 task :default => :spec
 
 Dir["task/*.rake"].each(&method(:load))
