@@ -277,7 +277,9 @@ module Bundler
     def update(*gems)
       SharedHelpers.major_deprecation(2, "The `--force` option has been renamed to `--redownload`") if ARGV.include?("--force")
       require "bundler/cli/update"
-      Update.new(options, gems).run
+      Bundler.settings.temporary(:no_install => false) do
+        Update.new(options, gems).run
+      end
     end
 
     desc "show GEM [OPTIONS]", "Shows all gems that are part of the bundle, or the path to a given gem"
