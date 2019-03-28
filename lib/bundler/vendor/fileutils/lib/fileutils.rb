@@ -1,4 +1,13 @@
 # frozen_string_literal: true
+
+begin
+  require 'rbconfig'
+rescue LoadError
+  # for make mjit-headers
+end
+
+require "bundler/vendor/fileutils/lib/fileutils/version"
+
 #
 # = fileutils.rb
 #
@@ -56,7 +65,7 @@
 #
 # There are some `low level' methods, which do not accept any option:
 #
-#   Bundler::FileUtils.copy_entry(src, dest, preserve = false, dereference = false)
+#   Bundler::FileUtils.copy_entry(src, dest, preserve = false, dereference_root = false, remove_destination = false)
 #   Bundler::FileUtils.copy_file(src, dest, preserve = false, dereference = true)
 #   Bundler::FileUtils.copy_stream(srcstream, deststream)
 #   Bundler::FileUtils.remove_entry(path, force = false)
@@ -84,12 +93,7 @@
 # files/directories.  This equates to passing the <tt>:noop</tt> and
 # <tt>:verbose</tt> flags to methods in Bundler::FileUtils.
 #
-
-require 'rbconfig'
-
 module Bundler::FileUtils
-
-  VERSION = "1.1.0"
 
   def self.private_module_function(name)   #:nodoc:
     module_function name
@@ -110,12 +114,14 @@ module Bundler::FileUtils
   #
   # Changes the current directory to the directory +dir+.
   #
-  # If this method is called with block, resumes to the old
-  # working directory after the block execution finished.
+  # If this method is called with block, resumes to the previous
+  # working directory after the block execution has finished.
   #
-  #   Bundler::FileUtils.cd('/', :verbose => true)   # chdir and report it
+  #   Bundler::FileUtils.cd('/')  # change directory
   #
-  #   Bundler::FileUtils.cd('/') do  # chdir
+  #   Bundler::FileUtils.cd('/', :verbose => true)   # change directory and report it
+  #
+  #   Bundler::FileUtils.cd('/') do  # change directory
   #     # ...               # do something
   #   end                   # return to original directory
   #
@@ -519,13 +525,12 @@ module Bundler::FileUtils
         if destent.exist?
           if destent.directory?
             raise Errno::EEXIST, d
-          else
-            destent.remove_file if rename_cannot_overwrite_file?
           end
         end
         begin
           File.rename s, d
-        rescue Errno::EXDEV
+        rescue Errno::EXDEV,
+               Errno::EPERM # move from unencrypted to encrypted dir (ext4)
           copy_entry s, d, true
           if secure
             remove_entry_secure s, force
@@ -542,11 +547,6 @@ module Bundler::FileUtils
 
   alias move mv
   module_function :move
-
-  def rename_cannot_overwrite_file?   #:nodoc:
-    /emx/ =~ RbConfig::CONFIG['host_os']
-  end
-  private_module_function :rename_cannot_overwrite_file?
 
   #
   # Remove file(s) specified in +list+.  This method cannot remove directories.
@@ -698,7 +698,7 @@ module Bundler::FileUtils
         f.chown euid, -1
         f.chmod 0700
       }
-    rescue EISDIR # JRuby in non-native mode can't open files as dirs
+    rescue Errno::EISDIR # JRuby in non-native mode can't open files as dirs
       File.lstat(dot_file).tap {|fstat|
         unless fu_stat_identical_entry?(st, fstat)
           # symlink (TOC-to-TOU attack?)
@@ -1145,8 +1145,11 @@ module Bundler::FileUtils
   module StreamUtils_
     private
 
-    def fu_windows?
-      /mswin|mingw|bccwin|emx/ =~ RbConfig::CONFIG['host_os']
+    case (defined?(::RbConfig) ? ::RbConfig::CONFIG['host_os'] : ::RUBY_PLATFORM)
+    when /mswin|mingw/
+      def fu_windows?; true end
+    else
+      def fu_windows?; false end
     end
 
     def fu_copy_stream0(src, dest, blksize = nil)   #:nodoc:
@@ -1271,9 +1274,15 @@ module Bundler::FileUtils
     def entries
       opts = {}
       opts[:encoding] = ::Encoding::UTF_8 if fu_windows?
-      Dir.entries(path(), opts)\
-          .reject {|n| n == '.' or n == '..' }\
-          .map {|n| Entry_.new(prefix(), join(rel(), n.untaint)) }
+
+      files = if Dir.respond_to?(:children)
+        Dir.children(path, opts)
+      else
+        Dir.entries(path(), opts)
+           .reject {|n| n == '.' or n == '..' }
+      end
+
+      files.map {|n| Entry_.new(prefix(), join(rel(), n.untaint)) }
     end
 
     def stat
