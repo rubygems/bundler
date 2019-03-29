@@ -179,6 +179,18 @@ RSpec.describe "bundle package" do
 
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
+
+    it "does not prevent installing gems with bundle update" do
+      gemfile <<-D
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+      D
+
+      bundle! "package --no-install"
+      bundle! "update"
+
+      expect(the_bundle).to include_gems "rack 1.0.0"
+    end
   end
 
   context "with --all-platforms" do
