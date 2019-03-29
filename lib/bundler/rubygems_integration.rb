@@ -439,28 +439,24 @@ module Bundler
 
       redefine_method(gem_class, :find_spec_for_exe) do |gem_name, *args|
         exec_name = args.first
+        raise ArgumentError, "you must supply exec_name" unless exec_name
 
         spec_with_name = specs_by_name[gem_name]
-        spec = if exec_name
+        spec =
           if spec_with_name && spec_with_name.executables.include?(exec_name)
             spec_with_name
           else
             specs.find {|s| s.executables.include?(exec_name) }
           end
-        else
-          spec_with_name
-        end
 
         unless spec
           message = "can't find executable #{exec_name} for gem #{gem_name}"
-          if !exec_name || spec_with_name.nil?
+          if spec_with_name.nil?
             message += ". #{gem_name} is not currently included in the bundle, " \
                        "perhaps you meant to add it to your #{Bundler.default_gemfile.basename}?"
           end
           raise Gem::Exception, message
         end
-
-        raise Gem::Exception, "no default executable for #{spec.full_name}" unless exec_name ||= spec.default_executable
 
         unless spec.name == gem_name
           Bundler::SharedHelpers.major_deprecation 2,
