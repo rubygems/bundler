@@ -467,7 +467,7 @@ module Bundler
           warn \
             "The `#{exec_name}` executable in the `#{spec.name}` gem is being loaded, but it's also present in other gems (#{conflicting_names}).\n" \
             "If you meant to run the executable for another gem, make sure you use a project specific binstub (`bundle binstub <gem_name>`).\n" \
-            "If you plan to actually use _both_ conflicting executables, generate binstubs for both and disambiguate their names."
+            "If you plan to use multiple conflicting executables, generate binstubs for them and disambiguate their names."
         end
 
         spec

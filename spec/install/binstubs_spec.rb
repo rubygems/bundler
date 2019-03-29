@@ -41,11 +41,11 @@ RSpec.describe "bundle install" do
       expect(last_command.stderr).to include(
         "The `rackup` executable in the `fake` gem is being loaded, but it's also present in other gems (rack).\n" \
         "If you meant to run the executable for another gem, make sure you use a project specific binstub (`bundle binstub <gem_name>`).\n" \
-        "If you plan to actually use _both_ conflicting executables, generate binstubs for both and disambiguate their names."
+        "If you plan to use multiple conflicting executables, generate binstubs for them and disambiguate their names."
       ).or include(
         "The `rackup` executable in the `rack` gem is being loaded, but it's also present in other gems (fake).\n" \
         "If you meant to run the executable for another gem, make sure you use a project specific binstub (`bundle binstub <gem_name>`).\n" \
-        "If you plan to actually use _both_ conflicting executables, generate binstubs for both and disambiguate their names."
+        "If you plan to use multiple conflicting executables, generate binstubs for them and disambiguate their names."
       )
     end
   end
