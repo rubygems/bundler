@@ -3,8 +3,7 @@
 $:.unshift File.expand_path("../lib", __FILE__)
 require "benchmark"
 
-NULL_DEVICE = (Gem.win_platform? ? "NUL" : "/dev/null")
-RUBYGEMS_REPO = if `git -C "#{File.expand_path("..")}" remote --verbose 2> #{NULL_DEVICE}` =~ /rubygems/i
+RUBYGEMS_REPO = if `git -C "#{File.expand_path("..")}" remote --verbose 2> #{IO::NULL}` =~ /rubygems/i
   File.expand_path("..")
 else
   File.expand_path("tmp/rubygems")
@@ -115,14 +114,13 @@ namespace :spec do
 
   # RubyGems specs by version
   namespace :rubygems do
-    rubyopt = ENV["RUBYOPT"]
     # When editing this list, also edit .travis.yml!
     branches = %w[master]
     releases = %w[v2.5.2 v2.6.14 v2.7.9 v3.0.3]
     (branches + releases).each do |rg|
       desc "Run specs with RubyGems #{rg}"
       task rg do
-        sh("bin/rspec --format progress --color")
+        sh("bin/rspec --format progress")
       end
 
       # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
@@ -131,43 +129,26 @@ namespace :spec do
         task :realworld => ["set_realworld", rg]
       end
 
-      task "clone_rubygems_#{rg}" do
-        unless File.directory?(RUBYGEMS_REPO)
-          system("git clone https://github.com/rubygems/rubygems.git tmp/rubygems")
-        end
-        hash = nil
-
-        if RUBYGEMS_REPO.start_with?(Dir.pwd)
-          Dir.chdir(RUBYGEMS_REPO) do
-            system("git remote update")
-            if rg == "master"
-              system("git checkout origin/master")
-            else
-              system("git checkout #{rg}") || raise("Unknown RubyGems ref #{rg}")
-            end
-            hash = `git rev-parse HEAD`.chomp
-          end
-        elsif rg != "master"
-          raise "need to be running against master with bundler as a submodule"
-        end
-
-        puts "Checked out rubygems '#{rg}' at #{hash}"
+      task "set_#{rg}" do
         ENV["RGV"] = rg
       end
 
-      task rg => ["clone_rubygems_#{rg}"]
+      task rg => ["set_#{rg}"]
       task "rubygems:all" => rg
     end
 
-    desc "Run specs under a RubyGems checkout (set RG=path)"
+    desc "Run specs under a RubyGems checkout (set RGV=path)"
     task "co" do
-      sh("bin/rspec")
+      sh("bin/rspec --format progress")
+    end
+
+    namespace "co" do
+      task :sudo => ["set_sudo", "co", "clean_sudo"]
+      task :realworld => ["set_realworld", "co"]
     end
 
     task "setup_co" do
-      rg = File.expand_path ENV["RG"]
-      puts "Running specs against RubyGems in #{rg}..."
-      ENV["RUBYOPT"] = "-I#{rg} #{rubyopt}"
+      ENV["RGV"] = RUBYGEMS_REPO
     end
 
     task "co" => "setup_co"
@@ -177,6 +158,8 @@ namespace :spec do
   desc "Run the tests on Travis CI against a RubyGem version (using ENV['RGV'])"
   task :travis do
     rg = ENV["RGV"] || raise("RubyGems version is required on Travis!")
+
+    rg = "co" if File.directory?(File.expand_path(ENV["RGV"]))
 
     # disallow making network requests on CI
     ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
