@@ -54,11 +54,6 @@ namespace :spec do
       "'#{name}:#{version}'"
     end.join(" ")
     sh %(#{Gem.ruby} -S gem #{gem_install_command})
-
-    # Download and install gems used inside tests
-    $LOAD_PATH.unshift("./spec")
-    require "support/rubygems_ext"
-    Spec::Rubygems.setup
   end
 
   namespace :travis do
