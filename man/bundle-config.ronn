@@ -214,8 +214,6 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
    Generate a `gems.rb` instead of a `Gemfile` when running `bundle init`.
 * `jobs` (`BUNDLE_JOBS`):
    The number of gems Bundler can install in parallel. Defaults to 1.
-* `list_command` (`BUNDLE_LIST_COMMAND`)
-   Enable new list command feature
 * `no_install` (`BUNDLE_NO_INSTALL`):
    Whether `bundle package` should skip installing gems.
 * `no_prune` (`BUNDLE_NO_PRUNE`):
