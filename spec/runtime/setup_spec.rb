@@ -527,7 +527,7 @@ RSpec.describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       bundle! :install
 
       FileUtils.rm_rf(lib_path("local-rack"))
@@ -545,7 +545,7 @@ RSpec.describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       bundle! :install
 
       gemfile <<-G
@@ -567,7 +567,7 @@ RSpec.describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       bundle! :install
 
       gemfile <<-G
@@ -594,7 +594,7 @@ RSpec.describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :ref => "master", :branch => "nonexistant"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       run "require 'rack'"
       expect(last_command.stderr).to match(/is using branch master but Gemfile specifies nonexistant/)
     end
@@ -980,7 +980,7 @@ end
 
   describe "with system gems in the bundle" do
     before :each do
-      bundle! "config path.system true"
+      bundle! "config set path.system true"
       system_gems "rack-1.0.0"
 
       install_gemfile <<-G

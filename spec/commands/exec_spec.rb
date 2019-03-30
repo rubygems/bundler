@@ -220,13 +220,13 @@ RSpec.describe "bundle exec" do
   end
 
   it "raises a helpful error when exec'ing to something outside of the bundle", :ruby_repo do
-    bundle! "config clean false" # want to keep the rackup binstub
+    bundle! "config set clean false" # want to keep the rackup binstub
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
       gem "with_license"
     G
     [true, false].each do |l|
-      bundle! "config disable_exec_load #{l}"
+      bundle! "config set disable_exec_load #{l}"
       bundle "exec rackup"
       expect(last_command.stderr).to include "can't find executable rackup for gem rack. rack is not currently included in the bundle, perhaps you meant to add it to your Gemfile?"
     end

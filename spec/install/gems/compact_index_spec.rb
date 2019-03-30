@@ -255,7 +255,7 @@ The checksum of /versions does not match the checksum provided by the server! So
 
   it "does not double check for gems that are only installed locally" do
     system_gems %w[rack-1.0.0 thin-1.0 net_a-1.0]
-    bundle! "config --local path.system true"
+    bundle! "config set --local path.system true"
     ENV["BUNDLER_SPEC_ALL_REQUESTS"] = strip_whitespace(<<-EOS).strip
       #{source_uri}/versions
       #{source_uri}/info/rack
@@ -894,7 +894,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     end
 
     it "does not raise when disable_checksum_validation is set" do
-      bundle! "config disable_checksum_validation true"
+      bundle! "config set disable_checksum_validation true"
       install_gemfile! <<-G, :artifice => "compact_index_wrong_gem_checksum"
         source "#{source_uri}"
         gem "rack"

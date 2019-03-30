@@ -488,7 +488,7 @@ RSpec.describe "setting gemfile via config" do
       bundle "config set --local gemfile #{bundled_app("NotGemfile")}"
       expect(File.exist?(".bundle/config")).to eq(true)
 
-      bundle "config"
+      bundle "config list"
       expect(out).to include("NotGemfile")
     end
   end

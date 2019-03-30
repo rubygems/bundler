@@ -51,7 +51,7 @@ RSpec.describe "bundle install" do
     end
 
     context "with path_relative_to_cwd set to true" do
-      before { bundle! "config path_relative_to_cwd true" }
+      before { bundle! "config set path_relative_to_cwd true" }
 
       it "installs the bundle relatively to current working directory", :bundler => "< 2" do
         Dir.chdir(bundled_app.parent) do
@@ -98,7 +98,7 @@ RSpec.describe "bundle install" do
       if type == :env
         ENV["BUNDLE_PATH"] = location
       elsif type == :global
-        bundle! "config path #{location}", "no-color" => nil
+        bundle! "config set path #{location}", "no-color" => nil
       end
     end
 
@@ -116,7 +116,7 @@ RSpec.describe "bundle install" do
         context "with global_path_appends_ruby_scope set", :bundler => "2" do
           it "installs gems to ." do
             set_bundle_path(type, ".")
-            bundle! "config --global disable_shared_gems true"
+            bundle! "config set --global disable_shared_gems true"
 
             bundle! :install
 
@@ -150,7 +150,7 @@ RSpec.describe "bundle install" do
         context "with global_path_appends_ruby_scope unset", :bundler => "< 2" do
           it "installs gems to ." do
             set_bundle_path(type, ".")
-            bundle! "config --global disable_shared_gems true"
+            bundle! "config set --global disable_shared_gems true"
 
             bundle! :install
 

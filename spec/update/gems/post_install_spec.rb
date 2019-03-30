@@ -10,7 +10,7 @@ RSpec.describe "bundle update" do
       gem 'thin'
     G
 
-    bundle! "config #{config}" if config
+    bundle! "config set #{config}" if config
 
     bundle! :install
   end

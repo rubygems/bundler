@@ -202,7 +202,7 @@ RSpec.describe "bundle outdated" do
         build_gem "activesupport", "2.3.4"
       end
 
-      bundle! "config clean false"
+      bundle! "config set clean false"
 
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -414,7 +414,7 @@ RSpec.describe "bundle outdated" do
       gem "foo"
     G
 
-    bundle "config auto_install 1"
+    bundle "config set auto_install 1"
     bundle :outdated
     expect(out).to include("Installing foo 1.0")
   end

@@ -276,7 +276,7 @@ RSpec.describe "bundle clean" do
   end
 
   it "displays an error when used without --path" do
-    bundle! "config path.system true"
+    bundle! "config set path.system true"
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -320,7 +320,7 @@ RSpec.describe "bundle clean" do
   end
 
   it "does not call clean automatically when using system gems" do
-    bundle! "config path.system true"
+    bundle! "config set path.system true"
 
     bundle! "config list"
 
@@ -446,7 +446,7 @@ RSpec.describe "bundle clean" do
   end
 
   it "does not clean on bundle update when using --system" do
-    bundle! "config path.system true"
+    bundle! "config set path.system true"
 
     build_repo2
 
@@ -468,7 +468,7 @@ RSpec.describe "bundle clean" do
   end
 
   it "cleans system gems when --force is used" do
-    bundle! "config path.system true"
+    bundle! "config set path.system true"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -560,7 +560,7 @@ RSpec.describe "bundle clean" do
   end
 
   it "when using --force on system gems, it doesn't remove binaries" do
-    bundle! "config path.system true"
+    bundle! "config set path.system true"
 
     build_repo2
     update_repo2 do
@@ -707,7 +707,7 @@ RSpec.describe "bundle clean" do
       gem "weakling"
     G
 
-    bundle! "config auto_install 1"
+    bundle! "config set auto_install 1"
     bundle! :clean
     expect(out).to include("Installing weakling 0.0.3")
     should_have_gems "thin-1.0", "rack-1.0.0", "weakling-0.0.3"

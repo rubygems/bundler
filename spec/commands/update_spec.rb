@@ -72,7 +72,7 @@ RSpec.describe "bundle update" do
   end
 
   context "when update_requires_all_flag is set" do
-    before { bundle! "config update_requires_all_flag true" }
+    before { bundle! "config set update_requires_all_flag true" }
 
     it "errors when passed nothing" do
       install_gemfile! ""
@@ -133,7 +133,7 @@ RSpec.describe "bundle update" do
   describe "when a possible resolve requires an older version of a locked gem" do
     context "and only_update_to_newer_versions is set" do
       before do
-        bundle! "config only_update_to_newer_versions true"
+        bundle! "config set only_update_to_newer_versions true"
       end
 
       it "does not go to an older version" do
@@ -290,14 +290,14 @@ RSpec.describe "bundle update" do
     end
 
     it "should suggest different command when frozen is set globally", :bundler => "< 2" do
-      bundle! "config --global frozen 1"
+      bundle! "config set --global frozen 1"
       bundle "update", :all => bundle_update_requires_all?
       expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m).
         and match(/freeze \nby running `bundle config unset frozen`./m)
     end
 
     it "should suggest different command when frozen is set globally", :bundler => "2" do
-      bundle! "config --global deployment true"
+      bundle! "config set --global deployment true"
       bundle "update", :all => bundle_update_requires_all?
       expect(err).to match(/You are trying to install in deployment mode after changing.your Gemfile/m).
         and match(/freeze \nby running `bundle config unset deployment`./m)
@@ -328,7 +328,7 @@ RSpec.describe "bundle update" do
     end
 
     context "with unlock_source_unlocks_spec set to false" do
-      before { bundle! "config unlock_source_unlocks_spec false" }
+      before { bundle! "config set unlock_source_unlocks_spec false" }
 
       it "should not update gems not included in the source that happen to have the same name" do
         install_gemfile <<-G
@@ -598,7 +598,7 @@ RSpec.describe "bundle update" do
   end
 
   context "with suppress_install_using_messages set" do
-    before { bundle! "config suppress_install_using_messages true" }
+    before { bundle! "config set suppress_install_using_messages true" }
 
     it "only prints `Using` for versions that have changed" do
       build_repo4 do
@@ -811,7 +811,7 @@ RSpec.describe "bundle update conservative" do
 
     context "with patch set as default update level in config" do
       it "should do a patch level update" do
-        bundle! "config --local prefer_patch true"
+        bundle! "config set --local prefer_patch true"
         bundle! "update foo"
 
         expect(the_bundle).to include_gems "foo 1.4.5", "bar 2.1.1", "qux 1.0.0"

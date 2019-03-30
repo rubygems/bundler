@@ -32,7 +32,7 @@ RSpec.describe "bundle install with git sources" do
 
     it "caches the git repo globally" do
       simulate_new_machine
-      bundle! "config global_gem_cache true"
+      bundle! "config set global_gem_cache true"
       bundle! :install
       expect(Dir["#{home}/.bundle/cache/git/foo-1.0-*"]).to have_attributes :size => 1
     end
@@ -285,7 +285,7 @@ RSpec.describe "bundle install with git sources" do
         sys_exec!('git update-ref -m "Bundler Spec!" refs/bundler/1 master~1')
       end
 
-      bundle! "config global_gem_cache true"
+      bundle! "config set global_gem_cache true"
 
       install_gemfile! <<-G
         git "#{lib_path("foo-1.0")}" do
@@ -406,7 +406,7 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle! %(config local.rack #{lib_path("local-rack")})
+      bundle! %(config set local.rack #{lib_path("local-rack")})
       bundle! :install
 
       run "require 'rack'"
@@ -427,7 +427,7 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       run "require 'rack'"
       expect(out).to eq("LOCAL")
     end
@@ -447,7 +447,7 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle! %(config local.rack #{lib_path("local-rack")})
+      bundle! %(config set local.rack #{lib_path("local-rack")})
       bundle! :install
       run! "require 'rack'"
       expect(out).to eq("LOCAL")
@@ -470,7 +470,7 @@ RSpec.describe "bundle install with git sources" do
         s.add_dependency "nokogiri", "1.4.2"
       end
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       run "require 'rack'"
 
       lockfile1 = File.read(bundled_app("Gemfile.lock"))
@@ -490,7 +490,7 @@ RSpec.describe "bundle install with git sources" do
       FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
       update_git "rack", "0.8", :path => lib_path("local-rack")
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       bundle :install
 
       lockfile1 = File.read(bundled_app("Gemfile.lock"))
@@ -505,7 +505,7 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       bundle :install
       expect(err).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
 
@@ -527,7 +527,7 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       bundle :install
       expect(err).to match(/Cannot use local override for rack-0.8 at #{Regexp.escape(lib_path('local-rack').to_s)} because :branch is not specified in Gemfile/)
 
@@ -549,8 +549,8 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
-      bundle %(config disable_local_branch_check true)
+      bundle %(config set local.rack #{lib_path("local-rack")})
+      bundle %(config set disable_local_branch_check true)
       bundle :install
       expect(out).to match(/Bundle complete!/)
     end
@@ -569,7 +569,7 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       bundle :install
       expect(err).to match(/is using branch another but Gemfile specifies master/)
     end
@@ -586,7 +586,7 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config set local.rack #{lib_path("local-rack")})
       bundle :install
       expect(err).to match(/The Gemfile lock is pointing to revision \w+/)
     end
@@ -1402,7 +1402,7 @@ In Gemfile:
 
   describe "when the git source is overridden with a local git repo" do
     before do
-      bundle! "config --global local.foo #{lib_path("foo")}"
+      bundle! "config set --global local.foo #{lib_path("foo")}"
     end
 
     describe "and git output is colorized" do

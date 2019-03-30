@@ -76,7 +76,7 @@ RSpec.describe "installing a gem with native extensions", :ruby_repo do
       C
     end
 
-    bundle! "config build.c_extension --with-c_extension=hello"
+    bundle! "config set build.c_extension --with-c_extension=hello"
 
     install_gemfile! <<-G
       gem "c_extension", :git => #{lib_path("c_extension-1.0").to_s.dump}

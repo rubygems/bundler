@@ -106,7 +106,7 @@ RSpec.describe "bundle check" do
   end
 
   it "uses the without setting" do
-    bundle! "config without foo"
+    bundle! "config set without foo"
     install_gemfile! <<-G
       source "file://#{gem_repo1}"
       group :foo do

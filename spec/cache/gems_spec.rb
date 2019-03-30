@@ -74,12 +74,12 @@ RSpec.describe "bundle cache" do
   end
 
   context "using system gems" do
-    before { bundle! "config path.system true" }
+    before { bundle! "config set path.system true" }
     it_behaves_like "when there are only gemsources"
   end
 
   context "installing into a local path" do
-    before { bundle! "config path ./.bundle" }
+    before { bundle! "config set path ./.bundle" }
     it_behaves_like "when there are only gemsources"
   end
 
@@ -97,7 +97,7 @@ RSpec.describe "bundle cache" do
     end
 
     it "uses builtin gems when installing to system gems" do
-      bundle! "config path.system true"
+      bundle! "config set path.system true"
       install_gemfile %(gem 'builtin_gem', '1.0.2')
       expect(the_bundle).to include_gems("builtin_gem 1.0.2")
     end
@@ -129,7 +129,7 @@ RSpec.describe "bundle cache" do
     end
 
     it "errors if the builtin gem isn't available to cache" do
-      bundle! "config path.system true"
+      bundle! "config set path.system true"
 
       install_gemfile <<-G
         gem 'builtin_gem', '1.0.2'
