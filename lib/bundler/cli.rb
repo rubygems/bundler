@@ -282,35 +282,38 @@ module Bundler
       end
     end
 
-    desc "show GEM [OPTIONS]", "Shows all gems that are part of the bundle, or the path to a given gem"
-    long_desc <<-D
-      Show lists the names and versions of all gems that are required by your Gemfile.
-      Calling show with [GEM] will list the exact location of that gem on your machine.
-    D
-    method_option "paths", :type => :boolean,
-                           :banner => "List the paths of all gems that are required by your Gemfile."
-    method_option "outdated", :type => :boolean,
-                              :banner => "Show verbose output including whether gems are outdated."
-    def show(gem_name = nil)
-      if ARGV[0] == "show"
-        rest = ARGV[1..-1]
+    unless Bundler.feature_flag.list_command?
+      desc "show GEM [OPTIONS]", "Shows all gems that are part of the bundle, or the path to a given gem"
+      long_desc <<-D
+        Show lists the names and versions of all gems that are required by your Gemfile.
+        Calling show with [GEM] will list the exact location of that gem on your machine.
+      D
+      method_option "paths", :type => :boolean,
+                             :banner => "List the paths of all gems that are required by your Gemfile."
+      method_option "outdated", :type => :boolean,
+                                :banner => "Show verbose output including whether gems are outdated."
+      def show(gem_name = nil)
+        if ARGV[0] == "show"
+          rest = ARGV[1..-1]
 
-        new_command = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
+          new_command = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
 
-        new_arguments = rest.map do |arg|
-          next arg if arg != "--paths"
-          next "--path" if new_command == "info"
+          new_arguments = rest.map do |arg|
+            next arg if arg != "--paths"
+            next "--path" if new_command == "info"
+          end
+
+          old_argv = ARGV.join(" ")
+          new_argv = [new_command, *new_arguments.compact].join(" ")
+
+          Bundler::SharedHelpers.major_deprecation(2, "use `bundle #{new_argv}` instead of `bundle #{old_argv}`")
         end
-
-        old_argv = ARGV.join(" ")
-        new_argv = [new_command, *new_arguments.compact].join(" ")
-
-        Bundler::SharedHelpers.major_deprecation(2, "use `bundle #{new_argv}` instead of `bundle #{old_argv}`")
+        require "bundler/cli/show"
+        Show.new(options, gem_name).run
       end
-      require "bundler/cli/show"
-      Show.new(options, gem_name).run
+
+      map %w[list] => "show"
     end
-    # TODO: 2.0 remove `bundle show`
 
     if Bundler.feature_flag.list_command?
       desc "list", "List all gems in the bundle"
@@ -324,8 +327,6 @@ module Bundler
       end
 
       map %w[ls] => "list"
-    else
-      map %w[list] => "show"
     end
 
     desc "info GEM [OPTIONS]", "Show information for the given gem"
