@@ -41,10 +41,30 @@ RSpec.describe "bundle info" do
     end
 
     context "given a default gem shippped in ruby", :ruby_repo do
-      it "prints information about the default gem" do
-        bundle "info rdoc"
-        expect(out).to include("* rdoc")
-        expect(out).to include("Default Gem: yes")
+      context "when included in the bundle" do
+        before do
+          install_gemfile <<-G
+            gem "rdoc"
+          G
+        end
+
+        it "prints information about the default gem" do
+          bundle "info rdoc"
+          expect(out).to include("* rdoc")
+          expect(out).to include("Default Gem: yes")
+        end
+      end
+
+      context "when not included in the bundle" do
+        before do
+          install_gemfile <<-G
+          G
+        end
+
+        it "does not print information about the default gem" do
+          bundle "info rdoc"
+          expect(err).to include("Could not find gem 'rdoc'")
+        end
       end
     end
 
