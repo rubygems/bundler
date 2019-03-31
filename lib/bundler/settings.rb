@@ -18,7 +18,6 @@ module Bundler
       cache_all
       cache_all_platforms
       cache_command_is_package
-      console_command
       default_install_uses_path
       deployment
       deployment_means_frozen

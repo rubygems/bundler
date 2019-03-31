@@ -33,7 +33,6 @@ module Bundler
     settings_flag(:auto_config_jobs) { bundler_2_mode? }
     settings_flag(:cache_all) { bundler_2_mode? }
     settings_flag(:cache_command_is_package) { bundler_2_mode? }
-    settings_flag(:console_command) { !bundler_3_mode? }
     settings_flag(:default_install_uses_path) { bundler_2_mode? }
     settings_flag(:deployment_means_frozen) { bundler_2_mode? }
     settings_flag(:disable_multisource) { bundler_2_mode? }

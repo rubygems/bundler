@@ -487,7 +487,7 @@ module Bundler
       Open.new(options, name).run
     end
 
-    if Bundler.feature_flag.console_command?
+    unless Bundler.feature_flag.bundler_3_mode?
       desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
       def console(group = nil)
         require "bundler/cli/console"

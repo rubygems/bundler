@@ -167,7 +167,6 @@ RSpec.describe "The library itself" do
     exemptions = %w[
       auto_config_jobs
       cache_command_is_package
-      console_command
       deployment_means_frozen
       forget_cli_options
       gem.coc
