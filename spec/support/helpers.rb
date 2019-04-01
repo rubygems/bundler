@@ -283,7 +283,7 @@ module Spec
       if contents.nil?
         File.open("Gemfile.lock", "r", &:read)
       else
-        create_file("Gemfile.lock", contents, *args)
+        create_file("Gemfile.lock", normalize_uri_file(contents), *args)
       end
     end
 

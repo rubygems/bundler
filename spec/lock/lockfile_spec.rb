@@ -76,7 +76,7 @@ RSpec.describe "the lockfile format", :bundler => "2" do
   end
 
   it "does not update the lockfile's bundler version if nothing changed during bundle install" do
-    version = "#{Bundler::VERSION.split(".").first}.0.0.0.a"
+    version = "#{Bundler::VERSION.split(".").first}.0.0.a"
 
     lockfile <<-L
       GEM
