@@ -435,7 +435,7 @@ module Spec
       ENV["GEM_PATH"] = system_gem_path.to_s
 
       gems.each do |gem|
-        gem_command :install, "--no-document #{gem}"
+        gem_command! :install, "--no-document #{gem}"
       end
       return unless block_given?
       begin
