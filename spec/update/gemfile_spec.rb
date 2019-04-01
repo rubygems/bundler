@@ -9,7 +9,7 @@ RSpec.describe "bundle update" do
       G
 
       bundle! :install, :gemfile => bundled_app("NotGemfile")
-      bundle! :update, :gemfile => bundled_app("NotGemfile"), :all => bundle_update_requires_all?
+      bundle! :update, :gemfile => bundled_app("NotGemfile"), :all => true
 
       # Specify BUNDLE_GEMFILE for `the_bundle`
       # to retrieve the proper Gemfile
@@ -30,7 +30,7 @@ RSpec.describe "bundle update" do
     end
 
     it "uses the gemfile to update" do
-      bundle! "update", :all => bundle_update_requires_all?
+      bundle! "update", :all => true
       bundle "list"
 
       expect(out).to include("rack (1.0.0)")
@@ -39,7 +39,7 @@ RSpec.describe "bundle update" do
     it "uses the gemfile while in a subdirectory" do
       bundled_app("subdir").mkpath
       Dir.chdir(bundled_app("subdir")) do
-        bundle! "update", :all => bundle_update_requires_all?
+        bundle! "update", :all => true
         bundle "list"
 
         expect(out).to include("rack (1.0.0)")
@@ -55,7 +55,7 @@ RSpec.describe "bundle update" do
       create_file("Gemfile", "raise 'wrong Gemfile!'")
 
       bundle! :install
-      bundle! :update, :all => bundle_update_requires_all?
+      bundle! :update, :all => true
 
       expect(bundled_app("gems.rb")).to be_file
       expect(bundled_app("Gemfile.lock")).not_to be_file

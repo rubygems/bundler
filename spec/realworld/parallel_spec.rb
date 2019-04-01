@@ -34,7 +34,7 @@ RSpec.describe "parallel", :realworld => true, :sometimes => true do
       gem 'i18n', '~> 0.6.0' # Because 0.7+ requires Ruby 1.9.3+
     G
 
-    bundle :update, :jobs => 4, :env => { "DEBUG" => "1" }, :all => bundle_update_requires_all?
+    bundle :update, :jobs => 4, :env => { "DEBUG" => "1" }, :all => true
 
     expect(out).to match(/[1-3]: /)
 
