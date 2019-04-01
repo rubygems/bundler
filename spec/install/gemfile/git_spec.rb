@@ -294,7 +294,7 @@ RSpec.describe "bundle install with git sources" do
       G
 
       # ensure we also git fetch after cloning
-      bundle! :update, :all => bundle_update_requires_all?
+      bundle! :update, :all => true
 
       Dir.chdir(Dir[home(".bundle/cache/git/foo-*")].first) do
         sys_exec("git ls-remote .")
@@ -798,14 +798,14 @@ RSpec.describe "bundle install with git sources" do
       s.write "lib/forced.rb", "FORCED = '1.1'"
     end
 
-    bundle "update", :all => bundle_update_requires_all?
+    bundle "update", :all => true
     expect(the_bundle).to include_gems "forced 1.1"
 
     Dir.chdir(lib_path("forced-1.0")) do
       `git reset --hard HEAD^`
     end
 
-    bundle "update", :all => bundle_update_requires_all?
+    bundle "update", :all => true
     expect(the_bundle).to include_gems "forced 1.0"
   end
 
@@ -1268,7 +1268,7 @@ In Gemfile:
       G
 
       with_path_as("") do
-        bundle "update", :all => bundle_update_requires_all?
+        bundle "update", :all => true
       end
       expect(last_command.bundler_err).
         to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")

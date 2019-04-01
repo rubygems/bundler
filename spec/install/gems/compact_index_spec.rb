@@ -247,7 +247,7 @@ The checksum of /versions does not match the checksum provided by the server! So
         gem "rack"
       G
 
-      bundle! "update --full-index", :artifice => "compact_index", :all => bundle_update_requires_all?
+      bundle! "update --full-index", :artifice => "compact_index", :all => true
       expect(out).to include("Fetching source index from #{source_uri}")
       expect(the_bundle).to include_gems "rack 1.0.0"
     end

@@ -511,7 +511,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle "update", :all => bundle_update_requires_all?
+      bundle "update", :all => true
       expect(the_bundle).to include_gems "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
@@ -528,7 +528,7 @@ G
           build_gem "activesupport", "3.0"
         end
 
-        bundle "update", :all => bundle_update_requires_all?
+        bundle "update", :all => true
         expect(the_bundle).to include_gems "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
       end
     end
@@ -545,7 +545,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle :update, :all => bundle_update_requires_all?
+      bundle :update, :all => true
       should_be_ruby_version_incorrect
     end
 
@@ -561,7 +561,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle :update, :all => bundle_update_requires_all?
+      bundle :update, :all => true
       should_be_engine_incorrect
     end
 
@@ -578,7 +578,7 @@ G
           build_gem "activesupport", "3.0"
         end
 
-        bundle :update, :all => bundle_update_requires_all?
+        bundle :update, :all => true
         should_be_engine_version_incorrect
       end
     end
@@ -594,7 +594,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle :update, :all => bundle_update_requires_all?
+      bundle :update, :all => true
       should_be_patchlevel_incorrect
     end
   end

@@ -52,10 +52,6 @@ module Spec
       last_command.exitstatus
     end
 
-    def bundle_update_requires_all?
-      Bundler::VERSION.start_with?("2.") ? nil : true
-    end
-
     def in_app_root(&blk)
       Dir.chdir(bundled_app, &blk)
     end

@@ -16,7 +16,7 @@ RSpec.describe "bundle update" do
         s.write "lib/foo.rb", "FOO = '1.1'"
       end
 
-      bundle "update", :all => bundle_update_requires_all?
+      bundle "update", :all => true
 
       expect(the_bundle).to include_gems "foo 1.1"
     end
@@ -111,7 +111,7 @@ RSpec.describe "bundle update" do
         gem 'foo', :git => "#{@remote.path}", :tag => "fubar"
       G
 
-      bundle "update", :all => bundle_update_requires_all?
+      bundle "update", :all => true
       expect(exitstatus).to eq(0) if exitstatus
     end
 
@@ -191,7 +191,7 @@ RSpec.describe "bundle update" do
 
       lib_path("foo-1.0").join(".git").rmtree
 
-      bundle :update, :all => bundle_update_requires_all?
+      bundle :update, :all => true
       expect(last_command.bundler_err).to include(lib_path("foo-1.0").to_s).
         and match(/Git error: command `git fetch.+has failed/)
     end
@@ -233,7 +233,7 @@ RSpec.describe "bundle update" do
           rails!
       G
 
-      bundle "update", :all => bundle_update_requires_all?
+      bundle "update", :all => true
       expect(out).to include("Using rails 3.0 (was 2.3.2) from #{lib_path("rails")} (at master@#{revision_for(lib_path("rails"))[0..6]})")
     end
   end

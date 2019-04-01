@@ -187,7 +187,7 @@ RSpec.describe "bundle package" do
       D
 
       bundle! "package --no-install"
-      bundle! "update"
+      bundle! "update --all"
 
       expect(the_bundle).to include_gems "rack 1.0.0"
     end

@@ -201,7 +201,7 @@ RSpec.describe "bundle clean" do
     update_git "foo", :path => lib_path("foo-bar")
     revision2 = revision_for(lib_path("foo-bar"))
 
-    bundle! "update", :all => bundle_update_requires_all?
+    bundle! "update", :all => true
     bundle! :clean
 
     expect(out).to include("Removing foo-bar (#{revision[0..11]})")
@@ -378,7 +378,7 @@ RSpec.describe "bundle clean" do
       build_gem "foo", "1.0.1"
     end
 
-    bundle! "update", :all => bundle_update_requires_all?
+    bundle! "update", :all => true
 
     should_have_gems "foo-1.0.1"
     should_not_have_gems "foo-1.0"
@@ -441,7 +441,7 @@ RSpec.describe "bundle clean" do
       build_gem "foo", "1.0.1"
     end
 
-    bundle! :update, :all => bundle_update_requires_all?
+    bundle! :update, :all => true
     should_have_gems "foo-1.0", "foo-1.0.1"
   end
 
@@ -460,7 +460,7 @@ RSpec.describe "bundle clean" do
     update_repo2 do
       build_gem "foo", "1.0.1"
     end
-    bundle! :update, :all => bundle_update_requires_all?
+    bundle! :update, :all => true
 
     gem = ruby_core? ? ENV["BUNDLE_GEM"] : "gem"
     sys_exec! "#{gem} list"

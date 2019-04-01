@@ -81,7 +81,7 @@ end
       ref = git.ref_for("master", 11)
       expect(ref).not_to eq(old_ref)
 
-      bundle! "update", :all => bundle_update_requires_all?
+      bundle! "update", :all => true
       bundle! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
