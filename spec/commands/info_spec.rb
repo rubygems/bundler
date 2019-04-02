@@ -138,7 +138,7 @@ RSpec.describe "bundle info" do
 
       invalid_regexp = "[]"
 
-      bundle "show #{invalid_regexp}"
+      bundle "info #{invalid_regexp}"
       expect(err).to include("Could not find gem '#{invalid_regexp}'.")
     end
   end
