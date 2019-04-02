@@ -263,18 +263,22 @@ module Spec
     end
 
     def gemfile(*args)
-      if args.empty?
+      contents = args.shift
+
+      if contents.nil?
         File.open("Gemfile", "r", &:read)
       else
-        create_file("Gemfile", *args)
+        create_file("Gemfile", contents, *args)
       end
     end
 
     def lockfile(*args)
-      if args.empty?
+      contents = args.shift
+
+      if contents.nil?
         File.open("Gemfile.lock", "r", &:read)
       else
-        create_file("Gemfile.lock", *args)
+        create_file("Gemfile.lock", normalize_uri_file(contents), *args)
       end
     end
 
