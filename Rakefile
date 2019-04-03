@@ -3,12 +3,6 @@
 $:.unshift File.expand_path("../lib", __FILE__)
 require "benchmark"
 
-RUBYGEMS_REPO = if `git -C "#{File.expand_path("..")}" remote --verbose 2> #{IO::NULL}` =~ /rubygems/i
-  File.expand_path("..")
-else
-  File.expand_path("tmp/rubygems")
-end
-
 def development_dependencies
   @development_dependencies ||= Gem::Specification.load("bundler.gemspec").development_dependencies
 end
@@ -139,7 +133,11 @@ namespace :spec do
     end
 
     task "setup_co" do
-      ENV["RGV"] = RUBYGEMS_REPO
+      ENV["RGV"] = if `git -C "#{File.expand_path("..")}" remote --verbose 2> #{IO::NULL}` =~ /rubygems/i
+        File.expand_path("..")
+      else
+        File.expand_path("tmp/rubygems")
+      end
     end
 
     task "co" => "setup_co"
