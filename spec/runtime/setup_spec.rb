@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "tmpdir"
+require "tempfile"
 
 RSpec.describe "Bundler.setup" do
   describe "with no arguments" do
