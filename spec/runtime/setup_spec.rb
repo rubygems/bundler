@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "tmpdir"
+
 RSpec.describe "Bundler.setup" do
   describe "with no arguments" do
     it "makes all groups available" do
