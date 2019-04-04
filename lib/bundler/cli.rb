@@ -487,7 +487,7 @@ module Bundler
       Open.new(options, name).run
     end
 
-    if Bundler.feature_flag.console_command?
+    unless Bundler.feature_flag.bundler_3_mode?
       desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
       def console(group = nil)
         require "bundler/cli/console"
@@ -524,7 +524,7 @@ module Bundler
       end
     end
 
-    if Bundler.feature_flag.viz_command?
+    unless Bundler.feature_flag.bundler_3_mode?
       desc "viz [OPTIONS]", "Generates a visual dependency graph", :hide => true
       long_desc <<-D
         Viz generates a PNG file of the current Gemfile as a dependency graph.

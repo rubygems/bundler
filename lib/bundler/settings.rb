@@ -18,7 +18,6 @@ module Bundler
       cache_all
       cache_all_platforms
       cache_command_is_package
-      console_command
       default_install_uses_path
       deployment
       deployment_means_frozen
@@ -60,7 +59,6 @@ module Bundler
       unlock_source_unlocks_spec
       update_requires_all_flag
       use_gem_version_promoter_for_major_updates
-      viz_command
     ].freeze
 
     NUMBER_KEYS = %w[

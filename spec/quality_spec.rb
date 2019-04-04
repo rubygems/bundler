@@ -167,7 +167,6 @@ RSpec.describe "The library itself" do
     exemptions = %w[
       auto_config_jobs
       cache_command_is_package
-      console_command
       deployment_means_frozen
       forget_cli_options
       gem.coc
@@ -176,7 +175,6 @@ RSpec.describe "The library itself" do
       inline
       lockfile_uses_separate_rubygems_sources
       use_gem_version_promoter_for_major_updates
-      viz_command
     ]
 
     all_settings = Hash.new {|h, k| h[k] = [] }
