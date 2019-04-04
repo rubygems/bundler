@@ -293,8 +293,6 @@ module Bundler
       # for Ruby core repository
       exe_file = File.expand_path("../../../../bin/bundle", __FILE__) unless File.exist?(exe_file)
       Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", exe_file
-
-      # Set BUNDLE_GEMFILE
       Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", find_gemfile(:order_matters).to_s
       Bundler::SharedHelpers.set_env "BUNDLER_VERSION", Bundler::VERSION
     end
