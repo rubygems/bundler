@@ -47,11 +47,8 @@ env:
   # Test the latest rubygems release with all of our supported rubies
   - RGV=v3.0.3
 
-jobs:
+matrix:
   include:
-    - rvm: 2.6.2
-      script: rake rubocop
-      stage: linting
     # 3.x mode
     - rvm: 2.6.2
       env: RGV=v3.0.1 BUNDLER_SPEC_SUB_VERSION=3.0.0
