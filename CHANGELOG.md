@@ -1,3 +1,48 @@
+## 2.0.1 (2019-01-04)
+
+Changes:
+
+  - Relaxed RubyGems requirement to `>= 2.5.0` ([#6867](https://github.com/bundler/bundler/pull/6867))
+
+## 2.0.0 (2019-01-03)
+
+No new changes
+
+## 2.0.0.pre.3 (2018-12-30)
+
+Breaking Changes:
+
+  - Bundler 2 now requires RubyGems 3.0.0 at minimum
+
+Changes:
+
+  - Ruby 2.6 compatibility fixes (@segiddins)
+  - Import changes from Bundler 1.17.3 release
+
+Note: To upgrade your Gemfile to Bundler 2 you will need to run `bundle update --bundler`
+
+## 2.0.0.pre.2 (2018-11-27)
+
+Breaking Changes:
+
+  - `:github` source in the Gemfile now defaults to using HTTPS
+
+Changes
+
+  - Add compatibility for Bundler merge into ruby-src
+
+Note: To upgrade your Gemfile to Bundler 2 you will need to run `bundle update --bundler`
+
+## 2.0.0.pre.1 (2018-11-09)
+
+Breaking Changes:
+
+  - Dropped support for versions of Ruby < 2.3
+  - Dropped support for version of RubyGems < 2.5
+  - Moved error messages from STDOUT to STDERR
+
+Note: To upgrade your Gemfile to Bundler 2 you will need to run `bundle update --bundler`
+
 ## 1.17.3 (2018-12-27)
 
 Bugfixes:
