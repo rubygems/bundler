@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "bundler/vendored_persistent"
+require_relative "vendored_persistent"
 require "cgi"
 require "securerandom"
 require "zlib"

@@ -62,7 +62,7 @@ module Bundler
       Bundler.load.cache if Bundler.app_cache.exist?
 
       if CLI::Common.clean_after_install?
-        require "bundler/cli/clean"
+        require_relative "clean"
         Bundler::CLI::Clean.new(options).run
       end
 

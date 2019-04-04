@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "bundler/shared_helpers"
+require_relative "shared_helpers"
 
 if Bundler::SharedHelpers.in_bundle?
   require "bundler"

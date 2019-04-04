@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require "bundler/compatibility_guard"
+require_relative "compatibility_guard"
 
 require "pathname"
 require "rbconfig"
 require "rubygems"
 
-require "bundler/version"
-require "bundler/constants"
-require "bundler/rubygems_integration"
-require "bundler/current_ruby"
+require_relative "version"
+require_relative "constants"
+require_relative "rubygems_integration"
+require_relative "current_ruby"
 
 module Bundler
   module SharedHelpers
@@ -132,7 +132,7 @@ module Bundler
     def major_deprecation(major_version, message)
       bundler_major_version = Bundler.bundler_major_version
       if bundler_major_version > major_version
-        require "bundler/errors"
+        require_relative "errors"
         raise DeprecatedError, "[REMOVED] #{message}"
       end
 
@@ -351,9 +351,9 @@ module Bundler
     end
 
     def prints_major_deprecations?
-      require "bundler"
+      require_relative "../bundler"
       return false if Bundler.settings[:silence_deprecations]
-      require "bundler/deprecate"
+      require_relative "deprecate"
       return false if Bundler::Deprecate.skip
       true
     end

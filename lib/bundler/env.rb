@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "bundler/rubygems_integration"
-require "bundler/source/git/git_proxy"
+require_relative "rubygems_integration"
+require_relative "source/git/git_proxy"
 
 module Bundler
   class Env

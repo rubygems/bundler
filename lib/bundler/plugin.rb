@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "bundler/plugin/api"
+require_relative "plugin/api"
 
 module Bundler
   module Plugin

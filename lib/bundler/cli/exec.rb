@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "bundler/current_ruby"
+require_relative "../current_ruby"
 
 module Bundler
   class CLI::Exec
@@ -69,7 +69,7 @@ module Bundler
       Process.setproctitle(process_title(file, args)) if Process.respond_to?(:setproctitle)
       ui = Bundler.ui
       Bundler.ui = nil
-      require "bundler/setup"
+      require_relative "../setup"
       TRAPPED_SIGNALS.each {|s| trap(s, "DEFAULT") }
       Kernel.load(file)
     rescue SystemExit, SignalException

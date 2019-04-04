@@ -8,7 +8,7 @@ require "rubygems/specification"
 # shouldn't be deferred.
 require "rubygems/source"
 
-require "bundler/match_platform"
+require_relative "match_platform"
 
 module Gem
   class Specification

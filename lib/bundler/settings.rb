@@ -357,7 +357,7 @@ module Bundler
       return unless file
       SharedHelpers.filesystem_access(file) do |p|
         FileUtils.mkdir_p(p.dirname)
-        require "bundler/yaml_serializer"
+        require_relative "yaml_serializer"
         p.open("w") {|f| f.write(YAMLSerializer.dump(hash)) }
       end
     end
@@ -397,7 +397,7 @@ module Bundler
       SharedHelpers.filesystem_access(config_file, :read) do |file|
         valid_file = file.exist? && !file.size.zero?
         return {} unless valid_file
-        require "bundler/yaml_serializer"
+        require_relative "yaml_serializer"
         YAMLSerializer.load file.read
       end
     end
