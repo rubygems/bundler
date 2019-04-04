@@ -807,6 +807,7 @@ end
     let(:gem_home) { Dir.mktmpdir }
     let(:symlinked_gem_home) { Tempfile.new("gem_home").path }
     let(:bundler_dir) { ruby_core? ? File.expand_path("../../../..", __FILE__) : File.expand_path("../../..", __FILE__) }
+    let(:full_name) { "bundler-#{Bundler::VERSION}" }
 
     before do
       FileUtils.ln_sf(gem_home, symlinked_gem_home)
@@ -815,14 +816,14 @@ end
       Dir.mkdir(gems_dir)
       Dir.mkdir(specifications_dir)
 
-      FileUtils.ln_s(bundler_dir, File.join(gems_dir, "bundler-#{Bundler::VERSION}"))
+      FileUtils.ln_s(bundler_dir, File.join(gems_dir, full_name))
 
       gemspec_file = ruby_core? ? "#{bundler_dir}/lib/bundler/bundler.gemspec" : "#{bundler_dir}/bundler.gemspec"
       gemspec = File.read(gemspec_file).
                 sub("Bundler::VERSION", %("#{Bundler::VERSION}"))
       gemspec = gemspec.lines.reject {|line| line =~ %r{lib/bundler/version} }.join
 
-      File.open(File.join(specifications_dir, "bundler.gemspec"), "wb") do |f|
+      File.open(File.join(specifications_dir, "#{full_name}.gemspec"), "wb") do |f|
         f.write(gemspec)
       end
     end
