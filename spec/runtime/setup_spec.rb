@@ -828,20 +828,18 @@ end
       end
     end
 
-    # Can't make this pass on 2.6 since the ruby standard library has the same $LOAD_PATH
-    # entry as bundler (since it's a default gem)
-    it "should successfully require 'bundler/setup'", :ruby_repo, :ruby => "< 2.6" do
+    it "should not remove itself from the LOAD_PATH and require a different copy of 'bundler/setup'", :ruby_repo do
       install_gemfile ""
 
-      ruby <<-'R', :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
-        # Remove any bundler that's not the current bundler from $LOAD_PATH
-        $LOAD_PATH.each do |path|
-          $LOAD_PATH.delete(path) if File.exist?("#{path}/bundler.rb")
+      ruby <<-R, :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
+        TracePoint.trace(:class) do |tp|
+          puts "OMG" if tp.path.include?("bundler") && !tp.path.start_with?("#{File.expand_path("../..", __dir__)}")
         end
-        puts (require 'bundler/setup')
+        gem 'bundler', '#{Bundler::VERSION}'
+        require 'bundler/setup'
       R
 
-      expect(out).to eql("true")
+      expect(out).to be_empty
     end
   end
 
