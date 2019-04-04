@@ -30,8 +30,8 @@ addons:
       secure: "TrzIv116JLGUxm6PAUskCYrv8KTDguncKROVwbnjVPKTGDAgoDderd8JUdDEXrKoZ9qGLD2TPYKExt9/QDl71E+qHdWnVqWv4HKCUk2P9z/VLKzHuggOUBkCXiJUhjywUieCJhI3N92bfq2EjSBbu2/OFHqWOjLQ+QCooTEBjv8="
 
 rvm:
-  - 2.6.1
-  - 2.5.3
+  - 2.6.2
+  - 2.5.5
   - 2.4.5
   - 2.3.8
 
@@ -45,15 +45,15 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v3.0.2
+  - RGV=v3.0.3
 
-matrix:
+jobs:
   include:
-    - rvm: 2.6.1
+    - rvm: 2.6.2
       script: rake rubocop
       stage: linting
     # 3.x mode
-    - rvm: 2.6.1
+    - rvm: 2.6.2
       env: RGV=v3.0.1 BUNDLER_SPEC_SUB_VERSION=3.0.0
     # Ruby 2.5, Rubygems 2.7 and up
     - rvm: 2.5.3
