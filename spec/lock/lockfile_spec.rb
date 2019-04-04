@@ -203,7 +203,7 @@ RSpec.describe "the lockfile format" do
     G
   end
 
-  it "errors if the current is a major version older than lockfile's bundler version", :bundler => "2" do
+  it "errors if the current is a major version older than lockfile's bundler version", :bundler => "3" do
     lockfile <<-L
       GEM
         remote: file://localhost#{gem_repo1}/
@@ -268,7 +268,7 @@ RSpec.describe "the lockfile format" do
     expect(err).to include("You must use Bundler 9999999 or greater with this lockfile.")
   end
 
-  it "warns when updating bundler major version", :bundler => "< 2" do
+  it "warns when updating bundler major version", :bundler => "< 3" do
     lockfile <<-L
       GEM
         remote: file://localhost#{gem_repo1}/
@@ -316,7 +316,7 @@ RSpec.describe "the lockfile format" do
     G
   end
 
-  it "warns when updating bundler major version", :bundler => "2" do
+  it "warns when updating bundler major version", :bundler => "3" do
     lockfile <<-L
       GEM
         remote: file://localhost#{gem_repo1}/
@@ -514,7 +514,7 @@ RSpec.describe "the lockfile format" do
     expect(the_bundle).to include_gems "net-sftp 1.1.1", "net-ssh 1.0.0"
   end
 
-  it "generates a simple lockfile for a single pinned source, gem with a version requirement", :bundler => "< 2" do
+  it "generates a simple lockfile for a single pinned source, gem with a version requirement", :bundler => "< 3" do
     git = build_git "foo"
 
     install_gemfile <<-G
@@ -1064,7 +1064,7 @@ RSpec.describe "the lockfile format" do
     G
   end
 
-  it "keeps existing platforms in the lockfile", :bundler => "< 2" do
+  it "keeps existing platforms in the lockfile", :bundler => "< 3" do
     lockfile <<-G
       GEM
         remote: file://localhost#{gem_repo1}/
@@ -1105,7 +1105,7 @@ RSpec.describe "the lockfile format" do
     G
   end
 
-  it "keeps existing platforms in the lockfile", :bundler => "2" do
+  it "keeps existing platforms in the lockfile", :bundler => "3" do
     lockfile <<-G
       GEM
         remote: file://localhost#{gem_repo1}/
@@ -1147,7 +1147,7 @@ RSpec.describe "the lockfile format" do
     G
   end
 
-  it "persists the spec's platform to the lockfile", :bundler => "< 2" do
+  it "persists the spec's platform to the lockfile", :bundler => "< 3" do
     build_repo2 do
       build_gem "platform_specific", "1.0" do |s|
         s.platform = Gem::Platform.new("universal-java-16")
@@ -1178,7 +1178,7 @@ RSpec.describe "the lockfile format" do
     G
   end
 
-  it "persists the spec's platform and specific platform to the lockfile", :bundler => "2" do
+  it "persists the spec's platform and specific platform to the lockfile", :bundler => "3" do
     build_repo2 do
       build_gem "platform_specific", "1.0" do |s|
         s.platform = Gem::Platform.new("universal-java-16")

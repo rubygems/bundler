@@ -48,7 +48,14 @@ RSpec.describe "bundle pristine", :ruby_repo do
       bundle! "install"
       bundle! "pristine", :system_bundler => true
       bundle! "-v", :system_bundler => true
-      expect(out).to end_with(Bundler::VERSION)
+
+      expected = if Bundler::VERSION < "3.0"
+        "Bundler version"
+      else
+        Bundler::VERSION
+      end
+
+      expect(out).to start_with(expected)
     end
   end
 

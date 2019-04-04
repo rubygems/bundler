@@ -30,7 +30,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints deprecation", :bundler => "2" do
+    it "prints deprecation" do
       bundle "show rails"
       expect(err).to eq("[DEPRECATED] use `bundle info rails` instead of `bundle show rails`")
     end
@@ -40,7 +40,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints deprecation when called with a gem and the --paths option", :bundler => "2" do
+    it "prints deprecation when called with a gem and the --paths option" do
       bundle "show rails --paths"
       expect(err).to eq("[DEPRECATED] use `bundle info rails --path` instead of `bundle show rails --paths`")
     end
@@ -59,7 +59,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
       expect(out).to eq(root.to_s)
     end
 
-    it "prints deprecation when called with bundler", :bundler => "2" do
+    it "prints deprecation when called with bundler" do
       bundle "show bundler"
       expect(err).to eq("[DEPRECATED] use `bundle info bundler` instead of `bundle show bundler`")
     end
@@ -79,7 +79,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
       expect(gem_list).to eq(gem_list.sort)
     end
 
-    it "prints a deprecation when called with the --paths option", :bundler => 2 do
+    it "prints a deprecation when called with the --paths option" do
       bundle "show --paths"
 
       expect(err).to eq("[DEPRECATED] use `bundle list` instead of `bundle show --paths`")
@@ -225,4 +225,8 @@ RSpec.describe "bundle show", :bundler => "< 3" do
       expect(the_bundle).to include_gem("rails 2.3.2")
     end
   end
+end
+
+RSpec.describe "bundle show", :bundler => "3" do
+  pending "shows a friendly error about the command removal"
 end

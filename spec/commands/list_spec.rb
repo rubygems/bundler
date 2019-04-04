@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle list", :bundler => ">= 2" do
+RSpec.describe "bundle list" do
   context "with name-only and paths option" do
     it "raises an error" do
       bundle "list --name-only --paths"

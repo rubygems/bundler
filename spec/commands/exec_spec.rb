@@ -621,17 +621,7 @@ RSpec.describe "bundle exec" do
       it_behaves_like "it runs"
     end
 
-    context "the executable is empty", :bundler => "< 2" do
-      let(:executable) { "" }
-
-      let(:exit_code) { 0 }
-      let(:expected) { "#{path} is empty" }
-      let(:expected_err) { "" }
-
-      it_behaves_like "it runs"
-    end
-
-    context "the executable is empty", :bundler => "2" do
+    context "the executable is empty" do
       let(:executable) { "" }
 
       let(:exit_code) { 0 }
@@ -640,18 +630,7 @@ RSpec.describe "bundle exec" do
       it_behaves_like "it runs"
     end
 
-    context "the executable raises", :bundler => "< 2" do
-      let(:executable) { super() << "\nraise 'ERROR'" }
-      let(:exit_code) { 1 }
-      let(:expected) { super() << "\nbundler: failed to load command: #{path} (#{path})" }
-      let(:expected_err) do
-        "RuntimeError: ERROR\n  #{path}:10" +
-          (Bundler.current_ruby.ruby_18? ? "" : ":in `<top (required)>'")
-      end
-      it_behaves_like "it runs"
-    end
-
-    context "the executable raises", :bundler => "2" do
+    context "the executable raises" do
       let(:executable) { super() << "\nraise 'ERROR'" }
       let(:exit_code) { 1 }
       let(:expected_err) do
@@ -661,16 +640,7 @@ RSpec.describe "bundle exec" do
       it_behaves_like "it runs"
     end
 
-    context "the executable raises an error without a backtrace", :bundler => "< 2" do
-      let(:executable) { super() << "\nclass Err < Exception\ndef backtrace; end;\nend\nraise Err" }
-      let(:exit_code) { 1 }
-      let(:expected) { super() << "\nbundler: failed to load command: #{path} (#{path})" }
-      let(:expected_err) { "Err: Err" }
-
-      it_behaves_like "it runs"
-    end
-
-    context "the executable raises an error without a backtrace", :bundler => "2" do
+    context "the executable raises an error without a backtrace" do
       let(:executable) { super() << "\nclass Err < Exception\ndef backtrace; end;\nend\nraise Err" }
       let(:exit_code) { 1 }
       let(:expected_err) { "bundler: failed to load command: #{path} (#{path})\nErr: Err" }
@@ -684,25 +654,7 @@ RSpec.describe "bundle exec" do
       it_behaves_like "it runs"
     end
 
-    context "when Bundler.setup fails", :bundler => "< 2" do
-      before do
-        gemfile <<-G
-          gem 'rack', '2'
-        G
-        ENV["BUNDLER_FORCE_TTY"] = "true"
-      end
-
-      let(:exit_code) { Bundler::GemNotFound.new.status_code }
-      let(:expected_err) { "" }
-      let(:expected) { <<-EOS.strip }
-\e[31mCould not find gem 'rack (= 2)' in any of the gem sources listed in your Gemfile.\e[0m
-\e[33mRun `bundle install` to install missing gems.\e[0m
-      EOS
-
-      it_behaves_like "it runs"
-    end
-
-    context "when Bundler.setup fails", :bundler => "2" do
+    context "when Bundler.setup fails", :bundler => "< 3" do
       before do
         gemfile <<-G
           gem 'rack', '2'

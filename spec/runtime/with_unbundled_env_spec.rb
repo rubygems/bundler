@@ -98,7 +98,7 @@ RSpec.describe "Bundler.with_env helpers" do
     it_behaves_like "an unbundling helper"
   end
 
-  describe "Bundler.clean_env" do
+  describe "Bundler.clean_env", :bundler => 2 do
     let(:modified_env) { "Bundler.clean_env" }
 
     it_behaves_like "an unbundling helper"
@@ -120,7 +120,7 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.with_clean_env" do
+  describe "Bundler.with_clean_env", :bundler => 2 do
     it "should set ENV to unbundled_env in the block" do
       expected = Bundler.unbundled_env
       actual = Bundler.with_clean_env { ENV.to_hash }
@@ -161,7 +161,7 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.clean_system" do
+  describe "Bundler.clean_system", :bundler => 2 do
     it "runs system inside with_clean_env" do
       code = 'exit Bundler.clean_system(%(test "\$BUNDLE_FOO" = "bar"))'
       lib = File.expand_path("../../lib", __dir__)
@@ -199,7 +199,7 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.clean_exec" do
+  describe "Bundler.clean_exec", :bundler => 2 do
     let(:code) do
       <<~RUBY
         Process.fork do
