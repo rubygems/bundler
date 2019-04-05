@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "thread"
-
 module Bundler
   class Worker
     POISON = Object.new
