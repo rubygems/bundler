@@ -39,7 +39,6 @@ module Bundler
       global_gem_cache
       ignore_messages
       init_gems_rb
-      list_command
       lockfile_uses_separate_rubygems_sources
       no_install
       no_prune
