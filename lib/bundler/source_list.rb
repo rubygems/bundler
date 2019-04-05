@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "set"
+
 module Bundler
   class SourceList
     attr_reader :path_sources,
