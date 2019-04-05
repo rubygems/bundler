@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+def bundler_spec
+  Gem::Specification.load("bundler.gemspec")
+end
+
 def write_build_metadata(build_metadata)
   build_metadata_file = "lib/bundler/build_metadata.rb"
 
