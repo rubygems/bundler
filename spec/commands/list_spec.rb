@@ -93,8 +93,6 @@ RSpec.describe "bundle list", :bundler => ">= 2" do
         gem "git_test", :git => "#{lib_path("git_test")}"
         gemspec :path => "#{tmp.join("gemspec_test")}"
       G
-
-      bundle! "install"
     end
 
     it "prints the path of each gem in the bundle" do
