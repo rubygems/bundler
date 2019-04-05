@@ -5,7 +5,6 @@ require "bundler/compatibility_guard"
 require "bundler/vendored_fileutils"
 require "pathname"
 require "rbconfig"
-require "thread"
 
 require "bundler/errors"
 require "bundler/environment_preserver"

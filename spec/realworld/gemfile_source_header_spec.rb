@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "thread"
-
 RSpec.describe "fetching dependencies with a mirrored source", :realworld => true do
   let(:mirror) { "https://server.example.org" }
   let(:original) { "http://127.0.0.1:#{@port}" }
