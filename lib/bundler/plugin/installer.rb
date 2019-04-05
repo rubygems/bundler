@@ -16,7 +16,7 @@ module Bundler
 
         version = options[:version] || [">= 0"]
 
-        Bundler.settings.temporary(:lockfile_uses_separate_rubygems_sources => false, :disable_multisource => false) do
+        Bundler.settings.temporary(:disable_multisource => false) do
           if options[:git]
             install_git(names, version, options)
           elsif options[:local_git]

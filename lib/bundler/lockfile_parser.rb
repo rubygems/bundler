@@ -88,7 +88,7 @@ module Bundler
           send("parse_#{@state}", line)
         end
       end
-      @sources << @rubygems_aggregate unless Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      @sources << @rubygems_aggregate unless Bundler.feature_flag.disable_multisource?
       @specs = @specs.values.sort_by(&:identifier)
       warn_for_outdated_bundler_version
     rescue ArgumentError => e
@@ -139,7 +139,7 @@ module Bundler
             @sources << @current_source
           end
         when GEM
-          if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+          if Bundler.feature_flag.disable_multisource?
             @opts["remotes"] = @opts.delete("remote")
             @current_source = TYPES[@type].from_lock(@opts)
             @sources << @current_source

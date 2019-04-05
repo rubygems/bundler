@@ -51,7 +51,7 @@ module Bundler
       end
 
       def can_lock?(spec)
-        return super if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+        return super if Bundler.feature_flag.disable_multisource?
         spec.source.is_a?(Rubygems)
       end
 

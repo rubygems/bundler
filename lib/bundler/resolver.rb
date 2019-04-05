@@ -39,7 +39,7 @@ module Bundler
       @gem_version_promoter = gem_version_promoter
       @allow_bundler_dependency_conflicts = Bundler.feature_flag.allow_bundler_dependency_conflicts?
       @use_gvp = Bundler.feature_flag.use_gem_version_promoter_for_major_updates? || !@gem_version_promoter.major?
-      @lockfile_uses_separate_rubygems_sources = Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      @lockfile_uses_separate_rubygems_sources = Bundler.feature_flag.disable_multisource?
     end
 
     def start(requirements)

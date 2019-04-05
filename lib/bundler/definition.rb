@@ -643,7 +643,7 @@ module Bundler
     end
 
     def converge_rubygems_sources
-      return false if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      return false if Bundler.feature_flag.disable_multisource?
 
       changes = false
 
@@ -915,7 +915,7 @@ module Bundler
       # look for that gemspec (or its dependencies)
       default = sources.default_source
       source_requirements = { :default => default }
-      default = nil unless Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      default = nil unless Bundler.feature_flag.disable_multisource?
       dependencies.each do |dep|
         next unless source = dep.source || default
         source_requirements[dep.name] = source
@@ -929,7 +929,7 @@ module Bundler
 
     def pinned_spec_names(skip = nil)
       pinned_names = []
-      default = Bundler.feature_flag.lockfile_uses_separate_rubygems_sources? && sources.default_source
+      default = Bundler.feature_flag.disable_multisource? && sources.default_source
       @dependencies.each do |dep|
         next unless dep_source = dep.source || default
         next if dep_source == skip
