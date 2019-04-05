@@ -320,7 +320,7 @@ module Bundler
     desc "list", "List all gems in the bundle"
     method_option "name-only", :type => :boolean, :banner => "print only the gem names"
     method_option "only-group", :type => :string, :banner => "print gems from a particular group"
-    method_option "without-group", :type => :string, :banner => "print all gems expect from a group"
+    method_option "without-group", :type => :string, :banner => "print all gems except from a group"
     method_option "paths", :type => :boolean, :banner => "print the path to each gem in the bundle"
     def list
       require "bundler/cli/list"
