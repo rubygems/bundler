@@ -625,6 +625,38 @@ RSpec.describe "bundle install with gems on multiple sources" do
     end
   end
 
+  describe "source changed to one containing a higher version of a dependency" do
+    before do
+      install_gemfile! <<-G
+        source "file://#{gem_repo1}"
+
+        gem "rack"
+      G
+
+      build_repo2 do
+        build_gem "bar"
+      end
+
+      build_lib("gemspec_test", :path => tmp.join("gemspec_test")) do |s|
+        s.add_dependency "bar", "=1.0.0"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack"
+        gemspec :path => "#{tmp.join("gemspec_test")}"
+      G
+    end
+
+    it "keeps the old version", :bundler => "2" do
+      expect(the_bundle).to include_gems("rack 1.0.0")
+    end
+
+    it "installs the higher version in the new repo", :bundler => "3" do
+      expect(the_bundle).to include_gems("rack 1.2")
+    end
+  end
+
   context "when a gem is available from multiple ambiguous sources", :bundler => "3" do
     it "raises, suggesting a source block" do
       build_repo4 do
