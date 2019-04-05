@@ -434,7 +434,7 @@ module Bundler
     # Used to make bin stubs that are not created by bundler work
     # under bundler. The new Gem.bin_path only considers gems in
     # +specs+
-    def replace_bin_path(specs, specs_by_name)
+    def replace_bin_path(specs_by_name)
       gem_class = (class << Gem; self; end)
 
       redefine_method(gem_class, :find_spec_for_exe) do |gem_name, *args|
@@ -442,7 +442,7 @@ module Bundler
         raise ArgumentError, "you must supply exec_name" unless exec_name
 
         spec_with_name = specs_by_name[gem_name]
-        matching_specs_by_exec_name = specs.select {|s| s.executables.include?(exec_name) }
+        matching_specs_by_exec_name = specs_by_name.values.select {|s| s.executables.include?(exec_name) }
         spec = matching_specs_by_exec_name.delete(spec_with_name)
 
         unless spec || !matching_specs_by_exec_name.empty?
@@ -525,7 +525,7 @@ module Bundler
 
       replace_gem(specs, specs_by_name)
       stub_rubygems(specs)
-      replace_bin_path(specs, specs_by_name)
+      replace_bin_path(specs_by_name)
       replace_refresh
 
       Gem.clear_paths
