@@ -357,8 +357,8 @@ RSpec.describe "major deprecations" do
       expect(deprecations).to be_empty
     end
 
-    xit "shows a deprecation", :bundler => "2" do
-      expect(deprecations).to include("Your Gemfile contains multiple primary sources.")
+    it "shows a deprecation", :bundler => "2" do
+      expect(deprecations).to include(a_string_containing("Your Gemfile contains multiple primary sources."))
     end
   end
 
