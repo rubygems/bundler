@@ -82,7 +82,6 @@ RSpec.describe "bundle list", :bundler => ">= 2" do
       build_git "git_test", "1.0.0", :path => lib_path("git_test")
 
       build_lib("gemspec_test", :path => tmp.join("gemspec_test")) do |s|
-        s.write("Gemfile", "source :rubygems\ngemspec")
         s.add_dependency "bar", "=1.0.0"
       end
 
