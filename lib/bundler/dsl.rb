@@ -582,7 +582,7 @@ The :#{name} git source is deprecated, and will be removed in the future.#{addit
         description = self.description
         if dsl_path && description =~ /((#{Regexp.quote File.expand_path(dsl_path)}|#{Regexp.quote dsl_path.to_s}):\d+)/
           trace_line = Regexp.last_match[1]
-          description = description.sub(/#{Regexp.quote trace_line}:\s*/, "").sub("\n", " - ")
+          description = description.sub(/\n.*\n(\.\.\.)? *\^~+$/, "").sub(/#{Regexp.quote trace_line}:\s*/, "").sub("\n", " - ")
         end
         [trace_line, description]
       end
