@@ -11,8 +11,6 @@ require "rubygems/source"
 require "bundler/match_platform"
 
 module Gem
-  @loaded_stacks = Hash.new {|h, k| h[k] = [] }
-
   class Specification
     attr_accessor :remote, :location, :relative_loaded_from
 
