@@ -14,7 +14,7 @@ When you're looking at a ticket, here are the main questions to ask:
   * Are the steps to reproduce the bug clearly documented in the ticket?
   * Which versions of Bundler (1.1.x, 1.2.x, git, etc.) manifest this bug?
   * Which operating systems (OS X, Windows, Ubuntu, CentOS, etc.) manifest this bug?
-  * Which rubies (MRI, JRuby, Rubinius, etc.) and which versions (1.8.7, 1.9.3, etc.) have this bug?
+  * Which rubies (MRI, JRuby, Rubinius, etc.) and which versions (2.5, 2.6, etc.) have this bug?
 
 Strategies for triaging a ticket:
   * Be sure to ask the user to output the entirety of their `bundle env`. Sometimes users forget to post all of their `bundle env` output in the issue.
