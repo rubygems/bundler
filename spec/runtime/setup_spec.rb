@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "tmpdir"
+require "tempfile"
+
 RSpec.describe "Bundler.setup" do
   describe "with no arguments" do
     it "makes all groups available" do
@@ -804,7 +807,7 @@ end
     let(:gem_home) { Dir.mktmpdir }
     let(:symlinked_gem_home) { Tempfile.new("gem_home").path }
     let(:bundler_dir) { ruby_core? ? File.expand_path("../../../..", __FILE__) : File.expand_path("../../..", __FILE__) }
-    let(:bundler_lib) { File.join(bundler_dir, "lib") }
+    let(:full_name) { "bundler-#{Bundler::VERSION}" }
 
     before do
       FileUtils.ln_sf(gem_home, symlinked_gem_home)
@@ -813,32 +816,30 @@ end
       Dir.mkdir(gems_dir)
       Dir.mkdir(specifications_dir)
 
-      FileUtils.ln_s(bundler_dir, File.join(gems_dir, "bundler-#{Bundler::VERSION}"))
+      FileUtils.ln_s(bundler_dir, File.join(gems_dir, full_name))
 
       gemspec_file = ruby_core? ? "#{bundler_dir}/lib/bundler/bundler.gemspec" : "#{bundler_dir}/bundler.gemspec"
-      gemspec = File.read(gemspec_file).
+      gemspec = File.binread(gemspec_file).
                 sub("Bundler::VERSION", %("#{Bundler::VERSION}"))
       gemspec = gemspec.lines.reject {|line| line =~ %r{lib/bundler/version} }.join
 
-      File.open(File.join(specifications_dir, "bundler.gemspec"), "wb") do |f|
+      File.open(File.join(specifications_dir, "#{full_name}.gemspec"), "wb") do |f|
         f.write(gemspec)
       end
     end
 
-    # Can't make this pass on 2.6 since the ruby standard library has the same $LOAD_PATH
-    # entry as bundler (since it's a default gem)
-    it "should successfully require 'bundler/setup'", :ruby_repo, :ruby => "< 2.6" do
+    it "should not remove itself from the LOAD_PATH and require a different copy of 'bundler/setup'", :ruby_repo do
       install_gemfile ""
 
-      ruby <<-'R', :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
-        # Remove any bundler that's not the current bundler from $LOAD_PATH
-        $LOAD_PATH.each do |path|
-          $LOAD_PATH.delete(path) if File.exist?("#{path}/bundler.rb")
+      ruby <<-R, :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
+        TracePoint.trace(:class) do |tp|
+          puts "OMG" if tp.path.include?("bundler") && !tp.path.start_with?("#{File.expand_path("../..", __dir__)}")
         end
-        puts (require 'bundler/setup')
+        gem 'bundler', '#{Bundler::VERSION}'
+        require 'bundler/setup'
       R
 
-      expect(out).to eql("true")
+      expect(out).to be_empty
     end
   end
 
