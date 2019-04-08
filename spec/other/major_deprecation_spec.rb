@@ -5,12 +5,10 @@ RSpec.describe "major deprecations" do
 
   describe "Bundler" do
     before do
-      create_file "gems.rb", <<-G
+      install_gemfile! <<-G
         source "file:#{gem_repo1}"
-        ruby #{RUBY_VERSION.dump}
         gem "rack"
       G
-      bundle! "install"
     end
 
     describe ".clean_env" do
@@ -98,165 +96,171 @@ RSpec.describe "major deprecations" do
         expect(deprecations).to include "Bundler.environment has been removed in favor of Bundler.load"
       end
     end
+  end
 
-    describe "bundle update --quiet" do
-      it "does not print any deprecations" do
-        bundle :update, :quiet => true
-        expect(deprecations).to be_empty
-      end
+  describe "bundle update --quiet" do
+    it "does not print any deprecations" do
+      bundle :update, :quiet => true
+      expect(deprecations).to be_empty
     end
+  end
 
-    describe "bundle config" do
-      describe "old list interface" do
-        before do
-          bundle! "config"
-        end
-
-        it "does not warn", :bundler => "< 2" do
-          expect(deprecations).to be_empty
-        end
-
-        it "warns", :bundler => "2" do
-          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config list` instead.")
-        end
-      end
-
-      describe "old get interface" do
-        before do
-          bundle! "config waka"
-        end
-
-        it "does not warn", :bundler => "< 2" do
-          expect(deprecations).to be_empty
-        end
-
-        it "warns", :bundler => "2" do
-          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config get waka` instead.")
-        end
-      end
-
-      describe "old set interface" do
-        before do
-          bundle! "config waka wakapun"
-        end
-
-        it "does not warn", :bundler => "< 2" do
-          expect(deprecations).to be_empty
-        end
-
-        it "warns", :bundler => "2" do
-          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config set waka wakapun` instead.")
-        end
-      end
-
-      describe "old set interface with --local" do
-        before do
-          bundle! "config --local waka wakapun"
-        end
-
-        it "does not warn", :bundler => "< 2" do
-          expect(deprecations).to be_empty
-        end
-
-        it "warns", :bundler => "2" do
-          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config set --local waka wakapun` instead.")
-        end
-      end
-
-      describe "old set interface with --global" do
-        before do
-          bundle! "config --global waka wakapun"
-        end
-
-        it "does not warn", :bundler => "< 2" do
-          expect(deprecations).to be_empty
-        end
-
-        it "warns", :bundler => "2" do
-          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config set --global waka wakapun` instead.")
-        end
-      end
-
-      describe "old unset interface" do
-        before do
-          bundle! "config --delete waka"
-        end
-
-        it "does not warn", :bundler => "< 2" do
-          expect(deprecations).to be_empty
-        end
-
-        it "warns", :bundler => "2" do
-          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config unset waka` instead.")
-        end
-      end
-
-      describe "old unset interface with --local" do
-        before do
-          bundle! "config --delete --local waka"
-        end
-
-        it "does not warn", :bundler => "< 2" do
-          expect(deprecations).to be_empty
-        end
-
-        it "warns", :bundler => "2" do
-          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config unset --local waka` instead.")
-        end
-      end
-
-      describe "old unset interface with --global" do
-        before do
-          bundle! "config --delete --global waka"
-        end
-
-        it "does not warn", :bundler => "< 2" do
-          expect(deprecations).to be_empty
-        end
-
-        it "warns", :bundler => "2" do
-          expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config unset --global waka` instead.")
-        end
-      end
-    end
-
-    describe "bundle update" do
+  describe "bundle config" do
+    describe "old list interface" do
       before do
-        bundle! "install"
+        bundle! "config"
       end
 
-      it "does not warn when no options are given", :bundler => "< 2" do
-        bundle! "update"
+      it "does not warn", :bundler => "< 2" do
         expect(deprecations).to be_empty
       end
 
-      it "warns when no options are given", :bundler => "2" do
-        bundle! "update"
-        expect(deprecations).to include("Pass --all to `bundle update` to update everything")
-      end
-
-      it "does not warn when --all is passed" do
-        bundle! "update --all"
-        expect(deprecations).to be_empty
+      it "warns", :bundler => "2" do
+        expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config list` instead.")
       end
     end
 
-    describe "bundle install --binstubs" do
+    describe "old get interface" do
       before do
-        bundle :install, :binstubs => true
+        bundle! "config waka"
       end
 
-      it "should print no deprecations", :bundler => "< 2" do
+      it "does not warn", :bundler => "< 2" do
         expect(deprecations).to be_empty
       end
 
-      it "should output a deprecation warning", :bundler => "2" do
-        expect(deprecations).to include("The --binstubs option will be removed in favor of `bundle binstubs`")
+      it "warns", :bundler => "2" do
+        expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config get waka` instead.")
+      end
+    end
+
+    describe "old set interface" do
+      before do
+        bundle! "config waka wakapun"
+      end
+
+      it "does not warn", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "warns", :bundler => "2" do
+        expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config set waka wakapun` instead.")
+      end
+    end
+
+    describe "old set interface with --local" do
+      before do
+        bundle! "config --local waka wakapun"
+      end
+
+      it "does not warn", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "warns", :bundler => "2" do
+        expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config set --local waka wakapun` instead.")
+      end
+    end
+
+    describe "old set interface with --global" do
+      before do
+        bundle! "config --global waka wakapun"
+      end
+
+      it "does not warn", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "warns", :bundler => "2" do
+        expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config set --global waka wakapun` instead.")
+      end
+    end
+
+    describe "old unset interface" do
+      before do
+        bundle! "config --delete waka"
+      end
+
+      it "does not warn", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "warns", :bundler => "2" do
+        expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config unset waka` instead.")
+      end
+    end
+
+    describe "old unset interface with --local" do
+      before do
+        bundle! "config --delete --local waka"
+      end
+
+      it "does not warn", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "warns", :bundler => "2" do
+        expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config unset --local waka` instead.")
+      end
+    end
+
+    describe "old unset interface with --global" do
+      before do
+        bundle! "config --delete --global waka"
+      end
+
+      it "does not warn", :bundler => "< 2" do
+        expect(deprecations).to be_empty
+      end
+
+      it "warns", :bundler => "2" do
+        expect(deprecations).to include("Using the `config` command without a subcommand [list, get, set, unset] is deprecated and will be removed in the future. Use `bundle config unset --global waka` instead.")
       end
     end
   end
 
-  context "when bundle install is run" do
+  describe "bundle update" do
+    before do
+      install_gemfile <<-G
+        source "file:#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    it "does not warn when no options are given", :bundler => "< 2" do
+      bundle! "update"
+      expect(deprecations).to be_empty
+    end
+
+    it "warns when no options are given", :bundler => "2" do
+      bundle! "update"
+      expect(deprecations).to include("Pass --all to `bundle update` to update everything")
+    end
+
+    it "does not warn when --all is passed" do
+      bundle! "update --all"
+      expect(deprecations).to be_empty
+    end
+  end
+
+  describe "bundle install --binstubs" do
+    before do
+      install_gemfile <<-G, :binstubs => true
+        source "file:#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    it "should print no deprecations", :bundler => "< 2" do
+      expect(deprecations).to be_empty
+    end
+
+    it "should output a deprecation warning", :bundler => "2" do
+      expect(deprecations).to include("The --binstubs option will be removed in favor of `bundle binstubs`")
+    end
+  end
+
+  context "bundle install with both gems.rb and Gemfile present" do
     it "should not warn about gems.rb" do
       create_file "gems.rb", <<-G
         source "file://#{gem_repo1}"
@@ -267,7 +271,7 @@ RSpec.describe "major deprecations" do
       expect(deprecations).to be_empty
     end
 
-    it "should print a proper warning when both gems.rb and Gemfile present, and use Gemfile", :bundler => "< 2" do
+    it "should print a proper warning, and use Gemfile", :bundler => "< 2" do
       create_file "gems.rb"
       install_gemfile! <<-G
         source "file://#{gem_repo1}"
@@ -281,7 +285,7 @@ RSpec.describe "major deprecations" do
       expect(the_bundle).to include_gem "rack 1.0"
     end
 
-    it "should print a proper warning when both gems.rb and Gemfile present, and use gems.rb", :bundler => "2" do
+    it "should print a proper warning, and use gems.rb", :bundler => "2" do
       create_file "gems.rb"
       install_gemfile! <<-G
         source "file://#{gem_repo1}"
@@ -294,48 +298,48 @@ RSpec.describe "major deprecations" do
 
       expect(the_bundle).not_to include_gem "rack 1.0"
     end
+  end
 
-    context "with flags" do
-      before do
-        install_gemfile <<-G, :path => "vendor/bundle"
-          source "file://#{gem_repo1}"
-          gem "rack"
-        G
+  context "bundle install with flags" do
+    before do
+      install_gemfile <<-G, :path => "vendor/bundle"
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    {
+      :clean => true,
+      :deployment => true,
+      :frozen => true,
+      :"no-cache" => true,
+      :"no-prune" => true,
+      :path => "vendor/bundle",
+      :shebang => "ruby27",
+      :system => true,
+      :without => "development",
+      :with => "development",
+    }.each do |name, value|
+      flag_name = "--#{name}"
+
+      context "with the #{flag_name} flag", :bundler => "2" do
+        it "should print a deprecation warning" do
+          bundle "install #{flag_name} #{value}"
+
+          expect(deprecations).to include(
+            "The `#{flag_name}` flag is deprecated because it relies on " \
+            "being remembered accross bundler invokations, which bundler " \
+            "will no longer do in future versions. Instead please use " \
+            "`bundle config #{name} '#{value}'`, and stop using this flag"
+          )
+        end
       end
 
-      {
-        :clean => true,
-        :deployment => true,
-        :frozen => true,
-        :"no-cache" => true,
-        :"no-prune" => true,
-        :path => "vendor/bundle",
-        :shebang => "ruby27",
-        :system => true,
-        :without => "development",
-        :with => "development",
-      }.each do |name, value|
-        flag_name = "--#{name}"
+      context "with the #{flag_name} flag", :bundler => "< 2" do
+        it "should not print a deprecation warning" do
+          bundle "install #{flag_name} #{value}"
 
-        context "with the #{flag_name} flag", :bundler => "2" do
-          it "should print a deprecation warning" do
-            bundle "install #{flag_name} #{value}"
-
-            expect(deprecations).to include(
-              "The `#{flag_name}` flag is deprecated because it relies on " \
-              "being remembered accross bundler invokations, which bundler " \
-              "will no longer do in future versions. Instead please use " \
-              "`bundle config #{name} '#{value}'`, and stop using this flag"
-            )
-          end
-        end
-
-        context "with the #{flag_name} flag", :bundler => "< 2" do
-          it "should not print a deprecation warning" do
-            bundle "install #{flag_name} #{value}"
-
-            expect(deprecations).to be_empty
-          end
+          expect(deprecations).to be_empty
         end
       end
     end
