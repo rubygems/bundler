@@ -14,16 +14,10 @@ module Gem
   class Specification
     attr_accessor :remote, :location, :relative_loaded_from
 
-    if instance_methods(false).include?(:source)
-      remove_method :source
-      attr_writer :source
-      def source
-        (defined?(@source) && @source) || Gem::Source::Installed.new
-      end
-    else
-      # rubocop:disable Lint/DuplicateMethods
-      attr_accessor :source
-      # rubocop:enable Lint/DuplicateMethods
+    remove_method :source
+    attr_writer :source
+    def source
+      (defined?(@source) && @source) || Gem::Source::Installed.new
     end
 
     alias_method :rg_full_gem_path, :full_gem_path
