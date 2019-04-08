@@ -4,14 +4,9 @@ require "pathname"
 
 require "rubygems/specification"
 
-begin
-  # Possible use in Gem::Specification#source below and require
-  # shouldn't be deferred.
-  require "rubygems/source"
-rescue LoadError
-  # Not available before RubyGems 2.0.0, ignore
-  nil
-end
+# Possible use in Gem::Specification#source below and require
+# shouldn't be deferred.
+require "rubygems/source"
 
 require "bundler/match_platform"
 
