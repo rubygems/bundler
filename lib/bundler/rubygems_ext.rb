@@ -23,8 +23,6 @@ module Gem
     alias_method :rg_full_gem_path, :full_gem_path
     alias_method :rg_loaded_from,   :loaded_from
 
-    attr_writer :full_gem_path unless instance_methods.include?(:full_gem_path=)
-
     def full_gem_path
       # this cannot check source.is_a?(Bundler::Plugin::API::Source)
       # because that _could_ trip the autoload, and if there are unresolved
