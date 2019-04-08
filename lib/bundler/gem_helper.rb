@@ -100,25 +100,13 @@ module Bundler
   protected
 
     def rubygem_push(path)
-      args = ["gem", "push", path]
-      args += ["--key", gem_key] if gem_key
-      args += ["--host", allowed_push_host] if allowed_push_host
-
+      gem_command = %W[gem push #{path}]
+      gem_command << "--key" << gem_key if gem_key
+      gem_command << "--host" << allowed_push_host if allowed_push_host
       unless allowed_push_host || Bundler.user_home.join(".gem/credentials").file?
         raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
       end
-
-      Bundler.ui.debug(args.join(" "))
-      SharedHelpers.chdir(base) do
-        IO.popen(args, :in => :in) do |io|
-          Thread.new { puts io.gets until io.eof? }.join
-          io.close
-        end
-      end
-
-      code = $?.exitstatus
-      exit code unless code.zero?
-
+      sh(gem_command)
       Bundler.ui.confirm "Pushed #{name} #{version} to #{gem_push_host}"
     end
 
@@ -204,7 +192,10 @@ module Bundler
     def sh_with_status(cmd, &block)
       Bundler.ui.debug(cmd)
       SharedHelpers.chdir(base) do
-        outbuf = IO.popen(cmd, :err => [:child, :out], &:read)
+        outbuf = IO.popen(cmd, :err => [:child, :out]) do |io|
+          Thread.new { print io.getc until io.eof? }.join
+          io.close
+        end
         status = $?
         block.call(outbuf) if status.success? && block
         [outbuf, status]
