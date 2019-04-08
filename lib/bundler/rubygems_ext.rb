@@ -21,7 +21,7 @@ module Gem
   class Specification
     attr_accessor :remote, :location, :relative_loaded_from
 
-    if instance_methods(false).map(&:to_sym).include?(:source)
+    if instance_methods(false).include?(:source)
       remove_method :source
       attr_writer :source
       def source
@@ -81,10 +81,7 @@ module Gem
       end
     end
 
-    # RubyGems 1.8+ used only.
-    methods = instance_methods(false)
-    gem_dir = methods.first.is_a?(String) ? "gem_dir" : :gem_dir
-    remove_method :gem_dir if methods.include?(gem_dir)
+    remove_method :gem_dir if instance_methods(false).include?(:gem_dir)
     def gem_dir
       full_gem_path
     end
