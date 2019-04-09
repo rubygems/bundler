@@ -725,7 +725,7 @@ RSpec.describe "bundle install with git sources" do
     build_lib "bar", :path => lib_path("foo/bar"), :gemspec => false do |s|
       s.write lib_path("foo/bar/lib/version.rb"), %(BAR_VERSION = '1.0')
       s.write "bar.gemspec", <<-G
-        $:.unshift Dir.pwd # For 1.9
+        $:.unshift Dir.pwd
         require 'lib/version'
         Gem::Specification.new do |s|
           s.name        = 'bar'

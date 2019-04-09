@@ -395,20 +395,6 @@ module Bundler
       Pathname.new(@root).join("config") if @root
     end
 
-    CONFIG_REGEX = %r{ # rubocop:disable Style/RegexpLiteral
-      ^
-      (BUNDLE_.+):\s # the key
-      (?: !\s)? # optional exclamation mark found with ruby 1.9.3
-      (['"]?) # optional opening quote
-      (.* # contents of the value
-        (?: # optionally, up until the next key
-          (\n(?!BUNDLE).+)*
-        )
-      )
-      \2 # matching closing quote
-      $
-    }xo.freeze
-
     def load_config(config_file)
       return {} if !config_file || ignore_config?
       SharedHelpers.filesystem_access(config_file, :read) do |file|

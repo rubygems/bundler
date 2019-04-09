@@ -11,17 +11,6 @@ require "bundler/constants"
 require "bundler/rubygems_integration"
 require "bundler/current_ruby"
 
-module Gem
-  class Dependency
-    # This is only needed for RubyGems < 1.4
-    unless method_defined? :requirement
-      def requirement
-        version_requirements
-      end
-    end
-  end
-end
-
 module Bundler
   module SharedHelpers
     def root
@@ -349,9 +338,6 @@ module Bundler
     end
 
     def clean_load_path
-      # handle 1.9 where system gems are always on the load path
-      return unless defined?(::Gem)
-
       bundler_lib = bundler_ruby_lib
 
       loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
