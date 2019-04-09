@@ -114,7 +114,11 @@ module Bundler
           end
 
           in_path do
-            git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*" #{extra_ref})
+            if remote?(uri)
+              git_retry %(fetch --force --quiet --depth 1 --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*" #{extra_ref})
+            else
+              git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*" #{extra_ref})
+            end
           end
         end
 
