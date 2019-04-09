@@ -192,13 +192,15 @@ module Bundler
     def sh_with_status(cmd, &block)
       Bundler.ui.debug(cmd)
       SharedHelpers.chdir(base) do
-        outbuf = IO.popen(cmd, :err => [:child, :out]) do |io|
-          Thread.new { print io.getc until io.eof? }.join
+        outbuf = StringIO.new
+        IO.popen(cmd, :err => [:child, :out]) do |io|
+          print outbuf.putc(io.getc) until io.eof?
           io.close
         end
         status = $?
-        block.call(outbuf) if status.success? && block
-        [outbuf, status]
+        output = outbuf.string
+        block.call(output) if status.success? && block
+        [output, status]
       end
     end
 
