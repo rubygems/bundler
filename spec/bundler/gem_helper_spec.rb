@@ -181,6 +181,7 @@ RSpec.describe Bundler::GemHelper do
           `git init`
           `git config user.email "you@example.com"`
           `git config user.name "name"`
+          `git config commit.gpgsign false`
           `git config push.default simple`
         end
 
@@ -208,11 +209,12 @@ RSpec.describe Bundler::GemHelper do
       end
 
       context "succeeds" do
+        let(:repo) { build_git("foo", :bare => true) }
+
         before do
-          Dir.chdir(gem_repo1) { `git init --bare` }
           Dir.chdir(app_path) do
-            `git remote add origin file://#{gem_repo1}`
-            `git commit -a -m "initial commit"`
+            sys_exec("git remote add origin file://#{repo.path}")
+            sys_exec('git commit -a -m "initial commit"')
           end
         end
 
