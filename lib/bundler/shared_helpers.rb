@@ -149,13 +149,9 @@ module Bundler
         break gemfiles.size != 1
       end
       return unless multiple_gemfiles
-      diagnosis = "Multiple gemfiles (gems.rb and Gemfile) detected."
-      advice = if Bundler.feature_flag.prefer_gems_rb?
-        "Make sure you remove Gemfile and Gemfile.lock since bundler is ignoring them in favor of gems.rb and gems.rb.locked."
-      else
-        "The gems.rb and gems.rb.locked files are currently ignored, but they will get used as soon as you delete your Gemfile and Gemfile.lock files."
-      end
-      Bundler.ui.warn [diagnosis, advice].join(" ")
+      message = "Multiple gemfiles (gems.rb and Gemfile) detected. " \
+                "Make sure you remove Gemfile and Gemfile.lock since bundler is ignoring them in favor of gems.rb and gems.rb.locked."
+      Bundler.ui.warn message
     end
 
     def trap(signal, override = false, &block)
@@ -235,13 +231,11 @@ module Bundler
     def find_gemfile(order_matters = false)
       given = ENV["BUNDLE_GEMFILE"]
       return given if given && !given.empty?
-      names = gemfile_names
-      names.reverse! if order_matters && Bundler.feature_flag.prefer_gems_rb?
-      find_file(*names)
+      find_file(*gemfile_names)
     end
 
     def gemfile_names
-      ["Gemfile", "gems.rb"]
+      ["gems.rb", "Gemfile"]
     end
 
     def find_file(*names)

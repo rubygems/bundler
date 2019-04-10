@@ -44,7 +44,6 @@ module Bundler
     settings_flag(:only_update_to_newer_versions) { bundler_3_mode? }
     settings_flag(:path_relative_to_cwd) { bundler_3_mode? }
     settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }
-    settings_flag(:prefer_gems_rb) { bundler_3_mode? }
     settings_flag(:print_only_version_number) { bundler_3_mode? }
     settings_flag(:setup_makes_kernel_gem_public) { !bundler_3_mode? }
     settings_flag(:skip_default_git_sources) { bundler_4_mode? }

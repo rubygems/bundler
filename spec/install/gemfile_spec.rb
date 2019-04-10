@@ -68,22 +68,6 @@ RSpec.describe "bundle install" do
     end
   end
 
-  context "with prefer_gems_rb set" do
-    before { bundle! "config set prefer_gems_rb true" }
-
-    it "prefers gems.rb to Gemfile" do
-      create_file("gems.rb", "gem 'bundler'")
-      create_file("Gemfile", "raise 'wrong Gemfile!'")
-
-      bundle! :install
-
-      expect(bundled_app("gems.rb")).to be_file
-      expect(bundled_app("Gemfile.lock")).not_to be_file
-
-      expect(the_bundle).to include_gem "bundler #{Bundler::VERSION}"
-    end
-  end
-
   context "with engine specified in symbol" do
     it "does not raise any error parsing Gemfile" do
       simulate_ruby_version "2.3.0" do
