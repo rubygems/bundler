@@ -94,7 +94,7 @@ RSpec.describe "bundle executable" do
       end
     end
 
-    let(:bundler_version) { "1.1" }
+    let(:bundler_version) { "2.1" }
     let(:latest_version) { nil }
     before do
       bundle! "config set --global disable_version_check false"
@@ -125,7 +125,7 @@ RSpec.describe "bundle executable" do
       let(:latest_version) { "222.0" }
       it "prints the version warning" do
         bundle "fail"
-        expect(last_command.stdout).to start_with(<<-EOS.strip)
+        expect(err).to start_with(<<-EOS.strip)
 The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
 To install the latest version, run `gem install bundler`
         EOS
@@ -150,7 +150,7 @@ To install the latest version, run `gem install bundler`
         let(:latest_version) { "222.0.0.pre.4" }
         it "prints the version warning" do
           bundle "fail"
-          expect(last_command.stdout).to start_with(<<-EOS.strip)
+          expect(err).to start_with(<<-EOS.strip)
 The latest bundler is #{latest_version}, but you are currently running #{bundler_version}.
 To install the latest version, run `gem install bundler --pre`
           EOS
