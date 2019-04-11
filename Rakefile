@@ -210,7 +210,6 @@ namespace :man do
 
     require "ronn"
   rescue LoadError
-    task(:require) { abort "We couln't activate ronn (#{ronn_requirement}). Try `gem install ronn:'#{ronn_requirement}'` to be able to release!" }
     task(:build) { abort "We couln't activate ronn (#{ronn_requirement}). Try `gem install ronn:'#{ronn_requirement}'` to be able to build the help pages" }
   else
     directory "man"
@@ -263,8 +262,6 @@ namespace :man do
     task :clobber do
       rm_rf "lib/bundler/man"
     end
-
-    task(:require) {}
   end
 end
 
