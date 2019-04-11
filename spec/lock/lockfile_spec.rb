@@ -227,7 +227,7 @@ RSpec.describe "the lockfile format" do
     G
 
     expect(last_command).to be_failure
-    expect(last_command.bundler_err).to include("You must use Bundler 9999999 or greater with this lockfile.")
+    expect(err).to include("You must use Bundler 9999999 or greater with this lockfile.")
   end
 
   it "shows a friendly error when running with a new bundler 2 lockfile" do
@@ -1579,7 +1579,7 @@ RSpec.describe "the lockfile format" do
       gem "rack"
     G
 
-    expect(last_command.bundler_err).to match(/your Gemfile.lock contains merge conflicts/i)
-    expect(last_command.bundler_err).to match(/git checkout HEAD -- Gemfile.lock/i)
+    expect(err).to match(/your Gemfile.lock contains merge conflicts/i)
+    expect(err).to match(/git checkout HEAD -- Gemfile.lock/i)
   end
 end
