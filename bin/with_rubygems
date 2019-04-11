@@ -4,7 +4,7 @@
 require "pathname"
 
 def run(*cmd)
-  return if system(*cmd)
+  return if system(*cmd, :out => IO::NULL)
   raise "Running `#{cmd.join(" ")}` failed"
 end
 
@@ -20,8 +20,6 @@ unless rubygems_path.directory?
     run("git remote update")
     version = "v#{version}" if version =~ /\A\d/
     run("git", "checkout", version, "--quiet")
-    hash = `git rev-parse HEAD`.chomp
-    puts "Checked out rubygems '#{version}' at #{hash}"
   end
 end
 
