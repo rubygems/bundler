@@ -48,7 +48,7 @@ RSpec.describe "bundle install" do
 
         Could not find gem 'bundler (= 0.9.2)' in any
         E
-      expect(last_command.bundler_err).to include(nice_error)
+      expect(err).to include(nice_error)
     end
 
     it "works for gems with multiple versions in its dependencies" do
@@ -104,7 +104,7 @@ RSpec.describe "bundle install" do
             rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
       E
-      expect(last_command.bundler_err).to include(nice_error)
+      expect(err).to include(nice_error)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -122,7 +122,7 @@ RSpec.describe "bundle install" do
             rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
       E
-      expect(last_command.bundler_err).to include(nice_error)
+      expect(err).to include(nice_error)
     end
 
     it "can install dependencies with newer bundler version with system gems" do

@@ -27,10 +27,6 @@ module Spec
       @stdboth ||= [stderr, stdout].join("\n").strip
     end
 
-    def bundler_err
-      stderr
-    end
-
     def to_s_verbose
       [
         to_s,

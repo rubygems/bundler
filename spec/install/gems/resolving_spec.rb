@@ -171,7 +171,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
             Ruby\0 (> 9000), which is required by gem 'require_ruby', is not available in the local ruby installation
           E
-          expect(last_command.bundler_err).to end_with(nice_error)
+          expect(err).to end_with(nice_error)
         end
       end
 

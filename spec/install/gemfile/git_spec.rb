@@ -1197,7 +1197,7 @@ RSpec.describe "bundle install with git sources" do
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
-      expect(last_command.bundler_err).to end_with(<<-M.strip)
+      expect(err).to end_with(<<-M.strip)
 An error occurred while installing foo (1.0), and Bundler cannot continue.
 
 In Gemfile:
@@ -1380,7 +1380,7 @@ In Gemfile:
       with_path_as("") do
         bundle "update", :all => true
       end
-      expect(last_command.bundler_err).
+      expect(err).
         to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")
     end
 

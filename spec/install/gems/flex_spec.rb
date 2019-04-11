@@ -209,7 +209,7 @@ RSpec.describe "bundle flex_install" do
       E
 
       bundle :install, :retry => 0
-      expect(last_command.bundler_err).to end_with(nice_error)
+      expect(err).to end_with(nice_error)
     end
   end
 

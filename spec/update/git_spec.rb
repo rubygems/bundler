@@ -192,7 +192,7 @@ RSpec.describe "bundle update" do
       lib_path("foo-1.0").join(".git").rmtree
 
       bundle :update, :all => true
-      expect(last_command.bundler_err).to include(lib_path("foo-1.0").to_s).
+      expect(err).to include(lib_path("foo-1.0").to_s).
         and match(/Git error: command `git fetch.+has failed/)
     end
 

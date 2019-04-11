@@ -430,7 +430,7 @@ E
 
       bundle "config set --global --local foo 5"
       expect(last_command).to be_failure
-      expect(last_command.bundler_err).to eq "The options global and local were specified. Please only use one of the switches at a time."
+      expect(err).to eq "The options global and local were specified. Please only use one of the switches at a time."
     end
 
     it "unset" do
@@ -470,7 +470,7 @@ E
 
       bundle "config unset foo --local --global"
       expect(last_command).to be_failure
-      expect(last_command.bundler_err).to eq "The options global and local were specified. Please only use one of the switches at a time."
+      expect(err).to eq "The options global and local were specified. Please only use one of the switches at a time."
     end
   end
 end

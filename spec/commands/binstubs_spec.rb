@@ -70,7 +70,7 @@ RSpec.describe "bundle binstubs <gem>" do
 
       bundle "binstubs rack", :all => true
       expect(last_command).to be_failure
-      expect(last_command.bundler_err).to include("Cannot specify --all with specific gems")
+      expect(err).to include("Cannot specify --all with specific gems")
     end
 
     context "when generating bundle binstub outside bundler" do
