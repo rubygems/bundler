@@ -23,12 +23,12 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
     gemfile <<-G
       source "https://rubygems.org"
 
-      gem 'rails', '~> 3.0'
+      gem 'rails', '~> 5.0'
       gem 'capybara', '~> 2.2.0'
       gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
     bundle! :lock
-    expect(lockfile).to include(rubygems_version("rails", "~> 3.0"))
+    expect(lockfile).to include(rubygems_version("rails", "~> 5.0"))
     expect(lockfile).to include("capybara (2.2.1)")
   end
 
@@ -37,7 +37,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
       source "https://rubygems.org"
 
       gem "sass-rails"
-      gem "rails", "~> 3"
+      gem "rails", "~> 5"
       gem "gxapi_rails", "< 0.1.0" # 0.1.0 was released way after the test was written
       gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
@@ -150,7 +150,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
             activemodel (= 4.2.7.1)
             activerecord (= 4.2.7.1)
             activesupport (= 4.2.7.1)
-            bundler (>= 1.3.0, < 2.0)
+            bundler (>= 1.3.0, < 3.0)
             railties (= 4.2.7.1)
             sprockets-rails
           rails-deprecated_sanitizer (1.0.3)
@@ -201,7 +201,8 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
       gem 'rack', '1.0.1'
     G
 
-    bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
+    bundle "config set --local path vendor/bundle"
+    bundle! :install
     expect(err).not_to include("Could not find rake")
     expect(last_command.stderr).to be_empty
   end

@@ -61,17 +61,23 @@ RSpec.describe Bundler::Dsl do
         it_behaves_like "the github DSL", "https"
       end
 
-      context "when github.https config is false" do
+      context "when github.https config is false", :bundler => "2" do
         before { bundle "config set github.https false" }
 
         it_behaves_like "the github DSL", "git"
       end
 
-      context "by default", :bundler => "< 2" do
-        it_behaves_like "the github DSL", "git"
+      context "when github.https config is false", :bundler => "3" do
+        before { bundle "config set github.https false" }
+
+        pending "should show a proper message about the removed setting"
       end
 
       context "by default", :bundler => "2" do
+        it_behaves_like "the github DSL", "https"
+      end
+
+      context "by default", :bundler => "3" do
         it_behaves_like "the github DSL", "https"
       end
 
@@ -266,7 +272,7 @@ RSpec.describe Bundler::Dsl do
     #   gem 'spree_api'
     #   gem 'spree_backend'
     # end
-    describe "#github", :bundler => "< 2" do
+    describe "#github", :bundler => "< 3" do
       it "from github" do
         spree_gems = %w[spree_core spree_api spree_backend]
         subject.github "spree" do
@@ -274,12 +280,12 @@ RSpec.describe Bundler::Dsl do
         end
 
         subject.dependencies.each do |d|
-          expect(d.source.uri).to eq("git://github.com/spree/spree.git")
+          expect(d.source.uri).to eq("https://github.com/spree/spree.git")
         end
       end
     end
 
-    describe "#github", :bundler => "2" do
+    describe "#github", :bundler => "3" do
       it "from github" do
         spree_gems = %w[spree_core spree_api spree_backend]
         subject.github "spree" do

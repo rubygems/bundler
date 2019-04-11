@@ -56,29 +56,19 @@ RSpec.describe "bundle install" do
     end
   end
 
-  describe "with --force" do
+  describe "with --force", :bundler => 2 do
     it_behaves_like "an option to force redownloading gems" do
       let(:flag) { "force" }
     end
 
-    it "shows a deprecation when single flag passed", :bundler => 2 do
+    it "shows a deprecation when single flag passed" do
       bundle! "install --force"
       expect(err).to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
     end
 
-    it "shows a deprecation when multiple flags passed", :bundler => 2 do
+    it "shows a deprecation when multiple flags passed" do
       bundle! "install --no-color --force"
       expect(err).to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
-    end
-
-    it "does not show a deprecation when single flag passed", :bundler => "< 2" do
-      bundle! "install --force"
-      expect(out).not_to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
-    end
-
-    it "does not show a deprecation when multiple flags passed", :bundler => "< 2" do
-      bundle! "install --no-color --force"
-      expect(out).not_to include "[DEPRECATED] The `--force` option has been renamed to `--redownload`"
     end
   end
 
