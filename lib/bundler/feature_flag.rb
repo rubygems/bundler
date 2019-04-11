@@ -35,13 +35,12 @@ module Bundler
     settings_flag(:cache_command_is_package) { bundler_2_mode? }
     settings_flag(:default_install_uses_path) { bundler_2_mode? }
     settings_flag(:deployment_means_frozen) { bundler_2_mode? }
-    settings_flag(:disable_multisource) { bundler_2_mode? }
+    settings_flag(:disable_multisource) { bundler_3_mode? }
     settings_flag(:error_on_stderr) { bundler_2_mode? }
     settings_flag(:forget_cli_options) { bundler_3_mode? }
     settings_flag(:global_path_appends_ruby_scope) { bundler_2_mode? }
     settings_flag(:global_gem_cache) { bundler_2_mode? }
     settings_flag(:init_gems_rb) { bundler_2_mode? }
-    settings_flag(:lockfile_uses_separate_rubygems_sources) { bundler_2_mode? }
     settings_flag(:only_update_to_newer_versions) { bundler_2_mode? }
     settings_flag(:path_relative_to_cwd) { bundler_2_mode? }
     settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }

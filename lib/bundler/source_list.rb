@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "set"
+
 module Bundler
   class SourceList
     attr_reader :path_sources,
@@ -41,17 +43,14 @@ module Bundler
     end
 
     def global_rubygems_source=(uri)
-      if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      if Bundler.feature_flag.disable_multisource?
         @global_rubygems_source ||= rubygems_aggregate_class.new("remotes" => uri)
       end
       add_rubygems_remote(uri)
     end
 
     def add_rubygems_remote(uri)
-      if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
-        return if Bundler.feature_flag.disable_multisource?
-        raise InvalidOption, "`lockfile_uses_separate_rubygems_sources` cannot be set without `disable_multisource` being set"
-      end
+      return if Bundler.feature_flag.disable_multisource?
       @rubygems_aggregate.add_remote(uri)
       @rubygems_aggregate
     end
@@ -78,7 +77,7 @@ module Bundler
 
     def lock_sources
       lock_sources = (path_sources + git_sources + plugin_sources).sort_by(&:to_s)
-      if Bundler.feature_flag.lockfile_uses_separate_rubygems_sources?
+      if Bundler.feature_flag.disable_multisource?
         lock_sources + rubygems_sources.sort_by(&:to_s)
       else
         lock_sources << combine_rubygems_sources
@@ -95,7 +94,7 @@ module Bundler
         end
       end
 
-      replacement_rubygems = !Bundler.feature_flag.lockfile_uses_separate_rubygems_sources? &&
+      replacement_rubygems = !Bundler.feature_flag.disable_multisource? &&
         replacement_sources.detect {|s| s.is_a?(Source::Rubygems) }
       @rubygems_aggregate = replacement_rubygems if replacement_rubygems
 
