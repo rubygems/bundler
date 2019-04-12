@@ -887,7 +887,7 @@ Usage: "bundle gem NAME [OPTIONS]"
         FileUtils.mkdir_p("conflict-foobar/Gemfile")
       end
       bundle! "gem conflict-foobar"
-      expect(last_command.stdout).to include("file_clash  conflict-foobar/Gemfile").
+      expect(out).to include("file_clash  conflict-foobar/Gemfile").
         and include "Initializing git repo in #{bundled_app("conflict-foobar")}"
     end
   end

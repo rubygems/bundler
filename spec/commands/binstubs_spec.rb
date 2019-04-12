@@ -173,7 +173,7 @@ RSpec.describe "bundle binstubs <gem>" do
 
         it "calls through to the latest bundler version" do
           sys_exec! "#{bundled_app("bin/bundle")} update --bundler"
-          expect(last_command.stdout).to eq %(system bundler #{system_bundler_version}\n["update", "--bundler"])
+          expect(out).to eq %(system bundler #{system_bundler_version}\n["update", "--bundler"])
         end
 
         it "calls through to the explicit bundler version" do

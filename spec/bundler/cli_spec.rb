@@ -31,7 +31,7 @@ RSpec.describe "bundle executable" do
     it "prints a concise help message", :bundler => "3" do
       bundle! ""
       expect(err).to be_empty
-      expect(last_command.stdout).to include("Bundler version #{Bundler::VERSION}").
+      expect(out).to include("Bundler version #{Bundler::VERSION}").
         and include("\n\nBundler commands:\n\n").
         and include("\n\n  Primary commands:\n").
         and include("\n\n  Utilities:\n").
@@ -72,17 +72,17 @@ RSpec.describe "bundle executable" do
     it "prints the running command" do
       gemfile ""
       bundle! "info bundler", :verbose => true
-      expect(last_command.stdout).to start_with("Running `bundle info bundler --verbose` with bundler #{Bundler::VERSION}")
+      expect(out).to start_with("Running `bundle info bundler --verbose` with bundler #{Bundler::VERSION}")
     end
 
     it "doesn't print defaults" do
       install_gemfile! "", :verbose => true
-      expect(last_command.stdout).to start_with("Running `bundle install --retry 0 --verbose` with bundler #{Bundler::VERSION}")
+      expect(out).to start_with("Running `bundle install --retry 0 --verbose` with bundler #{Bundler::VERSION}")
     end
 
     it "doesn't print defaults" do
       install_gemfile! "", :verbose => true
-      expect(last_command.stdout).to start_with("Running `bundle install --retry 0 --verbose` with bundler #{Bundler::VERSION}")
+      expect(out).to start_with("Running `bundle install --retry 0 --verbose` with bundler #{Bundler::VERSION}")
     end
   end
 

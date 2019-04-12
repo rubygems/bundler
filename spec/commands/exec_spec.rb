@@ -586,7 +586,7 @@ RSpec.describe "bundle exec" do
         subject
         expect(exitstatus).to eq(exit_code) if exitstatus
         expect(err).to eq(expected_err)
-        expect(last_command.stdout).to eq(expected)
+        expect(out).to eq(expected)
       end
     end
 

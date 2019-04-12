@@ -274,6 +274,6 @@ RSpec.describe "bundler/inline#gemfile" do
       puts RACK
     RUBY
     expect(last_command).to be_success
-    expect(last_command.stdout).to eq "1.0.0"
+    expect(out).to eq "1.0.0"
   end
 end
