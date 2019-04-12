@@ -154,7 +154,7 @@ RSpec.describe "the lockfile format" do
     G
   end
 
-  it "outputs a warning if the current is older than lockfile's bundler version" do
+  it "warns if the current is older than lockfile's bundler version" do
     current_version = Bundler::VERSION
     newer_minor = bump_minor(current_version)
 
