@@ -40,7 +40,6 @@ module Bundler
     settings_flag(:forget_cli_options) { bundler_3_mode? }
     settings_flag(:global_path_appends_ruby_scope) { bundler_3_mode? }
     settings_flag(:global_gem_cache) { bundler_3_mode? }
-    settings_flag(:init_gems_rb) { bundler_3_mode? }
     settings_flag(:only_update_to_newer_versions) { bundler_3_mode? }
     settings_flag(:path_relative_to_cwd) { bundler_3_mode? }
     settings_flag(:plugins) { @bundler_version >= Gem::Version.new("1.14") }
