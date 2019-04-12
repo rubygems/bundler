@@ -361,7 +361,7 @@ RSpec.describe "bundle install with platform conditionals" do
   it "does not attempt to install gems from other rubies when using --local" do
     simulate_platform "ruby"
     simulate_ruby_engine "ruby"
-    other_ruby_version_tag = RUBY_VERSION =~ /^1\.8/ ? :ruby_19 : :ruby_18
+    other_ruby_version_tag = RUBY_VERSION =~ /^2\.6/ ? :ruby_26 : :ruby_25
 
     gemfile <<-G
       source "file://#{gem_repo1}"

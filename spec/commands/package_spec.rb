@@ -197,7 +197,7 @@ RSpec.describe "bundle package" do
     it "puts the gems in vendor/cache even for other rubies" do
       gemfile <<-D
         source "file://#{gem_repo1}"
-        gem 'rack', :platforms => :ruby_19
+        gem 'rack', :platforms => :ruby_23
       D
 
       bundle "package --all-platforms"

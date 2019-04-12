@@ -141,8 +141,7 @@ RSpec.describe Bundler::Dsl do
   end
 
   describe "#gem" do
-    [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :ruby_22, :ruby_23, :ruby_24, :ruby_25, :mri, :mri_18, :mri_19,
-     :mri_20, :mri_21, :mri_22, :mri_23, :mri_24, :mri_25, :jruby, :rbx, :truffleruby].each do |platform|
+    [:ruby, :ruby_23, :ruby_24, :ruby_25, :mri, :mri_23, :mri_24, :mri_25, :jruby, :rbx, :truffleruby].each do |platform|
       it "allows #{platform} as a valid platform" do
         subject.gem("foo", :platform => platform)
       end
@@ -331,7 +330,7 @@ RSpec.describe Bundler::Dsl do
     end
   end
 
-  describe "Runtime errors", :unless => Bundler.current_ruby.on_18? do
+  describe "Runtime errors" do
     it "will raise a Bundler::GemfileError" do
       gemfile "s = 'foo'.freeze; s.strip!"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.

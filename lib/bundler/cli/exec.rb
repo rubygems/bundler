@@ -13,7 +13,7 @@ module Bundler
       @cmd = args.shift
       @args = args
 
-      if Bundler.current_ruby.ruby_2? && !Bundler.current_ruby.jruby?
+      if !Bundler.current_ruby.jruby?
         @args << { :close_others => !options.keep_file_descriptors? }
       elsif options.keep_file_descriptors?
         Bundler.ui.warn "Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec."
@@ -28,11 +28,7 @@ module Bundler
           return kernel_load(bin_path, *args)
         end
         # First, try to exec directly to something in PATH
-        if Bundler.current_ruby.jruby_18?
-          kernel_exec(bin_path, *args)
-        else
-          kernel_exec([bin_path, cmd], *args)
-        end
+        kernel_exec([bin_path, cmd], *args)
       else
         # exec using the given command
         kernel_exec(cmd, *args)
