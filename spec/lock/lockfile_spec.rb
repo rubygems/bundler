@@ -155,6 +155,9 @@ RSpec.describe "the lockfile format" do
   end
 
   it "outputs a warning if the current is older than lockfile's bundler version" do
+    current_version = Bundler::VERSION
+    newer_minor = bump_minor(current_version)
+
     lockfile <<-L
       GEM
         remote: file://localhost#{gem_repo1}/
@@ -162,27 +165,26 @@ RSpec.describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
 
       BUNDLED WITH
-         9999999.1.0
+         #{newer_minor}
     L
 
-    simulate_bundler_version "9999999.0.0" do
-      install_gemfile <<-G
-        source "file://localhost#{gem_repo1}"
+    install_gemfile <<-G
+      source "file://localhost#{gem_repo1}"
 
-        gem "rack"
-      G
-    end
+      gem "rack"
+    G
 
-    warning_message = "the running version of Bundler (9999999.0.0) is older " \
-                      "than the version that created the lockfile (9999999.1.0). " \
+    pre_flag = prerelease?(newer_minor) ? " --pre" : ""
+    warning_message = "the running version of Bundler (#{current_version}) is older " \
+                      "than the version that created the lockfile (#{newer_minor}). " \
                       "We suggest you to upgrade to the version that created the " \
-                      "lockfile by running `gem install bundler:9999999.1.0`."
+                      "lockfile by running `gem install bundler:#{newer_minor}#{pre_flag}`."
     expect(err).to include warning_message
 
     lockfile_should_be <<-G
@@ -192,18 +194,20 @@ RSpec.describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
-        #{specific_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
 
       BUNDLED WITH
-         9999999.1.0
+         #{newer_minor}
     G
   end
 
   it "warns when updating bundler major version" do
+    current_version = Bundler::VERSION
+    older_major = previous_major(current_version)
+
     lockfile <<-L
       GEM
         remote: file://localhost#{gem_repo1}/
@@ -211,43 +215,41 @@ RSpec.describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic_local_platform}
+        #{lockfile_platforms}
 
       DEPENDENCIES
         rack
 
       BUNDLED WITH
-         1.10.0
+         #{older_major}
     L
 
-    simulate_bundler_version "9999999.0.0" do
-      install_gemfile <<-G
-        source "file://localhost#{gem_repo1}/"
+    install_gemfile <<-G
+      source "file://localhost#{gem_repo1}/"
 
-        gem "rack"
-      G
+      gem "rack"
+    G
 
-      expect(err).to include(
-        "Warning: the lockfile is being updated to Bundler " \
-        "9999999, after which you will be unable to return to Bundler 1."
-      )
+    expect(err).to include(
+      "Warning: the lockfile is being updated to Bundler " \
+      "#{current_version.split(".").first}, after which you will be unable to return to Bundler #{older_major.split(".").first}."
+    )
 
-      lockfile_should_be <<-G
-        GEM
-          remote: file://localhost#{gem_repo1}/
-          specs:
-            rack (1.0.0)
+    lockfile_should_be <<-G
+      GEM
+        remote: file://localhost#{gem_repo1}/
+        specs:
+          rack (1.0.0)
 
-        PLATFORMS
-          #{lockfile_platforms}
+      PLATFORMS
+        #{lockfile_platforms}
 
-        DEPENDENCIES
-          rack
+      DEPENDENCIES
+        rack
 
-        BUNDLED WITH
-           9999999.0.0
-      G
-    end
+      BUNDLED WITH
+         #{current_version}
+    G
   end
 
   it "generates a simple lockfile for a single source, gem with dependencies" do
@@ -1468,5 +1470,23 @@ RSpec.describe "the lockfile format" do
 
     expect(err).to match(/your Gemfile.lock contains merge conflicts/i)
     expect(err).to match(/git checkout HEAD -- Gemfile.lock/i)
+  end
+
+private
+
+  def prerelease?(version)
+    Gem::Version.new(version).prerelease?
+  end
+
+  def previous_major(version)
+    version.split(".").map.with_index {|v, i| i == 0 ? v.to_i - 1 : v }.join(".")
+  end
+
+  def bump_minor(version)
+    bump(version, 1)
+  end
+
+  def bump(version, segment)
+    version.split(".").map.with_index {|v, i| i == segment ? v.to_i + 1 : v }.join(".")
   end
 end
