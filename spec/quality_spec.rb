@@ -225,9 +225,9 @@ RSpec.describe "The library itself" do
         end
 
         # there's no way around this warning
-        last_command.stderr.sub!(/^YAML safe loading.*/, "")
+        err.sub!(/^YAML safe loading.*/, "")
 
-        expect(last_command.stderr).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
+        expect(err).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
       ensure
         # clean up the .gem generated
         FileUtils.rm("bundler-#{Bundler::VERSION}.gem")

@@ -51,7 +51,7 @@ module Spec
     MAJOR_DEPRECATION = /^\[DEPRECATED\]\s*/.freeze
 
     def err_without_deprecations
-      last_command.stderr.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "")
+      err.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "")
     end
 
     def deprecations

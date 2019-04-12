@@ -204,7 +204,7 @@ RSpec.describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(last_command.stderr).to be_empty
+      expect(err).to be_empty
 
       run <<-RUBY
         require 'foo'
@@ -234,7 +234,7 @@ RSpec.describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(last_command.stderr).to be_empty
+      expect(err).to be_empty
 
       run! <<-RUBY
         require 'foo'
@@ -270,7 +270,7 @@ RSpec.describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(last_command.stderr).to be_empty
+      expect(err).to be_empty
 
       run! <<-RUBY
         require 'foo'
@@ -515,7 +515,7 @@ RSpec.describe "bundle install with git sources" do
       bundle solution
       bundle :install
 
-      expect(last_command.stderr).to be_empty
+      expect(err).to be_empty
     end
 
     it "explodes and gives correct solution if branch is not given on install" do
@@ -537,7 +537,7 @@ RSpec.describe "bundle install with git sources" do
       bundle solution
       bundle :install
 
-      expect(last_command.stderr).to be_empty
+      expect(err).to be_empty
     end
 
     it "does not explode if disable_local_branch_check is given" do

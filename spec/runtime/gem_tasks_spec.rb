@@ -22,7 +22,7 @@ RSpec.describe "require 'bundler/gem_tasks'", :ruby_repo do
       sys_exec "#{rake} -T"
     end
 
-    expect(last_command.stderr).to eq("")
+    expect(err).to eq("")
     expected_tasks = [
       "rake build",
       "rake clean",

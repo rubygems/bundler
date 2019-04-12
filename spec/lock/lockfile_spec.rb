@@ -183,7 +183,7 @@ RSpec.describe "the lockfile format" do
                       "than the version that created the lockfile (9999999.1.0). " \
                       "We suggest you to upgrade to the version that created the " \
                       "lockfile by running `gem install bundler:9999999.1.0`."
-    expect(last_command.stderr).to include warning_message
+    expect(err).to include warning_message
 
     lockfile_should_be <<-G
       GEM
@@ -293,7 +293,7 @@ RSpec.describe "the lockfile format" do
       G
     end
 
-    expect(last_command.stderr).to include(
+    expect(err).to include(
       "Warning: the lockfile is being updated to Bundler " \
       "9999999, after which you will be unable to return to Bundler 1."
     )
@@ -340,7 +340,7 @@ RSpec.describe "the lockfile format" do
         gem "rack"
       G
 
-      expect(last_command.stderr).to include(
+      expect(err).to include(
         "Warning: the lockfile is being updated to Bundler " \
         "9999999, after which you will be unable to return to Bundler 1."
       )
