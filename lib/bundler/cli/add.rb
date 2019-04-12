@@ -2,12 +2,13 @@
 
 module Bundler
   class CLI::Add
-    attr_reader :gems, :options
+    attr_reader :gems, :options, :version
 
     def initialize(options, gems)
       @gems = gems
       @options = options
       @options[:group] = options[:group].split(",").map(&:strip) if !options[:group].nil? && !options[:group].empty?
+      @version = options[:version].split(",").map(&:strip) unless options[:version].nil?
     end
 
     def run
@@ -15,8 +16,6 @@ module Bundler
 
       # raise error when no gems are specified
       raise InvalidOption, "Please specify gems to add." if gems.empty?
-
-      version = options[:version].nil? ? nil : options[:version].split(",").map(&:strip)
 
       unless version.nil?
         version.each do |v|
