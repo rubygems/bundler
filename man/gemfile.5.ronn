@@ -62,7 +62,7 @@ The version of Ruby that your application requires. If your application
 requires an alternate Ruby engine, such as JRuby, Rubinius or TruffleRuby, this
 should be the Ruby version that the engine is compatible with.
 
-    ruby "1.9.3"
+    ruby "2.6.2"
 
 ### ENGINE
 
@@ -91,7 +91,7 @@ Each application _may_ specify a Ruby engine version. If an engine version is
 specified, an engine _must_ also be specified. If the engine is "ruby" the
 engine version specified _must_ match the Ruby version.
 
-    ruby "1.8.7", :engine => "jruby", :engine_version => "1.6.7"
+    ruby "2.5.3", :engine => "jruby", :engine_version => "9.2.6.0"
 
 ### PATCHLEVEL
 
