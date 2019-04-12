@@ -47,7 +47,7 @@ namespace :spec do
     end]
 
     # JRuby can't build ronn, so we skip that
-    deps.delete("ronn") if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
+    deps.delete("ronn") if RUBY_ENGINE == "jruby"
 
     gem_install_command = "install --no-document --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
       "'#{name}:#{version}'"
