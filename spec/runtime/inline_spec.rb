@@ -290,4 +290,17 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(last_command).to be_success
     expect(out).to eq "1.0.0"
   end
+
+  it "skips platform warnings" do
+    simulate_platform "ruby"
+
+    script <<-RUBY
+      gemfile(true) do
+        source "file://#{gem_repo1}"
+        gem "rack", platform: :jruby
+      end
+    RUBY
+
+    expect(err).to be_empty
+  end
 end
