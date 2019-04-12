@@ -2,19 +2,21 @@
 
 module Bundler
   class CLI::Add
+    attr_reader :gems, :options
+
     def initialize(options, gems)
       @gems = gems
       @options = options
-      @options[:group] = @options[:group].split(",").map(&:strip) if !@options[:group].nil? && !@options[:group].empty?
+      @options[:group] = options[:group].split(",").map(&:strip) if !options[:group].nil? && !options[:group].empty?
     end
 
     def run
-      raise InvalidOption, "You can not specify `--strict` and `--optimistic` at the same time." if @options[:strict] && @options[:optimistic]
+      raise InvalidOption, "You can not specify `--strict` and `--optimistic` at the same time." if options[:strict] && options[:optimistic]
 
       # raise error when no gems are specified
-      raise InvalidOption, "Please specify gems to add." if @gems.empty?
+      raise InvalidOption, "Please specify gems to add." if gems.empty?
 
-      version = @options[:version].nil? ? nil : @options[:version].split(",").map(&:strip)
+      version = options[:version].nil? ? nil : options[:version].split(",").map(&:strip)
 
       unless version.nil?
         version.each do |v|
@@ -22,14 +24,14 @@ module Bundler
         end
       end
 
-      dependencies = @gems.map {|g| Bundler::Dependency.new(g, version, @options) }
+      dependencies = gems.map {|g| Bundler::Dependency.new(g, version, options) }
 
       Injector.inject(dependencies,
-        :conservative_versioning => @options[:version].nil?, # Perform conservative versioning only when version is not specified
-        :optimistic => @options[:optimistic],
-        :strict => @options[:strict])
+        :conservative_versioning => options[:version].nil?, # Perform conservative versioning only when version is not specified
+        :optimistic => options[:optimistic],
+        :strict => options[:strict])
 
-      Installer.install(Bundler.root, Bundler.definition) unless @options["skip-install"]
+      Installer.install(Bundler.root, Bundler.definition) unless options["skip-install"]
     end
   end
 end
