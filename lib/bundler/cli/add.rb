@@ -7,7 +7,7 @@ module Bundler
     def initialize(options, gems)
       @gems = gems
       @options = options
-      @options[:group] = options[:group].split(",").map(&:strip) if !options[:group].nil? && !options[:group].empty?
+      @options[:group] = options[:group].split(",").map(&:strip) unless options[:group].nil?
       @version = options[:version].split(",").map(&:strip) unless options[:version].nil?
     end
 
