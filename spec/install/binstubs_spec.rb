@@ -28,7 +28,7 @@ RSpec.describe "bundle install" do
         end
       end
 
-      install_gemfile <<-G, :binstubs => true
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "fake"
         gem "rack"
@@ -36,7 +36,7 @@ RSpec.describe "bundle install" do
     end
 
     it "warns about the situation" do
-      gembin("rackup")
+      bundle! "exec rackup"
 
       expect(last_command.stderr).to include(
         "The `rackup` executable in the `fake` gem is being loaded, but it's also present in other gems (rack).\n" \
