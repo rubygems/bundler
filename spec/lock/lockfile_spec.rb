@@ -230,44 +230,6 @@ RSpec.describe "the lockfile format" do
     expect(err).to include("You must use Bundler 9999999 or greater with this lockfile.")
   end
 
-  it "shows a friendly error when running with a new bundler 2 lockfile" do
-    lockfile <<-L
-      GEM
-        remote: https://rails-assets.org/
-        specs:
-         rails-assets-bootstrap (3.3.4)
-           rails-assets-jquery (>= 1.9.1)
-         rails-assets-jquery (2.1.4)
-
-      GEM
-        remote: https://rubygems.org/
-        specs:
-         rake (10.4.2)
-
-      PLATFORMS
-        ruby
-
-      DEPENDENCIES
-        rails-assets-bootstrap!
-        rake
-
-      BUNDLED WITH
-         9999999.0.0
-    L
-
-    install_gemfile <<-G
-      source 'https://rubygems.org'
-      gem 'rake'
-
-      source 'https://rails-assets.org' do
-        gem 'rails-assets-bootstrap'
-      end
-    G
-
-    expect(last_command).to be_failure
-    expect(err).to include("You must use Bundler 9999999 or greater with this lockfile.")
-  end
-
   it "warns when updating bundler major version", :bundler => "< 3" do
     lockfile <<-L
       GEM
