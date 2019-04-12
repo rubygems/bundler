@@ -240,21 +240,7 @@ RSpec.describe "major deprecations" do
       expect(deprecations).to be_empty
     end
 
-    it "should print a proper warning, and use Gemfile", :bundler => "2" do
-      create_file "gems.rb"
-      install_gemfile! <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
-
-      expect(warnings).to include(
-        "Multiple gemfiles (gems.rb and Gemfile) detected. The gems.rb and gems.rb.locked files are currently ignored, but they will get used as soon as you delete your Gemfile and Gemfile.lock files."
-      )
-
-      expect(the_bundle).to include_gem "rack 1.0"
-    end
-
-    it "should print a proper warning, and use gems.rb", :bundler => "3" do
+    it "should print a proper warning, and use gems.rb" do
       create_file "gems.rb"
       install_gemfile! <<-G
         source "file://#{gem_repo1}"
@@ -354,13 +340,7 @@ RSpec.describe "major deprecations" do
       RUBY
     end
 
-    it "should print a single deprecation warning", :bundler => "< 3" do
-      expect(warnings).to include(
-        "Multiple gemfiles (gems.rb and Gemfile) detected. The gems.rb and gems.rb.locked files are currently ignored, but they will get used as soon as you delete your Gemfile and Gemfile.lock files."
-      )
-    end
-
-    it "should print a single deprecation warning", :bundler => "3" do
+    it "should print a single deprecation warning" do
       expect(warnings).to include(
         "Multiple gemfiles (gems.rb and Gemfile) detected. Make sure you remove Gemfile and Gemfile.lock since bundler is ignoring them in favor of gems.rb and gems.rb.locked."
       )

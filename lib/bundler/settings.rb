@@ -45,7 +45,6 @@ module Bundler
       path_relative_to_cwd
       path.system
       plugins
-      prefer_gems_rb
       prefer_patch
       print_only_version_number
       setup_makes_kernel_gem_public

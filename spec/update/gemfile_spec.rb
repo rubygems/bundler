@@ -46,21 +46,4 @@ RSpec.describe "bundle update" do
       end
     end
   end
-
-  context "with prefer_gems_rb set" do
-    before { bundle! "config set prefer_gems_rb true" }
-
-    it "prefers gems.rb to Gemfile" do
-      create_file("gems.rb", "gem 'bundler'")
-      create_file("Gemfile", "raise 'wrong Gemfile!'")
-
-      bundle! :install
-      bundle! :update, :all => true
-
-      expect(bundled_app("gems.rb")).to be_file
-      expect(bundled_app("Gemfile.lock")).not_to be_file
-
-      expect(the_bundle).to include_gem "bundler #{Bundler::VERSION}"
-    end
-  end
 end

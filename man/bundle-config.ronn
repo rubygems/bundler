@@ -232,8 +232,6 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
    Makes `--path` relative to the CWD instead of the `Gemfile`.
 * `plugins` (`BUNDLE_PLUGINS`):
    Enable Bundler's experimental plugin system.
-* `prefer_gems_rb` (`BUNDLE_PREFER_GEMS_RB`)
-   Prefer `gems.rb` to `Gemfile` when Bundler is searching for a Gemfile.
 * `prefer_patch` (BUNDLE_PREFER_PATCH):
    Prefer updating only to next patch version during updates. Makes `bundle update` calls equivalent to `bundler update --patch`.
 * `print_only_version_number` (`BUNDLE_PRINT_ONLY_VERSION_NUMBER`)
