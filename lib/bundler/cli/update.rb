@@ -73,7 +73,7 @@ module Bundler
           locked_source = locked_spec.source
           locked_version = locked_spec.version
           new_spec = Bundler.definition.specs[name].first
-          new_source = new_spec && new_spec.source
+          new_source = new_spec.source.to_s
           new_version = new_spec.version
           next if locked_source != new_source
           if !new_version
