@@ -69,9 +69,9 @@ module Bundler
       if locked_gems = Bundler.definition.locked_gems
         gems.each do |name|
           locked_spec = locked_gems.specs.find {|s| s.name == name }
-          locked_source = locked_spec && locked_spec.source
+          next unless locked_spec
+          locked_source = locked_spec.source
           locked_version = locked_spec.version
-          next unless locked_version
           new_spec = Bundler.definition.specs[name].first
           new_source = new_spec && new_spec.source
           new_version = new_spec.version
