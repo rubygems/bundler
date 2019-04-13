@@ -434,40 +434,42 @@ module Bundler
     # Used to make bin stubs that are not created by bundler work
     # under bundler. The new Gem.bin_path only considers gems in
     # +specs+
-    def replace_bin_path(specs, specs_by_name)
+    def replace_bin_path(specs_by_name)
       gem_class = (class << Gem; self; end)
 
       redefine_method(gem_class, :find_spec_for_exe) do |gem_name, *args|
         exec_name = args.first
+        raise ArgumentError, "you must supply exec_name" unless exec_name
 
         spec_with_name = specs_by_name[gem_name]
-        spec = if exec_name
-          if spec_with_name && spec_with_name.executables.include?(exec_name)
-            spec_with_name
-          else
-            specs.find {|s| s.executables.include?(exec_name) }
-          end
-        else
-          spec_with_name
-        end
+        matching_specs_by_exec_name = specs_by_name.values.select {|s| s.executables.include?(exec_name) }
+        spec = matching_specs_by_exec_name.delete(spec_with_name)
 
-        unless spec
+        unless spec || !matching_specs_by_exec_name.empty?
           message = "can't find executable #{exec_name} for gem #{gem_name}"
-          if !exec_name || spec_with_name.nil?
+          if spec_with_name.nil?
             message += ". #{gem_name} is not currently included in the bundle, " \
                        "perhaps you meant to add it to your #{Bundler.default_gemfile.basename}?"
           end
           raise Gem::Exception, message
         end
 
-        raise Gem::Exception, "no default executable for #{spec.full_name}" unless exec_name ||= spec.default_executable
-
-        unless spec.name == gem_name
-          Bundler::SharedHelpers.major_deprecation 2,
+        unless spec
+          spec = matching_specs_by_exec_name.shift
+          warn \
             "Bundler is using a binstub that was created for a different gem (#{spec.name}).\n" \
             "You should run `bundle binstub #{gem_name}` " \
             "to work around a system/bundle conflict."
         end
+
+        unless matching_specs_by_exec_name.empty?
+          conflicting_names = matching_specs_by_exec_name.map(&:name).join(", ")
+          warn \
+            "The `#{exec_name}` executable in the `#{spec.name}` gem is being loaded, but it's also present in other gems (#{conflicting_names}).\n" \
+            "If you meant to run the executable for another gem, make sure you use a project specific binstub (`bundle binstub <gem_name>`).\n" \
+            "If you plan to use multiple conflicting executables, generate binstubs for them and disambiguate their names."
+        end
+
         spec
       end
 
@@ -523,7 +525,7 @@ module Bundler
 
       replace_gem(specs, specs_by_name)
       stub_rubygems(specs)
-      replace_bin_path(specs, specs_by_name)
+      replace_bin_path(specs_by_name)
       replace_refresh
 
       Gem.clear_paths

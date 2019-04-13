@@ -389,7 +389,7 @@ RSpec.describe Bundler::SharedHelpers do
 
     context "bundle executable in ENV['BUNDLE_BIN_PATH'] does not exist" do
       before { ENV["BUNDLE_BIN_PATH"] = "/does/not/exist" }
-      before { Bundler.rubygems.replace_bin_path [], [] }
+      before { Bundler.rubygems.replace_bin_path [] }
 
       it "sets BUNDLE_BIN_PATH to the bundle executable file" do
         subject.set_bundle_environment
