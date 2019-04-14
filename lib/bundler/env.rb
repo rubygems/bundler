@@ -102,6 +102,7 @@ module Bundler
       out << ["RubyGems", Gem::VERSION]
       out << ["  Gem Home", ENV.fetch("GEM_HOME") { Gem.dir }]
       out << ["  Gem Path", ENV.fetch("GEM_PATH") { Gem.path.join(File::PATH_SEPARATOR) }]
+      out << ["  User Home", Gem.user_home]
       out << ["  User Path", Gem.user_dir]
       out << ["  Bin Dir", Gem.bindir]
       if defined?(OpenSSL)

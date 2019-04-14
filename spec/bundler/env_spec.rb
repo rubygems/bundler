@@ -33,6 +33,13 @@ RSpec.describe Bundler::Env do
         end
       end
 
+      it "prints user home" do
+        with_clear_paths("HOME", "/a/b/c") do
+          out = described_class.report
+          expect(out).to include("User Home   /a/b/c")
+        end
+      end
+
       it "prints user path" do
         with_clear_paths("HOME", "/a/b/c") do
           out = described_class.report
