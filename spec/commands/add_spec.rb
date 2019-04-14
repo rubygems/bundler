@@ -21,7 +21,7 @@ RSpec.describe "bundle add" do
     it "shows error" do
       bundle "add"
 
-      expect(last_command.bundler_err).to include("Please specify gems to add")
+      expect(err).to include("Please specify gems to add")
     end
   end
 

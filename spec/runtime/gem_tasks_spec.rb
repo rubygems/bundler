@@ -22,7 +22,7 @@ RSpec.describe "require 'bundler/gem_tasks'", :ruby_repo do
       sys_exec "#{rake} -T"
     end
 
-    expect(last_command.stderr).to eq("")
+    expect(err).to eq("")
     expected_tasks = [
       "rake build",
       "rake clean",
@@ -39,6 +39,6 @@ RSpec.describe "require 'bundler/gem_tasks'", :ruby_repo do
     with_gem_path_as(Spec::Path.base_system_gems.to_s) do
       sys_exec! %(#{rake} -e 'load "Rakefile"; puts CLOBBER.inspect')
     end
-    expect(last_command.stdout).to eq '["pkg"]'
+    expect(out).to eq '["pkg"]'
   end
 end

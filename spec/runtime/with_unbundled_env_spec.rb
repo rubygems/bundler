@@ -46,7 +46,7 @@ RSpec.describe "Bundler.with_env helpers" do
         build_bundler_context
         bundle! "exec '#{Gem.ruby}' #{bundled_app("exe.rb")} 2"
       end
-      expect(last_command.stderr).to eq <<-EOS.strip
+      expect(err).to eq <<-EOS.strip
 2 false
 1 true
 0 true

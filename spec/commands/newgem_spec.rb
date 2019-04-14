@@ -770,22 +770,22 @@ RSpec.describe "bundle gem" do
 
     it "fails gracefully with a ." do
       bundle "gem foo.gemspec"
-      expect(last_command.bundler_err).to end_with("Invalid gem name foo.gemspec -- `Foo.gemspec` is an invalid constant name")
+      expect(err).to end_with("Invalid gem name foo.gemspec -- `Foo.gemspec` is an invalid constant name")
     end
 
     it "fails gracefully with a ^" do
       bundle "gem ^"
-      expect(last_command.bundler_err).to end_with("Invalid gem name ^ -- `^` is an invalid constant name")
+      expect(err).to end_with("Invalid gem name ^ -- `^` is an invalid constant name")
     end
 
     it "fails gracefully with a space" do
       bundle "gem 'foo bar'"
-      expect(last_command.bundler_err).to end_with("Invalid gem name foo bar -- `Foo bar` is an invalid constant name")
+      expect(err).to end_with("Invalid gem name foo bar -- `Foo bar` is an invalid constant name")
     end
 
     it "fails gracefully when multiple names are passed" do
       bundle "gem foo bar baz"
-      expect(last_command.bundler_err).to eq(<<-E.strip)
+      expect(err).to eq(<<-E.strip)
 ERROR: "bundle gem" was called with arguments ["foo", "bar", "baz"]
 Usage: "bundle gem NAME [OPTIONS]"
       E
@@ -876,7 +876,7 @@ Usage: "bundle gem NAME [OPTIONS]"
         FileUtils.touch("conflict-foobar")
       end
       bundle "gem conflict-foobar"
-      expect(last_command.bundler_err).to include("Errno::ENOTDIR")
+      expect(err).to include("Errno::ENOTDIR")
       expect(exitstatus).to eql(32) if exitstatus
     end
   end
@@ -887,7 +887,7 @@ Usage: "bundle gem NAME [OPTIONS]"
         FileUtils.mkdir_p("conflict-foobar/Gemfile")
       end
       bundle! "gem conflict-foobar"
-      expect(last_command.stdout).to include("file_clash  conflict-foobar/Gemfile").
+      expect(out).to include("file_clash  conflict-foobar/Gemfile").
         and include "Initializing git repo in #{bundled_app("conflict-foobar")}"
     end
   end
