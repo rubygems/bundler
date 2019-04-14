@@ -4,39 +4,24 @@ require "pathname"
 
 require "rubygems/specification"
 
-begin
-  # Possible use in Gem::Specification#source below and require
-  # shouldn't be deferred.
-  require "rubygems/source"
-rescue LoadError
-  # Not available before RubyGems 2.0.0, ignore
-  nil
-end
+# Possible use in Gem::Specification#source below and require
+# shouldn't be deferred.
+require "rubygems/source"
 
 require "bundler/match_platform"
 
 module Gem
-  @loaded_stacks = Hash.new {|h, k| h[k] = [] }
-
   class Specification
     attr_accessor :remote, :location, :relative_loaded_from
 
-    if instance_methods(false).include?(:source)
-      remove_method :source
-      attr_writer :source
-      def source
-        (defined?(@source) && @source) || Gem::Source::Installed.new
-      end
-    else
-      # rubocop:disable Lint/DuplicateMethods
-      attr_accessor :source
-      # rubocop:enable Lint/DuplicateMethods
+    remove_method :source
+    attr_writer :source
+    def source
+      (defined?(@source) && @source) || Gem::Source::Installed.new
     end
 
     alias_method :rg_full_gem_path, :full_gem_path
     alias_method :rg_loaded_from,   :loaded_from
-
-    attr_writer :full_gem_path unless instance_methods.include?(:full_gem_path=)
 
     def full_gem_path
       # this cannot check source.is_a?(Bundler::Plugin::API::Source)
