@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "openssl"
 require "bundler/settings"
 
 RSpec.describe Bundler::Env do
