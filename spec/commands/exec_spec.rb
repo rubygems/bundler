@@ -530,7 +530,7 @@ RSpec.describe "bundle exec" do
     expect(out).to include("Installing foo 1.0")
   end
 
-  describe "with gems bundled via :path with invalid gemspecs", :ruby_repo do
+  describe "with gems bundled via :path with invalid gemspecs" do
     it "outputs the gemspec validation errors" do
       build_lib "foo"
 
@@ -836,7 +836,7 @@ __FILE__: #{path.to_s.inspect}
         bundle :install, :system_bundler => true, :path => "vendor/bundler"
       end
 
-      it "overrides disable_shared_gems so bundler can be found", :rubygems => ">= 2.6.2" do
+      it "overrides disable_shared_gems so bundler can be found", :ruby_repo, :rubygems => ">= 2.6.2" do
         system_gems :bundler
         file = bundled_app("file_that_bundle_execs.rb")
         create_file(file, <<-RB)
