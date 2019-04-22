@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "set"
+
 if defined?(Encoding) && Encoding.default_external.name != "UTF-8"
   # An approximation of ruby -E UTF-8, since it works on 1.8.7
   Encoding.default_external = Encoding.find("UTF-8")
