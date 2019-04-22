@@ -275,4 +275,20 @@ RSpec.describe "The library itself" do
       expect(warnings).to be_well_formed
     end
   end
+
+  it "does not use require internally, but require_relative" do
+    Dir.chdir(root) do
+      exempt = %r{templates/|vendor/}
+      all_bad_requires = []
+      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
+      lib_files.split("\x0").each do |filename|
+        next if filename =~ exempt
+        File.readlines(filename).each_with_index do |line, number|
+          line.scan(/^ *require "bundler/).each { all_bad_requires << "#{filename}:#{number.succ}" }
+        end
+      end
+
+      expect(all_bad_requires).to be_empty, "#{all_bad_requires.size} internal requires that should use `require_relative`: #{all_bad_requires}"
+    end
+  end
 end

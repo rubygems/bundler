@@ -637,7 +637,7 @@ module Bundler
     end
 
     def all_specs
-      require "bundler/remote_specification"
+      require_relative "remote_specification"
       Gem::Specification.stubs.map do |stub|
         StubSpecification.from_stub(stub)
       end
