@@ -45,6 +45,7 @@ RSpec.describe "Bundler.load" do
 
   describe "without a gemfile" do
     it "raises an exception if the default gemfile is not found" do
+      ensure_no_gemfile
       expect do
         Bundler.load
       end.to raise_error(Bundler::GemfileNotFound, /could not locate gemfile/i)
@@ -55,19 +56,6 @@ RSpec.describe "Bundler.load" do
         ENV["BUNDLE_GEMFILE"] = "omg.rb"
         Bundler.load
       end.to raise_error(Bundler::GemfileNotFound, /omg\.rb/)
-    end
-
-    it "does not find a Gemfile above the testing directory" do
-      bundler_gemfile = tmp.join("../Gemfile")
-      unless File.exist?(bundler_gemfile)
-        FileUtils.touch(bundler_gemfile)
-        @remove_bundler_gemfile = true
-      end
-      begin
-        expect { Bundler.load }.to raise_error(Bundler::GemfileNotFound)
-      ensure
-        bundler_gemfile.rmtree if @remove_bundler_gemfile
-      end
     end
   end
 
