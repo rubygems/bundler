@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "bundler/vendored_thor"
+require_relative "../vendored_thor"
 
 module Bundler
   module UI

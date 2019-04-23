@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require "bundler/compatibility_guard"
+require_relative "compatibility_guard"
 
 require "pathname"
 require "rbconfig"
 require "rubygems"
 
-require "bundler/version"
-require "bundler/constants"
-require "bundler/rubygems_integration"
-require "bundler/current_ruby"
+require_relative "version"
+require_relative "constants"
+require_relative "rubygems_integration"
+require_relative "current_ruby"
 
 module Bundler
   module SharedHelpers
@@ -132,7 +132,7 @@ module Bundler
     def major_deprecation(major_version, message)
       bundler_major_version = Bundler.bundler_major_version
       if bundler_major_version > major_version
-        require "bundler/errors"
+        require_relative "errors"
         raise DeprecatedError, "[REMOVED] #{message}"
       end
 
@@ -289,20 +289,10 @@ module Bundler
     public :set_env
 
     def set_bundle_variables
-      begin
-        exe_file = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
-        unless File.exist?(exe_file)
-          exe_file = File.expand_path("../../../exe/bundle", __FILE__)
-        end
-        Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", exe_file
-      rescue Gem::GemNotFoundException
-        exe_file = File.expand_path("../../../exe/bundle", __FILE__)
-        # for Ruby core repository
-        exe_file = File.expand_path("../../../../bin/bundle", __FILE__) unless File.exist?(exe_file)
-        Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", exe_file
-      end
-
-      # Set BUNDLE_GEMFILE
+      exe_file = File.expand_path("../../../exe/bundle", __FILE__)
+      # for Ruby core repository
+      exe_file = File.expand_path("../../../../bin/bundle", __FILE__) unless File.exist?(exe_file)
+      Bundler::SharedHelpers.set_env "BUNDLE_BIN_PATH", exe_file
       Bundler::SharedHelpers.set_env "BUNDLE_GEMFILE", find_gemfile(:order_matters).to_s
       Bundler::SharedHelpers.set_env "BUNDLER_VERSION", Bundler::VERSION
     end
@@ -351,9 +341,9 @@ module Bundler
     end
 
     def prints_major_deprecations?
-      require "bundler"
+      require_relative "../bundler"
       return false if Bundler.settings[:silence_deprecations]
-      require "bundler/deprecate"
+      require_relative "deprecate"
       return false if Bundler::Deprecate.skip
       true
     end

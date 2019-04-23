@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "bundler/compatibility_guard"
+require_relative "compatibility_guard"
 
 # Allows for declaring a Gemfile inline in a ruby script, optionally installing
 # any gems that aren't already installed on the user's system.
@@ -32,7 +32,7 @@ require "bundler/compatibility_guard"
 #          puts Pod::VERSION # => "0.34.4"
 #
 def gemfile(install = false, options = {}, &gemfile)
-  require "bundler"
+  require_relative "../bundler"
 
   opts = options.dup
   ui = opts.delete(:ui) { Bundler::UI::Shell.new }

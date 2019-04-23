@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "bundler/lockfile_parser"
+require_relative "lockfile_parser"
 require "set"
 
 module Bundler
@@ -385,7 +385,7 @@ module Bundler
     end
 
     def to_lock
-      require "bundler/lockfile_generator"
+      require_relative "lockfile_generator"
       LockfileGenerator.generate(self)
     end
 

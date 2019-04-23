@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "bundler/remote_specification"
+require_relative "remote_specification"
 
 module Bundler
   class StubSpecification < RemoteSpecification

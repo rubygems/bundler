@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "bundler/dependency"
-require "bundler/ruby_dsl"
+require_relative "dependency"
+require_relative "ruby_dsl"
 
 module Bundler
   class Dsl

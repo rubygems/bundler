@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require "rubygems/dependency"
-require "bundler/shared_helpers"
-require "bundler/rubygems_ext"
+require_relative "shared_helpers"
+require_relative "rubygems_ext"
 
 module Bundler
   class Dependency < Gem::Dependency

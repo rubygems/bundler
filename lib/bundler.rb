@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
-require "bundler/compatibility_guard"
+require_relative "bundler/compatibility_guard"
 
-require "bundler/vendored_fileutils"
+require_relative "bundler/vendored_fileutils"
 require "pathname"
 require "rbconfig"
 
-require "bundler/errors"
-require "bundler/environment_preserver"
-require "bundler/plugin"
-require "bundler/rubygems_ext"
-require "bundler/rubygems_integration"
-require "bundler/version"
-require "bundler/constants"
-require "bundler/current_ruby"
-require "bundler/build_metadata"
+require_relative "bundler/errors"
+require_relative "bundler/environment_preserver"
+require_relative "bundler/plugin"
+require_relative "bundler/rubygems_ext"
+require_relative "bundler/rubygems_integration"
+require_relative "bundler/version"
+require_relative "bundler/constants"
+require_relative "bundler/current_ruby"
+require_relative "bundler/build_metadata"
 
 module Bundler
   environment_preserver = EnvironmentPreserver.new(ENV, EnvironmentPreserver::BUNDLER_KEYS)

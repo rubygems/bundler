@@ -80,7 +80,7 @@ module Bundler
       warn_ambiguous_gems
 
       if CLI::Common.clean_after_install?
-        require "bundler/cli/clean"
+        require_relative "clean"
         Bundler::CLI::Clean.new(options).run
       end
     rescue GemNotFound, VersionConflict => e
