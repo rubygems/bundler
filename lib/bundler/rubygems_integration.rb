@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require "monitor"
-
 module Bundler
   class RubygemsIntegration
     if defined?(Gem::Ext::Builder::CHDIR_MONITOR)
       EXT_LOCK = Gem::Ext::Builder::CHDIR_MONITOR
     else
+      require "monitor"
+
       EXT_LOCK = Monitor.new
     end
 
