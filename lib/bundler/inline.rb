@@ -49,26 +49,28 @@ def gemfile(install = false, options = {}, &gemfile)
   builder = Bundler::Dsl.new
   builder.instance_eval(&gemfile)
 
-  definition = builder.to_definition(nil, true)
-  def definition.lock(*); end
-  definition.validate_runtime!
+  Bundler.settings.temporary(:frozen => false) do
+    definition = builder.to_definition(nil, true)
+    def definition.lock(*); end
+    definition.validate_runtime!
 
-  missing_specs = proc do
-    definition.missing_specs?
-  end
+    missing_specs = proc do
+      definition.missing_specs?
+    end
 
-  Bundler.ui = ui if install
-  if install || missing_specs.call
-    Bundler.settings.temporary(:inline => true) do
-      installer = Bundler::Installer.install(Bundler.root, definition, :system => true)
-      installer.post_install_messages.each do |name, message|
-        Bundler.ui.info "Post-install message from #{name}:\n#{message}"
+    Bundler.ui = ui if install
+    if install || missing_specs.call
+      Bundler.settings.temporary(:inline => true) do
+        installer = Bundler::Installer.install(Bundler.root, definition, :system => true)
+        installer.post_install_messages.each do |name, message|
+          Bundler.ui.info "Post-install message from #{name}:\n#{message}"
+        end
       end
     end
-  end
 
-  runtime = Bundler::Runtime.new(nil, definition)
-  runtime.setup.require
+    runtime = Bundler::Runtime.new(nil, definition)
+    runtime.setup.require
+  end
 ensure
   bundler_module = class << Bundler; self; end
   bundler_module.send(:define_method, :root, old_root) if old_root

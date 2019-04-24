@@ -244,6 +244,20 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(exitstatus).to be_zero if exitstatus
   end
 
+  it "installs inline gems when frozen is set" do
+    script <<-RUBY, :env => { "BUNDLE_FROZEN" => "true" }
+      gemfile do
+        source "file://#{gem_repo1}"
+        gem "rack"
+      end
+
+      puts RACK
+    RUBY
+
+    expect(last_command.stderr).to be_empty
+    expect(exitstatus).to be_zero if exitstatus
+  end
+
   it "installs inline gems when BUNDLE_GEMFILE is set to an empty string" do
     ENV["BUNDLE_GEMFILE"] = ""
 
