@@ -90,7 +90,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
 
       expect(out).to include("* actionmailer (2.3.2)")
       expect(out).to include("\tSummary:  This is just a fake gem for testing")
-      expect(out).to include("\tHomepage: No website available.")
+      expect(out).to include("\tHomepage: http://example.com")
       expect(out).to include("\tStatus:   Up to date")
     end
   end
