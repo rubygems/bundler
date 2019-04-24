@@ -802,8 +802,10 @@ module Bundler
 
           deps2 = other.dependencies.select {|d| d.type != :development }
           runtime_dependencies = s.dependencies.select {|d| d.type != :development }
-          # If the dependencies of the path source have changed, unlock it
-          next unless runtime_dependencies.sort == deps2.sort
+          # If the dependencies of the path source have changed and locked spec can't satisfy new dependencies, unlock it
+          next unless deps2.sort == runtime_dependencies.sort || deps2.all? {|d| satisfies_locked_spec?(d) }
+
+          s.dependencies.replace(other.dependencies)
         end
 
         converged << s
