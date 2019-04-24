@@ -58,6 +58,14 @@ module Bundler
       Bundler.settings.set_command_option_if_given :jobs, opts["jobs"]
 
       Bundler.definition.validate_runtime!
+
+      if locked_gems = Bundler.definition.locked_gems
+        previous_locked_specs = locked_gems.specs.reduce({}) do |h, s|
+          h[s.name] = { :version => s.version, :source => s.source.to_s }
+          h
+        end
+      end
+
       installer = Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.app_cache.exist?
 
@@ -66,13 +74,16 @@ module Bundler
         Bundler::CLI::Clean.new(options).run
       end
 
-      if locked_gems = Bundler.definition.locked_gems
+      if locked_gems
         gems.each do |name|
-          locked_version = locked_gems.specs.find {|s| s.name == name }
-          locked_version &&= locked_version.version
-          next unless locked_version
-          new_version = Bundler.definition.specs[name].first
-          new_version &&= new_version.version
+          locked_spec = previous_locked_specs[name]
+          next unless locked_spec
+          locked_source = locked_spec[:source]
+          locked_version = locked_spec[:version]
+          new_spec = Bundler.definition.specs[name].first
+          new_source = new_spec.source.to_s
+          new_version = new_spec.version
+          next if locked_source != new_source
           if !new_version
             Bundler.ui.warn "Bundler attempted to update #{name} but it was removed from the bundle"
           elsif new_version < locked_version
