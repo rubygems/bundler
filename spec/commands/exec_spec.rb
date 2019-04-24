@@ -55,6 +55,17 @@ RSpec.describe "bundle exec" do
     expect(out).to eq("hi")
   end
 
+  it "respects custom process title when loading through ruby" do
+    script_that_changes_its_own_title_and_checks_if_picked_up_by_ps_unix_utility = <<~RUBY
+      Process.setproctitle("1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16")
+      puts `ps -eo args | grep [1]-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16`
+    RUBY
+    create_file "Gemfile"
+    create_file "a.rb", script_that_changes_its_own_title_and_checks_if_picked_up_by_ps_unix_utility
+    bundle "exec ruby a.rb"
+    expect(out).to eq("1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16")
+  end
+
   it "accepts --verbose" do
     install_gemfile 'gem "rack"'
     bundle "exec --verbose echo foobar"

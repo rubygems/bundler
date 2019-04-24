@@ -27,12 +27,7 @@ module Bundler
         if !Bundler.settings[:disable_exec_load] && ruby_shebang?(bin_path)
           return kernel_load(bin_path, *args)
         end
-        # First, try to exec directly to something in PATH
-        if Bundler.current_ruby.jruby_18?
-          kernel_exec(bin_path, *args)
-        else
-          kernel_exec([bin_path, cmd], *args)
-        end
+        kernel_exec(bin_path, *args)
       else
         # exec using the given command
         kernel_exec(cmd, *args)
