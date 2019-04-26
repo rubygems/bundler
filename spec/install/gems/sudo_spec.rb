@@ -3,11 +3,18 @@
 RSpec.describe "when using sudo", :sudo => true do
   describe "and BUNDLE_PATH is writable" do
     context "but BUNDLE_PATH/build_info is not writable" do
+      let(:subdir) do
+        system_gem_path("cache")
+      end
+
       before do
         bundle! "config set path.system true"
-        subdir = system_gem_path("cache")
         subdir.mkpath
         sudo "chmod u-w #{subdir}"
+      end
+
+      after do
+        sudo "chmod u+w #{subdir}"
       end
 
       it "installs" do
@@ -99,6 +106,10 @@ RSpec.describe "when using sudo", :sudo => true do
   describe "and BUNDLE_PATH is not writable" do
     before do
       sudo "chmod ugo-w #{default_bundle_path}"
+    end
+
+    after do
+      sudo "chmod ugo+w #{default_bundle_path}"
     end
 
     it "installs" do
