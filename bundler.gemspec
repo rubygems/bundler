@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 begin
-  require File.expand_path("../lib/bundler/version", __FILE__)
+  require_relative "lib/bundler/version"
 rescue LoadError
   # for Ruby core repository
-  require File.expand_path("../version", __FILE__)
+  require_relative "version"
 end
 
 Gem::Specification.new do |s|
