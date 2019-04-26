@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - more_relative_code_loading
 
 cache:
   directories:
