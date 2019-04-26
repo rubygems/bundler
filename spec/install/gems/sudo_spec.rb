@@ -142,6 +142,8 @@ RSpec.describe "when using sudo", :sudo => true do
       bundle :install, :env => { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil }
       expect(gem_home.join("bin/rackup")).to exist
       expect(the_bundle).to include_gems "rack 1.0", :env => { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil }
+
+      sudo "rm -rf #{tmp("sudo_gem_home")}"
     end
   end
 
