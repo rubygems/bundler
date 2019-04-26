@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require "monitor"
-
 module Bundler
   class RubygemsIntegration
     if defined?(Gem::Ext::Builder::CHDIR_MONITOR)
       EXT_LOCK = Gem::Ext::Builder::CHDIR_MONITOR
     else
+      require "monitor"
+
       EXT_LOCK = Monitor.new
     end
 
@@ -304,27 +304,17 @@ module Bundler
       end
     end
 
-    if provides?(">= 2.5.2")
-      # RubyGems-generated binstubs call Kernel#gem
-      def binstubs_call_gem?
-        false
-      end
+    # RubyGems-generated binstubs call Kernel#gem
+    def binstubs_call_gem?
+      !provides?(">= 2.5.2")
+    end
 
-      # only 2.5.2+ has all of the stub methods we want to use, and since this
-      # is a performance optimization _only_,
-      # we'll restrict ourselves to the most
-      # recent RG versions instead of all versions that have stubs
-      def stubs_provide_full_functionality?
-        true
-      end
-    else
-      def binstubs_call_gem?
-        true
-      end
-
-      def stubs_provide_full_functionality?
-        false
-      end
+    # only 2.5.2+ has all of the stub methods we want to use, and since this
+    # is a performance optimization _only_,
+    # we'll restrict ourselves to the most
+    # recent RG versions instead of all versions that have stubs
+    def stubs_provide_full_functionality?
+      provides?(">= 2.5.2")
     end
 
     def replace_gem(specs, specs_by_name)
