@@ -203,33 +203,6 @@ RSpec.describe "the lockfile format" do
     G
   end
 
-  it "errors if the current is a major version older than lockfile's bundler version", :bundler => "3" do
-    lockfile <<-L
-      GEM
-        remote: file://localhost#{gem_repo1}/
-        specs:
-          rack (1.0.0)
-
-      PLATFORMS
-        #{lockfile_platforms}
-
-      DEPENDENCIES
-        rack
-
-      BUNDLED WITH
-         9999999.0.0
-    L
-
-    install_gemfile <<-G
-      source "file://localhost#{gem_repo1}/"
-
-      gem "rack"
-    G
-
-    expect(last_command).to be_failure
-    expect(err).to include("You must use Bundler 9999999 or greater with this lockfile.")
-  end
-
   it "warns when updating bundler major version" do
     lockfile <<-L
       GEM
