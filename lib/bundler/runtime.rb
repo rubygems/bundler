@@ -31,7 +31,7 @@ module Bundler
         check_for_activated_spec!(spec)
 
         Bundler.rubygems.mark_loaded(spec)
-        spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
+        spec.load_paths
       end.reverse.flatten
 
       Bundler.rubygems.add_to_load_path(load_paths)
