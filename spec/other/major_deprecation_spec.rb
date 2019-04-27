@@ -483,6 +483,30 @@ The :gist git source is deprecated, and will be removed in the future. Add this 
 
       pending "fails with a helpful message", :bundler => "3"
     end
+
+    context "with the --paths option" do
+      before do
+        bundle "show --paths"
+      end
+
+      it "prints a deprecation warning recommending `bundle list`", :bundler => "2" do
+        expect(deprecations).to include("use `bundle list` instead of `bundle show --paths`")
+      end
+
+      pending "fails with a helpful message", :bundler => "3"
+    end
+
+    context "with a gem argument and the --paths option" do
+      before do
+        bundle "show rack --paths"
+      end
+
+      it "prints deprecation warning recommending `bundle info`", :bundler => "2" do
+        expect(deprecations).to include("use `bundle info rack --path` instead of `bundle show rack --paths`")
+      end
+
+      pending "fails with a helpful message", :bundler => "3"
+    end
   end
 
   context "bundle console" do

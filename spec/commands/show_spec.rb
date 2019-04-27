@@ -30,19 +30,9 @@ RSpec.describe "bundle show", :bundler => "< 3" do
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints deprecation" do
-      bundle "show rails"
-      expect(err).to eq("[DEPRECATED] use `bundle info rails` instead of `bundle show rails`")
-    end
-
     it "prints path if gem exists in bundle (with --paths option)" do
       bundle "show rails --paths"
       expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
-    end
-
-    it "prints deprecation when called with a gem and the --paths option" do
-      bundle "show rails --paths"
-      expect(err).to eq("[DEPRECATED] use `bundle info rails --path` instead of `bundle show rails --paths`")
     end
 
     it "warns if path no longer exists on disk" do
@@ -59,10 +49,6 @@ RSpec.describe "bundle show", :bundler => "< 3" do
       expect(out).to eq(root.to_s)
     end
 
-    it "prints deprecation when called with bundler" do
-      bundle "show bundler"
-      expect(err).to eq("[DEPRECATED] use `bundle info bundler` instead of `bundle show bundler`")
-    end
     it "complains if gem not in bundle" do
       bundle "show missing"
       expect(err).to match(/could not find gem 'missing'/i)
@@ -77,12 +63,6 @@ RSpec.describe "bundle show", :bundler => "< 3" do
       # Gem names are the last component of their path.
       gem_list = out.split.map {|p| p.split("/").last }
       expect(gem_list).to eq(gem_list.sort)
-    end
-
-    it "prints a deprecation when called with the --paths option" do
-      bundle "show --paths"
-
-      expect(err).to eq("[DEPRECATED] use `bundle list` instead of `bundle show --paths`")
     end
 
     it "prints summary of gems" do
