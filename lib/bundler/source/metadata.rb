@@ -13,6 +13,7 @@ module Bundler
           idx << Gem::Specification.new do |s|
             s.name     = "bundler"
             s.version  = VERSION
+            s.license  = "MIT"
             s.platform = Gem::Platform::RUBY
             s.source   = self
             s.authors  = ["bundler team"]
