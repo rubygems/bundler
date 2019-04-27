@@ -480,9 +480,9 @@ The :gist git source is deprecated, and will be removed in the future. Add this 
       it "prints a deprecation warning recommending `bundle info`", :bundler => "2" do
         expect(deprecations).to include("use `bundle info rack` instead of `bundle show rack`")
       end
-    end
 
-    pending "fails with a helpful message", :bundler => "3"
+      pending "fails with a helpful message", :bundler => "3"
+    end
   end
 
   context "bundle console" do
