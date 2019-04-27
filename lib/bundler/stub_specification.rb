@@ -41,10 +41,6 @@ module Bundler
       stub.instance_variable_set(:@activated, activated)
     end
 
-    def default_gem
-      stub.default_gem
-    end
-
     def full_gem_path
       # deleted gems can have their stubs return nil, so in that case grab the
       # expired path from the full spec
