@@ -136,26 +136,9 @@ module Gem
       end
       out
     end
-
-    # Backport of performance enhancement added to RubyGems 1.4
-    def matches_spec?(spec)
-      # name can be a Regexp, so use ===
-      return false unless name === spec.name
-      return true  if requirement.none?
-
-      requirement.satisfied_by?(spec.version)
-    end unless allocate.respond_to?(:matches_spec?)
   end
 
   class Requirement
-    # Backport of performance enhancement added to RubyGems 1.4
-    def none?
-      # note that it might be tempting to replace with with RubyGems 2.0's
-      # improved implementation. Don't. It requires `DefaultRequirement` to be
-      # defined, and more importantantly, these overrides are not used when the
-      # running RubyGems defines these methods
-      to_s == ">= 0"
-    end unless allocate.respond_to?(:none?)
 
     # Backport of performance enhancement added to RubyGems 2.2
     def exact?

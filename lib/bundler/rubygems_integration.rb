@@ -463,16 +463,6 @@ module Bundler
       Gem.clear_paths
     end
 
-    # This backports the correct segment generation code from RubyGems 1.4+
-    # by monkeypatching it into the method in RubyGems 1.3.6 and 1.3.7.
-    def backport_segment_generation
-      redefine_method(Gem::Version, :segments) do
-        @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
-          /^\d+$/ =~ s ? s.to_i : s
-        end
-      end
-    end
-
     # This backport fixes the marshaling of @segments.
     def backport_yaml_initialize
       redefine_method(Gem::Version, :yaml_initialize) do |_, map|
