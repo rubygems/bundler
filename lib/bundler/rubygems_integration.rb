@@ -463,15 +463,6 @@ module Bundler
       Gem.clear_paths
     end
 
-    # This backport fixes the marshaling of @segments.
-    def backport_yaml_initialize
-      redefine_method(Gem::Version, :yaml_initialize) do |_, map|
-        @version = map["version"]
-        @segments = nil
-        @hash = nil
-      end
-    end
-
     # This backports base_dir which replaces installation path
     # RubyGems 1.8+
     def backport_base_dir
