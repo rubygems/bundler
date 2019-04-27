@@ -31,13 +31,8 @@ Gem::Specification.new do |s|
     }
   end
 
-  if s.version >= Gem::Version.new("2.a".dup)
-    s.required_ruby_version     = ">= 2.3.0"
-    s.required_rubygems_version = ">= 2.5.0"
-  else
-    s.required_ruby_version     = ">= 1.8.7"
-    s.required_rubygems_version = ">= 1.3.6"
-  end
+  s.required_ruby_version     = ">= 2.3.0"
+  s.required_rubygems_version = ">= 2.5.0"
 
   s.add_development_dependency "automatiek", "~> 0.1.0"
   s.add_development_dependency "rake",       "~> 12.0"
