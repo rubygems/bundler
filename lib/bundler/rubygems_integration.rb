@@ -39,10 +39,6 @@ module Bundler
       Gem::Command.build_args = args
     end
 
-    def load_path_insert_index
-      Gem.load_path_insert_index
-    end
-
     def loaded_specs(name)
       Gem.loaded_specs[name]
     end
@@ -50,7 +46,7 @@ module Bundler
     def add_to_load_path(paths)
       return Gem.add_to_load_path(*paths) if Gem.respond_to?(:add_to_load_path)
 
-      if insert_index = load_path_insert_index
+      if insert_index = Gem.load_path_insert_index
         # Gem directories must come after -I and ENV['RUBYLIB']
         $LOAD_PATH.insert(insert_index, *paths)
       else
