@@ -60,7 +60,7 @@ module Bundler
       Bundler.definition.validate_runtime!
 
       if locked_gems = Bundler.definition.locked_gems
-        previous_locked_specs = locked_gems.specs.reduce({}) do |h, s|
+        previous_locked_info = locked_gems.specs.reduce({}) do |h, s|
           h[s.name] = { :version => s.version, :source => s.source.to_s }
           h
         end
@@ -76,18 +76,18 @@ module Bundler
 
       if locked_gems
         gems.each do |name|
-          locked_spec = previous_locked_specs[name]
-          next unless locked_spec
+          locked_info = previous_locked_info[name]
+          next unless locked_info
 
           new_spec = Bundler.definition.specs[name].first
           next unless new_spec
 
-          locked_source = locked_spec[:source]
+          locked_source = locked_info[:source]
           new_source = new_spec.source.to_s
           next if locked_source != new_source
 
           new_version = new_spec.version
-          locked_version = locked_spec[:version]
+          locked_version = locked_info[:version]
           if new_version < locked_version
             Bundler.ui.warn "Note: #{name} version regressed from #{locked_version} to #{new_version}"
           elsif new_version == locked_version
