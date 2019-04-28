@@ -55,8 +55,6 @@ module Bundler
       stub.full_require_paths
     end
 
-    # This is what we do in bundler/rubygems_ext
-    # full_require_paths is always implemented
     def load_paths
       full_require_paths
     end

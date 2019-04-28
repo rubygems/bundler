@@ -44,15 +44,7 @@ module Gem
     end
 
     def load_paths
-      return full_require_paths if respond_to?(:full_require_paths)
-
-      require_paths.map do |require_path|
-        if require_path.include?(full_gem_path)
-          require_path
-        else
-          File.join(full_gem_path, require_path)
-        end
-      end
+      full_require_paths
     end
 
     if method_defined?(:extension_dir)
@@ -136,32 +128,6 @@ module Gem
       end
       out
     end
-
-    # Backport of performance enhancement added to RubyGems 1.4
-    def matches_spec?(spec)
-      # name can be a Regexp, so use ===
-      return false unless name === spec.name
-      return true  if requirement.none?
-
-      requirement.satisfied_by?(spec.version)
-    end unless allocate.respond_to?(:matches_spec?)
-  end
-
-  class Requirement
-    # Backport of performance enhancement added to RubyGems 1.4
-    def none?
-      # note that it might be tempting to replace with with RubyGems 2.0's
-      # improved implementation. Don't. It requires `DefaultRequirement` to be
-      # defined, and more importantantly, these overrides are not used when the
-      # running RubyGems defines these methods
-      to_s == ">= 0"
-    end unless allocate.respond_to?(:none?)
-
-    # Backport of performance enhancement added to RubyGems 2.2
-    def exact?
-      return false unless @requirements.size == 1
-      @requirements[0][0] == "="
-    end unless allocate.respond_to?(:exact?)
   end
 
   class Platform

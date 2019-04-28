@@ -213,16 +213,8 @@ module Bundler
     end
 
     def loaded_gem_paths
-      # RubyGems 2.2+ can put binary extension into dedicated folders,
-      # therefore use RubyGems facilities to obtain their load paths.
-      if Gem::Specification.method_defined? :full_require_paths
-        loaded_gem_paths = Gem.loaded_specs.map {|_, s| s.full_require_paths }
-        loaded_gem_paths.flatten
-      else
-        $LOAD_PATH.select do |p|
-          Bundler.rubygems.gem_path.any? {|gp| p =~ /^#{Regexp.escape(gp)}/ }
-        end
-      end
+      loaded_gem_paths = Gem.loaded_specs.map {|_, s| s.full_require_paths }
+      loaded_gem_paths.flatten
     end
 
     def load_plugins
@@ -463,25 +455,6 @@ module Bundler
       Gem.clear_paths
     end
 
-    # This backports the correct segment generation code from RubyGems 1.4+
-    # by monkeypatching it into the method in RubyGems 1.3.6 and 1.3.7.
-    def backport_segment_generation
-      redefine_method(Gem::Version, :segments) do
-        @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
-          /^\d+$/ =~ s ? s.to_i : s
-        end
-      end
-    end
-
-    # This backport fixes the marshaling of @segments.
-    def backport_yaml_initialize
-      redefine_method(Gem::Version, :yaml_initialize) do |_, map|
-        @version = map["version"]
-        @segments = nil
-        @hash = nil
-      end
-    end
-
     # This backports base_dir which replaces installation path
     # RubyGems 1.8+
     def backport_base_dir
@@ -652,16 +625,8 @@ module Bundler
       end
     end
 
-    if Gem::Specification.respond_to?(:stubs_for)
-      def find_name(name)
-        Gem::Specification.stubs_for(name).map(&:to_spec)
-      end
-    else
-      def find_name(name)
-        Gem::Specification.stubs.find_all do |spec|
-          spec.name == name
-        end.map(&:to_spec)
-      end
+    def find_name(name)
+      Gem::Specification.stubs_for(name).map(&:to_spec)
     end
 
     if Gem::Specification.respond_to?(:default_stubs)
