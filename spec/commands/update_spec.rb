@@ -594,6 +594,7 @@ RSpec.describe "bundle update in more complicated situations" do
 
     it "is not updated because it is not actually included in the bundle" do
       bundle! "update a"
+      expect(last_command.stdboth).to include "Bundler attempted to update a but it was not considered because it is for a different platform from the current one"
       expect(the_bundle).to_not include_gem "a"
     end
   end

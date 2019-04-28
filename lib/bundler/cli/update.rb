@@ -61,7 +61,7 @@ module Bundler
 
       if locked_gems = Bundler.definition.locked_gems
         previous_locked_info = locked_gems.specs.reduce({}) do |h, s|
-          h[s.name] = { :version => s.version, :source => s.source.to_s }
+          h[s.name] = { :spec => s, :version => s.version, :source => s.source.to_s }
           h
         end
       end
@@ -79,8 +79,15 @@ module Bundler
           locked_info = previous_locked_info[name]
           next unless locked_info
 
+          locked_spec = locked_info[:spec]
           new_spec = Bundler.definition.specs[name].first
-          next unless new_spec
+          unless new_spec
+            if Bundler.rubygems.platforms.none? {|p| locked_spec.match_platform(p) }
+              Bundler.ui.warn "Bundler attempted to update #{name} but it was not considered because it is for a different platform from the current one"
+            end
+
+            next
+          end
 
           locked_source = locked_info[:source]
           new_source = new_spec.source.to_s
