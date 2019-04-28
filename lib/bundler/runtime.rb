@@ -34,13 +34,7 @@ module Bundler
         spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
       end.reverse.flatten
 
-      if insert_index = Bundler.rubygems.load_path_insert_index
-        # Gem directories must come after -I and ENV['RUBYLIB']
-        $LOAD_PATH.insert(insert_index, *load_paths)
-      else
-        # We are probably testing in core, -I and RUBYLIB don't apply
-        $LOAD_PATH.unshift(*load_paths)
-      end
+      Bundler.rubygems.add_to_load_path(load_paths)
 
       setup_manpath
 
