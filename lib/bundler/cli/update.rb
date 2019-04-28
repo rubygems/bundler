@@ -80,18 +80,20 @@ module Bundler
           next unless locked_spec
 
           locked_source = locked_spec[:source]
-          locked_version = locked_spec[:version]
           new_spec = Bundler.definition.specs[name].first
           new_source = new_spec.source.to_s
-          new_version = new_spec.version
           next if locked_source != new_source
 
+          new_version = new_spec.version
           if !new_version
             Bundler.ui.warn "Bundler attempted to update #{name} but it was removed from the bundle"
-          elsif new_version < locked_version
-            Bundler.ui.warn "Note: #{name} version regressed from #{locked_version} to #{new_version}"
-          elsif new_version == locked_version
-            Bundler.ui.warn "Bundler attempted to update #{name} but its version stayed the same"
+          else
+            locked_version = locked_spec[:version]
+            if new_version < locked_version
+              Bundler.ui.warn "Note: #{name} version regressed from #{locked_version} to #{new_version}"
+            elsif new_version == locked_version
+              Bundler.ui.warn "Bundler attempted to update #{name} but its version stayed the same"
+            end
           end
         end
       end
