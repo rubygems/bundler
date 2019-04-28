@@ -95,7 +95,7 @@ module Bundler
       end
 
       Bundler.ui.confirm "Bundle updated!"
-      Bundler::CLI::Common.output_without_groups_message
+      Bundler::CLI::Common.output_without_groups_message(:update)
       Bundler::CLI::Common.output_post_install_messages installer.post_install_messages
     end
   end
