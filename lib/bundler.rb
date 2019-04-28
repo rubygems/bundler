@@ -197,19 +197,19 @@ module Bundler
     def user_bundle_path(dir = "home")
       env_var, fallback = case dir
                           when "home"
-                            ["BUNDLE_USER_HOME", Pathname.new(user_home).join(".bundle")]
+                            ["BUNDLE_USER_HOME", proc { Pathname.new(user_home).join(".bundle") }]
                           when "cache"
-                            ["BUNDLE_USER_CACHE", user_bundle_path.join("cache")]
+                            ["BUNDLE_USER_CACHE", proc { user_bundle_path.join("cache") }]
                           when "config"
-                            ["BUNDLE_USER_CONFIG", user_bundle_path.join("config")]
+                            ["BUNDLE_USER_CONFIG", proc { user_bundle_path.join("config") }]
                           when "plugin"
-                            ["BUNDLE_USER_PLUGIN", user_bundle_path.join("plugin")]
+                            ["BUNDLE_USER_PLUGIN", proc { user_bundle_path.join("plugin") }]
                           else
                             raise BundlerError, "Unknown user path requested: #{dir}"
       end
       # `fallback` will already be a Pathname, but Pathname.new() is
       # idempotent so it's OK
-      Pathname.new(ENV.fetch(env_var, fallback))
+      Pathname.new(ENV.fetch(env_var, &fallback))
     end
 
     def user_cache

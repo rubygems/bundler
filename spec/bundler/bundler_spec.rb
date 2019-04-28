@@ -457,6 +457,7 @@ MESSAGE
 
       it "should use custom home path as root for other paths" do
         ENV["BUNDLE_USER_HOME"] = bundle_user_home_custom.to_s
+        allow(Bundler.rubygems).to receive(:user_home).and_raise
         expect(Bundler.user_bundle_path).to           eq(bundle_user_home_custom)
         expect(Bundler.user_bundle_path("home")).to   eq(bundle_user_home_custom)
         expect(Bundler.user_bundle_path("cache")).to  eq(bundle_user_home_custom.join("cache"))
