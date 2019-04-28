@@ -18,6 +18,8 @@ module Bundler
             s.source   = self
             s.authors  = ["bundler team"]
             s.bindir   = "exe"
+            s.homepage = "https://bundler.io"
+            s.summary  = "The best way to manage your application's dependencies"
             s.executables = %w[bundle]
             # can't point to the actual gemspec or else the require paths will be wrong
             s.loaded_from = File.expand_path("..", __FILE__)

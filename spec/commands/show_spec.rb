@@ -68,10 +68,23 @@ RSpec.describe "bundle show", :bundler => "< 3" do
     it "prints summary of gems" do
       bundle "show --verbose"
 
-      expect(out).to include("* actionmailer (2.3.2)")
-      expect(out).to include("\tSummary:  This is just a fake gem for testing")
-      expect(out).to include("\tHomepage: No website available.")
-      expect(out).to include("\tStatus:   Up to date")
+      expect(out).to include <<~MSG
+        * actionmailer (2.3.2)
+        \tSummary:  This is just a fake gem for testing
+        \tHomepage: http://example.com
+        \tStatus:   Up to date
+      MSG
+    end
+
+    it "includes bundler in the summary of gems" do
+      bundle "show --verbose"
+
+      expect(out).to include <<~MSG
+        * bundler (#{Bundler::VERSION})
+        \tSummary:  The best way to manage your application's dependencies
+        \tHomepage: https://bundler.io
+        \tStatus:   Up to date
+      MSG
     end
   end
 
