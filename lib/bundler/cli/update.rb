@@ -78,12 +78,14 @@ module Bundler
         gems.each do |name|
           locked_spec = previous_locked_specs[name]
           next unless locked_spec
+
           locked_source = locked_spec[:source]
           locked_version = locked_spec[:version]
           new_spec = Bundler.definition.specs[name].first
           new_source = new_spec.source.to_s
           new_version = new_spec.version
           next if locked_source != new_source
+
           if !new_version
             Bundler.ui.warn "Bundler attempted to update #{name} but it was removed from the bundle"
           elsif new_version < locked_version
