@@ -34,7 +34,6 @@ module Bundler
         spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
       end.reverse.flatten
 
-      # See Gem::Specification#add_self_to_load_path (since RubyGems 1.8)
       if insert_index = Bundler.rubygems.load_path_insert_index
         # Gem directories must come after -I and ENV['RUBYLIB']
         $LOAD_PATH.insert(insert_index, *load_paths)
