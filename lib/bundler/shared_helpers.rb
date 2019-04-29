@@ -253,19 +253,6 @@ module Bundler
       current  = File.expand_path(SharedHelpers.pwd).untaint
 
       until !File.directory?(current) || current == previous
-        if ENV["BUNDLE_SPEC_RUN"]
-          # avoid stepping above the tmp directory when testing
-          gemspec = if ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"]
-            # for Ruby Core
-            "lib/bundler/bundler.gemspec"
-          else
-            "bundler.gemspec"
-          end
-
-          # avoid stepping above the tmp directory when testing
-          return nil if File.file?(File.join(current, gemspec))
-        end
-
         names.each do |name|
           filename = File.join(current, name)
           yield filename
