@@ -123,6 +123,8 @@ task :rubocop do
   sh("bin/rubocop --parallel")
 end
 
+require_relative "spec/support/rubygems_ext"
+
 namespace :man do
   if RUBY_ENGINE == "jruby"
     task(:build) {}
