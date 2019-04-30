@@ -1,3 +1,5 @@
+require: rubocop-performance
+
 AllCops:
   DisabledByDefault: true
   TargetRubyVersion: 2.3
@@ -219,16 +221,6 @@ Lint/Void:
 Layout/AccessModifierIndentation:
   Enabled: true
   EnforcedStyle: outdent
-  Exclude:
-    - 'lib/bundler/cli.rb'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/feature_flag.rb'
-    - 'lib/bundler/gem_helpers.rb'
-    - 'lib/bundler/index.rb'
-    - 'lib/bundler/remote_specification.rb'
-    - 'lib/bundler/shared_helpers.rb'
-    - 'lib/bundler/source/path.rb'
-    - 'spec/realworld/gemfile_source_header_spec.rb'
 
 Layout/AlignArray:
   Enabled: true
@@ -309,19 +301,19 @@ Layout/EndOfLine:
 Layout/ExtraSpacing:
   Enabled: true
 
-Layout/FirstParameterIndentation:
-  Enabled: true
-
-Layout/IndentArray:
-  Enabled: true
-  EnforcedStyle: consistent
-
 Layout/IndentAssignment:
   Enabled: true
 
-Layout/IndentHash:
+Layout/IndentFirstArrayElement:
+  Enabled: true
+  EnforcedStyle: consistent
+
+Layout/IndentFirstHashElement:
   Enabled: true
   EnforcedStyle: special_inside_parentheses
+
+Layout/IndentFirstArgument:
+  Enabled: true
 
 Layout/IndentationConsistency:
   Enabled: true
@@ -464,19 +456,10 @@ Performance/EndWith:
 Performance/FixedSize:
   Enabled: true
 
-Performance/LstripRstrip:
-  Enabled: true
-
-Performance/RedundantSortBy:
-  Enabled: true
-
 Performance/RegexpMatch:
   Enabled: true
 
 Performance/ReverseEach:
-  Enabled: true
-
-Performance/Sample:
   Enabled: true
 
 Performance/Size:
@@ -731,6 +714,9 @@ Style/RedundantParentheses:
 Style/RedundantSelf:
   Enabled: true
 
+Style/RedundantSortBy:
+  Enabled: true
+
 Style/RegexpLiteral:
   Enabled: true
 
@@ -738,6 +724,9 @@ Style/RescueModifier:
   Enabled: true
 
 Style/RescueStandardError:
+  Enabled: true
+
+Style/Sample:
   Enabled: true
 
 Style/SelfAssignment:
@@ -767,6 +756,9 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
+
+Style/Strip:
+  Enabled: true
 
 Style/StructInheritance:
   Enabled: true
