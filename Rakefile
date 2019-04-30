@@ -9,10 +9,6 @@ else
   File.expand_path("tmp/rubygems")
 end
 
-def development_dependencies
-  @development_dependencies ||= Gem::Specification.load("bundler.gemspec").development_dependencies
-end
-
 # Benchmark task execution
 module Rake
   class Task
