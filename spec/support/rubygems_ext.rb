@@ -63,6 +63,7 @@ module Spec
     end
 
     def self.safe_activate(gem_name, gem_requirement)
+      Gem::Specification.reset if RUBY_VERSION < "2.4"
       gem gem_name, gem_requirement
     rescue Gem::LoadError
       warn "We couln't activate #{gem_name} (#{gem_requirement}). Installing it..."
