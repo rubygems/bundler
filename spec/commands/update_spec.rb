@@ -563,6 +563,41 @@ RSpec.describe "bundle update in more complicated situations" do
       expect(the_bundle).to include_gem "a 1.1"
     end
   end
+
+  context "when the dependency is for a different platform" do
+    before do
+      build_repo4 do
+        build_gem("a", "0.9") {|s| s.platform = "java" }
+        build_gem("a", "1.1") {|s| s.platform = "java" }
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo4}"
+        gem "a", platform: :jruby
+      G
+
+      lockfile <<-L
+        GEM
+          remote: file://#{gem_repo4}
+          specs:
+            a (0.9-java)
+
+        PLATFORMS
+          java
+
+        DEPENDENCIES
+          a
+      L
+
+      simulate_platform linux
+    end
+
+    it "is not updated because it is not actually included in the bundle" do
+      bundle! "update a"
+      expect(last_command.stdboth).to include "Bundler attempted to update a but it was not considered because it is for a different platform from the current one"
+      expect(the_bundle).to_not include_gem "a"
+    end
+  end
 end
 
 RSpec.describe "bundle update without a Gemfile.lock" do
