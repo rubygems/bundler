@@ -1,0 +1,62 @@
+PATH
+  remote: .
+  specs:
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ast (2.4.0)
+    automatiek (0.1.2)
+    diff-lcs (1.3)
+    hpricot (0.8.6)
+    jaro_winkler (1.5.2)
+    mustache (1.1.0)
+    parallel (1.17.0)
+    parser (2.6.3.0)
+      ast (~> 2.4.0)
+    rainbow (3.0.0)
+    rake (12.3.2)
+    rdiscount (2.2.0.1)
+    ronn (0.7.3)
+      hpricot (>= 0.8.2)
+      mustache (>= 0.7.0)
+      rdiscount (>= 1.5.8)
+    rspec (3.8.0)
+      rspec-core (~> 3.8.0)
+      rspec-expectations (~> 3.8.0)
+      rspec-mocks (~> 3.8.0)
+    rspec-core (3.8.0)
+      rspec-support (~> 3.8.0)
+    rspec-expectations (3.8.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.8.0)
+    rspec-mocks (3.8.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.8.0)
+    rspec-support (3.8.0)
+    rubocop (0.68.0)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.5, != 2.5.1.1)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 1.6)
+    rubocop-performance (1.1.0)
+      rubocop (>= 0.67.0)
+    ruby-progressbar (1.10.0)
+    unicode-display_width (1.5.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  automatiek (~> 0.1.0)
+  bundler!
+  rake (~> 12.0)
+  ronn (~> 0.7.3)
+  rspec (~> 3.6)
+  rubocop (= 0.68.0)
+  rubocop-performance (~> 1.1)
+
+BUNDLED WITH
+   2.1.0.pre.1
