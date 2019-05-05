@@ -33,7 +33,6 @@ module Bundler
       frozen
       gem.coc
       gem.mit
-      github.https
       global_path_appends_ruby_scope
       global_gem_cache
       ignore_messages

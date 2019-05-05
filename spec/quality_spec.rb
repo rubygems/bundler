@@ -173,7 +173,6 @@ RSpec.describe "The library itself" do
       forget_cli_options
       gem.coc
       gem.mit
-      github.https
       inline
       use_gem_version_promoter_for_major_updates
     ]
