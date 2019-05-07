@@ -62,6 +62,22 @@ RSpec.describe "bundle info" do
         expect(out).to_not include("Homepage:")
       end
     end
+
+    context "when gem has a dependency" do
+      it "prints the details" do
+        bundle "info actionpack"
+
+        expect(out).to include("Dependencies:\n\t\trails (2.3.2) depends on actionpack (= 2.3.2)")
+      end
+    end
+
+    context "when gem has no dependencies" do
+      it "prints a placeholder" do
+        bundle "info rails"
+
+        expect(out).to include("Dependencies:\n\t\t(none)")
+      end
+    end
   end
 
   context "with a git repo in the Gemfile" do
