@@ -33,7 +33,6 @@ module Bundler
       frozen
       gem.coc
       gem.mit
-      global_path_appends_ruby_scope
       global_gem_cache
       ignore_messages
       init_gems_rb
@@ -205,13 +204,12 @@ module Bundler
       locations
     end
 
-    # for legacy reasons, in Bundler 1, the ruby scope isnt appended when the setting comes from ENV or the global config,
-    # nor do we respect :disable_shared_gems
+    # for legacy reasons, in Bundler 2, we do not respect :disable_shared_gems
     def path
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
       if path && !@temporary.key?(key) && !@local_config.key?(key)
-        return Path.new(path, Bundler.feature_flag.global_path_appends_ruby_scope?, false, false)
+        return Path.new(path, true, false, false)
       end
 
       system_path = self["path.system"] || (self[:disable_shared_gems] == false)

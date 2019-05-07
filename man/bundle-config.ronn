@@ -202,9 +202,6 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
 * `global_gem_cache` (`BUNDLE_GLOBAL_GEM_CACHE`):
    Whether Bundler should cache all gems globally, rather than locally to the
    installing Ruby installation.
-* `global_path_appends_ruby_scope` (`BUNDLE_GLOBAL_PATH_APPENDS_RUBY_SCOPE`):
-   Whether Bundler should append the Ruby scope (e.g. engine and ABI version)
-   to a globally-configured path.
 * `ignore_messages` (`BUNDLE_IGNORE_MESSAGES`): When set, no post install
    messages will be printed. To silence a single gem, use dot notation like
    `ignore_messages.httparty true`.
