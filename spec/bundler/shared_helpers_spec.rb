@@ -25,7 +25,6 @@ RSpec.describe Bundler::SharedHelpers do
       before { ENV["BUNDLE_GEMFILE"] = nil }
 
       it "raises a GemfileNotFound error" do
-        ensure_no_gemfile
         expect { subject.default_gemfile }.to raise_error(
           Bundler::GemfileNotFound, "Could not locate Gemfile"
         )

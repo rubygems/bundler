@@ -391,10 +391,10 @@ E
   describe "subcommands" do
     it "list", :ruby_repo do
       bundle! "config list"
-      expect(out).to eq "Settings are listed in order of priority. The top value will be used."
+      expect(out).to eq "Settings are listed in order of priority. The top value will be used.\nspec_run\nSet via BUNDLE_SPEC_RUN: \"true\""
 
       bundle! "config list", :parseable => true
-      expect(out).to be_empty
+      expect(out).to eq "spec_run=true"
     end
 
     it "get" do

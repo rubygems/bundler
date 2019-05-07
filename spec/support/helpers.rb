@@ -313,12 +313,6 @@ module Spec
       bundle :lock, opts
     end
 
-    # Makes tests that require absence of any Gemfiles pass, even if the running
-    # system has a Gemfile further up from the specs folder
-    def ensure_no_gemfile
-      allow(Bundler::SharedHelpers).to receive(:search_up).and_return(nil)
-    end
-
     def install_gems(*gems)
       options = gems.last.is_a?(Hash) ? gems.pop : {}
       gem_repo = options.fetch(:gem_repo) { gem_repo1 }
