@@ -4,9 +4,9 @@ require "uri"
 
 module Bundler
   class Settings
-    autoload :Mirror,  "bundler/mirror"
-    autoload :Mirrors, "bundler/mirror"
-    autoload :Validator, "bundler/settings/validator"
+    autoload :Mirror,  File.expand_path("mirror", __dir__)
+    autoload :Mirrors, File.expand_path("mirror", __dir__)
+    autoload :Validator, File.expand_path("settings/validator", __dir__)
 
     BOOL_KEYS = %w[
       allow_bundler_dependency_conflicts

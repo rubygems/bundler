@@ -291,8 +291,9 @@ module Bundler
 
     def set_rubyopt
       rubyopt = [ENV["RUBYOPT"]].compact
-      return if !rubyopt.empty? && rubyopt.first =~ %r{-rbundler/setup}
-      rubyopt.unshift %(-rbundler/setup)
+      setup_require = "-r#{File.expand_path("setup", __dir__)}"
+      return if !rubyopt.empty? && rubyopt.first =~ /#{setup_require}/
+      rubyopt.unshift %(#{setup_require})
       Bundler::SharedHelpers.set_env "RUBYOPT", rubyopt.join(" ")
     end
 
