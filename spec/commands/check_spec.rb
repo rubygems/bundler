@@ -199,7 +199,6 @@ RSpec.describe "bundle check" do
   end
 
   it "outputs an error when the default Gemfile is not found" do
-    ensure_no_gemfile
     bundle :check
     expect(exitstatus).to eq(10) if exitstatus
     expect(err).to include("Could not locate Gemfile")

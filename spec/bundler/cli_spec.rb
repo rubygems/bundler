@@ -141,7 +141,6 @@ To install the latest version, run `gem install bundler`
           bundle! "config get --parseable foo"
           expect(last_command.stdboth).to eq ""
 
-          ensure_no_gemfile
           bundle "platform --ruby"
           expect(last_command.stdboth).to eq "Could not locate Gemfile"
         end

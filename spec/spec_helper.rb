@@ -25,6 +25,7 @@ $debug = false
 Spec::Manpages.setup unless Gem.win_platform?
 Spec::Rubygems.setup
 ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
+ENV["BUNDLE_SPEC_RUN"] = "true"
 
 # Don't wrap output in tests
 ENV["THOR_COLUMNS"] = "10000"

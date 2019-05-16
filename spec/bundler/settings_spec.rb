@@ -10,7 +10,6 @@ RSpec.describe Bundler::Settings do
       subject(:settings) { described_class.new(nil) }
 
       it "raises a GemfileNotFound error with explanation" do
-        ensure_no_gemfile
         expect { subject.set_local("foo", "bar") }.
           to raise_error(Bundler::GemfileNotFound, "Could not locate Gemfile")
       end
