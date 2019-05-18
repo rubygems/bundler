@@ -1,15 +1,19 @@
 module Bundler
   class Fetcher
     class Metrics
+
       def initialize
-        @uri = URI.parse("https://webhook.site/6e4832e5-df36-422d-ae2f-53c4e85ab475")
-        @http = Net::HTTP.new(@uri.host, @uri.port)
+        #dummy server for now
+        uri = URI.parse("https://webhook.site/6e4832e5-df36-422d-ae2f-53c4e85ab475")
+        @http = Net::HTTP.new(uri.host, uri.port)
         @http.use_ssl = true
-        @request = Net::HTTP::Post.new(@uri.request_uri)
+        @request = Net::HTTP::Post.new(uri.request_uri)
         @metrics = Hash.new
       end
+
+      #sending user agent metrics over http
       def add_metrics(cis)
-        puts "SENDING METRICS..."
+        puts "SENDING METRICS"
         ruby = Bundler::RubyVersion.system
         @metrics["Request ID"] = SecureRandom.hex(8)
         @metrics["Bundler Version"] = "bundler/#{Bundler::VERSION}"
