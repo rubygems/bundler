@@ -13,6 +13,7 @@ module Bundler
     autoload :Downloader, File.expand_path("fetcher/downloader", __dir__)
     autoload :Dependency, File.expand_path("fetcher/dependency", __dir__)
     autoload :Index, File.expand_path("fetcher/index", __dir__)
+    autoload :Metrics, File.expand_path("fetcher/metrics", __dir__)
 
     # This error is raised when it looks like the network is down
     class NetworkDownError < HTTPError; end
@@ -195,27 +196,7 @@ module Bundler
         # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
         agent << " " << extra_ua if extra_ua
-
-        puts "BEFORE SENDING"
-        uri2 = URI.parse("https://webhook.site/6e4832e5-df36-422d-ae2f-53c4e85ab475")
-        http2 = Net::HTTP.new(uri2.host, uri2.port)
-        http2.use_ssl = true
-        request2 = Net::HTTP::Post.new(uri2.request_uri)
-        metrics = {}
-        metrics["Request ID"] = SecureRandom.hex(8)
-        metrics["Bundler Version"] = "bundler/#{Bundler::VERSION}"
-        metrics["Rubygems Version"] = "rubygems/#{Gem::VERSION}"
-        metrics["Ruby Versions"] = "ruby/#{ruby.versions_string(ruby.versions)}"
-        metrics["Roby Host"] = "(#{ruby.host})"
-        metrics["Command"] = "command/#{ARGV.first}"
-        metrics["Ruby Engine"] = "#{ruby.engine}/#{ruby.versions_string(engine_version)}"
-        metrics["Options"] = "options/#{Bundler.settings.all.join(",")}"
-        metrics["ci"] = "ci/#{cis.join(",")}" if cis.any?
-        metrics["Extra UA strings set in config"] = extra_ua if extra_ua
-        request2.set_form_data(metrics)
-        response2 = http2.request(request2)
-        puts "AFTER SENDING"
-
+        metrics
         agent
       end
     end
@@ -328,5 +309,11 @@ module Bundler
     def downloader
       @downloader ||= Downloader.new(connection, self.class.redirect_limit)
     end
+
+    def metrics
+      @metrics = Metrics.new
+      @metrics.add_metrics(cis)
+    end
+
   end
 end
