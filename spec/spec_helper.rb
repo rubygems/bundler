@@ -69,8 +69,11 @@ RSpec.configure do |config|
     config.filter_run_excluding :realworld => true
   end
 
+  git_version = Bundler::Source::Git::GitProxy.new(nil, nil, nil).version
+
   config.filter_run_excluding :ruby => RequirementChecker.against(RUBY_VERSION)
   config.filter_run_excluding :rubygems => RequirementChecker.against(Gem::VERSION)
+  config.filter_run_excluding :git => RequirementChecker.against(git_version)
   config.filter_run_excluding :rubygems_master => (ENV["RGV"] != "master")
   config.filter_run_excluding :bundler => RequirementChecker.against(Bundler::VERSION.split(".")[0])
   config.filter_run_excluding :ruby_repo => !(ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"]).nil?
