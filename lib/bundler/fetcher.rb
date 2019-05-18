@@ -196,6 +196,7 @@ module Bundler
         # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
         agent << " " << extra_ua if extra_ua
+        #calling the metrics method in the user agent for now
         metrics
         agent
       end
@@ -309,10 +310,10 @@ module Bundler
     def downloader
       @downloader ||= Downloader.new(connection, self.class.redirect_limit)
     end
-
+    
     def metrics
-      @metrics = Metrics.new
-      @metrics.add_metrics(cis)
+      #send the ci's to metrics otherwise its undefined, the rest can be collected locally
+      @metrics = Metrics.new.add_metrics(cis)
     end
 
   end
