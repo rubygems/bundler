@@ -37,7 +37,6 @@ module Bundler
     settings_flag(:deployment_means_frozen) { bundler_3_mode? }
     settings_flag(:disable_multisource) { bundler_3_mode? }
     settings_flag(:forget_cli_options) { bundler_3_mode? }
-    settings_flag(:global_path_appends_ruby_scope) { bundler_3_mode? }
     settings_flag(:global_gem_cache) { bundler_3_mode? }
     settings_flag(:only_update_to_newer_versions) { bundler_3_mode? }
     settings_flag(:path_relative_to_cwd) { bundler_3_mode? }

@@ -52,8 +52,6 @@ RSpec.describe "when using sudo", :sudo => true do
     end
 
     it "installs when BUNDLE_PATH is owned by root" do
-      bundle! "config set global_path_appends_ruby_scope false" # consistency in tests between 1.x and 2.x modes
-
       bundle_path = tmp("owned_by_root")
       FileUtils.mkdir_p bundle_path
       sudo "chown -R root #{bundle_path}"
@@ -64,14 +62,12 @@ RSpec.describe "when using sudo", :sudo => true do
         gem "rack", '1.0'
       G
 
-      expect(bundle_path.join("gems/rack-1.0.0")).to exist
-      expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
+      expect(bundle_path.join(Bundler.ruby_scope, "gems/rack-1.0.0")).to exist
+      expect(bundle_path.join(Bundler.ruby_scope, "gems/rack-1.0.0").stat.uid).to eq(0)
       expect(the_bundle).to include_gems "rack 1.0"
     end
 
     it "installs when BUNDLE_PATH does not exist" do
-      bundle! "config set global_path_appends_ruby_scope false" # consistency in tests between 1.x and 2.x modes
-
       root_path = tmp("owned_by_root")
       FileUtils.mkdir_p root_path
       sudo "chown -R root #{root_path}"
@@ -83,8 +79,8 @@ RSpec.describe "when using sudo", :sudo => true do
         gem "rack", '1.0'
       G
 
-      expect(bundle_path.join("gems/rack-1.0.0")).to exist
-      expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
+      expect(bundle_path.join(Bundler.ruby_scope, "gems/rack-1.0.0")).to exist
+      expect(bundle_path.join(Bundler.ruby_scope, "gems/rack-1.0.0").stat.uid).to eq(0)
       expect(the_bundle).to include_gems "rack 1.0"
     end
 
