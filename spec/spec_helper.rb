@@ -58,6 +58,8 @@ RSpec.configure do |config|
   # forever due to memory constraints
   config.fail_fast ||= 25 if ENV["CI"]
 
+  config.bisect_runner = :shell
+
   if ENV["BUNDLER_SUDO_TESTS"] && Spec::Sudo.present?
     config.filter_run :sudo => true
   else
