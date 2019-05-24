@@ -111,14 +111,15 @@ RSpec.configure do |config|
     build_repo1
   end
 
-  config.before :each do
+  config.around :each do |example|
+    ENV.replace(original_env)
     reset!
     system_gems []
     in_app_root
     @command_executions = []
-  end
 
-  config.after :each do |example|
+    example.run
+
     all_output = @command_executions.map(&:to_s_verbose).join("\n\n")
     if example.exception && !all_output.empty?
       warn all_output unless config.formatters.grep(RSpec::Core::Formatters::DocumentationFormatter).empty?
@@ -129,7 +130,6 @@ RSpec.configure do |config|
     end
 
     Dir.chdir(original_wd)
-    ENV.replace(original_env)
   end
 
   config.after :suite do
