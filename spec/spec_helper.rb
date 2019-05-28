@@ -23,12 +23,6 @@ end
 $debug = false
 
 Spec::Manpages.setup unless Gem.win_platform?
-Spec::Rubygems.setup
-ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
-ENV["BUNDLE_SPEC_RUN"] = "true"
-
-# Don't wrap output in tests
-ENV["THOR_COLUMNS"] = "10000"
 
 module Gem
   def self.ruby=(ruby)
@@ -57,6 +51,8 @@ RSpec.configure do |config|
   # bundler being broken) so that running the full test suite doesn't take
   # forever due to memory constraints
   config.fail_fast ||= 25 if ENV["CI"]
+
+  config.bisect_runner = :shell
 
   if ENV["BUNDLER_SUDO_TESTS"] && Spec::Sudo.present?
     config.filter_run :sudo => true
@@ -102,6 +98,15 @@ RSpec.configure do |config|
   end
 
   config.before :suite do
+    Spec::Rubygems.setup
+    ENV["RUBYOPT"] = original_env["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
+    ENV["BUNDLE_SPEC_RUN"] = original_env["BUNDLE_SPEC_RUN"] = "true"
+
+    # Don't wrap output in tests
+    ENV["THOR_COLUMNS"] = "10000"
+
+    original_env = ENV.to_hash.delete_if {|k, _v| k.start_with?(Bundler::EnvironmentPreserver::BUNDLER_PREFIX) }
+
     if ENV["BUNDLE_RUBY"]
       FileUtils.cp_r Spec::Path.bindir, File.join(Spec::Path.root, "lib", "exe")
     end
@@ -111,14 +116,15 @@ RSpec.configure do |config|
     build_repo1
   end
 
-  config.before :each do
+  config.around :each do |example|
+    ENV.replace(original_env)
     reset!
     system_gems []
     in_app_root
     @command_executions = []
-  end
 
-  config.after :each do |example|
+    example.run
+
     all_output = @command_executions.map(&:to_s_verbose).join("\n\n")
     if example.exception && !all_output.empty?
       warn all_output unless config.formatters.grep(RSpec::Core::Formatters::DocumentationFormatter).empty?
@@ -129,7 +135,6 @@ RSpec.configure do |config|
     end
 
     Dir.chdir(original_wd)
-    ENV.replace(original_env)
   end
 
   config.after :suite do
