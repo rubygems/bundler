@@ -16,7 +16,7 @@ steps:
   displayName: 'work around readline crash (for https://github.com/bundler/bundler/issues/6902)'
 
 - script: |
-    git apply --ignore-space-change --ignore-whitespace .azure-pipelines\rbreadline.diff --directory=C:/hostedtoolcache/windows/Ruby/2.4.3/x64/lib/ruby/site_ruby --unsafe-paths
+    git apply --ignore-space-change --ignore-whitespace .azure-pipelines\rbreadline.diff --directory=C:/hostedtoolcache/windows/Ruby/2.4.5/x64/lib/ruby/site_ruby --unsafe-paths
   displayName: 'patch local readline implementation (for https://github.com/bundler/bundler/issues/6907)'
 
 - script: |
