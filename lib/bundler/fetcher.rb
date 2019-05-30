@@ -170,38 +170,10 @@ module Bundler
 
     def user_agent
       @user_agent ||= begin
-        ruby = Bundler::RubyVersion.system
-        # CONTINUE
-        # metrics
-        # agent = @metrics.metrics_hash["Bundler Version"]
-        agent = "bundler/#{Bundler::VERSION}"
-        agent << " rubygems/#{Gem::VERSION}"
-        agent << " ruby/#{ruby.versions_string(ruby.versions)}"
-        agent << " (#{ruby.host})"
-        agent << " command/#{ARGV.first}"
-        if ruby.engine != "ruby"
-          # engine_version raises on unknown engines
-          engine_version = begin
-                             ruby.engine_versions
-                           rescue RuntimeError
-                             "???"
-                           end
-          agent << " #{ruby.engine}/#{ruby.versions_string(engine_version)}"
-        end
-
-        agent << " options/#{Bundler.settings.all.join(",")}"
-
-        agent << " ci/#{cis.join(",")}" if cis.any?
-
-        # add a random ID so we can consolidate runs server-side
-        agent << " " << SecureRandom.hex(8)
-
-        # add any user agent strings set in the config
-        extra_ua = Bundler.settings[:user_agent]
-        agent << " " << extra_ua if extra_ua
-        # calling the metrics method in the user agent for now
-        agent
+        metrics
+        @metrics.metrics_hash.values.join(" ")
       end
+      @user_agent
     end
 
     def fetchers
@@ -252,6 +224,7 @@ module Bundler
         con.open_timeout = Fetcher.api_timeout
         con.override_headers["User-Agent"] = user_agent
         con.override_headers["X-Gemfile-Source"] = @remote.original_uri.to_s if @remote.original_uri
+        @metrics.send_metrics
         con
       end
     end
