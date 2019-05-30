@@ -30,9 +30,7 @@ module Bundler
 
       # sending user agent metrics over http
       def add_metrics
-        puts "SENDING METRICS"
         ruby = Bundler::RubyVersion.system
-        @metrics_hash["Request ID"] = SecureRandom.hex(8)
         @metrics_hash["Bundler Version"] = "bundler/#{Bundler::VERSION}"
         @metrics_hash["Rubygems Version"] = "rubygems/#{Gem::VERSION}"
         @metrics_hash["Ruby Versions"] = "ruby/#{ruby.versions_string(ruby.versions)}"
@@ -49,11 +47,16 @@ module Bundler
         end
         @metrics_hash["Options"] = "options/#{Bundler.settings.all.join(",")}"
         @metrics_hash["CI"] = "ci/#{cis.join(",")}" if cis.any?
+        # add a random ID so we can consolidate runs server-side
+        @metrics_hash["Request ID"] = SecureRandom.hex(8)
+        # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
         @metrics_hash["Extra UA in config"] = extra_ua if extra_ua
+      end
+
+      def send_metrics
         @request.set_form_data(@metrics_hash)
         @http.request(@request)
-        puts "METRICS SENT"
       end
     end
   end
