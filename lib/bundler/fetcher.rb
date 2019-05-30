@@ -171,7 +171,10 @@ module Bundler
     def user_agent
       @user_agent ||= begin
         ruby = Bundler::RubyVersion.system
-        agent = String.new("bundler/#{Bundler::VERSION}")
+        # CONTINUE
+        # metrics
+        # agent = @metrics.metrics_hash["Bundler Version"]
+        agent = "bundler/#{Bundler::VERSION}"
         agent << " rubygems/#{Gem::VERSION}"
         agent << " ruby/#{ruby.versions_string(ruby.versions)}"
         agent << " (#{ruby.host})"
@@ -196,8 +199,7 @@ module Bundler
         # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
         agent << " " << extra_ua if extra_ua
-        #calling the metrics method in the user agent for now
-        metrics
+        # calling the metrics method in the user agent for now
         agent
       end
     end
@@ -218,21 +220,6 @@ module Bundler
   private
 
     FETCHERS = [CompactIndex, Dependency, Index].freeze
-
-    def cis
-      env_cis = {
-        "TRAVIS" => "travis",
-        "CIRCLECI" => "circle",
-        "SEMAPHORE" => "semaphore",
-        "JENKINS_URL" => "jenkins",
-        "BUILDBOX" => "buildbox",
-        "GO_SERVER_URL" => "go",
-        "SNAP_CI" => "snap",
-        "CI_NAME" => ENV["CI_NAME"],
-        "CI" => "ci",
-      }
-      env_cis.find_all {|env, _| ENV[env] }.map {|_, ci| ci }
-    end
 
     def connection
       @connection ||= begin
@@ -310,10 +297,10 @@ module Bundler
     def downloader
       @downloader ||= Downloader.new(connection, self.class.redirect_limit)
     end
-    
+
     def metrics
-      #send the ci's to metrics otherwise its undefined, the rest can be collected locally
-      @metrics = Metrics.new.add_metrics(cis)
+      @metrics = Metrics.new
+      @metrics.add_metrics
     end
 
   end
