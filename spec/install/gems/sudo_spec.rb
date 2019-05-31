@@ -3,11 +3,18 @@
 RSpec.describe "when using sudo", :sudo => true do
   describe "and BUNDLE_PATH is writable" do
     context "but BUNDLE_PATH/build_info is not writable" do
+      let(:subdir) do
+        system_gem_path("cache")
+      end
+
       before do
         bundle! "config set path.system true"
-        subdir = system_gem_path("cache")
         subdir.mkpath
         sudo "chmod u-w #{subdir}"
+      end
+
+      after do
+        sudo "chmod u+w #{subdir}"
       end
 
       it "installs" do
@@ -101,6 +108,10 @@ RSpec.describe "when using sudo", :sudo => true do
       sudo "chmod ugo-w #{default_bundle_path}"
     end
 
+    after do
+      sudo "chmod ugo+w #{default_bundle_path}"
+    end
+
     it "installs" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
@@ -142,6 +153,8 @@ RSpec.describe "when using sudo", :sudo => true do
       bundle :install, :env => { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil }
       expect(gem_home.join("bin/rackup")).to exist
       expect(the_bundle).to include_gems "rack 1.0", :env => { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil }
+
+      sudo "rm -rf #{tmp("sudo_gem_home")}"
     end
   end
 

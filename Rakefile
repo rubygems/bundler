@@ -97,15 +97,10 @@ namespace :spec do
   end
 
   desc "Run the spec suite with the sudo tests"
-  task :sudo => %w[set_sudo spec clean_sudo]
+  task :sudo => %w[set_sudo spec]
 
   task :set_sudo do
     ENV["BUNDLER_SUDO_TESTS"] = "1"
-  end
-
-  task :clean_sudo do
-    puts "Cleaning up sudo test files..."
-    system "sudo rm -rf #{File.expand_path("../tmp/sudo_gem_home", __FILE__)}"
   end
 
   # RubyGems specs by version
@@ -121,7 +116,7 @@ namespace :spec do
 
       # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
       namespace rg do
-        task :sudo => ["set_sudo", rg, "clean_sudo"]
+        task :sudo => ["set_sudo", rg]
         task :realworld => ["set_realworld", rg]
       end
 
@@ -139,7 +134,7 @@ namespace :spec do
     end
 
     namespace "co" do
-      task :sudo => ["set_sudo", "co", "clean_sudo"]
+      task :sudo => ["set_sudo", "co"]
       task :realworld => ["set_realworld", "co"]
     end
 
