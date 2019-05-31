@@ -11,6 +11,14 @@ module Bundler
         @http.use_ssl = true
         @request = Net::HTTP::Post.new(uri.request_uri)
         @metrics_hash = Hash.new
+        @path = File.expand_path("~/.bundle/metrics.yml")
+      end
+
+      def create_metrics_file
+        SharedHelpers.filesystem_access(@path) do |p|
+          require_relative "../yaml_serializer"
+          File.open(p, "w") {|f| f.write(YAMLSerializer.dump(@metrics_hash)) }
+        end
       end
 
       def cis
@@ -52,6 +60,7 @@ module Bundler
         # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
         @metrics_hash["Extra UA in config"] = extra_ua if extra_ua
+        create_metrics_file
       end
 
       def send_metrics
