@@ -11,13 +11,22 @@ module Bundler
         @http.use_ssl = true
         @request = Net::HTTP::Post.new(uri.request_uri)
         @metrics_hash = Hash.new
-        @path = File.expand_path("~/.bundle/metrics.yml")
+        @path = Pathname.new(File.expand_path("~/.bundle/metrics.yml"))
       end
 
       def create_metrics_file
-        SharedHelpers.filesystem_access(@path) do |p|
+        SharedHelpers.filesystem_access(@path) do |file|
           require_relative "../yaml_serializer"
-          File.open(p, "w") {|f| f.write(YAMLSerializer.dump(@metrics_hash)) }
+          File.open(file, "w") {|f| f.write(YAMLSerializer.dump(@metrics_hash)) }
+        end
+      end
+
+      def read_from_file
+        SharedHelpers.filesystem_access(@path, :read) do |file|
+          valid_file = file.exist? && !file.size.zero?
+          return {} unless valid_file
+          require_relative "../yaml_serializer"
+          YAMLSerializer.load file.read
         end
       end
 
@@ -64,6 +73,7 @@ module Bundler
       end
 
       def send_metrics
+        read_from_file
         @request.set_form_data(@metrics_hash)
         @http.request(@request)
       end
