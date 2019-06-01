@@ -2,7 +2,7 @@ module Bundler
   class Fetcher
     class Metrics
 
-      attr_accessor :metrics_hash
+      attr_accessor :metrics_hash, :path
 
       def initialize
         # dummy server for now
@@ -14,17 +14,18 @@ module Bundler
         @path = Pathname.new(File.expand_path("~/.bundle/metrics.yml"))
       end
 
-      def create_metrics_file
+      def write_to_file
         SharedHelpers.filesystem_access(@path) do |file|
+          FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
           require_relative "../yaml_serializer"
           File.open(file, "w") {|f| f.write(YAMLSerializer.dump(@metrics_hash)) }
         end
       end
 
       def read_from_file
+        valid_file = @path.exist? && !@path.size.zero?
+        return {} unless valid_file
         SharedHelpers.filesystem_access(@path, :read) do |file|
-          valid_file = file.exist? && !file.size.zero?
-          return {} unless valid_file
           require_relative "../yaml_serializer"
           YAMLSerializer.load file.read
         end
@@ -69,7 +70,7 @@ module Bundler
         # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
         @metrics_hash["Extra UA in config"] = extra_ua if extra_ua
-        create_metrics_file
+        write_to_file
       end
 
       def send_metrics

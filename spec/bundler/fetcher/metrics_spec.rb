@@ -1,10 +1,6 @@
-RSpec.describe Bundler::Fetcher::Metrics do
-  let(:uri) { URI("https://example.com") }
-  let(:http) { Net::HTTP.new(uri.host, uri.port)}
-  let(:request) { Net::HTTP::Post.new(uri.request_uri)}
-  let(:metrics_hash) { Hash.new}
+# frozen_string_literal: true
 
-  subject(:http) { http.use_ssl = true }
+RSpec.describe Bundler::Fetcher::Metrics do
   subject(:metrics) { Bundler::Fetcher::Metrics.new }
 
   describe "#add_metrics" do
@@ -36,6 +32,26 @@ RSpec.describe Bundler::Fetcher::Metrics do
           expect(ci_part).to match("my_ci")
         end
       end
+    end
+  end
+
+  describe "#write_to_file" do
+    before do
+      metrics.add_metrics
+    end
+    it "Creates a file in the global bundler path and writes into it" do
+      expect(metrics.path.exist?).to eq(true)
+      expect(metrics.path.size.zero?).to eq(false)
+    end
+  end
+
+  describe "#read_from_file" do
+    it "Returns an empty hash if the metrics.yml file has not been found" do
+      expect(metrics.read_from_file.empty?).to eq(true)
+    end
+    it "Reads the metrics hash from the metrics.yml file and returns it" do
+      metrics.add_metrics
+      expect(metrics.read_from_file.empty?).to eq(false)
     end
   end
 end
