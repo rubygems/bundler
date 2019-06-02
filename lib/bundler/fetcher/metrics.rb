@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bundler
   class Fetcher
     class Metrics
@@ -11,7 +13,7 @@ module Bundler
         @http.use_ssl = true
         @request = Net::HTTP::Post.new(uri.request_uri)
         @metrics_hash = Hash.new
-        @path = Pathname.new(File.expand_path("~/.bundle/metrics.yml"))
+        @path = Pathname.new(File.expand_path(File.join(Bundler.user_home.join(".bundle"), "metrics.yml")))
       end
 
       def write_to_file

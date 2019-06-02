@@ -276,6 +276,5 @@ module Bundler
       @metrics = Metrics.new
       @metrics.add_metrics
     end
-
   end
 end
