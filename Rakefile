@@ -242,6 +242,7 @@ namespace :man do
       end
       task :build_all_pages => "index.txt"
 
+      desc "Remove all built man pages"
       task :clean do
         leftovers = Dir["man/*"].reject do |f|
           File.extname(f) == ".ronn"
@@ -251,11 +252,6 @@ namespace :man do
 
       desc "Build the man pages"
       task :build => ["man:clean", "man:build_all_pages"]
-
-      desc "Remove all built man pages"
-      task :clobber do
-        rm_rf "lib/bundler/man"
-      end
     end
   end
 end
