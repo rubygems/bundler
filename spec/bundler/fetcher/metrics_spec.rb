@@ -8,18 +8,20 @@ RSpec.describe Bundler::Fetcher::Metrics do
       metrics.add_metrics
     end
     it "builds metrics_hash with current ruby version and Bundler settings" do
-      expect(metrics.metrics_hash["Bundler Version"]).to match(%r{bundler/(\d.)})
-      expect(metrics.metrics_hash["Rubygems Version"]).to match(%r{rubygems/(\d.)})
-      expect(metrics.metrics_hash["Ruby Versions"]).to match(%r{ruby/(\d.)})
-      expect(metrics.metrics_hash["Options"]).to match(%r{options/spec_run})
-      expect(metrics.metrics_hash["Command"]).to match(%r{command/(...)})
+      expect(metrics.metrics_hash["bundler_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(pre){0,1}\.{0,1}\d{0,1}/)
+      expect(metrics.metrics_hash["rubygems_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(preview|pre){0,1}\.{0,1}\d{0,1}/)
+      expect(metrics.metrics_hash["ruby_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(preview|pre){0,1}\.{0,1}\d{0,1}/)
+      expect(metrics.metrics_hash["options"]).to match(/(spec_run)/)
+      expect(metrics.metrics_hash["command"]).to match(/(...)/)
+      expect(metrics.metrics_hash["time_stamp"]).to match(/\d{4}-\d{2}-\d{2}\S\d{2}:\d{2}:\d{2}\S/)
+      expect(metrics.metrics_hash["request_id"]).to match(/\w/)
     end
 
     describe "include CI information" do
       it "from one CI" do
         with_env_vars("JENKINS_URL" => "foo") do
           metrics.add_metrics
-          ci_part = metrics.metrics_hash["CI"]
+          ci_part = metrics.metrics_hash["ci"]
           expect(ci_part).to match("jenkins")
         end
       end
@@ -27,7 +29,7 @@ RSpec.describe Bundler::Fetcher::Metrics do
       it "from many CI" do
         with_env_vars("TRAVIS" => "foo", "CI_NAME" => "my_ci") do
           metrics.add_metrics
-          ci_part = metrics.metrics_hash["CI"]
+          ci_part = metrics.metrics_hash["ci"]
           expect(ci_part).to match("travis")
           expect(ci_part).to match("my_ci")
         end
