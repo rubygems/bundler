@@ -170,10 +170,37 @@ module Bundler
 
     def user_agent
       @user_agent ||= begin
+        ruby = Bundler::RubyVersion.system
+
+        agent = String.new("bundler/#{Bundler::VERSION}")
+        agent << " rubygems/#{Gem::VERSION}"
+        agent << " ruby/#{ruby.versions_string(ruby.versions)}"
+        agent << " (#{ruby.host})"
+        agent << " command/#{ARGV.first}"
+
+        if ruby.engine != "ruby"
+          # engine_version raises on unknown engines
+          engine_version = begin
+                             ruby.engine_versions
+                           rescue RuntimeError
+                             "???"
+                           end
+          agent << " #{ruby.engine}/#{ruby.versions_string(engine_version)}"
+        end
+
+        agent << " options/#{Bundler.settings.all.join(",")}"
+
+        agent << " ci/#{cis.join(",")}" if cis.any?
+
+        # add a random ID so we can consolidate runs server-side
+        agent << " " << SecureRandom.hex(8)
+
+        # add any user agent strings set in the config
+        extra_ua = Bundler.settings[:user_agent]
+        agent << " " << extra_ua if extra_ua
         metrics
-        @metrics.metrics_hash.values.join(" ")
+        agent
       end
-      @user_agent
     end
 
     def fetchers
@@ -192,6 +219,21 @@ module Bundler
   private
 
     FETCHERS = [CompactIndex, Dependency, Index].freeze
+
+    def cis
+      env_cis = {
+        "TRAVIS" => "travis",
+        "CIRCLECI" => "circle",
+        "SEMAPHORE" => "semaphore",
+        "JENKINS_URL" => "jenkins",
+        "BUILDBOX" => "buildbox",
+        "GO_SERVER_URL" => "go",
+        "SNAP_CI" => "snap",
+        "CI_NAME" => ENV["CI_NAME"],
+        "CI" => "ci",
+      }
+      env_cis.find_all {|env, _| ENV[env] }.map {|_, ci| ci }
+    end
 
     def connection
       @connection ||= begin
@@ -225,6 +267,8 @@ module Bundler
         con.override_headers["User-Agent"] = user_agent
         con.override_headers["X-Gemfile-Source"] = @remote.original_uri.to_s if @remote.original_uri
         @metrics.send_metrics
+        # TODO
+        puts "I'VE SENT THE METRICS!"
         con
       end
     end

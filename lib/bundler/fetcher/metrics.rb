@@ -13,7 +13,7 @@ module Bundler
         @http.use_ssl = true
         @request = Net::HTTP::Post.new(uri.request_uri)
         @metrics_hash = Hash.new
-        @path = Pathname.new(File.expand_path(File.join(Bundler.user_home.join(".bundle"), "metrics.yml")))
+        @path = Pathname.new(File.join(Bundler.user_home.join(".bundle"), "metrics.yml"))
       end
 
       def write_to_file
@@ -50,12 +50,15 @@ module Bundler
 
       # sending user agent metrics over http
       def add_metrics
+        @metrics_hash["time_stamp"] = Time.now.utc.iso8601
+        # add a random ID so we can consolidate runs server-side
+        @metrics_hash["request_id"] = SecureRandom.hex(8)
+        @metrics_hash["command"] = ARGV.first
         ruby = Bundler::RubyVersion.system
-        @metrics_hash["Bundler Version"] = "bundler/#{Bundler::VERSION}"
-        @metrics_hash["Rubygems Version"] = "rubygems/#{Gem::VERSION}"
-        @metrics_hash["Ruby Versions"] = "ruby/#{ruby.versions_string(ruby.versions)}"
-        @metrics_hash["Roby Host"] = "(#{ruby.host})"
-        @metrics_hash["Command"] = "command/#{ARGV.first}"
+        @metrics_hash["host"] = ruby.host
+        @metrics_hash["ruby_version"] = ruby.versions_string(ruby.versions)
+        @metrics_hash["bundler_version"] = Bundler::VERSION
+        @metrics_hash["rubygems_version"] = Gem::VERSION
         if ruby.engine != "ruby"
           # engine_version raises on unknown engines
           engine_version = begin
@@ -63,16 +66,24 @@ module Bundler
                            rescue RuntimeError
                              "???"
                            end
-          @metrics_hash["Ruby Engine"] = "#{ruby.engine}/#{ruby.versions_string(engine_version)}"
+          @metrics_hash["ruby_engine"] = "#{ruby.engine}/#{ruby.versions_string(engine_version)}"
         end
-        @metrics_hash["Options"] = "options/#{Bundler.settings.all.join(",")}"
-        @metrics_hash["CI"] = "ci/#{cis.join(",")}" if cis.any?
-        # add a random ID so we can consolidate runs server-side
-        @metrics_hash["Request ID"] = SecureRandom.hex(8)
+        @metrics_hash["options"] = Bundler.settings.all.join(",")
+        @metrics_hash["ci"] = cis.join(",") if cis.any?
         # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
-        @metrics_hash["Extra UA in config"] = extra_ua if extra_ua
+        @metrics_hash["extra_ua"] = extra_ua if extra_ua
+        total = Bundler.definition.dependencies.count
+        p total
+        add_additional_metrics
         write_to_file
+      end
+
+      def add_additional_metrics
+        case ARGV.first
+        when "install"
+          @metrics_hash["gemfile_gem_count"] = Bundler.definition.unlock.count
+        end
       end
 
       def send_metrics
