@@ -75,6 +75,32 @@ RSpec.describe "bundle outdated" do
     end
   end
 
+  describe "--with-new-dependencies option" do
+    before :each do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "duradura", '7.0'
+      G
+
+      update_repo2 do
+        build_gem "duradura", "8.0" do |g|
+          g.add_dependency "actionpack", "5.1.4"
+        end
+      end
+    end
+
+    it "show new dependencies with the flag" do
+      bundle "outdated --with-new-dependencies"
+      expect(out).to include("    > actionpack = 5.1.4")
+    end
+
+    it "not show new dependencies without the flag" do
+      bundle "outdated"
+      expect(out).not_to include("    > actionpack = 5.1.4")
+    end
+  end
+
   describe "with --group option" do
     def test_group_option(group = nil, gems_list_size = 1)
       install_gemfile <<-G

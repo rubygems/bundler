@@ -145,7 +145,8 @@ module Bundler
                 gem[:active_spec],
                 gem[:dependency],
                 groups,
-                options_include_groups.any?
+                options_include_groups.any?,
+                options[:'with-new-dependencies']
               )
             end
           end
@@ -156,7 +157,8 @@ module Bundler
               gem[:active_spec],
               gem[:dependency],
               gem[:groups],
-              options_include_groups.any?
+              options_include_groups.any?,
+              options[:'with-new-dependencies']
             )
           end
         end
@@ -199,7 +201,7 @@ module Bundler
       end
     end
 
-    def print_gem(current_spec, active_spec, dependency, groups, options_include_groups)
+    def print_gem(current_spec, active_spec, dependency, groups, options_include_groups, with_dependencies)
       spec_version = "#{active_spec.version}#{active_spec.git_version}"
       spec_version += " (from #{active_spec.loaded_from})" if Bundler.ui.debug? && active_spec.loaded_from
       current_version = "#{current_spec.version}#{current_spec.git_version}"
@@ -220,6 +222,19 @@ module Bundler
       end
 
       Bundler.ui.info output_message.rstrip
+
+      if with_dependencies
+        active_spec_deps = dependencies_to_str(active_spec.dependencies)
+        current_spec_deps = dependencies_to_str(current_spec.dependencies)
+        new_deps = active_spec_deps - current_spec_deps
+        return if new_deps.size == 0
+
+        Bundler.ui.info "    > #{new_deps.join(", ")}".rstrip
+      end
+    end
+
+    def dependencies_to_str(dependencies)
+      dependencies.to_a.map { |d| "#{d.name} #{d.requirement}" }.sort
     end
 
     def check_for_deployment_mode

@@ -386,6 +386,7 @@ module Bundler
     D
     method_option "group", :type => :string, :banner => "List gems from a specific group"
     method_option "groups", :type => :boolean, :banner => "List gems organized by groups"
+    method_option "with-new-dependencies", :type => :boolean, :banner => "Show new dependencies or changed"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
