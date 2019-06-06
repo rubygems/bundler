@@ -3,9 +3,9 @@
 require_relative "vendored_thor"
 
 module Bundler
+  autoload :Metrics, File.expand_path("metrics", __dir__)
   class CLI < Thor
     require_relative "cli/common"
-
     package_name "Bundler"
 
     AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
@@ -235,6 +235,8 @@ module Bundler
       Bundler.settings.temporary(:no_install => false) do
         Install.new(options.dup).run
       end
+      metrics
+      @metrics.send_metrics
     end
 
     desc "update [OPTIONS]", "Update the current environment"
@@ -793,6 +795,11 @@ module Bundler
         "remembered accross bundler invokations, which bundler will no longer " \
         "do in future versions. Instead please use `bundle config set #{name} " \
         "'#{value}'`, and stop using this flag"
+    end
+
+    def metrics
+      @metrics = Metrics.new
+      @metrics.add_metrics
     end
   end
 end

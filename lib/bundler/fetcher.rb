@@ -13,7 +13,6 @@ module Bundler
     autoload :Downloader, File.expand_path("fetcher/downloader", __dir__)
     autoload :Dependency, File.expand_path("fetcher/dependency", __dir__)
     autoload :Index, File.expand_path("fetcher/index", __dir__)
-    autoload :Metrics, File.expand_path("fetcher/metrics", __dir__)
 
     # This error is raised when it looks like the network is down
     class NetworkDownError < HTTPError; end
@@ -199,7 +198,6 @@ module Bundler
         # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
         agent << " " << extra_ua if extra_ua
-        metrics
         agent
       end
     end
@@ -267,7 +265,6 @@ module Bundler
         con.open_timeout = Fetcher.api_timeout
         con.override_headers["User-Agent"] = user_agent
         con.override_headers["X-Gemfile-Source"] = @remote.original_uri.to_s if @remote.original_uri
-        @metrics.send_metrics
         con
       end
     end
@@ -312,11 +309,6 @@ module Bundler
 
     def downloader
       @downloader ||= Downloader.new(connection, self.class.redirect_limit)
-    end
-
-    def metrics
-      @metrics = Metrics.new
-      @metrics.add_metrics
     end
   end
 end

@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Fetcher::Metrics do
-  subject(:metrics) { Bundler::Fetcher::Metrics.new }
+require "bundler/metrics"
+require "net/http"
+require "time"
+require "securerandom"
+
+RSpec.describe Bundler::Metrics do
+  subject(:metrics) { Bundler::Metrics.new }
 
   describe "#add_metrics" do
     before do
