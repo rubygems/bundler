@@ -267,8 +267,6 @@ module Bundler
         con.override_headers["User-Agent"] = user_agent
         con.override_headers["X-Gemfile-Source"] = @remote.original_uri.to_s if @remote.original_uri
         @metrics.send_metrics
-        # TODO
-        puts "I'VE SENT THE METRICS!"
         con
       end
     end
