@@ -15,8 +15,7 @@ module Bundler
       :requires,
       :ruby_version,
       :lockfile,
-      :gemfiles,
-      :unlock
+      :gemfiles
     )
 
     # Given a gemfile and lockfile creates a Bundler definition

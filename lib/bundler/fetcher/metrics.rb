@@ -3,7 +3,6 @@
 module Bundler
   class Fetcher
     class Metrics
-
       attr_accessor :metrics_hash, :path
 
       def initialize
@@ -73,8 +72,6 @@ module Bundler
         # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
         @metrics_hash["extra_ua"] = extra_ua if extra_ua
-        total = Bundler.definition.dependencies.count
-        p total
         add_additional_metrics
         write_to_file
       end
@@ -82,7 +79,7 @@ module Bundler
       def add_additional_metrics
         case ARGV.first
         when "install"
-          @metrics_hash["gemfile_gem_count"] = Bundler.definition.unlock.count
+          @metrics_hash["gemfile_gem_count"] = Bundler.definition.dependencies.count
         end
       end
 
