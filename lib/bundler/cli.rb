@@ -467,6 +467,7 @@ module Bundler
     map "e" => "exec"
     def exec(*args)
       require_relative "cli/exec"
+      metrics
       Exec.new(options, args).run
     end
 
@@ -812,7 +813,6 @@ module Bundler
 
     def metrics
       @metrics = Metrics.new
-      @metrics.add_metrics
     end
   end
 end
