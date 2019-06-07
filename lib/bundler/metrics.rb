@@ -23,14 +23,23 @@ module Bundler
       begin
         origin = `git remote get-url origin`
         @metrics_hash["origin"] = Digest::MD5.hexdigest(origin.chomp) unless origin.empty?
+      rescue Errno::ENOENT
+      end
+      begin
         git_ver = `git --version`
         @metrics_hash["git_version"] = git_ver[git_ver.index(/\d/)..git_ver.rindex(/\d/)] unless git_ver.empty?
+      rescue Errno::ENOENT
+      end
+      begin
         rvm_ver = `rvm --version`
         @metrics_hash["rvm_version"] = rvm_ver[rvm_ver.index(/\d/)..-1].chomp unless rvm_ver.empty?
+      rescue Errno::ENOENT
+      end
+      begin
         rbenv_ver = `rbenv --version`
         @metrics_hash["rbenv_version"] = rbenv_ver[rbenv_ver.index(/\d/)..-1].chomp unless rbenv_ver.empty?
+      rescue Errno::ENOENT
       end
-    rescue Errno::ENOENT
       @metrics_hash["command"] = ARGV.first
       ruby = Bundler::RubyVersion.system
       @metrics_hash["host"] = ruby.host
