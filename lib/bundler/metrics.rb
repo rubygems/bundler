@@ -2,6 +2,7 @@
 
 require "time"
 require "securerandom"
+require "digest"
 module Bundler
   class Metrics
     attr_accessor :metrics_hash, :path
@@ -17,6 +18,9 @@ module Bundler
       @metrics_hash["time_stamp"] = Time.now.utc.iso8601
       # add a random ID so we can consolidate runs server-side
       @metrics_hash["request_id"] = SecureRandom.hex(8)
+      # hash the origin repository to calculate unique bundler users
+      origin = `git remote get-url origin`
+      @metrics_hash["origin"] = Digest::MD5.hexdigest(origin.chomp) unless origin.empty?
       @metrics_hash["command"] = ARGV.first
       ruby = Bundler::RubyVersion.system
       @metrics_hash["host"] = ruby.host
@@ -95,6 +99,13 @@ module Bundler
       when "install"
         @metrics_hash["gemfile_gem_count"] = Bundler.definition.dependencies.count
         @metrics_hash["installed_gem_count"] = Bundler.definition.specs.count
+        @metrics_hash["git_gem_count"] = Bundler.definition.sources.git_sources.count
+        @metrics_hash["path_gem_count"] = Bundler.definition.sources.path_sources.count
+        # The last index of rubygems_sources is an entry of all sources concatenated, so it has to be ignored
+        @metrics_hash["rubygems_source_count"] = Bundler.definition.sources.rubygems_sources[0..-2].count
+        @metrics_hash["gem_sources"] = Bundler.definition.sources.rubygems_sources[0..-2].map {|s| Digest::MD5.hexdigest(s.get_source) } if @metrics_hash["rubygems_source_count"] > 1
+        # The last index is the only entry if there's a single source, so iteration has to be different
+        @metrics_hash["gem_sources"] = Bundler.definition.sources.rubygems_sources.map {|s| Digest::MD5.hexdigest(s.get_source) } if @metrics_hash["rubygems_source_count"] == 1
       when "exec"
         ARGV[1..-1].each_index {|i| @metrics_hash["executed_command_#{i+1}"] = ARGV[i+1] }
       end
