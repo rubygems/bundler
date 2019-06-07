@@ -229,12 +229,12 @@ module Bundler
         new_deps = active_spec_deps - current_spec_deps
         return if new_deps.size == 0
 
-        Bundler.ui.info "    > #{new_deps.join(", ")}".rstrip
+        Bundler.ui.info "    > #{new_deps.sort.join(", ")}".rstrip
       end
     end
 
     def dependencies_to_str(dependencies)
-      dependencies.to_a.map { |d| "#{d.name} #{d.requirement}" }.sort
+      dependencies.to_a.map { |d| "#{d.name} #{d.requirement}" }
     end
 
     def check_for_deployment_mode
