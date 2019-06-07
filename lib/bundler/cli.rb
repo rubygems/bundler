@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "vendored_thor"
-
 module Bundler
-  autoload :Metrics, File.expand_path("metrics", __dir__)
   class CLI < Thor
     require_relative "cli/common"
     package_name "Bundler"

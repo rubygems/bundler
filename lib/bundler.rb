@@ -59,6 +59,7 @@ module Bundler
   autoload :UI,                     File.expand_path("bundler/ui", __dir__)
   autoload :URICredentialsFilter,   File.expand_path("bundler/uri_credentials_filter", __dir__)
   autoload :VersionRanges,          File.expand_path("bundler/version_ranges", __dir__)
+  autoload :Metrics,                File.expand_path("bundler/metrics", __dir__)
 
   class << self
     def configure
