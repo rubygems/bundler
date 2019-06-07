@@ -234,7 +234,7 @@ module Bundler
     end
 
     def dependencies_to_str(dependencies)
-      dependencies.to_a.map { |d| "#{d.name} #{d.requirement}" }
+      dependencies.to_a.map {|d| "#{d.name} #{d.requirement}" }
     end
 
     def check_for_deployment_mode
