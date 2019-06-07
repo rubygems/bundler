@@ -8,7 +8,8 @@ module Bundler
       :git_sources,
       :plugin_sources,
       :global_rubygems_source,
-      :metadata_source
+      :metadata_source,
+      :rubygems_sources
 
     def initialize
       @path_sources           = []

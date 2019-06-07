@@ -15,7 +15,8 @@ module Bundler
       :requires,
       :ruby_version,
       :lockfile,
-      :gemfiles
+      :gemfiles,
+      :sources
     )
 
     # Given a gemfile and lockfile creates a Bundler definition
@@ -531,9 +532,6 @@ module Bundler
     def find_indexed_specs(current_spec)
       index[current_spec.name].select {|spec| spec.match_platform(current_spec.platform) }.sort_by(&:version)
     end
-
-    attr_reader :sources
-    private :sources
 
     def nothing_changed?
       !@source_changes && !@dependency_changes && !@new_platform && !@path_changes && !@local_changes && !@locked_specs_incomplete_for_platform
