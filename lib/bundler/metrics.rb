@@ -3,6 +3,7 @@
 require "time"
 require "securerandom"
 require "digest"
+
 module Bundler
   class Metrics
     attr_accessor :metrics_hash, :path
@@ -55,9 +56,10 @@ module Bundler
       write_to_file
     end
 
-    def add_performance_metrics(time)
-      @metrics_hash["command_time_taken"] = time
-    end
+    # cant use it for now 
+    # def add_performance_metrics(time)
+    #   @metrics_hash["command_time_taken"] = time.round(2)
+    # end
 
     def send_metrics
       # dummy server for now
@@ -77,8 +79,8 @@ module Bundler
     def write_to_file
       SharedHelpers.filesystem_access(@path) do |file|
         FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
-        require_relative "yaml_serializer"
-        File.open(file, "a") {|f| f.write(YAMLSerializer.dump(@metrics_hash)) }
+        require "psych"
+        File.open(file, "a") {|f| f.write(Psych.dump(@metrics_hash)) }
       end
     end
 
@@ -87,6 +89,7 @@ module Bundler
       return {} unless valid_file
       list = Array.new
       SharedHelpers.filesystem_access(@path, :read) do |file|
+        require "psych"
         Psych.load_stream(file.read) {|doc| list << doc }
       end
       list
