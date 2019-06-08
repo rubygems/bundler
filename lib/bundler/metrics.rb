@@ -72,12 +72,17 @@ module Bundler
 
     def send_metrics
       # dummy server for now
-      uri = URI.parse("https://webhook.site/ee1e4493-c0f0-4e40-84fb-3a36d79d47fb")
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      request = Net::HTTP::Post.new(uri.request_uri)
-      request.set_form_data(read_from_file)
-      http.request(request)
+      begin
+        uri = URI.parse("https://webhook.site/ee1e4493-c0f0-4e40-84fb-3a36d79d47fb")
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        request = Net::HTTP::Post.new(uri.request_uri)
+        request.set_form_data(read_from_file)
+        http.request(request)
+      rescue SocketError
+        "TCP connection failed"
+      end
+
       # We've sent the metrics so we empty the file
       # File::TRUNC is preferable since File.truncate doesn't work for all systems
       open(@path, File::TRUNC) if File.exist?(@path)
