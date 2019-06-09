@@ -197,6 +197,7 @@ module Bundler
         # add any user agent strings set in the config
         extra_ua = Bundler.settings[:user_agent]
         agent << " " << extra_ua if extra_ua
+
         agent
       end
     end

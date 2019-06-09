@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require_relative "vendored_thor"
+
 module Bundler
   class CLI < Thor
     require_relative "cli/common"
+
     package_name "Bundler"
 
     AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
