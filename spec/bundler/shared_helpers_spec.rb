@@ -223,6 +223,14 @@ RSpec.describe Bundler::SharedHelpers do
       ENV["BUNDLE_GEMFILE"] = "Gemfile"
     end
 
+    let(:setup_path) do
+      if ruby_core?
+        File.expand_path("../../../lib/bundler/setup", __dir__)
+      else
+        File.expand_path("../../lib/bundler/setup", __dir__)
+      end
+    end
+
     shared_examples_for "ENV['PATH'] gets set correctly" do
       before { Dir.mkdir ".bundle" }
 
@@ -236,7 +244,7 @@ RSpec.describe Bundler::SharedHelpers do
     shared_examples_for "ENV['RUBYOPT'] gets set correctly" do
       it "ensures -rbundler/setup is at the beginning of ENV['RUBYOPT']" do
         subject.set_bundle_environment
-        expect(ENV["RUBYOPT"].split(" ")).to start_with("-r#{File.expand_path("../../lib/bundler/setup", __dir__)}")
+        expect(ENV["RUBYOPT"].split(" ")).to start_with("-r#{setup_path}")
       end
     end
 
@@ -393,7 +401,7 @@ RSpec.describe Bundler::SharedHelpers do
 
       it "sets BUNDLE_BIN_PATH to the bundle executable file" do
         subject.set_bundle_environment
-        bundle_exe = ruby_core? ? "../../../../exe/bundle" : "../../../exe/bundle"
+        bundle_exe = ruby_core? ? "../../../../../bin/bundle" : "../../../exe/bundle"
         expect(ENV["BUNDLE_BIN_PATH"]).to eq(File.expand_path(bundle_exe, __FILE__))
       end
     end
