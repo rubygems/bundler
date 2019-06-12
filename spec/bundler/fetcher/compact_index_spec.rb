@@ -12,8 +12,6 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
 
   describe "#specs_for_names" do
     it "has only one thread open at the end of the run" do
-      expect(thread_count).to eq(1), "Expected 1 active thread before `#specs_for_names`, but found #{thread_count}. In particular, found:\n#{thread_inspection}"
-
       compact_index.specs_for_names(["lskdjf"])
 
       expect(thread_count).to eq(1), "Expected 1 active thread after `#specs_for_names`, but found #{thread_count}. In particular, found:\n#{thread_inspection}"
@@ -99,20 +97,6 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
           compact_index.specs_for_names(["lskdjf"])
         end
       end
-    end
-
-  private
-
-    def thread_count
-      thread_list.count
-    end
-
-    def thread_list
-      Thread.list.select {|thread| thread.status == "run" }
-    end
-
-    def thread_inspection
-      thread_list.map {|th| "  * #{th} (#{th.status}):\n    #{th.backtrace_locations.join("\n    ")}" }.join("\n")
     end
   end
 end

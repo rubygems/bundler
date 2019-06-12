@@ -123,7 +123,11 @@ RSpec.configure do |config|
     in_app_root
     @command_executions = []
 
-    example.run
+    begin
+      example.run
+    ensure
+      expect(thread_count).to eq(1), "#{example.location} left #{thread_count} threads running. In particular:\n#{thread_inspection}"
+    end
 
     all_output = @command_executions.map(&:to_s_verbose).join("\n\n")
     if example.exception && !all_output.empty?

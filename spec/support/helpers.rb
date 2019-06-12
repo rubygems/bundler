@@ -618,5 +618,17 @@ module Spec
         ::FileUtils
       end
     end
+
+    def thread_count
+      thread_list.count
+    end
+
+    def thread_list
+      Thread.list.select {|thread| thread.status == "run" }
+    end
+
+    def thread_inspection
+      thread_list.map {|th| "  * #{th} (#{th.status}):\n    #{th.backtrace_locations.join("\n    ")}" }.join("\n")
+    end
   end
 end
