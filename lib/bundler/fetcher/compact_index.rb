@@ -93,15 +93,8 @@ module Bundler
           func = lambda {|object, _index| blk.call(object) }
           worker = bundle_worker(func)
           inputs.each {|input| worker.enq(input) }
-
-          results = []
-
-          begin
-            results = inputs.map { worker.deq }
-          ensure
-            worker.stop
-          end
-
+          results = inputs.map { worker.deq }
+          worker.stop
           results
         end
 
