@@ -1,3 +1,29 @@
+## 2.0.2 (2019-05-13)
+
+Changes:
+
+  - Fixes for Bundler integration with ruby-src ([#6941](https://github.com/bundler/bundler/pull/6941), [#6973](https://github.com/bundler/bundler/pull/6973), [#6977](https://github.com/bundler/bundler/pull/6977), [#6315](https://github.com/bundler/bundler/pull/6315), [#7061](https://github.com/bundler/bundler/pull/7061))
+  - Use `__dir__` instead of `__FILE__` when generate a gem with `bundle gem` ([#6503](https://github.com/bundler/bundler/pull/6503))
+  - Use `https` on externals links in the Bundler gemspec ([#6721](https://github.com/bundler/bundler/pull/6721))
+  - Removed duplicate gem names from the suggested `did you mean` list for gem typos ([#6739](https://github.com/bundler/bundler/pull/6739))
+  - Removed Ruby 1.x compatibility code ([#6764](https://github.com/bundler/bundler/pull/6764), [#6806](https://github.com/bundler/bundler/pull/6806))
+  - Fixed an issue where `bundle remove` would crash with certain Gemfiles ([#6768](https://github.com/bundler/bundler/pull/6769))
+  - Fixed indentation in the executable template ([#6773](https://github.com/bundler/bundler/pull/6773))
+  - Fixed an issue where plugins could register for the same hook multiple times ([#6775](https://github.com/bundler/bundler/pull/6775))
+  - Changed the "multiple sources" message in `bundle install` to be a warning instead of an error ([#6790](https://github.com/bundler/bundler/pull/6790))
+  - Fixed a bug where path gems would be break when using `only_update_to_newer_versions` ([#6774](https://github.com/bundler/bundler/pull/6774))
+  - Fixed a bug where installing plugins with the `--delpoyment` setting would fail ([#6805](https://github.com/bundler/bundler/pull/6805))
+  - Fixed an issue where `bundle update` couldn't update & install a gem when `no_install` was set (a `bundle package` config) ([#7078](https://github.com/bundler/bundler/pull/7078))
+  - Fixed an issue where users could not run `bundle exec` on default gems ([#6963](https://github.com/bundler/bundler/pull/6963))
+  - Updated vendor libraries to their latest version ([#7076](https://github.com/bundler/bundler/pull/7067), [#7068](https://github.com/bundler/bundler/pull/7068))
+  - Fixed an issue where the `github` source was not using `https` by default that we mentioned in the 2.0 release ([#7182](https://github.com/bundler/bundler/pull/7182))
+  - Fixed an issue where `rake release` was not outputting the message to users asking for a 2fa token ([#7199](https://github.com/bundler/bundler/pull/7199))
+
+Documentation:
+
+  - Fix incorrect documented `BUNDLE_PATH_RELATIVE_TO_CWD` env var ([#6751](https://github.com/bundler/bundler/pull/6751))
+  - Update URLs in Bundler's documentation to use `https` ([#6935](https://github.com/bundler/bundler/pull/6935))
+
 ## 2.0.1 (2019-01-04)
 
 Changes:
