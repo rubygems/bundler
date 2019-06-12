@@ -42,8 +42,6 @@ module Bundler
           deps = begin
                    parallel_compact_index_client.dependencies(remaining_gems)
                  rescue TooManyRequestsError
-                   @bundle_worker.stop if @bundle_worker
-                   @bundle_worker = nil # reset it.  Not sure if necessary
                    serial_compact_index_client.dependencies(remaining_gems)
                  end
           next_gems = deps.map {|d| d[3].map(&:first).flatten(1) }.flatten(1).uniq
@@ -51,8 +49,6 @@ module Bundler
           complete_gems.concat(deps.map(&:first)).uniq!
           remaining_gems = next_gems - complete_gems
         end
-        @bundle_worker.stop if @bundle_worker
-        @bundle_worker = nil # reset it.  Not sure if necessary
 
         gem_info
       end
@@ -97,7 +93,16 @@ module Bundler
           func = lambda {|object, _index| blk.call(object) }
           worker = bundle_worker(func)
           inputs.each {|input| worker.enq(input) }
-          inputs.map { worker.deq }
+
+          results = []
+
+          begin
+            results = inputs.map { worker.deq }
+          ensure
+            worker.stop
+          end
+
+          results
         end
 
         compact_index_client
