@@ -107,7 +107,7 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
     end
 
     def thread_inspection
-      thread_list.map {|th| "  * #{th}:\n    #{th.backtrace_locations.join("\n    ")}" }.join("\n")
+      thread_list.map {|th| "  * #{th} (#{th.status}):\n    #{th.backtrace_locations.join("\n    ")}" }.join("\n")
     end
   end
 end
