@@ -11,9 +11,6 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
   end
 
   describe "#specs_for_names" do
-    let(:thread_list) { Thread.list.select {|thread| thread.status == "run" } }
-    let(:thread_inspection) { thread_list.map {|th| "  * #{th}:\n    #{th.backtrace_locations.join("\n    ")}" }.join("\n") }
-
     it "has only one thread open at the end of the run" do
       compact_index.specs_for_names(["lskdjf"])
 
@@ -101,6 +98,16 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
           compact_index.specs_for_names(["lskdjf"])
         end
       end
+    end
+
+  private
+
+    def thread_list
+      Thread.list.select {|thread| thread.status == "run" }
+    end
+
+    def thread_inspection
+      thread_list.map {|th| "  * #{th}:\n    #{th.backtrace_locations.join("\n    ")}" }.join("\n")
     end
   end
 end
