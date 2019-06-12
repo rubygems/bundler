@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "major deprecations", :bundler => "< 3" do
+RSpec.describe "major deprecations", :bundler => "<= 2" do
   let(:warnings) { last_command.bundler_err } # change to err in 2.0
   let(:warnings_without_version_messages) { warnings.gsub(/#{Spec::Matchers::MAJOR_DEPRECATION}Bundler will only support ruby(gems)? >= .*/, "") }
 
@@ -198,17 +198,6 @@ RSpec.describe "major deprecations", :bundler => "< 3" do
     end
 
     context "with github gems" do
-      it "warns about the https change" do
-        msg = <<-EOS
-The :github git source is deprecated, and will be removed in Bundler 3.0. Change any "reponame" :github sources to "username/reponame". Add this code to the top of your Gemfile to ensure it continues to work:
-
-    git_source(:github) {|repo_name| "https://github.com/\#{repo_name}.git" }
-
-        EOS
-        expect(Bundler::SharedHelpers).to receive(:major_deprecation).with(3, msg)
-        subject.gem("sparks", :github => "indirect/sparks")
-      end
-
       it "upgrades to https on request" do
         Bundler.settings.temporary "github.https" => true
         msg = <<-EOS
