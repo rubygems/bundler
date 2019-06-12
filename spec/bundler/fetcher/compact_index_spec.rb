@@ -14,7 +14,6 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
     it "has only one thread open at the end of the run" do
       compact_index.specs_for_names(["lskdjf"])
 
-      thread_count = thread_list.count
       expect(thread_count).to eq(1), "Expected 1 active thread after `#specs_for_names`, but found #{thread_count}. In particular, found:\n#{thread_inspection}"
     end
 
@@ -101,6 +100,10 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
     end
 
   private
+
+    def thread_count
+      thread_list.count
+    end
 
     def thread_list
       Thread.list.select {|thread| thread.status == "run" }
