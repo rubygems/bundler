@@ -79,6 +79,8 @@ module Bundler
 
       warn_ambiguous_gems
 
+      handle_install_metrics
+
       if CLI::Common.clean_after_install?
         require_relative "clean"
         Bundler::CLI::Clean.new(options).run
@@ -213,6 +215,13 @@ module Bundler
         Bundler.ui.warn "    gem '#{name}', :source => '#{installed_from_uri}'"
         Bundler.ui.warn "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
       end
+    end
+
+    def handle_install_metrics
+      metrics = Bundler.metrics
+      metrics.record_system_info
+      metrics.record_install_info
+      metrics.send_metrics
     end
   end
 end
