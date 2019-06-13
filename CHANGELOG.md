@@ -12,7 +12,7 @@ Changes:
   - Fixed an issue where plugins could register for the same Bundler hook multiple times ([#6775](https://github.com/bundler/bundler/pull/6775))
   - Changed the "multiple sources" message in `bundle install` to be a warning instead of an error ([#6790](https://github.com/bundler/bundler/pull/6790))
   - Fixed a bug where path gems would break when using `only_update_to_newer_versions` ([#6774](https://github.com/bundler/bundler/pull/6774))
-  - Fixed a bug where installing plugins with the `--delpoyment` setting would fail ([#6805](https://github.com/bundler/bundler/pull/6805))
+  - Fixed a bug where installing plugins with the `--deployment` setting would fail ([#6805](https://github.com/bundler/bundler/pull/6805))
   - Fixed an issue where `bundle update` couldn't update & install a gem when `no_install` was set (a `bundle package` config) ([#7078](https://github.com/bundler/bundler/pull/7078))
   - Fixed an issue where users could not run `bundle exec` on default gems ([#6963](https://github.com/bundler/bundler/pull/6963))
   - Updated vendor libraries to their latest version ([#7076](https://github.com/bundler/bundler/pull/7067), [#7068](https://github.com/bundler/bundler/pull/7068))
