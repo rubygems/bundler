@@ -224,10 +224,7 @@ module Bundler
       @metrics = Bundler.metrics
       @metrics.record_system_info
       @metrics.record_install_info
-      @install_hash = Hash.new
-      @install_hash["command"] = ARGV[0]
-      @install_hash["time_taken"] = time_taken.round(2)
-      @metrics.record(@install_hash)
+      @metrics.record("time_taken", time_taken.round(2))
       @metrics.send_metrics
     end
   end

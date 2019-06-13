@@ -12,9 +12,11 @@ module Bundler
       @path = Bundler.user_bundle_path("metrics")
     end
 
-    def record(entry = {})
-      @standalone_metrics = entry
-      entry["timestamp"] = Time.now.utc.iso8601
+    def record(key, value)
+      @standalone_metrics = Hash.new
+      @standalone_metrics[key] = value
+      @standalone_metrics["command"] = ARGV[0]
+      @standalone_metrics["timestamp"] = Time.now.utc.iso8601
       write_to_file
     end
 
