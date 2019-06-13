@@ -6,8 +6,6 @@ require "digest"
 
 module Bundler
   class Metrics
-    attr_accessor :system_metrics, :path
-
     def initialize
       @path = Bundler.user_bundle_path("metrics")
     end
@@ -15,7 +13,7 @@ module Bundler
     def record(key, value)
       @standalone_metrics = Hash.new
       @standalone_metrics[key] = value
-      @standalone_metrics["command"] = ARGV[0]
+      @standalone_metrics["command"] = ARGV.first
       @standalone_metrics["timestamp"] = Time.now.utc.iso8601
       write_to_file
     end
@@ -47,7 +45,6 @@ module Bundler
         @system_metrics["rbenv_version"] = rbenv_ver[rbenv_ver.index(/\d/)..-1].chomp unless rbenv_ver.empty?
       rescue Errno::ENOENT
       end
-      @system_metrics["command"] = ARGV.first
       ruby = Bundler::RubyVersion.system
       @system_metrics["host"] = ruby.host
       @system_metrics["ruby_version"] = ruby.versions_string(ruby.versions)
