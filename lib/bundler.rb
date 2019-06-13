@@ -205,6 +205,8 @@ module Bundler
                             ["BUNDLE_USER_CONFIG", proc { user_bundle_path.join("config") }]
                           when "plugin"
                             ["BUNDLE_USER_PLUGIN", proc { user_bundle_path.join("plugin") }]
+                          when "metrics"
+                            ["BUNDLE_USER_METRICS", proc { user_bundle_path.join("metrics.yml") }]
                           else
                             raise BundlerError, "Unknown user path requested: #{dir}"
       end
@@ -560,6 +562,10 @@ EOF
       rubygems.undo_replacements
       rubygems.reset
       @rubygems = nil
+    end
+
+    def metrics
+      @metrics = Metrics.new
     end
 
   private

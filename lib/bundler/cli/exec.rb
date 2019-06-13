@@ -21,15 +21,19 @@ module Bundler
     end
 
     def run
+      start = Time.now
       validate_cmd!
       SharedHelpers.set_bundle_environment
       if bin_path = Bundler.which(cmd)
         if !Bundler.settings[:disable_exec_load] && ruby_shebang?(bin_path)
+          handle_exec_metrics(Time.now - start)
           return kernel_load(bin_path, *args)
         end
+        handle_exec_metrics(Time.now - start)
         kernel_exec(bin_path, *args)
       else
         # exec using the given command
+        handle_exec_metrics(Time.now - start)
         kernel_exec(cmd, *args)
       end
     end
@@ -95,6 +99,14 @@ module Bundler
 
       first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }
       possibilities.any? {|shebang| first_line.start_with?(shebang) }
+    end
+
+    def handle_exec_metrics(time_taken)
+      @exec_hash = Hash.new
+      @metrics = Bundler.metrics
+      @exec_hash["command"] = ARGV[0]
+      @exec_hash["time_taken"] = time_taken
+      @metrics.record(@exec_hash)
     end
   end
 end

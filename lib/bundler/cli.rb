@@ -233,8 +233,6 @@ module Bundler
       Bundler.settings.temporary(:no_install => false) do
         Install.new(options.dup).run
       end
-      metrics
-      @metrics.send_metrics
     end
 
     desc "update [OPTIONS]", "Update the current environment"
@@ -467,7 +465,6 @@ module Bundler
     map "e" => "exec"
     def exec(*args)
       require_relative "cli/exec"
-      metrics
       Exec.new(options, args).run
     end
 
@@ -809,10 +806,6 @@ module Bundler
         "remembered accross bundler invokations, which bundler will no longer " \
         "do in future versions. Instead please use `bundle config #{name} " \
         "'#{value}'`, and stop using this flag"
-    end
-
-    def metrics
-      @metrics = Metrics.new
     end
   end
 end
