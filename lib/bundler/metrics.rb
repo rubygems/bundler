@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require "time"
-require "securerandom"
-require "digest"
-
 module Bundler
   class Metrics
     def initialize
@@ -12,9 +8,10 @@ module Bundler
 
     def record(key, value)
       @standalone_metrics = Hash.new
-      @standalone_metrics[key] = value
       @standalone_metrics["command"] = ARGV.first
+      require "time"
       @standalone_metrics["timestamp"] = Time.now.utc.iso8601
+      @standalone_metrics[key] = value
       write_to_file
     end
 
@@ -23,10 +20,12 @@ module Bundler
     def record_system_info
       @system_metrics = Hash.new
       # add a random ID so we can consolidate runs server-side
+      require "securerandom"
       @system_metrics["request_id"] = SecureRandom.hex(8)
       # hash the origin repository to calculate unique bundler users
       begin
         origin = `git remote get-url origin`
+        require "digest"
         @system_metrics["origin"] = Digest::MD5.hexdigest(origin.chomp) unless origin.empty?
       rescue Errno::ENOENT
       end
@@ -90,6 +89,7 @@ module Bundler
       @system_metrics["git_gem_count"] = Bundler.definition.sources.git_sources.count
       @system_metrics["path_gem_count"] = Bundler.definition.sources.path_sources.count
       @system_metrics["rubygems_source_count"] = Bundler.definition.sources.rubygems_sources.count
+      require "digest"
       @system_metrics["gem_sources"] = Bundler.definition.sources.rubygems_sources.map {|s| Digest::MD5.hexdigest(s.get_source) }
     end
 
