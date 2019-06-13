@@ -27,7 +27,10 @@ module Bundler
     end
 
     def run
-      check_for_deployment_mode!
+      start = Time.now
+      check_for_deployment_mode
+
+      sources = Array(options[:source])
 
       gems.each do |gem_name|
         Bundler::CLI::Common.select_spec(gem_name)
@@ -129,9 +132,8 @@ module Bundler
         else
           print_gems(outdated_gems_list)
         end
-
-        exit 1
       end
+      handle_outdated_metrics(Time.now - start)
     end
 
   private
@@ -265,6 +267,14 @@ module Bundler
     def get_version_semver_portion_value(spec, version_portion_index)
       version_section = spec.version.segments[version_portion_index, 1]
       version_section.to_a[0].to_i
+    end
+
+    def handle_outdated_metrics(time_taken)
+      @metrics = Bundler.metrics
+      @metrics.record_system_info
+      @metrics.record_install_info
+      @metrics.record("time_taken", time_taken.round(2))
+      @metrics.send_metrics
     end
   end
 end
