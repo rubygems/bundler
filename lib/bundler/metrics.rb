@@ -6,16 +6,15 @@ require "digest"
 
 module Bundler
   class Metrics
-    attr_reader :system_metrics, :path
+    attr_accessor :system_metrics, :path
 
     def initialize
       @path = Bundler.user_bundle_path("metrics")
-      @standalone_metrics = Array.new
     end
 
     def record(entry = {})
+      @standalone_metrics = entry
       entry["timestamp"] = Time.now.utc.iso8601
-      @standalone_metrics << entry
       write_to_file
     end
 
@@ -23,7 +22,6 @@ module Bundler
     # to be called when bundle install or bundle outdated is run
     def record_system_info
       @system_metrics = Hash.new
-      @system_metrics["timestamp"] = Time.now.utc.iso8601
       # add a random ID so we can consolidate runs server-side
       @system_metrics["request_id"] = SecureRandom.hex(8)
       # hash the origin repository to calculate unique bundler users

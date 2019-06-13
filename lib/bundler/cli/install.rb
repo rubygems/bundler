@@ -8,6 +8,8 @@ module Bundler
     end
 
     def run
+      start = Time.now
+
       Bundler.ui.level = "error" if options[:quiet]
 
       warn_if_root
@@ -79,12 +81,13 @@ module Bundler
 
       warn_ambiguous_gems
 
-      handle_install_metrics
-
       if CLI::Common.clean_after_install?
         require_relative "clean"
         Bundler::CLI::Clean.new(options).run
       end
+
+      handle_install_metrics(Time.now - start)
+
     rescue GemNotFound, VersionConflict => e
       if options[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your #{Bundler.settings.app_cache_path} directory."
@@ -217,11 +220,15 @@ module Bundler
       end
     end
 
-    def handle_install_metrics
-      metrics = Bundler.metrics
-      metrics.record_system_info
-      metrics.record_install_info
-      metrics.send_metrics
+    def handle_install_metrics(time_taken)
+      @metrics = Bundler.metrics
+      @metrics.record_system_info
+      @metrics.record_install_info
+      @install_hash = Hash.new
+      @install_hash["command"] = ARGV[0]
+      @install_hash["time_taken"] = time_taken.round(2)
+      @metrics.record(@install_hash)
+      @metrics.send_metrics
     end
   end
 end
