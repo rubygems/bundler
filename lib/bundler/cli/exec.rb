@@ -102,11 +102,8 @@ module Bundler
     end
 
     def handle_exec_metrics(time_taken)
-      @exec_hash = Hash.new
       @metrics = Bundler.metrics
-      @exec_hash["command"] = ARGV[0]
-      @exec_hash["time_taken"] = time_taken
-      @metrics.record(@exec_hash)
+      @metrics.record("time_taken", time_taken)
     end
   end
 end
