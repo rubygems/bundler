@@ -75,17 +75,19 @@ m = Module.new do
   end
 
   def activate_bundler(bundler_version)
-    if Gem::Version.correct?(bundler_version) && Gem::Version.new(bundler_version).release < Gem::Version.new("2.0")
-      bundler_version = "< 2"
+    required_version = if Gem::Version.correct?(bundler_version)
+      return "< 2" if Gem::Version.new(bundler_version).release < Gem::Version.new("2.0")
+
+      ">= #{bundler_version}"
     end
     gem_error = activation_error_handling do
-      gem "bundler", bundler_version
+      gem "bundler", (required_version || bundler_version)
     end
     return if gem_error.nil?
     require_error = activation_error_handling do
       require "bundler/version"
     end
-    return if require_error.nil? && Gem::Requirement.new(bundler_version).satisfied_by?(Gem::Version.new(Bundler::VERSION))
+    return if require_error.nil? && Gem::Requirement.new(required_version || bundler_version).satisfied_by?(Gem::Version.new(Bundler::VERSION))
     warn "Activating bundler (#{bundler_version}) failed:\n#{gem_error.message}\n\nTo install the version of bundler this project requires, run `gem install bundler -v '#{bundler_version}'`"
     exit 42
   end
