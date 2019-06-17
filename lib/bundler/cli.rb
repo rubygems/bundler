@@ -817,14 +817,12 @@ module Bundler
     end
 
     def self.handle_general_metrics(time_taken)
-      metrics = Bundler.metrics
-      metrics.record("time_taken", time_taken)
+      Bundler.metrics.record("time_taken", time_taken)
     end
 
     # help may exit in advance and not be registered
     def handle_help_metrics(time_taken)
-      metrics = Bundler.metrics
-      metrics.record("time_taken", time_taken)
+      Bundler.metrics.record("time_taken", time_taken)
     end
   end
 end
