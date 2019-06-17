@@ -14,11 +14,6 @@ module Bundler
       specs.unmet_dependency_names
     end
 
-    def get_source
-      string_repr = to_s
-      string_repr[string_repr.index(/http/)..string_repr.rindex("/")] if string_repr.match(/http/)
-    end
-
     def version_message(spec)
       message = "#{spec.name} #{spec.version}"
       message += " (#{spec.platform})" if spec.platform != Gem::Platform::RUBY && !spec.platform.nil?
