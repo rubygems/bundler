@@ -563,7 +563,7 @@ EOF
     end
 
     def metrics
-      @metrics = Metrics.new
+      Metrics.new
     end
 
   private
