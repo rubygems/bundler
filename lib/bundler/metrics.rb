@@ -88,9 +88,17 @@ module Bundler
       @system_metrics["installed_gem_count"] = Bundler.definition.specs.count
       @system_metrics["git_gem_count"] = Bundler.definition.sources.git_sources.count
       @system_metrics["path_gem_count"] = Bundler.definition.sources.path_sources.count
-      @system_metrics["rubygems_source_count"] = Bundler.definition.sources.rubygems_sources.count
+      @system_metrics["gem_source_count"] = Bundler.definition.sources.rubygems_sources.count
       require "digest"
       @system_metrics["gem_sources"] = Bundler.definition.sources.rubygems_sources.map(&:to_s).map {|source| Digest::MD5.hexdigest(source[source.index(/http/)..source.rindex("/")]) if source.match(/http/) }
+    end
+
+    def record_and_send_full_info(time_taken)
+      metrics = Bundler.metrics
+      metrics.record_system_info
+      metrics.record_install_info
+      metrics.record("time_taken", time_taken.round(2))
+      metrics.send_metrics
     end
 
   private

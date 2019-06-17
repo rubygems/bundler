@@ -86,8 +86,7 @@ module Bundler
         Bundler::CLI::Clean.new(options).run
       end
 
-      handle_install_metrics(Time.now - start)
-
+      Bundler.metrics.record_and_send_full_info(Time.now - start)
     rescue GemNotFound, VersionConflict => e
       if options[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your #{Bundler.settings.app_cache_path} directory."
@@ -218,14 +217,6 @@ module Bundler
         Bundler.ui.warn "    gem '#{name}', :source => '#{installed_from_uri}'"
         Bundler.ui.warn "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
       end
-    end
-
-    def handle_install_metrics(time_taken)
-      @metrics = Bundler.metrics
-      @metrics.record_system_info
-      @metrics.record_install_info
-      @metrics.record("time_taken", time_taken.round(2))
-      @metrics.send_metrics
     end
   end
 end
