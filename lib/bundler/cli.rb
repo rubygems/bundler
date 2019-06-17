@@ -18,8 +18,8 @@ module Bundler
 
       super
 
-      # install, outdated and package truncate the metrics file and send the content from within the file
-      handle_general_metrics(Time.now - start) unless ["install", "outdated", "package", "update"].include?(ARGV.first)
+      # install, outdated, package and pristine truncate the metrics file and send the content from within the file
+      handle_general_metrics(Time.now - start) unless ["install", "outdated", "package", "update", "pristine"].include?(ARGV.first)
     rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = UI::Shell.new
       raise e
@@ -821,6 +821,7 @@ module Bundler
       metrics.record("time_taken", time_taken)
     end
 
+    # help may exit in advance and not be registered
     def handle_help_metrics(time_taken)
       metrics = Bundler.metrics
       metrics.record("time_taken", time_taken)
