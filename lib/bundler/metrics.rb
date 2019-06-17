@@ -90,7 +90,7 @@ module Bundler
       @system_metrics["path_gem_count"] = Bundler.definition.sources.path_sources.count
       @system_metrics["rubygems_source_count"] = Bundler.definition.sources.rubygems_sources.count
       require "digest"
-      @system_metrics["gem_sources"] = Bundler.definition.sources.rubygems_sources.map {|s| Digest::MD5.hexdigest(s.get_source) }
+      @system_metrics["gem_sources"] = Bundler.definition.sources.rubygems_sources.map(&:to_s).map {|source| Digest::MD5.hexdigest(source[source.index(/http/)..source.rindex("/")]) if source.match(/http/) }
     end
 
   private
