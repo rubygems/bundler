@@ -8,7 +8,7 @@ module Bundler::Molinillo
     if [].respond_to?(:flat_map)
       # Flat map
       # @param [Enumerable] enum an enumerable object
-      # @block the block to flat-map with
+      # @param blk the block to flat-map with
       # @return The enum, flat-mapped
       def flat_map(enum, &blk)
         enum.flat_map(&blk)
@@ -16,7 +16,7 @@ module Bundler::Molinillo
     else
       # Flat map
       # @param [Enumerable] enum an enumerable object
-      # @block the block to flat-map with
+      # @param blk the block to flat-map with
       # @return The enum, flat-mapped
       def flat_map(enum, &blk)
         enum.map(&blk).flatten(1)
