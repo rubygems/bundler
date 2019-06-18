@@ -101,6 +101,10 @@ module Bundler
       metrics.send_metrics
     end
 
+    def self.handle_general_metrics(time_taken)
+      Bundler.metrics.record("time_taken", time_taken)
+    end
+
   private
 
     def write_to_file
