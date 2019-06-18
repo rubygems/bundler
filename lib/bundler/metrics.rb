@@ -27,6 +27,7 @@ module Bundler
       # hash the origin repository to calculate unique bundler users
       begin
         origin = `git remote get-url origin`
+        origin = `git config --get remote.origin.url` if origin.empty? # for older git versions
         require "digest"
         @system_metrics["origin"] = Digest::MD5.hexdigest(origin.chomp) unless origin.empty?
       rescue Errno::ENOENT
