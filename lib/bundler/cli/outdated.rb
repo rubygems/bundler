@@ -133,7 +133,7 @@ module Bundler
           print_gems(outdated_gems_list)
         end
       end
-      handle_outdated_metrics(Time.now - start)
+      Bundler.metrics.record_and_send_full_info(Time.now - start)
     end
 
   private
@@ -267,14 +267,6 @@ module Bundler
     def get_version_semver_portion_value(spec, version_portion_index)
       version_section = spec.version.segments[version_portion_index, 1]
       version_section.to_a[0].to_i
-    end
-
-    def handle_outdated_metrics(time_taken)
-      @metrics = Bundler.metrics
-      @metrics.record_system_info
-      @metrics.record_install_info
-      @metrics.record("time_taken", time_taken.round(2))
-      @metrics.send_metrics
     end
   end
 end
