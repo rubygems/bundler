@@ -26,14 +26,14 @@ module Bundler
       SharedHelpers.set_bundle_environment
       if bin_path = Bundler.which(cmd)
         if !Bundler.settings[:disable_exec_load] && ruby_shebang?(bin_path)
-          handle_exec_metrics(Time.now - start)
+          Bundler::Metrics.handle_general_metrics(Time.now - start)
           return kernel_load(bin_path, *args)
         end
-        handle_exec_metrics(Time.now - start)
+        Bundler::Metrics.handle_general_metrics(Time.now - start)
         kernel_exec(bin_path, *args)
       else
         # exec using the given command
-        handle_exec_metrics(Time.now - start)
+        Bundler::Metrics.handle_general_metrics(Time.now - start)
         kernel_exec(cmd, *args)
       end
     end
@@ -99,11 +99,6 @@ module Bundler
 
       first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }
       possibilities.any? {|shebang| first_line.start_with?(shebang) }
-    end
-
-    def handle_exec_metrics(time_taken)
-      @metrics = Bundler.metrics
-      @metrics.record("time_taken", time_taken)
     end
   end
 end

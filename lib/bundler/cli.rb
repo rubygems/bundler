@@ -18,8 +18,8 @@ module Bundler
 
       super
 
-      # install, outdated, package and pristine truncate the metrics file and send the content from within the file
-      handle_general_metrics(Time.now - start) unless ["install", "outdated", "package", "update", "pristine"].include?(ARGV.first)
+      # install, outdated, package and pristine truncate the metrics file and send it's contents, other commands record general metrics
+      Bundler::Metrics.handle_general_metrics(Time.now - start) unless ["install", "outdated", "package", "update", "pristine"].include?(ARGV.first)
     rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = UI::Shell.new
       raise e
@@ -115,13 +115,13 @@ module Bundler
 
       if man_pages.include?(command)
         if Bundler.which("man") && man_path !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          handle_help_metrics(Time.now - start)
+          Bundler::Metrics.handle_general_metrics(Time.now - start)
           Kernel.exec "man #{man_pages[command]}"
         else
           puts File.read("#{man_path}/#{File.basename(man_pages[command])}.txt")
         end
       elsif command_path = Bundler.which("bundler-#{cli}")
-        handle_help_metrics(Time.now - start)
+        Bundler::Metrics.handle_general_metrics(Time.now - start)
         Kernel.exec(command_path, "--help")
       else
         super
@@ -814,15 +814,6 @@ module Bundler
         "remembered accross bundler invokations, which bundler will no longer " \
         "do in future versions. Instead please use `bundle config #{name} " \
         "'#{value}'`, and stop using this flag"
-    end
-
-    def self.handle_general_metrics(time_taken)
-      Bundler.metrics.record("time_taken", time_taken)
-    end
-
-    # help may exit in advance and not be registered
-    def handle_help_metrics(time_taken)
-      Bundler.metrics.record("time_taken", time_taken)
     end
   end
 end
