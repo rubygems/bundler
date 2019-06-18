@@ -9,6 +9,8 @@ module Bundler
     def record(key, value)
       @standalone_metrics = Hash.new
       @standalone_metrics["command"] = ARGV.first
+      options = Bundler.settings.all.join(",")
+      @standalone_metrics["options"] = options unless options.empty?
       require "time"
       @standalone_metrics["timestamp"] = Time.now.utc.iso8601
       @standalone_metrics[key] = value
@@ -58,8 +60,6 @@ module Bundler
                           end
         @system_metrics["ruby_engine"] = "#{ruby.engine}/#{ruby.versions_string(engine_version)}"
       end
-      options = Bundler.settings.all.join(",")
-      @system_metrics["options"] = options unless options.empty?
       @system_metrics["ci"] = cis.join(",") if cis.any?
       # add any user agent strings set in the config
       extra_ua = Bundler.settings[:user_agent]

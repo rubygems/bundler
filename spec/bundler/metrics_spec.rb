@@ -16,8 +16,8 @@ RSpec.describe Bundler::Metrics do
       expect(metrics.instance_variable_get(:@system_metrics)["bundler_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(pre){0,1}\.{0,1}\d{0,1}/)
       expect(metrics.instance_variable_get(:@system_metrics)["rubygems_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(preview|pre){0,1}\.{0,1}\d{0,1}/)
       expect(metrics.instance_variable_get(:@system_metrics)["ruby_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(preview|pre){0,1}\.{0,1}\d{0,1}/)
-      expect(metrics.instance_variable_get(:@system_metrics)["options"]).to match(/(spec_run)/)
       expect(metrics.instance_variable_get(:@system_metrics)["request_id"]).to match(/\w/)
+      expect(metrics.instance_variable_get(:@system_metrics)["host"].nil?).to eq(false)
     end
 
     describe "include CI information" do
@@ -48,8 +48,12 @@ RSpec.describe Bundler::Metrics do
       expect(metrics.instance_variable_get(:@standalone_metrics)["time_taken"]).to match(3)
       expect(metrics.instance_variable_get(:@standalone_metrics)["timestamp"]).to match(/\d{4}-\d{2}-\d{2}\S\d{2}:\d{2}:\d{2}\S/)
       expect(metrics.instance_variable_get(:@standalone_metrics)["command"]).to match(%r{(spec\/bundler\/metrics_spec.rb)})
+      expect(metrics.instance_variable_get(:@standalone_metrics)["options"]).to match(/(spec_run)/)
     end
     describe "write_to_file" do
+      after do
+        File.delete(metrics.instance_variable_get(:@path)) if File.exist?(metrics.instance_variable_get(:@path))
+      end
       it "Creates a file in the global bundler path and writes into it" do
         expect(Pathname.new(metrics.instance_variable_get(:@path)).exist?).to eq(true)
         expect(Pathname.new(metrics.instance_variable_get(:@path)).size.zero?).to eq(false)
