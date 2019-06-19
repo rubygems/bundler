@@ -11,6 +11,18 @@ module Bundler
       @command_metrics[key] = value
     end
 
+    def record_failed_install(gem_name, gem_version)
+      @command_metrics ||= Hash.new
+      @command_metrics["command"] = "failed install"
+      @command_metrics["gem_name"] = gem_name
+      @command_metrics["gem_version"] = gem_version
+      options = Bundler.settings.all.join(",")
+      @command_metrics["options"] = options unless options.empty?
+      require "time"
+      @command_metrics["timestamp"] = Time.now.utc.iso8601
+      write_to_file
+    end
+
     # called when a light command is executed
     def record(command_time_taken)
       @command_metrics ||= Hash.new
