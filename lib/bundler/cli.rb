@@ -19,8 +19,8 @@ module Bundler
 
       super
 
-      # install, outdated, package and pristine truncate the metrics file and send it's contents, other commands record general metrics
-      Bundler.metrics.record(Time.now - start) unless ["install", "outdated", "package", "update", "pristine"].include?(ARGV.first)
+      # install, outdated, package, update and pristine truncate the metrics file and send it's contents, other commands record general metrics
+      Bundler.metrics.record(Time.now - start) unless %w[install outdated package update pristine].include?(ARGV.first)
     rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = UI::Shell.new
       raise e
