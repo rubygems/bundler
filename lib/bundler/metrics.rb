@@ -7,20 +7,21 @@ module Bundler
     end
 
     def record(key, value)
-      @standalone_metrics = Hash.new
-      @standalone_metrics["command"] = ARGV.first
+      @command_metrics ||= Hash.new
+      @command_metrics["command"] = ARGV.first
       options = Bundler.settings.all.join(",")
-      @standalone_metrics["options"] = options unless options.empty?
+      @command_metrics["options"] = options unless options.empty?
       require "time"
-      @standalone_metrics["timestamp"] = Time.now.utc.iso8601
-      @standalone_metrics[key] = value
+      @command_metrics["timestamp"] = Time.now.utc.iso8601
+      @command_metrics[key] = value
+      add_command_specific_info
       write_to_file
     end
 
     # sending user agent metrics over http
     # to be called when bundle install or bundle outdated is run
     def record_system_info
-      @system_metrics = Hash.new
+      @system_metrics ||= Hash.new
       # add a random ID so we can consolidate runs server-side
       require "securerandom"
       @system_metrics["request_id"] = SecureRandom.hex(8)
@@ -84,7 +85,16 @@ module Bundler
       open(@path, File::TRUNC) if File.exist?(@path)
     end
 
-    def record_install_info
+    def record_and_send_full_info(time_taken)
+      record_system_info
+      record_gem_info
+      record("time_taken", time_taken.round(2))
+      send_metrics
+    end
+
+  private
+
+    def record_gem_info
       @system_metrics["gemfile_gem_count"] = Bundler.definition.dependencies.count
       @system_metrics["installed_gem_count"] = Bundler.definition.specs.count
       @system_metrics["git_gem_count"] = Bundler.definition.sources.git_sources.count
@@ -94,25 +104,11 @@ module Bundler
       @system_metrics["gem_sources"] = Bundler.definition.sources.rubygems_sources.map(&:to_s).map {|source| Digest::MD5.hexdigest(source[source.index(/http/)..source.rindex("/")]) if source.match(/http/) }
     end
 
-    def record_and_send_full_info(time_taken)
-      metrics = Bundler.metrics
-      metrics.record_system_info
-      metrics.record_install_info
-      metrics.record("time_taken", time_taken.round(2))
-      metrics.send_metrics
-    end
-
-    def self.handle_general_metrics(time_taken)
-      Bundler.metrics.record("time_taken", time_taken)
-    end
-
-  private
-
     def write_to_file
       SharedHelpers.filesystem_access(@path) do |file|
         FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
         require "psych"
-        File.open(file, "a") {|f| f.write(Psych.dump(@standalone_metrics)) }
+        File.open(file, "a") {|f| f.write(Psych.dump(@command_metrics)) }
       end
     end
 
@@ -125,6 +121,19 @@ module Bundler
         Psych.load_stream(file.read) {|doc| list << doc }
       end
       list << @system_metrics
+    end
+
+    def record_time_to_resolve
+      @command_metrics["time_to_resolve_gemfile"] = Bundler.definition.time_to_resolve
+    end
+
+    def add_command_specific_info
+      case ARGV.first
+      when "install"
+        record_time_to_resolve
+      when "outdated"
+        record_time_to_resolve
+      end
     end
 
     def cis
