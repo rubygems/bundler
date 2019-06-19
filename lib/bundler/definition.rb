@@ -16,8 +16,7 @@ module Bundler
       :ruby_version,
       :lockfile,
       :gemfiles,
-      :sources,
-      :time_to_resolve
+      :sources
     )
 
     # Given a gemfile and lockfile creates a Bundler definition
@@ -259,7 +258,7 @@ module Bundler
             Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
             start = Time.now
             resolved = last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, gem_version_promoter, additional_base_requirements_for_resolve, platforms)
-            @time_to_resolve = Time.now - start
+            Bundler.metrics.record_single_metric("time_to_resolve_gemfile", Time.now - start)
             resolved
           end
         # filter out gems that _can_ be installed on multiple platforms, but don't need

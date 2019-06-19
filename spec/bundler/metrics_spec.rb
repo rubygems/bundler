@@ -42,13 +42,13 @@ RSpec.describe Bundler::Metrics do
 
   describe "#record" do
     before do
-      metrics.record("time_taken", 3)
+      metrics.record(670)
     end
     it "records a single metric and appends it to metrics.yml" do
-      expect(metrics.instance_variable_get(:@standalone_metrics)["time_taken"]).to match(3)
-      expect(metrics.instance_variable_get(:@standalone_metrics)["timestamp"]).to match(/\d{4}-\d{2}-\d{2}\S\d{2}:\d{2}:\d{2}\S/)
-      expect(metrics.instance_variable_get(:@standalone_metrics)["command"]).to match(%r{(spec\/bundler\/metrics_spec.rb)})
-      expect(metrics.instance_variable_get(:@standalone_metrics)["options"]).to match(/(spec_run)/)
+      expect(metrics.instance_variable_get(:@command_metrics)["command_time_taken"]).to match(670)
+      expect(metrics.instance_variable_get(:@command_metrics)["timestamp"]).to match(/\d{4}-\d{2}-\d{2}\S\d{2}:\d{2}:\d{2}\S/)
+      expect(metrics.instance_variable_get(:@command_metrics)["command"]).to match(%r{(spec\/bundler\/metrics_spec.rb)})
+      expect(metrics.instance_variable_get(:@command_metrics)["options"]).to match(/(spec_run)/)
     end
     describe "write_to_file" do
       after do
@@ -70,7 +70,7 @@ RSpec.describe Bundler::Metrics do
 
     describe "read_from_file" do
       before do
-        metrics.record("time_taken", 4.2)
+        metrics.record(4.2)
         metrics.send(:write_to_file)
       end
       it "Should return a list of the file's documents" do
@@ -92,7 +92,7 @@ RSpec.describe Bundler::Metrics do
     end
 
     it "Truncates the metrics.yml file after sending the metrics" do
-      metrics.record("time_taken", 3)
+      metrics.record(3)
       metrics.send_metrics
       expect(Pathname.new(metrics.instance_variable_get(:@path)).empty?).to eq(true)
     end

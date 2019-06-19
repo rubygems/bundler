@@ -562,8 +562,10 @@ EOF
       @rubygems = nil
     end
 
-    def metrics
-      Metrics.new
+    attr_reader :metrics
+
+    def init_metrics
+      @metrics = Metrics.new
     end
 
   private
