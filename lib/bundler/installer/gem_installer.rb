@@ -42,6 +42,7 @@ module Bundler
     end
 
     def install_error_message
+      Bundler.metrics.record_failed_install(spec.name, spec.version.to_s)
       "An error occurred while installing #{spec.name} (#{spec.version}), and Bundler cannot continue."
     end
 
