@@ -22,7 +22,9 @@ module Bundler
     def self.install(root, definition, options = {})
       installer = new(root, definition)
       Plugin.hook(Plugin::Events::GEM_BEFORE_INSTALL_ALL, definition.dependencies)
+      start = Time.now
       installer.run(options)
+      Bundler.metrics.record_single_metric("time_to_install", (Time.now - start).round(2))
       Plugin.hook(Plugin::Events::GEM_AFTER_INSTALL_ALL, definition.dependencies)
       installer
     end
