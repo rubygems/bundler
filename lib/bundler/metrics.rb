@@ -92,7 +92,7 @@ module Bundler
     def record_and_send_full_info(time_taken)
       record_system_info
       record_gem_info
-      record(time_taken.round(2))
+      record(time_taken.round(3))
       send_metrics
     end
 
