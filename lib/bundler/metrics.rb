@@ -6,20 +6,24 @@ module Bundler
       @path = Bundler.user_bundle_path("metrics")
     end
 
-    def record(key, value)
+    def record_single_metric(key, value)
+      @command_metrics ||= Hash.new
+      @command_metrics[key] = value
+    end
+
+    # called when a light command is executed
+    def record(command_time_taken)
       @command_metrics ||= Hash.new
       @command_metrics["command"] = ARGV.first
       options = Bundler.settings.all.join(",")
       @command_metrics["options"] = options unless options.empty?
       require "time"
       @command_metrics["timestamp"] = Time.now.utc.iso8601
-      @command_metrics[key] = value
-      add_command_specific_info
+      @command_metrics["command_time_taken"] = command_time_taken
       write_to_file
     end
 
-    # sending user agent metrics over http
-    # to be called when bundle install or bundle outdated is run
+    # called when bundle install, outdated, package or pristine are run
     def record_system_info
       @system_metrics ||= Hash.new
       # add a random ID so we can consolidate runs server-side
@@ -80,7 +84,7 @@ module Bundler
       rescue SocketError
         "TCP connection failed"
       end
-      # We've sent the metrics so we empty the file
+      # The file is emptied after sending metrics
       # File::TRUNC is preferable since File.truncate doesn't work for all systems
       open(@path, File::TRUNC) if File.exist?(@path)
     end
@@ -88,7 +92,7 @@ module Bundler
     def record_and_send_full_info(time_taken)
       record_system_info
       record_gem_info
-      record("time_taken", time_taken.round(2))
+      record(time_taken.round(2))
       send_metrics
     end
 
@@ -121,19 +125,6 @@ module Bundler
         Psych.load_stream(file.read) {|doc| list << doc }
       end
       list << @system_metrics
-    end
-
-    def record_time_to_resolve
-      @command_metrics["time_to_resolve_gemfile"] = Bundler.definition.time_to_resolve
-    end
-
-    def add_command_specific_info
-      case ARGV.first
-      when "install"
-        record_time_to_resolve
-      when "outdated"
-        record_time_to_resolve
-      end
     end
 
     def cis
