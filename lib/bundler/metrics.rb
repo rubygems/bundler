@@ -64,6 +64,11 @@ module Bundler
         @system_metrics["rbenv_version"] = rbenv_ver[rbenv_ver.index(/\d/)..-1].chomp unless rbenv_ver.empty?
       rescue Errno::ENOENT
       end
+      begin
+        chruby_ver = `chruby --version`
+        @system_metrics["chruby_version"] = rbenv_ver[chruby_ver.index(/\d/)..-1].chomp unless chruby_ver.empty?
+      rescue Errno::ENOENT
+      end
       ruby = Bundler::RubyVersion.system
       @system_metrics["host"] = ruby.host
       @system_metrics["ruby_version"] = ruby.versions_string(ruby.versions)
