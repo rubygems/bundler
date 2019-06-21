@@ -9,7 +9,7 @@ module Bundler
     end
 
     def run
-      start = Time.now
+      start = Time.now unless Bundler.opt_out
 
       Bundler.ui.level = "error" if options[:quiet]
 
@@ -109,7 +109,7 @@ module Bundler
       Bundler::CLI::Common.output_without_groups_message(:update)
       Bundler::CLI::Common.output_post_install_messages installer.post_install_messages
 
-      Bundler.metrics.record_and_send_full_info(Time.now - start)
+      Bundler.metrics.record_and_send_full_info(Time.now - start) unless Bundler.opt_out
     end
   end
 end

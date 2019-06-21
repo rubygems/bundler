@@ -7,7 +7,7 @@ module Bundler
     end
 
     def run
-      start = Time.now
+      start = Time.now unless Bundler.opt_out
       CLI::Common.ensure_all_gems_in_lockfile!(@gems)
       definition = Bundler.definition
       definition.validate_runtime!
@@ -43,7 +43,7 @@ module Bundler
 
         Bundler::GemInstaller.new(spec, installer, false, 0, true).install_from_spec
       end
-      Bundler.metrics.record_and_send_full_info(Time.now - start)
+      Bundler.metrics.record_and_send_full_info(Time.now - start) unless Bundler.opt_out
     end
   end
 end

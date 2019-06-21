@@ -256,9 +256,9 @@ module Bundler
           else
             # Run a resolve against the locally available gems
             Bundler.ui.debug("Found changes from the lockfile, re-resolving dependencies because #{change_reason}")
-            start = Time.now
+            start = Time.now unless Bundler.opt_out
             resolved = last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, gem_version_promoter, additional_base_requirements_for_resolve, platforms)
-            Bundler.metrics.record_single_metric("time_to_resolve_gemfile", (Time.now - start).round(2))
+            Bundler.metrics.record_single_metric("time_to_resolve_gemfile", (Time.now - start).round(3)) unless Bundler.opt_out
             resolved
           end
         # filter out gems that _can_ be installed on multiple platforms, but don't need
