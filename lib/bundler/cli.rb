@@ -14,13 +14,15 @@ module Bundler
     ].freeze
 
     def self.start(*)
-      start = Time.now
-      Bundler.init_metrics
+      unless Bundler.opt_out
+        start = Time.now
+        Bundler.init_metrics
+      end
 
       super
 
       # install, outdated, package, update and pristine truncate the metrics file and send it's contents, other commands record general metrics
-      Bundler.metrics.record(Time.now - start) unless %w[install outdated package update pristine].include?(ARGV.first)
+      (Bundler.metrics.record(Time.now - start) unless %w[install outdated package update pristine].include?(ARGV.first)) unless Bundler.opt_out
     rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = UI::Shell.new
       raise e
@@ -102,7 +104,7 @@ module Bundler
     class_option "verbose", :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
-      start = Time.now
+      start = Time.now unless Bundler.opt_out
       case cli
       when "gemfile" then command = "gemfile"
       when nil       then command = "bundle"
@@ -116,13 +118,13 @@ module Bundler
 
       if man_pages.include?(command)
         if Bundler.which("man") && man_path !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          Bundler.metrics.record(Time.now - start)
+          Bundler.metrics.record(Time.now - start) unless Bundler.opt_out
           Kernel.exec "man #{man_pages[command]}"
         else
           puts File.read("#{man_path}/#{File.basename(man_pages[command])}.txt")
         end
       elsif command_path = Bundler.which("bundler-#{cli}")
-        Bundler.metrics.record(Time.now - start)
+        Bundler.metrics.record(Time.now - start) unless Bundler.opt_out
         Kernel.exec(command_path, "--help")
       else
         super

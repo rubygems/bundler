@@ -564,13 +564,24 @@ EOF
       @rubygems = nil
     end
 
-    attr_reader :metrics
+    attr_reader :metrics, :opt_out
 
     def init_metrics
-      @metrics = Metrics.new
+      @metrics = Metrics.new unless metrics_opt_out?
+    end
+
+    def metrics_opt_out?
+      @opt_out = Bundler.settings["disable_metrics"]
+      delete_metrics_file if @opt_out
+      @opt_out
     end
 
   private
+
+    def delete_metrics_file
+      file = Bundler.user_bundle_path("metrics")
+      File.delete(file) if File.exist?(file)
+    end
 
     def eval_yaml_gemspec(path, contents)
       Kernel.send(:require, "bundler/psyched_yaml")

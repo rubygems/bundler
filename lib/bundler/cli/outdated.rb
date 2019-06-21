@@ -10,7 +10,7 @@ module Bundler
     end
 
     def run
-      start = Time.now
+      start = Time.now unless Bundler.opt_out
       check_for_deployment_mode
 
       sources = Array(options[:source])
@@ -162,7 +162,7 @@ module Bundler
           end
         end
       end
-      Bundler.metrics.record_and_send_full_info(Time.now - start)
+      Bundler.metrics.record_and_send_full_info(Time.now - start) unless Bundler.opt_out
     end
 
   private

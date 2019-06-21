@@ -89,9 +89,9 @@ module Bundler
         else
           options[:jobs] = 1 # to avoid the overhead of Bundler::Worker
         end
-        start = Time.now
+        start = Time.now unless Bundler.opt_out
         install(options)
-        Bundler.metrics.record_single_metric("time_to_install", (Time.now - start).round(3))
+        Bundler.metrics.record_single_metric("time_to_install", (Time.now - start).round(3)) unless Bundler.opt_out
 
         lock unless Bundler.frozen_bundle?
         Standalone.new(options[:standalone], @definition).generate if options[:standalone]
