@@ -477,4 +477,31 @@ MESSAGE
       end
     end
   end
+
+  describe "#init_metrics" do
+    it "should not create a metrics object if the user has opted out" do
+      Bundler.settings.set_global("disable_metrics", true)
+      expect(Bundler.init_metrics).to eq(nil)
+    end
+
+    describe "#metrics_opt_out?" do
+      it "should return nil if the user hasn't set the disable_metrics setting" do
+        expect(Bundler.metrics_opt_out?).to eq(nil)
+      end
+      it "should return a boolean value according the the setting the user set in the global config file" do
+        Bundler.settings.set_global("disable_metrics", false)
+        expect(Bundler.metrics_opt_out?).to eq(false.to_s)
+        Bundler.settings.set_global("disable_metrics", true)
+        expect(Bundler.metrics_opt_out?).to eq(true.to_s)
+      end
+    end
+
+    describe "#delete_metrics_file" do
+      it "should delete the metrics file if the user has opted out" do
+        Bundler.send(:delete_metrics_file)
+        Bundler.init_metrics
+        expect(Bundler.user_bundle_path("metrics")).to_not exist
+      end
+    end
+  end
 end
