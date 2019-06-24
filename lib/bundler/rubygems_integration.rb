@@ -139,10 +139,20 @@ module Bundler
     end
 
     def inflate(obj)
-      if defined?(Gem::Util)
-        Gem::Util.inflate(obj)
+      require "rubygems/util"
+
+      Gem::Util.inflate(obj)
+    end
+
+    def correct_for_windows_path(path)
+      require "rubygems/util"
+
+      if Gem::Util.respond_to?(:correct_for_windows_path)
+        Gem::Util.correct_for_windows_path(path)
+      elsif path[0].chr == "/" && path[1].chr =~ /[a-z]/i && path[2].chr == ":"
+        path[1..-1]
       else
-        Gem.inflate(obj)
+        path
       end
     end
 
