@@ -16,6 +16,8 @@ RSpec.describe "bundle gem" do
     expect(bundled_app("#{gem_name}/lib/test/gem/version.rb")).to exist
   end
 
+  let(:generated_gemspec) { Bundler::GemHelper.new(bundled_app(gem_name).to_s).gemspec }
+
   before do
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
     git_config_content = <<-EOF
@@ -39,22 +41,22 @@ RSpec.describe "bundle gem" do
   shared_examples_for "git config is present" do
     context "git config user.{name,email} present" do
       it "sets gemspec author to git user.name if available" do
-        expect(generated_gem.gemspec.authors.first).to eq("Bundler User")
+        expect(generated_gemspec.authors.first).to eq("Bundler User")
       end
 
       it "sets gemspec email to git user.email if available" do
-        expect(generated_gem.gemspec.email.first).to eq("user@example.com")
+        expect(generated_gemspec.email.first).to eq("user@example.com")
       end
     end
   end
 
   shared_examples_for "git config is absent" do
     it "sets gemspec author to default message if git user.name is not set or empty" do
-      expect(generated_gem.gemspec.authors.first).to eq("TODO: Write your name")
+      expect(generated_gemspec.authors.first).to eq("TODO: Write your name")
     end
 
     it "sets gemspec email to default message if git user.email is not set or empty" do
-      expect(generated_gem.gemspec.email.first).to eq("TODO: Write your email address")
+      expect(generated_gemspec.email.first).to eq("TODO: Write your email address")
     end
   end
 
@@ -116,7 +118,6 @@ RSpec.describe "bundle gem" do
 
   context "README.md" do
     let(:gem_name) { "test_gem" }
-    let(:generated_gem) { Bundler::GemHelper.new(bundled_app(gem_name).to_s) }
 
     context "git config github.user present" do
       before do
@@ -232,8 +233,6 @@ RSpec.describe "bundle gem" do
       execute_bundle_gem(gem_name)
     end
 
-    let(:generated_gem) { Bundler::GemHelper.new(bundled_app(gem_name).to_s) }
-
     it "generates a gem skeleton" do
       expect(bundled_app("test_gem/test_gem.gemspec")).to exist
       expect(bundled_app("test_gem/Gemfile")).to exist
@@ -271,8 +270,14 @@ RSpec.describe "bundle gem" do
     end
 
     it "sets gemspec metadata['allowed_push_host']" do
-      expect(generated_gem.gemspec.metadata["allowed_push_host"]).
+      expect(generated_gemspec.metadata["allowed_push_host"]).
         to match(/mygemserver\.com/)
+    end
+
+    it "sets a minimum ruby version" do
+      bundler_gemspec = Bundler::GemHelper.new(File.expand_path("../..", __dir__)).gemspec
+
+      expect(bundler_gemspec.required_ruby_version).to eq(generated_gemspec.required_ruby_version)
     end
 
     it "requires the version file" do
@@ -359,7 +364,7 @@ RSpec.describe "bundle gem" do
       end
 
       it "depends on a specific version of rspec" do
-        rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "rspec" }
+        rspec_dep = generated_gemspec.development_dependencies.find {|d| d.name == "rspec" }
         expect(rspec_dep).to be_specific
       end
 
@@ -406,7 +411,7 @@ RSpec.describe "bundle gem" do
       end
 
       it "depends on a specific version of minitest" do
-        rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "minitest" }
+        rspec_dep = generated_gemspec.development_dependencies.find {|d| d.name == "minitest" }
         expect(rspec_dep).to be_specific
       end
 
@@ -515,8 +520,6 @@ RSpec.describe "bundle gem" do
     before do
       execute_bundle_gem(gem_name)
     end
-
-    let(:generated_gem) { Bundler::GemHelper.new(bundled_app(gem_name).to_s) }
 
     it "generates a gem skeleton" do
       expect(bundled_app("test-gem/test-gem.gemspec")).to exist
