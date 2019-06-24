@@ -51,22 +51,22 @@ module Bundler
       end
       begin
         git_ver = `git --version`
-        @system_metrics["git_version"] = git_ver[git_ver.index(/\d/)..git_ver.rindex(/\d/)] unless git_ver.empty?
+        @system_metrics["git_version"] = git_ver[git_ver.index(/\d/)..git_ver.rindex(/\d/)].chomp unless git_ver.empty?
       rescue Errno::ENOENT
       end
       begin
         rvm_ver = `rvm --version`
-        @system_metrics["rvm_version"] = rvm_ver[rvm_ver.index(/\d/)..-1].chomp unless rvm_ver.empty?
+        @system_metrics["rvm_version"] = rvm_ver[rvm_ver.index(/\d/)..rvm_ver.rindex(/\d/)].chomp unless rvm_ver.empty?
       rescue Errno::ENOENT
       end
       begin
         rbenv_ver = `rbenv --version`
-        @system_metrics["rbenv_version"] = rbenv_ver[rbenv_ver.index(/\d/)..-1].chomp unless rbenv_ver.empty?
+        @system_metrics["rbenv_version"] = rbenv_ver[rbenv_ver.index(/\d/)..rbenv_ver.rindex(/\d/)].chomp unless rbenv_ver.empty?
       rescue Errno::ENOENT
       end
       begin
         chruby_ver = `chruby --version`
-        @system_metrics["chruby_version"] = rbenv_ver[chruby_ver.index(/\d/)..-1].chomp unless chruby_ver.empty?
+        @system_metrics["chruby_version"] = chruby_ver[chruby_ver.index(/\d/)..chruby_ver.rindex(/\d/)].chomp unless chruby_ver.empty?
       rescue Errno::ENOENT
       end
       ruby = Bundler::RubyVersion.system
@@ -83,7 +83,8 @@ module Bundler
                           end
         @system_metrics["ruby_engine"] = "#{ruby.engine}/#{ruby.versions_string(engine_version)}"
       end
-      @system_metrics["ci"] = cis.join(",") if cis.any?
+      cis_var = cis
+      @system_metrics["ci"] = cis_var.join(",") if cis_var.any?
       # add any user agent strings set in the config
       extra_ua = Bundler.settings[:user_agent]
       @system_metrics["extra_ua"] = extra_ua if extra_ua
