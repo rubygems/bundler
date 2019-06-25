@@ -286,16 +286,6 @@ else
     lib.namespace = "Net::HTTP::Persistent"
     lib.prefix = "Bundler::Persistent"
     lib.vendor_lib = "lib/bundler/vendor/net-http-persistent"
-
-    mixin = Module.new do
-      def namespace_files
-        super
-        require_target = vendor_lib.sub(%r{^(.+?/)?lib/}, "") << "/lib"
-        relative_files = files.map {|f| Pathname.new(f).relative_path_from(Pathname.new(vendor_lib) / "lib").sub_ext("").to_s }
-        process_files(/require (['"])(#{Regexp.union(relative_files)})/, "require \\1#{require_target}/\\2")
-      end
-    end
-    lib.send(:extend, mixin)
   end
 
   desc "Vendor a specific version of connection_pool"
