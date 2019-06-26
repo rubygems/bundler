@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require File.expand_path("../path.rb", __FILE__)
+include Spec::Path
+
+$LOAD_PATH.unshift Dir[base_system_gems.join("gems/rack-test*/lib")].first.to_s
 require "rack/test"
 require "net/http"
 require "net/https"
