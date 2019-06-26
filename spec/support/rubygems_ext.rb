@@ -81,7 +81,7 @@ module Spec
       reqs.map! {|name, req| "'#{name}:#{req}'" }
       deps = reqs.concat(no_reqs).join(" ")
       gem = Spec::Path.ruby_core? ? ENV["BUNDLE_GEM"] : "#{Gem.ruby} -S gem"
-      cmd = "#{gem} install #{deps} --no-document --conservative"
+      cmd = "#{gem} install #{deps} --no-document"
       puts cmd
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
     end

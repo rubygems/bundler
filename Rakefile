@@ -96,7 +96,7 @@ namespace :spec do
         sh("bin/rspec --format progress")
       end
 
-      # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
+      # Create tasks like spec:rubygems:v3.0.4:sudo to run the sudo specs
       namespace rg do
         task :sudo => ["set_sudo", rg]
         task :realworld => ["set_realworld", rg]
