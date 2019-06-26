@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rack/test"
 require "net/http"
 require "net/https"
@@ -34,6 +36,7 @@ module Artifice
   end
 
 private
+
   def self.replace_net_http(value)
     ::Net.class_eval do
       remove_const(:HTTP)
@@ -93,7 +96,7 @@ private
         body_stream_contents = req.body_stream.read if req.body_stream
 
         response = rack_request.request("#{prefix}#{req.path}",
-          {:method => req.method, :input => body || req.body || body_stream_contents})
+          :method => req.method, :input => body || req.body || body_stream_contents)
 
         make_net_http_response(response, &block)
       end
@@ -110,7 +113,9 @@ private
       # @yield [Net::HTTPResponse] If a block is provided, yield the
       #   response to it after the body is read
       def make_net_http_response(response)
-        status, headers, body = response.status, response.headers, response.body
+        status = response.status
+        headers = response.headers
+        body = response.body
 
         response_string = []
         response_string << "HTTP/1.1 #{status} #{Rack::Utils::HTTP_STATUS_CODES[status]}"
