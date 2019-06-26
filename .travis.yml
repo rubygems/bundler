@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - vendorize_artifice
 
 cache:
   directories:
