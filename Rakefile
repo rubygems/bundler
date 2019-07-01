@@ -337,5 +337,3 @@ end
 task :default => :spec
 
 Dir["task/*.rake"].each(&method(:load))
-
-task :generate_files => Rake::Task.tasks.select {|t| t.name.start_with?("lib/bundler/generated") }
