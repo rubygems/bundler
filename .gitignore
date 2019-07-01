@@ -16,6 +16,3 @@ man/*
 
 # rspec failure tracking
 .rspec_status
-
-# files generated during packaging
-/lib/bundler/generated/

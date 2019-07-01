@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "bundler/gem_tasks"
-task :build => ["build_metadata", "man:build", "generate_files"] do
+task :build => ["build_metadata", "man:build"] do
   Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
 end
 task :release => ["man:build", "release:verify_files", "release:verify_github", "build_metadata"]
