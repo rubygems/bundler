@@ -2,6 +2,7 @@
 
 require "bundler/gem_tasks"
 task :build => ["build_metadata", "man:build"] do
+  Rake::Task["man:clean"].tap(&:reenable).real_invoke
   Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
 end
 task :release => ["man:build", "release:verify_files", "release:verify_github", "build_metadata"]
