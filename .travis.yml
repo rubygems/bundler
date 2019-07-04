@@ -4,7 +4,6 @@ script: rake spec:travis
 before_script:
   - travis_retry rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
   - travis_retry rake spec:travis:deps
-  - travis_retry rake man:build
 
 branches:
   only:
@@ -46,6 +45,9 @@ jobs:
   include:
     - rvm: 2.6.3
       script: rake rubocop
+      stage: linting
+    - rvm: 2.6.3
+      script: rake man:build
       stage: linting
     # Ruby 2.3 also tested in 2.x mode
     - rvm: 2.3.8
