@@ -63,7 +63,7 @@ module Spec
     end
 
     def self.safe_activate(gem_name, gem_requirement)
-      Gem::Specification.reset if RUBY_VERSION < "2.4"
+      Gem::Specification.reset # TODO: can probably be removed once rubygems incrementally populates stubs again
       gem gem_name, gem_requirement
     rescue Gem::LoadError => e
       warn "We couln't activate #{gem_name} (#{gem_requirement}), because `#{e.message}`. Installing it..."
