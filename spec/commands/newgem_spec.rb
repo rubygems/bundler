@@ -363,9 +363,14 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
       end
 
-      it "depends on a specific version of rspec" do
-        rspec_dep = generated_gemspec.development_dependencies.find {|d| d.name == "rspec" }
-        expect(rspec_dep).to be_specific
+      it "depends on a specific version of rspec in generated Gemfile" do
+        Dir.chdir(bundled_app("test_gem")) do
+          builder = Bundler::Dsl.new
+          builder.eval_gemfile(bundled_app("test_gem/Gemfile"))
+          builder.dependencies
+          rspec_dep = builder.dependencies.find {|d| d.name == "rspec" }
+          expect(rspec_dep).to be_specific
+        end
       end
 
       it "requires 'test-gem'" do
@@ -411,8 +416,13 @@ RSpec.describe "bundle gem" do
       end
 
       it "depends on a specific version of minitest" do
-        rspec_dep = generated_gemspec.development_dependencies.find {|d| d.name == "minitest" }
-        expect(rspec_dep).to be_specific
+        Dir.chdir(bundled_app("test_gem")) do
+          builder = Bundler::Dsl.new
+          builder.eval_gemfile(bundled_app("test_gem/Gemfile"))
+          builder.dependencies
+          minitest_dep = builder.dependencies.find {|d| d.name == "minitest" }
+          expect(minitest_dep).to be_specific
+        end
       end
 
       it "builds spec skeleton" do
@@ -703,7 +713,7 @@ RSpec.describe "bundle gem" do
       end
 
       it "includes rake-compiler" do
-        expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "rake-compiler"')
+        expect(bundled_app("test_gem/Gemfile").read).to include('gem "rake-compiler"')
       end
 
       it "depends on compile task for build" do
@@ -727,8 +737,7 @@ RSpec.describe "bundle gem" do
 
   describe "uncommon gem names" do
     it "can deal with two dashes" do
-      bundle "gem a--a"
-      Bundler.clear_gemspec_cache
+      execute_bundle_gem("a--a")
 
       expect(bundled_app("a--a/a--a.gemspec")).to exist
     end
@@ -809,7 +818,7 @@ Usage: "bundle gem NAME [OPTIONS]"
       RAKEFILE
 
       expect(bundled_app("foobar/Rakefile").read).to eq(rakefile)
-      expect(bundled_app("foobar/foobar.gemspec").read).to include('spec.add_development_dependency "rspec"')
+      expect(bundled_app("foobar/Gemfile").read).to include('gem "rspec"')
     end
 
     it "asks about MIT license" do
