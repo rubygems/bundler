@@ -51,7 +51,7 @@ RSpec.describe "bundle lock" do
         with_license
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     L
   end
 
@@ -107,7 +107,7 @@ RSpec.describe "bundle lock" do
         foo
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     L
     bundle "lock --gemfile CustomGemfile"
 
@@ -304,7 +304,7 @@ RSpec.describe "bundle lock" do
         mixlib-shellout
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
 
     simulate_platform(rb) { bundle! :lock }
@@ -332,7 +332,7 @@ RSpec.describe "bundle lock" do
         mixlib-shellout
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 

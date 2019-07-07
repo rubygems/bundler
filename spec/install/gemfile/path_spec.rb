@@ -513,7 +513,7 @@ RSpec.describe "bundle install with explicit source paths" do
           foo!
 
         BUNDLED WITH
-           #{Bundler::VERSION}
+          #{Bundler::VERSION}
       G
 
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
@@ -541,7 +541,7 @@ RSpec.describe "bundle install with explicit source paths" do
           foo!
 
         BUNDLED WITH
-           #{Bundler::VERSION}
+          #{Bundler::VERSION}
       G
 
       expect(the_bundle).to include_gems "rack 0.9.1"

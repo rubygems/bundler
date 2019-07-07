@@ -742,7 +742,7 @@ RSpec.describe "bundle update --ruby" do
        DEPENDENCIES
 
        BUNDLED WITH
-          #{Bundler::VERSION}
+         #{Bundler::VERSION}
       L
     end
   end
@@ -768,10 +768,10 @@ RSpec.describe "bundle update --ruby" do
        DEPENDENCIES
 
        RUBY VERSION
-          ruby 2.1.4p222
+         ruby 2.1.4p222
 
        BUNDLED WITH
-          #{Bundler::VERSION}
+         #{Bundler::VERSION}
       L
     end
   end
@@ -812,10 +812,10 @@ RSpec.describe "bundle update --ruby" do
        DEPENDENCIES
 
        RUBY VERSION
-          ruby 1.8.3p55
+         ruby 1.8.3p55
 
        BUNDLED WITH
-          #{Bundler::VERSION}
+         #{Bundler::VERSION}
       L
     end
   end
@@ -970,7 +970,7 @@ RSpec.describe "bundle update conservative" do
           isolated_owner
 
         BUNDLED WITH
-           1.13.0
+          1.13.0
       L
     end
 

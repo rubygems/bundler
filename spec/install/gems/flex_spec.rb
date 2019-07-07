@@ -272,7 +272,7 @@ RSpec.describe "bundle flex_install" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
       L
     end
 
@@ -307,7 +307,7 @@ RSpec.describe "bundle flex_install" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
       L
     end
   end

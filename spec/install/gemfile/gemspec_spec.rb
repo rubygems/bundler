@@ -361,7 +361,7 @@ RSpec.describe "bundle install from an existing gemspec" do
             foo!
 
           BUNDLED WITH
-             #{Bundler::VERSION}
+            #{Bundler::VERSION}
         L
       end
 
@@ -475,7 +475,7 @@ RSpec.describe "bundle install from an existing gemspec" do
                 foo!
 
               BUNDLED WITH
-                 #{Bundler::VERSION}
+                #{Bundler::VERSION}
             L
           end
         end
@@ -506,7 +506,7 @@ RSpec.describe "bundle install from an existing gemspec" do
                 platform_specific
 
               BUNDLED WITH
-                 #{Bundler::VERSION}
+                #{Bundler::VERSION}
             L
           end
         end
@@ -540,7 +540,7 @@ RSpec.describe "bundle install from an existing gemspec" do
                 indirect_platform_specific
 
               BUNDLED WITH
-                 #{Bundler::VERSION}
+                #{Bundler::VERSION}
             L
           end
         end

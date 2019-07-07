@@ -23,7 +23,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -69,7 +69,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -148,7 +148,7 @@ RSpec.describe "the lockfile format" do
         rack (> 0)
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -219,7 +219,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{older_major}
+        #{older_major}
     L
 
     install_gemfile <<-G
@@ -246,7 +246,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{current_version}
+        #{current_version}
     G
   end
 
@@ -272,7 +272,7 @@ RSpec.describe "the lockfile format" do
         rack-obama
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -298,7 +298,7 @@ RSpec.describe "the lockfile format" do
         rack-obama (>= 1.0)
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -331,7 +331,7 @@ RSpec.describe "the lockfile format" do
         rack-obama (>= 1.0)!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -370,7 +370,7 @@ RSpec.describe "the lockfile format" do
         rack-obama (>= 1.0)!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -395,7 +395,7 @@ RSpec.describe "the lockfile format" do
         net-sftp
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
 
     expect(the_bundle).to include_gems "net-sftp 1.1.1", "net-ssh 1.0.0"
@@ -425,7 +425,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -453,7 +453,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -489,7 +489,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     L
 
     bundle! "install"
@@ -522,7 +522,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -552,7 +552,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -582,7 +582,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -609,7 +609,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -639,7 +639,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -681,7 +681,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -716,7 +716,7 @@ RSpec.describe "the lockfile format" do
         thin
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -755,7 +755,7 @@ RSpec.describe "the lockfile format" do
         rails
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -781,7 +781,7 @@ RSpec.describe "the lockfile format" do
         double_deps
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -807,7 +807,7 @@ RSpec.describe "the lockfile format" do
         rack-obama (>= 1.0)
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -833,7 +833,7 @@ RSpec.describe "the lockfile format" do
         rack-obama (>= 1.0)
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -862,7 +862,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -891,7 +891,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -920,7 +920,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -947,7 +947,7 @@ RSpec.describe "the lockfile format" do
         foo!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -965,7 +965,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
 
     install_gemfile <<-G
@@ -988,7 +988,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1006,7 +1006,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
 
     install_gemfile <<-G
@@ -1030,7 +1030,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1061,7 +1061,7 @@ RSpec.describe "the lockfile format" do
         platform_specific
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1094,7 +1094,7 @@ RSpec.describe "the lockfile format" do
         platform_specific
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1125,7 +1125,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1149,7 +1149,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1173,7 +1173,7 @@ RSpec.describe "the lockfile format" do
         rack (= 1.0)
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1197,7 +1197,7 @@ RSpec.describe "the lockfile format" do
         rack (= 1.0)
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1242,7 +1242,7 @@ RSpec.describe "the lockfile format" do
         rack (> 0.9, < 1.0)
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1266,10 +1266,10 @@ RSpec.describe "the lockfile format" do
         rack (> 0.9, < 1.0)
 
       RUBY VERSION
-         ruby #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}
+        ruby #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     G
   end
 
@@ -1318,7 +1318,7 @@ RSpec.describe "the lockfile format" do
         omg!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     L
 
     FileUtils.rm_rf(bundled_app("vendor"))
@@ -1345,7 +1345,7 @@ RSpec.describe "the lockfile format" do
         omg!
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     L
   end
 
@@ -1458,7 +1458,7 @@ RSpec.describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     L
 
     install_gemfile(<<-G)

@@ -125,7 +125,7 @@ RSpec.describe "bundle install across platforms" do
         pry
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     L
 
     bundle! "lock --add-platform ruby"
@@ -157,7 +157,7 @@ RSpec.describe "bundle install across platforms" do
         pry
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     L
 
     lockfile_should_be good_lockfile
@@ -403,7 +403,7 @@ RSpec.describe "bundle install with platform conditionals" do
         rack
 
       BUNDLED WITH
-         #{Bundler::VERSION}
+        #{Bundler::VERSION}
     L
   end
 end

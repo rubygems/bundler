@@ -466,10 +466,10 @@ RSpec.describe "bundle install with gem sources" do
          DEPENDENCIES
 
          RUBY VERSION
-            ruby 2.1.3p100
+           ruby 2.1.3p100
 
          BUNDLED WITH
-            #{Bundler::VERSION}
+           #{Bundler::VERSION}
         L
       end
 
@@ -490,10 +490,10 @@ RSpec.describe "bundle install with gem sources" do
          DEPENDENCIES
 
          RUBY VERSION
-            ruby 2.2.3p100
+           ruby 2.2.3p100
 
          BUNDLED WITH
-            #{Bundler::VERSION}
+           #{Bundler::VERSION}
         L
       end
     end

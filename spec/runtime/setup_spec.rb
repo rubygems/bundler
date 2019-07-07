@@ -1087,7 +1087,7 @@ end
       L
 
       if bundler_version
-        lock += "\n        BUNDLED WITH\n           #{bundler_version}\n"
+        lock += "\n        BUNDLED WITH\n         #{bundler_version}\n"
       end
 
       lock
@@ -1151,7 +1151,7 @@ end
       lock += <<-L
 
         BUNDLED WITH
-           #{Bundler::VERSION}
+          #{Bundler::VERSION}
       L
 
       lock

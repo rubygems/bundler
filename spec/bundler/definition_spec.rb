@@ -68,7 +68,7 @@ RSpec.describe Bundler::Definition do
           foo!
 
         BUNDLED WITH
-           #{Bundler::VERSION}
+          #{Bundler::VERSION}
       G
     end
 
@@ -106,7 +106,7 @@ RSpec.describe Bundler::Definition do
           foo!
 
         BUNDLED WITH
-           #{Bundler::VERSION}
+          #{Bundler::VERSION}
       G
     end
 
@@ -143,7 +143,7 @@ RSpec.describe Bundler::Definition do
           foo!
 
         BUNDLED WITH
-           #{Bundler::VERSION}
+          #{Bundler::VERSION}
       G
     end
 
@@ -171,7 +171,7 @@ RSpec.describe Bundler::Definition do
           only_java
 
         BUNDLED WITH
-           #{Bundler::VERSION}
+          #{Bundler::VERSION}
       G
     end
 
@@ -197,7 +197,7 @@ RSpec.describe Bundler::Definition do
           foo
 
         BUNDLED WITH
-           #{Bundler::VERSION}
+          #{Bundler::VERSION}
       G
     end
   end
@@ -265,7 +265,7 @@ RSpec.describe Bundler::Definition do
               isolated_owner
 
             BUNDLED WITH
-               1.13.0
+              1.13.0
           L
         end
 
