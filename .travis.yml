@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - simplify_stuff
 
 cache:
   directories:
