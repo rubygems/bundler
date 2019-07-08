@@ -265,18 +265,20 @@ begin
 
   require "automatiek"
 rescue LoadError
+  msg = "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems"
+
   namespace :vendor do
     desc "Vendor a specific version of molinillo"
-    task(:molinillo) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:molinillo) { abort msg }
 
     desc "Vendor a specific version of fileutils"
-    task(:fileutils) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:fileutils) { abort msg }
 
     desc "Vendor a specific version of thor"
-    task(:thor) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:thor) { abort msg }
 
     desc "Vendor a specific version of net-http-persistent"
-    task(:"net-http-persistent") { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:"net-http-persistent") { abort msg }
   end
 else
   desc "Vendor a specific version of molinillo"
