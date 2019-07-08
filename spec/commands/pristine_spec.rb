@@ -43,7 +43,6 @@ RSpec.describe "bundle pristine", :ruby_repo do
     end
 
     it "does not delete the bundler gem", :rubygems => ">= 2.6.2" do
-      ENV["BUNDLER_SPEC_KEEP_DEFAULT_BUNDLER_GEM"] = "true"
       system_gems :bundler
       bundle! "install"
       bundle! "pristine", :system_bundler => true
