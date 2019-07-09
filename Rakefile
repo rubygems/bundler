@@ -3,9 +3,7 @@
 $:.unshift File.expand_path("../lib", __FILE__)
 require "benchmark"
 
-def development_dependencies
-  @development_dependencies ||= Gem::Specification.load("bundler.gemspec").development_dependencies
-end
+require_relative "spec/support/rubygems_ext"
 
 # Benchmark task execution
 module Rake
@@ -36,17 +34,7 @@ namespace :spec do
 
   desc "Ensure spec dependencies are installed"
   task :deps do
-    deps = Hash[development_dependencies.map do |d|
-      [d.name, d.requirement.to_s]
-    end]
-
-    # JRuby can't build ronn, so we skip that
-    deps.delete("ronn") if RUBY_ENGINE == "jruby"
-
-    gem_install_command = "install --no-document --conservative " + deps.sort_by {|name, _| name }.map do |name, version|
-      "'#{name}:#{version}'"
-    end.join(" ")
-    sh %(#{Gem.ruby} -S gem #{gem_install_command})
+    Spec::Rubygems.dev_setup
   end
 
   namespace :travis do
@@ -191,18 +179,10 @@ namespace :man do
   if RUBY_ENGINE == "jruby"
     task(:build) {}
   else
-    ronn_dep = development_dependencies.find do |dep|
-      dep.name == "ronn"
-    end
-
-    ronn_requirement = ronn_dep.requirement.to_s
-
     begin
-      gem "ronn", ronn_requirement
-
-      require "ronn"
-    rescue LoadError
-      task(:build) { abort "We couln't activate ronn (#{ronn_requirement}). Try `gem install ronn:'#{ronn_requirement}'` to be able to build the help pages" }
+      Spec::Rubygems.gem_require("ronn")
+    rescue Gem::LoadError => e
+      task(:build) { abort "We couln't activate ronn (#{e.requirement}). Try `gem install ronn:'#{e.requirement}'` to be able to build the help pages" }
     else
       directory "man"
 
@@ -254,29 +234,23 @@ namespace :man do
   end
 end
 
-automatiek_dep = development_dependencies.find do |dep|
-  dep.name == "automatiek"
-end
-
-automatiek_requirement = automatiek_dep.requirement.to_s
-
 begin
-  gem "automatiek", automatiek_requirement
+  Spec::Rubygems.gem_require("automatiek")
+rescue Gem::LoadError => e
+  msg = "We couldn't activate automatiek (#{e.requirement}). Try `gem install automatiek:'#{e.requirement}'` to be able to vendor gems"
 
-  require "automatiek"
-rescue LoadError
   namespace :vendor do
     desc "Vendor a specific version of molinillo"
-    task(:molinillo) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:molinillo) { abort msg }
 
     desc "Vendor a specific version of fileutils"
-    task(:fileutils) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:fileutils) { abort msg }
 
     desc "Vendor a specific version of thor"
-    task(:thor) { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:thor) { abort msg }
 
     desc "Vendor a specific version of net-http-persistent"
-    task(:"net-http-persistent") { abort "We couldn't activate automatiek (#{automatiek_requirement}). Try `gem install automatiek:'#{automatiek_requirement}'` to be able to vendor gems" }
+    task(:"net-http-persistent") { abort msg }
   end
 else
   desc "Vendor a specific version of molinillo"
