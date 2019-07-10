@@ -10,7 +10,6 @@
 /pkg/
 
 # output from ronn
-/lib/bundler/man/
 man/*
 !man/*.ronn
 
