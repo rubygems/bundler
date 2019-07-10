@@ -230,6 +230,25 @@ namespace :man do
 
       desc "Build the man pages"
       task :build => ["man:clean", "man:build_all_pages"]
+
+      desc "Verify man pages are in sync"
+      task :check => :build do
+        sh("git diff --quiet man") do |outcome, _|
+          if outcome
+            puts
+            puts "Manpages are in sync!"
+            puts
+          else
+            sh("GIT_PAGER=cat git diff man")
+
+            puts
+            puts "Man pages are out of sync. Above you can see the diff that got generated from rebuilding them. Please review and commit the results."
+            puts
+
+            exit(1)
+          end
+        end
+      end
     end
   end
 end

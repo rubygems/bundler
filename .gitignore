@@ -9,9 +9,5 @@
 # gems built by `rake build`
 /pkg/
 
-# output from ronn
-man/*
-!man/*.ronn
-
 # rspec failure tracking
 .rspec_status
