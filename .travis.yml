@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - fix_pristine_with_default_gems
 
 cache:
   directories:
