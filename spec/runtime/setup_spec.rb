@@ -845,7 +845,7 @@ end
     end
   end
 
-  it "stubs out Gem.refresh so it does not reveal system gems" do
+  it "does not reveal system gems even when Gem.refresh is called" do
     system_gems "rack-1.0.0"
 
     install_gemfile <<-G
@@ -854,12 +854,12 @@ end
     G
 
     run <<-R
-      puts Bundler.rubygems.find_name("rack").inspect
+      puts Bundler.rubygems.all_specs.map(&:name)
       Gem.refresh
-      puts Bundler.rubygems.find_name("rack").inspect
+      puts Bundler.rubygems.all_specs.map(&:name)
     R
 
-    expect(out).to eq("[]\n[]")
+    expect(out).to eq("activesupport\nbundler\nactivesupport\nbundler")
   end
 
   describe "when a vendored gem specification uses the :path option" do
