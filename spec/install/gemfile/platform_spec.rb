@@ -102,7 +102,7 @@ RSpec.describe "bundle install across platforms" do
       gem "pry"
     G
 
-    expect(the_bundle.lockfile).to read_as strip_whitespace(<<-L)
+    lockfile_should_be <<-L
       GEM
         remote: #{file_uri_for(gem_repo4)}/
         specs:
@@ -160,7 +160,7 @@ RSpec.describe "bundle install across platforms" do
          #{Bundler::VERSION}
     L
 
-    expect(the_bundle.lockfile).to read_as good_lockfile
+    lockfile_should_be good_lockfile
 
     bad_lockfile = strip_whitespace <<-L
       GEM
@@ -196,23 +196,23 @@ RSpec.describe "bundle install across platforms" do
     aggregate_failures do
       lockfile bad_lockfile
       bundle! :install
-      expect(the_bundle.lockfile).to read_as good_lockfile
+      lockfile_should_be good_lockfile
 
       lockfile bad_lockfile
       bundle! :update, :all => true
-      expect(the_bundle.lockfile).to read_as good_lockfile
+      lockfile_should_be good_lockfile
 
       lockfile bad_lockfile
       bundle! "update ffi"
-      expect(the_bundle.lockfile).to read_as good_lockfile
+      lockfile_should_be good_lockfile
 
       lockfile bad_lockfile
       bundle! "update empyrean"
-      expect(the_bundle.lockfile).to read_as good_lockfile
+      lockfile_should_be good_lockfile
 
       lockfile bad_lockfile
       bundle! :lock
-      expect(the_bundle.lockfile).to read_as good_lockfile
+      lockfile_should_be good_lockfile
     end
   end
 
@@ -372,7 +372,7 @@ RSpec.describe "bundle install with platform conditionals" do
     expect(out).not_to match(/Could not find gem 'some_gem/)
   end
 
-  it "prints a helpful warning when a dependency is unused on any platform" do
+  it "resolves all platforms by default and without warning messages" do
     simulate_platform "ruby"
     simulate_ruby_engine "ruby"
 
@@ -384,28 +384,27 @@ RSpec.describe "bundle install with platform conditionals" do
 
     bundle! "install"
 
-    expect(err).to include <<-O.strip
-The dependency #{Gem::Dependency.new("rack", ">= 0")} will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.
-    O
-  end
+    expect(err).to be_empty
 
-  context "when disable_platform_warnings is true" do
-    before { bundle! "config set disable_platform_warnings true" }
+    lockfile_should_be <<-L
+      GEM
+        remote: #{file_uri_for(gem_repo1)}/
+        specs:
+          rack (1.0.0)
 
-    it "does not print the warning when a dependency is unused on any platform" do
-      simulate_platform "ruby"
-      simulate_ruby_engine "ruby"
+      PLATFORMS
+        java
+        ruby
+        x64-mingw32
+        x86-mingw32
+        x86-mswin32
 
-      gemfile <<-G
-        source "#{file_uri_for(gem_repo1)}"
+      DEPENDENCIES
+        rack
 
-        gem "rack", :platform => [:mingw, :mswin, :x64_mingw, :jruby]
-      G
-
-      bundle! "install"
-
-      expect(out).not_to match(/The dependency (.*) will be unused/)
-    end
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    L
   end
 end
 
