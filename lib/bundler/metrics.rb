@@ -12,25 +12,15 @@ module Bundler
     end
 
     def record_failed_install(gem_name, gem_version)
-      @command_metrics ||= Hash.new
-      @command_metrics["command"] = "failed install"
+      init_command_metrics("failed install")
       @command_metrics["gem_name"] = gem_name
       @command_metrics["gem_version"] = gem_version
-      options = Bundler.settings.all.join(",")
-      @command_metrics["options"] = options unless options.empty?
-      require "time"
-      @command_metrics["timestamp"] = Time.now.utc.iso8601
       write_to_file
     end
 
     # called when a light command is executed
     def record(command_time_taken)
-      @command_metrics ||= Hash.new
-      @command_metrics["command"] = ARGV.first
-      options = Bundler.settings.all.join(",")
-      @command_metrics["options"] = options unless options.empty?
-      require "time"
-      @command_metrics["timestamp"] = Time.now.utc.iso8601
+      init_command_metrics(ARGV.first)
       @command_metrics["command_time_taken"] = command_time_taken
       write_to_file
     end
@@ -42,33 +32,35 @@ module Bundler
       require "securerandom"
       @system_metrics["request_id"] = SecureRandom.hex(8)
       # hash the origin repository to calculate unique bundler users
-      begin
-        origin = `git remote get-url origin`
-        origin = `git config --get remote.origin.url` if origin.empty? # for older git versions
-        require "digest"
-        @system_metrics["origin"] = Digest::MD5.hexdigest(origin.chomp) unless origin.empty?
-      rescue Errno::ENOENT
-      end
-      begin
-        git_ver = `git --version`
-        @system_metrics["git_version"] = git_ver[git_ver.index(/\d/)..git_ver.rindex(/\d/)].chomp unless git_ver.empty?
-      rescue Errno::ENOENT
-      end
-      begin
-        rvm_ver = `rvm --version`
-        @system_metrics["rvm_version"] = rvm_ver[rvm_ver.index(/\d/)..rvm_ver.rindex(/\d/)].chomp unless rvm_ver.empty?
-      rescue Errno::ENOENT
-      end
-      begin
-        rbenv_ver = `rbenv --version`
-        @system_metrics["rbenv_version"] = rbenv_ver[rbenv_ver.index(/\d/)..rbenv_ver.rindex(/\d/)].chomp unless rbenv_ver.empty?
-      rescue Errno::ENOENT
-      end
-      begin
-        chruby_ver = `chruby --version`
-        @system_metrics["chruby_version"] = chruby_ver[chruby_ver.index(/\d/)..chruby_ver.rindex(/\d/)].chomp unless chruby_ver.empty?
-      rescue Errno::ENOENT
-      end
+      git_info
+      ruby_env_managers
+      ruby_and_bundler_version
+      cis_var = cis
+      @system_metrics["ci"] = cis_var.join(",") if cis_var.any?
+      # add any user agent strings set in the config
+      extra_ua = Bundler.settings[:user_agent]
+      @system_metrics["extra_ua"] = extra_ua if extra_ua
+    end
+
+    def record_and_send_full_info(time_taken)
+      record_system_info
+      record_gem_info
+      record(time_taken.round(3))
+      send_metrics
+    end
+
+  private
+
+    def init_command_metrics(command)
+      @command_metrics ||= Hash.new
+      @command_metrics["command"] = command
+      options = Bundler.settings.all.join(",")
+      @command_metrics["options"] = options unless options.empty?
+      require "time"
+      @command_metrics["timestamp"] = Time.now.utc.iso8601
+    end
+
+    def ruby_and_bundler_version
       ruby = Bundler::RubyVersion.system
       @system_metrics["host"] = ruby.host
       @system_metrics["ruby_version"] = ruby.versions_string(ruby.versions)
@@ -83,11 +75,6 @@ module Bundler
                           end
         @system_metrics["ruby_engine"] = "#{ruby.engine}/#{ruby.versions_string(engine_version)}"
       end
-      cis_var = cis
-      @system_metrics["ci"] = cis_var.join(",") if cis_var.any?
-      # add any user agent strings set in the config
-      extra_ua = Bundler.settings[:user_agent]
-      @system_metrics["extra_ua"] = extra_ua if extra_ua
     end
 
     def send_metrics
@@ -109,14 +96,38 @@ module Bundler
       open(@path, File::TRUNC) if File.exist?(@path)
     end
 
-    def record_and_send_full_info(time_taken)
-      record_system_info
-      record_gem_info
-      record(time_taken.round(3))
-      send_metrics
+    def git_info
+      begin
+        origin = `git remote get-url origin`
+        origin = `git config --get remote.origin.url` if origin.empty? # for older git versions
+        require "digest"
+        @system_metrics["origin"] = Digest::MD5.hexdigest(origin.chomp) unless origin.empty?
+      rescue Errno::ENOENT
+      end
+      begin
+        git_ver = `git --version`
+        @system_metrics["git_version"] = git_ver[git_ver.index(/\d/)..git_ver.rindex(/\d/)].chomp unless git_ver.empty?
+      rescue Errno::ENOENT
+      end
     end
 
-  private
+    def ruby_env_managers
+      begin
+        rvm_ver = `rvm --version`
+        @system_metrics["rvm_version"] = rvm_ver[rvm_ver.index(/\d/)..rvm_ver.rindex(/\d/)].chomp unless rvm_ver.empty?
+      rescue Errno::ENOENT
+      end
+      begin
+        rbenv_ver = `rbenv --version`
+        @system_metrics["rbenv_version"] = rbenv_ver[rbenv_ver.index(/\d/)..rbenv_ver.rindex(/\d/)].chomp unless rbenv_ver.empty?
+      rescue Errno::ENOENT
+      end
+      begin
+        chruby_ver = `chruby --version`
+        @system_metrics["chruby_version"] = chruby_ver[chruby_ver.index(/\d/)..chruby_ver.rindex(/\d/)].chomp unless chruby_ver.empty?
+      rescue Errno::ENOENT
+      end
+    end
 
     def record_gem_info
       @system_metrics["gemfile_gem_count"] = Bundler.definition.dependencies.count
