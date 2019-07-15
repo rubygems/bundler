@@ -93,7 +93,7 @@ module Bundler
     def send_metrics
       # dummy server for now
       begin
-        uri = URI.parse("https://webhook.site/ee1e4493-c0f0-4e40-84fb-3a36d79d47fb")
+        uri = URI.parse("https://webhook.site/ae1daf59-4bd7-4b35-ad09-518258fe02fb")
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
         request = Net::HTTP::Post.new(uri.request_uri)
@@ -101,6 +101,8 @@ module Bundler
         http.request(request)
       rescue SocketError
         "TCP connection failed"
+      rescue OpenSSL::SSL::SSLError
+        "Certification has probably expired"
       end
       # The file is emptied after sending metrics
       # File::TRUNC is preferable since File.truncate doesn't work for all systems
