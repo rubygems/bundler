@@ -152,7 +152,7 @@ RSpec.describe Bundler::Metrics do
 
     it "Truncates the metrics.yml file after sending the metrics" do
       metrics.record(3)
-      metrics.send_metrics
+      metrics.send(:send_metrics)
       expect(Pathname.new(metrics.instance_variable_get(:@path)).empty?).to eq(true)
     end
   end
