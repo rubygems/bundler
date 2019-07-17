@@ -78,14 +78,13 @@ module Bundler
     end
 
     def send_metrics
-      # dummy server for now
+      # TODO: change URI
       begin
-        uri = URI.parse("https://www.example.com")
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
-        request = Net::HTTP::Post.new(uri.request_uri)
-        request.set_form_data(read_from_file)
-        http.request(request)
+        uri = URI("http://localhost:3000/api/metrics")
+        Net::HTTP.start(uri.host, uri.port) do # TODO: add ', :use_ssl => true' later
+          data_array = read_from_file
+          data_array.each {|hash| Net::HTTP.post_form(uri, hash) }
+        end
       rescue SocketError, Errno::ECONNREFUSED
         "TCP connection failed"
       rescue OpenSSL::SSL::SSLError
