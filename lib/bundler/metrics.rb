@@ -80,13 +80,13 @@ module Bundler
     def send_metrics
       # dummy server for now
       begin
-        uri = URI.parse("https://webhook.site/ae1daf59-4bd7-4b35-ad09-518258fe02fb")
+        uri = URI.parse("https://www.example.com")
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
         request = Net::HTTP::Post.new(uri.request_uri)
         request.set_form_data(read_from_file)
         http.request(request)
-      rescue SocketError
+      rescue SocketError, Errno::ECONNREFUSED
         "TCP connection failed"
       rescue OpenSSL::SSL::SSLError
         "Certification has probably expired"
