@@ -37,9 +37,6 @@ module Bundler
       ruby_and_bundler_version
       cis_var = cis
       @system_metrics["ci"] = cis_var.join(",") if cis_var.any?
-      # add any user agent strings set in the config
-      extra_ua = Bundler.settings[:user_agent]
-      @system_metrics["extra_ua"] = extra_ua if extra_ua
     end
 
     def record_and_send_full_info(time_taken)
