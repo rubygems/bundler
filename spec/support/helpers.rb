@@ -316,7 +316,11 @@ module Spec
           "#{gem_repo}/gems/#{g}.gem"
         end
 
-        raise "OMG `#{path}` does not exist!" unless File.exist?(path)
+        unless File.exist?(path)
+          msg = "OMG `#{path}` does not exist!"
+          msg += " Run `rake spec:deps` and try again" if g == :bundler
+          raise msg
+        end
 
         gem_command! :install, "--no-document --ignore-dependencies '#{path}'"
       end
