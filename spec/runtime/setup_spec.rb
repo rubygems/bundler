@@ -12,7 +12,7 @@ RSpec.describe "Bundler.setup" do
       G
 
       ruby <<-RUBY
-        require 'bundler'
+        require '../../lib/bundler'
         Bundler.setup
 
         require 'rack'
@@ -34,7 +34,7 @@ RSpec.describe "Bundler.setup" do
 
     it "doesn't make all groups available" do
       ruby <<-RUBY
-        require 'bundler'
+        require '../../lib/bundler'
         Bundler.setup(:default)
 
         begin
@@ -49,7 +49,7 @@ RSpec.describe "Bundler.setup" do
 
     it "accepts string for group name" do
       ruby <<-RUBY
-        require 'bundler'
+        require '../../lib/bundler'
         Bundler.setup(:default, 'test')
 
         require 'rack'
@@ -61,7 +61,7 @@ RSpec.describe "Bundler.setup" do
 
     it "leaves all groups available if they were already" do
       ruby <<-RUBY
-        require 'bundler'
+        require '../../lib/bundler'
         Bundler.setup
         Bundler.setup(:default)
 
@@ -74,7 +74,7 @@ RSpec.describe "Bundler.setup" do
 
     it "leaves :default available if setup is called twice" do
       ruby <<-RUBY
-        require 'bundler'
+        require '../../lib/bundler'
         Bundler.setup(:default)
         Bundler.setup(:default, :test)
 
@@ -91,7 +91,7 @@ RSpec.describe "Bundler.setup" do
 
     it "handles multiple non-additive invocations" do
       ruby <<-RUBY
-        require 'bundler'
+        require '../../lib/bundler'
         Bundler.setup(:default, :test)
         Bundler.setup(:default)
         require 'rack'
@@ -127,7 +127,7 @@ RSpec.describe "Bundler.setup" do
       ENV["RUBYLIB"] = "rubylib_dir"
 
       ruby <<-RUBY
-        require 'bundler'
+        require '../../lib/bundler'
         Bundler.setup
         puts $LOAD_PATH
       RUBY
@@ -147,7 +147,7 @@ RSpec.describe "Bundler.setup" do
       G
 
       ruby! <<-RUBY
-        require 'bundler'
+        require '../../lib/bundler'
         Bundler.setup
         puts $LOAD_PATH
       RUBY
@@ -174,7 +174,7 @@ RSpec.describe "Bundler.setup" do
       G
 
       ruby! <<-RUBY
-        require 'bundler/setup'
+        require '../../lib/bundler/setup'
         puts $LOAD_PATH
       RUBY
 
@@ -291,7 +291,7 @@ RSpec.describe "Bundler.setup" do
 
         ENV["BUNDLE_GEMFILE"] = "Gemfile"
         ruby <<-R
-          require 'bundler'
+          require '../../lib/bundler'
 
           begin
             Bundler.setup
@@ -446,7 +446,7 @@ RSpec.describe "Bundler.setup" do
       break_git!
 
       ruby <<-R
-        require 'bundler'
+        require '../../lib/bundler'
 
         begin
           Bundler.setup
@@ -467,7 +467,7 @@ RSpec.describe "Bundler.setup" do
       break_git!
 
       ruby <<-R
-        require "bundler"
+        require "../../lib/bundler"
 
         begin
           Bundler.setup
@@ -776,7 +776,7 @@ end
         s.class.send(:define_method, :build_extensions) { nil }
       end
 
-      require 'bundler'
+      require '../../lib/bundler'
       gem '#{gem_name}'
 
       puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} >= 2
@@ -1087,7 +1087,7 @@ end
     context "is not present" do
       it "does not change the lock" do
         lockfile lock_with(nil)
-        ruby "require 'bundler/setup'"
+        ruby "require '../../lib/bundler/setup'"
         lockfile_should_be lock_with(nil)
       end
     end
@@ -1095,7 +1095,7 @@ end
     context "is newer" do
       it "does not change the lock or warn" do
         lockfile lock_with(Bundler::VERSION.succ)
-        ruby "require 'bundler/setup'"
+        ruby "require '../../lib/bundler/setup'"
         expect(out).to eq("")
         expect(err).to eq("")
         lockfile_should_be lock_with(Bundler::VERSION.succ)
@@ -1105,7 +1105,7 @@ end
     context "is older" do
       it "does not change the lock" do
         lockfile lock_with("1.10.1")
-        ruby "require 'bundler/setup'"
+        ruby "require '../../lib/bundler/setup'"
         lockfile_should_be lock_with("1.10.1")
       end
     end
@@ -1152,14 +1152,14 @@ end
 
     context "is not present" do
       it "does not change the lock" do
-        expect { ruby! "require 'bundler/setup'" }.not_to change { lockfile }
+        expect { ruby! "require '../../lib/bundler/setup'" }.not_to change { lockfile }
       end
     end
 
     context "is newer" do
       let(:ruby_version) { "5.5.5" }
       it "does not change the lock or warn" do
-        expect { ruby! "require 'bundler/setup'" }.not_to change { lockfile }
+        expect { ruby! "require '../../lib/bundler/setup'" }.not_to change { lockfile }
         expect(out).to eq("")
         expect(err).to eq("")
       end
@@ -1168,7 +1168,7 @@ end
     context "is older" do
       let(:ruby_version) { "1.0.0" }
       it "does not change the lock" do
-        expect { ruby! "require 'bundler/setup'" }.not_to change { lockfile }
+        expect { ruby! "require '../../lib/bundler/setup'" }.not_to change { lockfile }
       end
     end
   end
@@ -1177,7 +1177,7 @@ end
     it "does not load Psych" do
       gemfile ""
       ruby <<-RUBY
-        require 'bundler/setup'
+        require "../../lib/bundler/setup"
         puts defined?(Psych::VERSION) ? Psych::VERSION : "undefined"
         require 'psych'
         puts Psych::VERSION
@@ -1190,7 +1190,7 @@ end
     it "does not load openssl" do
       install_gemfile! ""
       ruby! <<-RUBY
-        require "bundler/setup"
+        require "../../lib/bundler/setup"
         puts defined?(OpenSSL) || "undefined"
         require "openssl"
         puts defined?(OpenSSL) || "undefined"
@@ -1203,7 +1203,7 @@ end
         if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7")
           []
         else
-          %w[io-console openssl]
+          %w[io-console openssl fileutils etc]
         end << "bundler"
       end
 
@@ -1244,7 +1244,7 @@ end
 
       it "activates no gems with -rbundler/setup" do
         install_gemfile! ""
-        ruby! code, :env => { :RUBYOPT => activation_warning_hack_rubyopt + " -rbundler/setup" }
+        ruby! code, :env => { :RUBYOPT => activation_warning_hack_rubyopt + " -r../../lib/bundler/setup" }
         expect(out).to eq("{}")
       end
 
@@ -1319,7 +1319,7 @@ end
       G
 
       ruby! <<-RUBY
-        require "bundler/setup"
+        require "../../lib/bundler/setup"
         Object.new.gem "rack"
         puts Gem.loaded_specs["rack"].full_name
       RUBY
@@ -1334,7 +1334,7 @@ end
       G
 
       ruby <<-RUBY
-        require "bundler/setup"
+        require "../../lib/bundler/setup"
         Object.new.gem "rack"
         puts "FAIL"
       RUBY
@@ -1350,7 +1350,7 @@ end
       G
 
       ruby <<-RUBY
-        require "bundler/setup"
+        require "../../lib/bundler/setup"
         Object.new.require "rack"
         puts "FAIL"
       RUBY

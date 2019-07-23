@@ -528,6 +528,8 @@ The checksum of /versions does not match the checksum provided by the server! So
       gem "rack"
     G
 
+    system_gems :bundler
+
     bundle "install --binstubs", :artifice => "compact_index"
 
     gembin "rackup"

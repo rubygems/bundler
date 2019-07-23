@@ -77,7 +77,8 @@ module Spec
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
       groups = args.map(&:inspect).join(", ")
-      setup = "require 'bundler' ; Bundler.setup(#{groups})\n"
+      bundler = File.expand_path("../../lib/bundler.rb", __dir__)
+      setup = "require '#{bundler}' ; Bundler.setup(#{groups})\n"
       ruby(setup + cmd, opts)
     end
     bang :run
@@ -196,8 +197,9 @@ module Spec
     end
 
     def gembin(cmd)
+      bundler_setup = File.expand_path("../../../lib/bundler/setup", __FILE__)
       old = ENV["RUBYOPT"]
-      ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -I#{lib}"
+      ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -I#{lib} -r#{bundler_setup}"
       cmd = bundled_app("bin/#{cmd}") unless cmd.to_s.include?("/")
       sys_exec(cmd.to_s)
     ensure

@@ -74,9 +74,10 @@ RSpec.describe "Bundler.with_env helpers" do
 
     it "should remove '-rbundler/setup' from RUBYOPT" do
       code = "print #{modified_env}['RUBYOPT']"
-      ENV["RUBYOPT"] = "-W2 -rbundler/setup #{ENV["RUBYOPT"]}"
+      setup_path = File.expand_path("../../lib/bundler/setup", __dir__)
+      ENV["RUBYOPT"] = "-W2 -r#{setup_path} #{ENV["RUBYOPT"]}"
       bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).not_to include("-rbundler/setup")
+      expect(last_command.stdboth).not_to include("-r#{setup_path}")
     end
 
     it "should restore RUBYLIB", :ruby_repo do

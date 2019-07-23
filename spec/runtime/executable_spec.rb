@@ -9,7 +9,7 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "runs the bundled command when in the bundle" do
-    bundle! "binstubs rack"
+    bundle! "binstubs rack bundler"
 
     build_gem "rack", "2.0", :to_system => true do |s|
       s.executables = "rackup"
@@ -20,7 +20,7 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "allows the location of the gem stubs to be specified" do
-    bundle! "binstubs rack", :path => "gbin"
+    bundle! "binstubs rack bundler", :path => "gbin"
 
     expect(bundled_app("bin")).not_to exist
     expect(bundled_app("gbin/rackup")).to exist
@@ -30,19 +30,19 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "allows absolute paths as a specification of where to install bin stubs" do
-    bundle! "binstubs rack", :path => tmp("bin")
+    bundle! "binstubs rack bundler", :path => tmp("bin")
 
     gembin tmp("bin/rackup")
     expect(out).to eq("1.0.0")
   end
 
   it "uses the default ruby install name when shebang is not specified" do
-    bundle! "binstubs rack"
+    bundle! "binstubs rack bundler"
     expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env #{RbConfig::CONFIG["ruby_install_name"]}\n")
   end
 
   it "allows the name of the shebang executable to be specified" do
-    bundle! "binstubs rack", :shebang => "ruby-foo"
+    bundle! "binstubs rack bundler", :shebang => "ruby-foo"
     expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env ruby-foo\n")
   end
 
@@ -69,7 +69,7 @@ RSpec.describe "Running bin/* commands" do
       gem "rack", :path => "#{lib_path("rack")}"
     G
 
-    bundle! "binstubs rack"
+    bundle! "binstubs rack bundler"
 
     build_gem "rack", "2.0", :to_system => true do |s|
       s.executables = "rackup"
@@ -138,7 +138,7 @@ RSpec.describe "Running bin/* commands" do
 
     create_file("bin/rackup", "OMG")
 
-    bundle! "binstubs rack"
+    bundle! "binstubs rack bundler"
 
     expect(bundled_app("bin/rackup").read).to_not eq("OMG")
   end
@@ -162,11 +162,11 @@ RSpec.describe "Running bin/* commands" do
     bundle "install"
     bundle! "binstubs bindir"
 
-    # remove user settings
-    ENV["BUNDLE_GEMFILE"] = nil
-
     # run binstub for non default Gemfile
     gembin "foo"
+
+    # remove user settings
+    ENV["BUNDLE_GEMFILE"] = nil
 
     expect(exitstatus).to eq(0) if exitstatus
     expect(out).to eq("1.0")

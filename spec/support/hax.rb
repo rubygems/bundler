@@ -12,16 +12,10 @@ module Gem
     @local = new(ENV["BUNDLER_SPEC_PLATFORM"]) if ENV["BUNDLER_SPEC_PLATFORM"]
   end
   @platforms = [Gem::Platform::RUBY, Gem::Platform.local]
-
-  if defined?(@path_to_default_spec_map) && !ENV["BUNDLER_SPEC_KEEP_DEFAULT_BUNDLER_GEM"]
-    @path_to_default_spec_map.delete_if do |_path, spec|
-      spec.name == "bundler"
-    end
-  end
 end
 
 if ENV["BUNDLER_SPEC_VERSION"]
-  require "bundler/version"
+  require_relative "../../lib/bundler/version"
 
   module Bundler
     remove_const(:VERSION) if const_defined?(:VERSION)
@@ -30,7 +24,7 @@ if ENV["BUNDLER_SPEC_VERSION"]
 end
 
 if ENV["BUNDLER_SPEC_WINDOWS"] == "true"
-  require "bundler/constants"
+  require_relative "../../lib/bundler/constants"
 
   module Bundler
     remove_const :WINDOWS if defined?(WINDOWS)

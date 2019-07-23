@@ -502,6 +502,8 @@ RSpec.describe "gemcutter's dependency API" do
       gem "rack"
     G
 
+    system_gems :bundler
+
     bundle "install --binstubs", :artifice => "endpoint"
 
     gembin "rackup"

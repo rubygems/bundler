@@ -44,7 +44,7 @@ class Endpoint < Sinatra::Base
       return [] if gem_names.nil? || gem_names.empty?
 
       require "rubygems"
-      require "bundler"
+      require_relative "../../../lib/bundler"
       Bundler::Deprecate.skip_during do
         all_specs = %w[specs.4.8 prerelease_specs.4.8].map do |filename|
           Marshal.load(File.open(gem_repo.join(filename)).read)
