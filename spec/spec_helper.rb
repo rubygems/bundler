@@ -78,7 +78,7 @@ RSpec.configure do |config|
   config.filter_run_when_matching :focus unless ENV["CI"]
 
   original_wd  = Dir.pwd
-  original_env = ENV.to_hash.delete_if {|k, _v| k.start_with?(Bundler::EnvironmentPreserver::BUNDLER_PREFIX) }
+  original_env = ENV.to_hash
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
@@ -99,13 +99,13 @@ RSpec.configure do |config|
 
   config.before :suite do
     Spec::Rubygems.setup
-    ENV["RUBYOPT"] = original_env["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
-    ENV["BUNDLE_SPEC_RUN"] = original_env["BUNDLE_SPEC_RUN"] = "true"
+    ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
+    ENV["BUNDLE_SPEC_RUN"] = "true"
 
     # Don't wrap output in tests
     ENV["THOR_COLUMNS"] = "10000"
 
-    original_env = ENV.to_hash.delete_if {|k, _v| k.start_with?(Bundler::EnvironmentPreserver::BUNDLER_PREFIX) }
+    original_env = ENV.to_hash
 
     if ENV["BUNDLE_RUBY"]
       FileUtils.cp_r Spec::Path.bindir, File.join(Spec::Path.root, "lib", "exe")
