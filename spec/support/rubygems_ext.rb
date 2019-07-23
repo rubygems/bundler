@@ -62,11 +62,11 @@ module Spec
         spec.bindir = "libexec"
         File.open(root.join("bundler.gemspec").to_s, "w") {|f| f.write spec.to_ruby }
         cmd = "#{gem_cmd} build #{root.join("bundler.gemspec")}"
-        system(cmd) || raise("Building bundler gem failed!")
+        Dir.chdir(root) { system(cmd) } || raise("Building bundler gem failed!")
         FileUtils.rm(root.join("bundler.gemspec"))
       else
         cmd = "#{gem_cmd} build #{gemspec}"
-        system(cmd) || raise("Building bundler gem failed!")
+        Dir.chdir(root) { system(cmd) } || raise("Building bundler gem failed!")
       end
 
       FileUtils.mv(root.join("bundler-#{Bundler::VERSION}.gem"), "pkg")
