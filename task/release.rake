@@ -221,7 +221,8 @@ namespace :release do
     in_release = prs("HEAD") - prs(last_stable)
 
     in_release.each do |pr|
-      system("open", "https://github.com/bundler/bundler/pull/#{pr}")
+      url_opener = /darwin/ =~ RUBY_PLATFORM ? "open" : "xdg-open"
+      system(url_opener, "https://github.com/bundler/bundler/pull/#{pr}")
       confirm
     end
   end
