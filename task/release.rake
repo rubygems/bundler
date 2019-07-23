@@ -220,6 +220,10 @@ namespace :release do
 
     in_release = prs("HEAD") - prs(last_stable)
 
+    print "About to review #{in_release.size} pending PRs. "
+
+    confirm "Continue?"
+
     in_release.each do |pr|
       url_opener = /darwin/ =~ RUBY_PLATFORM ? "open" : "xdg-open"
       system(url_opener, "https://github.com/bundler/bundler/pull/#{pr}")
