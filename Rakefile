@@ -35,6 +35,7 @@ namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
     Spec::Rubygems.dev_setup
+    Spec::Rubygems.build
   end
 
   namespace :travis do

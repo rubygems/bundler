@@ -54,6 +54,24 @@ module Spec
       require gem_name
     end
 
+    def self.build
+      root = Path.root
+      gemspec = Path.gemspec.to_s
+      if Path.ruby_core?
+        spec = Gem::Specification.load(gemspec)
+        spec.bindir = "libexec"
+        File.open(root.join("bundler.gemspec").to_s, "w") {|f| f.write spec.to_ruby }
+        cmd = "#{gem_cmd} build #{root.join("bundler.gemspec")}"
+        system(cmd) || raise("Building bundler gem failed!")
+        FileUtils.rm(root.join("bundler.gemspec"))
+      else
+        cmd = "#{gem_cmd} build #{gemspec}"
+        system(cmd) || raise("Building bundler gem failed!")
+      end
+
+      FileUtils.mv(root.join("bundler-#{Bundler::VERSION}.gem"), "pkg")
+    end
+
     def self.setup
       Gem.clear_paths
 
@@ -83,10 +101,13 @@ module Spec
       no_reqs.map!(&:first)
       reqs.map! {|name, req| "'#{name}:#{req}'" }
       deps = reqs.concat(no_reqs).join(" ")
-      gem = Spec::Path.ruby_core? ? ENV["BUNDLE_GEM"] : "#{Gem.ruby} -S gem"
-      cmd = "#{gem} install #{deps} --no-document --conservative"
+      cmd = "#{gem_cmd} install #{deps} --no-document --conservative"
       puts cmd
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
+    end
+
+    def self.gem_cmd
+      Path.ruby_core? ? ENV["BUNDLE_GEM"] : "#{Gem.ruby} -S gem"
     end
   end
 end
