@@ -69,7 +69,7 @@ module Spec
         Dir.chdir(root) { system(cmd) } || raise("Building bundler gem failed!")
       end
 
-      FileUtils.mv(root.join("bundler-#{Bundler::VERSION}.gem"), "pkg")
+      FileUtils.mv(root.join("bundler-#{Bundler::VERSION}.gem"), "tmp")
     end
 
     def self.setup

@@ -309,7 +309,7 @@ module Spec
       gem_repo = options.fetch(:gem_repo) { gem_repo1 }
       gems.each do |g|
         path = if g == :bundler
-          root + "pkg/bundler-#{Bundler::VERSION}.gem"
+          root + "tmp/bundler-#{Bundler::VERSION}.gem"
         elsif g.to_s =~ %r{\A(?:[A-Z]:)?/.*\.gem\z}
           g
         else
