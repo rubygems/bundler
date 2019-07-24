@@ -798,6 +798,9 @@ Style/TrailingCommaInHashLiteral:
 Style/TrailingMethodEndStatement:
   Enabled: true
 
+Style/UnneededInterpolation:
+  Enabled: true
+
 Style/UnlessElse:
   Enabled: true
 
