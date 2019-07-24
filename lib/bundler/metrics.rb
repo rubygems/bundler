@@ -78,9 +78,12 @@ module Bundler
       # TODO: change URI
       begin
         uri = URI("http://localhost:3000/api/metrics")
-        Net::HTTP.start(uri.host, uri.port) do # TODO: add ', :use_ssl => true' later
-          data_array = read_from_file
-          data_array.each {|hash| Net::HTTP.post_form(uri, hash) }
+        Net::HTTP.start(uri.host, uri.port) do |http| # TODO: add ', :use_ssl => true' later
+          req = Net::HTTP::Post.new(uri)
+          req["Content-Type"] = "application/json"
+          require "json"
+          req.body = read_from_file.to_json
+          http.request(req)
         end
       rescue SocketError, Errno::ECONNREFUSED
         "TCP connection failed"
@@ -149,7 +152,7 @@ module Bundler
       list = Array.new
       SharedHelpers.filesystem_access(@path, :read) do |file|
         require "psych"
-        Psych.load_stream(file.read) {|doc| list << doc }
+        list = Psych.load_stream(file.read)
       end
       list << @system_metrics
     end
