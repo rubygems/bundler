@@ -1,6 +1,6 @@
 # Bundler Policies
 
-This document is an attempt to record the policies and processes that are used to govern the Bundler project--it’s not fixed or permanent, and will likely evolve as events warrant.
+This document is an attempt to record the policies and processes that are used to govern the Bundler project--it's not fixed or permanent, and will likely evolve as events warrant.
 
 ### Our Goals
 
@@ -9,7 +9,7 @@ This document is an attempt to record the policies and processes that are used t
 2. Strive to empower Bundler contributors, as long as it does not harm users. For example, potential contributors should be able to set up a complete development and testing environment with a single command.
 3. Strive to empower maintainers, as long as it does not harm contributors or users. For example, automating issue triage to reduce repetitive work for maintainers, as long as users with problems are not worse off.
 
-These policies are intended to be examples of how to apply these goals, and we realize that we can’t possibly cover every edge case or loophole. In any case where policies turn out to conflict with these goals, the goals should win.
+These policies are intended to be examples of how to apply these goals, and we realize that we can't possibly cover every edge case or loophole. In any case where policies turn out to conflict with these goals, the goals should win.
 
 ### Compatibility guidelines
 
@@ -62,16 +62,16 @@ Contributors who have contributed regularly for more than six months (or impleme
 
 Bugfix releases should generally be cut as soon as possible. Multiple bugfix releases are preferable to waiting for a specific fix to land.
 
-Minor/feature releases can be cut anytime at least one new feature is ready, but don’t have to be. Minor version releases should include an update to the documentation website, allowing users to view the documentation for whatever minor version they happen to be using.
+Minor/feature releases can be cut anytime at least one new feature is ready, but don't have to be. Minor version releases should include an update to the documentation website, allowing users to view the documentation for whatever minor version they happen to be using.
 
 Major version releases should be cut no more than once per year, ideally between Ruby's release on December 25 and February 15 of the next year. Releasing soon after Ruby helps us stay in sync with deprecated Ruby versions. Breaking changes other than dropping support for old Ruby versions should be avoided whenever possible, but may be included in major releases. In general, breaking changes should include at least one major version with a deprecation warning before the breaking change takes effect.
 
 ### Enforcement guidelines
 
-First off, Bundler’s policies and enforcement of those policies are subsidiary to [Bundler’s code of conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md) in any case where they conflict. The first priority is treating human beings with respect and empathy, and figuring out project guidelines and sticking to them will always come after that.
+First off, Bundler's policies and enforcement of those policies are subsidiary to [Bundler's code of conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md) in any case where they conflict. The first priority is treating human beings with respect and empathy, and figuring out project guidelines and sticking to them will always come after that.
 
-When it comes to carrying out our own policies, we’re all regular humans trying to do the best we can. There will probably be times when we don’t stick to our policies or goals. If you notice a discrepancy between real-life actions and these policies and goals, please bring it up! We want to make sure that our actions and our policies line up, and that our policies exemplify our goals.
+When it comes to carrying out our own policies, we're all regular humans trying to do the best we can. There will probably be times when we don't stick to our policies or goals. If you notice a discrepancy between real-life actions and these policies and goals, please bring it up! We want to make sure that our actions and our policies line up, and that our policies exemplify our goals.
 
-Policies are not set in stone, and may be revised if policy violations are found to be in the spirit of the project goals. Likewise, actions that violate the spirit of the project goals will be considered policy violations, and enforcement action will be taken. We’re not interested in rules-lawyering, and we will take action when needed to ensure that everyone feels safe and included.
+Policies are not set in stone, and may be revised if policy violations are found to be in the spirit of the project goals. Likewise, actions that violate the spirit of the project goals will be considered policy violations, and enforcement action will be taken. We're not interested in rules-lawyering, and we will take action when needed to ensure that everyone feels safe and included.
 
 If you are comfortable reporting issues to the entire Bundler team, please send an email to team@bundler.io. If you are not comfortable reporting to the entire team, for any reason, please check the [maintainers team list](https://bundler.io/team) and use email, Twitter, or Slack to report to a single maintainer of your choice. Anyone violating a policy or goal is expected to cooperate with the team (and the reporter, if they request it) to resolve the issue in a way that follows the project goals.
