@@ -35,8 +35,7 @@ module Bundler
       git_info
       ruby_env_managers
       ruby_and_bundler_version
-      cis_var = cis
-      @system_metrics["ci"] = cis_var.join(",") if cis_var.any?
+      ci_info
     end
 
     def record_and_send_full_info(time_taken)
@@ -170,6 +169,11 @@ module Bundler
         "CI" => "ci",
       }
       env_cis.find_all {|env, _| ENV[env] }.map {|_, ci| ci }
+    end
+
+    def ci_info
+      cis_var = cis
+      @system_metrics["ci"] = cis_var.join(",") if cis_var.any?
     end
   end
 end
