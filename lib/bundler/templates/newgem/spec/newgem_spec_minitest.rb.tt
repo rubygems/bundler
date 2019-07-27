@@ -1,0 +1,11 @@
+require "spec_helper"
+
+describe <%= config[:constant_name] %> do
+  it "has a version number" do
+    <%= config[:constant_name] %>::VERSION.wont_be :nil?
+  end
+
+  it "does something useful" do
+    false.must_equal true
+  end
+end

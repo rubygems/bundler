@@ -443,6 +443,40 @@ RSpec.describe "bundle gem" do
       end
     end
 
+    context "--test parameter set to minitest-spec" do
+      before do
+        in_app_root
+        bundle "gem #{gem_name} --test=minitest-spec"
+      end
+
+      it "depends on a specific version of minitest" do
+        Dir.chdir(bundled_app("test_gem")) do
+          builder = Bundler::Dsl.new
+          builder.eval_gemfile(bundled_app("test_gem/Gemfile"))
+          builder.dependencies
+          minitest_dep = builder.dependencies.find {|d| d.name == "minitest" }
+          expect(minitest_dep).to be_specific
+        end
+      end
+
+      it "builds spec skeleton" do
+        expect(bundled_app("test_gem/spec/test_gem_spec.rb")).to exist
+        expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
+      end
+
+      it "requires 'test-gem'" do
+        expect(bundled_app("test_gem/spec/spec_helper.rb").read).to include(%(require "test_gem"))
+      end
+
+      it "requires 'minitest_helper'" do
+        expect(bundled_app("test_gem/spec/test_gem_spec.rb").read).to include(%(require "spec_helper"))
+      end
+
+      it "creates a default test which fails" do
+        expect(bundled_app("test_gem/spec/test_gem_spec.rb").read).to include("false.must_equal true")
+      end
+    end
+
     context "gem.test setting set to minitest" do
       before do
         in_app_root
@@ -462,6 +496,33 @@ RSpec.describe "bundle gem" do
           end
 
           task :default => :test
+        RAKEFILE
+
+        expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
+      end
+    end
+
+    context "gem.test setting set to minitest-spec" do
+      before do
+        in_app_root
+        bundle "config set gem.test minitest-spec"
+        bundle "gem #{gem_name}"
+      end
+
+      it "creates a default rake task to run the test suite" do
+        rakefile = strip_whitespace <<-RAKEFILE
+          require "bundler/gem_tasks"
+          require "rake/testtask"
+
+          Rake::TestTask.new(:spec) do |t|
+            t.libs << "lib"
+            t.libs << "spec"
+            t.test_files = FileList["spec/**/*_spec.rb"]
+            # Supress `circular require` error messages from minitest
+            t.warning = false
+          end
+
+          task :default => :spec
         RAKEFILE
 
         expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)

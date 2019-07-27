@@ -1,0 +1,5 @@
+require "bundler/setup"
+require "<%= config[:namespaced_path] %>"
+
+require "minitest/spec"
+require "minitest/autorun"

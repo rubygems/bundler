@@ -540,7 +540,7 @@ module Bundler
     method_option :ext, :type => :boolean, :default => false, :desc => "Generate the boilerplate for C extension code"
     method_option :mit, :type => :boolean, :desc => "Generate an MIT license file. Set a default with `bundle config set gem.mit true`."
     method_option :test, :type => :string, :lazy_default => "rspec", :aliases => "-t", :banner => "rspec",
-                         :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config set gem.test rspec`."
+                         :desc => "Generate tests for your library (rspec/minitest/minitest-spec). Set a default with `bundle config set gem.test rspec`."
     def gem(name)
     end
 
