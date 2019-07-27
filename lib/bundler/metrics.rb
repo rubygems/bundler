@@ -25,19 +25,6 @@ module Bundler
       write_to_file
     end
 
-    # called when bundle install, outdated, package or pristine are run
-    def record_system_info
-      @system_metrics ||= Hash.new
-      # add a random ID so we can consolidate runs server-side
-      require "securerandom"
-      @system_metrics["request_id"] = SecureRandom.hex(8)
-      # hash the origin repository to calculate unique bundler users
-      git_info
-      ruby_env_managers
-      ruby_and_bundler_version
-      ci_info
-    end
-
     def record_and_send_full_info(time_taken)
       record_system_info
       record_gem_info
@@ -56,21 +43,14 @@ module Bundler
       @command_metrics["timestamp"] = Time.now.utc.iso8601
     end
 
-    def ruby_and_bundler_version
-      ruby = Bundler::RubyVersion.system
-      @system_metrics["host"] = ruby.host
-      @system_metrics["ruby_version"] = ruby.versions_string(ruby.versions)
-      @system_metrics["bundler_version"] = Bundler::VERSION
-      @system_metrics["rubygems_version"] = Gem::VERSION
-      if ruby.engine != "ruby"
-        # engine_version raises on unknown engines
-        engine_version = begin
-                            ruby.engine_versions
-                          rescue RuntimeError
-                            "???"
-                          end
-        @system_metrics["ruby_engine"] = "#{ruby.engine}/#{ruby.versions_string(engine_version)}"
-      end
+    def record_gem_info
+      @system_metrics["gemfile_gem_count"] = Bundler.definition.dependencies.count
+      @system_metrics["installed_gem_count"] = Bundler.definition.specs.count
+      @system_metrics["git_gem_count"] = Bundler.definition.sources.git_sources.count
+      @system_metrics["path_gem_count"] = Bundler.definition.sources.path_sources.count
+      @system_metrics["gem_source_count"] = Bundler.definition.sources.rubygems_sources.count
+      require "digest"
+      @system_metrics["gem_sources"] = Bundler.definition.sources.rubygems_sources.map(&:to_s).map {|source| Digest::MD5.hexdigest(source[source.index(/http/)..source.rindex("/")]) if source.match(/http/) }
     end
 
     def send_metrics
@@ -127,33 +107,21 @@ module Bundler
       end
     end
 
-    def record_gem_info
-      @system_metrics["gemfile_gem_count"] = Bundler.definition.dependencies.count
-      @system_metrics["installed_gem_count"] = Bundler.definition.specs.count
-      @system_metrics["git_gem_count"] = Bundler.definition.sources.git_sources.count
-      @system_metrics["path_gem_count"] = Bundler.definition.sources.path_sources.count
-      @system_metrics["gem_source_count"] = Bundler.definition.sources.rubygems_sources.count
-      require "digest"
-      @system_metrics["gem_sources"] = Bundler.definition.sources.rubygems_sources.map(&:to_s).map {|source| Digest::MD5.hexdigest(source[source.index(/http/)..source.rindex("/")]) if source.match(/http/) }
-    end
-
-    def write_to_file
-      SharedHelpers.filesystem_access(@path) do |file|
-        FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
-        require "psych"
-        File.open(file, "a") {|f| f.write(Psych.dump(@command_metrics)) }
+    def ruby_and_bundler_version
+      ruby = Bundler::RubyVersion.system
+      @system_metrics["host"] = ruby.host
+      @system_metrics["ruby_version"] = ruby.versions_string(ruby.versions)
+      @system_metrics["bundler_version"] = Bundler::VERSION
+      @system_metrics["rubygems_version"] = Gem::VERSION
+      if ruby.engine != "ruby"
+        # engine_version raises on unknown engines
+        engine_version = begin
+                            ruby.engine_versions
+                          rescue RuntimeError
+                            "???"
+                          end
+        @system_metrics["ruby_engine"] = "#{ruby.engine}/#{ruby.versions_string(engine_version)}"
       end
-    end
-
-    def read_from_file
-      valid_file = @path.exist? && !@path.size.zero?
-      return {} unless valid_file
-      list = Array.new
-      SharedHelpers.filesystem_access(@path, :read) do |file|
-        require "psych"
-        list = Psych.load_stream(file.read)
-      end
-      list << @system_metrics
     end
 
     def cis
@@ -174,6 +142,38 @@ module Bundler
     def ci_info
       cis_var = cis
       @system_metrics["ci"] = cis_var.join(",") if cis_var.any?
+    end
+
+    # called when bundle install, outdated, package or pristine are run
+    def record_system_info
+      @system_metrics ||= Hash.new
+      # add a random ID so we can consolidate runs server-side
+      require "securerandom"
+      @system_metrics["request_id"] = SecureRandom.hex(8)
+      # hash the origin repository to calculate unique bundler users
+      git_info
+      ruby_env_managers
+      ruby_and_bundler_version
+      ci_info
+    end
+
+    def write_to_file
+      SharedHelpers.filesystem_access(@path) do |file|
+        FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
+        require "psych"
+        File.open(file, "a") {|f| f.write(Psych.dump(@command_metrics)) }
+      end
+    end
+
+    def read_from_file
+      valid_file = @path.exist? && !@path.size.zero?
+      return {} unless valid_file
+      list = Array.new
+      SharedHelpers.filesystem_access(@path, :read) do |file|
+        require "psych"
+        list = Psych.load_stream(file.read)
+      end
+      list << @system_metrics
     end
   end
 end

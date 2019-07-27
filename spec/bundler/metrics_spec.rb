@@ -10,7 +10,7 @@ RSpec.describe Bundler::Metrics do
 
   describe "#record_system_info" do
     before do
-      metrics.record_system_info
+      metrics.send(:record_system_info)
     end
     it "builds system_metrics with current ruby version and Bundler settings" do
       expect(metrics.instance_variable_get(:@system_metrics)["bundler_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(pre){0,1}\.{0,1}\d{0,1}/)
@@ -38,7 +38,7 @@ RSpec.describe Bundler::Metrics do
     describe "include CI information" do
       it "from one CI" do
         with_env_vars("JENKINS_URL" => "foo") do
-          metrics.record_system_info
+          metrics.send(:ci_info)
           ci_part = metrics.instance_variable_get(:@system_metrics)["ci"]
           expect(ci_part).to match("jenkins")
         end
@@ -46,7 +46,7 @@ RSpec.describe Bundler::Metrics do
 
       it "from many CI" do
         with_env_vars("TRAVIS" => "foo", "CI_NAME" => "my_ci") do
-          metrics.record_system_info
+          metrics.send(:ci_info)
           ci_part = metrics.instance_variable_get(:@system_metrics)["ci"]
           expect(ci_part).to match("travis")
           expect(ci_part).to match("my_ci")
@@ -71,7 +71,7 @@ RSpec.describe Bundler::Metrics do
         source "file://#{gem_repo2}"
         gem "rails", "3.0"
       G
-      Bundler.metrics.record_system_info
+      Bundler.metrics.send(:record_system_info)
       Bundler.metrics.send(:record_gem_info)
       expect(Bundler.metrics.instance_variable_get(:@system_metrics)["gemfile_gem_count"]).to eq(1)
       expect(Bundler.metrics.instance_variable_get(:@system_metrics)["installed_gem_count"]).to eq(2)
