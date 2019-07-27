@@ -12,6 +12,7 @@ module Bundler
     TEST_FRAMEWORK_VERSIONS = {
       "rspec" => "3.0",
       "minitest" => "5.0",
+      "minitest-spec" => "5.0"
     }.freeze
 
     attr_reader :options, :gem_name, :thor, :name, :target
@@ -97,10 +98,22 @@ module Bundler
             "test/test_helper.rb.tt" => "test/test_helper.rb",
             "test/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
           )
+        when "minitest-spec"
+          templates.merge!(
+            "spec/spec_helper_minitest.rb.tt" => "spec/spec_helper.rb",
+            "spec/newgem_spec_minitest.rb.tt" => "spec/#{namespaced_path}_spec.rb"
+          )
         end
       end
 
-      config[:test_task] = config[:test] == "minitest" ? "test" : "spec"
+      config[:test_task] = case test_framework
+                           when 'minitest'
+                             'test'
+                           when 'minitest-spec'
+                             'spec'
+                           else
+                             'spec'
+                           end
 
       if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
         "This means that any other developer or company will be legally allowed to use your code " \
@@ -199,9 +212,10 @@ module Bundler
 
       if test_framework.nil?
         Bundler.ui.confirm "Do you want to generate tests with your gem?"
-        result = Bundler.ui.ask "Type 'rspec' or 'minitest' to generate those test files now and " \
-          "in the future. rspec/minitest/(none):"
-        if result =~ /rspec|minitest/
+        result = Bundler.ui.ask "Type 'rspec', 'minitest', or " \
+          "'minitest-spec' to generate those test files now and " \
+          "in the future. rspec/minitest/minitest-spec/(none):"
+        if %w(rspec minitest minitest-spec).include? result
           test_framework = result
         else
           test_framework = false

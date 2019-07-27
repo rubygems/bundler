@@ -8,5 +8,9 @@ gem "rake", "~> 12.0"
 gem "rake-compiler"
 <%- end -%>
 <%- if config[:test] -%>
+<%- if config[:test] == 'minitest-spec' -%>
+gem "minitest", "~> <%= config[:test_framework_version] %>"
+<%- else -%>
 gem "<%= config[:test] %>", "~> <%= config[:test_framework_version] %>"
+<%- end -%>
 <%- end -%>
