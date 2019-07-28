@@ -65,9 +65,9 @@ module Bundler
           http.request(req)
         end
       rescue SocketError, Errno::ECONNREFUSED
-        "TCP connection failed"
+        puts "TCP connection failed"
       rescue OpenSSL::SSL::SSLError
-        "Certification has probably expired"
+        puts "Certification has probably expired"
       end
       # The file is emptied after sending metrics
       # File::TRUNC is preferable since File.truncate doesn't work for all systems
