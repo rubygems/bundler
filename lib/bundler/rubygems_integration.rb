@@ -214,7 +214,7 @@ module Bundler
     end
 
     def config_map
-      Gem::ConfigMap
+      RbConfig::CONFIG
     end
 
     def clear_paths
