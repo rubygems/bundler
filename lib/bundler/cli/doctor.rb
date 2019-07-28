@@ -138,7 +138,7 @@ module Bundler
         ok
       end
     rescue Errno::ENOENT
-      "gems/x.y.z/bundler directory not found"
+      puts "gems/x.y.z/bundler directory not found"
     end
   end
 end
