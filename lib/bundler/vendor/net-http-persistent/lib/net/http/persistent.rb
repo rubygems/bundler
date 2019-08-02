@@ -136,45 +136,6 @@ autoload :OpenSSL, 'openssl'
 # Socket options may be set on newly-created connections.  See #socket_options
 # for details.
 #
-# === Non-Idempotent Requests
-#
-# By default non-idempotent requests will not be retried per RFC 2616.  By
-# setting retry_change_requests to true requests will automatically be retried
-# once.
-#
-# Only do this when you know that retrying a POST or other non-idempotent
-# request is safe for your application and will not create duplicate
-# resources.
-#
-# The recommended way to handle non-idempotent requests is the following:
-#
-#   require 'bundler/vendor/net-http-persistent/lib/net/http/persistent'
-#
-#   uri = URI 'http://example.com/awesome/web/service'
-#   post_uri = uri + 'create'
-#
-#   http = Bundler::Persistent::Net::HTTP::Persistent.new name: 'my_app_name'
-#
-#   post = Net::HTTP::Post.new post_uri.path
-#   # ... fill in POST request
-#
-#   begin
-#     response = http.request post_uri, post
-#   rescue Bundler::Persistent::Net::HTTP::Persistent::Error
-#
-#     # POST failed, make a new request to verify the server did not process
-#     # the request
-#     exists_uri = uri + '...'
-#     response = http.get exists_uri
-#
-#     # Retry if it failed
-#     retry if response.code == '404'
-#   end
-#
-# The method of determining if the resource was created or not is unique to
-# the particular service you are using.  Of course, you will want to add
-# protection from infinite looping.
-#
 # === Connection Termination
 #
 # If you are done using the Bundler::Persistent::Net::HTTP::Persistent instance you may shut down
@@ -214,22 +175,7 @@ class Bundler::Persistent::Net::HTTP::Persistent
   VERSION = '3.1.0'
 
   ##
-  # Exceptions rescued for automatic retry on ruby 2.0.0.  This overlaps with
-  # the exception list for ruby 1.x.
-
-  RETRIED_EXCEPTIONS = [ # :nodoc:
-    (Net::ReadTimeout if Net.const_defined? :ReadTimeout),
-    IOError,
-    EOFError,
-    Errno::ECONNRESET,
-    Errno::ECONNABORTED,
-    Errno::EPIPE,
-    (OpenSSL::SSL::SSLError if HAVE_OPENSSL),
-    Timeout::Error,
-  ].compact
-
-  ##
-  # Error class for errors raised by Bundler::Persistent::Net::HTTP::Persistent.  Various
+  # Error class for errors raised by Net::HTTP::Persistent.  Various
   # SystemCallErrors are re-raised with a human-readable message under this
   # class.
 
@@ -496,18 +442,7 @@ class Bundler::Persistent::Net::HTTP::Persistent
   attr_reader :verify_mode
 
   ##
-  # Enable retries of non-idempotent requests that change data (e.g. POST
-  # requests) when the server has disconnected.
-  #
-  # This will in the worst case lead to multiple requests with the same data,
-  # but it may be useful for some applications.  Take care when enabling
-  # this option to ensure it is safe to POST or perform other non-idempotent
-  # requests to the server.
-
-  attr_accessor :retry_change_requests
-
-  ##
-  # Creates a new Bundler::Persistent::Net::HTTP::Persistent.
+  # Creates a new Net::HTTP::Persistent.
   #
   # Set +name+ to keep your connections apart from everybody else's.  Not
   # required currently, but highly recommended.  Your library name should be
@@ -572,8 +507,6 @@ class Bundler::Persistent::Net::HTTP::Persistent
       @verify_mode        = OpenSSL::SSL::VERIFY_PEER
       @reuse_ssl_sessions = OpenSSL::SSL.const_defined? :Session
     end
-
-    @retry_change_requests = false
 
     self.proxy = proxy if proxy
   end
@@ -675,19 +608,6 @@ class Bundler::Persistent::Net::HTTP::Persistent
   end
 
   ##
-  # Returns an error message containing the number of requests performed on
-  # this connection
-
-  def error_message connection
-    connection.requests -= 1 # fixup
-
-    age = Time.now - connection.last_use
-
-    "after #{connection.requests} requests on #{connection.http.object_id}, " \
-      "last used #{age} seconds ago"
-  end
-
-  ##
   # URI::escape wrapper
 
   def escape str
@@ -747,23 +667,6 @@ class Bundler::Persistent::Net::HTTP::Persistent
 
   def http_version uri
     @http_versions["#{uri.host}:#{uri.port}"]
-  end
-
-  ##
-  # Is +req+ idempotent according to RFC 2616?
-
-  def idempotent? req
-    case req.method
-    when 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PUT', 'TRACE' then
-      true
-    end
-  end
-
-  ##
-  # Is the request +req+ idempotent or is retry_change_requests allowed.
-
-  def can_retry? req
-    @retry_change_requests && !idempotent?(req)
   end
 
   ##
@@ -942,15 +845,9 @@ class Bundler::Persistent::Net::HTTP::Persistent
   # If a block is passed #request behaves like Net::HTTP#request (the body of
   # the response will not have been read).
   #
-  # +req+ must be a Net::HTTPGenericRequest subclass (see Net::HTTP for a list).
-  #
-  # If there is an error and the request is idempotent according to RFC 2616
-  # it will be retried automatically.
+  # +req+ must be a Net::HTTPRequest subclass (see Net::HTTP for a list).
 
   def request uri, req = nil, &block
-    retried      = false
-    bad_response = false
-
     uri      = URI uri
     req      = request_setup req || uri
     response = nil
@@ -969,32 +866,7 @@ class Bundler::Persistent::Net::HTTP::Persistent
            response.connection_close? then
           finish connection
         end
-      rescue Net::HTTPBadResponse => e
-        message = error_message connection
-
-        finish connection
-
-        raise Error, "too many bad responses #{message}" if
-        bad_response or not can_retry? req
-
-        bad_response = true
-        retry
-      rescue *RETRIED_EXCEPTIONS => e
-        request_failed e, req, connection if
-          retried or not can_retry? req
-
-        reset connection
-
-        retried = true
-        retry
-      rescue Errno::EINVAL, Errno::ETIMEDOUT => e # not retried on ruby 2
-        request_failed e, req, connection if retried or not can_retry? req
-
-        reset connection
-
-        retried = true
-        retry
-      rescue Exception => e
+      rescue Exception # make sure to close the connection when it was interrupted
         finish connection
 
         raise
@@ -1006,21 +878,6 @@ class Bundler::Persistent::Net::HTTP::Persistent
     @http_versions["#{uri.host}:#{uri.port}"] ||= response.http_version
 
     response
-  end
-
-  ##
-  # Raises an Error for +exception+ which resulted from attempting the request
-  # +req+ on the +connection+.
-  #
-  # Finishes the +connection+.
-
-  def request_failed exception, req, connection # :nodoc:
-    due_to = "(due to #{exception.message} - #{exception.class})"
-    message = "too many connection resets #{due_to} #{error_message connection}"
-
-    finish connection
-
-    raise Error, message, exception.backtrace
   end
 
   ##

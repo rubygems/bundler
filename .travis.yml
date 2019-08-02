@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - remove_net_http_persistent_retries
 
 cache:
   directories:
