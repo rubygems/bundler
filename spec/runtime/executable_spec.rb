@@ -47,13 +47,14 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "runs the bundled command when out of the bundle" do
-    bundle! "binstubs rack"
+    bundle! "binstubs rack bundler"
 
     build_gem "rack", "2.0", :to_system => true do |s|
       s.executables = "rackup"
     end
 
-    Dir.chdir(tmp) do
+    Dir.mkdir bundled_app("tmp")
+    Dir.chdir(bundled_app("tmp")) do
       gembin "rackup"
       expect(out).to eq("1.0.0")
     end
