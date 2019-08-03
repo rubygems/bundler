@@ -109,8 +109,8 @@ RSpec.describe "Bundler.setup" do
     def clean_load_path(lp)
       without_bundler_load_path = ruby!("puts $LOAD_PATH").split("\n")
       lp = lp - [
-        bundler_path.to_s,
-        bundler_path.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
+        lib.to_s,
+        lib.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
         tmp("rubygems/lib").to_s,
         root.join("../lib").expand_path.to_s,
       ] - without_bundler_load_path
