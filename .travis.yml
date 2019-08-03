@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - revert_net_http_persistent_upgrade
 
 cache:
   directories:
