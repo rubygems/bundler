@@ -251,9 +251,6 @@ rescue Gem::LoadError => e
 
     desc "Vendor a specific version of net-http-persistent"
     task(:"net-http-persistent") { abort msg }
-
-    desc "Vendor a specific version of connection_pool"
-    task(:connection_pool) { abort msg }
   end
 else
   desc "Vendor a specific version of molinillo"
@@ -264,9 +261,6 @@ else
     lib.vendor_lib = "lib/bundler/vendor/molinillo"
   end
 
-  # We currently cherry-pick changes to use `require_relative` internally
-  # instead of regular `require`. They are already in thor's master branch but
-  # still need to be released.
   desc "Vendor a specific version of thor"
   Automatiek::RakeTask.new("thor") do |lib|
     lib.download = { :github => "https://github.com/erikhuda/thor" }
@@ -275,9 +269,6 @@ else
     lib.vendor_lib = "lib/bundler/vendor/thor"
   end
 
-  # We currently cherry-pick changes to use `require_relative` internally
-  # instead of regular `require`. They are already in fileutils' master branch
-  # but still need to be released.
   desc "Vendor a specific version of fileutils"
   Automatiek::RakeTask.new("fileutils") do |lib|
     lib.download = { :github => "https://github.com/ruby/fileutils" }
@@ -286,28 +277,22 @@ else
     lib.vendor_lib = "lib/bundler/vendor/fileutils"
   end
 
-  # Currently `net-http-persistent` and it's dependency `connection_pool` are
-  # vendored separately, but `connection_pool` references inside the vendored
-  # copy of `net-http-persistent` are not properly updated to refer to the
-  # vendored copy of `connection_pool`, so they need to be manually updated.
-  # This will be automated once https://github.com/segiddins/automatiek/pull/3
-  # is included in `automatiek` and we start using the new API for vendoring
-  # subdependencies.
-
   desc "Vendor a specific version of net-http-persistent"
   Automatiek::RakeTask.new("net-http-persistent") do |lib|
     lib.download = { :github => "https://github.com/drbrain/net-http-persistent" }
     lib.namespace = "Net::HTTP::Persistent"
     lib.prefix = "Bundler::Persistent"
     lib.vendor_lib = "lib/bundler/vendor/net-http-persistent"
-  end
 
-  desc "Vendor a specific version of connection_pool"
-  Automatiek::RakeTask.new("connection_pool") do |lib|
-    lib.download = { :github => "https://github.com/mperham/connection_pool" }
-    lib.namespace = "ConnectionPool"
-    lib.prefix = "Bundler"
-    lib.vendor_lib = "lib/bundler/vendor/connection_pool"
+    mixin = Module.new do
+      def namespace_files
+        super
+        require_target = vendor_lib.sub(%r{^(.+?/)?lib/}, "") << "/lib"
+        relative_files = files.map {|f| Pathname.new(f).relative_path_from(Pathname.new(vendor_lib) / "lib").sub_ext("").to_s }
+        process_files(/require (['"])(#{Regexp.union(relative_files)})/, "require \\1#{require_target}/\\2")
+      end
+    end
+    lib.send(:extend, mixin)
   end
 end
 

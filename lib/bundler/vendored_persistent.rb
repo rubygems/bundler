@@ -20,15 +20,13 @@ require_relative "vendor/net-http-persistent/lib/net/http/persistent"
 module Bundler
   class PersistentHTTP < Persistent::Net::HTTP::Persistent
     def connection_for(uri)
-      super(uri) do |connection|
-        result = yield connection
-        warn_old_tls_version_rubygems_connection(uri, connection)
-        result
-      end
+      connection = super
+      warn_old_tls_version_rubygems_connection(uri, connection)
+      connection
     end
 
     def warn_old_tls_version_rubygems_connection(uri, connection)
-      return unless connection.http.use_ssl?
+      return unless connection.use_ssl?
       return unless (uri.host || "").end_with?("rubygems.org")
 
       socket = connection.instance_variable_get(:@socket)

@@ -242,7 +242,7 @@ module Bundler
           Bundler.settings[:ssl_client_cert]
         raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
-        con = PersistentHTTP.new :name => "bundler", :proxy => :ENV
+        con = PersistentHTTP.new "bundler", :ENV
         if gem_proxy = Bundler.rubygems.configuration[:http_proxy]
           con.proxy = URI.parse(gem_proxy) if gem_proxy != :no_proxy
         end
