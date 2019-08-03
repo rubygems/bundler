@@ -1,0 +1,7 @@
+> GET /info/therubyracer
+> accept-encoding: gzip
+> accept: */*
+> user-agent: bundler/2.1.0.pre.1 rubygems/3.0.4 ruby/2.6.3 (x86_64-pc-linux-gnu) command/lock options/spec_run 5e16d0529f03ce6d
+> connection: keep-alive
+> keep-alive: 30
+> host: index.rubygems.org
