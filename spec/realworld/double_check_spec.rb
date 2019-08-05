@@ -35,6 +35,8 @@ RSpec.describe "double checking sources", :realworld => true, :sometimes => true
     RUBY
 
     ruby! cmd
+    puts out
     ruby! cmd
+    puts out
   end
 end
