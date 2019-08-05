@@ -1,7 +1,7 @@
 > GET /info/websocket-driver
 > accept-encoding: gzip
 > accept: */*
-> user-agent: bundler/2.0.0.dev rubygems/3.1.0.pre1 ruby/2.6.1 (x86_64-pc-linux-gnu) command/lock options/spec_run 9d9d3e8c8762d996
+> user-agent: bundler/2.1.0.pre.1 rubygems/3.1.0.pre1 ruby/2.6.3 (x86_64-pc-linux-gnu) command/lock options/spec_run d65b69f77226d9f8
 > connection: keep-alive
 > keep-alive: 30
 > host: index.rubygems.org

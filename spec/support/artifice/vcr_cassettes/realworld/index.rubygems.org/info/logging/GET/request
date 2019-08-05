@@ -1,7 +1,7 @@
 > GET /info/logging
 > accept-encoding: gzip
 > accept: */*
-> user-agent: bundler/2.0.0.dev rubygems/3.1.0.pre1 ruby/2.6.1 (x86_64-pc-linux-gnu) command/lock options/spec_run 9138760e40ab97c9
+> user-agent: bundler/2.1.0.pre.1 rubygems/3.1.0.pre1 ruby/2.6.3 (x86_64-pc-linux-gnu) command/lock options/spec_run a8b28ebe8ef9a517
 > connection: keep-alive
 > keep-alive: 30
 > host: index.rubygems.org
