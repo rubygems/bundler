@@ -34,9 +34,9 @@ RSpec.describe "double checking sources", :realworld => true, :sometimes => true
       end
     RUBY
 
-    ruby! cmd
+    ruby! cmd, :env => { "DEBUG" => "true" }
     puts out
-    ruby! cmd
+    ruby! cmd, :env => { "DEBUG" => "true" }
     puts out
   end
 end
