@@ -12,7 +12,7 @@ RSpec.describe "bundle exec" do
     G
 
     bundle "exec --gemfile CustomGemfile rackup"
-    expect(out).to eq("1.0.0")
+    expect(out).to eq("Resolving dependencies...\n1.0.0")
   end
 
   it "activates the correct gem" do
@@ -21,7 +21,7 @@ RSpec.describe "bundle exec" do
     G
 
     bundle "exec rackup"
-    expect(out).to eq("0.9.1")
+    expect(out).to eq("Resolving dependencies...\n0.9.1")
   end
 
   it "works when the bins are in ~/.bundle" do
@@ -63,7 +63,7 @@ RSpec.describe "bundle exec" do
     create_file "Gemfile"
     create_file "a.rb", script_that_changes_its_own_title_and_checks_if_picked_up_by_ps_unix_utility
     bundle "exec ruby a.rb"
-    expect(out).to eq("1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16")
+    expect(out).to eq("Resolving dependencies...\n1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16")
   end
 
   it "accepts --verbose" do
@@ -703,7 +703,6 @@ RSpec.describe "bundle exec" do
         gemfile <<-G
           gem 'rack', '2'
         G
-        ENV["BUNDLER_FORCE_TTY"] = "true"
       end
 
       let(:exit_code) { Bundler::GemNotFound.new.status_code }
@@ -721,7 +720,6 @@ RSpec.describe "bundle exec" do
         gemfile <<-G
           gem 'rack', '2'
         G
-        ENV["BUNDLER_FORCE_TTY"] = "true"
       end
 
       let(:exit_code) { Bundler::GemNotFound.new.status_code }

@@ -75,7 +75,7 @@ RSpec.describe "Running bin/* commands" do
     end
 
     gembin "rackup"
-    expect(out).to eq("1.0")
+    expect(out).to eq("Resolving dependencies...\n1.0")
   end
 
   it "creates a bundle binstub" do

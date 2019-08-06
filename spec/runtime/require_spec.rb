@@ -265,7 +265,7 @@ RSpec.describe "Bundler.require" do
   describe "using bundle exec" do
     it "requires the locked gems" do
       bundle "exec ruby -e 'Bundler.require'"
-      expect(out).to eq("two")
+      expect(out).to eq("Resolving dependencies...\ntwo")
 
       bundle "exec ruby -e 'Bundler.require(:bar)'"
       expect(out).to eq("baz\nqux")
