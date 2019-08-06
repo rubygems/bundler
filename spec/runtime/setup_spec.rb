@@ -1107,19 +1107,26 @@ end
     end
 
     context "is newer" do
-      it "does not change the lock or warn" do
+      it "does not change the lock but warns" do
         lockfile lock_with(Bundler::VERSION.succ)
         ruby "require 'bundler/setup'"
         expect(out).to eq("")
-        expect(err).to eq("")
+        suggested_cmd = "gem install bundler:#{Bundler::VERSION.succ}"
+        suggested_cmd += " --pre" if Gem::Version.new(Bundler::VERSION).prerelease?
+        expect(err).to eq(
+          "Warning: the running version of Bundler (#{Bundler::VERSION}) is older than the version that created the lockfile (#{Bundler::VERSION.succ}). " \
+          "We suggest you to upgrade to the version that created the lockfile by running `#{suggested_cmd}`."
+        )
         lockfile_should_be lock_with(Bundler::VERSION.succ)
       end
     end
 
     context "is older" do
-      it "does not change the lock" do
+      it "does not change the lock or warn" do
         lockfile lock_with("1.10.1")
         ruby "require 'bundler/setup'"
+        expect(out).to eq("")
+        expect(err).to eq("")
         lockfile_should_be lock_with("1.10.1")
       end
     end
@@ -1189,7 +1196,7 @@ end
 
   describe "with gemified standard libraries" do
     it "does not load Psych" do
-      gemfile ""
+      install_gemfile ""
       ruby <<-RUBY
         require 'bundler/setup'
         puts defined?(Psych::VERSION) ? Psych::VERSION : "undefined"
