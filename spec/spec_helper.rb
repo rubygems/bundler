@@ -17,7 +17,7 @@ require "rspec"
 
 Dir["#{File.expand_path("../support", __FILE__)}/*.rb"].each do |file|
   file = file.gsub(%r{\A#{Regexp.escape File.expand_path("..", __FILE__)}/}, "")
-  require file unless file.end_with?("hax.rb")
+  require file unless file.end_with?("artifice.rb", "hax.rb")
 end
 
 $debug = false
