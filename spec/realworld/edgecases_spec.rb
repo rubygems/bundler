@@ -27,7 +27,9 @@ RSpec.describe "real world edgecases", :realworld => true do
       gem 'capybara', '~> 2.2.0'
       gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
-    bundle! :lock
+    bundle! :lock, :env => { "DEBUG" => "true" }
+    puts out
+    puts err
     expect(lockfile).to include(rubygems_version("rails", "~> 5.0"))
     expect(lockfile).to include("capybara (2.2.1)")
   end
@@ -41,7 +43,9 @@ RSpec.describe "real world edgecases", :realworld => true do
       gem "gxapi_rails", "< 0.1.0" # 0.1.0 was released way after the test was written
       gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
-    bundle! :lock
+    bundle! :lock, :env => { "DEBUG" => "true" }
+    puts out
+    puts err
     expect(lockfile).to include("gxapi_rails (0.0.6)")
   end
 
@@ -54,7 +58,9 @@ RSpec.describe "real world edgecases", :realworld => true do
       gem "activerecord", "~> 3.0"
       gem "builder", "~> 2.1.2"
     G
-    bundle! :lock
+    bundle! :lock, :env => { "DEBUG" => "true" }
+    puts out
+    puts err
     expect(lockfile).to include(rubygems_version("i18n", "~> 0.6.0"))
     expect(lockfile).to include(rubygems_version("activesupport", "~> 3.0"))
   end
@@ -187,7 +193,9 @@ RSpec.describe "real world edgecases", :realworld => true do
         rails (~> 4.2.7.1)
     L
 
-    bundle! "lock --update paperclip"
+    bundle! "lock --update paperclip", :env => { "DEBUG" => "true" }
+    puts out
+    puts err
 
     expect(lockfile).to include(rubygems_version("paperclip", "~> 5.1.0"))
   end
@@ -202,7 +210,9 @@ RSpec.describe "real world edgecases", :realworld => true do
     G
 
     bundle "config set --local path vendor/bundle"
-    bundle! :install
+    bundle! :install, :env => { "DEBUG" => "true" }
+    puts out
+    puts err
     expect(err).not_to include("Could not find rake")
     expect(err).to be_empty
   end
@@ -330,16 +340,20 @@ RSpec.describe "real world edgecases", :realworld => true do
         activesupport!
     L
 
-    bundle! :lock
+    bundle! :lock, :env => { "DEBUG" => "true" }
+    puts out
+    puts err
     expect(err).to be_empty
   end
 
   it "outputs a helpful error message when gems have invalid gemspecs" do
-    install_gemfile <<-G, :standalone => true
+    install_gemfile <<-G, :standalone => true, :env => { "DEBUG" => "true" }
       source 'https://rubygems.org'
       gem "resque-scheduler", "2.2.0"
     G
     expect(err).to include("You have one or more invalid gemspecs that need to be fixed.")
     expect(err).to include("resque-scheduler 2.2.0 has an invalid gemspec")
+    puts out
+    puts err
   end
 end
