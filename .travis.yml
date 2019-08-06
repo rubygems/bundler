@@ -1,10 +1,10 @@
 language: ruby
 dist: xenial
-script: rake spec:travis
+script: bin/rake spec:travis
 before_script:
-  - travis_retry rake override_version
-  - travis_retry rake spec:travis:deps
-  - travis_retry rake man:build
+  - travis_retry bin/rake override_version
+  - travis_retry bin/rake spec:travis:deps
+  - travis_retry bin/rake man:build
 
 branches:
   only:
