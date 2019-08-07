@@ -396,6 +396,20 @@ module Bundler
 
         spec
       end
+
+      if provides?("< 2.6.2")
+        redefine_method(gem_class, :bin_path) do |name, *args|
+          exec_name = args.first
+          return ENV["BUNDLE_BIN_PATH"] if exec_name == "bundle"
+
+          spec = find_spec_for_exe(name, *args)
+          exec_name ||= spec.default_executable
+
+          gem_bin = File.join(spec.full_gem_path, spec.bindir, exec_name)
+          gem_from_path_bin = File.join(File.dirname(spec.loaded_from), spec.bindir, exec_name)
+          File.exist?(gem_bin) ? gem_bin : gem_from_path_bin
+        end
+      end
     end
 
     # Replace or hook into RubyGems to provide a bundlerized view
