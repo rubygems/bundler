@@ -312,7 +312,9 @@ else
   # This will be automated once https://github.com/segiddins/automatiek/pull/3
   # is included in `automatiek` and we start using the new API for vendoring
   # subdependencies.
-
+  # Besides that, we currently cherry-pick changes to use `require_relative`
+  # internally instead of regular `require`. They are pending review at
+  # https://github.com/drbrain/net-http-persistent/pull/106
   desc "Vendor a specific version of net-http-persistent"
   Automatiek::RakeTask.new("net-http-persistent") do |lib|
     lib.download = { :github => "https://github.com/drbrain/net-http-persistent" }
