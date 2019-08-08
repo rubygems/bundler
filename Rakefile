@@ -196,7 +196,7 @@ namespace :man do
         index << [ronn, File.basename(roff)]
 
         file roff => ["man", ronn] do
-          sh "#{Gem.ruby} -S ronn --roff --pipe #{ronn} > #{roff}"
+          sh "bin/ronn --roff --pipe #{ronn} > #{roff}"
         end
 
         file "#{roff}.txt" => roff do
