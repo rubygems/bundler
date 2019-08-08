@@ -713,6 +713,7 @@ RSpec.describe "bundle exec" do
         gemfile <<-G
           gem 'rack', '2'
         G
+        ENV["BUNDLER_FORCE_TTY"] = "true"
       end
 
       let(:exit_code) { Bundler::GemNotFound.new.status_code }
@@ -730,6 +731,7 @@ RSpec.describe "bundle exec" do
         gemfile <<-G
           gem 'rack', '2'
         G
+        ENV["BUNDLER_FORCE_TTY"] = "true"
       end
 
       let(:exit_code) { Bundler::GemNotFound.new.status_code }

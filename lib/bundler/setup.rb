@@ -6,15 +6,20 @@ if Bundler::SharedHelpers.in_bundle?
   require_relative "../bundler"
 
   Bundler.ui = Bundler::UI::Shell.new
-  begin
-    Bundler.setup
-  rescue Bundler::BundlerError => e
-    Bundler.ui.warn "\e[31m#{e.message}\e[0m"
-    Bundler.ui.warn e.backtrace.join("\n") if ENV["DEBUG"]
-    if e.is_a?(Bundler::GemNotFound)
-      Bundler.ui.warn "\e[33mRun `bundle install` to install missing gems.\e[0m"
+
+  if STDOUT.tty? || ENV["BUNDLER_FORCE_TTY"]
+    begin
+      Bundler.setup
+    rescue Bundler::BundlerError => e
+      Bundler.ui.warn "\e[31m#{e.message}\e[0m"
+      Bundler.ui.warn e.backtrace.join("\n") if ENV["DEBUG"]
+      if e.is_a?(Bundler::GemNotFound)
+        Bundler.ui.warn "\e[33mRun `bundle install` to install missing gems.\e[0m"
+      end
+      exit e.status_code
     end
-    exit e.status_code
+  else
+    Bundler.setup
   end
 
   # Add bundler to the load path after disabling system gems
