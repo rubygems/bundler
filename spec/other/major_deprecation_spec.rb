@@ -318,7 +318,7 @@ RSpec.describe "major deprecations" do
       )
     end
 
-    pending "should fail with a helpful error", :bundler => "3"
+    pending "fails with a helpful error", :bundler => "3"
   end
 
   context "when Bundler.setup is run in a ruby script" do
