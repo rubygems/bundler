@@ -6,6 +6,6 @@ The best ways to get in touch are:
 
 * [Bundler Slack](https://bundler.slack.com).
   * Not a member of the Slack? Join the Bundler team slack [here](https://slack.bundler.io/)!
-* [Bundler mailing list](http://groups.google.com/group/ruby-bundler)
+* [Bundler mailing list](https://groups.google.com/group/ruby-bundler)
 
 You may also find our guide on [filing issues](ISSUES.md) to be helpful as well!
