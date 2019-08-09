@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - uncomment_working_test
 
 cache:
   directories:
