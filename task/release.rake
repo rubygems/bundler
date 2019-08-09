@@ -218,17 +218,18 @@ namespace :release do
       commits.reverse_each.map {|c| c =~ /(Auto merge of|Merge pull request|Merge) #(\d+)/ && $2 }.compact
     end
 
-    def release_tags
-      `git ls-remote origin`.split("\n").map {|r| r =~ %r{refs/tags/v([\d.]+)$} && $1 }.compact.map {|v| Gem::Version.create(v) }
+    def minor_release_tags
+      `git ls-remote origin`.split("\n").map {|r| r =~ %r{refs/tags/v([\d.]+)$} && $1 }.compact.map {|v| Gem::Version.create(Gem::Version.create(v).segments[0, 2].join(".")) }.sort.uniq
     end
 
     def to_stable_branch(release_tag)
       release_tag.segments[0, 2].<<("stable").join("-")
     end
 
-    last_stable = to_stable_branch(release_tags.max)
+    last_stable = to_stable_branch(minor_release_tags[-1])
+    previous_to_last_stable = to_stable_branch(minor_release_tags[-2])
 
-    in_release = prs("HEAD") - prs(last_stable)
+    in_release = prs("HEAD") - prs(last_stable) - prs(previous_to_last_stable)
 
     print "About to review #{in_release.size} pending PRs. "
 
