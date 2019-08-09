@@ -450,11 +450,8 @@ repo_name ||= user_name
       if Bundler.feature_flag.disable_multisource?
         msg = "This Gemfile contains multiple primary sources. " \
           "Each source after the first must include a block to indicate which gems " \
-          "should come from that source"
-        unless Bundler.feature_flag.bundler_2_mode?
-          msg += ". To downgrade this error to a warning, run " \
-            "`bundle config unset disable_multisource`"
-        end
+          "should come from that source. To downgrade this error to a warning, run " \
+          "`bundle config unset disable_multisource`"
         raise GemfileEvalError, msg
       else
         Bundler::SharedHelpers.major_deprecation 2, "Your Gemfile contains multiple primary sources. " \
