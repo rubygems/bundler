@@ -75,7 +75,10 @@ namespace :release do
     loop do
       print(prompt)
       print(": ") unless prompt.empty?
-      break if $stdin.gets.strip == "y"
+
+      answer = $stdin.gets.strip
+      break if answer == "y"
+      abort if answer == "n"
     end
   rescue Interrupt
     abort
@@ -222,7 +225,7 @@ namespace :release do
 
     print "About to review #{in_release.size} pending PRs. "
 
-    confirm "Continue?"
+    confirm "Continue? (y/n)"
 
     in_release.each do |pr|
       url_opener = /darwin/ =~ RUBY_PLATFORM ? "open" : "xdg-open"
