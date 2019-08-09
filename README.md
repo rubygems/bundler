@@ -1,7 +1,7 @@
 [![Version     ](https://img.shields.io/gem/v/bundler.svg?style=flat)](https://rubygems.org/gems/bundler)
 [![Build Status](https://img.shields.io/travis/bundler/bundler/master.svg?style=flat)](https://travis-ci.org/bundler/bundler)
-[![Inline docs ](http://inch-ci.org/github/bundler/bundler.svg?style=flat)](http://inch-ci.org/github/bundler/bundler)
-[![Slack       ](http://bundler-slackin.herokuapp.com/badge.svg)](http://bundler-slackin.herokuapp.com)
+[![Inline docs ](https://inch-ci.org/github/bundler/bundler.svg?style=flat)](https://inch-ci.org/github/bundler/bundler)
+[![Slack       ](https://bundler-slackin.herokuapp.com/badge.svg)](https://bundler-slackin.herokuapp.com)
 
 # Bundler: a gem to bundle gems
 

@@ -2,7 +2,7 @@
 
 Community is an important part of all we do. If you'd like to be part of the Bundler community, you can jump right in and start helping make Bundler better for everyone who uses it.
 
-It would be tremendously helpful to have more people answering questions about Bundler (and often simply about [RubyGems](https://github.com/rubygems/rubygems) or Ruby itself) in our [issue tracker](https://github.com/bundler/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
+It would be tremendously helpful to have more people answering questions about Bundler (and often simply about [RubyGems](https://github.com/rubygems/rubygems) or Ruby itself) in our [issue tracker](https://github.com/bundler/bundler/issues) or on [Stack Overflow](https://stackoverflow.com/questions/tagged/bundler).
 
 Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [bundler.io](https://bundler.io), we would absolutely love it if you opened an issue or pull request on the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
