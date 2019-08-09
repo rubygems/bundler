@@ -16,22 +16,22 @@ RSpec.describe Bundler::Metrics do
       expect(metrics.instance_variable_get(:@system_metrics)["bundler_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(pre){0,1}\.{0,1}\d{0,1}/)
       expect(metrics.instance_variable_get(:@system_metrics)["rubygems_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(preview|pre){0,1}\.{0,1}\d{0,1}/)
       expect(metrics.instance_variable_get(:@system_metrics)["ruby_version"]).to match(/\d\.\d{1,2}\.{0,1}\d{0,1}\.{0,1}(preview|pre){0,1}\.{0,1}\d{0,1}/)
-      expect(metrics.instance_variable_get(:@system_metrics)["request_id"]).to match(/\w/)
+      expect(metrics.instance_variable_get(:@system_metrics)["request_id"]).to match(/[\w]*/)
       expect(metrics.instance_variable_get(:@system_metrics)["host"].nil?).to eq(false)
     end
 
     it "doesn't crash when the user doesn't have either of the following installed: chruby, rbenv, rvm, git (metrics that are collected later exist)" do
       expect(metrics.instance_variable_get(:@system_metrics)["chruby_version"]).to satisfy("be nil or contain the chruby version") do |v|
-        v.nil? || v.match(/([0-9].)*/)
+        v.nil? || v.match(/([0-9].){1,4}([\w]*)/)
       end
       expect(metrics.instance_variable_get(:@system_metrics)["rbenv_version"]).to satisfy("be nil or contain the rbenv version") do |v|
-        v.nil? || v.match(/([0-9].)*/)
+        v.nil? || v.match(/([0-9].){1,4}([\w]*)/)
       end
       expect(metrics.instance_variable_get(:@system_metrics)["rvm_version"]).to satisfy("be nil or contain the rvm version") do |v|
-        v.nil? || v.match(/([0-9].)*/)
+        v.nil? || v.match(/([0-9].){1,4}([\w]*)/)
       end
       expect(metrics.instance_variable_get(:@system_metrics)["git_version"]).to satisfy("be nil or contain the git version") do |v|
-        v.nil? || v.match(/([0-9].)*/)
+        v.nil? || v.match(/([0-9].){1,4}([\w]*)/)
       end
     end
 
