@@ -238,8 +238,8 @@ namespace :release do
     in_release.each do |pr|
       url_opener = /darwin/ =~ RUBY_PLATFORM ? "open" : "xdg-open"
       url = "https://github.com/bundler/bundler/pull/#{pr}"
-      system(url_opener, url, :out => IO::NULL, :err => IO::NULL)
-      confirm "Add entry for #{url}. Done?"
+      print "#{url}. (n)ext/(o)pen? "
+      system(url_opener, url, :out => IO::NULL, :err => IO::NULL) if $stdin.gets.strip == "o"
     end
   end
 end
