@@ -320,11 +320,8 @@ RSpec.describe "major deprecations" do
 
     it "fails with a helpful error", :bundler => "3" do
       expect(err).to include(
-        "[!] There was an error evaluating `Gemfile`: " \
         "This Gemfile contains multiple primary sources. " \
-        "Each source after the first must include a block to indicate which gems should come from that source. " \
-        "To downgrade this error to a warning, run `bundle config unset disable_multisource`. " \
-        "Bundler cannot continue."
+        "Each source after the first must include a block to indicate which gems should come from that source."
       )
     end
   end

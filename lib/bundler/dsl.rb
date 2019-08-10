@@ -10,6 +10,7 @@ module Bundler
     def self.evaluate(gemfile, lockfile, unlock)
       builder = new
       builder.eval_gemfile(gemfile)
+      builder.check_primary_source_safety
       builder.to_definition(lockfile, unlock)
     end
 
@@ -24,6 +25,7 @@ module Bundler
     def initialize
       @source               = nil
       @sources              = SourceList.new
+      @global_sources       = []
       @git_sources          = {}
       @dependencies         = []
       @groups               = []
@@ -165,7 +167,7 @@ module Bundler
       elsif block_given?
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
-        check_primary_source_safety(@sources)
+        @global_sources << source
         @sources.global_rubygems_source = source
       end
     end
@@ -443,8 +445,11 @@ repo_name ||= user_name
       end
     end
 
-    def check_primary_source_safety(source_list)
-      return if source_list.rubygems_primary_remotes.empty? && source_list.global_rubygems_source.nil?
+    def check_primary_source_safety
+      if @global_sources.size <= 1
+        Bundler.settings.temporary(:disable_multisource => true)
+        return
+      end
 
       if Bundler.feature_flag.disable_multisource?
         msg = "This Gemfile contains multiple primary sources. " \
@@ -461,6 +466,7 @@ repo_name ||= user_name
           "disable_multisource true`."
       end
     end
+    public :check_primary_source_safety
 
     def warn_deprecated_git_source(name, replacement, additional_message = nil)
       additional_message &&= " #{additional_message}"
