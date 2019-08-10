@@ -133,6 +133,7 @@ module Bundler
       end
 
       return unless bundler_major_version >= major_version && prints_major_deprecations?
+      Bundler.ui ||= Bundler::UI::Shell.new("no-color" => true)
       Bundler.ui.warn("[DEPRECATED] #{message}")
     end
 
