@@ -133,7 +133,14 @@ module Bundler
       end
 
       return unless bundler_major_version >= major_version && prints_major_deprecations?
-      Bundler.ui.warn("[DEPRECATED] #{message}")
+
+      begin
+        ui = Bundler.ui
+        Bundler.ui = Bundler::UI::Shell.new("no-color" => true)
+        Bundler.ui.warn("[DEPRECATED] #{message}")
+      ensure
+        Bundler.ui = ui
+      end
     end
 
     def print_major_deprecations!
