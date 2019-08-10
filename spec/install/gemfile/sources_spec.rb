@@ -198,6 +198,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
               expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
               expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
 
+              # In https://github.com/bundler/bundler/issues/3585 this failed
               # when there is already a lock file, and the gems are missing, so try again
               system_gems []
               bundle! :install
