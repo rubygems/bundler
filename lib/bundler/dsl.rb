@@ -191,10 +191,9 @@ module Bundler
               "the path method, like: \n\n" \
               "    path 'dir/containing/rails' do\n" \
               "      gem 'rails'\n" \
-              "    end\n\n"
+              "    end"
 
-        raise DeprecatedError, msg if Bundler.feature_flag.disable_multisource?
-        SharedHelpers.major_deprecation(2, msg.strip)
+        SharedHelpers.major_deprecation(2, msg)
       end
 
       source_options = normalize_hash(options).merge(
