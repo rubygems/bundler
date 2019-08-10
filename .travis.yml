@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - disable_multisource_improvements
 
 cache:
   directories:
