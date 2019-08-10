@@ -107,7 +107,8 @@ RSpec.describe "bundle install with gems on multiple sources" do
         expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
         expect(bundled_app("vendor/cache/rack-obama-1.0.gem")).to exist
 
-        bundle! :install, forgotten_command_line_options(:deployment => true)
+        bundle! "config set deployment true"
+        bundle! :install
 
         expect(the_bundle).to include_gems("rack-obama 1.0.0", "rack 1.0.0")
       end
