@@ -64,7 +64,7 @@ RSpec.describe "Running bin/* commands" do
       s.executables = "rackup"
     end
 
-    install_gemfile <<-G
+    gemfile <<-G
       gem "rack", :path => "#{lib_path("rack")}"
     G
 
