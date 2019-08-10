@@ -45,12 +45,12 @@ module Bundler
     def global_rubygems_source=(uri)
       if Bundler.feature_flag.disable_multisource?
         @global_rubygems_source ||= rubygems_aggregate_class.new("remotes" => uri)
+      else
+        add_rubygems_remote(uri)
       end
-      add_rubygems_remote(uri)
     end
 
     def add_rubygems_remote(uri)
-      return if Bundler.feature_flag.disable_multisource?
       @rubygems_aggregate.add_remote(uri)
       @rubygems_aggregate
     end
