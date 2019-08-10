@@ -27,7 +27,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
         G
       end
 
-      it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first", :bundler => "2" do
+      it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first", :bundler => "< 3" do
         bundle :install
 
         expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
@@ -56,7 +56,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
         bundle :install
       end
 
-      it "warns about ambiguous gems, but installs anyway", :bundler => "2" do
+      it "warns about ambiguous gems, but installs anyway", :bundler => "< 3" do
         expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
         expect(err).to include("Installed from: #{file_uri_for(gem_repo1)}")
         expect(the_bundle).to include_gems("rack-obama 1.0.0", "rack 1.0.0", :source => "remote1")
@@ -249,7 +249,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
             bundle :install
           end
 
-          it "installs from the other source and warns about ambiguous gems", :bundler => "2" do
+          it "installs from the other source and warns about ambiguous gems", :bundler => "< 3" do
             expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
             expect(err).to include("Installed from: #{file_uri_for(gem_repo2)}")
             expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
@@ -279,7 +279,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
             G
           end
 
-          it "installs the dependency from the pinned source without warning", :bundler => "2" do
+          it "installs the dependency from the pinned source without warning", :bundler => "< 3" do
             bundle :install
 
             expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
@@ -609,7 +609,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
       G
     end
 
-    it "keeps the old version", :bundler => "2" do
+    it "keeps the old version", :bundler => "< 3" do
       expect(the_bundle).to include_gems("rack 1.0.0")
     end
 
