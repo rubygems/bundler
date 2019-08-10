@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - remove_deprecations_from_specs
 
 cache:
   directories:
