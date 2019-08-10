@@ -168,7 +168,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
           it "installs from the same source without any warning" do
             bundle :install
             expect(err).not_to include("Warning")
-            expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
+            expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0", :source => "remote3")
           end
         end
 
@@ -191,7 +191,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
               bundle! :install
 
               expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
-              expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
+              expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0", :source => "remote3")
 
               # In https://github.com/bundler/bundler/issues/3585 this failed
               # when there is already a lock file, and the gems are missing, so try again
@@ -199,7 +199,7 @@ RSpec.describe "bundle install with gems on multiple sources" do
               bundle! :install
 
               expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
-              expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
+              expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0", :source => "remote3")
             end
           end
         end
