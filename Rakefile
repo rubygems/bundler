@@ -196,7 +196,7 @@ namespace :man do
         index << [ronn, File.basename(roff)]
 
         file roff => ["man", ronn] do
-          sh "bin/ronn --roff --pipe #{ronn} > #{roff}"
+          sh "bin/ronn --roff --pipe --date #{Time.now.strftime("%Y-%m-%d")} #{ronn} > #{roff}"
         end
 
         file "#{roff}.txt" => roff do
