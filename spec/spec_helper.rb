@@ -34,7 +34,6 @@ RSpec.configure do |config|
   config.include Spec::Indexes
   config.include Spec::Matchers
   config.include Spec::Path
-  config.include Spec::Rubygems
   config.include Spec::Platforms
   config.include Spec::Sudo
   config.include Spec::Permissions
