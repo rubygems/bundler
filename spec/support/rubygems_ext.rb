@@ -29,7 +29,9 @@ module Spec
       "ruby-graphviz" => ">= 0.a",
     }.freeze
 
-    def self.dev_setup
+    extend self
+
+    def dev_setup
       deps = DEV_DEPS
 
       # JRuby can't build ronn, so we skip that
@@ -38,22 +40,22 @@ module Spec
       install_gems(deps)
     end
 
-    def self.gem_load(gem_name, bin_container)
+    def gem_load(gem_name, bin_container)
       gem_activate(gem_name)
       load Gem.bin_path(gem_name, bin_container)
     end
 
-    def self.gem_activate(gem_name)
+    def gem_activate(gem_name)
       gem_requirement = DEV_DEPS[gem_name]
       gem gem_name, gem_requirement
     end
 
-    def self.gem_require(gem_name)
+    def gem_require(gem_name)
       gem_activate(gem_name)
       require gem_name
     end
 
-    def self.setup
+    def setup
       Gem.clear_paths
 
       ENV["BUNDLE_PATH"] = nil
@@ -77,7 +79,7 @@ module Spec
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
     end
 
-    def self.install_gems(gems)
+    def install_gems(gems)
       reqs, no_reqs = gems.partition {|_, req| !req.nil? && !req.split(" ").empty? }
       no_reqs.map!(&:first)
       reqs.map! {|name, req| "'#{name}:#{req}'" }
