@@ -43,6 +43,8 @@ module Spec
     def gem_load(gem_name, bin_container)
       gem_activate(gem_name)
       load Gem.bin_path(gem_name, bin_container)
+    rescue Gem::LoadError => e
+      warn "We couln't activate #{gem_name} (#{e.requirement}). Run `gem install #{gem_name}:'#{e.requirement}'`"
     end
 
     def gem_require(gem_name)
