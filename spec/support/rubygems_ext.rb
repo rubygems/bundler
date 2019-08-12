@@ -45,11 +45,6 @@ module Spec
       load Gem.bin_path(gem_name, bin_container)
     end
 
-    def gem_activate(gem_name)
-      gem_requirement = DEV_DEPS[gem_name]
-      gem gem_name, gem_requirement
-    end
-
     def gem_require(gem_name)
       gem_activate(gem_name)
       require gem_name
@@ -77,6 +72,13 @@ module Spec
       ENV["TMPDIR"] = Path.tmpdir.to_s
 
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
+    end
+
+  private
+
+    def gem_activate(gem_name)
+      gem_requirement = DEV_DEPS[gem_name]
+      gem gem_name, gem_requirement
     end
 
     def install_gems(gems)
