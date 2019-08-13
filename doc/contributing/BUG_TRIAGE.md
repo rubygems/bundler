@@ -41,7 +41,7 @@ Everyone is welcome and encouraged to fix any open bug, improve an error message
 
 ## Duplicates!
 
-Finally, the ticket may be a duplicate of another older ticket. If you notice a ticket is a duplicate, simply comment on the ticket noting the original ticket’s number. For example, you could say “This is a duplicate of issue #42, and can be closed”.
+Finally, the ticket may be a duplicate of another older ticket. If you notice a ticket is a duplicate, simply comment on the ticket noting the original ticket's number. For example, you could say “This is a duplicate of issue #42, and can be closed”.
 
 ## Stale issues
 

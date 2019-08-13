@@ -1,7 +1,7 @@
 > GET /info/rubyforge
 > accept-encoding: gzip
 > accept: */*
-> user-agent: bundler/2.0.0.dev rubygems/3.1.0.pre1 ruby/2.6.1 (x86_64-pc-linux-gnu) command/ options/inline,spec_run,gemfile 2b245065a74de07f
+> user-agent: bundler/2.1.0.pre.1 rubygems/3.1.0.pre1 ruby/2.6.3 (x86_64-pc-linux-gnu) command/lock options/spec_run 5b0bb92a68f3b942
 > connection: keep-alive
 > keep-alive: 30
 > host: index.rubygems.org
