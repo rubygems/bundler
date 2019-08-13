@@ -54,12 +54,17 @@ The `rake release:patch` command will automatically handle cherry-picking, and i
 
 Bundler maintains a list of changes present in each version in the `CHANGELOG.md` file.
 Entries should not be added in pull requests, but are rather written by the Bundler
-maintainers in the [bundler-changelog repo](https://github.com/bundler/bundler-changelog).
-That repository tracks changes by pull requests, with each entry having an associated version,
-PR, section, author(s), issue(s) closed, and message.
+maintainers before the release.
 
-Ensure that repo has been updated with all new PRs before releasing a new version,
-and copy over the new sections to the `CHANGELOG.md` in the Bundler repo.
+To fill in the changelog, maintainers can go through the relevant PRs using the
+`rake release:open_unreleased_prs` and manually add a changelog entry for each
+PR that it's about to be released.
+
+If you're releasing a patch level version, you can use `rake
+release:open_unreleased_prs` to instead label each relevant PR with the proper
+milestone of the version to be release. Then the `rake release:patch` task will
+go _only_ through those PRs, and prompt you to add a changelog entry for each of
+them.
 
 ## Releases
 
@@ -79,8 +84,7 @@ Here's the checklist for releasing new minor versions:
 * [ ] Create a new stable branch from master (see **Branching** below)
 * [ ] Update `version.rb` to a prerelease number, e.g. `1.12.pre.1`
 * [ ] Update `CHANGELOG.md` to include all of the features, bugfixes, etc for that
-  version, from the [bundler-changelog](https://github.com/bundler/bundler-changelog)
-  repo.
+  version.
 * [ ] Run `rake release`, tweet, blog, let people know about the prerelease!
 * [ ] Wait a **minimum of 7 days**
 * [ ] If significant problems are found, increment the prerelease (i.e. 1.12.pre.2)
