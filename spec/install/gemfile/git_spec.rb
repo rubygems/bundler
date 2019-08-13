@@ -876,7 +876,7 @@ RSpec.describe "bundle install with git sources" do
     update_git "foo"
     update_git "foo"
 
-    install_gemfile <<-G
+    install_gemfile! <<-G
       git "#{lib_path("foo-1.0")}", :ref => "#{git.ref_for("HEAD^")}" do
         gem "foo"
       end
