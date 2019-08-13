@@ -28,9 +28,7 @@ module Bundler
 
     def run
       start = Time.now unless Bundler.opt_out
-      check_for_deployment_mode
-
-      sources = Array(options[:source])
+      check_for_deployment_mode!
 
       gems.each do |gem_name|
         Bundler::CLI::Common.select_spec(gem_name)
