@@ -26,4 +26,4 @@ Here are the different ways you can start contributing to the Bundler project:
 
 ## Supporting Bundler
 
-[Ruby Together](https://rubytogether.org/) pays some Bundler maintainers for their work, funded directly by the Ruby community. If you’d like to support Bundler with a financial contribution, [become an individual sponsor](https://rubytogether.org/developers#plans). We also welcome financial [contributions from companies](https://rubytogether.org/companies#plans), too! (You can also support us through [Open Collective](https://opencollective.com/rubytogether).)
+[Ruby Together](https://rubytogether.org/) pays some Bundler maintainers for their work, funded directly by the Ruby community. If you'd like to support Bundler with a financial contribution, [become an individual sponsor](https://rubytogether.org/developers#plans). We also welcome financial [contributions from companies](https://rubytogether.org/companies#plans), too! (You can also support us through [Open Collective](https://opencollective.com/rubytogether).)

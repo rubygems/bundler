@@ -18,7 +18,7 @@ If you are unsure where to begin, ping [@feministy](https://github.com/feministy
 
 ## [Writing docs for man pages](WRITING.md)
 
-If you’d like to submit a patch to the man pages, you're in the right place! Details on editing and previewing changes to man pages can be found [here](WRITING.md).
+If you'd like to submit a patch to the man pages, you're in the right place! Details on editing and previewing changes to man pages can be found [here](WRITING.md).
 
 ## [Documentation vision](VISION.md)
 

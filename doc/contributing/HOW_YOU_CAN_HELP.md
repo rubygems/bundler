@@ -1,6 +1,6 @@
 # How you can help: your first commits!
 
-If you’re interested in contributing to Bundler, that’s awesome! We’d love your help.
+If you're interested in contributing to Bundler, that's awesome! We'd love your help.
 
 If at any point you get stuck, here's how to [get in touch with the Bundler team for help](GETTING_HELP.md).
 
