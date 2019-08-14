@@ -46,7 +46,7 @@ namespace :spec do
       # Refresh packages index that the ones we need can be installed
       sh "sudo apt-get update"
       # Install groff so ronn can generate man/help pages
-      sh "sudo apt-get install groff-base -y"
+      sh "sudo apt-get install groff-base=1.22.3-10 -y"
       # Install graphviz so that the viz specs can run
       sh "sudo apt-get install graphviz -y"
 
@@ -196,7 +196,7 @@ namespace :man do
         index << [ronn, File.basename(roff)]
 
         file roff => ["man", ronn] do
-          sh "bin/ronn --roff --pipe #{ronn} > #{roff}"
+          sh "bin/ronn --roff --pipe --date #{Time.now.strftime("%Y-%m-%d")} #{ronn} > #{roff}"
         end
 
         file "#{roff}.txt" => roff do
@@ -233,13 +233,13 @@ namespace :man do
 
       desc "Verify man pages are in sync"
       task :check => :build do
-        sh("git diff --quiet man") do |outcome, _|
+        sh("git diff --quiet --ignore-all-space man") do |outcome, _|
           if outcome
             puts
             puts "Manpages are in sync!"
             puts
           else
-            sh("GIT_PAGER=cat git diff man")
+            sh("GIT_PAGER=cat git diff --ignore-all-space man")
 
             puts
             puts "Man pages are out of sync. Above you can see the diff that got generated from rebuilding them. Please review and commit the results."
