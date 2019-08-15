@@ -45,7 +45,7 @@ RSpec.describe "Bundler.require" do
       s.write "lib/ten.rb", "puts 'ten'"
     end
 
-    gemfile <<-G
+    install_gemfile <<-G
       path "#{lib_path}" do
         gem "one", :group => :bar, :require => %w[baz qux]
         gem "two"

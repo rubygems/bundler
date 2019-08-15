@@ -11,12 +11,13 @@ RSpec.describe "bundle exec" do
       gem "rack", "1.0.0"
     G
 
+    bundle "install --gemfile CustomGemfile"
     bundle "exec --gemfile CustomGemfile rackup"
     expect(out).to eq("1.0.0")
   end
 
   it "activates the correct gem" do
-    gemfile <<-G
+    install_gemfile <<-G
       gem "rack", "0.9.1"
     G
 
@@ -60,7 +61,7 @@ RSpec.describe "bundle exec" do
       Process.setproctitle("1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16")
       puts `ps -eo args | grep [1]-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16`
     RUBY
-    create_file "Gemfile"
+    install_gemfile ""
     create_file "a.rb", script_that_changes_its_own_title_and_checks_if_picked_up_by_ps_unix_utility
     bundle "exec ruby a.rb"
     expect(out).to eq("1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16")
