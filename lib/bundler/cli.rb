@@ -102,7 +102,7 @@ module Bundler
     class_option "verbose", :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
-      start = Time.now unless Bundler.opt_out
+      start = Time.now
       case cli
       when "gemfile" then command = "gemfile"
       when nil       then command = "bundle"
