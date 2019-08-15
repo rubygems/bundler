@@ -1,17 +1,27 @@
 # frozen_string_literal: true
 
 module Bundler
-  class Metrics
-    def initialize
-      @path = Bundler.user_bundle_path("metrics")
+  module Metrics
+    @path = Bundler.user_bundle_path("metrics")
+
+    def self.opt_out
+      @opt_out
     end
 
-    def record_single_metric(key, value)
+    def self.opt_out=(val)
+      @opt_out = val
+    end
+
+    def self.record_single_metric(key, value)
+      return if @opt_out
+
       @command_metrics ||= Hash.new
       @command_metrics[key] = value
     end
 
-    def record_failed_install(gem_name, gem_version)
+    def self.record_failed_install(gem_name, gem_version)
+      return if @opt_out
+
       init_command_metrics("failed install")
       @command_metrics["gem_name"] = gem_name
       @command_metrics["gem_version"] = gem_version
@@ -19,13 +29,17 @@ module Bundler
     end
 
     # called when a light command is executed
-    def record(command_time_taken)
+    def self.record(command_time_taken)
+      return if @opt_out
+
       init_command_metrics(ARGV.first)
       @command_metrics["command_time_taken"] = command_time_taken
       write_to_file
     end
 
-    def record_and_send_full_info(time_taken)
+    def self.record_and_send_full_info(time_taken)
+      return if @opt_out
+
       record_system_info
       record_gem_info
       record(time_taken.round(3))
@@ -34,7 +48,7 @@ module Bundler
 
   private
 
-    def init_command_metrics(command)
+    def self.init_command_metrics(command)
       @command_metrics ||= Hash.new
       @command_metrics["command"] = command
       options = Bundler.settings.all.join(",")
@@ -43,7 +57,7 @@ module Bundler
       @command_metrics["timestamp"] = Time.now.utc.iso8601
     end
 
-    def record_gem_info
+    def self.record_gem_info
       @system_metrics["gemfile_gem_count"] = Bundler.definition.dependencies.count
       @system_metrics["installed_gem_count"] = Bundler.definition.specs.count
       @system_metrics["git_gem_count"] = Bundler.definition.sources.git_sources.count
@@ -53,7 +67,7 @@ module Bundler
       @system_metrics["gem_sources"] = Bundler.definition.sources.rubygems_sources.map(&:to_s).map {|source| Digest::MD5.hexdigest(source[source.index(/http/)..source.rindex("/")]) if source.match(/http/) }
     end
 
-    def send_metrics
+    def self.send_metrics
       # TODO: change URI
       begin
         uri = URI("http://localhost:3000/api/metrics")
@@ -74,7 +88,7 @@ module Bundler
       open(@path, File::TRUNC) if File.exist?(@path)
     end
 
-    def git_info
+    def self.git_info
       begin
         origin = `git remote get-url origin`
         origin = `git config --get remote.origin.url` if origin.empty? # for older git versions
@@ -89,7 +103,7 @@ module Bundler
       end
     end
 
-    def ruby_env_managers
+    def self.ruby_env_managers
       begin
         rvm_ver = `rvm --version`
         @system_metrics["rvm_version"] = rvm_ver[rvm_ver.index(/\d/)..rvm_ver.rindex(/\d/)].chomp unless rvm_ver.empty?
@@ -107,7 +121,7 @@ module Bundler
       end
     end
 
-    def ruby_and_bundler_version
+    def self.ruby_and_bundler_version
       ruby = Bundler::RubyVersion.system
       @system_metrics["host"] = ruby.host
       @system_metrics["ruby_version"] = ruby.versions_string(ruby.versions)
@@ -124,7 +138,7 @@ module Bundler
       end
     end
 
-    def cis
+    def self.cis
       env_cis = {
         "TRAVIS" => "travis",
         "CIRCLECI" => "circle",
@@ -139,13 +153,13 @@ module Bundler
       env_cis.find_all {|env, _| ENV[env] }.map {|_, ci| ci }
     end
 
-    def ci_info
+    def self.ci_info
       cis_var = cis
       @system_metrics["ci"] = cis_var.join(",") if cis_var.any?
     end
 
     # called when bundle install, outdated, package or pristine are run
-    def record_system_info
+    def self.record_system_info
       @system_metrics ||= Hash.new
       # add a random ID so we can consolidate runs server-side
       require "securerandom"
@@ -157,7 +171,7 @@ module Bundler
       ci_info
     end
 
-    def write_to_file
+    def self.write_to_file
       SharedHelpers.filesystem_access(@path) do |file|
         FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
         require "psych"
@@ -165,7 +179,7 @@ module Bundler
       end
     end
 
-    def read_from_file
+    def self.read_from_file
       valid_file = @path.exist? && !@path.size.zero?
       return {} unless valid_file
       list = Array.new
