@@ -16,6 +16,15 @@ RSpec.describe "bundle exec" do
     expect(out).to eq("1.0.0")
   end
 
+  it "resolves automatically without having run `bundle install`" do
+    gemfile <<-G
+      gem "rack", "0.9.1"
+    G
+
+    bundle "exec rackup"
+    expect(out).to include("Resolving dependencies...\n")
+  end
+
   it "activates the correct gem" do
     install_gemfile <<-G
       gem "rack", "0.9.1"
