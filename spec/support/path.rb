@@ -150,7 +150,7 @@ module Spec
     end
 
     def ruby_core?
-      # avoid to wornings
+      # avoid to warnings
       @ruby_core ||= nil
 
       if @ruby_core.nil?
