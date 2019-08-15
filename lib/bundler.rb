@@ -562,16 +562,9 @@ EOF
       @rubygems = nil
     end
 
-    attr_reader :metrics, :opt_out
-
-    def init_metrics
-      @metrics = Metrics.new unless metrics_opt_out?
-    end
-
     def metrics_opt_out?
-      @opt_out = Bundler.settings["disable_metrics"]
-      delete_metrics_file if @opt_out
-      @opt_out
+      Metrics.opt_out = Bundler.settings["disable_metrics"]
+      delete_metrics_file if Metrics.opt_out
     end
 
   private

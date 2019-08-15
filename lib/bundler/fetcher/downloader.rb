@@ -12,13 +12,13 @@ module Bundler
       end
 
       def fetch(uri, headers = {}, counter = 0)
-        start = Time.now unless Bundler.opt_out
+        start = Time.now
         raise HTTPError, "Too many redirects" if counter >= redirect_limit
 
         response = request(uri, headers)
         Bundler.ui.debug("HTTP #{response.code} #{response.message} #{uri}")
 
-        Bundler.metrics.record_single_metric("time_to_download", (Time.now - start).round(3)) unless Bundler.opt_out
+        Metrics.record_single_metric("time_to_download", (Time.now - start).round(3))
 
         case response
         when Net::HTTPSuccess, Net::HTTPNotModified

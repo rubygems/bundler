@@ -14,15 +14,13 @@ module Bundler
     ].freeze
 
     def self.start(*)
-      unless Bundler.opt_out
-        start = Time.now
-        Bundler.init_metrics
-      end
+      Bundler.metrics_opt_out?
+      start = Time.now
 
       super
 
       # install, outdated, package, update and pristine truncate the metrics file and send it's contents, other commands record general metrics
-      (Bundler.metrics.record(Time.now - start) unless %w[install outdated package update pristine].include?(ARGV.first)) unless Bundler.opt_out
+      Metrics.record(Time.now - start) unless %w[install outdated package update pristine].include?(ARGV.first)
     rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = UI::Shell.new
       raise e
@@ -118,13 +116,13 @@ module Bundler
 
       if man_pages.include?(command)
         if Bundler.which("man") && man_path !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          Bundler.metrics.record(Time.now - start) unless Bundler.opt_out
+          Metrics.record(Time.now - start)
           Kernel.exec "man #{man_pages[command]}"
         else
           puts File.read("#{man_path}/#{File.basename(man_pages[command])}.txt")
         end
       elsif command_path = Bundler.which("bundler-#{cli}")
-        Bundler.metrics.record(Time.now - start) unless Bundler.opt_out
+        Metrics.record(Time.now - start)
         Kernel.exec(command_path, "--help")
       else
         super

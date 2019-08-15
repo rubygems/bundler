@@ -8,7 +8,7 @@ module Bundler
     end
 
     def run
-      start = Time.now unless Bundler.opt_out
+      start = Time.now
 
       Bundler.ui.level = "error" if options[:quiet]
 
@@ -86,7 +86,7 @@ module Bundler
         Bundler::CLI::Clean.new(options).run
       end
 
-      Bundler.metrics.record_and_send_full_info(Time.now - start) unless Bundler.opt_out
+      Metrics.record_and_send_full_info(Time.now - start)
     rescue GemNotFound, VersionConflict => e
       if options[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your #{Bundler.settings.app_cache_path} directory."

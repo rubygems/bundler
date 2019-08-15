@@ -21,19 +21,19 @@ module Bundler
     end
 
     def run
-      start = Time.now unless Bundler.opt_out
+      start = Time.now
       validate_cmd!
       SharedHelpers.set_bundle_environment
       if bin_path = Bundler.which(cmd)
         if !Bundler.settings[:disable_exec_load] && ruby_shebang?(bin_path)
-          Bundler.metrics.record(Time.now - start) unless Bundler.opt_out
+          Metrics.record(Time.now - start)
           return kernel_load(bin_path, *args)
         end
-        Bundler.metrics.record(Time.now - start) unless Bundler.opt_out
+        Metrics.record(Time.now - start)
         kernel_exec(bin_path, *args)
       else
         # exec using the given command
-        Bundler.metrics.record(Time.now - start) unless Bundler.opt_out
+        Metrics.record(Time.now - start)
         kernel_exec(cmd, *args)
       end
     end

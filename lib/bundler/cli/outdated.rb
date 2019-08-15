@@ -27,7 +27,7 @@ module Bundler
     end
 
     def run
-      start = Time.now unless Bundler.opt_out
+      start = Time.now
       check_for_deployment_mode!
 
       gems.each do |gem_name|
@@ -131,7 +131,7 @@ module Bundler
           print_gems(outdated_gems_list)
         end
       end
-      Bundler.metrics.record_and_send_full_info(Time.now - start) unless Bundler.opt_out
+      Metrics.record_and_send_full_info(Time.now - start)
     end
 
   private
