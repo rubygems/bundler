@@ -71,7 +71,8 @@ RSpec.configure do |config|
   config.filter_run_excluding :git => RequirementChecker.against(git_version)
   config.filter_run_excluding :bundler => RequirementChecker.against(Bundler::VERSION.split(".")[0])
   config.filter_run_excluding :ruby_repo => !(ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"]).nil?
-  config.filter_run_excluding :non_windows => Gem.win_platform?
+  config.filter_run_excluding :no_color_tty => Gem.win_platform? || !ENV["GITHUB_ACTION"].nil?
+  config.filter_run_excluding :github_action_linux => !ENV["GITHUB_ACTION"].nil? && (ENV["RUNNER_OS"] == "Linux")
 
   config.filter_run_when_matching :focus unless ENV["CI"]
 
@@ -100,6 +101,7 @@ RSpec.configure do |config|
     ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
     ENV["BUNDLE_SPEC_RUN"] = "true"
     ENV["BUNDLE_USER_CONFIG"] = ENV["BUNDLE_USER_CACHE"] = ENV["BUNDLE_USER_PLUGIN"] = nil
+    ENV["GEMRC"] = nil
 
     # Don't wrap output in tests
     ENV["THOR_COLUMNS"] = "10000"
