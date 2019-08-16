@@ -564,7 +564,7 @@ EOF
 
     def metrics_opt_out?
       Metrics.opt_out = Bundler.settings["disable_metrics"]
-      delete_metrics_file if Metrics.opt_out
+      delete_metrics_file if Metrics.opt_out?
     end
 
   private
