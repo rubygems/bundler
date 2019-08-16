@@ -2,9 +2,18 @@
 
 module Bundler
   module Metrics
+    # Collects and sends anonymous metrics from the local host
+    # to a dedicated rubygems.org API
+    # If `disable_metrics` is set to true in the global config file,
+    # no metric related action will take place aside from returning
+    # from the public methods on external call.
+    # this setting is set in Bundler#metrics_opt_out?
+    # metrics.yml is deleted once metrics are disabled
+
+    # Expanded path is ~/.bundle/metrics.yml
     @path = Bundler.user_bundle_path("metrics")
 
-    def self.opt_out
+    def self.opt_out?
       @opt_out
     end
 
@@ -12,6 +21,8 @@ module Bundler
       @opt_out = val
     end
 
+    # Used to add a single metric to the hash
+    # Required to avoid exposing other class/module's internals
     def self.record_single_metric(key, value)
       return if @opt_out
 
@@ -28,7 +39,8 @@ module Bundler
       write_to_file
     end
 
-    # called when a light command is executed
+    # Called on all commands and appends recorded metrics
+    # to the metrics.yml file
     def self.record(command_time_taken)
       return if @opt_out
 
@@ -37,6 +49,9 @@ module Bundler
       write_to_file
     end
 
+    # Called on `bundle install/outdated/package/update/pristine`
+    # Records the bulk of the system's info (still anynomous, of course)
+    # Called only for these commands to avoid harming perfomance
     def self.record_and_send_full_info(time_taken)
       return if @opt_out
 
@@ -64,6 +79,7 @@ module Bundler
       @system_metrics["path_gem_count"] = Bundler.definition.sources.path_sources.count
       @system_metrics["gem_source_count"] = Bundler.definition.sources.rubygems_sources.count
       require "digest"
+      # hashes each gem source domain (ex. https://rubygems.org/)
       @system_metrics["gem_sources"] = Bundler.definition.sources.rubygems_sources.map(&:to_s).map {|source| Digest::MD5.hexdigest(source[source.index(/http/)..source.rindex("/")]) if source.match(/http/) }
     end
 
@@ -73,6 +89,7 @@ module Bundler
         uri = URI("http://localhost:3000/api/metrics")
         Net::HTTP.start(uri.host, uri.port) do |http| # TODO: add ', :use_ssl => true' later
           req = Net::HTTP::Post.new(uri)
+          # JSON format is required to properly access the keys in the backend API
           req["Content-Type"] = "application/json"
           require "json"
           req.body = read_from_file.to_json
@@ -93,6 +110,7 @@ module Bundler
         origin = `git remote get-url origin`
         origin = `git config --get remote.origin.url` if origin.empty? # for older git versions
         require "digest"
+        # hash the origin repository to calculate the number of unique bundler users
         @system_metrics["origin"] = Digest::MD5.hexdigest(origin.chomp) unless origin.empty?
       rescue Errno::ENOENT
       end
@@ -164,13 +182,16 @@ module Bundler
       # add a random ID so we can consolidate runs server-side
       require "securerandom"
       @system_metrics["request_id"] = SecureRandom.hex(8)
-      # hash the origin repository to calculate unique bundler users
       git_info
       ruby_env_managers
       ruby_and_bundler_version
       ci_info
     end
 
+    # Appends a @command_metrics hash to the metrics.yml file
+    # It writes said hash to file every time a light command is run
+    # to collect metrics, but avoid harming performance by collecting
+    # big amounts of info and creating an HTTP connection
     def self.write_to_file
       SharedHelpers.filesystem_access(@path) do |file|
         FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
@@ -179,6 +200,12 @@ module Bundler
       end
     end
 
+    # When either of install/outdated/package/update/pristine is run,
+    # performance will not be harmed since they all take tens of seconds
+    # It reads each metric hash in the file into an array of hashes,
+    # @system_metrics contains the bulk of the data, and is populated beforehand
+    # when #record_system_info is called in #record_and_send_full_info
+    # @system metrics is appended to the array, and the array is sent to rubygems.org
     def self.read_from_file
       valid_file = @path.exist? && !@path.size.zero?
       return {} unless valid_file

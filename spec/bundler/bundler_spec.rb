@@ -483,16 +483,16 @@ MESSAGE
     it "should return a boolean value according the the setting the user set in the global config file" do
       Bundler.settings.set_global("disable_metrics", false)
       Bundler.metrics_opt_out?
-      expect(Bundler::Metrics.opt_out).to eq(false)
+      expect(Bundler::Metrics.opt_out?).to eq(false)
       Bundler.settings.set_global("disable_metrics", true)
       Bundler.metrics_opt_out?
-      expect(Bundler::Metrics.opt_out).to eq(true)
+      expect(Bundler::Metrics.opt_out?).to eq(true)
     end
 
     it "should return nil if the user hasn't set the disable_metrics setting" do
       Bundler.settings.set_global("disable_metrics", nil)
       Bundler.metrics_opt_out?
-      expect(Bundler::Metrics.opt_out).to eq(nil)
+      expect(Bundler::Metrics.opt_out?).to eq(nil)
     end
   end
 
