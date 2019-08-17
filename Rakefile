@@ -51,7 +51,7 @@ namespace :spec do
       sh "sudo apt-get install graphviz -y"
 
       # Install the gems with a consistent version of RubyGems
-      sh "gem update --system 3.0.4"
+      sh "gem update --system 3.0.6"
 
       # Install the other gem deps, etc
       Rake::Task["spec:deps"].invoke
@@ -89,7 +89,7 @@ namespace :spec do
   namespace :rubygems do
     # When editing this list, also edit .travis.yml!
     branches = %w[master]
-    releases = %w[v2.5.2 v2.6.14 v2.7.10 v3.0.4]
+    releases = %w[v2.5.2 v2.6.14 v2.7.10 v3.0.6]
     (branches + releases).each do |rg|
       desc "Run specs with RubyGems #{rg}"
       task rg do

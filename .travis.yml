@@ -39,8 +39,8 @@ env:
   - RGV=master BUNDLER_SPEC_SUB_VERSION=3.0.0
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v3.0.4 BUNDLER_SPEC_SUB_VERSION=3.0.0
-  - RGV=v3.0.4
+  - RGV=v3.0.6 BUNDLER_SPEC_SUB_VERSION=3.0.0
+  - RGV=v3.0.6
 
 jobs:
   include:
@@ -52,7 +52,7 @@ jobs:
       env: RGV=master
       stage: test
     - rvm: 2.3.8
-      env: RGV=v3.0.4
+      env: RGV=v3.0.6
       stage: test
     # Ruby 2.5, Rubygems 2.7
     - rvm: 2.5.5
