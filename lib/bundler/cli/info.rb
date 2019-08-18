@@ -60,8 +60,8 @@ module Bundler
       Bundler.ui.info gem_info
     end
 
-    def print_gem_dependencies(spec)
-      top_level_dependencies = summarize(spec)
+    def print_gem_dependencies(gem_name)
+      top_level_dependencies = summarize(gem_name)
 
       stat_info = String.new
       stat_info << "\tDependents:\n"
@@ -76,13 +76,13 @@ module Bundler
       Bundler.ui.info stat_info
     end
 
-    def summarize(spec)
+    def summarize(gem_name)
       definition = Bundler.definition
       lockfile_contents = definition.to_lock
       parser = Bundler::LockfileParser.new(lockfile_contents)
       @tree = specs_as_tree(parser.specs)
 
-      reverse_dependencies_with_versions(spec)
+      reverse_dependencies_with_versions(gem_name)
     end
 
     def specs_as_tree(specs)
@@ -92,10 +92,10 @@ module Bundler
       end
     end
 
-    def transitive_dependencies(target)
-      raise ArgumentError, "Unknown gem #{target}" unless @tree.key? target
+    def transitive_dependencies(gem_name)
+      raise ArgumentError, "Unknown gem #{gem_name}" unless @tree.key? gem_name
 
-      top_level = @tree[target].dependencies
+      top_level = @tree[gem_name].dependencies
       all_level = top_level + top_level.inject([]) do |arr, dep|
         next arr if dep.name == "bundler"
 
@@ -105,10 +105,10 @@ module Bundler
       all_level.uniq(&:name)
     end
 
-    def reverse_dependencies_with_versions(target)
+    def reverse_dependencies_with_versions(gem_name)
       @tree.map do |name, dep|
         transitive_dependencies(name).map do |transitive_dependency|
-          next unless transitive_dependency.name == target
+          next unless transitive_dependency.name == gem_name
           {
             :name => dep.name,
             :version => transitive_dependency.requirement.to_s,
