@@ -5,14 +5,19 @@ RSpec.describe "bundle info" do
     before do
       install_gemfile <<-G
         source "#{file_uri_for(gem_repo1)}"
-        gem "rake"
         gem "rails"
       G
     end
 
     it "prints the gems dependent on the gem in argument" do
-      bundle "info rake"
-      expect(out).to include "\tDependents:\n\t\trails"
+      bundle "info activesupport"
+      expect(out).to include "\tDependents:\n\t\tactionmailer"
+      expect(out).to include "\n\t\tactionpack"
+    end
+
+    it "prints None on the gem in argument that doesn't have any dependent" do
+      bundle "info rails"
+      expect(out).to include "\t\tNone"
     end
 
     it "creates a Gemfile.lock when invoked with a gem name" do
