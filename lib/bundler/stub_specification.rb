@@ -83,7 +83,7 @@ module Bundler
     #   #_remote_specification has logic to handle this case, so delegate to that in that situation,
     #   because otherwise we can end up with a stack overflow when calling #missing_extensions?
     def stub(check = false)
-      if check && @_remote_specification.nil? && @stub.instance_variable_get(:@data) && Gem.loaded_specs[name].equal?(self)
+      if check && @_remote_specification.nil? && Gem.loaded_specs[name].equal?(self)
         _remote_specification
       end
       @stub
