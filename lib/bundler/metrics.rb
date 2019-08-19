@@ -84,10 +84,9 @@ module Bundler
     end
 
     def self.send_metrics
-      # TODO: change URI
       begin
-        uri = URI("http://localhost:3000/api/metrics")
-        Net::HTTP.start(uri.host, uri.port) do |http| # TODO: add ', :use_ssl => true' later
+        uri = URI("https://rubygems.org/api/metrics")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
           req = Net::HTTP::Post.new(uri)
           # JSON format is required to properly access the keys in the backend API
           req["Content-Type"] = "application/json"
