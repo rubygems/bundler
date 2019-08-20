@@ -85,17 +85,18 @@ module Bundler
 
     def self.send_metrics
       begin
-        uri = URI("https://rubygems.org/api/metrics")
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
-          req = Net::HTTP::Post.new(uri)
-          # JSON format is required to properly access the keys in the backend API
-          req["Content-Type"] = "application/json"
-          require "json"
-          req.body = read_from_file.to_json
-          http.request(req)
-        end
-      rescue SocketError, Errno::ECONNREFUSED
-        puts "TCP connection failed"
+        uri = URI "https://rubygems.org/api/metrics"
+        # use persistent connection to so we can use a single connection to rubygems
+        require "bundler/vendored_persistent"
+        http = Bundler::Persistent::Net::HTTP::Persistent.new
+        post = Net::HTTP::Post.new(uri)
+        # JSON format is required to properly access the keys in the backend API
+        post["Content-Type"] = "application/json"
+        require "json"
+        post.body = read_from_file.to_json
+        http.request(uri, post)
+      rescue Bundler::Persistent::Net::HTTP::Persistent::Error
+        puts "Connection failed"
       rescue OpenSSL::SSL::SSLError
         puts "Certification has probably expired"
       end
