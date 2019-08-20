@@ -95,7 +95,7 @@ module Bundler
         require "json"
         post.body = read_from_file.to_json
         http.request(uri, post)
-      rescue Bundler::Persistent::Net::HTTP::Persistent::Error
+      rescue Bundler::Persistent::Net::HTTP::Persistent::Error, Errno::ENETUNREACH
         puts "Connection failed"
       rescue OpenSSL::SSL::SSLError
         puts "Certification has probably expired"
