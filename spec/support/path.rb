@@ -38,7 +38,14 @@ module Spec
     end
 
     def tmp(*path)
-      root.join("tmp", *path)
+      root.join("tmp", scope, *path)
+    end
+
+    def scope
+      test_number = ENV["TEST_ENV_NUMBER"]
+      return "1" if test_number.nil?
+
+      test_number.empty? ? "1" : test_number
     end
 
     def home(*path)
