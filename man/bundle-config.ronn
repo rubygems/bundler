@@ -45,6 +45,12 @@ configuration only from the local application.
 Executing bundle with the `BUNDLE_IGNORE_CONFIG` environment variable set will
 cause it to ignore all configuration.
 
+Executing `bundle config set disable_metrics true` disables all metric collection
+and sending.
+
+Executing `bundle config set disable_metrics false` returns to default state,
+collecting and sending metrics.
+
 Executing `bundle config set disable_multisource true` upgrades the warning about
 the Gemfile containing multiple primary sources to an error. Executing `bundle
 config unset disable_multisource` downgrades this error to a warning.
@@ -175,6 +181,9 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
 * `disable_local_branch_check` (`BUNDLE_DISABLE_LOCAL_BRANCH_CHECK`):
    Allow Bundler to use a local git override without a branch specified in the
    Gemfile.
+* `disable_metrics` (`BUNDLE_DISABLE_METRICS`):
+   When set to true, disables all metric collection and sending.
+   When set to false (default), enables back all metrics collection and sending.
 * `disable_multisource` (`BUNDLE_DISABLE_MULTISOURCE`):
    When set, Gemfiles containing multiple sources will produce errors
    instead of warnings.
