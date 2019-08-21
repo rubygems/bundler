@@ -13,6 +13,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - remove_unnecessary_check
 
 cache:
   directories:
