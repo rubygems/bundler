@@ -57,7 +57,10 @@ Executing \fBbundle config unset \-\-local <name> <value>\fR will delete the con
 Executing bundle with the \fBBUNDLE_IGNORE_CONFIG\fR environment variable set will cause it to ignore all configuration\.
 .
 .P
-Executing \fBbundle config set disable_metrics false\fR disables all metric collection and sending\. Executing \fBbundle config unset disable_metrics\fR or \fBbundle config set disable_metrics false\fR enables back metric collection and sending\.
+Executing \fBbundle config set disable_metrics true\fR disables all metric collection and sending\.
+.
+.P
+Executing \fBbundle config set disable_metrics false\fR returns to default state, collecting and sending metrics\.
 .
 .P
 Executing \fBbundle config set disable_multisource true\fR upgrades the warning about the Gemfile containing multiple primary sources to an error\. Executing \fBbundle config unset disable_multisource\fR downgrades this error to a warning\.
@@ -187,7 +190,7 @@ The following is a list of all configuration keys and their purpose\. You can le
 \fBdisable_local_branch_check\fR (\fBBUNDLE_DISABLE_LOCAL_BRANCH_CHECK\fR): Allow Bundler to use a local git override without a branch specified in the Gemfile\.
 .
 .IP "\(bu" 4
-\fBdisable_metrics\fR (\fBBUNDLE_DISABLE_METRICS\fR): When set to true, disables all metric collection and sending\. Reversed back to default behavior by using \fBbundle config unset disable_metrics\fR or \fBbundle set disable_metrics false\fR\.
+\fBdisable_metrics\fR (\fBBUNDLE_DISABLE_METRICS\fR): When set to true, disables all metric collection and sending\. When set to false (default), enables back all metrics collection and sending\.
 .
 .IP "\(bu" 4
 \fBdisable_multisource\fR (\fBBUNDLE_DISABLE_MULTISOURCE\fR): When set, Gemfiles containing multiple sources will produce errors instead of warnings\. Use \fBbundle config unset disable_multisource\fR to unset\.

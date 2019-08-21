@@ -55,11 +55,11 @@ DESCRIPTION
        Executing bundle with the BUNDLE_IGNORE_CONFIG environment variable set
        will cause it to ignore all configuration.
 
-       Executing `bundle config set disable_metrics true` disables all metric collection
-       and sending.
+       Executing  bundle  config  set disable_metrics true disables all metric
+       collection and sending.
 
-       Executing `bundle config set disable_metrics false` returns to default state,
-       collecting and sending metrics.
+       Executing bundle config set disable_metrics false  returns  to  default
+       state, collecting and sending metrics.
 
        Executing bundle config set disable_multisource true upgrades the warn-
        ing about the Gemfile containing multiple primary sources to an	error.
@@ -82,13 +82,13 @@ REMEMBERING OPTIONS
 	      text. If used, you might add this  directory  to	your  environ-
 	      ment's  PATH variable. For instance, if the rails gem comes with
 	      a rails executable, this flag will create a bin/rails executable
-	      that  ensures  that  all	referred dependencies will be resolved
-	      using the bundled gems.
+	      that ensures that all referred dependencies will be resolved us-
+	      ing the bundled gems.
 
        deployment
-	      In deployment mode, Bundler will 'roll-out' the bundle for  pro-
-	      duction  use.  Please  check  carefully if you want to have this
-	      option enabled in development or test environments.
+	      In  deployment mode, Bundler will 'roll-out' the bundle for pro-
+	      duction use. Please check carefully if you want to have this op-
+	      tion enabled in development or test environments.
 
        path   The location to install the specified gems to. This defaults  to
 	      Rubygems'  setting.  Bundler shares this location with Rubygems,
@@ -157,8 +157,8 @@ LIST OF AVAILABLE KEYS
        dle-install.1.html.
 
        o   allow_bundler_dependency_conflicts	  (BUNDLE_ALLOW_BUNDLER_DEPEN-
-	   DENCY_CONFLICTS):  Allow  resolving	to  specifications  that  have
-	   dependencies on bundler that  are  incompatible  with  the  running
+	   DENCY_CONFLICTS): Allow resolving to specifications that  have  de-
+	   pendencies  on  bundler  that  are  incompatible  with  the running
 	   Bundler version.
 
        o   allow_deployment_source_credential_changes	 (BUNDLE_ALLOW_DEPLOY-
@@ -174,8 +174,8 @@ LIST OF AVAILABLE KEYS
 	   cally  run  bundle clean after installing when an explicit path has
 	   not been set and Bundler is not installing into the system gems.
 
-       o   auto_install  (BUNDLE_AUTO_INSTALL):   Automatically   run	bundle
-	   install when gems are missing.
+       o   auto_install  (BUNDLE_AUTO_INSTALL):  Automatically	run bundle in-
+	   stall when gems are missing.
 
        o   bin	(BUNDLE_BIN):  Install	executables from gems in the bundle to
 	   the specified directory. Defaults to false.
@@ -197,8 +197,8 @@ LIST OF AVAILABLE KEYS
 	   Defaults to irb.
 
        o   default_install_uses_path	   (BUNDLE_DEFAULT_INSTALL_USES_PATH):
-	   Whether  a  bundle  install	without  an  explicit  --path argument
-	   defaults to installing gems in .bundle.
+	   Whether a bundle install without an explicit  --path  argument  de-
+	   faults to installing gems in .bundle.
 
        o   deployment (BUNDLE_DEPLOYMENT): Disallow changes  to  the  Gemfile.
 	   When  the Gemfile is changed and the lockfile has not been updated,
@@ -208,16 +208,16 @@ LIST OF AVAILABLE KEYS
 	   Allow  installing  gems even if they do not match the checksum pro-
 	   vided by RubyGems.
 
-       o   disable_exec_load  (BUNDLE_DISABLE_EXEC_LOAD):  Stop  Bundler  from
-	   using load to launch an executable in-process in bundle exec.
+       o   disable_exec_load (BUNDLE_DISABLE_EXEC_LOAD): Stop Bundler from us-
+	   ing load to launch an executable in-process in bundle exec.
 
-       o   disable_local_branch_check	  (BUNDLE_DISABLE_LOCAL_BRANCH_CHECK):
-	   Allow Bundler to use a local git override without a	branch	speci-
-	   fied in the Gemfile.
+       o   disable_local_branch_check (BUNDLE_DISABLE_LOCAL_BRANCH_CHECK): Al-
+	   low	Bundler to use a local git override without a branch specified
+	   in the Gemfile.
 
-       o   `disable_metrics` (`BUNDLE_DISABLE_METRICS`):
-          When set to true, disables all metric collection and sending.
-          When set to false (default), enables back all metrics collection and sending.
+       o   disable_metrics (BUNDLE_DISABLE_METRICS): When set  to  true,  dis-
+	   ables  all  metric  collection  and sending. When set to false (de-
+	   fault), enables back all metrics collection and sending.
 
        o   disable_multisource (BUNDLE_DISABLE_MULTISOURCE):  When  set,  Gem-
 	   files  containing  multiple	sources will produce errors instead of
@@ -324,8 +324,8 @@ LIST OF AVAILABLE KEYS
 	   Bundler should skip adding default git source shortcuts to the Gem-
 	   file DSL.
 
-       o   specific_platform  (BUNDLE_SPECIFIC_PLATFORM):  Allow  bundler   to
-	   resolve for the specific running platform and store it in the lock-
+       o   specific_platform  (BUNDLE_SPECIFIC_PLATFORM): Allow bundler to re-
+	   solve for the specific running platform and store it in  the  lock-
 	   file, instead of only using a generic platform. A specific platform
 	   is  the exact platform triple reported by Gem::Platform.local, such
 	   as x86_64-darwin-16	or  universal-java-1.8.  On  the  other  hand,
@@ -381,9 +381,9 @@ LIST OF AVAILABLE KEYS
        ronment variables will take preference over global settings.
 
 LOCAL GIT REPOS
-       Bundler also allows you	to  work  against  a  git  repository  locally
-       instead of using the remote version. This can be achieved by setting up
-       a local override:
+       Bundler	also  allows  you to work against a git repository locally in-
+       stead of using the remote version. This can be achieved by setting up a
+       local override:
 
 
 
@@ -407,8 +407,8 @@ LOCAL GIT REPOS
        the Gemfile.lock to the local git repo revision. This requires the same
        attention as git submodules. Before pushing to the remote, you need  to
        ensure the local override was pushed, otherwise you may point to a com-
-       mit that only exists in your local machine. You'll  also  need  to  CGI
-       escape your usernames and passwords as well.
+       mit that only exists in your local machine. You'll also need to CGI es-
+       cape your usernames and passwords as well.
 
        Bundler	does many checks to ensure a developer won't work with invalid
        references. Particularly, we force a developer to specify a  branch  in
