@@ -208,16 +208,16 @@ LIST OF AVAILABLE KEYS
 	   Allow  installing  gems even if they do not match the checksum pro-
 	   vided by RubyGems.
 
-       o   disable_exec_load (BUNDLE_DISABLE_EXEC_LOAD): Stop Bundler from us-
-	   ing load to launch an executable in-process in bundle exec.
+       o   disable_exec_load  (BUNDLE_DISABLE_EXEC_LOAD):  Stop  Bundler  from
+	   using load to launch an executable in-process in bundle exec.
 
-       o   disable_local_branch_check (BUNDLE_DISABLE_LOCAL_BRANCH_CHECK): Al-
-	   low	Bundler to use a local git override without a branch specified
-	   in the Gemfile.
+       o   disable_local_branch_check	  (BUNDLE_DISABLE_LOCAL_BRANCH_CHECK):
+	   Allow Bundler to use a local git override without a	branch	speci-
+	   fied in the Gemfile.
 
        o   disable_metrics (BUNDLE_DISABLE_METRICS): When set  to  true,  dis-
-	   ables  all  metric  collection  and sending. When set to false (de-
-	   fault), enables back all metrics collection and sending.
+	   ables  all  metric  collection  and	sending.  When	set  to  false
+	   (default), enables back all metrics collection and sending.
 
        o   disable_multisource (BUNDLE_DISABLE_MULTISOURCE):  When  set,  Gem-
 	   files  containing  multiple	sources will produce errors instead of
