@@ -146,7 +146,9 @@ namespace :spec do
     ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
 
     puts "\n\e[1;33m[Travis CI] Running bundler specs against RubyGems #{rg}\e[m\n\n"
-    specs = safe_task { Rake::Task["spec:rubygems:parallel_#{rg}"].invoke }
+    specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
+
+    Rake::Task["spec:rubygems:#{rg}"].reenable
 
     puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against RubyGems #{rg}\e[m\n\n"
     sudos = system("sudo -E rake spec:rubygems:#{rg}:sudo")
