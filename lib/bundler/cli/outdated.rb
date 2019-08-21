@@ -130,6 +130,9 @@ module Bundler
         else
           print_gems(outdated_gems_list)
         end
+        Metrics.record_and_send_full_info(Time.now - start)
+
+        exit 1
       end
       Metrics.record_and_send_full_info(Time.now - start)
     end

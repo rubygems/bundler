@@ -96,9 +96,9 @@ module Bundler
         post.body = read_from_file.to_json
         http.request(uri, post)
       rescue Bundler::Persistent::Net::HTTP::Persistent::Error, Errno::ENETUNREACH, Errno::ENOENT
-        puts "Connection failed"
+        "Connection failed"
       rescue OpenSSL::SSL::SSLError
-        puts "Certification has probably expired"
+        "Certification has probably expired"
       end
       # The file is emptied after sending metrics
       # File::TRUNC is preferable since File.truncate doesn't work for all systems

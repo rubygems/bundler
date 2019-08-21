@@ -89,8 +89,8 @@ RSpec.describe Bundler::Metrics do
     it "records a single metric and appends it to metrics.yml" do
       expect(Bundler::Metrics.instance_variable_get(:@command_metrics)["command_time_taken"]).to match(670)
       expect(Bundler::Metrics.instance_variable_get(:@command_metrics)["timestamp"]).to match(/\d{4}-\d{2}-\d{2}\S\d{2}:\d{2}:\d{2}\S/)
-      expect(Bundler::Metrics.instance_variable_get(:@command_metrics)["command"]).to match("--color").or match(%r{(spec\/bundler\/metrics_spec.rb)})
-      expect(Bundler::Metrics.instance_variable_get(:@command_metrics)["options"]).to match(/(spec_run)/)
+      expect(Bundler::Metrics.instance_variable_get(:@command_metrics)["command"]).to match("--color").or match(/(spec)+.*/)
+      expect(Bundler::Metrics.instance_variable_get(:@command_metrics)["options"]).to match(/(spec)+.*/)
     end
 
     describe "write_to_file" do
@@ -106,9 +106,9 @@ RSpec.describe Bundler::Metrics do
       it "Should write the recorded info into the file" do
         file_data = Bundler::Metrics.send(:read_from_file)
         expect(file_data[0]["command_time_taken"]).to eq(670)
-        expect(file_data[0]["command"]).to match("--color").or match(%r{(spec\/bundler\/metrics_spec.rb)})
+        expect(file_data[0]["command"]).to match("--color").or match(/(spec)+.*/)
         expect(file_data[0]["timestamp"]).to match(/\d{4}-\d{2}-\d{2}\S\d{2}:\d{2}:\d{2}\S/)
-        expect(file_data[0]["options"]).to match(/(spec_run)/)
+        expect(file_data[0]["options"]).to match(/(spec)+.*/)
       end
 
       it "Should write the recorded info into the file several times" do

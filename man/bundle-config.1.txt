@@ -55,6 +55,12 @@ DESCRIPTION
        Executing bundle with the BUNDLE_IGNORE_CONFIG environment variable set
        will cause it to ignore all configuration.
 
+       Executing `bundle config set disable_metrics true` disables all metric collection
+       and sending.
+
+       Executing `bundle config set disable_metrics false` returns to default state,
+       collecting and sending metrics.
+
        Executing bundle config set disable_multisource true upgrades the warn-
        ing about the Gemfile containing multiple primary sources to an	error.
        Executing bundle config unset disable_multisource downgrades this error
@@ -209,8 +215,12 @@ LIST OF AVAILABLE KEYS
 	   Allow Bundler to use a local git override without a	branch	speci-
 	   fied in the Gemfile.
 
-       o   disable_multisource	(BUNDLE_DISABLE_MULTISOURCE):  When  set, Gem-
-	   files containing multiple sources will produce  errors  instead  of
+       o   `disable_metrics` (`BUNDLE_DISABLE_METRICS`):
+          When set to true, disables all metric collection and sending.
+          When set to false (default), enables back all metrics collection and sending.
+
+       o   disable_multisource (BUNDLE_DISABLE_MULTISOURCE):  When  set,  Gem-
+	   files  containing  multiple	sources will produce errors instead of
 	   warnings. Use bundle config unset disable_multisource to unset.
 
        o   disable_platform_warnings  (BUNDLE_DISABLE_PLATFORM_WARNINGS): Dis-
