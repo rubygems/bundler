@@ -87,7 +87,7 @@ module Bundler
       begin
         uri = URI "https://rubygems.org/api/metrics"
         # use persistent connection to so we can use a single connection to rubygems
-        require "bundler/vendored_persistent"
+        require_relative "vendored_persistent"
         http = Bundler::Persistent::Net::HTTP::Persistent.new
         post = Net::HTTP::Post.new(uri)
         # JSON format is required to properly access the keys in the backend API
@@ -95,7 +95,7 @@ module Bundler
         require "json"
         post.body = read_from_file.to_json
         http.request(uri, post)
-      rescue Bundler::Persistent::Net::HTTP::Persistent::Error, Errno::ENETUNREACH
+      rescue Bundler::Persistent::Net::HTTP::Persistent::Error, Errno::ENETUNREACH, Errno::ENOENT
         puts "Connection failed"
       rescue OpenSSL::SSL::SSLError
         puts "Certification has probably expired"

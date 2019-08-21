@@ -259,6 +259,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     ENV["BUNDLER_SPEC_ALL_REQUESTS"] = strip_whitespace(<<-EOS).strip
       #{source_uri}/versions
       #{source_uri}/info/rack
+      https://rubygems.org/api/metrics
     EOS
 
     install_gemfile! <<-G, :artifice => "compact_index", :verbose => true
