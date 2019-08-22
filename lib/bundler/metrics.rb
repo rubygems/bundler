@@ -102,7 +102,10 @@ module Bundler
       end
       # The file is emptied after sending metrics
       # File::TRUNC is preferable since File.truncate doesn't work for all systems
-      open(@path, File::TRUNC) if File.exist?(@path)
+      begin
+        open(@path, File::TRUNC) if File.exist?(@path)
+      rescue Errno::EINVAL # CI's fail here otherwise
+      end
     end
 
     def self.git_info
