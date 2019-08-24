@@ -27,6 +27,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - parallelize_again
 
 cache:
   directories:
