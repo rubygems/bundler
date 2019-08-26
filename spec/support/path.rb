@@ -96,6 +96,10 @@ module Spec
       bundled_app("vendor/cache/#{path}.gem")
     end
 
+    def bundled_app_lock
+      bundled_app("Gemfile.lock")
+    end
+
     def base_system_gems
       tmp.join("gems/base")
     end

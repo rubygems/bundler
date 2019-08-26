@@ -31,7 +31,7 @@ RSpec.describe "bundle update" do
         exit!
       G
       bundle "update"
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app_lock).to exist
     end
   end
 
@@ -54,7 +54,7 @@ RSpec.describe "bundle update" do
         exit!
       G
       bundle "update", :all => true
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app_lock).to exist
     end
   end
 

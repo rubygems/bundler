@@ -10,9 +10,9 @@ RSpec.describe "bundle inject", :bundler => "< 3" do
 
   context "without a lockfile" do
     it "locks with the injected gems" do
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app_lock).not_to exist
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile.lock").read).to match(/rack-obama/)
+      expect(bundled_app_lock.read).to match(/rack-obama/)
     end
   end
 
@@ -28,9 +28,9 @@ RSpec.describe "bundle inject", :bundler => "< 3" do
     end
 
     it "locks with the injected gems" do
-      expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
+      expect(bundled_app_lock.read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile.lock").read).to match(/rack-obama/)
+      expect(bundled_app_lock.read).to match(/rack-obama/)
     end
   end
 
@@ -92,9 +92,9 @@ Usage: "bundle inject GEM VERSION"
     end
 
     it "locks with the injected gems" do
-      expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
+      expect(bundled_app_lock.read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile.lock").read).to match(/rack-obama/)
+      expect(bundled_app_lock.read).to match(/rack-obama/)
     end
 
     it "restores frozen afterwards" do
@@ -111,7 +111,7 @@ Usage: "bundle inject GEM VERSION"
       bundle "inject 'rack' '> 0'"
       expect(err).to match(/trying to install in deployment mode after changing/)
 
-      expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
+      expect(bundled_app_lock.read).not_to match(/rack-obama/)
     end
   end
 end

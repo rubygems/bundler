@@ -33,7 +33,7 @@ RSpec.describe "bundle check" do
 
     bundle "check"
 
-    expect(bundled_app("Gemfile.lock")).to exist
+    expect(bundled_app_lock).to exist
   end
 
   it "does not create a Gemfile.lock if --dry-run was passed" do
@@ -46,7 +46,7 @@ RSpec.describe "bundle check" do
 
     bundle "check --dry-run"
 
-    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(bundled_app_lock).not_to exist
   end
 
   it "prints a generic error if the missing gems are unresolvable" do
@@ -232,7 +232,7 @@ RSpec.describe "bundle check" do
     G
 
     bundle! "install", forgotten_command_line_options(:deployment => true)
-    FileUtils.rm(bundled_app("Gemfile.lock"))
+    FileUtils.rm(bundled_app_lock)
 
     bundle :check
     expect(last_command).to be_failure

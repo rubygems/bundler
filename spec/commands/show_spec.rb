@@ -14,7 +14,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
 
       bundle! "show"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app_lock).to exist
     end
 
     it "creates a Gemfile.lock when invoked with a gem name" do
@@ -22,7 +22,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
 
       bundle! "show rails"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app_lock).to exist
     end
 
     it "prints path if gem exists in bundle" do

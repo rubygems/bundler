@@ -177,7 +177,7 @@ RSpec.describe Bundler::Env do
           ### Gemfile.lock
 
           ```
-          <No #{bundled_app("Gemfile.lock")} found>
+          <No #{bundled_app_lock} found>
           ```
         ENV
       end

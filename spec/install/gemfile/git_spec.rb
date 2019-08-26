@@ -481,7 +481,7 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      lockfile0 = File.read(bundled_app("Gemfile.lock"))
+      lockfile0 = File.read(bundled_app_lock)
 
       FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
       update_git "rack", "0.8", :path => lib_path("local-rack") do |s|
@@ -491,7 +491,7 @@ RSpec.describe "bundle install with git sources" do
       bundle %(config set local.rack #{lib_path("local-rack")})
       run "require 'rack'"
 
-      lockfile1 = File.read(bundled_app("Gemfile.lock"))
+      lockfile1 = File.read(bundled_app_lock)
       expect(lockfile1).not_to eq(lockfile0)
     end
 
@@ -503,7 +503,7 @@ RSpec.describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      lockfile0 = File.read(bundled_app("Gemfile.lock"))
+      lockfile0 = File.read(bundled_app_lock)
 
       FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
       update_git "rack", "0.8", :path => lib_path("local-rack")
@@ -511,7 +511,7 @@ RSpec.describe "bundle install with git sources" do
       bundle %(config set local.rack #{lib_path("local-rack")})
       bundle :install
 
-      lockfile1 = File.read(bundled_app("Gemfile.lock"))
+      lockfile1 = File.read(bundled_app_lock)
       expect(lockfile1).not_to eq(lockfile0)
     end
 
@@ -965,7 +965,7 @@ RSpec.describe "bundle install with git sources" do
       gem "bar", :git => "#{lib_path("nested")}"
     G
 
-    expect(File.read(bundled_app("Gemfile.lock")).scan("GIT").size).to eq(1)
+    expect(File.read(bundled_app_lock).scan("GIT").size).to eq(1)
   end
 
   describe "switching sources" do
@@ -1025,8 +1025,8 @@ RSpec.describe "bundle install with git sources" do
       update_git "valim"
       new_revision = revision_for(lib_path("valim-1.0"))
 
-      old_lockfile = File.read(bundled_app("Gemfile.lock"))
-      lockfile(bundled_app("Gemfile.lock"), old_lockfile.gsub(/revision: #{old_revision}/, "revision: #{new_revision}"))
+      old_lockfile = File.read(bundled_app_lock)
+      lockfile(bundled_app_lock, old_lockfile.gsub(/revision: #{old_revision}/, "revision: #{new_revision}"))
 
       bundle "install"
 

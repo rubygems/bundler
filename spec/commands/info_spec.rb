@@ -15,7 +15,7 @@ RSpec.describe "bundle info" do
 
       bundle! "info rails"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app_lock).to exist
     end
 
     it "prints information if gem exists in bundle" do

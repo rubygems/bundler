@@ -221,7 +221,7 @@ RSpec.describe "bundle binstubs <gem>" do
 
       context "without a lockfile" do
         it "falls back to the latest installed bundler" do
-          FileUtils.rm bundled_app("Gemfile.lock")
+          FileUtils.rm bundled_app_lock
           sys_exec! bundled_app("bin/bundle").to_s
           expect(out).to eq "system bundler #{system_bundler_version}\n[]"
         end

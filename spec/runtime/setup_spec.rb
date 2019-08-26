@@ -218,7 +218,7 @@ RSpec.describe "Bundler.setup" do
       Bundler.setup
     R
 
-    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(bundled_app_lock).not_to exist
   end
 
   it "doesn't change the Gemfile.lock if the setup fails" do
@@ -227,7 +227,7 @@ RSpec.describe "Bundler.setup" do
       gem "rack"
     G
 
-    lockfile = File.read(bundled_app("Gemfile.lock"))
+    lockfile = File.read(bundled_app_lock)
 
     gemfile <<-G
       source "#{file_uri_for(gem_repo1)}"
@@ -241,7 +241,7 @@ RSpec.describe "Bundler.setup" do
       Bundler.setup
     R
 
-    expect(File.read(bundled_app("Gemfile.lock"))).to eq(lockfile)
+    expect(File.read(bundled_app_lock)).to eq(lockfile)
   end
 
   it "makes a Gemfile.lock if setup succeeds" do
@@ -250,12 +250,12 @@ RSpec.describe "Bundler.setup" do
       gem "rack"
     G
 
-    File.read(bundled_app("Gemfile.lock"))
+    File.read(bundled_app_lock)
 
-    FileUtils.rm(bundled_app("Gemfile.lock"))
+    FileUtils.rm(bundled_app_lock)
 
     run "1"
-    expect(bundled_app("Gemfile.lock")).to exist
+    expect(bundled_app_lock).to exist
   end
 
   describe "$BUNDLE_GEMFILE" do
@@ -460,7 +460,7 @@ RSpec.describe "Bundler.setup" do
     it "provides a good exception if the lockfile is unavailable" do
       bundle "install"
 
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(bundled_app_lock)
 
       break_git!
 
