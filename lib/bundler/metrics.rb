@@ -68,6 +68,8 @@ module Bundler
       @command_metrics["command"] = command
       options = Bundler.settings.all.join(",")
       @command_metrics["options"] = options unless options.empty?
+
+      return if ARGV.first == "exec"
       require "time"
       @command_metrics["timestamp"] = Time.now.utc.iso8601
     end
@@ -85,15 +87,15 @@ module Bundler
 
     def self.send_metrics
       begin
-        uri = URI "https://rubygems.org/api/metrics"
+        uri = URI "http://localhost:3000/api/metrics"
         # use persistent connection to so we can use a single connection to rubygems
         require_relative "vendored_persistent"
         http = Bundler::Persistent::Net::HTTP::Persistent.new
         post = Net::HTTP::Post.new(uri)
-        # JSON format is required to properly access the keys in the backend API
-        post["Content-Type"] = "application/json"
-        require "json"
-        post.body = read_from_file.to_json
+        # YAML format is required to properly access the keys in the backend API, as we cant "require json" in bundler
+        post["Content-Type"] = "application/vnd.yaml"
+        require "yaml"
+        post.body = read_from_file.to_yaml
         http.request(uri, post)
       rescue Bundler::Persistent::Net::HTTP::Persistent::Error, Errno::ENETUNREACH, Errno::ENOENT
         "Connection failed"
@@ -198,8 +200,8 @@ module Bundler
     def self.write_to_file
       SharedHelpers.filesystem_access(@path) do |file|
         FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
-        require_relative "psyched_yaml"
-        File.open(file, "a") {|f| f.write(Psych.dump(@command_metrics)) }
+        require_relative "yaml_serializer"
+        File.open(file, "a") { |f| f.write(YAMLSerializer.dump(@command_metrics)) }
       end
     end
 
@@ -214,8 +216,8 @@ module Bundler
       return {} unless valid_file
       list = Array.new
       SharedHelpers.filesystem_access(@path, :read) do |file|
-        require_relative "psyched_yaml"
-        list = Psych.load_stream(file.read)
+        require "yaml"
+        list = YAML.load_stream(file.read)
       end
       list << @system_metrics
     end

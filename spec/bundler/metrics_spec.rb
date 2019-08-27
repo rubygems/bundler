@@ -105,7 +105,7 @@ RSpec.describe Bundler::Metrics do
 
       it "Should write the recorded info into the file" do
         file_data = Bundler::Metrics.send(:read_from_file)
-        expect(file_data[0]["command_time_taken"]).to eq(670)
+        expect(file_data[0]["command_time_taken"]).to eq(670.to_s)
         expect(file_data[0]["command"]).to match(/(--)+.*/).or match(/(spec)+.*/).or eq(nil)
         expect(file_data[0]["timestamp"]).to match(/\d{4}-\d{2}-\d{2}\S\d{2}:\d{2}:\d{2}\S/)
         expect(file_data[0]["options"]).to match(/(spec)+.*/)
@@ -114,7 +114,7 @@ RSpec.describe Bundler::Metrics do
       it "Should write the recorded info into the file several times" do
         Bundler::Metrics.record(31)
         file_data = Bundler::Metrics.send(:read_from_file)
-        expect(file_data[-2]["command_time_taken"]).to eq(31)
+        expect(file_data[-2]["command_time_taken"]).to eq(31.to_s)
       end
     end
   end
