@@ -112,7 +112,7 @@ _anything_ wrong as the release manager.
 #### Branching
 
 Minor releases of the next version start with a new release branch from the
-current state of master: `1-12-stable`, and are immediately followed by a `.pre.0` release.
+current state of master: `1-12-stable`, and are immediately followed by a `.pre.1` release.
 
 Once that `-stable` branch has been cut from `master`, changes for that minor
 release series (1.12) will only be made _intentionally_, via patch releases.
