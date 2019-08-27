@@ -1,3 +1,101 @@
+## 2.1.0.pre.1
+
+One of the biggest changes in bundler 2.1.0 is that deprecations for upcoming
+breaking changes in bundler 3 will be turned on by default. We do this to grab
+feedback and comunicate early to our users the kind of changes we're intending
+to ship with bundler 3. See
+[#6965](https://github.com/bundler/bundler/pull/6965).
+
+Another important improvement is a better coexistence between bundler
+installations and the default copy of bundler that comes with ruby installed as
+a default gem. Since bundler is shipped as a default gem with ruby, a number of
+users have been affected by issues where bundler ends up failing due to version
+mismatches, because at some point of the execution, bundler switches to run the
+default copy instead of the expected version. A number of PRs have been focused
+on minimizing (hopefully eliminating) this, such as
+[#7100](https://github.com/bundler/bundler/pull/7100),
+[#7137](https://github.com/bundler/bundler/pull/7137),
+[#6996](https://github.com/bundler/bundler/pull/6996),
+[#7056](https://github.com/bundler/bundler/pull/7056),
+[#7062](https://github.com/bundler/bundler/pull/7062),
+[#7193](https://github.com/bundler/bundler/pull/7193),
+[#7216](https://github.com/bundler/bundler/pull/7216),
+[#7274](https://github.com/bundler/bundler/pull/7274)
+
+Deprecations:
+
+  * See the [the upgrading document](UPGRADING.md) for a detailed explanation of
+    the deprecations that are getting enabled in bundler 2.1, and the future
+    breaking changes in bundler 3.
+
+Features:
+
+  - Reimplement `config` command using subcommands ([#5981](https://github.com/bundler/bundler/pull/5981))
+  - Add `bundle plugin list` command ([#6120](https://github.com/bundler/bundler/pull/6120))
+  - Introduce a `bundle lock --gemfile` flag ([#6748](https://github.com/bundler/bundler/pull/6748))
+  - Add local git repository source option (`--local_git`) to plugin installation ([#6749](https://github.com/bundler/bundler/pull/6749))
+  - Add `quiet` flag to inline bundler ([#6828](https://github.com/bundler/bundler/pull/6828))
+  - Introduce a `prefer_patch` configuration that makes `bundle update` behave like `bundle update --patch` ([#6931](https://github.com/bundler/bundler/pull/6931))
+  - Introduce `Bundler.original_system` and `Bundler.original_exec` to shell out or exec to external programs using the original environment before bundler was loaded ([#7052](https://github.com/bundler/bundler/pull/7052))
+  - Add feature parity to `bundle info GEM` with respect to the old deprecated command `bundle show GEM` [#7026](https://github.com/bundler/bundler/pull/7026)
+  - Introduce `bundle list` to list groups of gems in your Gemfile. This command was actually documented, but was working as an alias to `bundle show` so this could also be considered a bug fix :) [#7072](https://github.com/bundler/bundler/pull/7072)
+  - Introduce `bundle outdated --filter-strict` as an alias to `bundle outdated --strict` [#6030](https://github.com/bundler/bundler/pull/6030)
+  - Add `:git` and `:branch` options to `bundle add` ([#7127](https://github.com/bundler/bundler/pull/7127))
+  - Add `:ruby_26` as a valid value to the `:platform(s)` dsl ([#7155](https://github.com/bundler/bundler/pull/7155))
+  - Let the `bundle cache` command include all features currently provided by `bundle package` ([#7249](https://github.com/bundler/bundler/pull/7249))
+  - Several improvements on new gem templates ([#6924](https://github.com/bundler/bundler/pull/6924), [#6968](https://github.com/bundler/bundler/pull/6968), [#7209](https://github.com/bundler/bundler/pull/7209), [#7222](https://github.com/bundler/bundler/pull/7222), [#7238](https://github.com/bundler/bundler/pull/7238))
+  - Add `--[no-]git` option to `bundle gem` to generate non source control gems. Useful for monorepos, for example ([#7263](https://github.com/bundler/bundler/pull/7263))
+
+Bugfixes:
+
+  - Raise when the same gem is available in multiple sources, and show a suggestion to solve it ([#5985](https://github.com/bundler/bundler/pull/5985))
+  - Validate that bundler has permissions to write to the tmp directory, and raise with a meaningful error otherwise ([#5954](https://github.com/bundler/bundler/pull/5954))
+  - Remove downloaded `.gem` file from the cache if it's corrupted ([#6010](https://github.com/bundler/bundler/pull/6010))
+  - Fix generated README in new gems to explicitly suggest running `bundle install`, so that the outcome is independent from the major version of bundler being run ([#6068](https://github.com/bundler/bundler/pull/6068))
+  - Fix `bundle outdated --group NAME` when the group is listed second in the Gemfile ([#6116](https://github.com/bundler/bundler/pull/6116))
+  - Improve conflict resolution messages by not calling "ruby" a gem when conflict happens in the `required_ruby_version`, and by filtering out requirements that didn't contribute to the conflict ([#6647](https://github.com/bundler/bundler/pull/6647))
+  - Avoid fetching and rebuilding git gems whenever any gem is changed in the Gemfile ([#6711](https://github.com/bundler/bundler/pull/6711))
+  - Include the exact bundler version in the lock file in the suggested command when bundler warns about version mismatches of itself [#6971](https://github.com/bundler/bundler/pull/6971)
+  - Fix plugins being installed every time a command is run #[#6978](https://github.com/bundler/bundler/pull/6978)
+  - Fallback to sequentially fetching specs on 429s [#6728](https://github.com/bundler/bundler/pull/6728)
+  - Make `bundle clean` also clean native extensions for gems with a git source [#7058](https://github.com/bundler/bundler/pull/7058)
+  - Fix `bundle info bundler` to show the correct path to the bundler gem [#7026](https://github.com/bundler/bundler/pull/7026)
+  - Fix `bundle config build.<gem>` not sending multiple parameters to `extconf.rb` correctly [#7023](https://github.com/bundler/bundler/pull/7023)
+  - Fix bad error message on Gemfile errors under ruby 2.7 (still unreleased, but it's a bugfix for beta testers after all) [#7038](https://github.com/bundler/bundler/pull/7038)
+  - Warn about situations where multiple gems provide the same executable ([#7075](https://github.com/bundler/bundler/pull/7075))
+  - Ignore `frozen` setting in inline mode ([#7125](https://github.com/bundler/bundler/pull/7125))
+  - Fix incorrect "bundler attempted to update GEM but version stayed the same" message when updating git sourced gems ([#6325](https://github.com/bundler/bundler/pull/6325))
+  - Don't check for existance of a writable home directory if `BUNDLE_USER_HOME` is set ([#6885](https://github.com/bundler/bundler/pull/6885))
+  - Fix error message when server would respond to a bad username/password requiest with a 401 ([#6928](https://github.com/bundler/bundler/pull/6928))
+  - Fix `bundle outdated` pluralization when multiple groups are requested ([#7063](https://github.com/bundler/bundler/pull/7063))
+  - Fix `bundle install` not updating conservatively when gemspec is changed ([#7143](https://github.com/bundler/bundler/pull/7143))
+  - Fix `bundle exec` not respecting custom process titles inside scripts ([#7140](https://github.com/bundler/bundler/pull/7140))
+  - Fix `bundle update` message about exclude groups saying "installed" instead of "updated" ([#7150](https://github.com/bundler/bundler/pull/7150))
+  - Fix `bundle licenses` not showing correct information about bundler itself ([#7147](https://github.com/bundler/bundler/pull/7147))
+  - Fix installation path not including ruby scope when `BUNDLE_PATH` was set ([#7163](https://github.com/bundler/bundler/pull/7163))
+  - Fix `bundle clean` incorrectly removing git depedencies present in the Gemfile when rubygems 3.0+ was used and path involved a symlink ([#7211](https://github.com/bundler/bundler/pull/7211))
+  - Fix platform specific gems always being re-resolved when bundler was not running under that platform ([#7212](https://github.com/bundler/bundler/pull/7212))
+  - Fix `bundle package --all-platforms` causing `bundle install` to ignore `--with` and `--without` ([#6113](https://github.com/bundler/bundler/pull/6113))
+  - Fix `MissingRevision` git errors to include the specific `git` command that failed under the hood ([#7225](https://github.com/bundler/bundler/pull/7225))
+  - Fix using gemspec & `force_ruby_platform` on Windows ([#6809](https://github.com/bundler/bundler/pull/6809))
+  - Make bundler's binstub checks on bundler version consistent with rubygems `BundlerVersionFinder` ([#7259](https://github.com/bundler/bundler/pull/7259))
+  - Fix `bundle install` and `bundle update` generating different lockfiles when `path:` gems with relative paths starting with "./" were used ([#7264](https://github.com/bundler/bundler/pull/7264))
+  - Give a proper error when user tries to `bundle open` a default gem ([#7288](https://github.com/bundler/bundler/pull/7288))
+  - Fix `bundle doctor` command ([#7309](https://github.com/bundler/bundler/pull/7309))
+  - Fix bundler giving an unclear recommendation when duplicated gems are found in the Gemfile ([#7302](https://github.com/bundler/bundler/pull/7302))
+
+Documentation:
+
+  - Fix typo on a file extension in `bundle.ronn` [#7146](https://github.com/bundler/bundler/pull/7146)
+  - Fix incorrect default value for `cache_path` configuration ([#7229](https://github.com/bundler/bundler/pull/7229))
+  - Binstubs documentation has been improved ([#5889](https://github.com/bundler/bundler/pull/5889))
+  - Fix incorrect sections when explaining `:git`, `:branch`, and `:ref` options ([#7265](https://github.com/bundler/bundler/pull/7265))
+  - Fix mentions to remembered options in docs to explain the current state ([#7242](https://github.com/bundler/bundler/pull/7242))
+
+Internally, there's also been a bunch of improvements in our development
+environment, test suite, policies, contributing docs, and a bunch of cleanups of
+old compatibility code.
+
 ## 2.0.2 (2019-06-13)
 
 Changes:
@@ -63,8 +161,8 @@ Note: To upgrade your Gemfile to Bundler 2 you will need to run `bundle update -
 
 Breaking Changes:
 
-  - Dropped support for versions of Ruby < 2.3
-  - Dropped support for version of RubyGems < 2.5
+  - Dropped support for versions of Ruby under 2.3
+  - Dropped support for version of RubyGems under 2.5
   - Moved error messages from STDOUT to STDERR
 
 Note: To upgrade your Gemfile to Bundler 2 you will need to run `bundle update --bundler`
@@ -2812,7 +2910,7 @@ isolation.
   - Fixes an obscure bug where switching the source of a gem could fail to correctly
     change the source of its dependencies
   - Support multiple version dependencies in the Gemfile
-    (gem "rails", ">= 3.0.0.beta1", "<= 3.0.0")
+    (`gem "rails", ">= 3.0.0.beta1", "<= 3.0.0"`)
   - Raise an exception for ambiguous uses of multiple declarations of the same gem
     (for instance, with different versions or sources).
   - Fix cases where the same dependency appeared several times in the Gemfile.lock
