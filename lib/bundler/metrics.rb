@@ -69,6 +69,7 @@ module Bundler
       options = Bundler.settings.all.join(",")
       @command_metrics["options"] = options unless options.empty?
 
+      # We cant require things when `bundle exec` is run
       return if ARGV.first == "exec"
       require "time"
       @command_metrics["timestamp"] = Time.now.utc.iso8601
@@ -201,7 +202,7 @@ module Bundler
       SharedHelpers.filesystem_access(@path) do |file|
         FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
         require_relative "yaml_serializer"
-        File.open(file, "a") { |f| f.write(YAMLSerializer.dump(@command_metrics)) }
+        File.open(file, "a") {|f| f.write(YAMLSerializer.dump(@command_metrics)) }
       end
     end
 
