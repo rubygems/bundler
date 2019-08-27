@@ -53,24 +53,27 @@ that we plan to make to this set of commands and options.
   variables, application configuration, or machine configuration. For example,
   with `bundle config set without development test`.
 
+  The removal of this kind of flag also applies to analogous commands, for
+  example, to `bundle check --path`.
+
 * The `--force` flag to `bundle install` and `bundle update` has been renamed to `--redownload`.
 
-  This is just a simple renaming of the flag, to make more apparent what it
+  This is just a simple rename of the flag, to make more apparent what it
   actually does. This flag forces redownloading every gem, it doesn't "force"
   anything else.
 
 * `bundle viz` will be removed and extracted to a plugin.
 
   This is the only bundler command requiring external dependencies, both an OS
-  dependency (the `graphviz` package) a gem dependency (the `ruby-graphviz`
+  dependency (the `graphviz` package) and a gem dependency (the `ruby-graphviz`
   gem). Removing these dependencies will make development easier and it was also
-  seen by the bundler team as an opportunity to develop a [bundler plugin] that
-  it's officially maintained by the bundler team, and that users can take as a
-  reference to develop their own plugins. The plugin contains the same code as
-  the old core command, the only difference being that the command is now
-  implemented as `bundle graph` which is much easier to understand. Have a look
-  at https://github.com/bundler/bundle-viz for more information about how to
-  install and use the new plugin.
+  seen by the bundler team as an opportunity to develop a [bundler
+  plugin](https://github.com/bundler/bundle-viz) that it's officially maintained
+  by the bundler team, and that users can take as a reference to develop their
+  own plugins. The plugin contains the same code as the old core command, the
+  only difference being that the command is now implemented as `bundle graph`
+  hich is much easier to understand. Have a look at the plugin's repo for more
+  information about how to install and use the new plugin.
 
 * The `bundle console` will be removed and replaced with `bin/console`.
 
@@ -80,22 +83,14 @@ that we plan to make to this set of commands and options.
   in favor of a `bin/console` script created by `bundle gem` on gem generation
   that users can tweak to their needs.
 
-  [NOTE: Should we provide an easy way to add `bin/console` to an existing gem?]
-
 * The `bundle update` command will no longer update all gems, you'll need to pass `--all` to it.
 
-  [NOTE: I'm not elaborating on this change yet because I have hesitations about
-  it which I've mentioned in https://github.com/bundler/bundler/pull/7008. After
-  reading up on it a bit more and seeing that it all starts with "many people
-  think that they should run bundle update after git pull", I wonder even more.
-  Why is this? Isn't this a documentation issue that shouldn't make us change
-  bundler?]
+  The bundler team considers that updating all gems at once should not be the
+  main use case for this command, and that it's better to upgrade gems one at a
+  time (or in groups of related gems). You can still upgrade all gems at once,
+  but now you need the `--all` flag.
 
 * The `bundle install` command will no longer accept a `--binstubs` flag.
-
-  [NOTE: I'm not sure if I got the rationale for this one right, and I couln't
-  find any related Github discussion other than an upgrading document in the
-  2-0-stable flag that mentions it. Please double check this]
 
   The `--binstubs` option has been removed from `bundle install` and replaced
   with the `bundle binstubs` command. The `--binstubs` flag would create
@@ -201,7 +196,9 @@ unambiguously defined.
   gem "dependency2", git: "https://my_git_repo_with_gems"
   ```
 
-  or use the block forms:
+  or use the block forms if you have multiple gems for each source and you want
+  to be a bit DRYer:
+
 
   ```ruby
   path "/my/path/with/gems" do
@@ -216,8 +213,6 @@ unambiguously defined.
     # gem "dependencyn"
   end
   ```
-
-  if you have multiple gems for each source and you want to be a bit DRYer.
 
 #### Misc deprecations
 
