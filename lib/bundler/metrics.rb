@@ -198,7 +198,7 @@ module Bundler
     def self.write_to_file
       SharedHelpers.filesystem_access(@path) do |file|
         FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
-        require "psych"
+        require_relative "psyched_yaml"
         File.open(file, "a") {|f| f.write(Psych.dump(@command_metrics)) }
       end
     end
@@ -214,7 +214,7 @@ module Bundler
       return {} unless valid_file
       list = Array.new
       SharedHelpers.filesystem_access(@path, :read) do |file|
-        require "psych"
+        require_relative "psyched_yaml"
         list = Psych.load_stream(file.read)
       end
       list << @system_metrics
