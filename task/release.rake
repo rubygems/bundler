@@ -4,7 +4,7 @@ require "bundler/gem_tasks"
 task :build => ["build_metadata"] do
   Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
 end
-task :release => ["release:verify_docs", "release:verify_files", "release:verify_github", "build_metadata"]
+task :release => ["release:verify_docs", "release:verify_files", "release:verify_github", "build_metadata", "release:github"]
 
 namespace :release do
   task :verify_docs => :"man:check"
@@ -141,10 +141,6 @@ namespace :release do
                   :body => release_notes(version),
                   :prerelease => version.prerelease?,
                 }
-  end
-
-  task :release do |args|
-    Rake::Task["release:github"].invoke(args.version)
   end
 
   desc "Make a patch release with the PRs from master in the patch milestone"
