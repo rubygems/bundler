@@ -88,7 +88,7 @@ module Bundler
 
     def self.send_metrics
       begin
-        uri = URI "http://localhost:3000/api/metrics"
+        uri = URI "https://rubygems.org/api/metrics"
         # use persistent connection to so we can use a single connection to rubygems
         require_relative "vendored_persistent"
         http = Bundler::Persistent::Net::HTTP::Persistent.new
@@ -201,6 +201,7 @@ module Bundler
     def self.write_to_file
       SharedHelpers.filesystem_access(@path) do |file|
         FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
+        # bundle exec goes through here, so avoid requiring a default gem
         require_relative "yaml_serializer"
         File.open(file, "a") {|f| f.write(YAMLSerializer.dump(@command_metrics)) }
       end
@@ -217,7 +218,6 @@ module Bundler
       return {} unless valid_file
       list = Array.new
       SharedHelpers.filesystem_access(@path, :read) do |file|
-        require "yaml"
         list = YAML.load_stream(file.read)
       end
       list << @system_metrics
