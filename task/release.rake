@@ -129,6 +129,7 @@ namespace :release do
     relevant.join("\n").strip
   end
 
+  desc "Push the release to Github releases"
   task :github, :version do |_t, args|
     version = Gem::Version.new(args.version)
     tag = "v#{version}"
