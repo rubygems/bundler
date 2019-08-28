@@ -4,7 +4,7 @@ require "bundler/gem_tasks"
 task :build => ["build_metadata"] do
   Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
 end
-task :release => ["release:verify_docs", "release:verify_files", "release:verify_github", "build_metadata", "release:github"]
+task "release:rubygem_push" => ["release:verify_docs", "release:verify_files", "release:verify_github", "build_metadata", "release:github"]
 
 namespace :release do
   task :verify_docs => :"man:check"
