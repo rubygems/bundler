@@ -1,7 +1,7 @@
 > GET /info/cocaine
 > accept-encoding: gzip
 > accept: */*
-> user-agent: bundler/2.1.0.pre.1 rubygems/3.1.0.pre1 ruby/2.6.3 (x86_64-pc-linux-gnu) command/lock options/spec_run f427fa475572fe0f
+> user-agent: bundler/2.1.0.pre.1 rubygems/3.1.0.pre1 ruby/2.6.4 (x86_64-pc-linux-gnu) command/lock options/spec_run 01cd63ebbe19f3e8
 > connection: keep-alive
 > keep-alive: 30
 > host: index.rubygems.org
