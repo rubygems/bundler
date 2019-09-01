@@ -1,4 +1,4 @@
-## 2.1.0.pre.1
+## 2.1.0.pre.1 (August 28, 2019)
 
 One of the biggest changes in bundler 2.1.0 is that deprecations for upcoming
 breaking changes in bundler 3 will be turned on by default. We do this to grab
