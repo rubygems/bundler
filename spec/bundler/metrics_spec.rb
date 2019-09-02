@@ -2,11 +2,10 @@
 
 require "bundler/metrics"
 require "net/http"
-require "time"
-require "securerandom"
 
 RSpec.describe Bundler::Metrics do
   Bundler::Metrics.opt_out = false
+  Bundler::Metrics.instance_variable_set(:@system_metrics, Hash.new) unless Bundler::Metrics.instance_variable_get(:@system_metrics)
   describe "#record_system_info" do
     before do
       Bundler::Metrics.send(:record_system_info)
@@ -121,6 +120,7 @@ RSpec.describe Bundler::Metrics do
 
   describe "#send_metrics" do
     it "Makes a connection to an HTTP server" do
+      require "yaml"
       uri = URI.parse("https://www.example.com")
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
@@ -128,6 +128,7 @@ RSpec.describe Bundler::Metrics do
 
     describe "read_from_file" do
       before do
+        require "yaml"
         Bundler::Metrics.record(4.2)
         Bundler::Metrics.send(:write_to_file)
       end
