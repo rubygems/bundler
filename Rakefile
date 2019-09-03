@@ -187,6 +187,7 @@ namespace :man do
       Spec::Rubygems.gem_require("ronn")
     rescue Gem::LoadError => e
       task(:build) { abort "We couln't activate ronn (#{e.requirement}). Try `gem install ronn:'#{e.requirement}'` to be able to build the help pages" }
+      task(:check) { abort "We couln't activate ronn (#{e.requirement}). Try `gem install ronn:'#{e.requirement}'` to be able to build the help pages" }
     else
       directory "man"
 
