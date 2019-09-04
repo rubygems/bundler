@@ -274,9 +274,6 @@ rescue Gem::LoadError => e
 
     desc "Vendor a specific version of net-http-persistent"
     task(:"net-http-persistent") { abort msg }
-
-    desc "Vendor a specific version of connection_pool"
-    task(:connection_pool) { abort msg }
   end
 else
   desc "Vendor a specific version of molinillo"
@@ -309,15 +306,8 @@ else
     lib.vendor_lib = "lib/bundler/vendor/fileutils"
   end
 
-  # Currently `net-http-persistent` and it's dependency `connection_pool` are
-  # vendored separately, but `connection_pool` references inside the vendored
-  # copy of `net-http-persistent` are not properly updated to refer to the
-  # vendored copy of `connection_pool`, so they need to be manually updated.
-  # This will be automated once https://github.com/segiddins/automatiek/pull/3
-  # is included in `automatiek` and we start using the new API for vendoring
-  # subdependencies.
-  # Besides that, we currently cherry-pick changes to use `require_relative`
-  # internally instead of regular `require`. They are pending review at
+  # We currently cherry-pick changes to use `require_relative` internally
+  # instead of regular `require`. They are pending review at
   # https://github.com/drbrain/net-http-persistent/pull/106
   desc "Vendor a specific version of net-http-persistent"
   Automatiek::RakeTask.new("net-http-persistent") do |lib|
@@ -325,14 +315,14 @@ else
     lib.namespace = "Net::HTTP::Persistent"
     lib.prefix = "Bundler::Persistent"
     lib.vendor_lib = "lib/bundler/vendor/net-http-persistent"
-  end
 
-  desc "Vendor a specific version of connection_pool"
-  Automatiek::RakeTask.new("connection_pool") do |lib|
-    lib.download = { :github => "https://github.com/mperham/connection_pool" }
-    lib.namespace = "ConnectionPool"
-    lib.prefix = "Bundler"
-    lib.vendor_lib = "lib/bundler/vendor/connection_pool"
+    lib.dependency("connection_pool") do |sublib|
+      sublib.version = "v2.2.2"
+      sublib.download = { :github => "https://github.com/mperham/connection_pool" }
+      sublib.namespace = "ConnectionPool"
+      sublib.prefix = "Bundler"
+      sublib.vendor_lib = "lib/bundler/vendor/connection_pool"
+    end
   end
 end
 
