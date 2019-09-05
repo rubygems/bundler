@@ -1,3 +1,10 @@
+## 2.1.0.pre.2
+
+Bugfixes:
+
+  - Fix `bundle clean` trying to delete non-existent directory ([#7340](https://github.com/bundler/bundler/pull/7340))
+  - Fix warnings about keywork argument separation on ruby 2.7 ([#7337](https://github.com/bundler/bundler/pull/7337))
+
 ## 2.1.0.pre.1 (August 28, 2019)
 
 One of the biggest changes in bundler 2.1.0 is that deprecations for upcoming
