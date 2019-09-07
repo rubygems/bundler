@@ -14,7 +14,7 @@ RSpec.describe Bundler::Metrics do
   end
 
   describe "#record_system_info" do
-    before do
+    before(:each) do
       Bundler::Metrics.send(:record_system_info)
     end
     it "builds system_metrics with current ruby version and Bundler settings" do
@@ -62,7 +62,7 @@ RSpec.describe Bundler::Metrics do
   end
 
   describe "#record_gem_info" do
-    before do
+    before(:each) do
       build_repo2 do
         build_gem "rails", "3.0" do |s|
           s.add_dependency "bundler", ">= 0.9.0.pre"
@@ -187,7 +187,7 @@ RSpec.describe Bundler::Metrics do
     let(:spec_source) { instance_double("SpecSource") }
     let(:spec) { instance_double("Specification", :name => "dummy", :version => "0.0.1", :loaded_from => "dummy", :source => spec_source) }
     subject(:gem_installer) { Bundler::GemInstaller.new(spec, installer) }
-    before do
+    before(:each) do
       gem_installer.send(:install_error_message)
     end
 
