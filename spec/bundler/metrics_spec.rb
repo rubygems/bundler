@@ -4,7 +4,11 @@ require "bundler/metrics"
 require "net/http"
 
 RSpec.describe Bundler::Metrics do
-  Bundler::Metrics.opt_out = false
+  before(:all) do
+    Bundler::Metrics.opt_out = false
+    Bundler::Metrics.instance_variable_set(:@system_metrics, Hash.new)
+  end
+
   before(:each) do
     Bundler::Metrics.instance_variable_set(:@system_metrics, Hash.new) unless Bundler::Metrics.instance_variable_get(:@system_metrics)
   end
@@ -83,7 +87,7 @@ RSpec.describe Bundler::Metrics do
   end
 
   describe "#record" do
-    before do
+    before(:each) do
       path = Bundler::Metrics.instance_variable_get(:@path)
       open(path, File::TRUNC) if File.exist?(path)
       Bundler::Metrics.record(670)
@@ -131,7 +135,7 @@ RSpec.describe Bundler::Metrics do
     end
 
     describe "read_from_file" do
-      before do
+      before(:each) do
         require "yaml"
         Bundler::Metrics.record(4.2)
         Bundler::Metrics.send(:write_to_file)
@@ -164,7 +168,7 @@ RSpec.describe Bundler::Metrics do
   end
 
   describe "#record_single_metric" do
-    before do
+    before(:each) do
       Bundler::Metrics.record_single_metric("hopefully_this", "works")
     end
 
