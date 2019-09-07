@@ -86,7 +86,7 @@ REMEMBERING OPTIONS
 	      using the bundled gems.
 
        deployment
-	      In  deployment mode, Bundler will 'roll-out' the bundle for pro-
+	      In deployment mode, Bundler will 'roll-out' the bundle for  pro-
 	      duction  use.  Please  check  carefully if you want to have this
 	      option enabled in development or test environments.
 
@@ -219,8 +219,8 @@ LIST OF AVAILABLE KEYS
 	   ables  all  metric  collection  and	sending.  When	set  to  false
 	   (default), enables back all metrics collection and sending.
 
-       o   disable_multisource (BUNDLE_DISABLE_MULTISOURCE):  When  set,  Gem-
-	   files  containing  multiple	sources will produce errors instead of
+       o   disable_multisource	(BUNDLE_DISABLE_MULTISOURCE):  When  set, Gem-
+	   files containing multiple sources will produce  errors  instead  of
 	   warnings. Use bundle config unset disable_multisource to unset.
 
        o   disable_platform_warnings  (BUNDLE_DISABLE_PLATFORM_WARNINGS): Dis-
