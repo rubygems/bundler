@@ -134,7 +134,6 @@ module Bundler
 
         exit 1
       end
-      Metrics.record_and_send_full_info(Time.now - start)
     end
 
   private
