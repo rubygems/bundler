@@ -5,7 +5,10 @@ require "net/http"
 
 RSpec.describe Bundler::Metrics do
   Bundler::Metrics.opt_out = false
-  Bundler::Metrics.instance_variable_set(:@system_metrics, Hash.new) unless Bundler::Metrics.instance_variable_get(:@system_metrics)
+  before(:each) do
+    Bundler::Metrics.instance_variable_set(:@system_metrics, Hash.new) unless Bundler::Metrics.instance_variable_get(:@system_metrics)
+  end
+
   describe "#record_system_info" do
     before do
       Bundler::Metrics.send(:record_system_info)
