@@ -143,22 +143,11 @@ namespace :release do
                 }
   end
 
-  desc "Make a patch release with the PRs from master in the patch milestone"
-  task :patch, :version do |_t, args|
-    version = args.version
+  desc "Prepare a patch release with the PRs from master in the patch milestone"
+  task :prepare_patch do
+    version = bundler_spec.version.to_s
 
-    version ||= begin
-      version = bundler_spec.version
-      segments = version.segments
-      if segments.last.is_a?(String)
-        segments << "1"
-      else
-        segments[-1] += 1
-      end
-      segments.join(".")
-    end
-
-    confirm "You are about to release #{version}, currently #{bundler_spec.version}"
+    confirm "You are about to release #{version}"
 
     milestones = gh_api_request(:path => "repos/bundler/bundler/milestones?state=open")
     unless patch_milestone = milestones.find {|m| m["title"] == version }
@@ -172,17 +161,8 @@ namespace :release do
     end
     prs.compact!
 
-    bundler_spec.version = version
-
     branch = version.split(".", 3)[0, 2].push("stable").join("-")
     sh("git", "checkout", branch)
-
-    version_file = "lib/bundler/version.rb"
-    version_contents = File.read(version_file)
-    unless version_contents.sub!(/^(\s*VERSION = )"#{Gem::Version::VERSION_PATTERN}"/, "\\1#{version.to_s.dump}")
-      abort "failed to update #{version_file}, is it in the expected format?"
-    end
-    File.open(version_file, "w") {|f| f.write(version_contents) }
 
     commits = `git log --oneline origin/master --`.split("\n").map {|l| l.split(/\s/, 2) }.reverse
     commits.select! {|_sha, message| message =~ /(Auto merge of|Merge pull request|Merge) ##{Regexp.union(*prs)}/ }
@@ -193,19 +173,6 @@ namespace :release do
       warn "Opening a new shell to fix the cherry-pick errors"
       abort unless system("zsh")
     end
-
-    prs.each do |pr|
-      system("open", "https://github.com/bundler/bundler/pull/#{pr}")
-      confirm "Add to the changelog"
-    end
-
-    confirm "Update changelog"
-    sh("git", "commit", "-am", "Version #{version} with changelog")
-    sh("rake", "release")
-    sh("git", "checkout", "master")
-    sh("git", "pull")
-    sh("git", "merge", "v#{version}", "--no-edit")
-    sh("git", "push")
   end
 
   desc "Open all PRs that have not been included in a stable release"
