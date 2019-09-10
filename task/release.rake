@@ -162,7 +162,7 @@ namespace :release do
     prs.compact!
 
     branch = version.split(".", 3)[0, 2].push("stable").join("-")
-    sh("git", "checkout", branch)
+    sh("git", "checkout", "-b", "release/#{version}", branch)
 
     commits = `git log --oneline origin/master --`.split("\n").map {|l| l.split(/\s/, 2) }.reverse
     commits.select! {|_sha, message| message =~ /(Auto merge of|Merge pull request|Merge) ##{Regexp.union(*prs)}/ }
