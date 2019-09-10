@@ -147,8 +147,6 @@ namespace :release do
   task :prepare_patch do
     version = bundler_spec.version.to_s
 
-    confirm "You are about to release #{version}"
-
     milestones = gh_api_request(:path => "repos/bundler/bundler/milestones?state=open")
     unless patch_milestone = milestones.find {|m| m["title"] == version }
       abort "failed to find #{version} milestone on GitHub"
