@@ -165,7 +165,7 @@ RUBYGEMS PLUGINS
 
 
 
-	   ruby -rubygems -e "puts Gem.find_files('rubygems_plugin.rb')"
+	   ruby -rrubygems -e "puts Gem.find_files('rubygems_plugin.rb')"
 
 
 
