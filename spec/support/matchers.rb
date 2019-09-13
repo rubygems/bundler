@@ -170,7 +170,7 @@ module Spec
               end
             R
           rescue StandardError => e
-            next "checking for #{name} failed:\n#{e}"
+            next "checking for #{name} failed:\n#{e}\n#{e.backtrace.join("\n")}"
           end
           next if out == "WIN"
           next "expected #{name} to not be installed, but it was" if version.nil?
