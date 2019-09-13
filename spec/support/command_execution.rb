@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "support/helpers"
-require "support/path"
-
 module Spec
   CommandExecution = Struct.new(:command, :working_directory, :exitstatus, :stdout, :stderr) do
     include RSpec::Matchers::Composable
