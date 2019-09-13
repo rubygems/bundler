@@ -16,7 +16,6 @@ require "bundler"
 require "rspec"
 
 require_relative "support/builders"
-require_relative "support/command_execution"
 require_relative "support/filters"
 require_relative "support/helpers"
 require_relative "support/indexes"

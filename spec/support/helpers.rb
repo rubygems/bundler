@@ -2,6 +2,8 @@
 
 require "open3"
 
+require_relative "command_execution"
+
 module Spec
   module Helpers
     def reset!
