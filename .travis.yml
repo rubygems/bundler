@@ -2,7 +2,7 @@ language: ruby
 dist: bionic
 script: rake spec:travis
 before_script:
-  - travis_retry rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
+  - rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
   - travis_retry rake spec:travis:deps
   - rake man:check
 
