@@ -94,7 +94,6 @@ module Spec
       deps = reqs.concat(no_reqs).join(" ")
       gem = Path.gem_bin
       cmd = "#{gem} install #{deps} --no-document --conservative"
-      puts cmd
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
     end
   end
