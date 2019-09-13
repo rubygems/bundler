@@ -50,9 +50,6 @@ namespace :spec do
       # Install graphviz so that the viz specs can run
       sh "sudo apt-get install graphviz -y"
 
-      # Install the gems with a consistent version of RubyGems
-      sh "gem update --system 3.0.6"
-
       # Install the other gem deps, etc
       Rake::Task["spec:deps"].invoke
     end
