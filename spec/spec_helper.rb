@@ -15,10 +15,21 @@ end
 require "bundler"
 require "rspec"
 
-Dir["#{File.expand_path("../support", __FILE__)}/*.rb"].each do |file|
-  file = file.gsub(%r{\A#{Regexp.escape File.expand_path("..", __FILE__)}/}, "")
-  require file unless file.end_with?("hax.rb")
-end
+require_relative "support/builders"
+require_relative "support/command_execution"
+require_relative "support/filters"
+require_relative "support/helpers"
+require_relative "support/indexes"
+require_relative "support/matchers"
+require_relative "support/path"
+require_relative "support/parallel"
+require_relative "support/permissions"
+require_relative "support/platforms"
+require_relative "support/silent_logger"
+require_relative "support/sometimes"
+require_relative "support/streams"
+require_relative "support/sudo"
+require_relative "support/the_bundle"
 
 $debug = false
 
