@@ -2,8 +2,6 @@
 
 module Spec
   CommandExecution = Struct.new(:command, :working_directory, :exitstatus, :stdout, :stderr) do
-    include RSpec::Matchers::Composable
-
     def to_s
       c = Shellwords.shellsplit(command.strip).map {|s| s.include?("\n") ? " \\\n  <<EOS\n#{s.gsub(/^/, "  ").chomp}\nEOS" : Shellwords.shellescape(s) }
       c = c.reduce("") do |acc, elem|
