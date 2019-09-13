@@ -40,10 +40,7 @@ module Spec
     end
 
     def gem_load(gem_name, bin_container)
-      gem_activate(gem_name)
-      load Gem.bin_path(gem_name, bin_container)
-    rescue Gem::LoadError => e
-      warn "We couln't activate #{gem_name} (#{e.requirement}). Run `gem install #{gem_name}:'#{e.requirement}'`"
+      gem_load_and_activate(gem_name, bin_container)
     end
 
     def gem_require(gem_name)
@@ -77,6 +74,13 @@ module Spec
     end
 
   private
+
+    def gem_load_and_activate(gem_name, bin_container)
+      gem_activate(gem_name)
+      load Gem.bin_path(gem_name, bin_container)
+    rescue Gem::LoadError => e
+      warn "We couln't activate #{gem_name} (#{e.requirement}). Run `gem install #{gem_name}:'#{e.requirement}'`"
+    end
 
     def gem_activate(gem_name)
       gem_requirement = DEV_DEPS[gem_name]
