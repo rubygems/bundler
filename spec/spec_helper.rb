@@ -22,8 +22,6 @@ end
 
 $debug = false
 
-Spec::Manpages.setup unless Gem.win_platform?
-
 module Gem
   def self.ruby=(ruby)
     @ruby = ruby
@@ -68,12 +66,11 @@ RSpec.configure do |config|
 
   git_version = Bundler::Source::Git::GitProxy.new(nil, nil, nil).version
 
-  config.filter_run_excluding :ruby => RequirementChecker.against(RUBY_VERSION)
   config.filter_run_excluding :rubygems => RequirementChecker.against(Gem::VERSION)
   config.filter_run_excluding :git => RequirementChecker.against(git_version)
   config.filter_run_excluding :bundler => RequirementChecker.against(Bundler::VERSION.split(".")[0])
-  config.filter_run_excluding :ruby_repo => !(ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"]).nil?
-  config.filter_run_excluding :non_windows => Gem.win_platform?
+  config.filter_run_excluding :ruby_repo => !ENV["GEM_COMMAND"].nil?
+  config.filter_run_excluding :no_color_tty => Gem.win_platform? || !ENV["GITHUB_ACTION"].nil?
 
   config.filter_run_when_matching :focus unless ENV["CI"]
 
@@ -89,12 +86,12 @@ RSpec.configure do |config|
   end
 
   config.around :each do |example|
-    if ENV["BUNDLE_RUBY"]
+    if ENV["RUBY"]
       orig_ruby = Gem.ruby
-      Gem.ruby = ENV["BUNDLE_RUBY"]
+      Gem.ruby = ENV["RUBY"]
     end
     example.run
-    Gem.ruby = orig_ruby if ENV["BUNDLE_RUBY"]
+    Gem.ruby = orig_ruby if ENV["RUBY"]
   end
 
   config.before :suite do
@@ -102,13 +99,14 @@ RSpec.configure do |config|
     ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
     ENV["BUNDLE_SPEC_RUN"] = "true"
     ENV["BUNDLE_USER_CONFIG"] = ENV["BUNDLE_USER_CACHE"] = ENV["BUNDLE_USER_PLUGIN"] = nil
+    ENV["GEMRC"] = nil
 
     # Don't wrap output in tests
     ENV["THOR_COLUMNS"] = "10000"
 
     original_env = ENV.to_hash
 
-    if ENV["BUNDLE_RUBY"]
+    if ENV["RUBY"]
       FileUtils.cp_r Spec::Path.bindir, File.join(Spec::Path.root, "lib", "exe")
     end
   end
@@ -139,7 +137,7 @@ RSpec.configure do |config|
   end
 
   config.after :suite do
-    if ENV["BUNDLE_RUBY"]
+    if ENV["RUBY"]
       FileUtils.rm_rf File.join(Spec::Path.root, "lib", "exe")
     end
   end

@@ -156,6 +156,8 @@ module Bundler
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME).#{" Bundler will remember this value for future installs on this machine" unless Bundler.feature_flag.forget_cli_options?}"
     map "c" => "check"
     def check
+      remembered_flag_deprecation("path")
+
       require_relative "cli/check"
       Check.new(options).run
     end
@@ -205,7 +207,7 @@ module Bundler
     method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME).#{" Bundler will remember this value for future installs on this machine" unless Bundler.feature_flag.forget_cli_options?}"
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
     method_option "shebang", :type => :string, :banner =>
@@ -411,9 +413,10 @@ module Bundler
     end
 
     desc "#{Bundler.feature_flag.bundler_3_mode? ? :cache : :package} [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
-    method_option "all",  :type => :boolean,
-                          :default => Bundler.feature_flag.cache_all?,
-                          :banner => "Include all sources (including path and git)."
+    unless Bundler.feature_flag.cache_all?
+      method_option "all",  :type => :boolean,
+                            :banner => "Include all sources (including path and git)."
+    end
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not only the current one"
     method_option "cache-path", :type => :string, :banner =>
       "Specify a different cache path than the default (vendor/cache)."
@@ -421,7 +424,7 @@ module Bundler
     method_option "no-install", :type => :boolean, :banner => "Don't install the gems, only the package."
     method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME).#{" Bundler will remember this value for future installs on this machine" unless Bundler.feature_flag.forget_cli_options?}"
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     method_option "frozen", :type => :boolean, :banner =>
       "Do not allow the Gemfile.lock to be updated after this package operation's install"
@@ -537,6 +540,7 @@ module Bundler
                          :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find {|e| !e.nil? && !e.empty? },
                          :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
     method_option :ext, :type => :boolean, :default => false, :desc => "Generate the boilerplate for C extension code"
+    method_option :git, :type => :boolean, :default => true, :desc => "Initialize a git repo inside your library."
     method_option :mit, :type => :boolean, :desc => "Generate an MIT license file. Set a default with `bundle config set gem.mit true`."
     method_option :test, :type => :string, :lazy_default => "rspec", :aliases => "-t", :banner => "rspec",
                          :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config set gem.test rspec`."
@@ -787,7 +791,7 @@ module Bundler
       Bundler::SharedHelpers.major_deprecation 2,\
         "The `#{flag_name}` flag is deprecated because it relies on being " \
         "remembered accross bundler invokations, which bundler will no longer " \
-        "do in future versions. Instead please use `bundle config #{name} " \
+        "do in future versions. Instead please use `bundle config set #{name} " \
         "'#{value}'`, and stop using this flag"
     end
   end

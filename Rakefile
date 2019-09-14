@@ -46,12 +46,12 @@ namespace :spec do
       # Refresh packages index that the ones we need can be installed
       sh "sudo apt-get update"
       # Install groff so ronn can generate man/help pages
-      sh "sudo apt-get install groff-base -y"
+      sh "sudo apt-get install groff-base=1.22.3-10 -y"
       # Install graphviz so that the viz specs can run
       sh "sudo apt-get install graphviz -y"
 
       # Install the gems with a consistent version of RubyGems
-      sh "gem update --system 3.0.4"
+      sh "gem update --system 3.0.6"
 
       # Install the other gem deps, etc
       Rake::Task["spec:deps"].invoke
@@ -89,9 +89,13 @@ namespace :spec do
   namespace :rubygems do
     # When editing this list, also edit .travis.yml!
     branches = %w[master]
-    releases = %w[v2.5.2 v2.6.14 v2.7.10 v3.0.4]
+    releases = %w[v2.5.2 v2.6.14 v2.7.10 v3.0.6]
     (branches + releases).each do |rg|
       desc "Run specs with RubyGems #{rg}"
+      task "parallel_#{rg}" do
+        sh("bin/parallel_rspec spec/")
+      end
+
       task rg do
         sh("bin/rspec --format progress")
       end
@@ -112,7 +116,7 @@ namespace :spec do
 
     desc "Run specs under a RubyGems checkout (set RGV=path)"
     task "co" do
-      sh("bin/rspec --format progress")
+      sh("bin/parallel_rspec spec/")
     end
 
     namespace "co" do
@@ -183,6 +187,7 @@ namespace :man do
       Spec::Rubygems.gem_require("ronn")
     rescue Gem::LoadError => e
       task(:build) { abort "We couln't activate ronn (#{e.requirement}). Try `gem install ronn:'#{e.requirement}'` to be able to build the help pages" }
+      task(:check) { abort "We couln't activate ronn (#{e.requirement}). Try `gem install ronn:'#{e.requirement}'` to be able to build the help pages" }
     else
       directory "man"
 
@@ -196,7 +201,7 @@ namespace :man do
         index << [ronn, File.basename(roff)]
 
         file roff => ["man", ronn] do
-          sh "#{Gem.ruby} -S ronn --roff --pipe #{ronn} > #{roff}"
+          sh "bin/ronn --roff --pipe --date #{Time.now.strftime("%Y-%m-%d")} #{ronn} > #{roff}"
         end
 
         file "#{roff}.txt" => roff do
@@ -230,6 +235,25 @@ namespace :man do
 
       desc "Build the man pages"
       task :build => ["man:clean", "man:build_all_pages"]
+
+      desc "Verify man pages are in sync"
+      task :check => :build do
+        sh("git diff --quiet --ignore-all-space man") do |outcome, _|
+          if outcome
+            puts
+            puts "Manpages are in sync!"
+            puts
+          else
+            sh("GIT_PAGER=cat git diff --ignore-all-space man")
+
+            puts
+            puts "Man pages are out of sync. Above you can see the diff that got generated from rebuilding them. Please review and commit the results."
+            puts
+
+            exit(1)
+          end
+        end
+      end
     end
   end
 end
@@ -251,9 +275,6 @@ rescue Gem::LoadError => e
 
     desc "Vendor a specific version of net-http-persistent"
     task(:"net-http-persistent") { abort msg }
-
-    desc "Vendor a specific version of connection_pool"
-    task(:connection_pool) { abort msg }
   end
 else
   desc "Vendor a specific version of molinillo"
@@ -286,28 +307,23 @@ else
     lib.vendor_lib = "lib/bundler/vendor/fileutils"
   end
 
-  # Currently `net-http-persistent` and it's dependency `connection_pool` are
-  # vendored separately, but `connection_pool` references inside the vendored
-  # copy of `net-http-persistent` are not properly updated to refer to the
-  # vendored copy of `connection_pool`, so they need to be manually updated.
-  # This will be automated once https://github.com/segiddins/automatiek/pull/3
-  # is included in `automatiek` and we start using the new API for vendoring
-  # subdependencies.
-
+  # We currently cherry-pick changes to use `require_relative` internally
+  # instead of regular `require`. They are pending review at
+  # https://github.com/drbrain/net-http-persistent/pull/106
   desc "Vendor a specific version of net-http-persistent"
   Automatiek::RakeTask.new("net-http-persistent") do |lib|
     lib.download = { :github => "https://github.com/drbrain/net-http-persistent" }
     lib.namespace = "Net::HTTP::Persistent"
     lib.prefix = "Bundler::Persistent"
     lib.vendor_lib = "lib/bundler/vendor/net-http-persistent"
-  end
 
-  desc "Vendor a specific version of connection_pool"
-  Automatiek::RakeTask.new("connection_pool") do |lib|
-    lib.download = { :github => "https://github.com/mperham/connection_pool" }
-    lib.namespace = "ConnectionPool"
-    lib.prefix = "Bundler"
-    lib.vendor_lib = "lib/bundler/vendor/connection_pool"
+    lib.dependency("connection_pool") do |sublib|
+      sublib.version = "v2.2.2"
+      sublib.download = { :github => "https://github.com/mperham/connection_pool" }
+      sublib.namespace = "ConnectionPool"
+      sublib.prefix = "Bundler"
+      sublib.vendor_lib = "lib/bundler/vendor/connection_pool"
+    end
   end
 end
 
@@ -324,5 +340,3 @@ end
 task :default => :spec
 
 Dir["task/*.rake"].each(&method(:load))
-
-task :generate_files => Rake::Task.tasks.select {|t| t.name.start_with?("lib/bundler/generated") }

@@ -5,7 +5,7 @@ Currently, documentation for using Bundler is spread across two places:
 1. built-in `help` (including usage information and man pages)
 2. [Bundler documentation site](https://bundler.io)
 
-Additional documentation about using Bundler to publish gems can also be found on the [RubyGems guides](http://guides.rubygems.org/).
+Additional documentation about using Bundler to publish gems can also be found on the [RubyGems guides](https://guides.rubygems.org/).
 
 ## Goals
 
