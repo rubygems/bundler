@@ -3,6 +3,7 @@
 require "open3"
 
 require_relative "command_execution"
+require_relative "the_bundle"
 
 module Spec
   module Helpers

@@ -24,11 +24,8 @@ require_relative "support/path"
 require_relative "support/parallel"
 require_relative "support/permissions"
 require_relative "support/platforms"
-require_relative "support/silent_logger"
 require_relative "support/sometimes"
-require_relative "support/streams"
 require_relative "support/sudo"
-require_relative "support/the_bundle"
 
 $debug = false
 
