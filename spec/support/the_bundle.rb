@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "support/path"
+require_relative "path"
 
 module Spec
   class TheBundle

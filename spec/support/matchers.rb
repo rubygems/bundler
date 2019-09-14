@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require "forwardable"
-require "support/the_bundle"
+require_relative "the_bundle"
+
 module Spec
   module Matchers
     extend RSpec::Matchers
