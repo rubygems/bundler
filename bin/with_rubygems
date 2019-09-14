@@ -3,9 +3,9 @@
 
 require "pathname"
 
-def run(*cmd)
-  return if system(*cmd, :out => IO::NULL)
-  raise "Running `#{cmd.join(" ")}` failed"
+def run(cmd)
+  return if system(cmd, :out => IO::NULL)
+  raise "Running `#{cmd}` failed"
 end
 
 version = ENV.delete("RGV")
@@ -14,12 +14,12 @@ unless rubygems_path.directory?
   rubygems_path = Pathname.new("tmp/rubygems").expand_path
   unless rubygems_path.directory?
     rubygems_path.parent.mkpath
-    run("git", "clone", "https://github.com/rubygems/rubygems.git", rubygems_path.to_s)
+    run("git clone https://github.com/rubygems/rubygems.git #{rubygems_path}")
   end
   Dir.chdir(rubygems_path) do
     run("git remote update")
     version = "v#{version}" if version =~ /\A\d/
-    run("git", "checkout", version, "--quiet")
+    run("git checkout #{version} --quiet")
   end
 end
 
