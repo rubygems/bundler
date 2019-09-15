@@ -26,9 +26,9 @@ notifications:
       - secure: JxBi7DDJGkIF/7f/FSN/HUHpvV4EKfQccZHTPd1b2pNJn3GXo6u+tNVbAw2WjxYzPyPQI3ZcYBCU9SEXp/i7VmG8uMzh8Kyildw+miSKYKVb90uYqcsXWzbxwyNBgJLvyDkzST45H5lgnyAicee3WkFes/WDZikIajbH7ztdb04=
 
 rvm:
-  - 2.6.3
-  - 2.5.5
-  - 2.4.6
+  - 2.6.4
+  - 2.5.6
+  - 2.4.7
 
 stages:
   - linting
@@ -44,7 +44,7 @@ env:
 
 jobs:
   include:
-    - rvm: 2.6.3
+    - rvm: 2.6.4
       script: rake rubocop
       stage: linting
     # Ruby 2.3 also tested in 2.x mode
@@ -55,11 +55,11 @@ jobs:
       env: RGV=v3.0.6
       stage: test
     # Ruby 2.5, Rubygems 2.7
-    - rvm: 2.5.5
+    - rvm: 2.5.6
       env: RGV=v2.7.10
       stage: test
     # Ruby 2.4, Rubygems 2.6
-    - rvm: 2.4.6
+    - rvm: 2.4.7
       env: RGV=v2.6.14
       stage: test
     # Ruby 2.3, Rubygems 2.5
