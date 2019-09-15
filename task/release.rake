@@ -144,10 +144,21 @@ namespace :release do
   end
 
   desc "Prepare a patch release with the PRs from master in the patch milestone"
-  task :prepare_patch do
-    version = bundler_spec.version.to_s
+  task :prepare_patch, :version do |_t, args|
+    version = args.version
 
-    puts "Cherry-picking PRs milestoned for #{version} into the stable branch..."
+    version ||= begin
+      version = bundler_spec.version
+      segments = version.segments
+      if segments.last.is_a?(String)
+        segments << "1"
+      else
+        segments[-1] += 1
+      end
+      segments.join(".")
+    end
+
+    puts "Cherry-picking PRs milestoned for #{version} (currently #{bundler_spec.version}) into the stable branch..."
 
     milestones = gh_api_request(:path => "repos/bundler/bundler/milestones?state=open")
     unless patch_milestone = milestones.find {|m| m["title"] == version }
@@ -173,6 +184,15 @@ namespace :release do
       warn "Opening a new shell to fix the cherry-pick errors"
       abort unless system("zsh")
     end
+
+    version_file = "lib/bundler/version.rb"
+    version_contents = File.read(version_file)
+    unless version_contents.sub!(/^(\s*VERSION = )"#{Gem::Version::VERSION_PATTERN}"/, "\\1#{version.to_s.dump}")
+      abort "failed to update #{version_file}, is it in the expected format?"
+    end
+    File.open(version_file, "w") {|f| f.write(version_contents) }
+
+    sh("git", "commit", "-am", "Version #{version}")
   end
 
   desc "Open all PRs that have not been included in a stable release"
