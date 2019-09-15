@@ -1,4 +1,4 @@
-## 2.1.0.pre.2
+## 2.1.0.pre.2 (September 15, 2019)
 
 Bugfixes:
 
