@@ -48,7 +48,8 @@ using:
 $ git cherry-pick -m 1 dd6aef9
 ```
 
-The `rake release:patch` command will automatically handle cherry-picking, and is further detailed below.
+The `rake release:prepare_patch` command will automatically handle
+cherry-picking, and is further detailed below.
 
 ## Changelog
 
@@ -128,16 +129,22 @@ per bug fixed. Then run `rake release` from the `-stable` branch,
 and pour yourself a tasty drink!
 
 PRs containing regression fixes for a patch release of the current minor version
-are merged to master. These commits are then cherry-picked from master onto the
-minor branch (`1-12-stable`).
+are merged to master. These commits need to be cherry-picked from master onto
+the minor branch (`1-12-stable`).
 
-There is a `rake release:patch` rake task that automates creating a patch release.
-It takes a single argument, the _exact_ patch release being made (e.g. `1.12.3`),
-and checks out the appropriate stable branch (`1-12-stable`), grabs the `1.12.3`
-milestone from GitHub, ensures all PRs are closed, and then cherry-picks those changes
-(and only those changes) to the stable branch. The task then bumps the version in the
-version file, prompts you to update the `CHANGELOG.md`, then will commit those changes
-and run `rake release`!
+There is a `rake release:prepare_patch` rake task that helps with creating a patch
+release. It takes a single argument, the _exact_ patch release being made (e.g.
+`1.12.3`), but if not given it will bump the tiny version number by one. This
+task checks out the appropriate stable branch (`1-12-stable`), grabs the
+`1.12.3` milestone from GitHub, ensures all PRs are closed, and then
+cherry-picks those changes (and only those changes) to a new branch based off
+the stable branch. Then bumps the version in the version file and commits that
+change on top of the cherry-picks.
+
+Now you have a release branch ready to be merged into the stable branch. You'll
+want to open a PR from this branch into the stable branch and provided CI is
+green, you can go ahead, merge the PR and run `rake release` from the updated
+stable branch.
 
 ## Beta testing
 
