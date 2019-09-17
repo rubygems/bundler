@@ -5,8 +5,4 @@ load File.expand_path("../with_rubygems", __FILE__) if ENV["RGV"]
 
 require_relative "../spec/support/rubygems_ext"
 
-begin
-  Spec::Rubygems.gem_load("rake", "rake")
-rescue Gem::LoadError => e
-  warn "We couln't activate rake (#{e.requirement}). Run `gem install rake:'#{e.requirement}'`"
-end
+Spec::Rubygems.gem_load("rake", "rake")

@@ -5,8 +5,4 @@ load File.expand_path("../with_rubygems", __FILE__) if ENV["RGV"]
 
 require_relative "../spec/support/rubygems_ext"
 
-begin
-  Spec::Rubygems.gem_load("parallel_tests", "parallel_rspec")
-rescue Gem::LoadError => e
-  warn "We couln't activate parallel_tests (#{e.requirement}). Run `gem install parallel_tests:'#{e.requirement}'`"
-end
+Spec::Rubygems.gem_load("parallel_tests", "parallel_rspec")
