@@ -513,10 +513,6 @@ module Spec
       Dir.chdir(path) { `git rev-parse HEAD`.strip }
     end
 
-    def capture_output
-      capture(:stdout)
-    end
-
     def with_read_only(pattern)
       chmod = lambda do |dirmode, filemode|
         lambda do |f|
