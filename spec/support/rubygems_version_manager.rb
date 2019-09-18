@@ -15,7 +15,7 @@ class RubygemsVersionManager
 
     unrequire_rubygems_if_needed
 
-    switch_local_copy
+    switch_local_copy_if_needed
 
     prepare_environment
   end
@@ -40,7 +40,9 @@ private
     exec(ENV, *cmd)
   end
 
-  def switch_local_copy
+  def switch_local_copy_if_needed
+    return unless local_copy_switch_needed?
+
     Dir.chdir(local_copy_path) do
       sys_exec!("git remote update")
       sys_exec!("git checkout #{target_tag_version} --quiet")
@@ -55,12 +57,23 @@ private
     defined?(Gem) && Gem::VERSION != target_gem_version
   end
 
+  def local_copy_switch_needed?
+    !env_version_is_path? && target_gem_version != local_copy_version
+  end
+
   def target_gem_version
     @target_gem_version ||= resolve_target_gem_version
   end
 
   def target_tag_version
     @target_tag_version ||= resolve_target_tag_version
+  end
+
+  def local_copy_version
+    gemspec_contents = File.read(local_copy_path.join("lib/rubygems.rb"))
+    version_regexp = /VERSION = ["'](.*)["']/
+
+    version_regexp.match(gemspec_contents)[1]
   end
 
   def local_copy_path
