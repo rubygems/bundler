@@ -61,7 +61,7 @@ module Bundler
       send_metrics
     end
 
-  private
+    # ---private---
 
     def self.init_command_metrics(command)
       @command_metrics ||= Hash.new
@@ -214,7 +214,12 @@ module Bundler
         FileUtils.mkdir_p(file.dirname) unless File.exist?(file)
         # bundle exec goes through here, so avoid requiring a default gem
         require_relative "yaml_serializer"
-        File.open(file, "a") {|f| f.write(YAMLSerializer.dump(@command_metrics)) }
+        File.open(file, "a") do |f|
+          # dont append anymore data if user has somehow managed to reach a
+          # 100 MB metrics file
+          break if file.size > 100_000_000
+          f.write(YAMLSerializer.dump(@command_metrics))
+        end
       end
     end
 
@@ -233,5 +238,8 @@ module Bundler
       end
       list << @system_metrics
     end
+
+    private_class_method :init_command_metrics, :record_gem_info, :send_metrics, :git_info, :ruby_env_managers,
+                        :ruby_and_bundler_version, :cis, :ci_info, :record_system_info, :write_to_file, :read_from_file
   end
 end
