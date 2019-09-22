@@ -2,6 +2,9 @@
 
 require "open3"
 
+require_relative "command_execution"
+require_relative "the_bundle"
+
 module Spec
   module Helpers
     def reset!
@@ -113,6 +116,7 @@ module Spec
       env["PATH"].gsub!("#{Path.root}/exe", "") if env["PATH"] && system_bundler
 
       requires = options.delete(:requires) || []
+      requires << "support/rubygems"
       requires << "support/hax"
 
       artifice = options.delete(:artifice) do
@@ -146,7 +150,7 @@ module Spec
         end
       end.join
 
-      cmd = "#{sudo} #{Gem.ruby} #{load_path_str} #{requires_str} #{bundle_bin} #{cmd}#{args}"
+      cmd = "#{sudo} #{Gem.ruby} --disable-gems #{load_path_str} #{requires_str} #{bundle_bin} #{cmd}#{args}"
       sys_exec(cmd, env) {|i, o, thr| yield i, o, thr if block_given? }
     end
     bang :bundle
