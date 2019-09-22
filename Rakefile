@@ -50,9 +50,6 @@ namespace :spec do
       # Install graphviz so that the viz specs can run
       sh "sudo apt-get install graphviz -y"
 
-      # Install the gems with a consistent version of RubyGems
-      sh "gem update --system 3.0.6"
-
       # Install the other gem deps, etc
       Rake::Task["spec:deps"].invoke
     end
@@ -85,80 +82,27 @@ namespace :spec do
     ENV["BUNDLER_SUDO_TESTS"] = "1"
   end
 
-  # RubyGems specs by version
-  namespace :rubygems do
-    # When editing this list, also edit .travis.yml!
-    branches = %w[master]
-    releases = %w[v2.5.2 v2.6.14 v2.7.10 v3.0.6]
-    (branches + releases).each do |rg|
-      desc "Run specs with RubyGems #{rg}"
-      task "parallel_#{rg}" do
-        sh("bin/parallel_rspec spec/")
-      end
-
-      task rg do
-        sh("bin/rspec --format progress")
-      end
-
-      # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
-      namespace rg do
-        task :sudo => ["set_sudo", rg]
-        task :realworld => ["set_realworld", rg]
-      end
-
-      task "set_#{rg}" do
-        ENV["RGV"] = rg
-      end
-
-      task rg => ["set_#{rg}"]
-      task "rubygems:all" => rg
-    end
-
-    desc "Run specs under a RubyGems checkout (set RGV=path)"
-    task "co" do
-      sh("bin/parallel_rspec spec/")
-    end
-
-    namespace "co" do
-      task :sudo => ["set_sudo", "co"]
-      task :realworld => ["set_realworld", "co"]
-    end
-
-    task "setup_co" do
-      ENV["RGV"] = if `git -C "#{File.expand_path("..")}" remote --verbose 2> #{IO::NULL}` =~ /rubygems/i
-        File.expand_path("..")
-      else
-        File.expand_path("tmp/rubygems")
-      end
-    end
-
-    task "co" => "setup_co"
-    task "rubygems:all" => "co"
-  end
-
   desc "Run the tests on Travis CI against a RubyGem version (using ENV['RGV'])"
   task :travis do
     rg = ENV["RGV"] || raise("RubyGems version is required on Travis!")
-
-    rg = "co" if File.directory?(File.expand_path(ENV["RGV"]))
 
     # disallow making network requests on CI
     ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
 
     puts "\n\e[1;33m[Travis CI] Running bundler specs against RubyGems #{rg}\e[m\n\n"
-    specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
+    specs = safe_task { Rake::Task["spec"].invoke }
 
-    Rake::Task["spec:rubygems:#{rg}"].reenable
+    Rake::Task["spec"].reenable
 
     puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against RubyGems #{rg}\e[m\n\n"
-    sudos = system("sudo -E rake spec:rubygems:#{rg}:sudo")
+    sudos = system("sudo -E rake spec:sudo")
     # clean up by chowning the newly root-owned tmp directory back to the travis user
     system("sudo chown -R #{ENV["USER"]} #{File.join(File.dirname(__FILE__), "tmp")}")
 
-    Rake::Task["spec:rubygems:#{rg}"].reenable
+    Rake::Task["spec"].reenable
 
     puts "\n\e[1;33m[Travis CI] Running bundler real world specs against RubyGems #{rg}\e[m\n\n"
-    realworld = safe_task { Rake::Task["spec:rubygems:#{rg}:realworld"].invoke }
+    realworld = safe_task { Rake::Task["spec:realworld"].invoke }
 
     { "specs" => specs, "sudo" => sudos, "realworld" => realworld }.each do |name, passed|
       if passed

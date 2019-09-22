@@ -1,10 +1,11 @@
 language: ruby
 dist: bionic
-script: rake spec:travis
+script: bin/rake spec:travis
 before_script:
-  - rake override_version
-  - travis_retry rake spec:travis:deps
-  - rake man:check
+  - gem install rake:"~> 12.0"
+  - bin/rake override_version
+  - travis_retry bin/rake spec:travis:deps
+  - bin/rake man:check
 
 branches:
   only:
@@ -45,7 +46,7 @@ env:
 jobs:
   include:
     - rvm: 2.6.4
-      script: rake rubocop
+      script: bin/rake rubocop
       stage: linting
     # Ruby 2.3 also tested in 2.x mode
     - rvm: 2.3.8

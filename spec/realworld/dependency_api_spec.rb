@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../support/silent_logger"
+
 RSpec.describe "gemcutter's dependency API", :realworld => true do
   context "when Gemcutter API takes too long to respond" do
     before do

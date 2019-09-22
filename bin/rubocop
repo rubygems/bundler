@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-load File.expand_path("../with_rubygems", __FILE__) if ENV["RGV"]
-
 require_relative "../spec/support/rubygems_ext"
 
 Spec::Rubygems.gem_load("rubocop", "rubocop")
