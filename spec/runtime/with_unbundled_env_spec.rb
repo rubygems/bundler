@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../support/streams"
+
 RSpec.describe "Bundler.with_env helpers" do
   def bundle_exec_ruby!(code, options = {})
     build_bundler_context options
@@ -127,13 +129,17 @@ RSpec.describe "Bundler.with_env helpers" do
   describe "Bundler.with_clean_env", :bundler => 2 do
     it "should set ENV to unbundled_env in the block" do
       expected = Bundler.unbundled_env
-      actual = Bundler.with_clean_env { ENV.to_hash }
+      actual = nil
+      capture(:stderr) do
+        actual = Bundler.with_clean_env { ENV.to_hash }
+      end
+
       expect(actual).to eq(expected)
     end
 
     it "should restore the environment after execution" do
-      Bundler.with_clean_env do
-        ENV["FOO"] = "hello"
+      capture(:stderr) do
+        Bundler.with_clean_env { ENV["FOO"] = "hello" }
       end
 
       expect(ENV).not_to have_key("FOO")
@@ -175,7 +181,9 @@ RSpec.describe "Bundler.with_env helpers" do
   describe "Bundler.clean_system", :bundler => 2 do
     let(:code) do
       <<~RUBY
-        Bundler.clean_system(%([ "\$BUNDLE_FOO" = "bar" ] || exit 42))
+        capture(:stderr) do
+          Bundler.clean_system(%([ "\$BUNDLE_FOO" = "bar" ] || exit 42))
+        end
 
         exit $?.exitstatus
       RUBY
@@ -183,7 +191,7 @@ RSpec.describe "Bundler.with_env helpers" do
 
     it "runs system inside with_clean_env" do
       lib = File.expand_path("../../lib", __dir__)
-      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib} -rbundler -e '#{code}'")
+      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib}:#{spec} -rsupport/streams -rbundler -e '#{code}'")
       expect($?.exitstatus).to eq(42)
     end
   end
@@ -229,8 +237,10 @@ RSpec.describe "Bundler.with_env helpers" do
   describe "Bundler.clean_exec", :bundler => 2 do
     let(:code) do
       <<~RUBY
-        Process.fork do
-          exit Bundler.clean_exec(%(test "\$BUNDLE_FOO" = "bar"))
+        capture(:stderr) do
+          Process.fork do
+            exit Bundler.clean_exec(%(test "\$BUNDLE_FOO" = "bar"))
+          end
         end
 
         _, status = Process.wait2
@@ -243,7 +253,7 @@ RSpec.describe "Bundler.with_env helpers" do
       skip "Fork not implemented" if Gem.win_platform?
 
       lib = File.expand_path("../../lib", __dir__)
-      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib} -rbundler -e '#{code}'")
+      system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib}:#{spec} -rsupport/streams -rbundler -e '#{code}'")
       expect($?.exitstatus).to eq(1)
     end
   end
