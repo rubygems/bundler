@@ -116,7 +116,7 @@ module Bundler
     end
 
     def environment
-      SharedHelpers.major_deprecation 2, "Bundler.environment has been removed in favor of Bundler.load"
+      SharedHelpers.major_deprecation 2, "Bundler.environment has been removed in favor of Bundler.load", :print_caller_location => true
       load
     end
 
@@ -282,7 +282,8 @@ EOF
       Bundler::SharedHelpers.major_deprecation(
         2,
         "`Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
-        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`",
+        :print_caller_location => true
       )
 
       unbundled_env
@@ -321,7 +322,8 @@ EOF
       Bundler::SharedHelpers.major_deprecation(
         2,
         "`Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
-        "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
+        "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`",
+        :print_caller_location => true
       )
 
       with_env(unbundled_env) { yield }
@@ -342,7 +344,8 @@ EOF
       Bundler::SharedHelpers.major_deprecation(
         2,
         "`Bundler.clean_system` has been deprecated in favor of `Bundler.unbundled_system`. " \
-        "If you instead want to run the command in the environment before bundler was originally loaded, use `Bundler.original_system`"
+        "If you instead want to run the command in the environment before bundler was originally loaded, use `Bundler.original_system`",
+        :print_caller_location => true
       )
 
       with_env(unbundled_env) { Kernel.system(*args) }
@@ -363,7 +366,8 @@ EOF
       Bundler::SharedHelpers.major_deprecation(
         2,
         "`Bundler.clean_exec` has been deprecated in favor of `Bundler.unbundled_exec`. " \
-        "If you instead want to exec to a command in the environment before bundler was originally loaded, use `Bundler.original_exec`"
+        "If you instead want to exec to a command in the environment before bundler was originally loaded, use `Bundler.original_exec`",
+        :print_caller_location => true
       )
 
       with_env(unbundled_env) { Kernel.exec(*args) }

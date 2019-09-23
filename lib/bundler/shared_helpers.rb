@@ -124,7 +124,12 @@ module Bundler
       namespace.const_get(constant_name)
     end
 
-    def major_deprecation(major_version, message)
+    def major_deprecation(major_version, message, print_caller_location: false)
+      if print_caller_location
+        caller_location = caller_locations(2, 2).first
+        message = "#{message} (called at #{caller_location.path}:#{caller_location.lineno})"
+      end
+
       bundler_major_version = Bundler.bundler_major_version
       if bundler_major_version > major_version
         require_relative "errors"
