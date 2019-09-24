@@ -78,7 +78,6 @@ module Bundler
       specs.sort_by(&:name).each do |current_spec|
         next unless gems.empty? || gems.include?(current_spec.name)
 
-        dependency = current_dependencies[current_spec.name]
         active_spec = retrieve_active_spec(definition, current_spec)
 
         next if active_spec.nil?
@@ -87,6 +86,8 @@ module Bundler
 
         gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
         next unless gem_outdated || (current_spec.git_version != active_spec.git_version)
+
+        dependency = current_dependencies[current_spec.name]
         groups = nil
         if dependency && !options[:parseable]
           groups = dependency.groups.join(", ")
