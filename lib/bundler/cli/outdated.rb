@@ -115,7 +115,7 @@ module Bundler
             next if gems.nil?
             contains_group = groups.split(", ").include?(options[:group])
 
-            next if !options[:groups] && !contains_group
+            next unless options[:groups] || contains_group
 
             unless options[:parseable]
               Bundler.ui.info(header_group_message(groups))
