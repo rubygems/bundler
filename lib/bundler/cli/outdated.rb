@@ -109,8 +109,7 @@ module Bundler
         end
 
         if options_include_groups
-          ordered_groups = outdated_gems_by_groups.keys.compact.sort
-          ordered_groups.each do |groups|
+          outdated_gems_by_groups.keys.compact.sort.each do |groups|
             gems = outdated_gems_by_groups[groups]
             next if gems.nil?
 
