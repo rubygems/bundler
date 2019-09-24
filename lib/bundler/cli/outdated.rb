@@ -108,8 +108,6 @@ module Bundler
 
         if options_include_groups
           outdated_gems_by_groups.sort.each do |groups, gems|
-            next if gems.nil?
-
             contains_group = groups.split(", ").include?(options[:group])
             next unless options[:groups] || contains_group
 
