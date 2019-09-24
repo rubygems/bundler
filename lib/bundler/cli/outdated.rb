@@ -10,8 +10,7 @@ module Bundler
       @gems = gems
       @sources = Array(options[:source])
 
-      @filter_options_patch = options.keys &
-        %w[filter-major filter-minor filter-patch]
+      @filter_options_patch = options.keys & %w[filter-major filter-minor filter-patch]
 
       @outdated_gems_by_groups = {}
       @outdated_gems_list = []
@@ -22,8 +21,7 @@ module Bundler
 
       # the patch level options imply strict is also true. It wouldn't make
       # sense otherwise.
-      @strict = options["filter-strict"] ||
-        Bundler::CLI::Common.patch_level_options(options).any?
+      @strict = options["filter-strict"] || Bundler::CLI::Common.patch_level_options(options).any?
     end
 
     def run
