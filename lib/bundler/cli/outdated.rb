@@ -3,7 +3,7 @@
 module Bundler
   class CLI::Outdated
     attr_reader :options, :gems, :options_include_groups, :filter_options_patch, :sources, :strict
-    attr_accessor :outdated_gems_by_groups, :outdated_gems_list
+    attr_accessor :outdated_gems_list
 
     def initialize(options, gems)
       @options = options
@@ -12,7 +12,6 @@ module Bundler
 
       @filter_options_patch = options.keys & %w[filter-major filter-minor filter-patch]
 
-      @outdated_gems_by_groups = {}
       @outdated_gems_list = []
 
       @options_include_groups = [:group, :groups].any? do |v|
@@ -92,9 +91,6 @@ module Bundler
                                 :current_spec => current_spec,
                                 :dependency => dependency,
                                 :groups => groups }
-
-        outdated_gems_by_groups[groups] ||= []
-        outdated_gems_by_groups[groups] << outdated_gems_list[-1]
       end
 
       if outdated_gems_list.empty?
@@ -105,7 +101,7 @@ module Bundler
         end
 
         if options_include_groups
-          outdated_gems_by_groups.sort.each do |groups, gems|
+          outdated_gems_list.group_by {|g| g[:groups] }.sort.each do |groups, gems|
             contains_group = groups.split(", ").include?(options[:group])
             next unless options[:groups] || contains_group
 
