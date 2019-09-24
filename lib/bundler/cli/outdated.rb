@@ -76,7 +76,7 @@ module Bundler
       end
 
       specs.sort_by(&:name).each do |current_spec|
-        next if !gems.empty? && !gems.include?(current_spec.name)
+        next unless gems.empty? || gems.include?(current_spec.name)
 
         dependency = current_dependencies[current_spec.name]
         active_spec = retrieve_active_spec(definition, current_spec)
