@@ -79,8 +79,6 @@ module Bundler
         next unless gems.empty? || gems.include?(current_spec.name)
 
         active_spec = retrieve_active_spec(definition, current_spec)
-
-        next if active_spec.nil?
         next if filter_options_patch.any? &&
           !update_present_via_semver_portions(current_spec, active_spec, options)
 
@@ -235,6 +233,8 @@ module Bundler
     end
 
     def update_present_via_semver_portions(current_spec, active_spec, options)
+      return false if active_spec.nil?
+
       current_major = current_spec.version.segments.first
       active_major = active_spec.version.segments.first
 
