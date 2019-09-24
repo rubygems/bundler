@@ -79,8 +79,7 @@ module Bundler
         next unless gems.empty? || gems.include?(current_spec.name)
 
         active_spec = retrieve_active_spec(definition, current_spec)
-        next if filter_options_patch.any? &&
-          !update_present_via_semver_portions(current_spec, active_spec, options)
+        next if filter_options_patch.any? && !update_present_via_semver_portions(current_spec, active_spec, options)
 
         gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
         next unless gem_outdated || (current_spec.git_version != active_spec.git_version)
