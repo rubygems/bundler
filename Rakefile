@@ -21,7 +21,7 @@ end
 
 desc "Run specs"
 task :spec do
-  sh("bin/rspec --format progress")
+  sh("bin/rspec")
 end
 
 namespace :spec do
