@@ -113,8 +113,8 @@ module Bundler
           ordered_groups.each do |groups|
             gems = outdated_gems_by_groups[groups]
             next if gems.nil?
-            contains_group = groups.split(", ").include?(options[:group])
 
+            contains_group = groups.split(", ").include?(options[:group])
             next unless options[:groups] || contains_group
 
             unless options[:parseable]
