@@ -110,6 +110,8 @@ private
   end
 
   def resolve_target_gem_version
+    return local_copy_version if env_version_is_path?
+
     return @env_version[1..-1] if @env_version.match(/^v/)
 
     return master_gem_version if @env_version == "master"
