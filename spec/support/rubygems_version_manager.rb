@@ -2,9 +2,11 @@
 
 require "pathname"
 require_relative "helpers"
+require_relative "path"
 
 class RubygemsVersionManager
   include Spec::Helpers
+  include Spec::Path
 
   def initialize(env_version)
     @env_version = env_version
@@ -98,7 +100,7 @@ private
   end
 
   def expanded_env_version
-    @expanded_env_version ||= Pathname.new(@env_version).expand_path
+    @expanded_env_version ||= Pathname.new(@env_version).expand_path(root)
   end
 
   def resolve_target_tag_version
@@ -110,6 +112,8 @@ private
   end
 
   def resolve_target_gem_version
+    return local_copy_version if env_version_is_path?
+
     return @env_version[1..-1] if @env_version.match(/^v/)
 
     return master_gem_version if @env_version == "master"
