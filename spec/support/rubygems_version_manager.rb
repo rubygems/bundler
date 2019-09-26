@@ -36,6 +36,7 @@ private
 
   def install_local_copy
     Dir.chdir(local_copy_path) do
+      sys_exec!("git submodule update --init --recursive")
       sys_exec!("ruby setup.rb")
     end
   end
@@ -115,7 +116,7 @@ private
 
     unless rubygems_path.directory?
       rubygems_path.parent.mkpath
-      sys_exec!("git clone https://github.com/rubygems/rubygems.git #{rubygems_path}")
+      sys_exec!("git clone --recursive https://github.com/rubygems/rubygems.git #{rubygems_path}")
     end
 
     rubygems_path
