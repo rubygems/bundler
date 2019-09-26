@@ -38,6 +38,8 @@ private
     Dir.chdir(local_copy_path) do
       sys_exec!("which bundle")
       puts File.read("/home/travis/.rvm/rubies/ruby-#{RUBY_VERSION}/bin/bundle") if File.exist?("/home/travis/.rvm/rubies/ruby-#{RUBY_VERSION}/bin/bundle")
+      gem_home = `gem env home`.strip
+      sys_exec!("ruby -I lib bin/gem uninstall executable-hooks gem-wrappers -x --force -i #{gem_home}@global")
       sys_exec!("git submodule update --init --recursive")
       sys_exec!("ruby setup.rb")
     end
