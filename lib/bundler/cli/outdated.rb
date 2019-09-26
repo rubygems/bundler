@@ -3,17 +3,15 @@
 module Bundler
   class CLI::Outdated
     attr_reader :options, :gems, :options_include_groups, :filter_options_patch, :sources, :strict
-    attr_accessor :outdated_gems_by_groups, :outdated_gems_list
+    attr_accessor :outdated_gems_list
 
     def initialize(options, gems)
       @options = options
       @gems = gems
       @sources = Array(options[:source])
 
-      @filter_options_patch = options.keys &
-        %w[filter-major filter-minor filter-patch]
+      @filter_options_patch = options.keys & %w[filter-major filter-minor filter-patch]
 
-      @outdated_gems_by_groups = {}
       @outdated_gems_list = []
 
       @options_include_groups = [:group, :groups].any? do |v|
@@ -22,8 +20,7 @@ module Bundler
 
       # the patch level options imply strict is also true. It wouldn't make
       # sense otherwise.
-      @strict = options["filter-strict"] ||
-        Bundler::CLI::Common.patch_level_options(options).any?
+      @strict = options["filter-strict"] || Bundler::CLI::Common.patch_level_options(options).any?
     end
 
     def run
@@ -76,17 +73,15 @@ module Bundler
       end
 
       specs.sort_by(&:name).each do |current_spec|
-        next if !gems.empty? && !gems.include?(current_spec.name)
+        next unless gems.empty? || gems.include?(current_spec.name)
 
-        dependency = current_dependencies[current_spec.name]
         active_spec = retrieve_active_spec(definition, current_spec)
-
-        next if active_spec.nil?
-        next if filter_options_patch.any? &&
-          !update_present_via_semver_portions(current_spec, active_spec, options)
+        next unless filter_options_patch.empty? || update_present_via_semver_portions(current_spec, active_spec, options)
 
         gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
         next unless gem_outdated || (current_spec.git_version != active_spec.git_version)
+
+        dependency = current_dependencies[current_spec.name]
         groups = nil
         if dependency && !options[:parseable]
           groups = dependency.groups.join(", ")
@@ -96,9 +91,6 @@ module Bundler
                                 :current_spec => current_spec,
                                 :dependency => dependency,
                                 :groups => groups }
-
-        outdated_gems_by_groups[groups] ||= []
-        outdated_gems_by_groups[groups] << outdated_gems_list[-1]
       end
 
       if outdated_gems_list.empty?
@@ -109,16 +101,9 @@ module Bundler
         end
 
         if options_include_groups
-          ordered_groups = outdated_gems_by_groups.keys.compact.sort
-          ordered_groups.insert(0, nil).each do |groups|
-            gems = outdated_gems_by_groups[groups]
-            contains_group = if groups
-              groups.split(", ").include?(options[:group])
-            else
-              options[:group] == "group"
-            end
-
-            next if (!options[:groups] && !contains_group) || gems.nil?
+          outdated_gems_list.group_by {|g| g[:groups] }.sort.each do |groups, gems|
+            contains_group = groups.split(", ").include?(options[:group])
+            next unless options[:groups] || contains_group
 
             unless options[:parseable]
               Bundler.ui.info(header_group_message(groups))
@@ -239,6 +224,8 @@ module Bundler
     end
 
     def update_present_via_semver_portions(current_spec, active_spec, options)
+      return false if active_spec.nil?
+
       current_major = current_spec.version.segments.first
       active_major = active_spec.version.segments.first
 
