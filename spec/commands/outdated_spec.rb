@@ -104,7 +104,7 @@ RSpec.describe "bundle outdated" do
       expect(gem_list.size).to eq gems_list_size
     end
 
-    it "not outdated gems" do
+    it "works when the bundle is up to date" do
       bundle "outdated --group"
       expect(out).to include("Bundle up to date!")
     end
