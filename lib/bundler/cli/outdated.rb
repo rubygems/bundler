@@ -82,7 +82,7 @@ module Bundler
         next unless gem_outdated || (current_spec.git_version != active_spec.git_version)
 
         dependency = current_dependencies[current_spec.name]
-        groups = nil
+        groups = ""
         if dependency && !options[:parseable]
           groups = dependency.groups.join(", ")
         end
@@ -134,10 +134,10 @@ module Bundler
     end
 
     def header_group_message(groups)
-      if groups
-        "===== #{groups_text("Group", groups)} ====="
-      else
+      if groups.empty?
         "===== Without group ====="
+      else
+        "===== #{groups_text("Group", groups)} ====="
       end
     end
 
@@ -198,7 +198,7 @@ module Bundler
 
       output_message = if options[:parseable]
         spec_outdated_info.to_s
-      elsif options_include_groups || !groups
+      elsif options_include_groups || groups.empty?
         "  * #{spec_outdated_info}"
       else
         "  * #{spec_outdated_info} in #{groups_text("group", groups)}"
