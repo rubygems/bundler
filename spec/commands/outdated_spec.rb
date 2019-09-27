@@ -517,7 +517,6 @@ RSpec.describe "bundle outdated" do
           G
 
           bundle "outdated"
-          expect(out).to include("Outdated gems included in the bundle:")
           expect(out).to include("laduradura (newest 5.15.3, installed 5.15.2, requested = 5.15.2)")
         end
       end
@@ -527,7 +526,6 @@ RSpec.describe "bundle outdated" do
   shared_examples_for "version update is detected" do
     it "reports that a gem has a newer version" do
       subject
-      expect(out).to include("Outdated gems included in the bundle:")
       expect(out).to include("activesupport (newest")
       expect(out).to_not include("ERROR REPORT TEMPLATE")
     end

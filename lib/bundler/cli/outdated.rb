@@ -98,10 +98,6 @@ module Bundler
       if outdated_gems.empty?
         display_nothing_outdated_message
       else
-        unless options[:parseable]
-          Bundler.ui.info(header_outdated_message)
-        end
-
         if options_include_groups
           outdated_gems.group_by {|g| g[:groups] }.sort.each do |groups, gems|
             contains_group = groups.split(", ").include?(options[:group])
@@ -137,14 +133,6 @@ module Bundler
 
     def groups_text(group_text, groups)
       "#{group_text}#{groups.split(",").size > 1 ? "s" : ""} \"#{groups}\""
-    end
-
-    def header_outdated_message
-      if options[:pre]
-        "Outdated gems included in the bundle (including pre-releases):"
-      else
-        "Outdated gems included in the bundle:"
-      end
     end
 
     def header_group_message(groups)
