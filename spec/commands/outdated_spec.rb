@@ -104,7 +104,7 @@ RSpec.describe "bundle outdated" do
       expect(gem_list.size).to eq gems_list_size
     end
 
-    it "not outdated gems" do
+    it "works when the bundle is up to date" do
       bundle "outdated --group"
       expect(out).to include("Bundle up to date!")
     end
@@ -140,6 +140,39 @@ RSpec.describe "bundle outdated" do
       expect(out).to include("===== Groups \"development, test\" =====")
       expect(out).to include("activesupport")
       expect(out).to include("duradura")
+    end
+  end
+
+  describe "with --group option and outdated transitive dependencies" do
+    before do
+      update_repo2 do
+        build_gem "bar", %w[2.0.0]
+
+        build_gem "bar_dependant", "7.0" do |s|
+          s.add_dependency "bar", "~> 2.0"
+        end
+      end
+
+      install_gemfile <<-G
+        source "#{file_uri_for(gem_repo2)}"
+
+        gem "bar_dependant", '7.0'
+      G
+
+      update_repo2 do
+        build_gem "bar", %w[3.0.0]
+      end
+    end
+
+    it "returns a sorted list of outdated gems" do
+      bundle "outdated --groups"
+
+      expect(out).to include("===== Without group =====")
+      expect(out).to include("bar (newest 3.0.0, installed 2.0.0)")
+
+      # Gem names are one per-line, between "*" and their parenthesized version.
+      gem_list = out.split("\n").map {|g| g[/\* (.*) \(/, 1] }.compact
+      expect(gem_list).to eq(gem_list.sort)
     end
   end
 
