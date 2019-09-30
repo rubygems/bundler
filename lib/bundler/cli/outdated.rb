@@ -282,7 +282,7 @@ module Bundler
           element.to_s.ljust(column_sizes[index])
         end
 
-        Bundler.ui.info row.join(" ") + "\n"
+        Bundler.ui.info row.join("  ") + "\n"
       end
     end
 
