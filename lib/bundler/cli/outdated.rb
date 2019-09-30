@@ -112,9 +112,6 @@ module Bundler
             print_gems(gems)
           end
         elsif options[:pretty]
-          header = ["Gem Name", "Installed", "New", "Requested", "Groups"]
-          header << "Load Path" if options[:verbose]
-
           outdated_gems_list.map! do |gem|
             current_version = "#{gem[:current_spec].version}#{gem[:current_spec].git_version}"
             spec_version = "#{gem[:active_spec].version}#{gem[:active_spec].git_version}"
@@ -125,7 +122,7 @@ module Bundler
             ret_val
           end
 
-          print_indented header, *outdated_gems_list
+          print_indented table_header, *outdated_gems_list
         else
           print_gems(outdated_gems_list)
         end
@@ -285,6 +282,12 @@ module Bundler
 
         Bundler.ui.info row.join(" ") + "\n"
       end
+    end
+
+    def table_header
+      header = ["Gem Name", "Installed", "New", "Requested", "Groups"]
+      header << "Load Path" if options[:verbose]
+      header
     end
   end
 end
