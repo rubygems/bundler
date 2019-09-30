@@ -87,10 +87,12 @@ module Bundler
           groups = dependency.groups.join(", ")
         end
 
-        outdated_gems_list << { :active_spec => active_spec,
-                                :current_spec => current_spec,
-                                :dependency => dependency,
-                                :groups => groups }
+        outdated_gems_list << {
+          :active_spec => active_spec,
+          :current_spec => current_spec,
+          :dependency => dependency,
+          :groups => groups,
+        }
       end
 
       if outdated_gems_list.empty?
