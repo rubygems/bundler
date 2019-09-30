@@ -143,7 +143,7 @@ RSpec.describe "bundle outdated" do
     end
   end
 
-  describe "with --group option and outdated transitive dependencies" do
+  describe "with --groups option and outdated transitive dependencies" do
     before do
       update_repo2 do
         build_gem "bar", %w[2.0.0]
