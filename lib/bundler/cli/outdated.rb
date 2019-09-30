@@ -3,7 +3,7 @@
 module Bundler
   class CLI::Outdated
     attr_reader :options, :gems, :options_include_groups, :filter_options_patch, :sources, :strict
-    attr_accessor :outdated_gems_list
+    attr_accessor :outdated_gems
 
     def initialize(options, gems)
       @options = options
@@ -12,7 +12,7 @@ module Bundler
 
       @filter_options_patch = options.keys & %w[filter-major filter-minor filter-patch]
 
-      @outdated_gems_list = []
+      @outdated_gems = []
 
       @options_include_groups = [:group, :groups].any? do |v|
         options.keys.include?(v.to_s)
@@ -87,7 +87,7 @@ module Bundler
           groups = dependency.groups.join(", ")
         end
 
-        outdated_gems_list << {
+        outdated_gems << {
           :active_spec => active_spec,
           :current_spec => current_spec,
           :dependency => dependency,
@@ -95,7 +95,7 @@ module Bundler
         }
       end
 
-      if outdated_gems_list.empty?
+      if outdated_gems.empty?
         display_nothing_outdated_message
       else
         unless options[:parseable]
@@ -103,7 +103,7 @@ module Bundler
         end
 
         if options_include_groups
-          outdated_gems_list.group_by {|g| g[:groups] }.sort.each do |groups, gems|
+          outdated_gems.group_by {|g| g[:groups] }.sort.each do |groups, gems|
             contains_group = groups.split(", ").include?(options[:group])
             next unless options[:groups] || contains_group
 
@@ -114,7 +114,7 @@ module Bundler
             print_gems(gems)
           end
         elsif options[:pretty]
-          outdated_gems_list.map! do |gem|
+          outdated_gems.map! do |gem|
             current_version = "#{gem[:current_spec].version}#{gem[:current_spec].git_version}"
             spec_version = "#{gem[:active_spec].version}#{gem[:active_spec].git_version}"
             dependency = gem[:dependency].requirement if gem[:dependency] && gem[:dependency].specific?
@@ -124,9 +124,9 @@ module Bundler
             ret_val
           end
 
-          print_indented table_header, *outdated_gems_list
+          print_indented table_header, *outdated_gems
         else
-          print_gems(outdated_gems_list)
+          print_gems(outdated_gems)
         end
 
         exit 1
