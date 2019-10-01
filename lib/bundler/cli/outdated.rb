@@ -96,7 +96,9 @@ module Bundler
       end
 
       if outdated_gems.empty?
-        display_nothing_outdated_message
+        unless options[:parseable]
+          Bundler.ui.info(nothing_outdated_message)
+        end
       else
         if options_include_groups
           relevant_outdated_gems = outdated_gems.group_by {|g| g[:groups] }.sort.flat_map do |groups, gems|
@@ -153,12 +155,6 @@ module Bundler
       end
 
       active_spec
-    end
-
-    def display_nothing_outdated_message
-      unless options[:parseable]
-        Bundler.ui.info(nothing_outdated_message)
-      end
     end
 
     def print_gems(gems_list)
