@@ -99,30 +99,24 @@ module Bundler
         display_nothing_outdated_message
       else
         if options_include_groups
-          outdated_gems.group_by {|g| g[:groups] }.sort.each do |groups, gems|
+          relevant_outdated_gems = outdated_gems.group_by {|g| g[:groups] }.sort.flat_map do |groups, gems|
             contains_group = groups.split(", ").include?(options[:group])
             next unless options[:groups] || contains_group
 
-            unless options[:parseable]
-              Bundler.ui.info(header_group_message(groups))
+            gems
+          end.compact
+
+          if options[:parseable]
+            relevant_outdated_gems.each do |gems|
+              print_gems(gems)
             end
-
-            print_gems(gems)
+          else
+            print_gems_table(relevant_outdated_gems)
           end
-        elsif options[:pretty]
-          outdated_gems.map! do |gem|
-            current_version = "#{gem[:current_spec].version}#{gem[:current_spec].git_version}"
-            spec_version = "#{gem[:active_spec].version}#{gem[:active_spec].git_version}"
-            dependency = gem[:dependency].requirement if gem[:dependency] && gem[:dependency].specific?
-
-            ret_val = [gem[:active_spec].name, current_version, spec_version, dependency.to_s, gem[:groups].to_s]
-            ret_val << gem[:active_spec].loaded_from.to_s if options[:verbose]
-            ret_val
-          end
-
-          print_indented table_header, *outdated_gems
-        else
+        elsif options[:parseable]
           print_gems(outdated_gems)
+        else
+          print_gems_table(outdated_gems)
         end
 
         exit 1
@@ -133,14 +127,6 @@ module Bundler
 
     def groups_text(group_text, groups)
       "#{group_text}#{groups.split(",").size > 1 ? "s" : ""} \"#{groups}\""
-    end
-
-    def header_group_message(groups)
-      if groups.empty?
-        "===== Without group ====="
-      else
-        "===== #{groups_text("Group", groups)} ====="
-      end
     end
 
     def nothing_outdated_message
@@ -186,6 +172,19 @@ module Bundler
       end
     end
 
+    def print_gems_table(gems_list)
+      data = gems_list.map do |gem|
+        gem_column_for(
+          gem[:current_spec],
+          gem[:active_spec],
+          gem[:dependency],
+          gem[:groups],
+        )
+      end
+
+      print_indented([table_header] + data)
+    end
+
     def print_gem(current_spec, active_spec, dependency, groups)
       spec_version = "#{active_spec.version}#{active_spec.git_version}"
       spec_version += " (from #{active_spec.loaded_from})" if Bundler.ui.debug? && active_spec.loaded_from
@@ -207,6 +206,16 @@ module Bundler
       end
 
       Bundler.ui.info output_message.rstrip
+    end
+
+    def gem_column_for(current_spec, active_spec, dependency, groups)
+      current_version = "#{current_spec.version}#{current_spec.git_version}"
+      spec_version = "#{active_spec.version}#{active_spec.git_version}"
+      dependency = dependency.requirement if dependency
+
+      ret_val = [active_spec.name, current_version, spec_version, dependency.to_s, groups.to_s]
+      ret_val << active_spec.loaded_from.to_s if options[:verbose]
+      ret_val
     end
 
     def check_for_deployment_mode!
@@ -256,7 +265,7 @@ module Bundler
       version_section.to_a[0].to_i
     end
 
-    def print_indented(*data)
+    def print_indented(data)
       columns = data.first.size
 
       column_sizes = Array.new(columns) do |index|
