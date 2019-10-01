@@ -40,6 +40,26 @@ RSpec.describe "bundle outdated" do
       expect(out).to match(Regexp.new(expected_output))
     end
 
+    it "excludes header row from the sorting" do
+      update_repo2 do
+        build_gem "AAA", %w[1.0.0 2.0.0]
+      end
+
+      install_gemfile <<-G
+        source "#{file_uri_for(gem_repo2)}"
+        gem "AAA", "1.0.0"
+      G
+
+      bundle "outdated"
+
+      expected_output = <<~TABLE
+        Gem  Locked  Latest  Requested  Groups
+        AAA  1.0.0   2.0.0   = 1.0.0    default
+      TABLE
+
+      expect(out).to include(expected_output.strip)
+    end
+
     it "returns non zero exit status if outdated gems present" do
       update_repo2 do
         build_gem "activesupport", "3.0"

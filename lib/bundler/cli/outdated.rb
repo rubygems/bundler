@@ -265,12 +265,15 @@ module Bundler
       version_section.to_a[0].to_i
     end
 
-    def print_indented(data)
-      columns = data.first.size
+    def print_indented(matrix)
+      header = matrix[0]
+      data = matrix[1..-1]
 
-      column_sizes = Array.new(columns) do |index|
-        data.max_by {|row| row[index].length }[index].length
+      column_sizes = Array.new(header.size) do |index|
+        matrix.max_by {|row| row[index].length }[index].length
       end
+
+      Bundler.ui.info justify(header, column_sizes)
 
       data.sort_by! {|row| row[0] }
 
