@@ -192,7 +192,7 @@ RSpec.describe "bundle outdated" do
 
     it "not outdated gems" do
       bundle "outdated --groups"
-      expect(out).to include("Bundle up to date!")
+      expect(out).to end_with("Bundle up to date!")
     end
 
     it "returns a sorted list of outdated gems by groups" do
@@ -299,7 +299,8 @@ RSpec.describe "bundle outdated" do
         end
 
         bundle "outdated"
-        expect(out).not_to include("activesupport (3.0.0.beta > 2.3.5)")
+
+        expect(out).to end_with("Bundle up to date!")
       end
     end
 
@@ -354,7 +355,7 @@ RSpec.describe "bundle outdated" do
 
       bundle :outdated, filter_strict_option => true
 
-      expect(out).to_not include("rack (1.2")
+      expect(out).to end_with("Bundle up to date!")
     end
 
     describe "and filter options" do
@@ -493,7 +494,7 @@ RSpec.describe "bundle outdated" do
 
     it "reports that no updates are available" do
       bundle "outdated"
-      expect(out).to include("Bundle up to date!")
+      expect(out).to end_with("Bundle up to date!")
     end
   end
 
@@ -505,7 +506,7 @@ RSpec.describe "bundle outdated" do
       G
 
       bundle "outdated"
-      expect(out).to include("Bundle up to date!")
+      expect(out).to end_with("Bundle up to date!")
     end
 
     it "reports that updates are available if the JRuby platform is used" do
