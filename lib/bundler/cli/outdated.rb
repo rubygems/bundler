@@ -210,7 +210,7 @@ module Bundler
       dependency = dependency.requirement if dependency
 
       ret_val = [active_spec.name, current_version, spec_version, dependency.to_s, groups.to_s]
-      ret_val << active_spec.loaded_from.to_s if options[:verbose]
+      ret_val << active_spec.loaded_from.to_s if Bundler.ui.debug?
       ret_val
     end
 
@@ -280,7 +280,7 @@ module Bundler
 
     def table_header
       header = ["Gem", "Locked", "Latest", "Requested", "Groups"]
-      header << "Path" if options[:verbose]
+      header << "Path" if Bundler.ui.debug?
       header
     end
 
