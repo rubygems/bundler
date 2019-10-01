@@ -527,7 +527,6 @@ RSpec.describe "bundle outdated" do
     it "reports that a gem has a newer version" do
       subject
       expect(out).to include("activesupport (newest")
-      expect(out).to_not include("ERROR REPORT TEMPLATE")
     end
   end
 
@@ -583,7 +582,6 @@ RSpec.describe "bundle outdated" do
     it "does not detect any version updates" do
       subject
       expect(out).to include("updates to display.")
-      expect(out).to_not include("ERROR REPORT TEMPLATE")
       expect(out).to_not include("activesupport (newest")
       expect(out).to_not include("weakling (newest")
     end
