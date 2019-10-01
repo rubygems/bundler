@@ -91,12 +91,45 @@ RSpec.describe "bundle outdated" do
       update_repo2 { build_gem "activesupport", "3.0" }
       update_repo2 { build_gem "terranova", "9" }
 
+      bundle "outdated"
+
+      expected_output = <<~TABLE.strip
+        Gem            Locked  Latest  Requested  Groups
+        activesupport  2.3.5   3.0     = 2.3.5    development, test
+        terranova      8       9       = 8        default
+      TABLE
+
+      expect(out).to end_with(expected_output)
+    end
+  end
+
+  describe "with --verbose option" do
+    it "shows the location of the latest version's gemspec if installed" do
+      bundle! "config set clean false"
+
+      update_repo2 { build_gem "activesupport", "3.0" }
+      update_repo2 { build_gem "terranova", "9" }
+
+      install_gemfile <<-G
+        source "#{file_uri_for(gem_repo2)}"
+
+        gem "terranova", '9'
+        gem 'activesupport', '2.3.5'
+      G
+
+      gemfile <<-G
+        source "#{file_uri_for(gem_repo2)}"
+
+        gem "terranova", '8'
+        gem 'activesupport', '2.3.5'
+      G
+
       bundle "outdated --verbose"
 
       expected_output = <<~TABLE.strip
-        Gem            Locked  Latest  Requested  Groups             Path
-        activesupport  2.3.5   3.0     = 2.3.5    development, test
-        terranova      8       9       = 8        default
+        Gem            Locked  Latest  Requested  Groups   Path
+        activesupport  2.3.5   3.0     = 2.3.5    default
+        terranova      8       9       = 8        default  #{default_bundle_path("specifications/terranova-9.gemspec")}
       TABLE
 
       expect(out).to end_with(expected_output)
