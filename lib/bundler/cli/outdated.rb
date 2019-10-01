@@ -116,7 +116,7 @@ module Bundler
             dependency = gem[:dependency].requirement if gem[:dependency] && gem[:dependency].specific?
 
             ret_val = [gem[:active_spec].name, current_version, spec_version, dependency.to_s, gem[:groups].to_s]
-            ret_val << gem[:active_spec].loaded_from if options[:verbose]
+            ret_val << gem[:active_spec].loaded_from.to_s if options[:verbose]
             ret_val
           end
 
@@ -260,14 +260,14 @@ module Bundler
       columns = data.first.size
 
       column_sizes = Array.new(columns) do |index|
-        data.max_by {|row| row[index].to_s.length }[index].length
+        data.max_by {|row| row[index].length }[index].length
       end
 
       data.sort_by! {|row| row[0] }
 
       data.each do |row|
         row = row.each_with_index.map do |element, index|
-          element.to_s.ljust(column_sizes[index])
+          element.ljust(column_sizes[index])
         end
 
         Bundler.ui.info row.join("  ") + "\n"
