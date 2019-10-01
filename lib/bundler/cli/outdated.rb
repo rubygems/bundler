@@ -276,7 +276,7 @@ module Bundler
 
     def table_header
       header = ["Gem", "Installed", "Latest", "Requested", "Groups"]
-      header << "Load Path" if options[:verbose]
+      header << "Path" if options[:verbose]
       header
     end
   end
