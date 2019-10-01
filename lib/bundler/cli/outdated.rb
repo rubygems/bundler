@@ -279,7 +279,7 @@ module Bundler
     def justify(row, sizes)
       row.each_with_index.map do |element, index|
         element.ljust(sizes[index])
-      end.join("  ") + "\n"
+      end.join("  ").strip + "\n"
     end
   end
 end
