@@ -266,11 +266,7 @@ module Bundler
       data.sort_by! {|row| row[0] }
 
       data.each do |row|
-        row = row.each_with_index.map do |element, index|
-          element.ljust(column_sizes[index])
-        end
-
-        Bundler.ui.info row.join("  ") + "\n"
+        Bundler.ui.info justify(row, column_sizes)
       end
     end
 
@@ -278,6 +274,12 @@ module Bundler
       header = ["Gem", "Locked", "Latest", "Requested", "Groups"]
       header << "Path" if options[:verbose]
       header
+    end
+
+    def justify(row, sizes)
+      row.each_with_index.map do |element, index|
+        element.ljust(sizes[index])
+      end.join("  ") + "\n"
     end
   end
 end
