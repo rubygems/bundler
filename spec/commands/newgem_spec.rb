@@ -100,8 +100,7 @@ RSpec.describe "bundle gem" do
     it "generates a gem skeleton with MIT license" do
       gem_skeleton_assertions
       expect(bundled_app("#{gem_name}/LICENSE.txt")).to exist
-      skel = Bundler::GemHelper.new(bundled_app(gem_name).to_s)
-      expect(skel.gemspec.license).to eq("MIT")
+      expect(generated_gemspec.license).to eq("MIT")
     end
   end
 
