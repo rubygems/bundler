@@ -536,6 +536,40 @@ RSpec.describe "bundle gem" do
         expect(output).to include("echo \"#{gemspec_path}\"")
       end
     end
+
+    context "--ext parameter set" do
+      before do
+        in_app_root
+        bundle "gem test_gem --ext"
+      end
+
+      it "builds ext skeleton" do
+        expect(bundled_app("test_gem/ext/test_gem/extconf.rb")).to exist
+        expect(bundled_app("test_gem/ext/test_gem/test_gem.h")).to exist
+        expect(bundled_app("test_gem/ext/test_gem/test_gem.c")).to exist
+      end
+
+      it "includes rake-compiler" do
+        expect(bundled_app("test_gem/Gemfile").read).to include('gem "rake-compiler"')
+      end
+
+      it "depends on compile task for build" do
+        rakefile = strip_whitespace <<-RAKEFILE
+          require "bundler/gem_tasks"
+          require "rake/extensiontask"
+
+          task :build => :compile
+
+          Rake::ExtensionTask.new("test_gem") do |ext|
+            ext.lib_dir = "lib/test_gem"
+          end
+
+          task :default => [:clobber, :compile, :spec]
+        RAKEFILE
+
+        expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
+      end
+    end
   end
 
   context "testing --mit and --coc options against bundle config settings" do
@@ -743,40 +777,6 @@ RSpec.describe "bundle gem" do
       it "defaults to rspec" do
         expect(bundled_app("test-gem/spec/spec_helper.rb")).to exist
         expect(bundled_app("test-gem/test/minitest_helper.rb")).to_not exist
-      end
-    end
-
-    context "--ext parameter set" do
-      before do
-        in_app_root
-        bundle "gem test_gem --ext"
-      end
-
-      it "builds ext skeleton" do
-        expect(bundled_app("test_gem/ext/test_gem/extconf.rb")).to exist
-        expect(bundled_app("test_gem/ext/test_gem/test_gem.h")).to exist
-        expect(bundled_app("test_gem/ext/test_gem/test_gem.c")).to exist
-      end
-
-      it "includes rake-compiler" do
-        expect(bundled_app("test_gem/Gemfile").read).to include('gem "rake-compiler"')
-      end
-
-      it "depends on compile task for build" do
-        rakefile = strip_whitespace <<-RAKEFILE
-          require "bundler/gem_tasks"
-          require "rake/extensiontask"
-
-          task :build => :compile
-
-          Rake::ExtensionTask.new("test_gem") do |ext|
-            ext.lib_dir = "lib/test_gem"
-          end
-
-          task :default => [:clobber, :compile, :spec]
-        RAKEFILE
-
-        expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
       end
     end
   end
