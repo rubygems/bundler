@@ -6,13 +6,15 @@ RSpec.describe "bundle gem" do
     expect(bundled_app("#{gem_name}/README.md")).to exist
     expect(bundled_app("#{gem_name}/Gemfile")).to exist
     expect(bundled_app("#{gem_name}/Rakefile")).to exist
-    expect(bundled_app("#{gem_name}/lib/test/gem.rb")).to exist
-    expect(bundled_app("#{gem_name}/lib/test/gem/version.rb")).to exist
+    expect(bundled_app("#{gem_name}/lib/#{require_path}.rb")).to exist
+    expect(bundled_app("#{gem_name}/lib/#{require_path}/version.rb")).to exist
   end
 
   let(:generated_gemspec) { Bundler.load_gemspec_uncached(bundled_app(gem_name).join("#{gem_name}.gemspec")) }
 
-  let(:gem_name) { "test-gem" }
+  let(:gem_name) { "mygem" }
+
+  let(:require_path) { "mygem" }
 
   before do
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
@@ -521,6 +523,8 @@ RSpec.describe "bundle gem" do
 
   context "testing --mit and --coc options against bundle config settings" do
     let(:gem_name) { "test-gem" }
+
+    let(:require_path) { "test/gem" }
 
     context "with mit option in bundle config settings set to true" do
       before do
