@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe "bundle gem" do
-  def execute_bundle_gem(gem_name, flag = "")
-    bundle! "gem #{gem_name} #{flag}"
-  end
-
   def gem_skeleton_assertions(gem_name)
     expect(bundled_app("#{gem_name}/#{gem_name}.gemspec")).to exist
     expect(bundled_app("#{gem_name}/README.md")).to exist
@@ -63,8 +59,9 @@ RSpec.describe "bundle gem" do
 
     shared_examples_for "a gem with an initial git repo" do
       before do
-        execute_bundle_gem(gem_name, flags)
+        bundle! "gem #{gem_name} #{flags}"
       end
+
       it "generates a gem skeleton with a .git folder" do
         gem_skeleton_assertions(gem_name)
         expect(bundled_app("test-gem/.git")).to exist
@@ -85,7 +82,7 @@ RSpec.describe "bundle gem" do
 
     context "when passing --no-git" do
       before do
-        execute_bundle_gem(gem_name, "--no-git")
+        bundle! "gem #{gem_name} --no-git"
       end
       it "generates a gem skeleton without a .git folder" do
         gem_skeleton_assertions(gem_name)
@@ -96,7 +93,7 @@ RSpec.describe "bundle gem" do
 
   shared_examples_for "--mit flag" do
     before do
-      execute_bundle_gem(gem_name, "--mit")
+      bundle! "gem #{gem_name} --mit"
     end
     it "generates a gem skeleton with MIT license" do
       gem_skeleton_assertions(gem_name)
@@ -108,7 +105,7 @@ RSpec.describe "bundle gem" do
 
   shared_examples_for "--no-mit flag" do
     before do
-      execute_bundle_gem(gem_name, "--no-mit")
+      bundle! "gem #{gem_name} --no-mit"
     end
     it "generates a gem skeleton without MIT license" do
       gem_skeleton_assertions(gem_name)
@@ -118,7 +115,7 @@ RSpec.describe "bundle gem" do
 
   shared_examples_for "--coc flag" do
     before do
-      execute_bundle_gem(gem_name, "--coc")
+      bundle! "gem #{gem_name} --coc"
     end
     it "generates a gem skeleton with MIT license" do
       gem_skeleton_assertions(gem_name)
@@ -135,7 +132,7 @@ RSpec.describe "bundle gem" do
 
   shared_examples_for "--no-coc flag" do
     before do
-      execute_bundle_gem(gem_name, "--no-coc")
+      bundle! "gem #{gem_name} --no-coc"
     end
     it "generates a gem skeleton without Code of Conduct" do
       gem_skeleton_assertions(gem_name)
@@ -155,7 +152,7 @@ RSpec.describe "bundle gem" do
 
     context "git config github.user present" do
       before do
-        execute_bundle_gem(gem_name)
+        bundle! "gem #{gem_name}"
       end
 
       it "contribute URL set to git username" do
@@ -262,7 +259,7 @@ RSpec.describe "bundle gem" do
     let(:gem_name) { "test_gem" }
 
     before do
-      execute_bundle_gem(gem_name)
+      bundle! "gem #{gem_name}"
     end
 
     it "generates a gem skeleton" do
@@ -560,7 +557,7 @@ RSpec.describe "bundle gem" do
     let(:gem_name) { "test-gem" }
 
     before do
-      execute_bundle_gem(gem_name)
+      bundle! "gem #{gem_name}"
     end
 
     it "generates a gem skeleton" do
@@ -769,7 +766,7 @@ RSpec.describe "bundle gem" do
 
   describe "uncommon gem names" do
     it "can deal with two dashes" do
-      execute_bundle_gem("a--a")
+      bundle! "gem a--a"
 
       expect(bundled_app("a--a/a--a.gemspec")).to exist
     end
