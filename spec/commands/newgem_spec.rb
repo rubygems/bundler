@@ -255,14 +255,16 @@ RSpec.describe "bundle gem" do
   context "gem naming with underscore" do
     let(:gem_name) { "test_gem" }
 
+    let(:require_path) { "test_gem" }
+
     it "generates a gem skeleton" do
       bundle! "gem #{gem_name}"
 
       expect(bundled_app("#{gem_name}/#{gem_name}.gemspec")).to exist
       expect(bundled_app("#{gem_name}/Gemfile")).to exist
       expect(bundled_app("#{gem_name}/Rakefile")).to exist
-      expect(bundled_app("#{gem_name}/lib/test_gem.rb")).to exist
-      expect(bundled_app("#{gem_name}/lib/test_gem/version.rb")).to exist
+      expect(bundled_app("#{gem_name}/lib/#{require_path}.rb")).to exist
+      expect(bundled_app("#{gem_name}/lib/#{require_path}/version.rb")).to exist
       expect(bundled_app("#{gem_name}/.gitignore")).to exist
 
       expect(bundled_app("#{gem_name}/bin/setup")).to exist
@@ -274,14 +276,14 @@ RSpec.describe "bundle gem" do
     it "starts with version 0.1.0" do
       bundle! "gem #{gem_name}"
 
-      expect(bundled_app("#{gem_name}/lib/test_gem/version.rb").read).to match(/VERSION = "0.1.0"/)
+      expect(bundled_app("#{gem_name}/lib/#{require_path}/version.rb").read).to match(/VERSION = "0.1.0"/)
     end
 
     it "does not nest constants" do
       bundle! "gem #{gem_name}"
 
-      expect(bundled_app("#{gem_name}/lib/test_gem/version.rb").read).to match(/module TestGem/)
-      expect(bundled_app("#{gem_name}/lib/test_gem.rb").read).to match(/module TestGem/)
+      expect(bundled_app("#{gem_name}/lib/#{require_path}/version.rb").read).to match(/module TestGem/)
+      expect(bundled_app("#{gem_name}/lib/#{require_path}.rb").read).to match(/module TestGem/)
     end
 
     context "git config user.{name,email} is set" do
@@ -321,13 +323,13 @@ RSpec.describe "bundle gem" do
     it "requires the version file" do
       bundle! "gem #{gem_name}"
 
-      expect(bundled_app("#{gem_name}/lib/test_gem.rb").read).to match(%r{require "test_gem/version"})
+      expect(bundled_app("#{gem_name}/lib/#{require_path}.rb").read).to match(%r{require "#{require_path}/version"})
     end
 
     it "creates a base error class" do
       bundle! "gem #{gem_name}"
 
-      expect(bundled_app("#{gem_name}/lib/test_gem.rb").read).to match(/class Error < StandardError; end$/)
+      expect(bundled_app("#{gem_name}/lib/#{require_path}.rb").read).to match(/class Error < StandardError; end$/)
     end
 
     it "runs rake without problems" do
@@ -361,7 +363,7 @@ RSpec.describe "bundle gem" do
       end
 
       it "requires the main file" do
-        expect(bundled_app("#{gem_name}/exe/#{gem_name}").read).to match(/require "test_gem"/)
+        expect(bundled_app("#{gem_name}/exe/#{gem_name}").read).to match(/require "#{require_path}"/)
       end
     end
 
@@ -376,7 +378,7 @@ RSpec.describe "bundle gem" do
       end
 
       it "requires the main file" do
-        expect(bundled_app("#{gem_name}/exe/#{gem_name}").read).to match(/require "test_gem"/)
+        expect(bundled_app("#{gem_name}/exe/#{gem_name}").read).to match(/require "#{require_path}"/)
       end
     end
 
@@ -388,9 +390,9 @@ RSpec.describe "bundle gem" do
 
       it "doesn't create any spec/test file" do
         expect(bundled_app("#{gem_name}/.rspec")).to_not exist
-        expect(bundled_app("#{gem_name}/spec/test_gem_spec.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/spec/#{require_path}_spec.rb")).to_not exist
         expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to_not exist
-        expect(bundled_app("#{gem_name}/test/test_test_gem.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/test/#{require_path}.rb")).to_not exist
         expect(bundled_app("#{gem_name}/test/minitest_helper.rb")).to_not exist
       end
     end
@@ -403,7 +405,7 @@ RSpec.describe "bundle gem" do
 
       it "builds spec skeleton" do
         expect(bundled_app("#{gem_name}/.rspec")).to exist
-        expect(bundled_app("#{gem_name}/spec/test_gem_spec.rb")).to exist
+        expect(bundled_app("#{gem_name}/spec/#{require_path}_spec.rb")).to exist
         expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to exist
       end
 
@@ -418,11 +420,11 @@ RSpec.describe "bundle gem" do
       end
 
       it "requires the main file" do
-        expect(bundled_app("#{gem_name}/spec/spec_helper.rb").read).to include(%(require "test_gem"))
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb").read).to include(%(require "#{require_path}"))
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("#{gem_name}/spec/test_gem_spec.rb").read).to include("expect(false).to eq(true)")
+        expect(bundled_app("#{gem_name}/spec/#{require_path}_spec.rb").read).to include("expect(false).to eq(true)")
       end
     end
 
@@ -435,7 +437,7 @@ RSpec.describe "bundle gem" do
 
       it "builds spec skeleton" do
         expect(bundled_app("#{gem_name}/.rspec")).to exist
-        expect(bundled_app("#{gem_name}/spec/test_gem_spec.rb")).to exist
+        expect(bundled_app("#{gem_name}/spec/#{require_path}_spec.rb")).to exist
         expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to exist
       end
     end
@@ -448,7 +450,7 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("#{gem_name}/test/test_gem_test.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/#{require_path}_test.rb")).to exist
         expect(bundled_app("#{gem_name}/test/test_helper.rb")).to exist
       end
     end
@@ -470,20 +472,20 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("#{gem_name}/test/test_gem_test.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/#{require_path}_test.rb")).to exist
         expect(bundled_app("#{gem_name}/test/test_helper.rb")).to exist
       end
 
       it "requires the main file" do
-        expect(bundled_app("#{gem_name}/test/test_helper.rb").read).to include(%(require "test_gem"))
+        expect(bundled_app("#{gem_name}/test/test_helper.rb").read).to include(%(require "#{require_path}"))
       end
 
       it "requires 'minitest_helper'" do
-        expect(bundled_app("#{gem_name}/test/test_gem_test.rb").read).to include(%(require "test_helper"))
+        expect(bundled_app("#{gem_name}/test/#{require_path}_test.rb").read).to include(%(require "test_helper"))
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("#{gem_name}/test/test_gem_test.rb").read).to include("assert false")
+        expect(bundled_app("#{gem_name}/test/#{require_path}_test.rb").read).to include("assert false")
       end
     end
 
@@ -607,6 +609,8 @@ RSpec.describe "bundle gem" do
   context "gem naming with dashed" do
     let(:gem_name) { "test-gem" }
 
+    let(:require_path) { "test/gem" }
+
     before do
       bundle! "gem #{gem_name}"
     end
@@ -615,17 +619,17 @@ RSpec.describe "bundle gem" do
       expect(bundled_app("#{gem_name}/#{gem_name}.gemspec")).to exist
       expect(bundled_app("#{gem_name}/Gemfile")).to exist
       expect(bundled_app("#{gem_name}/Rakefile")).to exist
-      expect(bundled_app("#{gem_name}/lib/test/gem.rb")).to exist
-      expect(bundled_app("#{gem_name}/lib/test/gem/version.rb")).to exist
+      expect(bundled_app("#{gem_name}/lib/#{require_path}.rb")).to exist
+      expect(bundled_app("#{gem_name}/lib/#{require_path}/version.rb")).to exist
     end
 
     it "starts with version 0.1.0" do
-      expect(bundled_app("#{gem_name}/lib/test/gem/version.rb").read).to match(/VERSION = "0.1.0"/)
+      expect(bundled_app("#{gem_name}/lib/#{require_path}/version.rb").read).to match(/VERSION = "0.1.0"/)
     end
 
     it "nests constants so they work" do
-      expect(bundled_app("#{gem_name}/lib/test/gem/version.rb").read).to match(/module Test\n  module Gem/)
-      expect(bundled_app("#{gem_name}/lib/test/gem.rb").read).to match(/module Test\n  module Gem/)
+      expect(bundled_app("#{gem_name}/lib/#{require_path}/version.rb").read).to match(/module Test\n  module Gem/)
+      expect(bundled_app("#{gem_name}/lib/#{require_path}.rb").read).to match(/module Test\n  module Gem/)
     end
 
     it_should_behave_like "git config is present"
@@ -642,7 +646,7 @@ RSpec.describe "bundle gem" do
     end
 
     it "requires the version file" do
-      expect(bundled_app("#{gem_name}/lib/test/gem.rb").read).to match(%r{require "test/gem/version"})
+      expect(bundled_app("#{gem_name}/lib/#{require_path}.rb").read).to match(%r{require "#{require_path}/version"})
     end
 
     it "runs rake without problems" do
@@ -674,7 +678,7 @@ RSpec.describe "bundle gem" do
       end
 
       it "requires the main file" do
-        expect(bundled_app("#{gem_name}/exe/#{gem_name}").read).to match(%r{require "test/gem"})
+        expect(bundled_app("#{gem_name}/exe/#{gem_name}").read).to match(%r{require "#{require_path}"})
       end
     end
 
@@ -686,9 +690,9 @@ RSpec.describe "bundle gem" do
 
       it "doesn't create any spec/test file" do
         expect(bundled_app("#{gem_name}/.rspec")).to_not exist
-        expect(bundled_app("#{gem_name}/spec/test/gem_spec.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/spec/#{require_path}_spec.rb")).to_not exist
         expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to_not exist
-        expect(bundled_app("#{gem_name}/test/test_test/gem.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/test/test_#{require_path}.rb")).to_not exist
         expect(bundled_app("#{gem_name}/test/minitest_helper.rb")).to_not exist
       end
     end
@@ -701,16 +705,16 @@ RSpec.describe "bundle gem" do
 
       it "builds spec skeleton" do
         expect(bundled_app("#{gem_name}/.rspec")).to exist
-        expect(bundled_app("#{gem_name}/spec/test/gem_spec.rb")).to exist
+        expect(bundled_app("#{gem_name}/spec/#{require_path}_spec.rb")).to exist
         expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to exist
       end
 
       it "requires the main file" do
-        expect(bundled_app("#{gem_name}/spec/spec_helper.rb").read).to include(%(require "test/gem"))
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb").read).to include(%(require "#{require_path}"))
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("#{gem_name}/spec/test/gem_spec.rb").read).to include("expect(false).to eq(true)")
+        expect(bundled_app("#{gem_name}/spec/#{require_path}_spec.rb").read).to include("expect(false).to eq(true)")
       end
 
       it "creates a default rake task to run the specs" do
@@ -734,20 +738,20 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("#{gem_name}/test/test/gem_test.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/#{require_path}_test.rb")).to exist
         expect(bundled_app("#{gem_name}/test/test_helper.rb")).to exist
       end
 
       it "requires the main file" do
-        expect(bundled_app("#{gem_name}/test/test_helper.rb").read).to match(%r{require "test/gem"})
+        expect(bundled_app("#{gem_name}/test/test_helper.rb").read).to match(/require "#{require_path}"/)
       end
 
       it "requires 'test_helper'" do
-        expect(bundled_app("#{gem_name}/test/test/gem_test.rb").read).to match(/require "test_helper"/)
+        expect(bundled_app("#{gem_name}/test/#{require_path}_test.rb").read).to match(/require "test_helper"/)
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("#{gem_name}/test/test/gem_test.rb").read).to match(/assert false/)
+        expect(bundled_app("#{gem_name}/test/#{require_path}_test.rb").read).to match(/assert false/)
       end
 
       it "creates a default rake task to run the test suite" do
