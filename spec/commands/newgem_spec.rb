@@ -255,11 +255,9 @@ RSpec.describe "bundle gem" do
   context "gem naming with underscore" do
     let(:gem_name) { "test_gem" }
 
-    before do
-      bundle! "gem #{gem_name}"
-    end
-
     it "generates a gem skeleton" do
+      bundle! "gem #{gem_name}"
+
       expect(bundled_app("test_gem/test_gem.gemspec")).to exist
       expect(bundled_app("test_gem/Gemfile")).to exist
       expect(bundled_app("test_gem/Rakefile")).to exist
@@ -274,15 +272,25 @@ RSpec.describe "bundle gem" do
     end
 
     it "starts with version 0.1.0" do
+      bundle! "gem #{gem_name}"
+
       expect(bundled_app("test_gem/lib/test_gem/version.rb").read).to match(/VERSION = "0.1.0"/)
     end
 
     it "does not nest constants" do
+      bundle! "gem #{gem_name}"
+
       expect(bundled_app("test_gem/lib/test_gem/version.rb").read).to match(/module TestGem/)
       expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(/module TestGem/)
     end
 
-    it_should_behave_like "git config is present"
+    context "git config user.{name,email} is set" do
+      before do
+        bundle! "gem #{gem_name}"
+      end
+
+      it_should_behave_like "git config is present"
+    end
 
     context "git config user.{name,email} is not set" do
       before do
@@ -296,25 +304,35 @@ RSpec.describe "bundle gem" do
     end
 
     it "sets gemspec metadata['allowed_push_host']" do
+      bundle! "gem #{gem_name}"
+
       expect(generated_gemspec.metadata["allowed_push_host"]).
         to match(/mygemserver\.com/)
     end
 
     it "sets a minimum ruby version" do
+      bundle! "gem #{gem_name}"
+
       bundler_gemspec = Bundler::GemHelper.new(gemspec_dir).gemspec
 
       expect(bundler_gemspec.required_ruby_version).to eq(generated_gemspec.required_ruby_version)
     end
 
     it "requires the version file" do
+      bundle! "gem #{gem_name}"
+
       expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(%r{require "test_gem/version"})
     end
 
     it "creates a base error class" do
+      bundle! "gem #{gem_name}"
+
       expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(/class Error < StandardError; end$/)
     end
 
     it "runs rake without problems" do
+      bundle! "gem #{gem_name}"
+
       system_gems ["rake-12.3.2"]
 
       rakefile = strip_whitespace <<-RAKEFILE
