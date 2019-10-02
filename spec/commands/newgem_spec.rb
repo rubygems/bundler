@@ -176,8 +176,8 @@ RSpec.describe "bundle gem" do
 
   it "creates a new git repository" do
     in_app_root
-    bundle "gem test_gem"
-    expect(bundled_app("test_gem/.git")).to exist
+    bundle "gem #{gem_name}"
+    expect(bundled_app("#{gem_name}/.git")).to exist
   end
 
   context "when git is not available" do
@@ -258,30 +258,30 @@ RSpec.describe "bundle gem" do
     it "generates a gem skeleton" do
       bundle! "gem #{gem_name}"
 
-      expect(bundled_app("test_gem/test_gem.gemspec")).to exist
-      expect(bundled_app("test_gem/Gemfile")).to exist
-      expect(bundled_app("test_gem/Rakefile")).to exist
-      expect(bundled_app("test_gem/lib/test_gem.rb")).to exist
-      expect(bundled_app("test_gem/lib/test_gem/version.rb")).to exist
-      expect(bundled_app("test_gem/.gitignore")).to exist
+      expect(bundled_app("#{gem_name}/#{gem_name}.gemspec")).to exist
+      expect(bundled_app("#{gem_name}/Gemfile")).to exist
+      expect(bundled_app("#{gem_name}/Rakefile")).to exist
+      expect(bundled_app("#{gem_name}/lib/test_gem.rb")).to exist
+      expect(bundled_app("#{gem_name}/lib/test_gem/version.rb")).to exist
+      expect(bundled_app("#{gem_name}/.gitignore")).to exist
 
-      expect(bundled_app("test_gem/bin/setup")).to exist
-      expect(bundled_app("test_gem/bin/console")).to exist
-      expect(bundled_app("test_gem/bin/setup")).to be_executable
-      expect(bundled_app("test_gem/bin/console")).to be_executable
+      expect(bundled_app("#{gem_name}/bin/setup")).to exist
+      expect(bundled_app("#{gem_name}/bin/console")).to exist
+      expect(bundled_app("#{gem_name}/bin/setup")).to be_executable
+      expect(bundled_app("#{gem_name}/bin/console")).to be_executable
     end
 
     it "starts with version 0.1.0" do
       bundle! "gem #{gem_name}"
 
-      expect(bundled_app("test_gem/lib/test_gem/version.rb").read).to match(/VERSION = "0.1.0"/)
+      expect(bundled_app("#{gem_name}/lib/test_gem/version.rb").read).to match(/VERSION = "0.1.0"/)
     end
 
     it "does not nest constants" do
       bundle! "gem #{gem_name}"
 
-      expect(bundled_app("test_gem/lib/test_gem/version.rb").read).to match(/module TestGem/)
-      expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(/module TestGem/)
+      expect(bundled_app("#{gem_name}/lib/test_gem/version.rb").read).to match(/module TestGem/)
+      expect(bundled_app("#{gem_name}/lib/test_gem.rb").read).to match(/module TestGem/)
     end
 
     context "git config user.{name,email} is set" do
@@ -321,13 +321,13 @@ RSpec.describe "bundle gem" do
     it "requires the version file" do
       bundle! "gem #{gem_name}"
 
-      expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(%r{require "test_gem/version"})
+      expect(bundled_app("#{gem_name}/lib/test_gem.rb").read).to match(%r{require "test_gem/version"})
     end
 
     it "creates a base error class" do
       bundle! "gem #{gem_name}"
 
-      expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(/class Error < StandardError; end$/)
+      expect(bundled_app("#{gem_name}/lib/test_gem.rb").read).to match(/class Error < StandardError; end$/)
     end
 
     it "runs rake without problems" do
@@ -340,7 +340,7 @@ RSpec.describe "bundle gem" do
           puts 'SUCCESS'
         end
       RAKEFILE
-      File.open(bundled_app("test_gem/Rakefile"), "w") do |file|
+      File.open(bundled_app("#{gem_name}/Rakefile"), "w") do |file|
         file.puts rakefile
       end
 
@@ -357,11 +357,11 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds exe skeleton" do
-        expect(bundled_app("test_gem/exe/test_gem")).to exist
+        expect(bundled_app("#{gem_name}/exe/#{gem_name}")).to exist
       end
 
       it "requires the main file" do
-        expect(bundled_app("test_gem/exe/test_gem").read).to match(/require "test_gem"/)
+        expect(bundled_app("#{gem_name}/exe/#{gem_name}").read).to match(/require "test_gem"/)
       end
     end
 
@@ -372,11 +372,11 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds exe skeleton" do
-        expect(bundled_app("test_gem/exe/test_gem")).to exist
+        expect(bundled_app("#{gem_name}/exe/#{gem_name}")).to exist
       end
 
       it "requires the main file" do
-        expect(bundled_app("test_gem/exe/test_gem").read).to match(/require "test_gem"/)
+        expect(bundled_app("#{gem_name}/exe/#{gem_name}").read).to match(/require "test_gem"/)
       end
     end
 
@@ -387,11 +387,11 @@ RSpec.describe "bundle gem" do
       end
 
       it "doesn't create any spec/test file" do
-        expect(bundled_app("test_gem/.rspec")).to_not exist
-        expect(bundled_app("test_gem/spec/test_gem_spec.rb")).to_not exist
-        expect(bundled_app("test_gem/spec/spec_helper.rb")).to_not exist
-        expect(bundled_app("test_gem/test/test_test_gem.rb")).to_not exist
-        expect(bundled_app("test_gem/test/minitest_helper.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/.rspec")).to_not exist
+        expect(bundled_app("#{gem_name}/spec/test_gem_spec.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/test/test_test_gem.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/test/minitest_helper.rb")).to_not exist
       end
     end
 
@@ -402,15 +402,15 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("test_gem/.rspec")).to exist
-        expect(bundled_app("test_gem/spec/test_gem_spec.rb")).to exist
-        expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
+        expect(bundled_app("#{gem_name}/.rspec")).to exist
+        expect(bundled_app("#{gem_name}/spec/test_gem_spec.rb")).to exist
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to exist
       end
 
       it "depends on a specific version of rspec in generated Gemfile" do
-        Dir.chdir(bundled_app("test_gem")) do
+        Dir.chdir(bundled_app(gem_name)) do
           builder = Bundler::Dsl.new
-          builder.eval_gemfile(bundled_app("test_gem/Gemfile"))
+          builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
           builder.dependencies
           rspec_dep = builder.dependencies.find {|d| d.name == "rspec" }
           expect(rspec_dep).to be_specific
@@ -418,11 +418,11 @@ RSpec.describe "bundle gem" do
       end
 
       it "requires the main file" do
-        expect(bundled_app("test_gem/spec/spec_helper.rb").read).to include(%(require "test_gem"))
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb").read).to include(%(require "test_gem"))
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test_gem/spec/test_gem_spec.rb").read).to include("expect(false).to eq(true)")
+        expect(bundled_app("#{gem_name}/spec/test_gem_spec.rb").read).to include("expect(false).to eq(true)")
       end
     end
 
@@ -434,9 +434,9 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("test_gem/.rspec")).to exist
-        expect(bundled_app("test_gem/spec/test_gem_spec.rb")).to exist
-        expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
+        expect(bundled_app("#{gem_name}/.rspec")).to exist
+        expect(bundled_app("#{gem_name}/spec/test_gem_spec.rb")).to exist
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to exist
       end
     end
 
@@ -448,8 +448,8 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("test_gem/test/test_gem_test.rb")).to exist
-        expect(bundled_app("test_gem/test/test_helper.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/test_gem_test.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/test_helper.rb")).to exist
       end
     end
 
@@ -460,9 +460,9 @@ RSpec.describe "bundle gem" do
       end
 
       it "depends on a specific version of minitest" do
-        Dir.chdir(bundled_app("test_gem")) do
+        Dir.chdir(bundled_app(gem_name)) do
           builder = Bundler::Dsl.new
-          builder.eval_gemfile(bundled_app("test_gem/Gemfile"))
+          builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
           builder.dependencies
           minitest_dep = builder.dependencies.find {|d| d.name == "minitest" }
           expect(minitest_dep).to be_specific
@@ -470,20 +470,20 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("test_gem/test/test_gem_test.rb")).to exist
-        expect(bundled_app("test_gem/test/test_helper.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/test_gem_test.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/test_helper.rb")).to exist
       end
 
       it "requires the main file" do
-        expect(bundled_app("test_gem/test/test_helper.rb").read).to include(%(require "test_gem"))
+        expect(bundled_app("#{gem_name}/test/test_helper.rb").read).to include(%(require "test_gem"))
       end
 
       it "requires 'minitest_helper'" do
-        expect(bundled_app("test_gem/test/test_gem_test.rb").read).to include(%(require "test_helper"))
+        expect(bundled_app("#{gem_name}/test/test_gem_test.rb").read).to include(%(require "test_helper"))
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test_gem/test/test_gem_test.rb").read).to include("assert false")
+        expect(bundled_app("#{gem_name}/test/test_gem_test.rb").read).to include("assert false")
       end
     end
 
@@ -508,7 +508,7 @@ RSpec.describe "bundle gem" do
           task :default => :test
         RAKEFILE
 
-        expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
+        expect(bundled_app("#{gem_name}/Rakefile").read).to eq(rakefile)
       end
     end
 
@@ -519,12 +519,12 @@ RSpec.describe "bundle gem" do
       end
 
       it "defaults to rspec" do
-        expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
-        expect(bundled_app("test_gem/test/minitest_helper.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/minitest_helper.rb")).to_not exist
       end
 
       it "creates a .travis.yml file to test the library against the current Ruby version on Travis CI" do
-        expect(bundled_app("test_gem/.travis.yml").read).to match(/- #{RUBY_VERSION}/)
+        expect(bundled_app("#{gem_name}/.travis.yml").read).to match(/- #{RUBY_VERSION}/)
       end
     end
 
@@ -540,17 +540,17 @@ RSpec.describe "bundle gem" do
     context "--ext parameter set" do
       before do
         in_app_root
-        bundle "gem test_gem --ext"
+        bundle "gem #{gem_name} --ext"
       end
 
       it "builds ext skeleton" do
-        expect(bundled_app("test_gem/ext/test_gem/extconf.rb")).to exist
-        expect(bundled_app("test_gem/ext/test_gem/test_gem.h")).to exist
-        expect(bundled_app("test_gem/ext/test_gem/test_gem.c")).to exist
+        expect(bundled_app("#{gem_name}/ext/#{gem_name}/extconf.rb")).to exist
+        expect(bundled_app("#{gem_name}/ext/#{gem_name}/#{gem_name}.h")).to exist
+        expect(bundled_app("#{gem_name}/ext/#{gem_name}/#{gem_name}.c")).to exist
       end
 
       it "includes rake-compiler" do
-        expect(bundled_app("test_gem/Gemfile").read).to include('gem "rake-compiler"')
+        expect(bundled_app("#{gem_name}/Gemfile").read).to include('gem "rake-compiler"')
       end
 
       it "depends on compile task for build" do
@@ -560,14 +560,14 @@ RSpec.describe "bundle gem" do
 
           task :build => :compile
 
-          Rake::ExtensionTask.new("test_gem") do |ext|
-            ext.lib_dir = "lib/test_gem"
+          Rake::ExtensionTask.new("#{gem_name}") do |ext|
+            ext.lib_dir = "lib/#{gem_name}"
           end
 
           task :default => [:clobber, :compile, :spec]
         RAKEFILE
 
-        expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
+        expect(bundled_app("#{gem_name}/Rakefile").read).to eq(rakefile)
       end
     end
   end
@@ -612,20 +612,20 @@ RSpec.describe "bundle gem" do
     end
 
     it "generates a gem skeleton" do
-      expect(bundled_app("test-gem/test-gem.gemspec")).to exist
-      expect(bundled_app("test-gem/Gemfile")).to exist
-      expect(bundled_app("test-gem/Rakefile")).to exist
-      expect(bundled_app("test-gem/lib/test/gem.rb")).to exist
-      expect(bundled_app("test-gem/lib/test/gem/version.rb")).to exist
+      expect(bundled_app("#{gem_name}/#{gem_name}.gemspec")).to exist
+      expect(bundled_app("#{gem_name}/Gemfile")).to exist
+      expect(bundled_app("#{gem_name}/Rakefile")).to exist
+      expect(bundled_app("#{gem_name}/lib/test/gem.rb")).to exist
+      expect(bundled_app("#{gem_name}/lib/test/gem/version.rb")).to exist
     end
 
     it "starts with version 0.1.0" do
-      expect(bundled_app("test-gem/lib/test/gem/version.rb").read).to match(/VERSION = "0.1.0"/)
+      expect(bundled_app("#{gem_name}/lib/test/gem/version.rb").read).to match(/VERSION = "0.1.0"/)
     end
 
     it "nests constants so they work" do
-      expect(bundled_app("test-gem/lib/test/gem/version.rb").read).to match(/module Test\n  module Gem/)
-      expect(bundled_app("test-gem/lib/test/gem.rb").read).to match(/module Test\n  module Gem/)
+      expect(bundled_app("#{gem_name}/lib/test/gem/version.rb").read).to match(/module Test\n  module Gem/)
+      expect(bundled_app("#{gem_name}/lib/test/gem.rb").read).to match(/module Test\n  module Gem/)
     end
 
     it_should_behave_like "git config is present"
@@ -642,7 +642,7 @@ RSpec.describe "bundle gem" do
     end
 
     it "requires the version file" do
-      expect(bundled_app("test-gem/lib/test/gem.rb").read).to match(%r{require "test/gem/version"})
+      expect(bundled_app("#{gem_name}/lib/test/gem.rb").read).to match(%r{require "test/gem/version"})
     end
 
     it "runs rake without problems" do
@@ -653,7 +653,7 @@ RSpec.describe "bundle gem" do
           puts 'SUCCESS'
         end
       RAKEFILE
-      File.open(bundled_app("test-gem/Rakefile"), "w") do |file|
+      File.open(bundled_app("#{gem_name}/Rakefile"), "w") do |file|
         file.puts rakefile
       end
 
@@ -670,11 +670,11 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds bin skeleton" do
-        expect(bundled_app("test-gem/exe/test-gem")).to exist
+        expect(bundled_app("#{gem_name}/exe/#{gem_name}")).to exist
       end
 
       it "requires the main file" do
-        expect(bundled_app("test-gem/exe/test-gem").read).to match(%r{require "test/gem"})
+        expect(bundled_app("#{gem_name}/exe/#{gem_name}").read).to match(%r{require "test/gem"})
       end
     end
 
@@ -685,11 +685,11 @@ RSpec.describe "bundle gem" do
       end
 
       it "doesn't create any spec/test file" do
-        expect(bundled_app("test-gem/.rspec")).to_not exist
-        expect(bundled_app("test-gem/spec/test/gem_spec.rb")).to_not exist
-        expect(bundled_app("test-gem/spec/spec_helper.rb")).to_not exist
-        expect(bundled_app("test-gem/test/test_test/gem.rb")).to_not exist
-        expect(bundled_app("test-gem/test/minitest_helper.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/.rspec")).to_not exist
+        expect(bundled_app("#{gem_name}/spec/test/gem_spec.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/test/test_test/gem.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/test/minitest_helper.rb")).to_not exist
       end
     end
 
@@ -700,17 +700,17 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("test-gem/.rspec")).to exist
-        expect(bundled_app("test-gem/spec/test/gem_spec.rb")).to exist
-        expect(bundled_app("test-gem/spec/spec_helper.rb")).to exist
+        expect(bundled_app("#{gem_name}/.rspec")).to exist
+        expect(bundled_app("#{gem_name}/spec/test/gem_spec.rb")).to exist
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to exist
       end
 
       it "requires the main file" do
-        expect(bundled_app("test-gem/spec/spec_helper.rb").read).to include(%(require "test/gem"))
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb").read).to include(%(require "test/gem"))
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test-gem/spec/test/gem_spec.rb").read).to include("expect(false).to eq(true)")
+        expect(bundled_app("#{gem_name}/spec/test/gem_spec.rb").read).to include("expect(false).to eq(true)")
       end
 
       it "creates a default rake task to run the specs" do
@@ -723,7 +723,7 @@ RSpec.describe "bundle gem" do
           task :default => :spec
         RAKEFILE
 
-        expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
+        expect(bundled_app("#{gem_name}/Rakefile").read).to eq(rakefile)
       end
     end
 
@@ -734,20 +734,20 @@ RSpec.describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("test-gem/test/test/gem_test.rb")).to exist
-        expect(bundled_app("test-gem/test/test_helper.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/test/gem_test.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/test_helper.rb")).to exist
       end
 
       it "requires the main file" do
-        expect(bundled_app("test-gem/test/test_helper.rb").read).to match(%r{require "test/gem"})
+        expect(bundled_app("#{gem_name}/test/test_helper.rb").read).to match(%r{require "test/gem"})
       end
 
       it "requires 'test_helper'" do
-        expect(bundled_app("test-gem/test/test/gem_test.rb").read).to match(/require "test_helper"/)
+        expect(bundled_app("#{gem_name}/test/test/gem_test.rb").read).to match(/require "test_helper"/)
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test-gem/test/test/gem_test.rb").read).to match(/assert false/)
+        expect(bundled_app("#{gem_name}/test/test/gem_test.rb").read).to match(/assert false/)
       end
 
       it "creates a default rake task to run the test suite" do
@@ -764,7 +764,7 @@ RSpec.describe "bundle gem" do
           task :default => :test
         RAKEFILE
 
-        expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
+        expect(bundled_app("#{gem_name}/Rakefile").read).to eq(rakefile)
       end
     end
 
@@ -775,8 +775,8 @@ RSpec.describe "bundle gem" do
       end
 
       it "defaults to rspec" do
-        expect(bundled_app("test-gem/spec/spec_helper.rb")).to exist
-        expect(bundled_app("test-gem/test/minitest_helper.rb")).to_not exist
+        expect(bundled_app("#{gem_name}/spec/spec_helper.rb")).to exist
+        expect(bundled_app("#{gem_name}/test/minitest_helper.rb")).to_not exist
       end
     end
   end
