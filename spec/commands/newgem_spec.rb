@@ -3,8 +3,6 @@
 RSpec.describe "bundle gem" do
   def execute_bundle_gem(gem_name, flag = "")
     bundle! "gem #{gem_name} #{flag}"
-    # reset gemspec cache for each test because of commit 3d4163a
-    Bundler.clear_gemspec_cache
   end
 
   def gem_skeleton_assertions(gem_name)
@@ -16,7 +14,7 @@ RSpec.describe "bundle gem" do
     expect(bundled_app("#{gem_name}/lib/test/gem/version.rb")).to exist
   end
 
-  let(:generated_gemspec) { Bundler::GemHelper.new(bundled_app(gem_name).to_s).gemspec }
+  let(:generated_gemspec) { Bundler.load_gemspec_uncached(bundled_app(gem_name).join("#{gem_name}.gemspec")) }
 
   before do
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
