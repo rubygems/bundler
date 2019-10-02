@@ -360,7 +360,7 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test_gem/exe/test_gem")).to exist
       end
 
-      it "requires 'test-gem'" do
+      it "requires the main file" do
         expect(bundled_app("test_gem/exe/test_gem").read).to match(/require "test_gem"/)
       end
     end
@@ -375,7 +375,7 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test_gem/exe/test_gem")).to exist
       end
 
-      it "requires 'test-gem'" do
+      it "requires the main file" do
         expect(bundled_app("test_gem/exe/test_gem").read).to match(/require "test_gem"/)
       end
     end
@@ -417,7 +417,7 @@ RSpec.describe "bundle gem" do
         end
       end
 
-      it "requires 'test-gem'" do
+      it "requires the main file" do
         expect(bundled_app("test_gem/spec/spec_helper.rb").read).to include(%(require "test_gem"))
       end
 
@@ -474,7 +474,7 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test_gem/test/test_helper.rb")).to exist
       end
 
-      it "requires 'test-gem'" do
+      it "requires the main file" do
         expect(bundled_app("test_gem/test/test_helper.rb").read).to include(%(require "test_gem"))
       end
 
@@ -639,7 +639,7 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test-gem/exe/test-gem")).to exist
       end
 
-      it "requires 'test/gem'" do
+      it "requires the main file" do
         expect(bundled_app("test-gem/exe/test-gem").read).to match(%r{require "test/gem"})
       end
     end
@@ -671,7 +671,7 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test-gem/spec/spec_helper.rb")).to exist
       end
 
-      it "requires 'test/gem'" do
+      it "requires the main file" do
         expect(bundled_app("test-gem/spec/spec_helper.rb").read).to include(%(require "test/gem"))
       end
 
@@ -704,7 +704,7 @@ RSpec.describe "bundle gem" do
         expect(bundled_app("test-gem/test/test_helper.rb")).to exist
       end
 
-      it "requires 'test/gem'" do
+      it "requires the main file" do
         expect(bundled_app("test-gem/test/test_helper.rb").read).to match(%r{require "test/gem"})
       end
 
