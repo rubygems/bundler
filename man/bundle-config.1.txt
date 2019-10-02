@@ -525,4 +525,4 @@ CONFIGURE BUNDLER DIRECTORIES
 
 
 
-				September 2019		      BUNDLE-CONFIG(1)
+				 October 2019		      BUNDLE-CONFIG(1)
