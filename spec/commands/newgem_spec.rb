@@ -12,6 +12,8 @@ RSpec.describe "bundle gem" do
 
   let(:generated_gemspec) { Bundler.load_gemspec_uncached(bundled_app(gem_name).join("#{gem_name}.gemspec")) }
 
+  let(:gem_name) { "test-gem" }
+
   before do
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
     git_config_content = <<-EOF
@@ -55,8 +57,6 @@ RSpec.describe "bundle gem" do
   end
 
   describe "git repo initialization" do
-    let(:gem_name) { "test-gem" }
-
     shared_examples_for "a gem with an initial git repo" do
       before do
         bundle! "gem #{gem_name} #{flags}"
@@ -64,7 +64,7 @@ RSpec.describe "bundle gem" do
 
       it "generates a gem skeleton with a .git folder" do
         gem_skeleton_assertions(gem_name)
-        expect(bundled_app("test-gem/.git")).to exist
+        expect(bundled_app("#{gem_name}/.git")).to exist
       end
     end
 
@@ -86,7 +86,7 @@ RSpec.describe "bundle gem" do
       end
       it "generates a gem skeleton without a .git folder" do
         gem_skeleton_assertions(gem_name)
-        expect(bundled_app("test-gem/.git")).not_to exist
+        expect(bundled_app("#{gem_name}/.git")).not_to exist
       end
     end
   end
@@ -97,7 +97,7 @@ RSpec.describe "bundle gem" do
     end
     it "generates a gem skeleton with MIT license" do
       gem_skeleton_assertions(gem_name)
-      expect(bundled_app("test-gem/LICENSE.txt")).to exist
+      expect(bundled_app("#{gem_name}/LICENSE.txt")).to exist
       skel = Bundler::GemHelper.new(bundled_app(gem_name).to_s)
       expect(skel.gemspec.license).to eq("MIT")
     end
@@ -109,7 +109,7 @@ RSpec.describe "bundle gem" do
     end
     it "generates a gem skeleton without MIT license" do
       gem_skeleton_assertions(gem_name)
-      expect(bundled_app("test-gem/LICENSE.txt")).to_not exist
+      expect(bundled_app("#{gem_name}/LICENSE.txt")).to_not exist
     end
   end
 
@@ -119,13 +119,13 @@ RSpec.describe "bundle gem" do
     end
     it "generates a gem skeleton with MIT license" do
       gem_skeleton_assertions(gem_name)
-      expect(bundled_app("test-gem/CODE_OF_CONDUCT.md")).to exist
+      expect(bundled_app("#{gem_name}/CODE_OF_CONDUCT.md")).to exist
     end
 
     describe "README additions" do
       it "generates the README with a section for the Code of Conduct" do
-        expect(bundled_app("test-gem/README.md").read).to include("## Code of Conduct")
-        expect(bundled_app("test-gem/README.md").read).to include("https://github.com/bundleuser/#{gem_name}/blob/master/CODE_OF_CONDUCT.md")
+        expect(bundled_app("#{gem_name}/README.md").read).to include("## Code of Conduct")
+        expect(bundled_app("#{gem_name}/README.md").read).to include("https://github.com/bundleuser/#{gem_name}/blob/master/CODE_OF_CONDUCT.md")
       end
     end
   end
@@ -136,28 +136,26 @@ RSpec.describe "bundle gem" do
     end
     it "generates a gem skeleton without Code of Conduct" do
       gem_skeleton_assertions(gem_name)
-      expect(bundled_app("test-gem/CODE_OF_CONDUCT.md")).to_not exist
+      expect(bundled_app("#{gem_name}/CODE_OF_CONDUCT.md")).to_not exist
     end
 
     describe "README additions" do
       it "generates the README without a section for the Code of Conduct" do
-        expect(bundled_app("test-gem/README.md").read).not_to include("## Code of Conduct")
-        expect(bundled_app("test-gem/README.md").read).not_to include("https://github.com/bundleuser/#{gem_name}/blob/master/CODE_OF_CONDUCT.md")
+        expect(bundled_app("#{gem_name}/README.md").read).not_to include("## Code of Conduct")
+        expect(bundled_app("#{gem_name}/README.md").read).not_to include("https://github.com/bundleuser/#{gem_name}/blob/master/CODE_OF_CONDUCT.md")
       end
     end
   end
 
   context "README.md" do
-    let(:gem_name) { "test_gem" }
-
     context "git config github.user present" do
       before do
         bundle! "gem #{gem_name}"
       end
 
       it "contribute URL set to git username" do
-        expect(bundled_app("test_gem/README.md").read).not_to include("[USERNAME]")
-        expect(bundled_app("test_gem/README.md").read).to include("github.com/bundleuser")
+        expect(bundled_app("#{gem_name}/README.md").read).not_to include("[USERNAME]")
+        expect(bundled_app("#{gem_name}/README.md").read).to include("github.com/bundleuser")
       end
     end
 
@@ -169,8 +167,8 @@ RSpec.describe "bundle gem" do
       end
 
       it "contribute URL set to [USERNAME]" do
-        expect(bundled_app("test_gem/README.md").read).to include("[USERNAME]")
-        expect(bundled_app("test_gem/README.md").read).not_to include("github.com/bundleuser")
+        expect(bundled_app("#{gem_name}/README.md").read).to include("[USERNAME]")
+        expect(bundled_app("#{gem_name}/README.md").read).not_to include("github.com/bundleuser")
       end
     end
   end
@@ -182,8 +180,6 @@ RSpec.describe "bundle gem" do
   end
 
   context "when git is not available" do
-    let(:gem_name) { "test_gem" }
-
     # This spec cannot have `git` available in the test env
     before do
       load_paths = [lib, spec]
