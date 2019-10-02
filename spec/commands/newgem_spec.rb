@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe "bundle gem" do
-  def gem_skeleton_assertions(gem_name)
+  def gem_skeleton_assertions
     expect(bundled_app("#{gem_name}/#{gem_name}.gemspec")).to exist
     expect(bundled_app("#{gem_name}/README.md")).to exist
     expect(bundled_app("#{gem_name}/Gemfile")).to exist
@@ -65,7 +65,7 @@ RSpec.describe "bundle gem" do
       end
 
       it "generates a gem skeleton with a .git folder" do
-        gem_skeleton_assertions(gem_name)
+        gem_skeleton_assertions
         expect(bundled_app("#{gem_name}/.git")).to exist
       end
     end
@@ -87,7 +87,7 @@ RSpec.describe "bundle gem" do
         bundle! "gem #{gem_name} --no-git"
       end
       it "generates a gem skeleton without a .git folder" do
-        gem_skeleton_assertions(gem_name)
+        gem_skeleton_assertions
         expect(bundled_app("#{gem_name}/.git")).not_to exist
       end
     end
@@ -98,7 +98,7 @@ RSpec.describe "bundle gem" do
       bundle! "gem #{gem_name} --mit"
     end
     it "generates a gem skeleton with MIT license" do
-      gem_skeleton_assertions(gem_name)
+      gem_skeleton_assertions
       expect(bundled_app("#{gem_name}/LICENSE.txt")).to exist
       skel = Bundler::GemHelper.new(bundled_app(gem_name).to_s)
       expect(skel.gemspec.license).to eq("MIT")
@@ -110,7 +110,7 @@ RSpec.describe "bundle gem" do
       bundle! "gem #{gem_name} --no-mit"
     end
     it "generates a gem skeleton without MIT license" do
-      gem_skeleton_assertions(gem_name)
+      gem_skeleton_assertions
       expect(bundled_app("#{gem_name}/LICENSE.txt")).to_not exist
     end
   end
@@ -120,7 +120,7 @@ RSpec.describe "bundle gem" do
       bundle! "gem #{gem_name} --coc"
     end
     it "generates a gem skeleton with MIT license" do
-      gem_skeleton_assertions(gem_name)
+      gem_skeleton_assertions
       expect(bundled_app("#{gem_name}/CODE_OF_CONDUCT.md")).to exist
     end
 
@@ -137,7 +137,7 @@ RSpec.describe "bundle gem" do
       bundle! "gem #{gem_name} --no-coc"
     end
     it "generates a gem skeleton without Code of Conduct" do
-      gem_skeleton_assertions(gem_name)
+      gem_skeleton_assertions
       expect(bundled_app("#{gem_name}/CODE_OF_CONDUCT.md")).to_not exist
     end
 
