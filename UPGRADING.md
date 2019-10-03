@@ -31,7 +31,7 @@ The CLI defines a set of commands and options that can be used by our users to
 create command lines that bundler can understand. There's a number of changes
 that we plan to make to this set of commands and options.
 
-* Flags passed to `bundle install` that relied on being remembered across invokations have been deprecated.
+* Flags passed to `bundle install` that relied on being remembered across invocations have been deprecated.
 
   In particular, the `--clean`, `--deployment`, `--frozen`, `--no-cache`,
   `--no-prune`, `--path`, `--shebang`, `--system`, `--without`, and `--with`
@@ -39,7 +39,7 @@ that we plan to make to this set of commands and options.
 
   Remembering CLI options has been a source of historical confusion and bug
   reports, not only for beginners but also for experienced users. A CLI tool
-  should not behave differently across exactly the same invokations _unless_
+  should not behave differently across exactly the same invocations _unless_
   explicitly configured to do so. This is what configuration is about after all,
   and things should never be silently configured without the user knowing about
   it.
@@ -47,7 +47,7 @@ that we plan to make to this set of commands and options.
   The problem with changing this behavior is that very common workflows are
   relying on it. For example, when you run `bundle install --without
   development:test` in production, those flags are persisted in the app's
-  configuration file and further `bundle` invokations will happily ignore
+  configuration file and further `bundle` invocations will happily ignore
   development and test gems.  This magic will disappear from bundler 3, and
   you will explicitly need to configure it, either through environment
   variables, application configuration, or machine configuration. For example,
