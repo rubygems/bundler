@@ -78,7 +78,7 @@ that we plan to make to this set of commands and options.
 * The `bundle console` will be removed and replaced with `bin/console`.
 
   Over time we found `bundle console` hard to maintain because every user would
-  want to add her own specific tweaks to it. In order to ease maintainance and
+  want to add her own specific tweaks to it. In order to ease maintenance and
   reduce bikeshedding discussions, we're removing the `bundle console` command
   in favor of a `bin/console` script created by `bundle gem` on gem generation
   that users can tweak to their needs.
