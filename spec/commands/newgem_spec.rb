@@ -645,9 +645,6 @@ Usage: "bundle gem NAME [OPTIONS]"
     before do
       bundle "gem #{subject}"
     end
-    after do
-      Bundler.clear_gemspec_cache
-    end
 
     context "with an existing const name" do
       subject { "gem" }
