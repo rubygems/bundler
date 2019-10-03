@@ -163,7 +163,6 @@ RSpec.describe "bundle gem" do
     context "git config github.user is absent" do
       before do
         sys_exec("git config --unset github.user")
-        in_app_root
         bundle "gem #{gem_name}"
       end
 
@@ -175,7 +174,6 @@ RSpec.describe "bundle gem" do
   end
 
   it "creates a new git repository" do
-    in_app_root
     bundle "gem #{gem_name}"
     expect(bundled_app("#{gem_name}/.git")).to exist
   end
@@ -203,7 +201,6 @@ RSpec.describe "bundle gem" do
   end
 
   it "generates a valid gemspec" do
-    in_app_root
     bundle! "gem newgem --bin"
 
     prepare_gemspec(bundled_app("newgem", "newgem.gemspec"))
@@ -218,10 +215,6 @@ RSpec.describe "bundle gem" do
   end
 
   context "gem naming with relative paths" do
-    before do
-      in_app_root
-    end
-
     it "resolves ." do
       create_temporary_dir("tmp")
 
@@ -287,7 +280,6 @@ RSpec.describe "bundle gem" do
       before do
         `git config --unset user.name`
         `git config --unset user.email`
-        in_app_root
         bundle "gem #{gem_name}"
       end
 
@@ -343,7 +335,6 @@ RSpec.describe "bundle gem" do
 
     context "--exe parameter set" do
       before do
-        in_app_root
         bundle "gem #{gem_name} --exe"
       end
 
@@ -358,7 +349,6 @@ RSpec.describe "bundle gem" do
 
     context "--bin parameter set" do
       before do
-        in_app_root
         bundle "gem #{gem_name} --bin"
       end
 
@@ -373,7 +363,6 @@ RSpec.describe "bundle gem" do
 
     context "no --test parameter" do
       before do
-        in_app_root
         bundle "gem #{gem_name}"
       end
 
@@ -388,7 +377,6 @@ RSpec.describe "bundle gem" do
 
     context "--test parameter set to rspec" do
       before do
-        in_app_root
         bundle "gem #{gem_name} --test=rspec"
       end
 
@@ -419,7 +407,6 @@ RSpec.describe "bundle gem" do
 
     context "gem.test setting set to rspec" do
       before do
-        in_app_root
         bundle "config set gem.test rspec"
         bundle "gem #{gem_name}"
       end
@@ -433,7 +420,6 @@ RSpec.describe "bundle gem" do
 
     context "gem.test setting set to rspec and --test is set to minitest" do
       before do
-        in_app_root
         bundle "config set gem.test rspec"
         bundle "gem #{gem_name} --test=minitest"
       end
@@ -446,7 +432,6 @@ RSpec.describe "bundle gem" do
 
     context "--test parameter set to minitest" do
       before do
-        in_app_root
         bundle "gem #{gem_name} --test=minitest"
       end
 
@@ -480,7 +465,6 @@ RSpec.describe "bundle gem" do
 
     context "gem.test setting set to minitest" do
       before do
-        in_app_root
         bundle "config set gem.test minitest"
         bundle "gem #{gem_name}"
       end
@@ -505,7 +489,6 @@ RSpec.describe "bundle gem" do
 
     context "--test with no arguments" do
       before do
-        in_app_root
         bundle "gem #{gem_name} --test"
       end
 
@@ -521,7 +504,6 @@ RSpec.describe "bundle gem" do
 
     context "--edit option" do
       it "opens the generated gemspec in the user's text editor" do
-        in_app_root
         output = bundle "gem #{gem_name} --edit=echo"
         gemspec_path = File.join(Dir.pwd, gem_name, "#{gem_name}.gemspec")
         expect(output).to include("echo \"#{gemspec_path}\"")
@@ -579,7 +561,6 @@ RSpec.describe "bundle gem" do
 
     context "--ext parameter set" do
       before do
-        in_app_root
         bundle "gem #{gem_name} --ext"
       end
 
@@ -690,10 +671,6 @@ Usage: "bundle gem NAME [OPTIONS]"
   end
 
   context "on first run" do
-    before do
-      in_app_root
-    end
-
     it "asks about test framework" do
       global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__COC" => "false"
 
@@ -740,9 +717,7 @@ Usage: "bundle gem NAME [OPTIONS]"
 
   context "on conflicts with a previously created file" do
     it "should fail gracefully" do
-      in_app_root do
-        FileUtils.touch("conflict-foobar")
-      end
+      FileUtils.touch("conflict-foobar")
       bundle "gem conflict-foobar"
       expect(err).to include("Errno::ENOTDIR")
       expect(exitstatus).to eql(32) if exitstatus
@@ -751,9 +726,7 @@ Usage: "bundle gem NAME [OPTIONS]"
 
   context "on conflicts with a previously created directory" do
     it "should succeed" do
-      in_app_root do
-        FileUtils.mkdir_p("conflict-foobar/Gemfile")
-      end
+      FileUtils.mkdir_p("conflict-foobar/Gemfile")
       bundle! "gem conflict-foobar"
       expect(out).to include("file_clash  conflict-foobar/Gemfile").
         and include "Initializing git repo in #{bundled_app("conflict-foobar")}"
