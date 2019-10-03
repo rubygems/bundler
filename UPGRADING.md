@@ -39,7 +39,7 @@ that we plan to make to this set of commands and options.
 
   Remembering CLI options has been a source of historical confusion and bug
   reports, not only for beginners but also for experienced users. A CLI tool
-  should not behave differently accross exactly the same invokations _unless_
+  should not behave differently across exactly the same invokations _unless_
   explicitly configured to do so. This is what configuration is about after all,
   and things should never be silently configured without the user knowing about
   it.
