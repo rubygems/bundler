@@ -548,8 +548,10 @@ RSpec.describe "bundle gem" do
 
     let(:require_path) { "test_gem" }
 
+    let(:flags) { nil }
+
     before do
-      bundle! "gem #{gem_name}"
+      bundle! ["gem", gem_name, flags].compact.join(" ")
     end
 
     it "does not nest constants" do
@@ -560,9 +562,7 @@ RSpec.describe "bundle gem" do
     include_examples "generating a gem"
 
     context "--ext parameter set" do
-      before do
-        bundle "gem #{gem_name} --ext"
-      end
+      let(:flags) { "--ext" }
 
       it "builds ext skeleton" do
         expect(bundled_app("#{gem_name}/ext/#{gem_name}/extconf.rb")).to exist
