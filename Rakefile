@@ -240,9 +240,6 @@ else
     lib.vendor_lib = "lib/bundler/vendor/thor"
   end
 
-  # We currently cherry-pick changes to use `require_relative` internally
-  # instead of regular `require`. They are already in fileutils' master branch
-  # but still need to be released.
   desc "Vendor a specific version of fileutils"
   Automatiek::RakeTask.new("fileutils") do |lib|
     lib.download = { :github => "https://github.com/ruby/fileutils" }
