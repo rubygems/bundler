@@ -771,7 +771,7 @@ RSpec.describe "bundle outdated" do
     gem_list = out.split("\n").map {|g| g[/\* (.*) \(/, 1] }.compact
     expect(gem_list).to eq(gem_list.sort)
     expect(gem_list.size).to eq gems_list_size
-  end  
+  end
 
   describe "with --only-explicit" do
     it "does not report outdated dependent gems" do
