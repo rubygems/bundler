@@ -30,7 +30,7 @@ RSpec.describe "bundle outdated" do
       bundle "outdated"
 
       expected_output = <<~TABLE.gsub("x", "\\\h").tr(".", "\.").strip
-        Gem            Locked       Latest       Requested  Groups
+        Gem            Current      Latest       Requested  Groups
         activesupport  2.3.5        3.0          = 2.3.5    default
         foo            1.0 xxxxxxx  1.0 xxxxxxx  >= 0       default
         weakling       0.0.3        0.2          ~> 0.0.1   default
@@ -53,8 +53,8 @@ RSpec.describe "bundle outdated" do
       bundle "outdated"
 
       expected_output = <<~TABLE
-        Gem  Locked  Latest  Requested  Groups
-        AAA  1.0.0   2.0.0   = 1.0.0    default
+        Gem  Current  Latest  Requested  Groups
+        AAA  1.0.0    2.0.0   = 1.0.0    default
       TABLE
 
       expect(out).to include(expected_output.strip)
@@ -94,9 +94,9 @@ RSpec.describe "bundle outdated" do
       bundle "outdated"
 
       expected_output = <<~TABLE.strip
-        Gem            Locked  Latest  Requested  Groups
-        activesupport  2.3.5   3.0     = 2.3.5    development, test
-        terranova      8       9       = 8        default
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.5    3.0     = 2.3.5    development, test
+        terranova      8        9       = 8        default
       TABLE
 
       expect(out).to end_with(expected_output)
@@ -127,9 +127,9 @@ RSpec.describe "bundle outdated" do
       bundle "outdated --verbose"
 
       expected_output = <<~TABLE.strip
-        Gem            Locked  Latest  Requested  Groups   Path
-        activesupport  2.3.5   3.0     = 2.3.5    default
-        terranova      8       9       = 8        default  #{default_bundle_path("specifications/terranova-9.gemspec")}
+        Gem            Current  Latest  Requested  Groups   Path
+        activesupport  2.3.5    3.0     = 2.3.5    default
+        terranova      8        9       = 8        default  #{default_bundle_path("specifications/terranova-9.gemspec")}
       TABLE
 
       expect(out).to end_with(expected_output)
@@ -169,8 +169,8 @@ RSpec.describe "bundle outdated" do
       test_group_option("default")
 
       expected_output = <<~TABLE.strip
-        Gem        Locked  Latest  Requested  Groups
-        terranova  8       9       = 8        default
+        Gem        Current  Latest  Requested  Groups
+        terranova  8        9       = 8        default
       TABLE
 
       expect(out).to end_with(expected_output)
@@ -180,9 +180,9 @@ RSpec.describe "bundle outdated" do
       test_group_option("development")
 
       expected_output = <<~TABLE.strip
-        Gem            Locked  Latest  Requested  Groups
-        activesupport  2.3.5   3.0     = 2.3.5    development, test
-        duradura       7.0     8.0     = 7.0      development, test
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.5    3.0     = 2.3.5    development, test
+        duradura       7.0      8.0     = 7.0      development, test
       TABLE
 
       expect(out).to end_with(expected_output)
@@ -192,9 +192,9 @@ RSpec.describe "bundle outdated" do
       test_group_option("test")
 
       expected_output = <<~TABLE.strip
-        Gem            Locked  Latest  Requested  Groups
-        activesupport  2.3.5   3.0     = 2.3.5    development, test
-        duradura       7.0     8.0     = 7.0      development, test
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.5    3.0     = 2.3.5    development, test
+        duradura       7.0      8.0     = 7.0      development, test
       TABLE
 
       expect(out).to end_with(expected_output)
@@ -226,8 +226,8 @@ RSpec.describe "bundle outdated" do
       bundle "outdated --groups"
 
       expected_output = <<~TABLE.strip
-        Gem  Locked  Latest  Requested  Groups
-        bar  2.0.0   3.0.0
+        Gem  Current  Latest  Requested  Groups
+        bar  2.0.0    3.0.0
       TABLE
 
       expect(out).to end_with(expected_output)
@@ -263,10 +263,10 @@ RSpec.describe "bundle outdated" do
       bundle "outdated --groups"
 
       expected_output = <<~TABLE.strip
-        Gem            Locked  Latest  Requested  Groups
-        activesupport  2.3.5   3.0     = 2.3.5    development, test
-        duradura       7.0     8.0     = 7.0      development, test
-        terranova      8       9       = 8        default
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.5    3.0     = 2.3.5    development, test
+        duradura       7.0      8.0     = 7.0      development, test
+        terranova      8        9       = 8        default
       TABLE
 
       expect(out).to end_with(expected_output)
@@ -289,8 +289,8 @@ RSpec.describe "bundle outdated" do
       bundle "outdated --local"
 
       expected_output = <<~TABLE.strip
-        Gem            Locked  Latest  Requested  Groups
-        activesupport  2.3.4   2.3.5   = 2.3.4    default
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.4    2.3.5   = 2.3.4    default
       TABLE
 
       expect(out).to end_with(expected_output)
@@ -351,7 +351,7 @@ RSpec.describe "bundle outdated" do
       bundle "outdated foo"
 
       expected_output = <<~TABLE.gsub("x", "\\\h").tr(".", "\.").strip
-        Gem  Locked       Latest       Requested  Groups
+        Gem  Current      Latest       Requested  Groups
         foo  1.0 xxxxxxx  1.0 xxxxxxx  >= 0       default
       TABLE
 
@@ -381,8 +381,8 @@ RSpec.describe "bundle outdated" do
         bundle "outdated --pre"
 
         expected_output = <<~TABLE.strip
-          Gem            Locked  Latest      Requested  Groups
-          activesupport  2.3.5   3.0.0.beta  = 2.3.5    default
+          Gem            Current  Latest      Requested  Groups
+          activesupport  2.3.5    3.0.0.beta  = 2.3.5    default
         TABLE
 
         expect(out).to end_with(expected_output)
@@ -404,7 +404,7 @@ RSpec.describe "bundle outdated" do
         bundle "outdated"
 
         expected_output = <<~TABLE.strip
-          Gem            Locked        Latest        Requested       Groups
+          Gem            Current       Latest        Requested       Groups
           activesupport  3.0.0.beta.1  3.0.0.beta.2  = 3.0.0.beta.1  default
         TABLE
 
@@ -424,8 +424,8 @@ RSpec.describe "bundle outdated" do
       bundle :outdated, filter_strict_option => true
 
       expected_output = <<~TABLE.strip
-        Gem       Locked  Latest  Requested  Groups
-        weakling  0.0.3   0.0.5   ~> 0.0.1   default
+        Gem       Current  Latest  Requested  Groups
+        weakling  0.0.3    0.0.5   ~> 0.0.1   default
       TABLE
 
       expect(out).to end_with(expected_output)
@@ -458,8 +458,8 @@ RSpec.describe "bundle outdated" do
         bundle :outdated, filter_strict_option => true, "filter-patch" => true
 
         expected_output = <<~TABLE.strip
-          Gem       Locked  Latest  Requested  Groups
-          weakling  0.0.3   0.0.5   >= 0.0.1   default
+          Gem       Current  Latest  Requested  Groups
+          weakling  0.0.3    0.0.5   >= 0.0.1   default
         TABLE
 
         expect(out).to end_with(expected_output)
@@ -480,8 +480,8 @@ RSpec.describe "bundle outdated" do
         bundle :outdated, filter_strict_option => true, "filter-minor" => true
 
         expected_output = <<~TABLE.strip
-          Gem       Locked  Latest  Requested  Groups
-          weakling  0.0.3   0.1.5   >= 0.0.1   default
+          Gem       Current  Latest  Requested  Groups
+          weakling  0.0.3    0.1.5   >= 0.0.1   default
         TABLE
 
         expect(out).to end_with(expected_output)
@@ -502,8 +502,8 @@ RSpec.describe "bundle outdated" do
         bundle :outdated, filter_strict_option => true, "filter-major" => true
 
         expected_output = <<~TABLE.strip
-          Gem       Locked  Latest  Requested  Groups
-          weakling  0.0.3   1.1.5   >= 0.0.1   default
+          Gem       Current  Latest  Requested  Groups
+          weakling  0.0.3    1.1.5   >= 0.0.1   default
         TABLE
 
         expect(out).to end_with(expected_output)
@@ -616,8 +616,8 @@ RSpec.describe "bundle outdated" do
           bundle "outdated"
 
           expected_output = <<~TABLE.strip
-            Gem         Locked  Latest  Requested  Groups
-            laduradura  5.15.2  5.15.3  = 5.15.2   default
+            Gem         Current  Latest  Requested  Groups
+            laduradura  5.15.2   5.15.3  = 5.15.2   default
           TABLE
 
           expect(out).to end_with(expected_output)
@@ -817,10 +817,10 @@ RSpec.describe "bundle outdated" do
         bundle "outdated --patch --filter-patch"
 
         expected_output = <<~TABLE.strip
-          Gem    Locked  Latest  Requested  Groups
-          major  1.0.0   1.0.1   >= 0       default
-          minor  1.0.0   1.0.1   >= 0       default
-          patch  1.0.0   1.0.1   >= 0       default
+          Gem    Current  Latest  Requested  Groups
+          major  1.0.0    1.0.1   >= 0       default
+          minor  1.0.0    1.0.1   >= 0       default
+          patch  1.0.0    1.0.1   >= 0       default
         TABLE
 
         expect(out).to end_with(expected_output)
@@ -830,9 +830,9 @@ RSpec.describe "bundle outdated" do
         bundle "outdated --minor --filter-minor"
 
         expected_output = <<~TABLE.strip
-          Gem    Locked  Latest  Requested  Groups
-          major  1.0.0   1.1.0   >= 0       default
-          minor  1.0.0   1.1.0   >= 0       default
+          Gem    Current  Latest  Requested  Groups
+          major  1.0.0    1.1.0   >= 0       default
+          minor  1.0.0    1.1.0   >= 0       default
         TABLE
 
         expect(out).to end_with(expected_output)
@@ -884,9 +884,9 @@ RSpec.describe "bundle outdated" do
         bundle "outdated --patch --update-strict --filter-patch"
 
         expected_output = <<~TABLE.strip
-          Gem  Locked  Latest  Requested  Groups
-          bar  2.0.3   2.0.5
-          foo  1.4.3   1.4.4   >= 0       default
+          Gem  Current  Latest  Requested  Groups
+          bar  2.0.3    2.0.5
+          foo  1.4.3    1.4.4   >= 0       default
         TABLE
 
         expect(out).to end_with(expected_output)
@@ -917,8 +917,8 @@ RSpec.describe "bundle outdated" do
       bundle "outdated --only-explicit"
 
       expected_output = <<~TABLE.strip
-        Gem       Locked  Latest  Requested  Groups
-        weakling  0.2     0.3     >= 0       default
+        Gem       Current  Latest  Requested  Groups
+        weakling  0.2      0.3     >= 0       default
       TABLE
 
       expect(out).to end_with(expected_output)

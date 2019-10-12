@@ -279,7 +279,7 @@ module Bundler
     end
 
     def table_header
-      header = ["Gem", "Locked", "Latest", "Requested", "Groups"]
+      header = ["Gem", "Current", "Latest", "Requested", "Groups"]
       header << "Path" if Bundler.ui.debug?
       header
     end
