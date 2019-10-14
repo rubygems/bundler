@@ -1185,8 +1185,14 @@ G
       G
 
       bundle "outdated"
-      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5")
-      expect(out).to include("foo (newest 1.0")
+
+      expected_output = <<~TABLE.gsub("x", "\\\h").tr(".", "\.").strip
+        Gem            Current      Latest       Requested  Groups
+        activesupport  2.3.5        3.0          = 2.3.5    default
+        foo            1.0 xxxxxxx  1.0 xxxxxxx  >= 0       default
+      TABLE
+
+      expect(out).to match(Regexp.new(expected_output))
     end
 
     it "returns list of outdated gems when the ruby version matches for any engine" do
@@ -1206,8 +1212,14 @@ G
         G
 
         bundle "outdated"
-        expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
-        expect(out).to include("foo (newest 1.0")
+
+        expected_output = <<~TABLE.gsub("x", "\\\h").tr(".", "\.").strip
+          Gem            Current      Latest       Requested  Groups
+          activesupport  2.3.5        3.0          = 2.3.5    default
+          foo            1.0 xxxxxxx  1.0 xxxxxxx  >= 0       default
+        TABLE
+
+        expect(out).to match(Regexp.new(expected_output))
       end
     end
 

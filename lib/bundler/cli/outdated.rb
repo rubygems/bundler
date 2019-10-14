@@ -3,7 +3,7 @@
 module Bundler
   class CLI::Outdated
     attr_reader :options, :gems, :options_include_groups, :filter_options_patch, :sources, :strict
-    attr_accessor :outdated_gems_list
+    attr_accessor :outdated_gems
 
     def initialize(options, gems)
       @options = options
@@ -12,7 +12,7 @@ module Bundler
 
       @filter_options_patch = options.keys & %w[filter-major filter-minor filter-patch]
 
-      @outdated_gems_list = []
+      @outdated_gems = []
 
       @options_include_groups = [:group, :groups].any? do |v|
         options.keys.include?(v.to_s)
@@ -87,32 +87,38 @@ module Bundler
           groups = dependency.groups.join(", ")
         end
 
-        outdated_gems_list << { :active_spec => active_spec,
-                                :current_spec => current_spec,
-                                :dependency => dependency,
-                                :groups => groups }
+        outdated_gems << {
+          :active_spec => active_spec,
+          :current_spec => current_spec,
+          :dependency => dependency,
+          :groups => groups,
+        }
       end
 
-      if outdated_gems_list.empty?
-        display_nothing_outdated_message
-      else
+      if outdated_gems.empty?
         unless options[:parseable]
-          Bundler.ui.info(header_outdated_message)
+          Bundler.ui.info(nothing_outdated_message)
         end
-
+      else
         if options_include_groups
-          outdated_gems_list.group_by {|g| g[:groups] }.sort.each do |groups, gems|
+          relevant_outdated_gems = outdated_gems.group_by {|g| g[:groups] }.sort.flat_map do |groups, gems|
             contains_group = groups.split(", ").include?(options[:group])
             next unless options[:groups] || contains_group
 
-            unless options[:parseable]
-              Bundler.ui.info(header_group_message(groups))
-            end
+            gems
+          end.compact
 
-            print_gems(gems)
+          if options[:parseable]
+            relevant_outdated_gems.each do |gems|
+              print_gems(gems)
+            end
+          else
+            print_gems_table(relevant_outdated_gems)
           end
+        elsif options[:parseable]
+          print_gems(outdated_gems)
         else
-          print_gems(outdated_gems_list)
+          print_gems_table(outdated_gems)
         end
 
         exit 1
@@ -123,22 +129,6 @@ module Bundler
 
     def groups_text(group_text, groups)
       "#{group_text}#{groups.split(",").size > 1 ? "s" : ""} \"#{groups}\""
-    end
-
-    def header_outdated_message
-      if options[:pre]
-        "Outdated gems included in the bundle (including pre-releases):"
-      else
-        "Outdated gems included in the bundle:"
-      end
-    end
-
-    def header_group_message(groups)
-      if groups.empty?
-        "===== Without group ====="
-      else
-        "===== #{groups_text("Group", groups)} ====="
-      end
     end
 
     def nothing_outdated_message
@@ -167,12 +157,6 @@ module Bundler
       active_spec
     end
 
-    def display_nothing_outdated_message
-      unless options[:parseable]
-        Bundler.ui.info(nothing_outdated_message)
-      end
-    end
-
     def print_gems(gems_list)
       gems_list.each do |gem|
         print_gem(
@@ -182,6 +166,19 @@ module Bundler
           gem[:groups],
         )
       end
+    end
+
+    def print_gems_table(gems_list)
+      data = gems_list.map do |gem|
+        gem_column_for(
+          gem[:current_spec],
+          gem[:active_spec],
+          gem[:dependency],
+          gem[:groups],
+        )
+      end
+
+      print_indented([table_header] + data)
     end
 
     def print_gem(current_spec, active_spec, dependency, groups)
@@ -205,6 +202,16 @@ module Bundler
       end
 
       Bundler.ui.info output_message.rstrip
+    end
+
+    def gem_column_for(current_spec, active_spec, dependency, groups)
+      current_version = "#{current_spec.version}#{current_spec.git_version}"
+      spec_version = "#{active_spec.version}#{active_spec.git_version}"
+      dependency = dependency.requirement if dependency
+
+      ret_val = [active_spec.name, current_version, spec_version, dependency.to_s, groups.to_s]
+      ret_val << active_spec.loaded_from.to_s if Bundler.ui.debug?
+      ret_val
     end
 
     def check_for_deployment_mode!
@@ -252,6 +259,35 @@ module Bundler
     def get_version_semver_portion_value(spec, version_portion_index)
       version_section = spec.version.segments[version_portion_index, 1]
       version_section.to_a[0].to_i
+    end
+
+    def print_indented(matrix)
+      header = matrix[0]
+      data = matrix[1..-1]
+
+      column_sizes = Array.new(header.size) do |index|
+        matrix.max_by {|row| row[index].length }[index].length
+      end
+
+      Bundler.ui.info justify(header, column_sizes)
+
+      data.sort_by! {|row| row[0] }
+
+      data.each do |row|
+        Bundler.ui.info justify(row, column_sizes)
+      end
+    end
+
+    def table_header
+      header = ["Gem", "Current", "Latest", "Requested", "Groups"]
+      header << "Path" if Bundler.ui.debug?
+      header
+    end
+
+    def justify(row, sizes)
+      row.each_with_index.map do |element, index|
+        element.ljust(sizes[index])
+      end.join("  ").strip + "\n"
     end
   end
 end
