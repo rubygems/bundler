@@ -15,7 +15,7 @@ module Bundler
       "check" => "c",
       "install" => "i",
       "list" => "ls",
-      "exec" => "e",
+      "exec" => ["e", "ex", "exe"],
       "cache" => ["package", "pack"],
       "version" => ["-v", "--version"],
     }.freeze
@@ -696,7 +696,8 @@ module Bundler
     def self.reformatted_help_args(args)
       bundler_commands = all_commands.keys
       help_flags = %w[--help -h]
-      exec_commands = %w[e ex exe exec]
+      exec_commands = ["exec"] + COMMAND_ALIASES["exec"]
+
       help_used = args.index {|a| help_flags.include? a }
       exec_used = args.index {|a| exec_commands.include? a }
       command = args.find {|a| bundler_commands.include? a }
