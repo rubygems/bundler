@@ -9,9 +9,7 @@ module Bundler
     package_name "Bundler"
 
     AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
-    PARSEABLE_COMMANDS = %w[
-      check config help exec platform show version
-    ].freeze
+    PARSEABLE_COMMANDS = %w[check config help exec platform show version].freeze
 
     def self.start(*)
       super
