@@ -1300,7 +1300,7 @@ module Bundler::FileUtils
            .reject {|n| n == '.' or n == '..' }
       end
 
-      files.map {|n| Entry_.new(prefix(), join(rel(), n.untaint)) }
+      files.map {|n| Entry_.new(prefix(), join(rel(), n.tap{|x| x.untaint if RUBY_VERSION < "2.7" })) }
     end
 
     def stat
