@@ -36,8 +36,22 @@ module Bundler
       end
     end
 
+    def self.all_aliases
+      @all_aliases ||= begin
+                         command_aliases = {}
+
+                         COMMAND_ALIASES.each do |name, aliases|
+                           Array(aliases).each do |one_alias|
+                             command_aliases[one_alias] = name
+                           end
+                         end
+
+                         command_aliases
+                       end
+    end
+
     def self.aliases_for(command_name)
-      COMMAND_ALIASES.slice(command_name).invert
+      COMMAND_ALIASES.select {|k, _| k == command_name }.invert
     end
 
     def initialize(*args)
@@ -694,13 +708,17 @@ module Bundler
     # Reformat the arguments passed to bundle that include a --help flag
     # into the corresponding `bundle help #{command}` call
     def self.reformatted_help_args(args)
-      bundler_commands = all_commands.keys
+      bundler_commands = (COMMAND_ALIASES.keys + COMMAND_ALIASES.values).flatten
+
       help_flags = %w[--help -h]
       exec_commands = ["exec"] + COMMAND_ALIASES["exec"]
 
       help_used = args.index {|a| help_flags.include? a }
       exec_used = args.index {|a| exec_commands.include? a }
+
       command = args.find {|a| bundler_commands.include? a }
+      command = all_aliases[command] if all_aliases[command]
+
       if exec_used && help_used
         if exec_used + help_used == 1
           %w[help exec]
