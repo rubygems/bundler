@@ -11,6 +11,15 @@ module Bundler
     AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
     PARSEABLE_COMMANDS = %w[check config help exec platform show version].freeze
 
+    COMMAND_ALIASES = {
+      "check" => "c",
+      "install" => "i",
+      "list" => "ls",
+      "exec" => "e",
+      "cache" => ["package", "pack"],
+      "version" => ["-v", "--version"],
+    }.freeze
+
     def self.start(*)
       super
     rescue Exception => e # rubocop:disable Lint/RescueException
@@ -25,6 +34,10 @@ module Bundler
         i.send(:print_command)
         i.send(:warn_on_outdated_bundler)
       end
+    end
+
+    def self.aliases_for(command_name)
+      COMMAND_ALIASES.slice(command_name).invert
     end
 
     def initialize(*args)
@@ -157,7 +170,7 @@ module Bundler
       Check.new(options).run
     end
 
-    map "c" => "check"
+    map aliases_for("check")
 
     desc "remove [GEM [GEM ...]]", "Removes gems from the Gemfile"
     long_desc <<-D
@@ -233,7 +246,7 @@ module Bundler
       end
     end
 
-    map "i" => "install"
+    map aliases_for("install")
 
     desc "update [OPTIONS]", "Update the current environment"
     long_desc <<-D
@@ -326,7 +339,7 @@ module Bundler
       List.new(options).run
     end
 
-    map "ls" => "list"
+    map aliases_for("list")
 
     desc "info GEM [OPTIONS]", "Show information for the given gem"
     method_option "path", :type => :boolean, :banner => "Print full path to gem"
@@ -437,7 +450,7 @@ module Bundler
       Cache.new(options).run
     end
 
-    map %w[package pack] => :cache
+    map aliases_for("cache")
 
     desc "exec [OPTIONS]", "Run the command in context of the bundle"
     method_option :keep_file_descriptors, :type => :boolean, :default => false
@@ -452,7 +465,7 @@ module Bundler
       Exec.new(options, args).run
     end
 
-    map "e" => "exec"
+    map aliases_for("exec")
 
     desc "config NAME [VALUE]", "Retrieve or set a configuration value"
     long_desc <<-D
@@ -497,7 +510,7 @@ module Bundler
       end
     end
 
-    map %w[-v --version] => :version
+    map aliases_for("version")
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
