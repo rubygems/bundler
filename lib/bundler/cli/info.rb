@@ -50,7 +50,7 @@ module Bundler
     end
 
     def print_gem_info(spec)
-      metadata = spec.respond_to?(:metadata) ? spec.metadata : {}
+      metadata = spec.metadata
       gem_info = String.new
       gem_info << "  * #{spec.name} (#{spec.version}#{spec.git_version})\n"
       gem_info << "\tSummary: #{spec.summary}\n" if spec.summary
