@@ -324,7 +324,7 @@ module Bundler
       List.new(options).run
     end
 
-    map %w[ls] => "list"
+    map "ls" => "list"
 
     desc "info GEM [OPTIONS]", "Show information for the given gem"
     method_option "path", :type => :boolean, :banner => "Print full path to gem"
