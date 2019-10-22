@@ -1,7 +1,7 @@
 > GET /info/simplecov
 > accept-encoding: gzip
 > accept: */*
-> user-agent: bundler/2.1.0.pre.1 rubygems/3.1.0.pre1 ruby/2.6.4 (x86_64-pc-linux-gnu) command/lock options/spec_run f948bfe3c67410c3
+> user-agent: bundler/2.1.0.pre.2 rubygems/3.1.0.pre2 ruby/2.6.5 (x86_64-pc-linux-gnu) command/lock options/spec_run 3e43c0891d1533e1
 > connection: keep-alive
 > keep-alive: 30
 > host: index.rubygems.org
