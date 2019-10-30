@@ -85,7 +85,7 @@ private
   def resolve_local_copy_path
     return expanded_env_version if env_version_is_path?
 
-    rubygems_path = Pathname.new("../../tmp/rubygems").expand_path(__dir__)
+    rubygems_path = root.join("tmp/rubygems")
 
     unless rubygems_path.directory?
       rubygems_path.parent.mkpath

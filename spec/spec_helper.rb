@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-$:.unshift File.expand_path("..", __FILE__)
-$:.unshift File.expand_path("../../lib", __FILE__)
+require_relative "support/path"
+
+$:.unshift Spec::Path.spec_dir.to_s
+$:.unshift Spec::Path.lib_dir.to_s
 
 require "bundler/psyched_yaml"
 require "bundler/vendored_fileutils"
@@ -20,7 +22,6 @@ require_relative "support/filters"
 require_relative "support/helpers"
 require_relative "support/indexes"
 require_relative "support/matchers"
-require_relative "support/path"
 require_relative "support/parallel"
 require_relative "support/permissions"
 require_relative "support/platforms"
