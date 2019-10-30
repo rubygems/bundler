@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require File.expand_path("../../path.rb", __FILE__)
+require_relative "../path"
 require Spec::Path.lib_dir.join("bundler/deprecate")
 include Spec::Path
 

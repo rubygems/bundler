@@ -121,7 +121,7 @@ module Spec
         end
       end
       if artifice
-        requires << File.expand_path("../artifice/#{artifice}", __FILE__)
+        requires << "support/artifice/#{artifice}"
       end
 
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
