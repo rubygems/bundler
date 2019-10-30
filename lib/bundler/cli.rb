@@ -68,9 +68,7 @@ module Bundler
       version
       Bundler.ui.info "\n"
 
-      primary_commands = ["install", "update",
-                          Bundler.feature_flag.bundler_3_mode? ? "cache" : "package",
-                          "exec", "config", "help"]
+      primary_commands = ["install", "update", "cache", "exec", "config", "help"]
 
       list = self.class.printable_commands(true)
       by_name = list.group_by {|name, _message| name.match(/^bundle (\w+)/)[1] }
@@ -412,7 +410,7 @@ module Bundler
       Outdated.new(options, gems).run
     end
 
-    desc "#{Bundler.feature_flag.bundler_3_mode? ? :cache : :package} [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
+    desc "cache [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     unless Bundler.feature_flag.cache_all?
       method_option "all",  :type => :boolean,
                             :banner => "Include all sources (including path and git)."
@@ -421,24 +419,24 @@ module Bundler
     method_option "cache-path", :type => :string, :banner =>
       "Specify a different cache path than the default (vendor/cache)."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
-    method_option "no-install", :type => :boolean, :banner => "Don't install the gems, only the package."
+    method_option "no-install", :type => :boolean, :banner => "Don't install the gems, only update the cache."
     method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME).#{" Bundler will remember this value for future installs on this machine" unless Bundler.feature_flag.forget_cli_options?}"
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     method_option "frozen", :type => :boolean, :banner =>
-      "Do not allow the Gemfile.lock to be updated after this package operation's install"
+      "Do not allow the Gemfile.lock to be updated after this bundle cache operation's install"
     long_desc <<-D
-      The package command will copy the .gem files for every gem in the bundle into the
+      The cache command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
       control repository, others who check out your source will be able to install the
       bundle without having to download any additional gems.
     D
-    def package
-      require_relative "cli/package"
-      Package.new(options).run
+    def cache
+      require_relative "cli/cache"
+      Cache.new(options).run
     end
-    map %w[cache pack] => :package
+    map %w[package pack] => :cache
 
     desc "exec [OPTIONS]", "Run the command in context of the bundle"
     method_option :keep_file_descriptors, :type => :boolean, :default => false

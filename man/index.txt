@@ -2,6 +2,7 @@ Gemfile(5)            gemfile.5
 bundle(1)             bundle.1
 bundle-add(1)         bundle-add.1
 bundle-binstubs(1)    bundle-binstubs.1
+bundle-cache(1)       bundle-cache.1
 bundle-check(1)       bundle-check.1
 bundle-clean(1)       bundle-clean.1
 bundle-config(1)      bundle-config.1
@@ -16,7 +17,6 @@ bundle-list(1)        bundle-list.1
 bundle-lock(1)        bundle-lock.1
 bundle-open(1)        bundle-open.1
 bundle-outdated(1)    bundle-outdated.1
-bundle-package(1)     bundle-package.1
 bundle-platform(1)    bundle-platform.1
 bundle-pristine(1)    bundle-pristine.1
 bundle-remove(1)      bundle-remove.1
