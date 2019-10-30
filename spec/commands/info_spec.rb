@@ -6,6 +6,7 @@ RSpec.describe "bundle info" do
       install_gemfile <<-G
         source "#{file_uri_for(gem_repo1)}"
         gem "rails"
+        gem "has_metadata"
       G
     end
 
@@ -45,6 +46,22 @@ RSpec.describe "bundle info" do
         bundle "info rdoc"
         expect(out).to include("* rdoc")
         expect(out).to include("Default Gem: yes")
+      end
+    end
+
+    context "given a gem with metadata" do
+      it "prints the gem metadata" do
+        bundle "info has_metadata"
+        expect(out).to include "* has_metadata (1.0)
+\tSummary: This is just a fake gem for testing
+\tHomepage: http://example.com
+\tDocumentation: https://www.example.info/gems/bestgemever/0.0.1
+\tSource Code: https://example.com/user/bestgemever
+\tWiki: https://example.com/user/bestgemever/wiki
+\tChangelog: https://example.com/user/bestgemever/CHANGELOG.md
+\tBug Tracker: https://example.com/user/bestgemever/issues
+\tMailing List: https://groups.example.com/bestgemever
+\tPath: #{default_bundle_path("gems", "has_metadata-1.0")}"
       end
     end
 
