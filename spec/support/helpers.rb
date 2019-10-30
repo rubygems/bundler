@@ -96,10 +96,6 @@ module Spec
       run(cmd, *args)
     end
 
-    def spec
-      spec_dir.to_s
-    end
-
     def bundle(cmd, options = {})
       with_sudo = options.delete(:sudo)
       sudo = with_sudo == :preserve_env ? "sudo -E" : "sudo" if with_sudo
@@ -132,7 +128,7 @@ module Spec
 
       load_path = []
       load_path << lib unless system_bundler
-      load_path << spec
+      load_path << spec_dir
       load_path_str = "-I#{load_path.join(File::PATH_SEPARATOR)}"
 
       args = options.map do |k, v|

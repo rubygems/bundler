@@ -181,7 +181,7 @@ RSpec.describe "bundle gem" do
   context "when git is not available" do
     # This spec cannot have `git` available in the test env
     before do
-      load_paths = [lib, spec]
+      load_paths = [lib, spec_dir]
       load_path_str = "-I#{load_paths.join(File::PATH_SEPARATOR)}"
 
       sys_exec "#{Gem.ruby} #{load_path_str} #{bindir.join("bundle")} gem #{gem_name}", "PATH" => ""
