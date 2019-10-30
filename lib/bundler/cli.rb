@@ -9,9 +9,16 @@ module Bundler
     package_name "Bundler"
 
     AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean].freeze
-    PARSEABLE_COMMANDS = %w[
-      check config help exec platform show version
-    ].freeze
+    PARSEABLE_COMMANDS = %w[check config help exec platform show version].freeze
+
+    COMMAND_ALIASES = {
+      "check" => "c",
+      "install" => "i",
+      "list" => "ls",
+      "exec" => ["e", "ex", "exe"],
+      "cache" => ["package", "pack"],
+      "version" => ["-v", "--version"],
+    }.freeze
 
     def self.start(*)
       super
@@ -27,6 +34,24 @@ module Bundler
         i.send(:print_command)
         i.send(:warn_on_outdated_bundler)
       end
+    end
+
+    def self.all_aliases
+      @all_aliases ||= begin
+                         command_aliases = {}
+
+                         COMMAND_ALIASES.each do |name, aliases|
+                           Array(aliases).each do |one_alias|
+                             command_aliases[one_alias] = name
+                           end
+                         end
+
+                         command_aliases
+                       end
+    end
+
+    def self.aliases_for(command_name)
+      COMMAND_ALIASES.select {|k, _| k == command_name }.invert
     end
 
     def initialize(*args)
@@ -152,13 +177,14 @@ module Bundler
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME).#{" Bundler will remember this value for future installs on this machine" unless Bundler.feature_flag.forget_cli_options?}"
-    map "c" => "check"
     def check
       remembered_flag_deprecation("path")
 
       require_relative "cli/check"
       Check.new(options).run
     end
+
+    map aliases_for("check")
 
     desc "remove [GEM [GEM ...]]", "Removes gems from the Gemfile"
     long_desc <<-D
@@ -221,7 +247,6 @@ module Bundler
       "Exclude gems that are part of the specified named group."
     method_option "with", :type => :array, :banner =>
       "Include gems that are part of the specified named group."
-    map "i" => "install"
     def install
       SharedHelpers.major_deprecation(2, "The `--force` option has been renamed to `--redownload`") if ARGV.include?("--force")
 
@@ -234,6 +259,8 @@ module Bundler
         Install.new(options.dup).run
       end
     end
+
+    map aliases_for("install")
 
     desc "update [OPTIONS]", "Update the current environment"
     long_desc <<-D
@@ -326,7 +353,7 @@ module Bundler
       List.new(options).run
     end
 
-    map %w[ls] => "list"
+    map aliases_for("list")
 
     desc "info GEM [OPTIONS]", "Show information for the given gem"
     method_option "path", :type => :boolean, :banner => "Print full path to gem"
@@ -436,7 +463,8 @@ module Bundler
       require_relative "cli/cache"
       Cache.new(options).run
     end
-    map %w[package pack] => :cache
+
+    map aliases_for("cache")
 
     desc "exec [OPTIONS]", "Run the command in context of the bundle"
     method_option :keep_file_descriptors, :type => :boolean, :default => false
@@ -446,11 +474,12 @@ module Bundler
       bundle exec you can require and call the bundled gems as if they were installed
       into the system wide RubyGems repository.
     D
-    map "e" => "exec"
     def exec(*args)
       require_relative "cli/exec"
       Exec.new(options, args).run
     end
+
+    map aliases_for("exec")
 
     desc "config NAME [VALUE]", "Retrieve or set a configuration value"
     long_desc <<-D
@@ -494,7 +523,8 @@ module Bundler
         Bundler.ui.info "Bundler version #{Bundler::VERSION}#{build_info}"
       end
     end
-    map %w[-v --version] => :version
+
+    map aliases_for("version")
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
@@ -678,12 +708,17 @@ module Bundler
     # Reformat the arguments passed to bundle that include a --help flag
     # into the corresponding `bundle help #{command}` call
     def self.reformatted_help_args(args)
-      bundler_commands = all_commands.keys
+      bundler_commands = (COMMAND_ALIASES.keys + COMMAND_ALIASES.values).flatten
+
       help_flags = %w[--help -h]
-      exec_commands = %w[e ex exe exec]
+      exec_commands = ["exec"] + COMMAND_ALIASES["exec"]
+
       help_used = args.index {|a| help_flags.include? a }
       exec_used = args.index {|a| exec_commands.include? a }
+
       command = args.find {|a| bundler_commands.include? a }
+      command = all_aliases[command] if all_aliases[command]
+
       if exec_used && help_used
         if exec_used + help_used == 1
           %w[help exec]
