@@ -130,7 +130,10 @@ namespace :man do
     begin
       Spec::Rubygems.gem_require("ronn")
     rescue Gem::LoadError => e
+      desc "Build the man pages"
       task(:build) { abort "We couln't activate ronn (#{e.requirement}). Try `gem install ronn:'#{e.requirement}'` to be able to build the help pages" }
+
+      desc "Verify man pages are in sync"
       task(:check) { abort "We couln't activate ronn (#{e.requirement}). Try `gem install ronn:'#{e.requirement}'` to be able to build the help pages" }
     else
       directory "man"

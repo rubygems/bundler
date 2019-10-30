@@ -1391,7 +1391,7 @@ In Gemfile:
         end
       G
       bundle "config set cache_all true"
-      bundle :package
+      bundle :cache
       simulate_new_machine
 
       bundle! "install", :env => { "PATH" => "" }
