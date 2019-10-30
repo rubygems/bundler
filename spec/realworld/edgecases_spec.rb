@@ -3,10 +3,10 @@
 RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
   def rubygems_version(name, requirement)
     ruby! <<-RUBY
-      require #{File.expand_path("../../support/artifice/vcr.rb", __FILE__).dump}
-      require "bundler"
-      require "bundler/source/rubygems/remote"
-      require "bundler/fetcher"
+      require "#{spec}/support/artifice/vcr"
+      require "#{lib}/bundler"
+      require "#{lib}/bundler/source/rubygems/remote"
+      require "#{lib}/bundler/fetcher"
       rubygem = Bundler.ui.silence do
         source = Bundler::Source::Rubygems::Remote.new(URI("https://rubygems.org"))
         fetcher = Bundler::Fetcher.new(source)
