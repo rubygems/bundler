@@ -19,8 +19,6 @@ module Spec
       FileUtils.mkdir_p(home)
       FileUtils.mkdir_p(tmpdir)
       Bundler.reset!
-      Bundler.ui = nil
-      Bundler.ui # force it to initialize
     end
 
     def self.bang(method)
@@ -80,7 +78,7 @@ module Spec
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
       groups = args.map(&:inspect).join(", ")
-      setup = "require '#{lib}/bundler' ; Bundler.setup(#{groups})\n"
+      setup = "require '#{lib}/bundler' ; Bundler.ui.silence { Bundler.setup(#{groups}) }\n"
       ruby(setup + cmd, opts)
     end
     bang :run

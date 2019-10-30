@@ -360,7 +360,6 @@ RSpec.describe "major deprecations" do
         require 'bundler'
         require 'bundler/vendored_thor'
 
-        Bundler.ui = Bundler::UI::Shell.new
         Bundler.setup
         Bundler.setup
       RUBY

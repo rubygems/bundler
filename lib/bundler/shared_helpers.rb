@@ -137,10 +137,7 @@ module Bundler
       end
 
       return unless bundler_major_version >= major_version && prints_major_deprecations?
-      @major_deprecation_ui ||= Bundler::UI::Shell.new("no-color" => true)
-      with_major_deprecation_ui do |ui|
-        ui.warn("[DEPRECATED] #{message}")
-      end
+      Bundler.ui.warn("[DEPRECATED] #{message}")
     end
 
     def print_major_deprecations!
@@ -216,21 +213,6 @@ module Bundler
     end
 
   private
-
-    def with_major_deprecation_ui(&block)
-      ui = Bundler.ui
-
-      if ui.is_a?(@major_deprecation_ui.class)
-        yield ui
-      else
-        begin
-          Bundler.ui = @major_deprecation_ui
-          yield Bundler.ui
-        ensure
-          Bundler.ui = ui
-        end
-      end
-    end
 
     def validate_bundle_path
       path_separator = Bundler.rubygems.path_separator

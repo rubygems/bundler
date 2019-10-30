@@ -64,11 +64,11 @@ module Bundler
     end
 
     def ui
-      (defined?(@ui) && @ui) || (self.ui = UI::Silent.new)
+      (defined?(@ui) && @ui) || (self.ui = UI::Shell.new)
     end
 
     def ui=(ui)
-      Bundler.rubygems.ui = ui ? UI::RGProxy.new(ui) : nil
+      Bundler.rubygems.ui = UI::RGProxy.new(ui)
       @ui = ui
     end
 
