@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require File.expand_path("../../path.rb", __FILE__)
-require Spec::Path.root.join("lib/bundler/deprecate")
+require Spec::Path.lib_dir.join("bundler/deprecate")
 include Spec::Path
 
 $LOAD_PATH.unshift(*Dir[Spec::Path.base_system_gems.join("gems/{artifice,mustermann,rack,tilt,sinatra}-*/lib")].map(&:to_s))

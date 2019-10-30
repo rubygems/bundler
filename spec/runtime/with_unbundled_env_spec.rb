@@ -81,8 +81,8 @@ RSpec.describe "Bundler.with_env helpers" do
 
     it "should restore RUBYLIB", :ruby_repo do
       code = "print #{modified_env}['RUBYLIB']"
-      ENV["RUBYLIB"] = root.join("lib").to_s + File::PATH_SEPARATOR + "/foo"
-      ENV["BUNDLER_ORIG_RUBYLIB"] = root.join("lib").to_s + File::PATH_SEPARATOR + "/foo-original"
+      ENV["RUBYLIB"] = lib_dir.to_s + File::PATH_SEPARATOR + "/foo"
+      ENV["BUNDLER_ORIG_RUBYLIB"] = lib_dir.to_s + File::PATH_SEPARATOR + "/foo-original"
       bundle_exec_ruby! code.dump
       expect(last_command.stdboth).to include("/foo-original")
     end

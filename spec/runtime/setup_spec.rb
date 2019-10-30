@@ -1043,7 +1043,7 @@ end
   describe "when Bundler is bundled" do
     it "doesn't blow up" do
       install_gemfile <<-G
-        gem "bundler", :path => "#{File.expand_path("..", lib)}"
+        gem "bundler", :path => "#{root}"
       G
 
       bundle %(exec ruby -e "require 'bundler'; Bundler.setup")
