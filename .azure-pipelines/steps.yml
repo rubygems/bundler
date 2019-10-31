@@ -24,16 +24,5 @@ steps:
   displayName: 'ruby bin/rake spec:deps'
 
 - script: |
-    gem install --no-document --conservative rspec_junit_formatter
-  displayName: 'gem install rspec_junit_formatter'
-
-- script: |
-    ruby -r rspec_junit_formatter bin/rspec --format RspecJunitFormatter -o rspec/bundler-junit-results.xml || exit 0
+    ruby bin/rspec || exit 0
   displayName: 'ruby bin/rspec'
-
-- task: PublishTestResults@2
-  inputs:
-    testRunner: JUnit
-    testResultsFiles: rspec/bundler-junit-results.xml
-  displayName: Publish test results
-  condition: succeededOrFailed()
