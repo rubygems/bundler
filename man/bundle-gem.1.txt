@@ -88,4 +88,4 @@ SEE ALSO
 
 
 
-				 October 2019			 BUNDLE-GEM(1)
+				 November 2019			 BUNDLE-GEM(1)

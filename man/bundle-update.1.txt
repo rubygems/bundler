@@ -387,4 +387,4 @@ RECOMMENDED WORKFLOW
 
 
 
-				 October 2019		      BUNDLE-UPDATE(1)
+				 November 2019		      BUNDLE-UPDATE(1)
