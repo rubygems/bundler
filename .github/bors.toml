@@ -4,6 +4,7 @@ status = [
 
 timeout_sec = 14400
 delete_merged_branches = true
+use_squash_merge = true
 
 [committer]
 name = "Bundlerbot"
