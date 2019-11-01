@@ -74,8 +74,8 @@ module Bundler
               Kernel.require file
             rescue RuntimeError => e
               raise e if e.is_a?(LoadError) # we handle this a little later
-              raise Bundler::GemRequireError.new e,
-                "There was an error while trying to load the gem '#{file}'."
+              Bundler.ui.warn "There was an error while trying to load the gem '#{file}'"
+              raise
             end
           end
         rescue LoadError => e

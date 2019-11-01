@@ -80,25 +80,6 @@ RSpec.describe Bundler, "friendly errors" do
       it_behaves_like "Bundler.ui receive error", Bundler::GemspecError.new
     end
 
-    context "GemRequireError" do
-      let(:orig_error) { StandardError.new }
-      let(:error) { Bundler::GemRequireError.new(orig_error, "sample_message") }
-
-      before do
-        allow(orig_error).to receive(:backtrace).and_return([])
-      end
-
-      it "Bundler.ui receive error" do
-        expect(Bundler.ui).to receive(:error).with(error.message)
-        Bundler::FriendlyErrors.log_error(error)
-      end
-
-      it "writes to Bundler.ui.trace" do
-        expect(Bundler.ui).to receive(:trace).with(orig_error)
-        Bundler::FriendlyErrors.log_error(error)
-      end
-    end
-
     context "BundlerError" do
       it "Bundler.ui receive error" do
         error = Bundler::BundlerError.new

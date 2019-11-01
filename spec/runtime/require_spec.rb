@@ -138,6 +138,9 @@ RSpec.describe "Bundler.require" do
     run "Bundler.require"
     expect(err).to match("error while trying to load the gem 'faulty'")
     expect(err).to match("Gem Internal Error Message")
+
+    backtrace_lines = err.split("\n").select {|l| l =~ /from / }
+    expect(backtrace_lines.uniq).to eq(backtrace_lines), "Error message should display a single backtrace"
   end
 
   it "doesn't swallow the error when the library has an unrelated error" do

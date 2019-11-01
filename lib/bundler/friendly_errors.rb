@@ -13,9 +13,6 @@ module Bundler
         Bundler.ui.trace error.orig_exception
       when Dsl::DSLError, GemspecError
         Bundler.ui.error error.message
-      when GemRequireError
-        Bundler.ui.error error.message
-        Bundler.ui.trace error.orig_exception
       when BundlerError
         Bundler.ui.error error.message, :wrap => true
         Bundler.ui.trace error
@@ -43,8 +40,6 @@ module Bundler
           "Alternatively, you can increase the amount of memory the JVM is able to use by running Bundler with jruby -J-Xmx1024m -S bundle (JRuby defaults to 500MB)."
       else request_issue_report_for(error)
       end
-    rescue StandardError
-      raise error
     end
 
     def exit_status(error)
