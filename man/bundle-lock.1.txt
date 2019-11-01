@@ -90,4 +90,4 @@ PATCH LEVEL OPTIONS
 
 
 
-				 October 2019			BUNDLE-LOCK(1)
+				 November 2019			BUNDLE-LOCK(1)
