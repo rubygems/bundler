@@ -167,29 +167,13 @@ module Bundler
         end
 
         if warning
-          Kernel.send(:require, "etc")
-          user_home = tmp_home_path(Etc.getlogin, warning)
+          user_home = tmp_home_path(warning)
           Bundler.ui.warn "#{warning}\nBundler will use `#{user_home}' as your home directory temporarily.\n"
           user_home
         else
           Pathname.new(home)
         end
       end
-    end
-
-    def tmp_home_path(login, warning)
-      login ||= "unknown"
-      Kernel.send(:require, "tmpdir")
-      path = Pathname.new(Dir.tmpdir).join("bundler", "home")
-      SharedHelpers.filesystem_access(path) do |tmp_home_path|
-        unless tmp_home_path.exist?
-          tmp_home_path.mkpath
-          tmp_home_path.chmod(0o777)
-        end
-        tmp_home_path.join(login).tap(&:mkpath)
-      end
-    rescue RuntimeError => e
-      raise e.exception("#{warning}\nBundler also failed to create a temporary home directory at `#{path}':\n#{e}")
     end
 
     def user_bundle_path(dir = "home")
@@ -610,6 +594,17 @@ EOF
     def configure_gem_home
       Bundler::SharedHelpers.set_env "GEM_HOME", File.expand_path(bundle_path, root)
       Bundler.rubygems.clear_paths
+    end
+
+    def tmp_home_path(warning)
+      Kernel.send(:require, "tmpdir")
+      SharedHelpers.filesystem_access(Dir.tmpdir) do
+        path = Bundler.tmp
+        at_exit { Bundler.rm_rf(path) }
+        path
+      end
+    rescue RuntimeError => e
+      raise e.exception("#{warning}\nBundler also failed to create a temporary home directory':\n#{e}")
     end
 
     # @param env [Hash]
