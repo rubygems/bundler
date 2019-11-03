@@ -1,0 +1,14 @@
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+require "<%= config[:namespaced_path] %>"
+
+require "test/unit"
+
+class Test<%= config[:constant_name] %> < Test::Unit::TestCase
+  def test_that_it_has_a_version_number
+    refute_nil ::<%= config[:constant_name] %>::VERSION
+  end
+
+  def test_it_does_something_useful
+    assert false
+  end
+end

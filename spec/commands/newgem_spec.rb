@@ -430,6 +430,17 @@ RSpec.describe "bundle gem" do
       end
     end
 
+    context "gem.test setting set to rspec and --test is set to test-unit" do
+      before do
+        bundle "config set gem.test rspec"
+        bundle "gem #{gem_name} --test=test-unit"
+      end
+
+      it "builds spec skeleton" do
+        expect(bundled_app("#{gem_name}/test/test_#{require_path}.rb")).to exist
+      end
+    end
+
     context "--test parameter set to minitest" do
       before do
         bundle "gem #{gem_name} --test=minitest"
@@ -463,6 +474,34 @@ RSpec.describe "bundle gem" do
       end
     end
 
+    context "--test parameter set to test-unit" do
+      before do
+        bundle "gem #{gem_name} --test=test-unit"
+      end
+
+      it "depends on a specific version of test-unit" do
+        Dir.chdir(bundled_app(gem_name)) do
+          builder = Bundler::Dsl.new
+          builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
+          builder.dependencies
+          test_unit_dep = builder.dependencies.find {|d| d.name == "test-unit" }
+          expect(test_unit_dep).to be_specific
+        end
+      end
+
+      it "builds spec skeleton" do
+        expect(bundled_app("#{gem_name}/test/test_#{require_path}.rb")).to exist
+      end
+
+      it "requires the main file" do
+        expect(bundled_app("#{gem_name}/test/test_#{require_path}.rb").read).to include(%(require "#{require_path}"))
+      end
+
+      it "creates a default test which fails" do
+        expect(bundled_app("#{gem_name}/test/test_#{require_path}.rb").read).to include("assert false")
+      end
+    end
+
     context "gem.test setting set to minitest" do
       before do
         bundle "config set gem.test minitest"
@@ -478,6 +517,30 @@ RSpec.describe "bundle gem" do
             t.libs << "test"
             t.libs << "lib"
             t.test_files = FileList["test/**/*_test.rb"]
+          end
+
+          task :default => :test
+        RAKEFILE
+
+        expect(bundled_app("#{gem_name}/Rakefile").read).to eq(rakefile)
+      end
+    end
+
+    context "gem.test setting set to test-unit" do
+      before do
+        bundle "config set gem.test test-unit"
+        bundle "gem #{gem_name}"
+      end
+
+      it "creates a default rake task to run the test suite" do
+        rakefile = strip_whitespace <<-RAKEFILE
+          require "bundler/gem_tasks"
+          require "rake/testtask"
+
+          Rake::TestTask.new(:test) do |t|
+            t.libs << "test"
+            t.libs << "lib"
+            t.test_files = FileList["test/**/test_*.rb"]
           end
 
           task :default => :test
