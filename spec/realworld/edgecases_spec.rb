@@ -17,7 +17,7 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
         raise "Could not find #{name} (#{requirement}) on rubygems.org!\n" \
           "Found specs:\n\#{index.send(:specs).inspect}"
       end
-      "#{name} (\#{rubygem.version})"
+      puts "#{name} (\#{rubygem.version})"
     RUBY
   end
 
