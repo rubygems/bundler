@@ -7,10 +7,12 @@ RSpec.describe "real world edgecases", :realworld => true, :sometimes => true do
       require "bundler"
       require "bundler/source/rubygems/remote"
       require "bundler/fetcher"
-      source = Bundler::Source::Rubygems::Remote.new(URI("https://rubygems.org"))
-      fetcher = Bundler::Fetcher.new(source)
-      index = fetcher.specs([#{name.dump}], nil)
-      rubygem = index.search(Gem::Dependency.new(#{name.dump}, #{requirement.dump})).last
+      rubygem = Bundler.ui.silence do
+        source = Bundler::Source::Rubygems::Remote.new(URI("https://rubygems.org"))
+        fetcher = Bundler::Fetcher.new(source)
+        index = fetcher.specs([#{name.dump}], nil)
+        index.search(Gem::Dependency.new(#{name.dump}, #{requirement.dump})).last
+      end
       if rubygem.nil?
         raise "Could not find #{name} (#{requirement}) on rubygems.org!\n" \
           "Found specs:\n\#{index.send(:specs).inspect}"

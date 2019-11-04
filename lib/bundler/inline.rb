@@ -56,7 +56,7 @@ def gemfile(install = false, options = {}, &gemfile)
       definition.missing_specs?
     end
 
-    Bundler.ui = ui if install
+    Bundler.ui = install ? ui : Bundler::UI::Silent.new
     if install || missing_specs.call
       Bundler.settings.temporary(:inline => true, :disable_platform_warnings => true) do
         installer = Bundler::Installer.install(Bundler.root, definition, :system => true)

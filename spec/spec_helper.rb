@@ -107,7 +107,7 @@ RSpec.configure do |config|
     in_app_root
     @command_executions = []
 
-    example.run
+    Bundler.ui.silence { example.run }
 
     all_output = @command_executions.map(&:to_s_verbose).join("\n\n")
     if example.exception && !all_output.empty?
