@@ -356,7 +356,7 @@ RSpec.describe "major deprecations" do
       G
 
       ruby <<-RUBY
-        require 'bundler'
+        require '#{lib_dir}/bundler'
 
         Bundler.setup
         Bundler.setup
