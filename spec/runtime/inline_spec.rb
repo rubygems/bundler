@@ -5,7 +5,7 @@ RSpec.describe "bundler/inline#gemfile" do
     requires = ["#{lib_dir}/bundler/inline"]
     requires.unshift "#{spec_dir}/support/artifice/" + options.delete(:artifice) if options.key?(:artifice)
     requires = requires.map {|r| "require '#{r}'" }.join("\n")
-    @out = ruby("#{requires}\n\n" + code, options)
+    ruby("#{requires}\n\n" + code, options)
   end
 
   before :each do
