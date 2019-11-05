@@ -26,7 +26,7 @@ RSpec.describe "bundle gem" do
       user = bundleuser
     EOF
     @git_config_location = ENV["GIT_CONFIG"]
-    path = "#{File.expand_path(tmp, File.dirname(__FILE__))}/test_git_config.txt"
+    path = "#{tmp}/test_git_config.txt"
     File.open(path, "w") {|f| f.write(git_config_content) }
     ENV["GIT_CONFIG"] = path
   end
@@ -181,7 +181,7 @@ RSpec.describe "bundle gem" do
   context "when git is not available" do
     # This spec cannot have `git` available in the test env
     before do
-      load_paths = [lib, spec]
+      load_paths = [lib_dir, spec_dir]
       load_path_str = "-I#{load_paths.join(File::PATH_SEPARATOR)}"
 
       sys_exec "#{Gem.ruby} #{load_path_str} #{bindir.join("bundle")} gem #{gem_name}", "PATH" => ""

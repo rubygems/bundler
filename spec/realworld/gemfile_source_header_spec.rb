@@ -37,7 +37,7 @@ private
     @port = find_unused_port
     @server_uri = "http://127.0.0.1:#{@port}"
 
-    require File.expand_path("../../support/artifice/endpoint_mirror_source", __FILE__)
+    require_relative "../support/artifice/endpoint_mirror_source"
 
     @t = Thread.new do
       Rack::Server.start(:app       => EndpointMirrorSource,

@@ -131,7 +131,7 @@ module Spec
       tmp("libs", *args)
     end
 
-    def lib
+    def lib_dir
       root.join("lib")
     end
 
