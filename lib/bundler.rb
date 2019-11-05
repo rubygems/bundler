@@ -110,7 +110,7 @@ module Bundler
       end
     end
 
-    # Setups Bundler runtime. After +Bundler.setup+ call, all +load+ or
+    # Turns on the Bundler runtime. After +Bundler.setup+ call, all +load+ or
     # +require+ of the gems would be allowed only if they are part of
     # the Gemfile or Ruby's standard library. If the versions specified
     # in Gemfile, only those versions would be loaded.
