@@ -172,10 +172,10 @@ module Spec
     end
 
     def ruby(ruby, options = {})
-      env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
+      env = options.delete(:env) || {}
       ruby = ruby.gsub(/["`\$]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib_dir}"
-      sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"))
+      sys_exec(%(#{Gem.ruby}#{lib_option} -e "#{ruby}"), env)
     end
     bang :ruby
 
