@@ -10,12 +10,6 @@ steps:
   displayName: 'ruby -v + ridk version'
 
 - script: |
-    mkdir tmp
-    cd tmp
-    mkdir home
-  displayName: 'work around readline crash (for https://github.com/bundler/bundler/issues/6902)'
-
-- script: |
     bash .azure-pipelines\patch_readline.sh
   displayName: 'patch local readline implementation (for https://github.com/bundler/bundler/issues/6907)'
 
