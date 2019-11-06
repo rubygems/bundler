@@ -14,6 +14,25 @@ require_relative "bundler/constants"
 require_relative "bundler/current_ruby"
 require_relative "bundler/build_metadata"
 
+# Bundler provides a consistent environment for Ruby projects by
+# tracking and installing the exact gems and versions that are needed.
+#
+# Since Ruby 2.6, Bundler is a part of Ruby's standard library.
+#
+# Bunder is used by creating _gemfiles_ listing all the project dependencies
+# and (optionally) their versions and then using
+#
+#   require 'bundler/setup'
+#
+# or Bundler.setup to setup environment where only specified gems and their
+# specified versions could be used.
+#
+# See {Bundler website}[https://bundler.io/docs.html] for extensive documentation
+# on gemfiles creation and Bundler usage.
+#
+# As a standard library inside project, Bundler could be used for introspection
+# of loaded and required modules.
+#
 module Bundler
   environment_preserver = EnvironmentPreserver.new(ENV, EnvironmentPreserver::BUNDLER_KEYS)
   ORIGINAL_ENV = environment_preserver.restore
@@ -91,6 +110,33 @@ module Bundler
       end
     end
 
+    # Turns on the Bundler runtime. After +Bundler.setup+ call, all +load+ or
+    # +require+ of the gems would be allowed only if they are part of
+    # the Gemfile or Ruby's standard library. If the versions specified
+    # in Gemfile, only those versions would be loaded.
+    #
+    # Assuming Gemfile
+    #
+    #    gem 'first_gem', '= 1.0'
+    #    group :test do
+    #      gem 'second_gem', '= 1.0'
+    #    end
+    #
+    # The code using Bundler.setup works as follows:
+    #
+    #    require 'third_gem' # allowed, required from global gems
+    #    require 'first_gem' # allowed, loads the last installed version
+    #    Bundler.setup
+    #    require 'fourth_gem' # fails with LoadError
+    #    require 'second_gem' # loads exactly version 1.0
+    #
+    # +Bundler.setup+ can be called only once, all subsequent calls are no-op.
+    #
+    # If _groups_ list is provided, only gems from specified groups would
+    # be allowed (gems specified outside groups belong to special +:default+ group).
+    #
+    # To require all gems from Gemfile (or only some groups), see Bundler.require.
+    #
     def setup(*groups)
       # Return if all groups are already loaded
       return @setup if defined?(@setup) && @setup
@@ -107,6 +153,24 @@ module Bundler
       end
     end
 
+    # Setups Bundler environment (see Bundler.setup) if it is not already set,
+    # and loads all gems from groups specified. Unlike ::setup, can be called
+    # multiple times with different groups (if they were allowed by setup).
+    #
+    # Assuming Gemfile
+    #
+    #    gem 'first_gem', '= 1.0'
+    #    group :test do
+    #      gem 'second_gem', '= 1.0'
+    #    end
+    #
+    # The code will work as follows:
+    #
+    #    Bundler.setup # allow all groups
+    #    Bundler.require(:default) # requires only first_gem
+    #    # ...later
+    #    Bundler.require(:test)   # requires second_gem
+    #
     def require(*groups)
       setup(*groups).require(*groups)
     end
