@@ -67,6 +67,9 @@ module Spec
         manifest_path.open("w") {|f| f << manifest.join }
       end
 
+      FileUtils.mkdir_p(Path.home)
+      FileUtils.mkdir_p(Path.tmpdir)
+
       ENV["HOME"] = Path.home.to_s
       ENV["TMPDIR"] = Path.tmpdir.to_s
 
