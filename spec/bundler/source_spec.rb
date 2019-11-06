@@ -56,7 +56,7 @@ RSpec.describe Bundler::Source do
         context "with a different version" do
           let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "< 1.5") }
 
-          context "with color" do
+          context "with color", :no_color_tty do
             before do
               allow($stdout).to receive(:tty?).and_return(true)
             end
@@ -83,7 +83,7 @@ RSpec.describe Bundler::Source do
           let(:spec) { double(:spec, :name => "nokogiri", :version => "1.6.1", :platform => rb) }
           let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "1.7.0") }
 
-          context "with color" do
+          context "with color", :no_color_tty do
             before do
               allow($stdout).to receive(:tty?).and_return(true)
             end
@@ -110,7 +110,7 @@ RSpec.describe Bundler::Source do
           let(:spec) { double(:spec, :name => "nokogiri", :version => "1.7.1", :platform => rb) }
           let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "1.7.0") }
 
-          context "with color" do
+          context "with color", :no_color_tty do
             before do
               allow($stdout).to receive(:tty?).and_return(true)
             end
