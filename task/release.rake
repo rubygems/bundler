@@ -181,7 +181,7 @@ namespace :release do
     abort "Could not find commits for all PRs" unless commits.size == prs.size
 
     if commits.any? && !system("git", "cherry-pick", "-x", "-m", "1", *commits.map(&:first))
-      warn "Opening a new shell to fix the cherry-pick errors"
+      warn "Opening a new shell to fix the cherry-pick errors. Press Ctrl-D when done to resume the task"
 
       unless system(ENV["SHELL"] || "zsh")
         abort "Failed to resolve conflicts on a different shell. Resolve conflicts manually and finish the task manually"
