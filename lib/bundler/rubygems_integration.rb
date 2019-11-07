@@ -447,35 +447,6 @@ module Bundler
       Gem.clear_paths
     end
 
-    # This backports base_dir which replaces installation path
-    # RubyGems 1.8+
-    def backport_base_dir
-      redefine_method(Gem::Specification, :base_dir) do
-        return Gem.dir unless loaded_from
-        File.dirname File.dirname loaded_from
-      end
-    end
-
-    def backport_cache_file
-      redefine_method(Gem::Specification, :cache_dir) do
-        @cache_dir ||= File.join base_dir, "cache"
-      end
-
-      redefine_method(Gem::Specification, :cache_file) do
-        @cache_file ||= File.join cache_dir, "#{full_name}.gem"
-      end
-    end
-
-    def backport_spec_file
-      redefine_method(Gem::Specification, :spec_dir) do
-        @spec_dir ||= File.join base_dir, "specifications"
-      end
-
-      redefine_method(Gem::Specification, :spec_file) do
-        @spec_file ||= File.join spec_dir, "#{full_name}.gemspec"
-      end
-    end
-
     def undo_replacements
       @replaced_methods.each do |(sym, klass), method|
         redefine_method(klass, sym, method)
