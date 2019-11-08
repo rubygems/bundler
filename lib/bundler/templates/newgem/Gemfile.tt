@@ -10,3 +10,6 @@ gem "rake-compiler"
 <%- if config[:test] -%>
 gem "<%= config[:test] %>", "~> <%= config[:test_framework_version] %>"
 <%- end -%>
+<%- if config[:rubocop] -%>
+gem "rubocop"
+<%- end -%>

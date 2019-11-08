@@ -100,7 +100,7 @@ module Bundler
         end
       end
 
-      config[:test_task] = config[:test] == "minitest" ? "test" : "spec"
+      config[:test_task] = config[:test] == "minitest" ? :test : :spec
 
       if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
         "This means that any other developer or company will be legally allowed to use your code " \
@@ -122,6 +122,15 @@ module Bundler
         config[:coc] = true
         Bundler.ui.info "Code of conduct enabled in config"
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
+      end
+
+      if ask_and_set(:rubocop, "Do you want to add rubocop as a dependency for gems you generate?",
+        "RuboCop is a static code analyzer that has out-of-the-box rules for many " \
+        "of the guidelines in the community style guide. " \
+        "For more information, see the RuboCop docs (https://docs.rubocop.org/en/stable/) " \
+        "and the Ruby Style Guides (https://github.com/rubocop-hq/ruby-style-guide).")
+        config[:rubocop] = true
+        Bundler.ui.info "RuboCop enabled in config"
       end
 
       templates.merge!("exe/newgem.tt" => "exe/#{name}") if config[:exe]
