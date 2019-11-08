@@ -20,7 +20,7 @@ module Spec
       "compact_index" => "~> 0.11.0",
       "sinatra" => "~> 2.0",
       # Rake version has to be consistent for tests to pass
-      "rake" => "12.3.2",
+      "rake" => "13.0.1",
       "builder" => "~> 3.2",
       # ruby-graphviz is used by the viz tests
       "ruby-graphviz" => ">= 0.a",
