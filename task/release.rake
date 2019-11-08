@@ -131,7 +131,7 @@ namespace :release do
 
   desc "Push the release to Github releases"
   task :github, :version do |_t, args|
-    version = Gem::Version.new(args.version)
+    version = Gem::Version.new(args.version || bundler_spec.version)
     tag = "v#{version}"
 
     gh_api_post :path => "/repos/bundler/bundler/releases",

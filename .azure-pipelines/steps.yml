@@ -2,18 +2,12 @@ steps:
 
 - task: UseRubyVersion@0
   inputs:
-    versionSpec: '= 2.4'
+    versionSpec: '= 2.6'
 
 - script: |
     ruby -v
     ridk version
   displayName: 'ruby -v + ridk version'
-
-- script: |
-    mkdir tmp
-    cd tmp
-    mkdir home
-  displayName: 'work around readline crash (for https://github.com/bundler/bundler/issues/6902)'
 
 - script: |
     bash .azure-pipelines\patch_readline.sh
@@ -28,7 +22,7 @@ steps:
   displayName: 'gem install rspec_junit_formatter'
 
 - script: |
-    ruby -r rspec_junit_formatter bin/rspec --format progress --format RspecJunitFormatter -o rspec/bundler-junit-results.xml || exit 0
+    ruby -r rspec_junit_formatter bin/rspec --format RspecJunitFormatter -o rspec/bundler-junit-results.xml || exit 0
   displayName: 'ruby bin/rspec'
 
 - task: PublishTestResults@2
