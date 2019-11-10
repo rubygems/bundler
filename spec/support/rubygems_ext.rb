@@ -40,7 +40,7 @@ module Spec
     end
 
     def gem_load(gem_name, bin_container)
-      require_relative "rubygems"
+      require_relative "../rubygems/rubygems"
       gem_load_and_activate(gem_name, bin_container)
     end
 
