@@ -16,7 +16,7 @@ class Bundler::Thor
         end
 
         DidYouMean::Correctable
-      rescue LoadError
+      rescue LoadError, NameError
       end
     end
 
