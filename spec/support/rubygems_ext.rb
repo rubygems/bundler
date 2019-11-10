@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative "path"
-require "fileutils"
 
 module Spec
   module Rubygems
@@ -50,6 +49,8 @@ module Spec
     end
 
     def setup
+      require "fileutils"
+
       Gem.clear_paths
 
       ENV["BUNDLE_PATH"] = nil
