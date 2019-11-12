@@ -174,7 +174,7 @@ module Spec
       env = options.delete(:env) || {}
       ruby = ruby.gsub(/["`\$]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib_dir}"
-      sys_exec(%(#{Gem.ruby}#{lib_option} -e "#{ruby}"), env)
+      sys_exec(%(#{Gem.ruby}#{lib_option} -w -e "#{ruby}"), env)
     end
     bang :ruby
 
