@@ -1,4 +1,4 @@
-## 2.1.0.pre.3 (November 8, 2019)
+## 2.1.0.pre.3 (November 12, 2019)
 
 Features:
 
