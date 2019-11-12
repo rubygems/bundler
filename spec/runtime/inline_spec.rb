@@ -5,7 +5,7 @@ RSpec.describe "bundler/inline#gemfile" do
     requires = ["#{lib_dir}/bundler/inline"]
     requires.unshift "#{spec_dir}/support/artifice/" + options.delete(:artifice) if options.key?(:artifice)
     requires = requires.map {|r| "require '#{r}'" }.join("\n")
-    @out = ruby("#{requires}\n\n" + code, options)
+    ruby("#{requires}\n\n" + code, options)
   end
 
   before :each do
@@ -88,9 +88,8 @@ RSpec.describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to include("Installing activesupport")
-    err.gsub! %r{(.*lib/sinatra/base\.rb:\d+: warning: constant ::Fixnum is deprecated$)}, ""
     err_lines = err.split("\n")
-    err_lines.reject!{|line| line =~ /\.rb:\d+: warning: / }
+    err_lines.reject!{|line| line =~ /\.rb:\d+: warning: / } unless RUBY_VERSION < "2.7"
     expect(err_lines).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end

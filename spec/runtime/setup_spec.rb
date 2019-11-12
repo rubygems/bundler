@@ -1027,6 +1027,8 @@ end
 
       ruby <<-RUBY
         require '#{lib_dir}/bundler'
+        bundler_module = class << Bundler; self; end
+        bundler_module.send(:remove_method, :require)
         def Bundler.require(path)
           raise "LOSE"
         end
