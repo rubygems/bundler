@@ -2,8 +2,8 @@ language: ruby
 dist: bionic
 script: bin/rake spec:travis
 before_script:
-  - gem install rake:"~> 12.0"
-  - bin/rake override_version
+  - travis_retry gem install rake:"~> 12.0"
+  - travis_retry bin/rake override_version
   - travis_retry bin/rake spec:travis:deps
   - bin/rake man:check
 
