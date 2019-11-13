@@ -845,6 +845,12 @@ end
   end
 
   describe "when a vendored gem specification uses the :path option" do
+    let(:filesystem_root) do
+      current = Pathname.new(Dir.pwd)
+      current = current.parent until current == current.parent
+      current
+    end
+
     it "should resolve paths relative to the Gemfile" do
       path = bundled_app(File.join("vendor", "foo"))
       build_lib "foo", :path => path
@@ -866,7 +872,7 @@ end
     end
 
     it "should make sure the Bundler.root is really included in the path relative to the Gemfile" do
-      relative_path = File.join("vendor", Dir.pwd[1..-1], "foo")
+      relative_path = File.join("vendor", Dir.pwd.gsub(/^#{filesystem_root}/, ""))
       absolute_path = bundled_app(relative_path)
       FileUtils.mkdir_p(absolute_path)
       build_lib "foo", :path => absolute_path
