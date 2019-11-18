@@ -17,7 +17,7 @@ RSpec.describe "bundle install" do
       bundle! :install, flag => true
 
       expect(out).to include "Installing rack 1.0.0"
-      expect(rack_lib.open(&:read)).to eq("RACK = '1.0.0'\n")
+      expect(rack_lib.binread).to eq("RACK = '1.0.0'\n")
       expect(the_bundle).to include_gems "rack 1.0.0"
     end
 
