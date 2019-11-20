@@ -1,3 +1,20 @@
+## 2.1.0.pre.3 (November 12, 2019)
+
+Features:
+
+  - Add caller information to some deprecation messages to make them easier to fix [#7361](https://github.com/bundler/bundler/pull/7361)
+  - Reconcile `bundle cache` vs `bundle package` everywhere. Now in docs, CLI help and everywhere else `bundle cache` is the preferred version and `bundle package` remains as an alias [#7389](https://github.com/bundler/bundler/pull/7389)
+  - Display some basic `bundler` documentation together with ruby's RDoc based documentation [#7394](https://github.com/bundler/bundler/pull/7394)
+
+Bugfixes:
+
+  - Fix typos deprecation message and upgrading docs [#7374](https://github.com/bundler/bundler/pull/7374)
+  - Deprecation warnings about `taint` usage on ruby 2.7 [#7385](https://github.com/bundler/bundler/pull/7385)
+  - Fix `--help` flag not correctly delegating to `man` when used with command aliases [#7388](https://github.com/bundler/bundler/pull/7388)
+  - `bundle add` should cache newly added gems if an application cache exists [#7393](https://github.com/bundler/bundler/pull/7393)
+  - Stop using an insecure folder as a "fallback home" when user home is not defined [#7416](https://github.com/bundler/bundler/pull/7416)
+  - Fix `bundler/inline` warning about `Bundler.root` redefinition [#7417](https://github.com/bundler/bundler/pull/7417)
+
 ## 2.1.0.pre.2 (September 15, 2019)
 
 Bugfixes:
