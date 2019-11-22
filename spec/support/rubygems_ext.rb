@@ -10,8 +10,8 @@ module Spec
       "rake" => "~> 12.0",
       "ronn" => "~> 0.7.3",
       "rspec" => "~> 3.8",
-      "rubocop" => "= 0.74.0",
-      "rubocop-performance" => "= 1.4.0",
+      "rubocop" => "= 0.76.0",
+      "rubocop-performance" => "= 1.5.1",
     }.freeze
 
     DEPS = {
