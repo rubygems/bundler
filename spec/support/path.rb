@@ -30,14 +30,23 @@ module Spec
     end
 
     def tracked_files
+      if root != `git rev-parse --show-toplevel`
+        skip "not in git working directory"
+      end
       @tracked_files ||= ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb spec/bundler man/bundler*` : `git ls-files -z`
     end
 
     def shipped_files
+      if root != `git rev-parse --show-toplevel`
+        skip "not in git working directory"
+      end
       @shipped_files ||= ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb man/bundler* libexec/bundle*` : `git ls-files -z -- lib man exe CHANGELOG.md LICENSE.md README.md bundler.gemspec`
     end
 
     def lib_tracked_files
+      if root != `git rev-parse --show-toplevel`
+        skip "not in git working directory"
+      end
       @lib_tracked_files ||= ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
     end
 
@@ -150,7 +159,8 @@ module Spec
     def with_root_gemspec
       if ruby_core?
         root_gemspec = root.join("bundler.gemspec")
-        spec = Gem::Specification.load(gemspec.to_s)
+        # Dir.chdir(root) for Dir.glob in gemspec
+        spec = Dir.chdir(root) { Gem::Specification.load(gemspec.to_s) }
         spec.bindir = "libexec"
         File.open(root_gemspec.to_s, "w") {|f| f.write spec.to_ruby }
         yield(root_gemspec)
