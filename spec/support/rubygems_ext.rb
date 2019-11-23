@@ -65,7 +65,7 @@ module Spec
         FileUtils.mkdir_p(Path.base_system_gems)
         puts "installing gems for the tests to use..."
         install_gems(DEPS)
-        manifest_path.open("w") {|f| f << manifest.join }
+        manifest_path.open("wb") {|f| f << manifest.join }
       end
 
       FileUtils.mkdir_p(Path.home)
