@@ -183,15 +183,6 @@ Lint/UnderscorePrefixedVariableName:
 Lint/UnifiedInteger:
   Enabled: true
 
-Lint/UnneededCopDisableDirective:
-  Enabled: true
-
-Lint/UnneededCopEnableDirective:
-  Enabled: true
-
-Lint/UnneededSplatExpansion:
-  Enabled: true
-
 Lint/UnreachableCode:
   Enabled: true
 
@@ -705,7 +696,16 @@ Style/RedundantBegin:
 Style/RedundantConditional:
   Enabled: true
 
+Lint/RedundantCopDisableDirective:
+  Enabled: true
+
+Lint/RedundantCopEnableDirective:
+  Enabled: true
+
 Style/RedundantException:
+  Enabled: true
+
+Style/RedundantInterpolation:
   Enabled: true
 
 Style/RedundantParentheses:
@@ -715,6 +715,9 @@ Style/RedundantSelf:
   Enabled: true
 
 Style/RedundantSortBy:
+  Enabled: true
+
+Lint/RedundantSplatExpansion:
   Enabled: true
 
 Style/RegexpLiteral:
@@ -796,9 +799,6 @@ Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 
 Style/TrailingMethodEndStatement:
-  Enabled: true
-
-Style/UnneededInterpolation:
   Enabled: true
 
 Style/UnlessElse:
