@@ -22,7 +22,7 @@ RSpec.describe "bundle install with install-time dependencies" do
     build_repo2
 
     path = "#{gem_repo2}/#{Gem::MARSHAL_SPEC_DIR}/actionpack-2.3.2.gemspec.rz"
-    spec = Marshal.load(Bundler.rubygems.inflate(File.read(path)))
+    spec = Marshal.load(Bundler.rubygems.inflate(File.binread(path)))
     spec.dependencies.each do |d|
       d.instance_variable_set(:@type, :fail)
     end
