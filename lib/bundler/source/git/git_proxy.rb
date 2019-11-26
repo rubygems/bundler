@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "open3"
 require "shellwords"
 
 module Bundler
@@ -243,12 +242,14 @@ module Bundler
         end
 
         def capture_and_filter_stderr(uri, cmd)
+          require "open3"
           return_value, captured_err, status = Open3.capture3(cmd)
           Bundler.ui.warn URICredentialsFilter.credential_filtered_string(captured_err, uri) if uri && !captured_err.empty?
           [return_value, status]
         end
 
         def capture_and_ignore_stderr(cmd)
+          require "open3"
           return_value, _, status = Open3.capture3(cmd)
           [return_value, status]
         end

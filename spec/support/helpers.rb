@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "open3"
-
 require_relative "command_execution"
 require_relative "the_bundle"
 
@@ -211,6 +209,7 @@ module Spec
 
       env = env.map {|k, v| [k.to_s, v.to_s] }.to_h # convert env keys and values to string
 
+      require "open3"
       Open3.popen3(env, cmd.to_s) do |stdin, stdout, stderr, wait_thr|
         yield stdin, stdout, wait_thr if block_given?
         stdin.close
