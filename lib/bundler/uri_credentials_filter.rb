@@ -8,8 +8,8 @@ module Bundler
       return uri_to_anonymize if uri_to_anonymize.nil?
       uri = uri_to_anonymize.dup
       if uri.is_a?(String)
-        require "uri"
-        uri = URI(uri)
+        require_relative "vendored_uri"
+        uri = Bundler::URI(uri)
       end
 
       if uri.userinfo
@@ -23,7 +23,7 @@ module Bundler
       end
       return uri.to_s if uri_to_anonymize.is_a?(String)
       uri
-    rescue URI::InvalidURIError # uri is not canonical uri scheme
+    rescue Bundler::URI::InvalidURIError # uri is not canonical uri scheme
       uri
     end
 
