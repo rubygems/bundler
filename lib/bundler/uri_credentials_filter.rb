@@ -7,6 +7,7 @@ module Bundler
     def credential_filtered_uri(uri_to_anonymize)
       return uri_to_anonymize if uri_to_anonymize.nil?
       uri = uri_to_anonymize.dup
+      require "uri"
       uri = URI(uri.to_s) unless uri.is_a?(URI)
       if uri.userinfo
         # oauth authentication

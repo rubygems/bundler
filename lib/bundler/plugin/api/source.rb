@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "uri"
-
 module Bundler
   module Plugin
     class API

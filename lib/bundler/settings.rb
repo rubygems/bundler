@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "uri"
-
 module Bundler
   class Settings
     autoload :Mirror,  File.expand_path("mirror", __dir__)
@@ -152,6 +150,7 @@ module Bundler
     end
 
     def mirror_for(uri)
+      require "uri"
       uri = URI(uri.to_s) unless uri.is_a?(URI)
       gem_mirrors.for(uri.to_s).uri
     end
@@ -421,6 +420,7 @@ module Bundler
         suffix = $3
       end
       uri = "#{uri}/" unless uri.end_with?("/")
+      require "uri"
       uri = URI(uri)
       unless uri.absolute?
         raise ArgumentError, format("Gem sources must be absolute. You provided '%s'.", uri)

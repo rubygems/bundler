@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative "../vendored_fileutils"
-require "uri"
 
 module Bundler
   class Source
@@ -283,6 +282,7 @@ module Bundler
 
       def uri_hash
         if uri =~ %r{^\w+://(\w+@)?}
+          require "uri"
           # Downcase the domain component of the URI
           # and strip off a trailing slash, if one is present
           input = URI.parse(uri).normalize.to_s.sub(%r{/$}, "")
