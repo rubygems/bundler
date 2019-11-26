@@ -8,7 +8,7 @@ module Bundler
     class Git < Path
       autoload :GitProxy, File.expand_path("git/git_proxy", __dir__)
 
-      attr_reader :uri, :ref, :branch, :options, :submodules
+      attr_reader :uri, :ref, :branch, :options, :glob, :submodules
 
       def initialize(options)
         @options = options
@@ -48,13 +48,14 @@ module Bundler
       end
 
       def hash
-        [self.class, uri, ref, branch, name, version, submodules].hash
+        [self.class, uri, ref, branch, name, version, glob, submodules].hash
       end
 
       def eql?(other)
         other.is_a?(Git) && uri == other.uri && ref == other.ref &&
           branch == other.branch && name == other.name &&
-          version == other.version && submodules == other.submodules
+          version == other.version && glob == other.glob &&
+          submodules == other.submodules
       end
 
       alias_method :==, :eql?
