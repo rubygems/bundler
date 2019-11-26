@@ -268,6 +268,14 @@ else
       sublib.prefix = "Bundler"
       sublib.vendor_lib = "lib/bundler/vendor/connection_pool"
     end
+
+    lib.dependency("uri") do |sublib|
+      sublib.version = "master"
+      sublib.download = { :github => "https://github.com/ruby/uri" }
+      sublib.namespace = "URI"
+      sublib.prefix = "Bundler"
+      sublib.vendor_lib = "lib/bundler/vendor/uri"
+    end
   end
 end
 
