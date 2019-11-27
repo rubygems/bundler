@@ -9,11 +9,8 @@ before_script:
 
 branches:
   only:
-    - master
     - staging
     - trying
-    - /.+-dev$/
-    - /.+-stable$/
 
 cache:
   directories:
