@@ -14,6 +14,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - improve_gem_require_errors
 
 cache:
   directories:
