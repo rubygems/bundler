@@ -1276,7 +1276,7 @@ end
             gem "#{g}", "999999"
           G
 
-          expect(the_bundle).to include_gem("#{g} 999999")
+          expect(the_bundle).to include_gem("#{g} 999999", :env => { "RUBYOPT" => activation_warning_hack_rubyopt })
         end
 
         it "activates older versions of #{g}" do
@@ -1291,7 +1291,7 @@ end
             gem "#{g}", "0.0.0.a"
           G
 
-          expect(the_bundle).to include_gem("#{g} 0.0.0.a")
+          expect(the_bundle).to include_gem("#{g} 0.0.0.a", :env => { "RUBYOPT" => activation_warning_hack_rubyopt })
         end
       end
     end
