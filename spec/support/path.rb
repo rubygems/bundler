@@ -183,7 +183,7 @@ module Spec
   private
 
     def git_root_dir?
-      root == `git rev-parse --show-toplevel`
+      root.to_s == `git rev-parse --show-toplevel`.chomp
     end
   end
 end
