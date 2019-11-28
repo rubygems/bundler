@@ -1218,7 +1218,7 @@ end
             unless #{exemptions.inspect}.include?(name)
               warn '-' * 80
               warn "activating \#{full_name}"
-              warn *caller
+              warn(*caller)
               warn '*' * 80
             end
             bundler_spec_activate
