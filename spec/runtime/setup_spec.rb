@@ -1212,17 +1212,15 @@ end
       let(:activation_warning_hack) { strip_whitespace(<<-RUBY) }
         require #{spec_dir.join("support/hax").to_s.dump}
 
-        if Gem::Specification.instance_methods.map(&:to_sym).include?(:activate)
-          Gem::Specification.send(:alias_method, :bundler_spec_activate, :activate)
-          Gem::Specification.send(:define_method, :activate) do
-            unless #{exemptions.inspect}.include?(name)
-              warn '-' * 80
-              warn "activating \#{full_name}"
-              warn(*caller)
-              warn '*' * 80
-            end
-            bundler_spec_activate
+        Gem::Specification.send(:alias_method, :bundler_spec_activate, :activate)
+        Gem::Specification.send(:define_method, :activate) do
+          unless #{exemptions.inspect}.include?(name)
+            warn '-' * 80
+            warn "activating \#{full_name}"
+            warn(*caller)
+            warn '*' * 80
           end
+          bundler_spec_activate
         end
       RUBY
 
