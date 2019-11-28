@@ -1263,42 +1263,36 @@ end
         expect(out).to eq("{}")
       end
 
-      let(:default_gems) do
-        Gem::Specification.select(&:default_gem?).map(&:name).reject {|g| exemptions.include?(g) }
-      end
+      Gem::Specification.select(&:default_gem?).map(&:name).each do |g|
+        it "activates newer versions of #{g}" do
+          skip if exemptions.include?(g)
 
-      it "activates newer versions of default gems" do
-        build_repo4 do
-          default_gems.each do |g|
+          build_repo4 do
             build_gem g, "999999"
           end
+
+          install_gemfile! <<-G
+            source "#{file_uri_for(gem_repo4)}"
+            gem "#{g}", "999999"
+          G
+
+          expect(the_bundle).to include_gem("#{g} 999999")
         end
 
-        install_gemfile! <<-G
-          source "#{file_uri_for(gem_repo4)}"
-          #{default_gems}.each do |g|
-            gem g, "999999"
-          end
-        G
+        it "activates older versions of #{g}" do
+          skip if exemptions.include?(g)
 
-        expect(the_bundle).to include_gems(*default_gems.map {|g| "#{g} 999999" })
-      end
-
-      it "activates older versions of default gems" do
-        build_repo4 do
-          default_gems.each do |g|
+          build_repo4 do
             build_gem g, "0.0.0.a"
           end
+
+          install_gemfile! <<-G
+            source "#{file_uri_for(gem_repo4)}"
+            gem "#{g}", "0.0.0.a"
+          G
+
+          expect(the_bundle).to include_gem("#{g} 0.0.0.a")
         end
-
-        install_gemfile! <<-G
-          source "#{file_uri_for(gem_repo4)}"
-          #{default_gems}.each do |g|
-            gem g, "0.0.0.a"
-          end
-        G
-
-        expect(the_bundle).to include_gems(*default_gems.map {|g| "#{g} 0.0.0.a" })
       end
     end
   end
