@@ -23,9 +23,7 @@ module Spec
       define_method("#{method}!") do |*args, &blk|
         send(method, *args, &blk).tap do
           unless last_command.success?
-            raise RuntimeError,
-              "Invoking #{method}!(#{args.map(&:inspect).join(", ")}) failed:\n#{last_command.stdboth}",
-              caller.drop_while {|bt| bt.start_with?(__FILE__) }
+            raise "Invoking #{method}!(#{args.map(&:inspect).join(", ")}) failed:\n#{last_command.stdboth}"
           end
         end
       end
