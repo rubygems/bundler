@@ -1264,9 +1264,7 @@ end
       end
 
       let(:default_gems) do
-        ruby!(<<-RUBY).split("\n")
-          puts Gem::Specification.select(&:default_gem?).map(&:name)
-        RUBY
+        Gem::Specification.select(&:default_gem?).map(&:name)
       end
 
       it "activates newer versions of default gems" do
