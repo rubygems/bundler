@@ -1264,7 +1264,7 @@ end
       end
 
       let(:default_gems) do
-        Gem::Specification.select(&:default_gem?).map(&:name)
+        Gem::Specification.select(&:default_gem?).map(&:name).reject {|g| exemptions.include?(g) }
       end
 
       it "activates newer versions of default gems" do
@@ -1273,8 +1273,6 @@ end
             build_gem g, "999999"
           end
         end
-
-        default_gems.reject! {|g| exemptions.include?(g) }
 
         install_gemfile! <<-G
           source "#{file_uri_for(gem_repo4)}"
@@ -1292,8 +1290,6 @@ end
             build_gem g, "0.0.0.a"
           end
         end
-
-        default_gems.reject! {|g| exemptions.include?(g) }
 
         install_gemfile! <<-G
           source "#{file_uri_for(gem_repo4)}"
