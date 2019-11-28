@@ -864,7 +864,7 @@ end
       G
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile").to_s }
           require 'foo'
         R
       end
@@ -888,7 +888,7 @@ end
       bundle :install
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile").to_s }
           require 'foo'
         R
       end
@@ -1246,14 +1246,14 @@ end
 
       it "activates no gems with -rbundler/setup" do
         install_gemfile! ""
-        ruby! code, :env => { :RUBYOPT => activation_warning_hack_rubyopt + " -r#{lib_dir}/bundler/setup" }
+        ruby! code, :env => { "RUBYOPT" => activation_warning_hack_rubyopt + " -r#{lib_dir}/bundler/setup" }
         expect(out).to eq("{}")
       end
 
       it "activates no gems with bundle exec" do
         install_gemfile! ""
         create_file("script.rb", code)
-        bundle! "exec ruby ./script.rb", :env => { :RUBYOPT => activation_warning_hack_rubyopt }
+        bundle! "exec ruby ./script.rb", :env => { "RUBYOPT" => activation_warning_hack_rubyopt }
         expect(out).to eq("{}")
       end
 
@@ -1261,7 +1261,7 @@ end
         install_gemfile! ""
         create_file("script.rb", "#!/usr/bin/env ruby\n\n#{code}")
         FileUtils.chmod(0o777, bundled_app("script.rb"))
-        bundle! "exec ./script.rb", :artifice => nil, :env => { :RUBYOPT => activation_warning_hack_rubyopt }
+        bundle! "exec ./script.rb", :artifice => nil, :env => { "RUBYOPT" => activation_warning_hack_rubyopt }
         expect(out).to eq("{}")
       end
 

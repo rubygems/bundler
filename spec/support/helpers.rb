@@ -207,8 +207,6 @@ module Spec
     def sys_exec(cmd, env = {})
       command_execution = CommandExecution.new(cmd.to_s, Dir.pwd)
 
-      env = env.map {|k, v| [k.to_s, v.to_s] }.to_h # convert env keys and values to string
-
       require "open3"
       Open3.popen3(env, cmd.to_s) do |stdin, stdout, stderr, wait_thr|
         yield stdin, stdout, wait_thr if block_given?
