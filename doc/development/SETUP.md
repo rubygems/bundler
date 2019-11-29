@@ -24,6 +24,10 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
         $ bin/rake spec
 
+6. Optionally, you can run the test suite in parallel:
+
+        $ bin/parallel_rspec spec
+
 6. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias ([follow these instructions](https://www.moncefbelyamani.com/create-aliases-in-bash-profile-to-assign-shortcuts-for-common-terminal-commands/) for adding aliases to your `~/.bashrc` profile):
 
         $ alias dbundle='/path/to/bundler/repo/bin/bundle'
