@@ -15,11 +15,9 @@ class RubygemsVersionManager
   def switch
     return if use_system?
 
-    unrequire_rubygems_if_needed
-
     switch_local_copy_if_needed
 
-    prepare_environment
+    unrequire_rubygems_if_needed
   end
 
 private
@@ -37,7 +35,8 @@ private
     ruby << RbConfig::CONFIG["EXEEXT"]
 
     cmd = [ruby, $0, *ARGV].compact
-    cmd[1, 0] = "--disable-gems"
+
+    ENV["RUBYOPT"] = "-I#{local_copy_path.join("lib")} #{ENV["RUBYOPT"]}"
 
     exec(ENV, *cmd)
   end
@@ -49,33 +48,26 @@ private
       sys_exec!("git remote update")
       sys_exec!("git checkout #{target_tag_version} --quiet")
     end
-  end
 
-  def prepare_environment
-    $:.unshift File.expand_path("lib", local_copy_path)
+    ENV["RGV"] = local_copy_path.to_s
   end
 
   def rubygems_unrequire_needed?
-    defined?(Gem::VERSION) && Gem::VERSION != target_gem_version
+    !$LOADED_FEATURES.include?(local_copy_path.join("lib/rubygems.rb").to_s)
   end
 
   def local_copy_switch_needed?
-    !env_version_is_path? && target_gem_version != local_copy_version
-  end
-
-  def target_gem_version
-    @target_gem_version ||= resolve_target_gem_version
+    !env_version_is_path? && target_tag_version != local_copy_tag
   end
 
   def target_tag_version
     @target_tag_version ||= resolve_target_tag_version
   end
 
-  def local_copy_version
-    gemspec_contents = File.read(local_copy_path.join("lib/rubygems.rb"))
-    version_regexp = /VERSION = ["'](.*)["']/
-
-    version_regexp.match(gemspec_contents)[1]
+  def local_copy_tag
+    Dir.chdir(local_copy_path) do
+      sys_exec!("git rev-parse --abbrev-ref HEAD")
+    end
   end
 
   def local_copy_path
@@ -106,22 +98,6 @@ private
   def resolve_target_tag_version
     return "v#{@env_version}" if @env_version.match(/^\d/)
 
-    return "master" if @env_version == master_gem_version
-
     @env_version
-  end
-
-  def resolve_target_gem_version
-    return local_copy_version if env_version_is_path?
-
-    return @env_version[1..-1] if @env_version.match(/^v/)
-
-    return master_gem_version if @env_version == "master"
-
-    @env_version
-  end
-
-  def master_gem_version
-    "3.1.0.pre1"
   end
 end
