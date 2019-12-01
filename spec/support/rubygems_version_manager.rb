@@ -8,8 +8,8 @@ class RubygemsVersionManager
   include Spec::Helpers
   include Spec::Path
 
-  def initialize(env_version)
-    @env_version = env_version
+  def initialize(source)
+    @source = source
   end
 
   def switch
@@ -23,7 +23,7 @@ class RubygemsVersionManager
 private
 
   def use_system?
-    @env_version.nil?
+    @source.nil?
   end
 
   def unrequire_rubygems_if_needed
@@ -57,7 +57,7 @@ private
   end
 
   def local_copy_switch_needed?
-    !env_version_is_path? && target_tag != local_copy_tag
+    !source_is_path? && target_tag != local_copy_tag
   end
 
   def target_tag
@@ -75,7 +75,7 @@ private
   end
 
   def resolve_local_copy_path
-    return expanded_env_version if env_version_is_path?
+    return expanded_source if source_is_path?
 
     rubygems_path = root.join("tmp/rubygems")
 
@@ -87,17 +87,17 @@ private
     rubygems_path
   end
 
-  def env_version_is_path?
-    expanded_env_version.directory?
+  def source_is_path?
+    expanded_source.directory?
   end
 
-  def expanded_env_version
-    @expanded_env_version ||= Pathname.new(@env_version).expand_path(root)
+  def expanded_source
+    @expanded_source ||= Pathname.new(@source).expand_path(root)
   end
 
   def resolve_target_tag
-    return "v#{@env_version}" if @env_version.match(/^\d/)
+    return "v#{@source}" if @source.match(/^\d/)
 
-    @env_version
+    @source
   end
 end
