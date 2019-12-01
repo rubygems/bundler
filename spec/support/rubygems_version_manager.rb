@@ -46,7 +46,7 @@ private
 
     Dir.chdir(local_copy_path) do
       sys_exec!("git remote update")
-      sys_exec!("git checkout #{target_tag_version} --quiet")
+      sys_exec!("git checkout #{target_tag} --quiet")
     end
 
     ENV["RGV"] = local_copy_path.to_s
@@ -57,11 +57,11 @@ private
   end
 
   def local_copy_switch_needed?
-    !env_version_is_path? && target_tag_version != local_copy_tag
+    !env_version_is_path? && target_tag != local_copy_tag
   end
 
-  def target_tag_version
-    @target_tag_version ||= resolve_target_tag_version
+  def target_tag
+    @target_tag ||= resolve_target_tag
   end
 
   def local_copy_tag
@@ -95,7 +95,7 @@ private
     @expanded_env_version ||= Pathname.new(@env_version).expand_path(root)
   end
 
-  def resolve_target_tag_version
+  def resolve_target_tag
     return "v#{@env_version}" if @env_version.match(/^\d/)
 
     @env_version
