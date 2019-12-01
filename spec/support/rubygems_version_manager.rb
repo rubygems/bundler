@@ -17,7 +17,7 @@ class RubygemsVersionManager
 
     switch_local_copy_if_needed
 
-    unrequire_rubygems_if_needed
+    reexec_if_needed
   end
 
 private
@@ -26,7 +26,7 @@ private
     @source.nil?
   end
 
-  def unrequire_rubygems_if_needed
+  def reexec_if_needed
     return unless rubygems_unrequire_needed?
 
     require "rbconfig"
