@@ -247,12 +247,6 @@ module Bundler
       EXT_LOCK
     end
 
-    def fetch_prerelease_specs
-      fetch_specs(false, true)
-    rescue Gem::RemoteFetcher::FetchError
-      {} # if we can't download them, there aren't any
-    end
-
     def with_build_args(args)
       ext_lock.synchronize do
         old_args = build_args
