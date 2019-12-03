@@ -533,7 +533,7 @@ module Bundler
       require "resolv"
       proxy = configuration[:http_proxy]
       dns = Resolv::DNS.new
-      Bundler::GemRemoteFetcher.new(proxy, dns)
+      Gem::RemoteFetcher.new(proxy, dns)
     end
 
     def gem_from_path(path, policy = nil)
