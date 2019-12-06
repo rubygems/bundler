@@ -67,7 +67,7 @@ RSpec.describe Bundler::RubygemsIntegration do
   end
 
   describe "#fetch_all_remote_specs" do
-    let(:uri) { URI("https://example.com") }
+    let(:uri) { "https://example.com" }
     let(:fetcher) { double("gem_remote_fetcher") }
     let(:specs_response) { Marshal.dump(["specs"]) }
     let(:prerelease_specs_response) { Marshal.dump(["prerelease_specs"]) }

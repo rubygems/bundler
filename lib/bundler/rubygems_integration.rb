@@ -502,8 +502,8 @@ module Bundler
       end
     end
 
-    def fetch_specs(source, remote, name)
-      path = source + "#{name}.#{Gem.marshal_version}.gz"
+    def fetch_specs(remote, name)
+      path = remote.uri.to_s + "#{name}.#{Gem.marshal_version}.gz"
       fetcher = gem_remote_fetcher
       fetcher.headers = { "X-Gemfile-Source" => remote.original_uri.to_s } if remote.original_uri
       string = fetcher.fetch_path(path)
@@ -514,10 +514,8 @@ module Bundler
     end
 
     def fetch_all_remote_specs(remote)
-      source = remote.uri.is_a?(URI) ? remote.uri : URI.parse(source.to_s)
-
-      specs = fetch_specs(source, remote, "specs")
-      pres = fetch_specs(source, remote, "prerelease_specs") || []
+      specs = fetch_specs(remote, "specs")
+      pres = fetch_specs(remote, "prerelease_specs") || []
 
       specs.concat(pres)
     end
