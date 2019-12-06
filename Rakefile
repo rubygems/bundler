@@ -32,11 +32,6 @@ namespace :spec do
     false
   end
 
-  desc "Ensure spec dependencies are installed"
-  task :deps do
-    Spec::Rubygems.dev_setup
-  end
-
   namespace :travis do
     task :deps do
       # Give the travis user a name so that git won't fatally error
@@ -51,7 +46,7 @@ namespace :spec do
       sh "sudo apt-get install graphviz -y"
 
       # Install the other gem deps, etc
-      Rake::Task["spec:deps"].invoke
+      sh "bin/bundle install"
     end
   end
 

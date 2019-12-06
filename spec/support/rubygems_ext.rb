@@ -4,16 +4,6 @@ require_relative "path"
 
 module Spec
   module Rubygems
-    DEV_DEPS = {
-      "automatiek" => "~> 0.3.0",
-      "parallel_tests" => "~> 2.29",
-      "rake" => "~> 12.0",
-      "ronn" => "~> 0.7.3",
-      "rspec" => "~> 3.8",
-      "rubocop" => "= 0.76.0",
-      "rubocop-performance" => "= 1.5.1",
-    }.freeze
-
     DEPS = {
       "rack" => "~> 2.0",
       "rack-test" => "~> 1.1",
@@ -28,15 +18,6 @@ module Spec
     }.freeze
 
     extend self
-
-    def dev_setup
-      deps = DEV_DEPS
-
-      # JRuby can't build ronn, so we skip that
-      deps.delete("ronn") if RUBY_ENGINE == "jruby"
-
-      install_gems(deps)
-    end
 
     def gem_load(gem_name, bin_container)
       require_relative "rubygems_version_manager"
@@ -90,8 +71,9 @@ module Spec
     end
 
     def gem_activate(gem_name)
-      gem_requirement = DEV_DEPS[gem_name]
-      gem gem_name, gem_requirement
+      require_relative "../../lib/bundler"
+      gem_version = Bundler.definition.locked_gems.specs.find{|d| d.name == "rspec-core"}.version.to_s
+      gem gem_name, gem_version
     end
 
     def install_gems(gems)

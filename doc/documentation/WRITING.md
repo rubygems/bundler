@@ -37,8 +37,8 @@ If you're not sure if the formatting looks right, that's ok! Make a pull request
 To preview your changes as they will print out for Bundler users, you'll need to run a series of commands:
 
 ```
-$ rake spec:deps
-$ rake man:build
+$ bin/bundle install
+$ bin/rake man:build
 $ man man/bundle-cookies.1
 ```
 
