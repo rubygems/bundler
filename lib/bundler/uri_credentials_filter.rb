@@ -8,7 +8,7 @@ module Bundler
       return uri_to_anonymize if uri_to_anonymize.nil?
       uri = uri_to_anonymize.dup
       require "uri"
-      uri = URI(uri.to_s) unless uri.is_a?(URI)
+      uri = URI(uri) unless uri.is_a?(URI)
       if uri.userinfo
         # oauth authentication
         if uri.password == "x-oauth-basic" || uri.password == "x"
