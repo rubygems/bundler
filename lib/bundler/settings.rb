@@ -150,8 +150,11 @@ module Bundler
     end
 
     def mirror_for(uri)
-      require "uri"
-      uri = URI(uri) unless uri.is_a?(URI)
+      if uri.is_a?(String)
+        require "uri"
+        uri = URI(uri)
+      end
+
       gem_mirrors.for(uri.to_s).uri
     end
 

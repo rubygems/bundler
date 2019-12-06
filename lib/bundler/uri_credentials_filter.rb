@@ -7,8 +7,11 @@ module Bundler
     def credential_filtered_uri(uri_to_anonymize)
       return uri_to_anonymize if uri_to_anonymize.nil?
       uri = uri_to_anonymize.dup
-      require "uri"
-      uri = URI(uri) unless uri.is_a?(URI)
+      if uri.is_a?(String)
+        require "uri"
+        uri = URI(uri)
+      end
+
       if uri.userinfo
         # oauth authentication
         if uri.password == "x-oauth-basic" || uri.password == "x"
@@ -18,8 +21,8 @@ module Bundler
         end
         uri.password = nil
       end
-      return uri if uri_to_anonymize.is_a?(URI)
       return uri.to_s if uri_to_anonymize.is_a?(String)
+      uri
     rescue URI::InvalidURIError # uri is not canonical uri scheme
       uri
     end
