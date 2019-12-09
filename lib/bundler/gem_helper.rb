@@ -86,8 +86,8 @@ module Bundler
       built_gem_path ||= build_gem
       cmd = "#{gem_command} install #{built_gem_path}"
       cmd += " --local" if local
-      out, status = sh_with_status(cmd.shellsplit)
-      unless status.success? && out[/Successfully installed/]
+      _, status = sh_with_status(cmd.shellsplit)
+      unless status.success?
         raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output"
       end
       Bundler.ui.confirm "#{name} (#{version}) installed."
