@@ -22,7 +22,7 @@ RSpec.describe "require 'bundler/gem_tasks'" do
       sys_exec "#{rake} -T", "RUBYOPT" => "-I#{lib_dir}"
     end
 
-    expect(err).to eq("")
+    expect(err).to be_empty
     expected_tasks = [
       "rake build",
       "rake clean",
