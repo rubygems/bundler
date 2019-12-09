@@ -98,13 +98,13 @@ module Bundler
   protected
 
     def rubygem_push(path)
-      gem_command = %W[gem push #{path}]
-      gem_command << "--key" << gem_key if gem_key
-      gem_command << "--host" << allowed_push_host if allowed_push_host
+      cmd = %W[gem push #{path}]
+      cmd << "--key" << gem_key if gem_key
+      cmd << "--host" << allowed_push_host if allowed_push_host
       unless allowed_push_host || Bundler.user_home.join(".gem/credentials").file?
         raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
       end
-      sh_with_input(gem_command)
+      sh_with_input(cmd)
       Bundler.ui.confirm "Pushed #{name} #{version} to #{gem_push_host}"
     end
 
