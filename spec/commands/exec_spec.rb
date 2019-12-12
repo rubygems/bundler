@@ -104,7 +104,7 @@ RSpec.describe "bundle exec" do
     install_gemfile ""
     sys_exec "#{Gem.ruby} #{command.path}"
 
-    expect(out).to eq("")
+    expect(out).to be_empty
     expect(err).to be_empty
   end
 
