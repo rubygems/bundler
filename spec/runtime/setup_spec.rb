@@ -130,7 +130,7 @@ RSpec.describe "Bundler.setup" do
       load_path = out.split("\n")
       rack_load_order = load_path.index {|path| path.include?("rack") }
 
-      expect(err).to eq("")
+      expect(err).to be_empty
       expect(load_path).to include(a_string_ending_with("dash_i_dir"), "rubylib_dir")
       expect(rack_load_order).to be > 0
     end
@@ -1042,7 +1042,7 @@ end
       RUBY
 
       expect(err).to be_empty
-      expect(out).to eq("")
+      expect(out).to be_empty
     end
   end
 
@@ -1098,8 +1098,8 @@ end
       it "does not change the lock or warn" do
         lockfile lock_with(Bundler::VERSION.succ)
         ruby "require '#{lib_dir}/bundler/setup'"
-        expect(out).to eq("")
-        expect(err).to eq("")
+        expect(out).to be_empty
+        expect(err).to be_empty
         lockfile_should_be lock_with(Bundler::VERSION.succ)
       end
     end
@@ -1162,8 +1162,8 @@ end
       let(:ruby_version) { "5.5.5" }
       it "does not change the lock or warn" do
         expect { ruby! "require '#{lib_dir}/bundler/setup'" }.not_to change { lockfile }
-        expect(out).to eq("")
-        expect(err).to eq("")
+        expect(out).to be_empty
+        expect(err).to be_empty
       end
     end
 
