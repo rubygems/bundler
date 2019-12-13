@@ -1,3 +1,27 @@
+## 2.1.0 (December 15, 2019)
+
+Features:
+
+  - Add support for new default gems. In particular,
+
+    * `open3` [#7455](https://github.com/bundler/bundler/pull/7455)
+    * `cgi`: [#7456](https://github.com/bundler/bundler/pull/7456)
+    * `uri` [#7460](https://github.com/bundler/bundler/pull/7460)
+
+    plus other PRs removing or lazily loading usages of these gems from other places to not interfere with user's choice, such as [#7471](https://github.com/bundler/bundler/pull/7471) or [#7473](https://github.com/bundler/bundler/pull/7473)
+
+Bugfixes:
+
+  - Fix `bundle exec rake install` failing [#7474](https://github.com/bundler/bundler/pull/7474)
+  - Fix `bundle exec`'ing to rubygems being silent [#7442](https://github.com/bundler/bundler/pull/7442)
+  - Restore previous `BUNDLE_GEMFILE` in `bundler/inline` [#7418](https://github.com/bundler/bundler/pull/7418)
+  - Fix error when using `gem` DSL's `:glob` option for selecting gemspecs from a specific source [#7419](https://github.com/bundler/bundler/pull/7419)
+
+Changes:
+
+  - `bundle config` no longer warns when using "old interface" (might be deprecated again in the future) [#7475](https://github.com/bundler/bundler/pull/7475)
+  - `bundle update` no longer warns when used without arguments (might be deprecated again in the future) [#7475](https://github.com/bundler/bundler/pull/7475)
+
 ## 2.1.0.pre.3 (November 12, 2019)
 
 Features:
