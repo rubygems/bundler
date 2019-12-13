@@ -100,8 +100,6 @@ module Spec
       protocol = "file://"
       root = Gem.win_platform? ? "/" : ""
 
-      return protocol + "localhost" + root + path.to_s if RUBY_VERSION < "2.5"
-
       protocol + root + path.to_s
     end
 

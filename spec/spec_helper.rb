@@ -7,7 +7,7 @@ $:.unshift Spec::Path.lib_dir.to_s
 
 require "bundler/psyched_yaml"
 require "bundler/vendored_fileutils"
-require "uri"
+require "bundler/vendored_uri"
 require "digest"
 
 if File.expand_path(__FILE__) =~ %r{([^\w/\.:\-])}
