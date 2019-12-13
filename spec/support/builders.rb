@@ -632,7 +632,7 @@ module Spec
         @files.each do |file, source|
           file = Pathname.new(path).join(file)
           FileUtils.mkdir_p(file.dirname)
-          File.open(file, "wb") {|f| f.puts source }
+          File.open(file, "w") {|f| f.puts source }
         end
         @spec.files = @files.keys
         path
