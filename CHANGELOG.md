@@ -1,3 +1,27 @@
+## 2.1.0 (December 15, 2019)
+
+Features:
+
+  - Add support for new default gems. In particular,
+
+    * `open3` [#7455](https://github.com/bundler/bundler/pull/7455)
+    * `cgi`: [#7456](https://github.com/bundler/bundler/pull/7456)
+    * `uri` [#7460](https://github.com/bundler/bundler/pull/7460)
+
+    plus other PRs removing or lazily loading usages of these gems from other places to not interfere with user's choice, such as [#7471](https://github.com/bundler/bundler/pull/7471) or [#7473](https://github.com/bundler/bundler/pull/7473)
+
+Bugfixes:
+
+  - Fix `bundle exec rake install` failing [#7474](https://github.com/bundler/bundler/pull/7474)
+  - Fix `bundle exec`'ing to rubygems being silent [#7442](https://github.com/bundler/bundler/pull/7442)
+  - Restore previous `BUNDLE_GEMFILE` in `bundler/inline` [#7418](https://github.com/bundler/bundler/pull/7418)
+  - Fix error when using `gem` DSL's `:glob` option for selecting gemspecs from a specific source [#7419](https://github.com/bundler/bundler/pull/7419)
+
+Changes:
+
+  - `bundle config` no longer warns when using "old interface" (might be deprecated again in the future) [#7475](https://github.com/bundler/bundler/pull/7475)
+  - `bundle update` no longer warns when used without arguments (might be deprecated again in the future) [#7475](https://github.com/bundler/bundler/pull/7475)
+
 ## 2.1.0.pre.3 (November 12, 2019)
 
 Features:
@@ -20,13 +44,13 @@ Bugfixes:
 Bugfixes:
 
   - Fix `bundle clean` trying to delete non-existent directory ([#7340](https://github.com/bundler/bundler/pull/7340))
-  - Fix warnings about keywork argument separation on ruby 2.7 ([#7337](https://github.com/bundler/bundler/pull/7337))
+  - Fix warnings about keyword argument separation on ruby 2.7 ([#7337](https://github.com/bundler/bundler/pull/7337))
 
 ## 2.1.0.pre.1 (August 28, 2019)
 
 One of the biggest changes in bundler 2.1.0 is that deprecations for upcoming
 breaking changes in bundler 3 will be turned on by default. We do this to grab
-feedback and comunicate early to our users the kind of changes we're intending
+feedback and communicate early to our users the kind of changes we're intending
 to ship with bundler 3. See
 [#6965](https://github.com/bundler/bundler/pull/6965).
 
@@ -89,7 +113,7 @@ Bugfixes:
   - Warn about situations where multiple gems provide the same executable ([#7075](https://github.com/bundler/bundler/pull/7075))
   - Ignore `frozen` setting in inline mode ([#7125](https://github.com/bundler/bundler/pull/7125))
   - Fix incorrect "bundler attempted to update GEM but version stayed the same" message when updating git sourced gems ([#6325](https://github.com/bundler/bundler/pull/6325))
-  - Don't check for existance of a writable home directory if `BUNDLE_USER_HOME` is set ([#6885](https://github.com/bundler/bundler/pull/6885))
+  - Don't check for existence of a writable home directory if `BUNDLE_USER_HOME` is set ([#6885](https://github.com/bundler/bundler/pull/6885))
   - Fix error message when server would respond to a bad username/password requiest with a 401 ([#6928](https://github.com/bundler/bundler/pull/6928))
   - Fix `bundle outdated` pluralization when multiple groups are requested ([#7063](https://github.com/bundler/bundler/pull/7063))
   - Fix `bundle install` not updating conservatively when gemspec is changed ([#7143](https://github.com/bundler/bundler/pull/7143))

@@ -55,7 +55,7 @@ Lint/DuplicateCaseCondition:
 Lint/DuplicateMethods:
   Enabled: true
 
-Lint/DuplicatedKey:
+Lint/DuplicateHashKey:
   Enabled: true
 
 Lint/EachWithObjectArgument:
@@ -106,7 +106,7 @@ Lint/LiteralInInterpolation:
 Lint/Loop:
   Enabled: true
 
-Lint/MultipleCompare:
+Lint/MultipleComparison:
   Enabled: true
 
 Lint/NestedPercentLiteral:
@@ -171,7 +171,7 @@ Lint/ShadowedArgument:
 Lint/ShadowingOuterLocalVariable:
   Enabled: true
 
-Lint/StringConversionInInterpolation:
+Lint/RedundantStringCoercion:
   Enabled: true
 
 Lint/Syntax:
@@ -181,15 +181,6 @@ Lint/UnderscorePrefixedVariableName:
   Enabled: true
 
 Lint/UnifiedInteger:
-  Enabled: true
-
-Lint/UnneededCopDisableDirective:
-  Enabled: true
-
-Lint/UnneededCopEnableDirective:
-  Enabled: true
-
-Lint/UnneededSplatExpansion:
   Enabled: true
 
 Lint/UnreachableCode:
@@ -222,10 +213,10 @@ Layout/AccessModifierIndentation:
   Enabled: true
   EnforcedStyle: outdent
 
-Layout/AlignArray:
+Layout/ArrayAlignment:
   Enabled: true
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: true
   EnforcedStyle: with_fixed_indentation
 
@@ -301,18 +292,18 @@ Layout/EndOfLine:
 Layout/ExtraSpacing:
   Enabled: true
 
-Layout/IndentAssignment:
+Layout/AssignmentIndentation:
   Enabled: true
 
-Layout/IndentFirstArrayElement:
+Layout/FirstArrayElementIndentation:
   Enabled: true
   EnforcedStyle: consistent
 
-Layout/IndentFirstHashElement:
+Layout/FirstHashElementIndentation:
   Enabled: true
   EnforcedStyle: special_inside_parentheses
 
-Layout/IndentFirstArgument:
+Layout/FirstArgumentIndentation:
   Enabled: true
 
 Layout/IndentationConsistency:
@@ -324,7 +315,7 @@ Layout/IndentationWidth:
 Layout/InitialIndentation:
   Enabled: true
 
-Layout/LeadingBlankLines:
+Layout/LeadingEmptyLines:
   Enabled: true
 
 Layout/LeadingCommentSpace:
@@ -395,7 +386,7 @@ Layout/SpaceInsideStringInterpolation:
 Layout/Tab:
   Enabled: true
 
-Layout/TrailingBlankLines:
+Layout/TrailingEmptyLines:
   Enabled: true
 
 Layout/TrailingWhitespace:
@@ -424,7 +415,7 @@ Naming/HeredocDelimiterCase:
 Naming/MethodName:
   Enabled: true
 
-Naming/UncommunicativeBlockParamName:
+Naming/BlockParameterName:
   Enabled: true
 
 Naming/VariableName:
@@ -705,7 +696,16 @@ Style/RedundantBegin:
 Style/RedundantConditional:
   Enabled: true
 
+Lint/RedundantCopDisableDirective:
+  Enabled: true
+
+Lint/RedundantCopEnableDirective:
+  Enabled: true
+
 Style/RedundantException:
+  Enabled: true
+
+Style/RedundantInterpolation:
   Enabled: true
 
 Style/RedundantParentheses:
@@ -715,6 +715,9 @@ Style/RedundantSelf:
   Enabled: true
 
 Style/RedundantSortBy:
+  Enabled: true
+
+Lint/RedundantSplatExpansion:
   Enabled: true
 
 Style/RegexpLiteral:
@@ -796,9 +799,6 @@ Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 
 Style/TrailingMethodEndStatement:
-  Enabled: true
-
-Style/UnneededInterpolation:
   Enabled: true
 
 Style/UnlessElse:
