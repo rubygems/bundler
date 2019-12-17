@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-$:.unshift File.expand_path("../lib", __FILE__)
 require "benchmark"
 
 require_relative "spec/support/rubygems_ext"
