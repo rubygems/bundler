@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-$:.unshift File.expand_path("../lib", __FILE__)
 require "benchmark"
 
 require_relative "spec/support/rubygems_ext"
@@ -121,6 +120,14 @@ end
 desc "Run RuboCop"
 task :rubocop do
   sh("bin/rubocop --parallel")
+end
+
+desc "Check RVM integration"
+task :check_rvm_integration do
+  # The rubygems-bundler gem is installed by RVM by default and it could easily
+  # break when we change bundler. Make sure that binstubs still run with it
+  # installed.
+  sh("bin/rake install && gem install rubygems-bundler && rake -T")
 end
 
 namespace :man do
