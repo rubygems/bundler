@@ -48,6 +48,9 @@ jobs:
     - rvm: 2.6.5
       script: bin/rake rubocop
       stage: linting
+    - rvm: 2.6.5
+      script: bin/rake check_rvm_integration
+      stage: linting
     # Ruby 2.3 also tested in 2.x mode
     - rvm: 2.3.8
       env: RGV=master
