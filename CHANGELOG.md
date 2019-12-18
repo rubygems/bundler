@@ -1,3 +1,10 @@
+## 2.1.1 (December 17, 2019)
+
+Bugfixes:
+
+  - Fix some cases of shelling out to `rubygems` still being silent [#7493](https://github.com/bundler/bundler/pull/7493)
+  - Restore compatibility with `rubygems-bundler` so that binstubs work under `RVM` [#7498](https://github.com/bundler/bundler/pull/7498)
+
 ## 2.1.0 (December 15, 2019)
 
 Features:
