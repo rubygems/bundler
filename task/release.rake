@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "bundler/gem_tasks"
+require_relative "../lib/bundler/gem_tasks"
 task :build => ["build_metadata"] do
   Rake::Task["build_metadata:clean"].tap(&:reenable).real_invoke
 end
