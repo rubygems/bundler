@@ -1,3 +1,9 @@
+## 2.1.2 (December 20, 2019)
+
+Bugfixes:
+
+  - Restore an explicit `require "rubygems"` on top `rubygems_integration.rb` to avoid some missing constant errors under some convoluted setups [#7505](https://github.com/bundler/bundler/pull/7505)
+
 ## 2.1.1 (December 17, 2019)
 
 Bugfixes:
