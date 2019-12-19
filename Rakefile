@@ -109,7 +109,7 @@ task :check_rvm_integration do
   # The rubygems-bundler gem is installed by RVM by default and it could easily
   # break when we change bundler. Make sure that binstubs still run with it
   # installed.
-  sh("bin/rake install && gem install rubygems-bundler && rake -T")
+  sh("gem install rubygems-bundler && RUBYOPT=-Ilib rake -T")
 end
 
 namespace :man do
