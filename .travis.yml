@@ -8,7 +8,7 @@ before_script:
   - bin/rake man:check
   - if [ "$BUNDLER_SPEC_SUB_VERSION" = "" ];
     then
-      sudo apt-get install graphviz -y;
+      travis_retry sudo apt-get install graphviz -y;
     fi
   - if [ "$TRAVIS_RUBY_VERSION" = "2.3.8" ];
     then
