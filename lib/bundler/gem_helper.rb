@@ -130,9 +130,8 @@ module Bundler
 
     def perform_git_push(options = "")
       cmd = "git push #{options}"
-      out, status = sh_with_status(cmd)
+      out, status = sh_with_status(cmd.shellsplit)
       return if status.success?
-      cmd = cmd.shelljoin if cmd.respond_to?(:shelljoin)
       raise "Couldn't git push. `#{cmd}' failed with the following output:\n\n#{out}\n"
     end
 
