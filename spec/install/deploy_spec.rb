@@ -42,7 +42,7 @@ RSpec.describe "install with --deployment or --frozen" do
   end
 
   it "still works if you are not in the app directory and specify --gemfile" do
-    bundle "install"
+    bundle! "install"
     Dir.chdir tmp do
       simulate_new_machine
       bundle! :install,
@@ -60,12 +60,12 @@ RSpec.describe "install with --deployment or --frozen" do
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       end
     G
-    bundle :install
+    bundle! :install
     bundle! :install, forgotten_command_line_options(:deployment => true, :without => "test")
   end
 
   it "works when you bundle exec bundle" do
-    bundle :install
+    bundle! :install
     bundle "install --deployment"
     bundle! "exec bundle check"
   end
@@ -106,7 +106,7 @@ RSpec.describe "install with --deployment or --frozen" do
 
   describe "with an existing lockfile" do
     before do
-      bundle "install"
+      bundle! "install"
     end
 
     it "works with the --deployment flag if you didn't change anything", :bundler => "< 3" do
@@ -317,7 +317,7 @@ RSpec.describe "install with --deployment or --frozen" do
         before { bundle! "config set allow_deployment_source_credential_changes true" }
 
         it "allows the replace" do
-          bundle :install
+          bundle! :install
 
           expect(out).to match(/#{success_message}/)
         end
