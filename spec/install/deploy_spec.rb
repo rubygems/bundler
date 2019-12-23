@@ -281,10 +281,6 @@ RSpec.describe "install with --deployment or --frozen" do
     end
 
     context "when replacing a host with the same host with credentials" do
-      let(:success_message) do
-        "Bundle complete!"
-      end
-
       before do
         gemfile <<-G
         source "http://user_name:password@localgemserver.test/"
@@ -319,7 +315,7 @@ RSpec.describe "install with --deployment or --frozen" do
         it "allows the replace" do
           bundle! :install
 
-          expect(out).to match(/#{success_message}/)
+          expect(out).to match(/Bundle complete!/)
         end
       end
 
@@ -339,7 +335,7 @@ RSpec.describe "install with --deployment or --frozen" do
         it "allows the replace" do
           bundle :install
 
-          expect(out).to match(/#{success_message}/)
+          expect(out).to match(/Bundle complete!/)
         end
       end
 
