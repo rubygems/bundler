@@ -104,6 +104,77 @@ RSpec.describe "install with --deployment or --frozen" do
     expect(the_bundle).to include_gems "rack 1.0"
   end
 
+  context "when replacing a host with the same host with credentials" do
+    before do
+      bundle! "install"
+      gemfile <<-G
+      source "http://user_name:password@localgemserver.test/"
+      gem "rack"
+      G
+
+      lockfile <<-G
+      GEM
+        remote: http://localgemserver.test/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{local}
+
+      DEPENDENCIES
+        rack
+      G
+
+      bundle! "config set --local deployment true"
+    end
+
+    it "prevents the replace by default" do
+      bundle :install
+
+      expect(err).to match(/The list of sources changed/)
+    end
+
+    context "when allow_deployment_source_credential_changes is true" do
+      before { bundle! "config set allow_deployment_source_credential_changes true" }
+
+      it "allows the replace" do
+        bundle! :install
+
+        expect(out).to match(/Bundle complete!/)
+      end
+    end
+
+    context "when allow_deployment_source_credential_changes is false" do
+      before { bundle! "config set allow_deployment_source_credential_changes false" }
+
+      it "prevents the replace" do
+        bundle :install
+
+        expect(err).to match(/The list of sources changed/)
+      end
+    end
+
+    context "when BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES env var is true" do
+      before { ENV["BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES"] = "true" }
+
+      it "allows the replace" do
+        bundle :install
+
+        expect(out).to match(/Bundle complete!/)
+      end
+    end
+
+    context "when BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES env var is false" do
+      before { ENV["BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES"] = "false" }
+
+      it "prevents the replace" do
+        bundle :install
+
+        expect(err).to match(/The list of sources changed/)
+      end
+    end
+  end
+
   describe "with an existing lockfile" do
     before do
       bundle! "install"
@@ -278,76 +349,6 @@ RSpec.describe "install with --deployment or --frozen" do
       expect(err).to include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master@#{revision_for(lib_path("rack"))[0..6]})`")
       expect(err).not_to include("You have added to the Gemfile")
       expect(err).not_to include("You have deleted from the Gemfile")
-    end
-
-    context "when replacing a host with the same host with credentials" do
-      before do
-        gemfile <<-G
-        source "http://user_name:password@localgemserver.test/"
-        gem "rack"
-        G
-
-        lockfile <<-G
-        GEM
-          remote: http://localgemserver.test/
-          specs:
-            rack (1.0.0)
-
-        PLATFORMS
-          #{local}
-
-        DEPENDENCIES
-          rack
-        G
-
-        bundle! "config set --local deployment true"
-      end
-
-      it "prevents the replace by default" do
-        bundle :install
-
-        expect(err).to match(/The list of sources changed/)
-      end
-
-      context "when allow_deployment_source_credential_changes is true" do
-        before { bundle! "config set allow_deployment_source_credential_changes true" }
-
-        it "allows the replace" do
-          bundle! :install
-
-          expect(out).to match(/Bundle complete!/)
-        end
-      end
-
-      context "when allow_deployment_source_credential_changes is false" do
-        before { bundle! "config set allow_deployment_source_credential_changes false" }
-
-        it "prevents the replace" do
-          bundle :install
-
-          expect(err).to match(/The list of sources changed/)
-        end
-      end
-
-      context "when BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES env var is true" do
-        before { ENV["BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES"] = "true" }
-
-        it "allows the replace" do
-          bundle :install
-
-          expect(out).to match(/Bundle complete!/)
-        end
-      end
-
-      context "when BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES env var is false" do
-        before { ENV["BUNDLE_ALLOW_DEPLOYMENT_SOURCE_CREDENTIAL_CHANGES"] = "false" }
-
-        it "prevents the replace" do
-          bundle :install
-
-          expect(err).to match(/The list of sources changed/)
-        end
-      end
     end
 
     it "remembers that the bundle is frozen at runtime" do
