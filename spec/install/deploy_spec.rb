@@ -180,6 +180,16 @@ RSpec.describe "install with --deployment or --frozen" do
       bundle! "install"
     end
 
+    it "installs gems by default to vendor/bundle", :bundler => "< 3" do
+      bundle! "install --deployment"
+      expect(out).to include("vendor/bundle")
+    end
+
+    it "installs gems to custom path if specified", :bundler => "< 3" do
+      bundle! "install --path vendor/bundle2 --deployment"
+      expect(out).to include("vendor/bundle2")
+    end
+
     it "works with the --deployment flag if you didn't change anything", :bundler => "< 3" do
       bundle! "install --deployment"
     end
