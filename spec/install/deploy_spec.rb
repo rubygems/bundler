@@ -106,7 +106,7 @@ RSpec.describe "install with --deployment or --frozen" do
 
   context "when replacing a host with the same host with credentials" do
     before do
-      bundle! "install"
+      bundle! "install", forgotten_command_line_options(:path => "vendor/bundle")
       gemfile <<-G
       source "http://user_name:password@localgemserver.test/"
       gem "rack"
@@ -276,6 +276,19 @@ RSpec.describe "install with --deployment or --frozen" do
       expect(err).to include("* rack-obama")
       expect(err).not_to include("You have deleted from the Gemfile")
       expect(err).not_to include("You have changed in the Gemfile")
+    end
+
+    it "installs gems by default to vendor/bundle when `--deployment` is set via an environment variable", :bundler => "< 3" do
+      ENV["BUNDLE_DEPLOYMENT"] = "true"
+      bundle "install"
+      expect(out).to include("vendor/bundle")
+    end
+
+    it "installs gems to custom path when deployment mode is set via an environment variable ", :bundler => "< 3" do
+      ENV["BUNDLE_DEPLOYMENT"] = "true"
+      ENV["BUNDLE_PATH"] = "vendor/bundle2"
+      bundle "install"
+      expect(out).to include("vendor/bundle2")
     end
 
     it "can have --frozen set to false via an environment variable" do
