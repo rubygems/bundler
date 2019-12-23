@@ -286,7 +286,7 @@ RSpec.describe "install with --deployment or --frozen" do
       end
 
       before do
-        install_gemfile <<-G
+        gemfile <<-G
         source "http://user_name:password@localgemserver.test/"
         gem "rack"
         G
