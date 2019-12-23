@@ -205,9 +205,6 @@ learn more about their operation in [bundle install(1)](bundle-install.1.html).
 * `global_gem_cache` (`BUNDLE_GLOBAL_GEM_CACHE`):
    Whether Bundler should cache all gems globally, rather than locally to the
    installing Ruby installation.
-* `global_path_appends_ruby_scope` (`BUNDLE_GLOBAL_PATH_APPENDS_RUBY_SCOPE`):
-   Whether Bundler should append the Ruby scope (e.g. engine and ABI version)
-   to a globally-configured path.
 * `ignore_messages` (`BUNDLE_IGNORE_MESSAGES`): When set, no post install
    messages will be printed. To silence a single gem, use dot notation like
    `ignore_messages.httparty true`.
@@ -298,6 +295,17 @@ flag to the [bundle install(1)](bundle-install.1.html) or [bundle package(1)](bu
 You can set them globally either via environment variables or `bundle config`,
 whichever is preferable for your setup. If you use both, environment variables
 will take preference over global settings.
+
+## LIST OF EARLY OPT-IN CONFIGURATION KEYS
+
+The following is a list of configuration keys meant to only be used to early opt
+into bug fixes that are deemed to be too disruptive to be shipped on a non-major
+release of Bundler. The functionality they enable will be the default and only
+behavior in future versions of bundler. Only set these settings to true.
+
+* `global_path_appends_ruby_scope` (`BUNDLE_GLOBAL_PATH_APPENDS_RUBY_SCOPE`):
+   Whether Bundler should append the Ruby scope (e.g. engine and ABI version)
+   to a globally-configured path.
 
 ## LOCAL GIT REPOS
 

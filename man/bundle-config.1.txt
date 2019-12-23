@@ -247,89 +247,84 @@ LIST OF AVAILABLE KEYS
 	   cache all gems globally, rather than locally to the installing Ruby
 	   installation.
 
-       o   global_path_appends_ruby_scope				 (BUN-
-	   DLE_GLOBAL_PATH_APPENDS_RUBY_SCOPE): Whether Bundler should	append
-	   the	Ruby scope (e.g. engine and ABI version) to a globally-config-
-	   ured path.
-
        o   ignore_messages (BUNDLE_IGNORE_MESSAGES): When set, no post install
 	   messages will be printed. To silence a single gem, use dot notation
 	   like ignore_messages.httparty true.
 
-       o   init_gems_rb (BUNDLE_INIT_GEMS_RB) Generate a gems.rb instead of  a
+       o   init_gems_rb  (BUNDLE_INIT_GEMS_RB) Generate a gems.rb instead of a
 	   Gemfile when running bundle init.
 
-       o   jobs  (BUNDLE_JOBS): The number of gems Bundler can install in par-
+       o   jobs (BUNDLE_JOBS): The number of gems Bundler can install in  par-
 	   allel. Defaults to 1.
 
-       o   no_install (BUNDLE_NO_INSTALL): Whether bundle package should  skip
+       o   no_install  (BUNDLE_NO_INSTALL): Whether bundle package should skip
 	   installing gems.
 
-       o   no_prune  (BUNDLE_NO_PRUNE):  Whether Bundler should leave outdated
+       o   no_prune (BUNDLE_NO_PRUNE): Whether Bundler should  leave  outdated
 	   gems unpruned when caching.
 
        o   only_update_to_newer_versions     (BUNDLE_ONLY_UPDATE_TO_NEWER_VER-
 	   SIONS): During bundle update, only resolve to newer versions of the
 	   gems in the lockfile.
 
-       o   path (BUNDLE_PATH): The location on disk where  all	gems  in  your
+       o   path  (BUNDLE_PATH):  The  location	on disk where all gems in your
 	   bundle will be located regardless of $GEM_HOME or $GEM_PATH values.
-	   Bundle gems not found in this location will be installed by	bundle
-	   install.  Defaults  to Gem.dir. When --deployment is used, defaults
+	   Bundle  gems not found in this location will be installed by bundle
+	   install. Defaults to Gem.dir. When --deployment is  used,  defaults
 	   to vendor/bundle.
 
-       o   path.system (BUNDLE_PATH__SYSTEM):  Whether	Bundler  will  install
+       o   path.system	(BUNDLE_PATH__SYSTEM):	Whether  Bundler  will install
 	   gems into the default system path (Gem.dir).
 
-       o   path_relative_to_cwd   (BUNDLE_PATH_RELATIVE_TO_CWD)  Makes	--path
+       o   path_relative_to_cwd  (BUNDLE_PATH_RELATIVE_TO_CWD)	Makes	--path
 	   relative to the CWD instead of the Gemfile.
 
        o   plugins (BUNDLE_PLUGINS): Enable Bundler's experimental plugin sys-
 	   tem.
 
-       o   prefer_patch  (BUNDLE_PREFER_PATCH):  Prefer  updating only to next
-	   patch version during updates. Makes bundle update calls  equivalent
+       o   prefer_patch (BUNDLE_PREFER_PATCH): Prefer updating	only  to  next
+	   patch  version during updates. Makes bundle update calls equivalent
 	   to bundler update --patch.
 
-       o   print_only_version_number  (BUNDLE_PRINT_ONLY_VERSION_NUMBER) Print
+       o   print_only_version_number (BUNDLE_PRINT_ONLY_VERSION_NUMBER)  Print
 	   only version number from bundler --version.
 
-       o   redirect (BUNDLE_REDIRECT): The number  of  redirects  allowed  for
+       o   redirect  (BUNDLE_REDIRECT):  The  number  of redirects allowed for
 	   network requests. Defaults to 5.
 
-       o   retry  (BUNDLE_RETRY):  The number of times to retry failed network
+       o   retry (BUNDLE_RETRY): The number of times to retry  failed  network
 	   requests. Defaults to 3.
 
        o   setup_makes_kernel_gem_public   (BUNDLE_SETUP_MAKES_KERNEL_GEM_PUB-
-	   LIC):  Have	Bundler.setup  make the Kernel#gem method public, even
+	   LIC): Have Bundler.setup make the Kernel#gem  method  public,  even
 	   though RubyGems declares it as private.
 
-       o   shebang (BUNDLE_SHEBANG): The program name that should  be  invoked
-	   for	generated  binstubs. Defaults to the ruby install name used to
+       o   shebang  (BUNDLE_SHEBANG):  The program name that should be invoked
+	   for generated binstubs. Defaults to the ruby install name  used  to
 	   generate the binstub.
 
        o   silence_deprecations (BUNDLE_SILENCE_DEPRECATIONS): Whether Bundler
-	   should  silence  deprecation  warnings  for	behavior  that will be
+	   should silence deprecation  warnings  for  behavior	that  will  be
 	   changed in the next major version.
 
-       o   silence_root_warning  (BUNDLE_SILENCE_ROOT_WARNING):  Silence   the
+       o   silence_root_warning   (BUNDLE_SILENCE_ROOT_WARNING):  Silence  the
 	   warning Bundler prints when installing gems as root.
 
        o   skip_default_git_sources (BUNDLE_SKIP_DEFAULT_GIT_SOURCES): Whether
 	   Bundler should skip adding default git source shortcuts to the Gem-
 	   file DSL.
 
-       o   specific_platform   (BUNDLE_SPECIFIC_PLATFORM):  Allow  bundler  to
+       o   specific_platform  (BUNDLE_SPECIFIC_PLATFORM):  Allow  bundler   to
 	   resolve for the specific running platform and store it in the lock-
 	   file, instead of only using a generic platform. A specific platform
-	   is the exact platform triple reported by Gem::Platform.local,  such
-	   as  x86_64-darwin-16  or  universal-java-1.8.  On  the  other hand,
-	   generic platforms are those such as ruby, mswin, or java.  In  this
-	   example,  x86_64-darwin-16 would map to ruby and universal-java-1.8
+	   is  the exact platform triple reported by Gem::Platform.local, such
+	   as x86_64-darwin-16	or  universal-java-1.8.  On  the  other  hand,
+	   generic  platforms  are those such as ruby, mswin, or java. In this
+	   example, x86_64-darwin-16 would map to ruby and  universal-java-1.8
 	   to java.
 
-       o   ssl_ca_cert (BUNDLE_SSL_CA_CERT): Path to a designated CA  certifi-
-	   cate  file  or  folder containing multiple certificates for trusted
+       o   ssl_ca_cert	(BUNDLE_SSL_CA_CERT): Path to a designated CA certifi-
+	   cate file or folder containing multiple  certificates  for  trusted
 	   CAs in PEM format.
 
        o   ssl_client_cert (BUNDLE_SSL_CLIENT_CERT): Path to a designated file
@@ -339,41 +334,52 @@ LIST OF AVAILABLE KEYS
 	   Bundler uses when making HTTPS requests. Defaults to verify peer.
 
        o   suppress_install_using_messages (BUNDLE_SUPPRESS_INSTALL_USING_MES-
-	   SAGES):  Avoid printing Using ... messages during installation when
+	   SAGES): Avoid printing Using ... messages during installation  when
 	   the version of a gem has not changed.
 
-       o   system_bindir (BUNDLE_SYSTEM_BINDIR): The location  where  RubyGems
+       o   system_bindir  (BUNDLE_SYSTEM_BINDIR):  The location where RubyGems
 	   installs binstubs. Defaults to Gem.bindir.
 
        o   timeout (BUNDLE_TIMEOUT): The seconds allowed before timing out for
 	   network requests. Defaults to 10.
 
        o   unlock_source_unlocks_spec	  (BUNDLE_UNLOCK_SOURCE_UNLOCKS_SPEC):
-	   Whether  running bundle update --source NAME unlocks a gem with the
+	   Whether running bundle update --source NAME unlocks a gem with  the
 	   given name. Defaults to true.
 
-       o   update_requires_all_flag (BUNDLE_UPDATE_REQUIRES_ALL_FLAG)  Require
-	   passing  --all  to bundle update when everything should be updated,
+       o   update_requires_all_flag  (BUNDLE_UPDATE_REQUIRES_ALL_FLAG) Require
+	   passing --all to bundle update when everything should  be  updated,
 	   and disallow passing no options to bundle update.
 
-       o   user_agent (BUNDLE_USER_AGENT):  The  custom  user  agent  fragment
+       o   user_agent  (BUNDLE_USER_AGENT):  The  custom  user	agent fragment
 	   Bundler includes in API requests.
 
        o   with (BUNDLE_WITH): A :-separated list of groups whose gems bundler
 	   should install.
 
-       o   without (BUNDLE_WITHOUT): A :-separated list of groups  whose  gems
+       o   without  (BUNDLE_WITHOUT):  A :-separated list of groups whose gems
 	   bundler should not install.
 
 
 
-       In  general, you should set these settings per-application by using the
-       applicable flag to the bundle install(1) bundle-install.1.html or  bun-
+       In general, you should set these settings per-application by using  the
+       applicable  flag to the bundle install(1) bundle-install.1.html or bun-
        dle package(1) bundle-package.1.html command.
 
-       You  can  set  them globally either via environment variables or bundle
-       config, whichever is preferable for your setup. If you use both,  envi-
+       You can set them globally either via environment  variables  or	bundle
+       config,	whichever is preferable for your setup. If you use both, envi-
        ronment variables will take preference over global settings.
+
+LIST OF EARLY OPT-IN CONFIGURATION KEYS
+       The following is a list of configuration keys meant to only be used  to
+       early  opt  into  bug  fixes that are deemed to be too disruptive to be
+       shipped on a non-major  release	of  Bundler.  The  functionality  they
+       enable  will  be  the  default  and only behavior in future versions of
+       bundler. Only set these settings to true.
+
+       global_path_appends_ruby_scope (BUNDLE_GLOBAL_PATH_APPENDS_RUBY_SCOPE)
+	      Whether Bundler should append the Ruby scope  (e.g.  engine  and
+	      ABI version) to a globally-configured path.
 
 LOCAL GIT REPOS
        Bundler	also  allows  you  to  work  against  a git repository locally

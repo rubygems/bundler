@@ -192,6 +192,7 @@ RSpec.describe "The library itself" do
 
     all_settings = Hash.new {|h, k| h[k] = [] }
     documented_settings = []
+    documented_setting_sections = []
 
     Bundler::Settings::BOOL_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::BOOL_KEYS" }
     Bundler::Settings::NUMBER_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::NUMBER_KEYS" }
@@ -204,7 +205,8 @@ RSpec.describe "The library itself" do
           line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `#{filename}:#{number.succ}`" }
         end
       end
-      documented_settings = File.read("man/bundle-config.ronn")[/LIST OF AVAILABLE KEYS.*/m].scan(/^\* `#{key_pattern}`/).flatten
+      documented_setting_sections = File.read("man/bundle-config.ronn").split(/LIST OF .* KEYS/)[1..-1].map {|section| section.scan(/^\* `#{key_pattern}`/).flatten }
+      documented_settings = documented_setting_sections.flatten
     end
 
     documented_settings.each do |s|
@@ -221,7 +223,9 @@ RSpec.describe "The library itself" do
 
     expect(error_messages.sort).to be_well_formed
 
-    expect(documented_settings).to be_sorted
+    documented_setting_sections.each do |documented_setting_section|
+      expect(documented_setting_section).to be_sorted
+    end
   end
 
   it "can still be built" do

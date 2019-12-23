@@ -211,9 +211,6 @@ The following is a list of all configuration keys and their purpose\. You can le
 \fBglobal_gem_cache\fR (\fBBUNDLE_GLOBAL_GEM_CACHE\fR): Whether Bundler should cache all gems globally, rather than locally to the installing Ruby installation\.
 .
 .IP "\(bu" 4
-\fBglobal_path_appends_ruby_scope\fR (\fBBUNDLE_GLOBAL_PATH_APPENDS_RUBY_SCOPE\fR): Whether Bundler should append the Ruby scope (e\.g\. engine and ABI version) to a globally\-configured path\.
-.
-.IP "\(bu" 4
 \fBignore_messages\fR (\fBBUNDLE_IGNORE_MESSAGES\fR): When set, no post install messages will be printed\. To silence a single gem, use dot notation like \fBignore_messages\.httparty true\fR\.
 .
 .IP "\(bu" 4
@@ -313,6 +310,13 @@ In general, you should set these settings per\-application by using the applicab
 .
 .P
 You can set them globally either via environment variables or \fBbundle config\fR, whichever is preferable for your setup\. If you use both, environment variables will take preference over global settings\.
+.
+.SH "LIST OF EARLY OPT\-IN CONFIGURATION KEYS"
+The following is a list of configuration keys meant to only be used to early opt into bug fixes that are deemed to be too disruptive to be shipped on a non\-major release of Bundler\. The functionality they enable will be the default and only behavior in future versions of bundler\. Only set these settings to true\.
+.
+.TP
+\fBglobal_path_appends_ruby_scope\fR (\fBBUNDLE_GLOBAL_PATH_APPENDS_RUBY_SCOPE\fR)
+Whether Bundler should append the Ruby scope (e\.g\. engine and ABI version) to a globally\-configured path\.
 .
 .SH "LOCAL GIT REPOS"
 Bundler also allows you to work against a git repository locally instead of using the remote version\. This can be achieved by setting up a local override:
