@@ -34,7 +34,7 @@ RSpec.describe "install with --deployment or --frozen" do
       expect(exitstatus).to eq(15) if exitstatus
     end
 
-    it "works after you try to deploy without a lock" do
+    it "doesn't mess up a subsequent `bundle install` after you try to deploy without a lock" do
       bundle "install --deployment"
       bundle! :install
       expect(the_bundle).to include_gems "rack 1.0"
