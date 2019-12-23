@@ -25,8 +25,8 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "config set path vendor/bundle"
-    bundle "config set clean false"
+    bundle "config --local path vendor/bundle"
+    bundle "config --local clean false"
     bundle! "install"
 
     gemfile <<-G
@@ -54,8 +54,8 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "config set path vendor/bundle"
-    bundle "config set clean false"
+    bundle "config --local path vendor/bundle"
+    bundle "config --local clean false"
     bundle "install"
 
     gemfile <<-G
@@ -84,8 +84,8 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "config set path vendor/bundle"
-    bundle "config set clean false"
+    bundle "config set --local path vendor/bundle"
+    bundle "config set --local clean false"
     bundle! "install"
 
     gemfile <<-G
@@ -117,9 +117,9 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle "install"
-    bundle "config set without test_group"
+    bundle "config set --local without test_group"
     bundle "install"
     bundle :clean
 
@@ -145,7 +145,7 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle "install"
 
     bundle :clean
@@ -169,7 +169,7 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle "install"
 
     gemfile <<-G
@@ -210,7 +210,7 @@ RSpec.describe "bundle clean" do
     FileUtils.mkdir_p(bundled_app("real-path"))
     FileUtils.ln_sf(bundled_app("real-path"), bundled_app("symlink-path"))
 
-    bundle "config set path #{bundled_app("symlink-path")}"
+    bundle "config set --local path #{bundled_app("symlink-path")}"
     bundle "install"
 
     bundle :clean
@@ -233,7 +233,7 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle! "install"
 
     update_git "foo", :path => lib_path("foo-bar")
@@ -264,7 +264,7 @@ RSpec.describe "bundle clean" do
       gem "activesupport", :git => "#{lib_path("rails")}", :ref => '#{revision}'
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle "install"
     bundle :clean
     expect(out).to include("")
@@ -287,8 +287,8 @@ RSpec.describe "bundle clean" do
         end
       end
     G
-    bundle "config set path vendor/bundle"
-    bundle "config set without test"
+    bundle "config set --local path vendor/bundle"
+    bundle "config set --local without test"
     bundle "install"
 
     bundle :clean
@@ -310,8 +310,8 @@ RSpec.describe "bundle clean" do
       end
     G
 
-    bundle "config set path vendor/bundle"
-    bundle "config set without development"
+    bundle "config set --local path vendor/bundle"
+    bundle "config set --local without development"
     bundle "install"
 
     bundle :clean
@@ -341,7 +341,7 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle "install"
 
     gemfile <<-G
@@ -390,9 +390,9 @@ RSpec.describe "bundle clean" do
       gem "thin"
       gem "rack"
     G
-    bundle "config set path vendor/bundle"
-    bundle "config set clean false"
-    bundle "install --clean true"
+    bundle "config set --local path vendor/bundle"
+    bundle "config set --local clean true"
+    bundle "install"
 
     gemfile <<-G
       source "#{file_uri_for(gem_repo1)}"
@@ -413,9 +413,9 @@ RSpec.describe "bundle clean" do
 
       gem "foo"
     G
-    bundle "config set path vendor/bundle"
-    bundle "config set clean false"
-    bundle "install --clean true"
+    bundle "config set --local path vendor/bundle"
+    bundle "config set --local clean true"
+    bundle! "install"
 
     update_repo2 do
       build_gem "foo", "1.0.1"
@@ -458,7 +458,7 @@ RSpec.describe "bundle clean" do
       gem "thin"
       gem "rack"
     G
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle "install"
 
     gemfile <<-G
@@ -479,7 +479,7 @@ RSpec.describe "bundle clean" do
 
       gem "foo"
     G
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle! "install"
 
     update_repo2 do
@@ -581,7 +581,7 @@ RSpec.describe "bundle clean" do
       gem "foo", :git => "#{lib_path("foo-1.0")}"
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle "install"
 
     # mimic 7 length git revisions in Gemfile.lock
@@ -591,7 +591,7 @@ RSpec.describe "bundle clean" do
     end
     lockfile(bundled_app("Gemfile.lock"), gemfile_lock.join("\n"))
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle "install"
 
     bundle :clean
@@ -642,7 +642,7 @@ RSpec.describe "bundle clean" do
       gem "bar", "1.0", :path => "#{relative_path}"
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle "install"
     bundle! :clean
   end
@@ -655,8 +655,8 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "config set path vendor/bundle"
-    bundle "config set clean false"
+    bundle "config set --local path vendor/bundle"
+    bundle "config set --local clean false"
     bundle "install"
 
     gemfile <<-G
@@ -685,8 +685,8 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "config set path vendor/bundle"
-    bundle "config set clean false"
+    bundle "config set --local path vendor/bundle"
+    bundle "config set --local clean false"
     bundle "install"
 
     gemfile <<-G
@@ -715,8 +715,8 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "config set path vendor/bundle"
-    bundle "config set clean false"
+    bundle "config set --local path vendor/bundle"
+    bundle "config set --local clean false"
     bundle "install"
     bundle "config set dry_run false"
 
@@ -747,8 +747,8 @@ RSpec.describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "config set path vendor/bundle"
-    bundle "config set clean false"
+    bundle "config set --local path vendor/bundle"
+    bundle "config set --local clean false"
     bundle! "install"
 
     gemfile <<-G
@@ -776,7 +776,7 @@ RSpec.describe "bundle clean" do
       gem "very_simple_git_binary", :git => "#{lib_path("very_simple_git_binary-1.0")}", :ref => "#{revision}"
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle! "install"
     expect(vendored_gems("bundler/gems/extensions")).to exist
     expect(vendored_gems("bundler/gems/very_simple_git_binary-1.0-#{revision[0..11]}")).to exist
@@ -797,7 +797,7 @@ RSpec.describe "bundle clean" do
       gem "simple_binary"
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle! "install"
 
     very_simple_binary_extensions_dir =
@@ -837,7 +837,7 @@ RSpec.describe "bundle clean" do
       gem "very_simple_git_binary", :git => "#{lib_path("very_simple_git_binary-1.0")}", :ref => "#{revision}"
     G
 
-    bundle "config set path vendor/bundle"
+    bundle "config set --local path vendor/bundle"
     bundle! "install"
 
     very_simple_binary_extensions_dir =
