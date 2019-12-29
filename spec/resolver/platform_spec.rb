@@ -54,6 +54,17 @@ RSpec.describe "Resolving platform craziness" do
     should_resolve_as %w[foo-1.0.0]
   end
 
+  it "prefers the platform specific gem to the ruby version" do
+    @index = build_index do
+      gem "foo", "1.0.0"
+      gem "foo", "1.0.0", "x64-mingw32"
+    end
+    dep "foo"
+    platforms "x64-mingw32"
+
+    should_resolve_as %w[foo-1.0.0-x64-mingw32]
+  end
+
   it "takes the latest ruby gem if the platform specific gem doesn't match the required_ruby_version" do
     @index = build_index do
       gem "foo", "1.0.0"

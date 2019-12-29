@@ -146,7 +146,21 @@ module Bundler
           @gem_version_promoter.sort_versions(dependency, spec_groups)
         end
       end
-      search.select {|sg| sg.for?(platform) }.each {|sg| sg.activate_platform!(platform) }
+      selected_sgs = []
+      search.each do |sg|
+        next unless sg.for?(platform)
+        sg.activate_platform!(platform)
+        if sg.spec(platform).platform != Gem::Platform::RUBY
+          sg_ruby = SpecGroup.new(sg.all_specs)
+          sg_ruby.ignores_bundler_dependencies = sg.ignores_bundler_dependencies
+          if sg_ruby.for?(Gem::Platform::RUBY)
+            sg_ruby.activate_platform!(Gem::Platform::RUBY)
+            selected_sgs << sg_ruby
+          end
+        end
+        selected_sgs << sg
+      end
+      selected_sgs
     end
 
     def index_for(dependency)
@@ -183,9 +197,7 @@ module Bundler
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
-      return false unless requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
-      spec.activate_platform!(requirement.__platform) if !@platforms || @platforms.include?(requirement.__platform)
-      true
+      requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
     end
 
     def relevant_sources_for_vertex(vertex)

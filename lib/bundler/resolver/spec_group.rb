@@ -5,10 +5,12 @@ module Bundler
     class SpecGroup
       include GemHelpers
 
+      attr_reader :all_specs
       attr_accessor :name, :version, :source
       attr_accessor :ignores_bundler_dependencies
 
       def initialize(all_specs)
+        @all_specs = all_specs
         raise ArgumentError, "cannot initialize with an empty value" unless exemplary_spec = all_specs.first
         @name = exemplary_spec.name
         @version = exemplary_spec.version
@@ -37,9 +39,12 @@ module Bundler
         @activated_platforms << platform
       end
 
+      def spec(platform)
+        @specs[platform]
+      end
+
       def for?(platform)
-        spec = @specs[platform]
-        !spec.nil?
+        !spec(platform).nil?
       end
 
       def to_s
