@@ -149,15 +149,33 @@ module Bundler
       selected_sgs = []
       search.each do |sg|
         next unless sg.for?(platform)
-        sg.activate_platform!(platform)
-        if sg.spec(platform).platform != Gem::Platform::RUBY
+        spec_platform = sg.spec(platform).platform
+        if spec_platform && spec_platform != Gem::Platform::RUBY
+          # Add a spec group for "non platform specific spec" as the fallback
+          # spec group.
           sg_ruby = SpecGroup.new(sg.all_specs)
           sg_ruby.ignores_bundler_dependencies = sg.ignores_bundler_dependencies
           if sg_ruby.for?(Gem::Platform::RUBY)
             sg_ruby.activate_platform!(Gem::Platform::RUBY)
             selected_sgs << sg_ruby
           end
+          # Add a spec group for ["non platform specific spec", "platform
+          # specific spec"] to resolve a spec for multiple platforms.
+          # If Gemfile.lock file has the following entries, we need a ffi-1.9.14
+          # spec group for ["ruby", "x86-mingw32"].
+          #
+          # GEM
+          #   specs:
+          #     ffi (1.9.14)
+          #     ffi (1.9.14-x86-mingw32)
+          sg_ruby_platform = SpecGroup.new(sg.all_specs)
+          sg_ruby_platform.ignores_bundler_dependencies =
+            sg.ignores_bundler_dependencies
+          sg_ruby_platform.activate_platform!(Gem::Platform::RUBY)
+          sg_ruby_platform.activate_platform!(platform)
+          selected_sgs << sg_ruby_platform
         end
+        sg.activate_platform!(platform)
         selected_sgs << sg
       end
       selected_sgs

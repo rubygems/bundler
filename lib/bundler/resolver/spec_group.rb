@@ -48,7 +48,8 @@ module Bundler
       end
 
       def to_s
-        @to_s ||= "#{name} (#{version})"
+        activated_platforms_string = sorted_activated_platforms.join(", ")
+        "#{name} (#{version}) (#{activated_platforms_string})"
       end
 
       def dependencies_for_activated_platforms
@@ -63,6 +64,7 @@ module Bundler
         return unless other.is_a?(SpecGroup)
         name == other.name &&
           version == other.version &&
+          sorted_activated_platforms == other.sorted_activated_platforms &&
           source == other.source
       end
 
@@ -70,11 +72,18 @@ module Bundler
         return unless other.is_a?(SpecGroup)
         name.eql?(other.name) &&
           version.eql?(other.version) &&
+          sorted_activated_platforms.eql?(other.sorted_activated_platforms) &&
           source.eql?(other.source)
       end
 
       def hash
-        to_s.hash ^ source.hash
+        name.hash ^ version.hash ^ sorted_activated_platforms.hash ^ source.hash
+      end
+
+    protected
+
+      def sorted_activated_platforms
+        @activated_platforms.sort_by(&:to_s)
       end
 
     private
