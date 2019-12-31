@@ -1263,6 +1263,27 @@ end
         expect(out).to eq("{}")
       end
 
+      it "does not load net-http-pipeline too early" do
+        build_repo4 do
+          build_gem "net-http-pipeline", "1.0.1"
+        end
+
+        system_gems "net-http-pipeline-1.0.1", :gem_repo => gem_repo4 do
+          gemfile <<-G
+            source "#{file_uri_for(gem_repo4)}"
+            gem "net-http-pipeline", "1.0.1"
+          G
+
+          bundle "config set --local path vendor/bundle"
+
+          bundle! :install
+
+          bundle! :check
+
+          expect(out).to eq("The Gemfile's dependencies are satisfied")
+        end
+      end
+
       Gem::Specification.select(&:default_gem?).map(&:name).each do |g|
         it "activates newer versions of #{g}" do
           skip if exemptions.include?(g)
