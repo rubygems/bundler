@@ -17,7 +17,6 @@ RSpec.describe "bundle gem" do
   let(:require_path) { "mygem" }
 
   before do
-    global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
     git_config_content = <<-EOF
     [user]
       name = "Bundler User"
@@ -567,39 +566,48 @@ RSpec.describe "bundle gem" do
 
     context "with mit option in bundle config settings set to true" do
       before do
-        global_config "BUNDLE_GEM__MIT" => "true", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__RUBOCOP" => "false", "BUNDLE_GEM__COC" => "false"
+        global_config "BUNDLE_GEM__MIT" => "true"
       end
       it_behaves_like "--mit flag"
       it_behaves_like "--no-mit flag"
     end
 
     context "with mit option in bundle config settings set to false" do
+      before do
+        global_config "BUNDLE_GEM__MIT" => "false"
+      end
       it_behaves_like "--mit flag"
       it_behaves_like "--no-mit flag"
     end
 
     context "with coc option in bundle config settings set to true" do
       before do
-        global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__RUBOCOP" => "false", "BUNDLE_GEM__COC" => "true"
+        global_config "BUNDLE_GEM__COC" => "true"
       end
       it_behaves_like "--coc flag"
       it_behaves_like "--no-coc flag"
     end
 
     context "with coc option in bundle config settings set to false" do
+      before do
+        global_config "BUNDLE_GEM__COC" => "false"
+      end
       it_behaves_like "--coc flag"
       it_behaves_like "--no-coc flag"
     end
 
     context "with rubocop option in bundle config settings set to true" do
       before do
-        global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false", "BUNDLE_GEM__RUBOCOP" => "true"
+        global_config "BUNDLE_GEM__RUBOCOP" => "true"
       end
       it_behaves_like "--rubocop flag"
       it_behaves_like "--no-rubocop flag"
     end
 
     context "with rubocop option in bundle config settings set to false" do
+      before do
+        global_config "BUNDLE_GEM__RUBOCOP" => "false"
+      end
       it_behaves_like "--rubocop flag"
       it_behaves_like "--no-rubocop flag"
     end
