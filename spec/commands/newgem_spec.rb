@@ -211,7 +211,7 @@ RSpec.describe "bundle gem" do
     context "git config github.user is absent" do
       before do
         sys_exec("git config --unset github.user")
-        bundle "gem #{gem_name}"
+        bundle! "gem #{gem_name}"
       end
 
       it "contribute URL set to [USERNAME]" do
@@ -222,7 +222,7 @@ RSpec.describe "bundle gem" do
   end
 
   it "creates a new git repository" do
-    bundle "gem #{gem_name}"
+    bundle! "gem #{gem_name}"
     expect(bundled_app("#{gem_name}/.git")).to exist
   end
 
@@ -232,7 +232,7 @@ RSpec.describe "bundle gem" do
       load_paths = [lib_dir, spec_dir]
       load_path_str = "-I#{load_paths.join(File::PATH_SEPARATOR)}"
 
-      sys_exec "#{Gem.ruby} #{load_path_str} #{bindir.join("bundle")} gem #{gem_name}", "PATH" => ""
+      sys_exec! "#{Gem.ruby} #{load_path_str} #{bindir.join("bundle")} gem #{gem_name}", "PATH" => ""
     end
 
     it "creates the gem without the need for git" do
@@ -266,7 +266,7 @@ RSpec.describe "bundle gem" do
     it "resolves ." do
       create_temporary_dir("tmp")
 
-      bundle "gem ."
+      bundle! "gem ."
 
       expect(bundled_app("tmp/lib/tmp.rb")).to exist
     end
@@ -274,7 +274,7 @@ RSpec.describe "bundle gem" do
     it "resolves .." do
       create_temporary_dir("temp/empty_dir")
 
-      bundle "gem .."
+      bundle! "gem .."
 
       expect(bundled_app("temp/lib/temp.rb")).to exist
     end
@@ -282,7 +282,7 @@ RSpec.describe "bundle gem" do
     it "resolves relative directory" do
       create_temporary_dir("tmp/empty/tmp")
 
-      bundle "gem ../../empty"
+      bundle! "gem ../../empty"
 
       expect(bundled_app("tmp/empty/lib/empty.rb")).to exist
     end
@@ -328,7 +328,7 @@ RSpec.describe "bundle gem" do
       before do
         `git config --unset user.name`
         `git config --unset user.email`
-        bundle "gem #{gem_name}"
+        bundle! "gem #{gem_name}"
       end
 
       it_should_behave_like "git config is absent"
@@ -383,7 +383,7 @@ RSpec.describe "bundle gem" do
 
     context "--exe parameter set" do
       before do
-        bundle "gem #{gem_name} --exe"
+        bundle! "gem #{gem_name} --exe"
       end
 
       it "builds exe skeleton" do
@@ -397,7 +397,7 @@ RSpec.describe "bundle gem" do
 
     context "--bin parameter set" do
       before do
-        bundle "gem #{gem_name} --bin"
+        bundle! "gem #{gem_name} --bin"
       end
 
       it "builds exe skeleton" do
@@ -411,7 +411,7 @@ RSpec.describe "bundle gem" do
 
     context "no --test parameter" do
       before do
-        bundle "gem #{gem_name}"
+        bundle! "gem #{gem_name}"
       end
 
       it "doesn't create any spec/test file" do
@@ -425,7 +425,7 @@ RSpec.describe "bundle gem" do
 
     context "--test parameter set to rspec" do
       before do
-        bundle "gem #{gem_name} --test=rspec"
+        bundle! "gem #{gem_name} --test=rspec"
       end
 
       it "builds spec skeleton" do
@@ -456,7 +456,7 @@ RSpec.describe "bundle gem" do
     context "gem.test setting set to rspec" do
       before do
         bundle "config set gem.test rspec"
-        bundle "gem #{gem_name}"
+        bundle! "gem #{gem_name}"
       end
 
       it "builds spec skeleton" do
@@ -469,7 +469,7 @@ RSpec.describe "bundle gem" do
     context "gem.test setting set to rspec and --test is set to minitest" do
       before do
         bundle "config set gem.test rspec"
-        bundle "gem #{gem_name} --test=minitest"
+        bundle! "gem #{gem_name} --test=minitest"
       end
 
       it "builds spec skeleton" do
@@ -514,7 +514,7 @@ RSpec.describe "bundle gem" do
     context "gem.test setting set to minitest" do
       before do
         bundle "config set gem.test minitest"
-        bundle "gem #{gem_name}"
+        bundle! "gem #{gem_name}"
       end
 
       it "creates a default rake task to run the test suite" do
@@ -537,7 +537,7 @@ RSpec.describe "bundle gem" do
 
     context "--test with no arguments" do
       before do
-        bundle "gem #{gem_name} --test"
+        bundle! "gem #{gem_name} --test"
       end
 
       it "defaults to rspec" do
@@ -741,7 +741,7 @@ Usage: "bundle gem NAME [OPTIONS]"
     it "asks about test framework" do
       global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__COC" => "false"
 
-      bundle "gem foobar" do |input, _, _|
+      bundle! "gem foobar" do |input, _, _|
         input.puts "rspec"
       end
 
@@ -764,7 +764,7 @@ Usage: "bundle gem NAME [OPTIONS]"
 
       bundle "config list"
 
-      bundle "gem foobar" do |input, _, _|
+      bundle! "gem foobar" do |input, _, _|
         input.puts "yes"
       end
 
@@ -774,7 +774,7 @@ Usage: "bundle gem NAME [OPTIONS]"
     it "asks about CoC" do
       global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false"
 
-      bundle "gem foobar" do |input, _, _|
+      bundle! "gem foobar" do |input, _, _|
         input.puts "yes"
       end
 
