@@ -134,7 +134,7 @@ RSpec.describe "bundle info" do
   end
 
   context "with a valid regexp for gem name" do
-    it "presents alternatives" do
+    it "presents alternatives", :readline do
       install_gemfile <<-G
         source "#{file_uri_for(gem_repo1)}"
         gem "rack"

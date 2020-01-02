@@ -63,7 +63,7 @@ RSpec.describe "bundle gem" do
         bundle! "gem #{gem_name} #{flags}"
       end
 
-      it "generates a gem skeleton with a .git folder" do
+      it "generates a gem skeleton with a .git folder", :readline do
         gem_skeleton_assertions
         expect(bundled_app("#{gem_name}/.git")).to exist
       end
@@ -81,7 +81,7 @@ RSpec.describe "bundle gem" do
       end
     end
 
-    context "when passing --no-git" do
+    context "when passing --no-git", :readline do
       before do
         bundle! "gem #{gem_name} --no-git"
       end
@@ -196,7 +196,7 @@ RSpec.describe "bundle gem" do
     end
   end
 
-  context "README.md" do
+  context "README.md", :readline do
     context "git config github.user present" do
       before do
         bundle! "gem #{gem_name}"
@@ -221,12 +221,12 @@ RSpec.describe "bundle gem" do
     end
   end
 
-  it "creates a new git repository" do
+  it "creates a new git repository", :readline do
     bundle! "gem #{gem_name}"
     expect(bundled_app("#{gem_name}/.git")).to exist
   end
 
-  context "when git is not available" do
+  context "when git is not available", :readline do
     # This spec cannot have `git` available in the test env
     before do
       load_paths = [lib_dir, spec_dir]
@@ -248,7 +248,7 @@ RSpec.describe "bundle gem" do
     end
   end
 
-  it "generates a valid gemspec" do
+  it "generates a valid gemspec", :readline do
     bundle! "gem newgem --bin"
 
     prepare_gemspec(bundled_app("newgem", "newgem.gemspec"))
@@ -262,7 +262,7 @@ RSpec.describe "bundle gem" do
     expect(last_command.stdboth).not_to include("ERROR")
   end
 
-  context "gem naming with relative paths" do
+  context "gem naming with relative paths", :readline do
     it "resolves ." do
       create_temporary_dir("tmp")
 
@@ -559,7 +559,7 @@ RSpec.describe "bundle gem" do
     end
   end
 
-  context "testing --mit and --coc options against bundle config settings" do
+  context "testing --mit and --coc options against bundle config settings", :readline do
     let(:gem_name) { "test-gem" }
 
     let(:require_path) { "test/gem" }
@@ -613,7 +613,7 @@ RSpec.describe "bundle gem" do
     end
   end
 
-  context "gem naming with underscore" do
+  context "gem naming with underscore", :readline do
     let(:gem_name) { "test_gem" }
 
     let(:require_path) { "test_gem" }
@@ -663,7 +663,7 @@ RSpec.describe "bundle gem" do
     end
   end
 
-  context "gem naming with dashed" do
+  context "gem naming with dashed", :readline do
     let(:gem_name) { "test-gem" }
 
     let(:require_path) { "test/gem" }
@@ -681,7 +681,7 @@ RSpec.describe "bundle gem" do
   end
 
   describe "uncommon gem names" do
-    it "can deal with two dashes" do
+    it "can deal with two dashes", :readline do
       bundle! "gem a--a"
 
       expect(bundled_app("a--a/a--a.gemspec")).to exist
@@ -737,7 +737,7 @@ Usage: "bundle gem NAME [OPTIONS]"
     end
   end
 
-  context "on first run" do
+  context "on first run", :readline do
     it "asks about test framework" do
       global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__COC" => "false"
 
@@ -782,7 +782,7 @@ Usage: "bundle gem NAME [OPTIONS]"
     end
   end
 
-  context "on conflicts with a previously created file" do
+  context "on conflicts with a previously created file", :readline do
     it "should fail gracefully" do
       FileUtils.touch("conflict-foobar")
       bundle "gem conflict-foobar"
@@ -791,7 +791,7 @@ Usage: "bundle gem NAME [OPTIONS]"
     end
   end
 
-  context "on conflicts with a previously created directory" do
+  context "on conflicts with a previously created directory", :readline do
     it "should succeed" do
       FileUtils.mkdir_p("conflict-foobar/Gemfile")
       bundle! "gem conflict-foobar"
