@@ -711,7 +711,7 @@ Usage: "bundle gem NAME [OPTIONS]"
     end
   end
 
-  describe "#ensure_safe_gem_name" do
+  describe "#ensure_safe_gem_name", :readline do
     before do
       bundle "gem #{subject}"
     end
