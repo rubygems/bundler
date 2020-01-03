@@ -167,7 +167,7 @@ module Spec
         begin
           #{ruby}
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR"# if e.message.include?("-- #{name}")
+          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- #{name}")
         end
       R
     end
