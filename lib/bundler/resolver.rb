@@ -159,6 +159,8 @@ module Bundler
             sg_ruby.activate_platform!(Gem::Platform::RUBY)
             selected_sgs << sg_ruby
           end
+        end
+        if platform != Gem::Platform::RUBY
           # Add a spec group for ["non platform specific spec", "platform
           # specific spec"] to resolve a spec for multiple platforms.
           # If Gemfile.lock file has the following entries, we need a ffi-1.9.14
@@ -171,9 +173,11 @@ module Bundler
           sg_ruby_platform = SpecGroup.new(sg.all_specs)
           sg_ruby_platform.ignores_bundler_dependencies =
             sg.ignores_bundler_dependencies
-          sg_ruby_platform.activate_platform!(Gem::Platform::RUBY)
-          sg_ruby_platform.activate_platform!(platform)
-          selected_sgs << sg_ruby_platform
+          if sg_ruby_platform.for?(Gem::Platform::RUBY)
+            sg_ruby_platform.activate_platform!(Gem::Platform::RUBY)
+            sg_ruby_platform.activate_platform!(platform)
+            selected_sgs << sg_ruby_platform
+          end
         end
         sg.activate_platform!(platform)
         selected_sgs << sg
@@ -253,8 +257,9 @@ module Bundler
     end
 
     def self.platform_sort_key(platform)
-      return ["", "", ""] if Gem::Platform::RUBY == platform
-      platform.to_a.map {|part| part || "" }
+      # Prefer specific platform to not specific platform
+      return ["99-LAST", "", "", ""] if Gem::Platform::RUBY == platform
+      ["00", *platform.to_a.map {|part| part || "" }]
     end
 
   private
