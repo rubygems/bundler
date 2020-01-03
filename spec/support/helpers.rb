@@ -72,7 +72,7 @@ module Spec
         begin
           #{ruby}
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- #{name}")
+          warn "ZOMG LOAD ERROR" if e.message.include?("-- #{name}")
         end
       RUBY
       opts = args.last.is_a?(Hash) ? args.pop : {}
@@ -167,7 +167,7 @@ module Spec
         begin
           #{ruby}
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- #{name}")
+          warn "ZOMG LOAD ERROR" if e.message.include?("-- #{name}")
         end
       R
     end
