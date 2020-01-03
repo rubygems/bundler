@@ -281,7 +281,7 @@ module Spec
       gems.each do |g|
         if g == :bundler
           with_built_bundler {|gem_path| install_gem(gem_path) }
-        elsif g.to_s =~ %r{\A(?:[A-Z]:)?/.*\.gem\z}
+        elsif g.to_s =~ %r{\A(?:[a-zA-Z]:)?/.*\.gem\z}
           install_gem(g)
         else
           install_gem("#{gem_repo}/gems/#{g}.gem")
