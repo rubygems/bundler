@@ -156,7 +156,7 @@ module Spec
 
     def ruby(ruby, options = {})
       env = options.delete(:env) || {}
-      ruby = ruby.gsub(/["`\$]/) {|m| "\\#{m}" }
+      ruby = ruby.gsub(/["`]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib_dir}"
       sys_exec(%(#{Gem.ruby}#{lib_option} -w -e "#{ruby}"), env)
     end
@@ -194,7 +194,8 @@ module Spec
       command_execution = CommandExecution.new(cmd.to_s, Dir.pwd)
 
       require "open3"
-      Open3.popen3(env, cmd.to_s) do |stdin, stdout, stderr, wait_thr|
+      require "shellwords"
+      Open3.popen3(env, *cmd.shellsplit) do |stdin, stdout, stderr, wait_thr|
         yield stdin, stdout, wait_thr if block_given?
         stdin.close
 
