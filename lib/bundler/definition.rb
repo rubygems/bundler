@@ -706,9 +706,6 @@ module Bundler
         elsif dep.source
           dep.source = sources.get(dep.source)
         end
-        if dep.source.is_a?(Source::Gemspec)
-          dep.platforms.concat(@platforms.map {|p| Dependency::REVERSE_PLATFORM_MAP[p] }.flatten(1)).uniq!
-        end
       end
 
       changes = false
