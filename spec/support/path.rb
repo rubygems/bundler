@@ -158,8 +158,8 @@ module Spec
     def with_root_gemspec
       if ruby_core?
         root_gemspec = root.join("bundler.gemspec")
-        # Dir.chdir(root) for Dir.glob in gemspec
-        spec = Dir.chdir(root) { Gem::Specification.load(gemspec.to_s) }
+        # `in_repo_root` for Dir.glob in gemspec
+        spec = in_repo_root { Gem::Specification.load(gemspec.to_s) }
         spec.bindir = "libexec"
         File.open(root_gemspec.to_s, "w") {|f| f.write spec.to_ruby }
         yield(root_gemspec)
@@ -186,6 +186,10 @@ module Spec
 
     def in_app_root2(&blk)
       Dir.chdir(bundled_app2, &blk)
+    end
+
+    def in_repo_root(&blk)
+      Dir.chdir(root, &blk)
     end
 
     extend self

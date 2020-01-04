@@ -297,7 +297,7 @@ module Spec
 
     def with_built_bundler
       with_root_gemspec do |gemspec|
-        Dir.chdir(root) { gem_command! :build, gemspec.to_s }
+        in_repo_root { gem_command! :build, gemspec.to_s }
       end
 
       bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
