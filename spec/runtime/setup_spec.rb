@@ -1202,11 +1202,13 @@ end
 
     describe "default gem activation" do
       let(:exemptions) do
-        if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7")
+        exempts = if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7")
           %w[did_you_mean]
         else
           %w[io-console openssl]
         end << "bundler"
+        exempts << "fiddle" if Gem.win_platform? && Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7")
+        exempts
       end
 
       let(:activation_warning_hack) { strip_whitespace(<<-RUBY) }
