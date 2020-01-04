@@ -40,7 +40,7 @@ RSpec.shared_examples "bundle install --standalone" do
         testrb << "\nrequire \"#{k}\""
         testrb << "\nputs #{k.upcase}"
       end
-      Dir.chdir("#{bundled_app}2") do
+      in_app_root2 do
         ruby testrb, :no_lib => true
       end
 

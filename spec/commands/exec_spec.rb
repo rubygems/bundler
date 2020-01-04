@@ -146,7 +146,7 @@ RSpec.describe "bundle exec" do
       gem "rack", "0.9.1"
     G
 
-    Dir.chdir bundled_app2 do
+    in_app_root2 do
       install_gemfile bundled_app2("Gemfile"), <<-G
         source "#{file_uri_for(gem_repo2)}"
         gem "rack_two", "1.0.0"
@@ -157,7 +157,7 @@ RSpec.describe "bundle exec" do
 
     expect(out).to eq("0.9.1")
 
-    Dir.chdir bundled_app2 do
+    in_app_root2 do
       bundle! "exec rackup"
       expect(out).to eq("1.0.0")
     end
@@ -254,7 +254,7 @@ RSpec.describe "bundle exec" do
       gem "rack", "0.9.1"
     G
 
-    Dir.chdir bundled_app2 do
+    in_app_root2 do
       install_gemfile bundled_app2("Gemfile"), <<-G
         source "#{file_uri_for(gem_repo2)}"
         gem "rack_two", "1.0.0"
