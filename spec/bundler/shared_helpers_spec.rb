@@ -109,7 +109,8 @@ RSpec.describe Bundler::SharedHelpers do
 
     shared_examples_for "correctly determines whether to return a Gemfile path" do
       context "currently in directory with a Gemfile" do
-        before { File.new("Gemfile", "w") }
+        before { FileUtils.touch("Gemfile") }
+        after { FileUtils.rm("Gemfile") }
 
         it "returns path of the bundle Gemfile" do
           expect(subject.in_bundle?).to eq("#{bundled_app}/Gemfile")
