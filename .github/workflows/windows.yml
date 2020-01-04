@@ -31,4 +31,3 @@ jobs:
       - name: Run specs
         run: bin/parallel_rspec spec
         shell: bash
-        continue-on-error: true
