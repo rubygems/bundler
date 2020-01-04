@@ -192,6 +192,7 @@ RSpec.describe Bundler::Dsl do
       let(:platform) { "ruby" }
 
       it "keeps track of the ruby platforms in the dependency" do
+        allow(Gem::Platform).to receive(:local).and_return(rb)
         subject.gemspec
         expect(subject.dependencies.last.platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::RUBY])
       end
