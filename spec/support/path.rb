@@ -180,6 +180,14 @@ module Spec
       end
     end
 
+    def in_app_root(&blk)
+      Dir.chdir(bundled_app, &blk)
+    end
+
+    def in_app_root2(&blk)
+      Dir.chdir(bundled_app2, &blk)
+    end
+
     extend self
 
   private

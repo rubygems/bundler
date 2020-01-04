@@ -59,14 +59,6 @@ module Spec
       last_command.exitstatus
     end
 
-    def in_app_root(&blk)
-      Dir.chdir(bundled_app, &blk)
-    end
-
-    def in_app_root2(&blk)
-      Dir.chdir(bundled_app2, &blk)
-    end
-
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
       groups = args.map(&:inspect).join(", ")
