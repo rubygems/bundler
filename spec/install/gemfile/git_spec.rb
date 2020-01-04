@@ -129,6 +129,8 @@ RSpec.describe "bundle install with git sources" do
 
     it "still works after moving the application directory" do
       bundle "install --path vendor/bundle"
+
+      Dir.chdir root
       FileUtils.mv bundled_app, tmp("bundled_app.bck")
 
       Dir.chdir tmp("bundled_app.bck")
@@ -137,6 +139,8 @@ RSpec.describe "bundle install with git sources" do
 
     it "can still install after moving the application directory" do
       bundle "install --path vendor/bundle"
+
+      Dir.chdir root
       FileUtils.mv bundled_app, tmp("bundled_app.bck")
 
       update_git "foo", "1.1", :path => lib_path("foo-1.0")

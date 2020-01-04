@@ -59,6 +59,7 @@ RSpec.describe "require 'bundler/gem_tasks'" do
 
   context "rake build when path has spaces" do
     before do
+      Dir.chdir(root)
       spaced_bundled_app = tmp.join("bundled app")
       FileUtils.mv bundled_app, spaced_bundled_app
       Dir.chdir(spaced_bundled_app)

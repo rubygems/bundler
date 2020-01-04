@@ -29,6 +29,7 @@ RSpec.shared_examples "bundle install --standalone" do
     end
 
     it "works on a different system" do
+      Dir.chdir root
       FileUtils.mv(bundled_app, "#{bundled_app}2")
 
       testrb = String.new <<-RUBY
