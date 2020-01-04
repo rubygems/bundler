@@ -87,7 +87,7 @@ RSpec.describe "bundle doctor" do
       expect(@stdout.string).not_to include("No issues")
     end
 
-    context "when home contains files that are not owned by the current process" do
+    context "when home contains files that are not owned by the current process", :permissions do
       before(:each) do
         allow(@stat).to receive(:uid) { 0o0000 }
       end

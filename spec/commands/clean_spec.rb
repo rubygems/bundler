@@ -536,7 +536,7 @@ RSpec.describe "bundle clean" do
     expect(out).to include("rack (1.0.0)")
   end
 
-  describe "when missing permissions" do
+  describe "when missing permissions", :permissions do
     before { ENV["BUNDLE_PATH__SYSTEM"] = "true" }
     let(:system_cache_path) { system_gem_path("cache") }
     after do
