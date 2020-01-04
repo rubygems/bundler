@@ -124,7 +124,15 @@ RSpec.describe Bundler do
 
   describe "#which" do
     let(:executable) { "executable" }
-    let(:path) { %w[/a /b c ../d /e] }
+
+    let(:path) do
+      if Gem.win_platform?
+        %w[C:/a C:/b C:/c C:/../d C:/e]
+      else
+        %w[/a /b c ../d /e]
+      end
+    end
+
     let(:expected) { "executable" }
 
     before do
@@ -149,7 +157,13 @@ RSpec.describe Bundler do
     it_behaves_like "it returns the correct executable"
 
     context "when the executable in inside a quoted path" do
-      let(:expected) { "/e/executable" }
+      let(:expected) do
+        if Gem.win_platform?
+          "C:/e/executable"
+        else
+          "/e/executable"
+        end
+      end
       it_behaves_like "it returns the correct executable"
     end
 
