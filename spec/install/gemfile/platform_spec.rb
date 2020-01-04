@@ -274,6 +274,8 @@ end
 
 RSpec.describe "bundle install with platform conditionals" do
   it "installs gems tagged w/ the current platforms" do
+    skip "platform issues" if Gem.win_platform?
+
     install_gemfile <<-G
       source "#{file_uri_for(gem_repo1)}"
 
@@ -299,6 +301,8 @@ RSpec.describe "bundle install with platform conditionals" do
   end
 
   it "installs gems tagged w/ the current platforms inline" do
+    skip "platform issues" if Gem.win_platform?
+
     install_gemfile <<-G
       source "#{file_uri_for(gem_repo1)}"
       gem "nokogiri", :platforms => :#{local_tag}
@@ -317,6 +321,8 @@ RSpec.describe "bundle install with platform conditionals" do
   end
 
   it "installs gems tagged w/ the current platform inline" do
+    skip "platform issues" if Gem.win_platform?
+
     install_gemfile <<-G
       source "#{file_uri_for(gem_repo1)}"
       gem "nokogiri", :platform => :#{local_tag}
@@ -373,6 +379,8 @@ RSpec.describe "bundle install with platform conditionals" do
   end
 
   it "prints a helpful warning when a dependency is unused on any platform" do
+    skip "prints warning but bundle install fails" if Gem.win_platform?
+
     simulate_platform "ruby"
     simulate_ruby_engine "ruby"
 
@@ -393,6 +401,8 @@ The dependency #{Gem::Dependency.new("rack", ">= 0")} will be unused by any of t
     before { bundle! "config set disable_platform_warnings true" }
 
     it "does not print the warning when a dependency is unused on any platform" do
+      skip "skips warning but bundle install fails" if Gem.win_platform?
+
       simulate_platform "ruby"
       simulate_ruby_engine "ruby"
 

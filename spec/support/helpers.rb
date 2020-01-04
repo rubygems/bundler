@@ -344,6 +344,8 @@ module Spec
     end
 
     def with_fake_man
+      skip "fake_man is not a Windows friendly binstub" if Gem.win_platform?
+
       FileUtils.mkdir_p(tmp("fake_man"))
       File.open(tmp("fake_man/man"), "w", 0o755) do |f|
         f.puts "#!/usr/bin/env ruby\nputs ARGV.inspect\n"

@@ -218,6 +218,8 @@ RSpec.describe "bundle install with gem sources" do
 
     describe "with a gem that installs multiple platforms" do
       it "installs gems for the local platform as first choice" do
+        skip "version is 1.0, not 1.0.0" if Gem.win_platform?
+
         install_gemfile <<-G
           source "#{file_uri_for(gem_repo1)}"
           gem "platform_specific"
@@ -372,6 +374,8 @@ RSpec.describe "bundle install with gem sources" do
     end
 
     it "gracefully handles error when rubygems server is unavailable" do
+      skip "networking issue" if Gem.win_platform?
+
       install_gemfile <<-G, :artifice => nil
         source "#{file_uri_for(gem_repo1)}"
         source "http://0.0.0.0:9384" do

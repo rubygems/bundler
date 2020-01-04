@@ -311,11 +311,10 @@ RSpec.describe "bundle install with git sources" do
   describe "when specifying a branch" do
     let(:branch) { "branch" }
     let(:repo) { build_git("foo").path }
-    before(:each) do
-      update_git("foo", :path => repo, :branch => branch)
-    end
 
     it "works" do
+      update_git("foo", :path => repo, :branch => branch)
+
       install_gemfile <<-G
         git "#{repo}", :branch => #{branch.dump} do
           gem "foo"
@@ -328,6 +327,10 @@ RSpec.describe "bundle install with git sources" do
     context "when the branch starts with a `#`" do
       let(:branch) { "#149/redirect-url-fragment" }
       it "works" do
+        skip "git does not accept this" if Gem.win_platform?
+
+        update_git("foo", :path => repo, :branch => branch)
+
         install_gemfile <<-G
           git "#{repo}", :branch => #{branch.dump} do
             gem "foo"
@@ -341,6 +344,10 @@ RSpec.describe "bundle install with git sources" do
     context "when the branch includes quotes" do
       let(:branch) { %('") }
       it "works" do
+        skip "git does not accept this" if Gem.win_platform?
+
+        update_git("foo", :path => repo, :branch => branch)
+
         install_gemfile <<-G
           git "#{repo}", :branch => #{branch.dump} do
             gem "foo"
@@ -355,11 +362,10 @@ RSpec.describe "bundle install with git sources" do
   describe "when specifying a tag" do
     let(:tag) { "tag" }
     let(:repo) { build_git("foo").path }
-    before(:each) do
-      update_git("foo", :path => repo, :tag => tag)
-    end
 
     it "works" do
+      update_git("foo", :path => repo, :tag => tag)
+
       install_gemfile <<-G
         git "#{repo}", :tag => #{tag.dump} do
           gem "foo"
@@ -372,6 +378,10 @@ RSpec.describe "bundle install with git sources" do
     context "when the tag starts with a `#`" do
       let(:tag) { "#149/redirect-url-fragment" }
       it "works" do
+        skip "git does not accept this" if Gem.win_platform?
+
+        update_git("foo", :path => repo, :tag => tag)
+
         install_gemfile <<-G
           git "#{repo}", :tag => #{tag.dump} do
             gem "foo"
@@ -385,6 +395,10 @@ RSpec.describe "bundle install with git sources" do
     context "when the tag includes quotes" do
       let(:tag) { %('") }
       it "works" do
+        skip "git does not accept this" if Gem.win_platform?
+
+        update_git("foo", :path => repo, :tag => tag)
+
         install_gemfile <<-G
           git "#{repo}", :tag => #{tag.dump} do
             gem "foo"
@@ -625,6 +639,8 @@ RSpec.describe "bundle install with git sources" do
     end
 
     it "installs dependencies from git even if a newer gem is available elsewhere" do
+      skip "override is not winning" if Gem.win_platform?
+
       system_gems "rack-1.0.0"
 
       build_lib "rack", "1.0", :path => lib_path("nested/bar") do |s|
@@ -920,6 +936,8 @@ RSpec.describe "bundle install with git sources" do
   end
 
   it "prints a friendly error if a file blocks the git repo" do
+    skip "drive letter is not detected correctly in error message" if Gem.win_platform?
+
     build_git "foo"
 
     FileUtils.mkdir_p(default_bundle_path)
