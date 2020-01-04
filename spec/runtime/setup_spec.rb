@@ -708,7 +708,7 @@ end
     end
 
     context "when the user has one set" do
-      before { ENV["MANPATH"] = "/foo:" }
+      before { ENV["MANPATH"] = "/foo#{File::PATH_SEPARATOR}" }
 
       it "adds the gem's man dir to the MANPATH" do
         install_gemfile! <<-G
@@ -717,7 +717,7 @@ end
         G
 
         run! "puts ENV['MANPATH']"
-        expect(out).to eq("#{default_bundle_path("gems/with_man-1.0/man")}:/foo")
+        expect(out).to eq("#{default_bundle_path("gems/with_man-1.0/man")}#{File::PATH_SEPARATOR}/foo")
       end
     end
 
