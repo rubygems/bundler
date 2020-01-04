@@ -156,6 +156,13 @@ RSpec.describe "bundle install with install-time dependencies" do
 
       let(:ruby_requirement) { %("#{RUBY_VERSION}") }
       let(:error_message_requirement) { "~> #{RUBY_VERSION}.0" }
+      let(:error_message_platform) do
+        if Bundler.feature_flag.specific_platform?
+          " #{Bundler.local_platform}"
+        else
+          ""
+        end
+      end
 
       shared_examples_for "ruby version conflicts" do
         it "raises an error during resolution" do
@@ -172,10 +179,10 @@ RSpec.describe "bundle install with install-time dependencies" do
           nice_error = strip_whitespace(<<-E).strip
             Bundler found conflicting requirements for the Ruby\0 version:
               In Gemfile:
-                Ruby\0 (#{error_message_requirement})
+                Ruby\0 (#{error_message_requirement})#{error_message_platform}
 
                 require_ruby was resolved to 1.0, which depends on
-                  Ruby\0 (> 9000)
+                  Ruby\0 (> 9000)#{error_message_platform}
 
             Ruby\0 (> 9000), which is required by gem 'require_ruby', is not available in the local ruby installation
           E

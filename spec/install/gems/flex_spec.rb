@@ -192,6 +192,12 @@ RSpec.describe "bundle flex_install" do
     end
 
     it "suggests bundle update when the Gemfile requires different versions than the lock" do
+      if Bundler.feature_flag.specific_platform?
+        error_message_platform = " #{Bundler.local_platform}"
+      else
+        error_message_platform = ""
+      end
+
       bundle "config set force_ruby_platform true"
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
@@ -201,10 +207,10 @@ RSpec.describe "bundle flex_install" do
 
           In Gemfile:
             rack-obama (= 2.0) was resolved to 2.0, which depends on
-              rack (= 1.2)
+              rack (= 1.2)#{error_message_platform}
 
             rack_middleware was resolved to 1.0, which depends on
-              rack (= 0.9.1)
+              rack (= 0.9.1)#{error_message_platform}
 
         Running `bundle update` will rebuild your snapshot from scratch, using only
         the gems in your Gemfile, which may resolve the conflict.
