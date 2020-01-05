@@ -936,7 +936,7 @@ G
       G
     end
 
-    it "starts IRB with the default group loaded when ruby version matches" do
+    it "starts IRB with the default group loaded when ruby version matches", :readline do
       gemfile <<-G
         source "#{file_uri_for(gem_repo1)}"
         gem "rack"
@@ -953,7 +953,7 @@ G
       expect(out).to include("0.9.1")
     end
 
-    it "starts IRB with the default group loaded when ruby version matches any engine" do
+    it "starts IRB with the default group loaded when ruby version matches any engine", :readline do
       simulate_ruby_engine "jruby" do
         gemfile <<-G
           source "#{file_uri_for(gem_repo1)}"

@@ -92,7 +92,7 @@ module Spec
       run(cmd, *args)
     end
 
-    def bundle(cmd, options = {})
+    def bundle(cmd, options = {}, &block)
       with_sudo = options.delete(:sudo)
       sudo = with_sudo == :preserve_env ? "sudo -E" : "sudo" if with_sudo
 
@@ -140,7 +140,7 @@ module Spec
       end.join
 
       cmd = "#{sudo} #{Gem.ruby} #{load_path_str} #{requires_str} #{bundle_bin} #{cmd}#{args}"
-      sys_exec(cmd, env) {|i, o, thr| yield i, o, thr if block_given? }
+      sys_exec(cmd, env, &block)
     end
     bang :bundle
 

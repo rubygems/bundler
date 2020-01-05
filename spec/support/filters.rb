@@ -41,6 +41,7 @@ RSpec.configure do |config|
   config.filter_run_excluding :ruby_repo => !ENV["GEM_COMMAND"].nil?
   config.filter_run_excluding :no_color_tty => Gem.win_platform? || !ENV["GITHUB_ACTION"].nil?
   config.filter_run_excluding :permissions => Gem.win_platform?
+  config.filter_run_excluding :readline => Gem.win_platform?
 
   config.filter_run_when_matching :focus unless ENV["CI"]
 end
