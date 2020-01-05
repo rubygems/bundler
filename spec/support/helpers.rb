@@ -59,18 +59,6 @@ module Spec
       last_command.exitstatus
     end
 
-    def in_app_root(&blk)
-      Dir.chdir(bundled_app, &blk)
-    end
-
-    def in_app_root2(&blk)
-      Dir.chdir(bundled_app2, &blk)
-    end
-
-    def in_app_root_custom(root, &blk)
-      Dir.chdir(root, &blk)
-    end
-
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
       groups = args.map(&:inspect).join(", ")
@@ -309,7 +297,7 @@ module Spec
 
     def with_built_bundler
       with_root_gemspec do |gemspec|
-        Dir.chdir(root) { gem_command! :build, gemspec.to_s }
+        in_repo_root { gem_command! :build, gemspec.to_s }
       end
 
       bundler_path = root + "bundler-#{Bundler::VERSION}.gem"

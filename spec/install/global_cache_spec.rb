@@ -161,7 +161,7 @@ RSpec.describe "global gem caching" do
         expect(source_global_cache("rack-1.0.0.gem")).to exist
         expect(source_global_cache("activesupport-2.3.5.gem")).to exist
 
-        Dir.chdir bundled_app2 do
+        in_app_root2 do
           create_file bundled_app2("gems.rb"), <<-G
             source "#{source}"
             gem "activesupport"

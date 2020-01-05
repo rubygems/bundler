@@ -105,7 +105,9 @@ RSpec.configure do |config|
     ENV.replace(original_env)
     reset!
     system_gems []
-    in_app_root
+
+    Dir.chdir(bundled_app)
+
     @command_executions = []
 
     Bundler.ui.silence { example.run }

@@ -504,7 +504,7 @@ RSpec.describe "bundle install with gem sources" do
       root_dir = tmp("foo[]bar")
 
       FileUtils.mkdir_p(root_dir)
-      in_app_root_custom(root_dir)
+      Dir.chdir(root_dir)
     end
 
     it "doesn't blow up" do

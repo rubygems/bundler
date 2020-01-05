@@ -29,6 +29,7 @@ RSpec.shared_examples "bundle install --standalone" do
     end
 
     it "works on a different system" do
+      Dir.chdir root
       FileUtils.mv(bundled_app, "#{bundled_app}2")
 
       testrb = String.new <<-RUBY
@@ -40,7 +41,7 @@ RSpec.shared_examples "bundle install --standalone" do
         testrb << "\nrequire \"#{k}\""
         testrb << "\nputs #{k.upcase}"
       end
-      Dir.chdir("#{bundled_app}2") do
+      in_app_root2 do
         ruby testrb, :no_lib => true
       end
 

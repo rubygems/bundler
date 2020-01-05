@@ -107,7 +107,7 @@ RSpec.describe "The library itself" do
   it "has no malformed whitespace" do
     exempt = /\.gitmodules|fixtures|vendor|LICENSE|vcr_cassettes|rbreadline\.diff|\.txt$/
     error_messages = []
-    Dir.chdir(root) do
+    in_repo_root do
       tracked_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_tab_characters(filename)
@@ -120,7 +120,7 @@ RSpec.describe "The library itself" do
   it "has no estraneous quotes" do
     exempt = /vendor|vcr_cassettes|LICENSE|rbreadline\.diff/
     error_messages = []
-    Dir.chdir(root) do
+    in_repo_root do
       tracked_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_straneous_quotes(filename)
@@ -132,7 +132,7 @@ RSpec.describe "The library itself" do
   it "does not include any leftover debugging or development mechanisms" do
     exempt = %r{quality_spec.rb|support/helpers|vcr_cassettes|\.md|\.ronn|\.txt|\.5|\.1}
     error_messages = []
-    Dir.chdir(root) do
+    in_repo_root do
       tracked_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_debugging_mechanisms(filename)
@@ -144,7 +144,7 @@ RSpec.describe "The library itself" do
   it "does not include any unresolved merge conflicts" do
     error_messages = []
     exempt = %r{lock/lockfile_spec|quality_spec|vcr_cassettes|\.ronn|lockfile_parser\.rb}
-    Dir.chdir(root) do
+    in_repo_root do
       tracked_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_git_merge_conflicts(filename)
@@ -156,7 +156,7 @@ RSpec.describe "The library itself" do
   it "maintains language quality of the documentation" do
     included = /ronn/
     error_messages = []
-    Dir.chdir(root) do
+    in_repo_root do
       `git ls-files -z -- man`.split("\x0").each do |filename|
         next unless filename =~ included
         error_messages << check_for_expendable_words(filename)
@@ -169,7 +169,7 @@ RSpec.describe "The library itself" do
   it "maintains language quality of sentences used in source code" do
     error_messages = []
     exempt = /vendor|vcr_cassettes/
-    Dir.chdir(root) do
+    in_repo_root do
       lib_tracked_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_expendable_words(filename)
@@ -197,7 +197,7 @@ RSpec.describe "The library itself" do
     Bundler::Settings::NUMBER_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::NUMBER_KEYS" }
     Bundler::Settings::ARRAY_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::ARRAY_KEYS" }
 
-    Dir.chdir(root) do
+    in_repo_root do
       key_pattern = /([a-z\._-]+)/i
       lib_tracked_files.split("\x0").each do |filename|
         each_line(filename) do |line, number|
@@ -231,7 +231,7 @@ RSpec.describe "The library itself" do
   end
 
   it "ships the correct set of files" do
-    Dir.chdir(root) do
+    in_repo_root do
       git_list = shipped_files.split("\x0")
 
       gem_list = Gem::Specification.load(gemspec.to_s).files
@@ -241,7 +241,7 @@ RSpec.describe "The library itself" do
   end
 
   it "does not contain any warnings" do
-    Dir.chdir(root) do
+    in_repo_root do
       exclusions = %w[
         lib/bundler/capistrano.rb
         lib/bundler/deployment.rb
@@ -267,7 +267,7 @@ RSpec.describe "The library itself" do
   end
 
   it "does not use require internally, but require_relative" do
-    Dir.chdir(root) do
+    in_repo_root do
       exempt = %r{templates/|vendor/}
       all_bad_requires = []
       lib_tracked_files.split("\x0").each do |filename|
