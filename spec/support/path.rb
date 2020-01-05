@@ -180,16 +180,16 @@ module Spec
       end
     end
 
-    def in_app_root(&blk)
-      Dir.chdir(bundled_app, &blk)
+    def in_app_root
+      Dir.chdir(bundled_app) { yield }
     end
 
-    def in_app_root2(&blk)
-      Dir.chdir(bundled_app2, &blk)
+    def in_app_root2
+      Dir.chdir(bundled_app2) { yield }
     end
 
-    def in_repo_root(&blk)
-      Dir.chdir(root, &blk)
+    def in_repo_root
+      Dir.chdir(root) { yield }
     end
 
     extend self
