@@ -155,7 +155,7 @@ RSpec.describe "Bundler.require" do
       begin
         Bundler.require
       rescue LoadError => e
-        $stderr.puts "ZOMG LOAD ERROR: \#{e.message}"
+        warn "ZOMG LOAD ERROR: \#{e.message}"
       end
     RUBY
     run(cmd)
@@ -228,7 +228,7 @@ RSpec.describe "Bundler.require" do
         begin
           Bundler.require
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("Could not open library 'libfuuu-1.0'")
+          warn "ZOMG LOAD ERROR" if e.message.include?("Could not open library 'libfuuu-1.0'")
         end
       RUBY
       run(cmd)
@@ -251,7 +251,7 @@ RSpec.describe "Bundler.require" do
         begin
           Bundler.require
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR: \#{e.message}"
+          warn "ZOMG LOAD ERROR: \#{e.message}"
         end
       RUBY
       run(cmd)
