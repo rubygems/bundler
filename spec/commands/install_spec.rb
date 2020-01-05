@@ -536,7 +536,7 @@ RSpec.describe "bundle install with gem sources" do
     end
   end
 
-  describe "when bundle path does not have write access" do
+  describe "when bundle path does not have write access", :permissions do
     before do
       FileUtils.mkdir_p(bundled_app("vendor"))
       gemfile <<-G
