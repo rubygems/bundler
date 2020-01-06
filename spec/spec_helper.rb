@@ -2,7 +2,6 @@
 
 require_relative "support/path"
 
-$:.unshift Spec::Path.spec_dir.to_s
 $:.unshift Spec::Path.lib_dir.to_s
 
 require "bundler/psyched_yaml"
