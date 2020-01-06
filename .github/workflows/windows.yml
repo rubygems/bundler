@@ -29,6 +29,6 @@ jobs:
         shell: bash
 
       - name: Run specs
-        run: bin/rspec
+        run: bin/parallel_rspec spec
         shell: bash
         continue-on-error: true
