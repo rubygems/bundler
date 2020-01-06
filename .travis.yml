@@ -1,7 +1,7 @@
 language: ruby
 dist: bionic
 script:
-  - bin/rspec
+  - bin/parallel_rspec spec
   - sudo -E rake spec:sudo
   - sudo chown -R $(whoami) tmp
   - BUNDLER_SPEC_PRE_RECORDED=1 bin/rake spec:realworld
@@ -9,7 +9,7 @@ script:
 before_script:
   - travis_retry gem install rake:"~> 12.0"
   - travis_retry bin/rake override_version
-  - travis_retry bin/rake spec:deps
+  - travis_retry bin/rake spec:parallel_deps
   - if [ "$BUNDLER_SPEC_SUB_VERSION" = "" ];
     then
       travis_retry sudo apt-get install graphviz -y;
