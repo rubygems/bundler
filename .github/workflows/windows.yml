@@ -25,7 +25,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
 
       - name: Install dependencies
-        run: bin/rake spec:deps
+        run: bin/rake spec:parallel_deps
         shell: bash
 
       - name: Run specs

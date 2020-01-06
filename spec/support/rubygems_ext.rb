@@ -51,15 +51,9 @@ module Spec
     end
 
     def setup
+      install_test_deps
+
       require "fileutils"
-
-      Gem.clear_paths
-
-      ENV["BUNDLE_PATH"] = nil
-      ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
-      ENV["PATH"] = [Path.bindir, Path.system_gem_path.join("bin"), ENV["PATH"]].join(File::PATH_SEPARATOR)
-
-      install_gems(DEPS)
 
       FileUtils.mkdir_p(Path.home)
       FileUtils.mkdir_p(Path.tmpdir)
@@ -69,6 +63,32 @@ module Spec
 
       require "rubygems/user_interaction"
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
+    end
+
+    def install_parallel_test_deps
+      require "parallel"
+
+      prev_env_test_number = ENV["TEST_ENV_NUMBER"]
+
+      begin
+        Parallel.processor_count.times do |n|
+          ENV["TEST_ENV_NUMBER"] = (n + 1).to_s
+
+          install_test_deps
+        end
+      ensure
+        ENV["TEST_ENV_NUMBER"] = prev_env_test_number
+      end
+    end
+
+    def install_test_deps
+      Gem.clear_paths
+
+      ENV["BUNDLE_PATH"] = nil
+      ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
+      ENV["PATH"] = [Path.bindir, Path.system_gem_path.join("bin"), ENV["PATH"]].join(File::PATH_SEPARATOR)
+
+      install_gems(DEPS)
     end
 
   private
