@@ -86,10 +86,7 @@ module Spec
     end
 
     def install_gems(gems)
-      reqs, no_reqs = gems.partition {|_, req| !req.nil? && !req.split(" ").empty? }
-      no_reqs.map!(&:first)
-      reqs.map! {|name, req| "'#{name}:#{req}'" }
-      deps = reqs.concat(no_reqs).join(" ")
+      deps = gems.map {|name, req| "'#{name}:#{req}'" }.join(" ")
       gem = ENV["GEM_COMMAND"] || "#{Gem.ruby} -S gem --backtrace"
       cmd = "#{gem} install #{deps} --no-document --conservative"
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
