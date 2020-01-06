@@ -59,16 +59,7 @@ module Spec
       ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
       ENV["PATH"] = [Path.bindir, Path.system_gem_path.join("bin"), ENV["PATH"]].join(File::PATH_SEPARATOR)
 
-      manifest = DEPS.to_a.sort_by(&:first).map {|k, v| "#{k} => #{v}\n" }
-      manifest_path = Path.base_system_gems.join("manifest.txt")
-      # it's OK if there are extra gems
-      if !manifest_path.file? || !(manifest - manifest_path.readlines).empty?
-        FileUtils.rm_rf(Path.base_system_gems)
-        FileUtils.mkdir_p(Path.base_system_gems)
-        puts "installing gems for the tests to use..."
-        install_gems(DEPS)
-        manifest_path.open("wb") {|f| f << manifest.join }
-      end
+      install_gems(DEPS)
 
       FileUtils.mkdir_p(Path.home)
       FileUtils.mkdir_p(Path.tmpdir)
