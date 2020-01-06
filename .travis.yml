@@ -1,6 +1,11 @@
 language: ruby
 dist: bionic
-script: bin/rake spec:travis
+script:
+  - bin/rake spec
+  - sudo -E rake spec:sudo
+  - sudo chown -R $(whoami) tmp
+  - BUNDLER_SPEC_PRE_RECORDED=1 bin/rake spec:realworld
+
 before_script:
   - travis_retry gem install rake:"~> 12.0"
   - travis_retry bin/rake override_version
