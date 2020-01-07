@@ -1,7 +1,7 @@
 language: ruby
 dist: bionic
 script:
-  - bin/rake spec
+  - bin/rspec
   - sudo -E rake spec:sudo
   - sudo chown -R $(whoami) tmp
   - BUNDLER_SPEC_PRE_RECORDED=1 bin/rake spec:realworld
