@@ -708,7 +708,7 @@ end
     end
 
     context "when the user has one set" do
-      before { ENV["MANPATH"] = "/foo:" }
+      before { ENV["MANPATH"] = "/foo#{File::PATH_SEPARATOR}" }
 
       it "adds the gem's man dir to the MANPATH" do
         install_gemfile! <<-G
@@ -717,7 +717,7 @@ end
         G
 
         run! "puts ENV['MANPATH']"
-        expect(out).to eq("#{default_bundle_path("gems/with_man-1.0/man")}:/foo")
+        expect(out).to eq("#{default_bundle_path("gems/with_man-1.0/man")}#{File::PATH_SEPARATOR}/foo")
       end
     end
 
@@ -793,6 +793,8 @@ end
     let(:full_name) { "bundler-#{Bundler::VERSION}" }
 
     before do
+      skip "symlink destination exists" if Gem.win_platform?
+
       FileUtils.ln_sf(gem_home, symlinked_gem_home)
       gems_dir = File.join(gem_home, "gems")
       specifications_dir = File.join(gem_home, "specifications")
@@ -1015,6 +1017,8 @@ end
     end
 
     it "error intelligently if the gemspec has a LoadError" do
+      skip "whitespace issue?" if Gem.win_platform?
+
       ref = update_git "bar", :gemspec => false do |s|
         s.write "bar.gemspec", "require 'foobarbaz'"
       end.ref_for("HEAD")
@@ -1202,11 +1206,13 @@ end
 
     describe "default gem activation" do
       let(:exemptions) do
-        if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7")
+        exempts = if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7")
           %w[did_you_mean]
         else
           %w[io-console openssl]
         end << "bundler"
+        exempts << "fiddle" if Gem.win_platform? && Gem::Version.new(Gem::VERSION) >= Gem::Version.new("2.7")
+        exempts
       end
 
       let(:activation_warning_hack) { strip_whitespace(<<-RUBY) }
@@ -1256,6 +1262,8 @@ end
       end
 
       it "activates no gems with bundle exec that is loaded" do
+        skip "not executable" if Gem.win_platform?
+
         install_gemfile! ""
         create_file("script.rb", "#!/usr/bin/env ruby\n\n#{code}")
         FileUtils.chmod(0o777, bundled_app("script.rb"))

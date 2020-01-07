@@ -24,7 +24,7 @@ RSpec.describe "Bundler.with_env helpers" do
 
     it "should return the GEM_PATH present before bundle was activated" do
       code = "print Bundler.original_env['GEM_PATH']"
-      gem_path = ENV["GEM_PATH"] + ":/foo"
+      gem_path = ENV["GEM_PATH"] + "#{File::PATH_SEPARATOR}/foo"
       with_gem_path_as(gem_path) do
         bundle_exec_ruby!(code.dump)
         expect(last_command.stdboth).to eq(gem_path)
@@ -35,9 +35,9 @@ RSpec.describe "Bundler.with_env helpers" do
       create_file("exe.rb", <<-'RB')
         count = ARGV.first.to_i
         exit if count < 0
-        STDERR.puts "#{count} #{ENV["PATH"].end_with?(":/foo")}"
+        STDERR.puts "#{count} #{ENV["PATH"].end_with?("#{File::PATH_SEPARATOR}/foo")}"
         if count == 2
-          ENV["PATH"] = "#{ENV["PATH"]}:/foo"
+          ENV["PATH"] = "#{ENV["PATH"]}#{File::PATH_SEPARATOR}/foo"
         end
         exec(Gem.ruby, __FILE__, (count - 1).to_s)
       RB
@@ -170,6 +170,8 @@ RSpec.describe "Bundler.with_env helpers" do
     end
 
     it "runs system inside with_original_env" do
+      skip "obscure error" if Gem.win_platform?
+
       system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib_dir} -rbundler -e '#{code}'")
       expect($?.exitstatus).to eq(42)
     end
@@ -185,6 +187,8 @@ RSpec.describe "Bundler.with_env helpers" do
     end
 
     it "runs system inside with_clean_env" do
+      skip "obscure error" if Gem.win_platform?
+
       system({ "BUNDLE_FOO" => "bar" }, "ruby -I#{lib_dir} -rbundler -e '#{code}'")
       expect($?.exitstatus).to eq(42)
     end
