@@ -57,7 +57,7 @@ namespace :spec do
     task :record => %w[set_record realworld]
 
     task :set_record do
-      ENV["BUNDLER_SPEC_FORCE_RECORD"] = "TRUE"
+      ENV["BUNDLER_SPEC_FORCE_RECORD"] = "1"
     end
   end
 
@@ -77,7 +77,7 @@ namespace :spec do
     rg = ENV["RGV"] || raise("RubyGems version is required on Travis!")
 
     # disallow making network requests on CI
-    ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
+    ENV["BUNDLER_SPEC_PRE_RECORDED"] = "1"
 
     puts "\n\e[1;33m[Travis CI] Running bundler specs against RubyGems #{rg}\e[m\n\n"
     specs = safe_task { Rake::Task["spec"].invoke }
