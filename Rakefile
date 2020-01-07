@@ -38,10 +38,6 @@ namespace :spec do
     Spec::Rubygems.install_parallel_test_deps
   end
 
-  task :clean do
-    rm_rf "tmp"
-  end
-
   desc "Run the real-world spec suite"
   task :realworld => %w[set_realworld spec]
 
