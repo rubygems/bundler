@@ -51,24 +51,9 @@ module Spec
     end
 
     def setup
+      install_test_deps
+
       require "fileutils"
-
-      Gem.clear_paths
-
-      ENV["BUNDLE_PATH"] = nil
-      ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
-      ENV["PATH"] = [Path.bindir, Path.system_gem_path.join("bin"), ENV["PATH"]].join(File::PATH_SEPARATOR)
-
-      manifest = DEPS.to_a.sort_by(&:first).map {|k, v| "#{k} => #{v}\n" }
-      manifest_path = Path.base_system_gems.join("manifest.txt")
-      # it's OK if there are extra gems
-      if !manifest_path.file? || !(manifest - manifest_path.readlines).empty?
-        FileUtils.rm_rf(Path.base_system_gems)
-        FileUtils.mkdir_p(Path.base_system_gems)
-        puts "installing gems for the tests to use..."
-        install_gems(DEPS)
-        manifest_path.open("wb") {|f| f << manifest.join }
-      end
 
       FileUtils.mkdir_p(Path.home)
       FileUtils.mkdir_p(Path.tmpdir)
@@ -78,6 +63,32 @@ module Spec
 
       require "rubygems/user_interaction"
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
+    end
+
+    def install_parallel_test_deps
+      require "parallel"
+
+      prev_env_test_number = ENV["TEST_ENV_NUMBER"]
+
+      begin
+        Parallel.processor_count.times do |n|
+          ENV["TEST_ENV_NUMBER"] = (n + 1).to_s
+
+          install_test_deps
+        end
+      ensure
+        ENV["TEST_ENV_NUMBER"] = prev_env_test_number
+      end
+    end
+
+    def install_test_deps
+      Gem.clear_paths
+
+      ENV["BUNDLE_PATH"] = nil
+      ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
+      ENV["PATH"] = [Path.bindir, Path.system_gem_path.join("bin"), ENV["PATH"]].join(File::PATH_SEPARATOR)
+
+      install_gems(DEPS)
     end
 
   private
@@ -95,10 +106,7 @@ module Spec
     end
 
     def install_gems(gems)
-      reqs, no_reqs = gems.partition {|_, req| !req.nil? && !req.split(" ").empty? }
-      no_reqs.map!(&:first)
-      reqs.map! {|name, req| "'#{name}:#{req}'" }
-      deps = reqs.concat(no_reqs).join(" ")
+      deps = gems.map {|name, req| "'#{name}:#{req}'" }.join(" ")
       gem = ENV["GEM_COMMAND"] || "#{Gem.ruby} -S gem --backtrace"
       cmd = "#{gem} install #{deps} --no-document --conservative"
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")

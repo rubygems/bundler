@@ -24,20 +24,18 @@ task :spec do
 end
 
 namespace :spec do
-  def safe_task(&block)
-    yield
-    true
-  rescue StandardError
-    false
-  end
-
   desc "Ensure spec dependencies are installed"
   task :deps do
     Spec::Rubygems.dev_setup
+
+    Spec::Rubygems.install_test_deps
   end
 
-  task :clean do
-    rm_rf "tmp"
+  desc "Ensure spec dependencies for running in parallel are installed"
+  task :parallel_deps do
+    Spec::Rubygems.dev_setup
+
+    Spec::Rubygems.install_parallel_test_deps
   end
 
   desc "Run the real-world spec suite"
@@ -48,7 +46,7 @@ namespace :spec do
     task :record => %w[set_record realworld]
 
     task :set_record do
-      ENV["BUNDLER_SPEC_FORCE_RECORD"] = "TRUE"
+      ENV["BUNDLER_SPEC_FORCE_RECORD"] = "1"
     end
   end
 
@@ -61,41 +59,6 @@ namespace :spec do
 
   task :set_sudo do
     ENV["BUNDLER_SUDO_TESTS"] = "1"
-  end
-
-  desc "Run the tests on Travis CI against a RubyGem version (using ENV['RGV'])"
-  task :travis do
-    rg = ENV["RGV"] || raise("RubyGems version is required on Travis!")
-
-    # disallow making network requests on CI
-    ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
-
-    puts "\n\e[1;33m[Travis CI] Running bundler specs against RubyGems #{rg}\e[m\n\n"
-    specs = safe_task { Rake::Task["spec"].invoke }
-
-    Rake::Task["spec"].reenable
-
-    puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against RubyGems #{rg}\e[m\n\n"
-    sudos = system("sudo -E rake spec:sudo")
-    # clean up by chowning the newly root-owned tmp directory back to the travis user
-    system("sudo chown -R #{ENV["USER"]} #{File.join(File.dirname(__FILE__), "tmp")}")
-
-    Rake::Task["spec"].reenable
-
-    puts "\n\e[1;33m[Travis CI] Running bundler real world specs against RubyGems #{rg}\e[m\n\n"
-    realworld = safe_task { Rake::Task["spec:realworld"].invoke }
-
-    { "specs" => specs, "sudo" => sudos, "realworld" => realworld }.each do |name, passed|
-      if passed
-        puts "\e[0;32m[Travis CI] #{name} passed\e[m"
-      else
-        puts "\e[0;31m[Travis CI] #{name} failed\e[m"
-      end
-    end
-
-    unless specs && sudos && realworld
-      raise "Spec run failed, please review the log for more information"
-    end
   end
 end
 
