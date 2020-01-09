@@ -153,12 +153,8 @@ module Bundler
         if spec_platform && spec_platform != Gem::Platform::RUBY
           # Add a spec group for "non platform specific spec" as the fallback
           # spec group.
-          sg_ruby = SpecGroup.new(sg.all_specs)
-          sg_ruby.ignores_bundler_dependencies = sg.ignores_bundler_dependencies
-          if sg_ruby.for?(Gem::Platform::RUBY)
-            sg_ruby.activate_platform!(Gem::Platform::RUBY)
-            selected_sgs << sg_ruby
-          end
+          sg_ruby = sg.copy_for(Gem::Platform::RUBY)
+          selected_sgs << sg_ruby if sg_ruby
         end
         if platform != Gem::Platform::RUBY
           # Add a spec group for ["non platform specific spec", "platform
@@ -170,11 +166,8 @@ module Bundler
           #   specs:
           #     ffi (1.9.14)
           #     ffi (1.9.14-x86-mingw32)
-          sg_ruby_platform = SpecGroup.new(sg.all_specs)
-          sg_ruby_platform.ignores_bundler_dependencies =
-            sg.ignores_bundler_dependencies
-          if sg_ruby_platform.for?(Gem::Platform::RUBY)
-            sg_ruby_platform.activate_platform!(Gem::Platform::RUBY)
+          sg_ruby_platform = sg.copy_for(Gem::Platform::RUBY)
+          if sg_ruby_platform
             sg_ruby_platform.activate_platform!(platform)
             selected_sgs << sg_ruby_platform
           end

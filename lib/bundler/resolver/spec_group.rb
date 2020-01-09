@@ -5,7 +5,6 @@ module Bundler
     class SpecGroup
       include GemHelpers
 
-      attr_reader :all_specs
       attr_accessor :name, :version, :source
       attr_accessor :ignores_bundler_dependencies
 
@@ -37,6 +36,14 @@ module Bundler
         return unless for?(platform)
         return if @activated_platforms.include?(platform)
         @activated_platforms << platform
+      end
+
+      def copy_for(platform)
+        copied_sg = self.class.new(@all_specs)
+        copied_sg.ignores_bundler_dependencies = @ignores_bundler_dependencies
+        return nil unless copied_sg.for?(platform)
+        copied_sg.activate_platform!(platform)
+        copied_sg
       end
 
       def spec(platform)
