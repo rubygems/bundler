@@ -858,11 +858,7 @@ module Bundler
 
     def metadata_dependencies
       @metadata_dependencies ||= begin
-        ruby_versions = concat_ruby_version_requirements(@ruby_version)
-        if ruby_versions.empty? || !@ruby_version.exact?
-          concat_ruby_version_requirements(RubyVersion.system)
-          concat_ruby_version_requirements(locked_ruby_version_object) unless @unlock[:ruby]
-        end
+        ruby_versions = ruby_version_requirements(@ruby_version)
         [
           Dependency.new("Ruby\0", ruby_versions),
           Dependency.new("RubyGems\0", Gem::VERSION),
@@ -870,19 +866,19 @@ module Bundler
       end
     end
 
-    def concat_ruby_version_requirements(ruby_version, ruby_versions = [])
-      return ruby_versions unless ruby_version
+    def ruby_version_requirements(ruby_version)
+      return [] unless ruby_version
       if ruby_version.patchlevel
-        ruby_versions << ruby_version.to_gem_version_with_patchlevel
+        [ruby_version.to_gem_version_with_patchlevel]
       else
-        ruby_versions.concat(ruby_version.versions.map do |version|
+        ruby_version.versions.map do |version|
           requirement = Gem::Requirement.new(version)
           if requirement.exact?
             "~> #{version}.0"
           else
             requirement
           end
-        end)
+        end
       end
     end
 
