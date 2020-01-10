@@ -2,7 +2,7 @@
 
 RSpec.describe "ruby requirement" do
   def locked_ruby_version
-    Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(lockfile).ruby_version)
+    Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(File.read(bundled_app_lock)).ruby_version)
   end
 
   # As discovered by https://github.com/bundler/bundler/issues/4147, there is
@@ -51,6 +51,7 @@ RSpec.describe "ruby requirement" do
       gem "rack"
     G
 
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     expect(locked_ruby_version).to eq(Bundler::RubyVersion.system)
 
     simulate_ruby_version "5100"
@@ -72,6 +73,7 @@ RSpec.describe "ruby requirement" do
       gem "rack"
     G
 
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     expect(locked_ruby_version).to eq(Bundler::RubyVersion.system)
 
     simulate_ruby_version "5100"

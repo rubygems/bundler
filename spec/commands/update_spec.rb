@@ -831,6 +831,7 @@ RSpec.describe "bundle update --bundler" do
       source "#{file_uri_for(gem_repo4)}"
       gem "rack"
     G
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     lockfile lockfile.sub(/(^\s*)#{Bundler::VERSION}($)/, '\11.0.0\2')
 
     FileUtils.rm_r gem_repo4

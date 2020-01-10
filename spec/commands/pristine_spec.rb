@@ -28,6 +28,8 @@ RSpec.describe "bundle pristine", :ruby_repo do
 
       gemspec
     G
+
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
   end
 
   context "when sourced from RubyGems" do

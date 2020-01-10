@@ -117,7 +117,7 @@ RSpec.describe "Bundler.setup with multi platform stuff" do
   end
 
   it "allows specifying only-ruby-platform on windows with gemspec dependency" do
-    build_lib("foo", "1.0", :path => ".") do |s|
+    build_lib("foo", "1.0", :path => bundled_app) do |s|
       s.add_dependency "rack"
     end
 

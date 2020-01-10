@@ -213,6 +213,7 @@ RSpec.describe Bundler::Definition do
         end
 
         it "should get a locked specs list when updating all" do
+          allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
           definition = Bundler::Definition.new(bundled_app_lock, [], Bundler::SourceList.new, true)
           locked_specs = definition.gem_version_promoter.locked_specs
           expect(locked_specs.to_a.map(&:name)).to eq ["foo"]
@@ -267,6 +268,8 @@ RSpec.describe Bundler::Definition do
             BUNDLED WITH
                1.13.0
           L
+
+          allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
         end
 
         it "should not eagerly unlock shared dependency with bundle install conservative updating behavior" do

@@ -44,10 +44,8 @@ private
   def switch_local_copy_if_needed
     return unless local_copy_switch_needed?
 
-    Dir.chdir(local_copy_path) do
-      sys_exec!("git remote update")
-      sys_exec!("git checkout #{target_tag} --quiet")
-    end
+    sys_exec!("git remote update", :dir => local_copy_path)
+    sys_exec!("git checkout #{target_tag} --quiet", :dir => local_copy_path)
 
     ENV["RGV"] = local_copy_path.to_s
   end
@@ -65,9 +63,7 @@ private
   end
 
   def local_copy_tag
-    Dir.chdir(local_copy_path) do
-      sys_exec!("git rev-parse --abbrev-ref HEAD")
-    end
+    sys_exec!("git rev-parse --abbrev-ref HEAD", :dir => local_copy_path)
   end
 
   def local_copy_path

@@ -58,7 +58,6 @@ RSpec.configure do |config|
 
   config.bisect_runner = :shell
 
-  original_wd  = Dir.pwd
   original_env = ENV.to_hash
 
   config.expect_with :rspec do |c|
@@ -105,8 +104,6 @@ RSpec.configure do |config|
     reset!
     system_gems []
 
-    Dir.chdir(bundled_app)
-
     @command_executions = []
 
     Bundler.ui.silence { example.run }
@@ -120,7 +117,7 @@ RSpec.configure do |config|
       end
     end
 
-    Dir.chdir(original_wd)
+    raise example.description if File.exist?(root.join(".bundle"))
   end
 
   config.after :suite do

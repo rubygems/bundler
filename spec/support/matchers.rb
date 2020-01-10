@@ -124,14 +124,15 @@ module Spec
       match do
         opts = names.last.is_a?(Hash) ? names.pop : {}
         source = opts.delete(:source)
-        groups = Array(opts[:groups])
-        groups << opts
+        dir = opts.delete(:dir) || bundled_app
+        groups = Array(opts.delete(:groups))
+        env = opts.delete(:env) || {}
         @errors = names.map do |name|
           name, version, platform = name.split(/\s+/)
           require_path = name == "bundler" ? "#{lib_dir}/bundler" : name.tr("-", "/")
           version_const = name == "bundler" ? "Bundler::VERSION" : Spec::Builders.constantize(name)
           begin
-            run! "require '#{require_path}.rb'; puts #{version_const}", *groups
+            run! "require '#{require_path}.rb'; puts #{version_const}", *groups, :env => env, :dir => dir
           rescue StandardError => e
             next "#{name} is not installed:\n#{indent(e)}"
           end
@@ -145,7 +146,7 @@ module Spec
           next unless source
           begin
             source_const = "#{Spec::Builders.constantize(name)}_SOURCE"
-            run! "require '#{require_path}/source'; puts #{source_const}", *groups
+            run! "require '#{require_path}/source'; puts #{source_const}", *groups, :env => env, :dir => dir
           rescue StandardError
             next "#{name} does not have a source defined:\n#{indent(e)}"
           end
@@ -159,11 +160,12 @@ module Spec
 
       match_when_negated do
         opts = names.last.is_a?(Hash) ? names.pop : {}
-        groups = Array(opts[:groups]) || []
+        groups = Array(opts.delete(:groups))
+        dir = opts.delete(:dir) || bundled_app
         @errors = names.map do |name|
           name, version = name.split(/\s+/, 2)
           begin
-            run <<-R, *(groups + [opts])
+            run <<-R, *groups, :dir => dir
               begin
                 require '#{name}'
                 puts #{Spec::Builders.constantize(name)}

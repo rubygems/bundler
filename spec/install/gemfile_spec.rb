@@ -44,12 +44,10 @@ RSpec.describe "bundle install" do
     end
     it "uses the gemfile while in a subdirectory" do
       bundled_app("subdir").mkpath
-      Dir.chdir(bundled_app("subdir")) do
-        bundle "install"
-        bundle "list"
+      bundle "install", :dir => bundled_app("subdir")
+      bundle "list", :dir => bundled_app("subdir")
 
-        expect(out).to include("rack (1.0.0)")
-      end
+      expect(out).to include("rack (1.0.0)")
     end
   end
 

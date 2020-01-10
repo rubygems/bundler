@@ -32,9 +32,7 @@ RSpec.describe "bundle init" do
 
       FileUtils.mkdir bundled_app(subdir)
 
-      Dir.chdir bundled_app(subdir) do
-        bundle! :init
-      end
+      bundle! :init, :dir => bundled_app(subdir)
 
       expect(out).to include("Writing new Gemfile")
       expect(bundled_app("#{subdir}/Gemfile")).to be_file
@@ -50,9 +48,7 @@ RSpec.describe "bundle init" do
       mode = File.stat(bundled_app(subdir)).mode ^ 0o222
       FileUtils.chmod mode, bundled_app(subdir)
 
-      Dir.chdir bundled_app(subdir) do
-        bundle :init
-      end
+      bundle :init, :dir => bundled_app(subdir)
 
       expect(err).to include("directory is not writable")
       expect(Dir[bundled_app("#{subdir}/*")]).to be_empty
@@ -133,9 +129,7 @@ RSpec.describe "bundle init" do
 
         FileUtils.mkdir bundled_app(subdir)
 
-        Dir.chdir bundled_app(subdir) do
-          bundle! :init
-        end
+        bundle! :init, :dir => bundled_app(subdir)
 
         expect(out).to include("Writing new gems.rb")
         expect(bundled_app("#{subdir}/gems.rb")).to be_file

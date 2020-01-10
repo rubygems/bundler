@@ -120,18 +120,16 @@ RSpec.describe "bundle install from an existing gemspec" do
       s.add_development_dependency "rake", "=12.3.2"
     end
 
-    Dir.chdir(tmp.join("foo")) do
-      bundle "install"
-      # This should really be able to rely on $stderr, but, it's not written
-      # right, so we can't. In fact, this is a bug negation test, and so it'll
-      # ghost pass in future, and will only catch a regression if the message
-      # doesn't change. Exit codes should be used correctly (they can be more
-      # than just 0 and 1).
-      output = bundle("install --deployment")
-      expect(output).not_to match(/You have added to the Gemfile/)
-      expect(output).not_to match(/You have deleted from the Gemfile/)
-      expect(output).not_to match(/install in deployment mode after changing/)
-    end
+    bundle "install", :dir => tmp.join("foo")
+    # This should really be able to rely on $stderr, but, it's not written
+    # right, so we can't. In fact, this is a bug negation test, and so it'll
+    # ghost pass in future, and will only catch a regression if the message
+    # doesn't change. Exit codes should be used correctly (they can be more
+    # than just 0 and 1).
+    output = bundle("install --deployment", :dir => tmp.join("foo"))
+    expect(output).not_to match(/You have added to the Gemfile/)
+    expect(output).not_to match(/You have deleted from the Gemfile/)
+    expect(output).not_to match(/install in deployment mode after changing/)
   end
 
   it "should match a lockfile without needing to re-resolve" do
@@ -427,7 +425,7 @@ RSpec.describe "bundle install from an existing gemspec" do
           end
         end
 
-        build_lib "foo", :path => "." do |s|
+        build_lib "foo", :path => bundled_app do |s|
           if platform_specific_type == :runtime
             s.add_runtime_dependency dependency
           elsif platform_specific_type == :development
