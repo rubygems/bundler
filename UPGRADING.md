@@ -22,8 +22,9 @@ We do understand that changing behaviour that have been existing for years can
 be annoying for old users, that's why we intend to make this process as smooth
 as possible for everyone.
 
-I'll be dividing the deprecations into three groups: CLI deprecations, DSL
-deprecations, and misc deprecations. Let's dive into each of them.
+I'll be dividing the deprecations into four groups: CLI deprecations, Helper
+deprecations, DSL deprecations, and misc deprecations. Let's dive into each of
+them.
 
 #### CLI deprecations
 
@@ -67,13 +68,12 @@ that we plan to make to this set of commands and options.
   This is the only bundler command requiring external dependencies, both an OS
   dependency (the `graphviz` package) and a gem dependency (the `ruby-graphviz`
   gem). Removing these dependencies will make development easier and it was also
-  seen by the bundler team as an opportunity to develop a [bundler
-  plugin](https://github.com/bundler/bundle-viz) that it's officially maintained
-  by the bundler team, and that users can take as a reference to develop their
-  own plugins. The plugin contains the same code as the old core command, the
-  only difference being that the command is now implemented as `bundle graph`
-  hich is much easier to understand. Have a look at the plugin's repo for more
-  information about how to install and use the new plugin.
+  seen by the bundler team as an opportunity to develop a bundler plugin that
+  it's officially maintained by the bundler team, and that users can take as a
+  reference to develop their own plugins. The plugin will contain the same code
+  as the old core command, the only difference being that the command is now
+  implemented as `bundle graph` which is much easier to understand. However, the
+  details of the plugin are under discussion. See [#7041](https://github.com/rubygems/bundler/issues/7041).
 
 * The `bundle console` will be removed and replaced with `bin/console`.
 
@@ -83,12 +83,7 @@ that we plan to make to this set of commands and options.
   in favor of a `bin/console` script created by `bundle gem` on gem generation
   that users can tweak to their needs.
 
-* The `bundle update` command will no longer update all gems, you'll need to pass `--all` to it.
-
-  The bundler team considers that updating all gems at once should not be the
-  main use case for this command, and that it's better to upgrade gems one at a
-  time (or in groups of related gems). You can still upgrade all gems at once,
-  but now you need the `--all` flag.
+* ~The `bundle update` command will no longer update all gems, you'll need to pass `--all` to it.~ (postponed)
 
 * The `bundle install` command will no longer accept a `--binstubs` flag.
 
@@ -98,17 +93,9 @@ that we plan to make to this set of commands and options.
   hardly useful since most users will only use a subset of all the binstubs
   available to them. Also, it would force the introduction of a bunch of most
   likely unused files into source control. Because of this, binstubs now must
-  must be created and checked into version control individually.
+  be created and checked into version control individually.
 
-* The `bundle config` command has a new subcommand-based interface.
-
-  We believe the old interface where the kind of operation was guessed from the
-  combination of flags and number of arguments being passed to the command was
-  confusing. Instead we have introduced a compulsory subcommand argument that
-  can be either `list`, `get`, `set` or `unset`. We believe this will make the
-  `config` command much easier to interact with. The old interface is
-  deprecated, but we are giving suggestions about the new commands that should
-  be used along with the deprecation messages.
+* ~The `bundle config` command has a new subcommand-based interface.~ (postponed)
 
 * The `bundle inject` command is deprecated and replaced with `bundle add`.
 
@@ -223,7 +210,7 @@ unambiguously defined.
   the `capistrano-bundler` gem, and everyone using Capistrano 3 should be
   already using that instead. If for some reason, you are still using Capistrano
   2, feel free to copy the Capistrano tasks out of the Bundler 2 file
-  `bundler/deployment.rb` and put them into your app.
+  `lib/bundler/deployment.rb` and put them into your app.
 
   In general, we don't want to maintain integrations for every deployment system
   out there, so that's why we are removing these.
