@@ -11,7 +11,7 @@ RSpec.describe "bundle info" do
     end
 
     it "creates a Gemfile.lock when invoked with a gem name" do
-      FileUtils.rm("Gemfile.lock")
+      FileUtils.rm(bundled_app_lock)
 
       bundle! "info rails"
 

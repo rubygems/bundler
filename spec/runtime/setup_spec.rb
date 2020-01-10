@@ -489,15 +489,16 @@ RSpec.describe "Bundler.setup" do
     it "does not randomly change the path when specifying --path and the bundle directory becomes read only" do
       bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
 
-      with_read_only("**/*") do
+      with_read_only("#{bundled_app}/**/*") do
         expect(the_bundle).to include_gems "rack 1.0.0"
       end
     end
 
     it "finds git gem when default bundle path becomes read only" do
+      bundle "config set --local path .bundle"
       bundle "install"
 
-      with_read_only("#{Bundler.bundle_path}/**/*") do
+      with_read_only("#{bundled_app(".bundle")}/**/*") do
         expect(the_bundle).to include_gems "rack 1.0.0"
       end
     end
@@ -865,11 +866,9 @@ end
         gem 'foo', '1.2.3', :path => 'vendor/foo'
       G
 
-      Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app_gemfile.to_s }
-          require 'foo'
-        R
-      end
+      run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app_gemfile.to_s }, :dir => bundled_app.parent
+        require 'foo'
+      R
       expect(err).to be_empty
     end
 
@@ -889,11 +888,9 @@ end
 
       bundle :install
 
-      Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app_gemfile.to_s }
-          require 'foo'
-        R
-      end
+      run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app_gemfile.to_s }, :dir => bundled_app.parent
+        require 'foo'
+      R
 
       expect(err).to be_empty
     end

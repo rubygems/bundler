@@ -233,16 +233,14 @@ RSpec.describe "bundler/inline#gemfile" do
          1.13.6
     G
 
-    in_app_root do
-      script <<-RUBY
-        gemfile do
-          source "#{file_uri_for(gem_repo1)}"
-          gem "rack"
-        end
+    script <<-RUBY
+      gemfile do
+        source "#{file_uri_for(gem_repo1)}"
+        gem "rack"
+      end
 
-        puts RACK
-      RUBY
-    end
+      puts RACK
+    RUBY
 
     expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus
@@ -265,16 +263,14 @@ RSpec.describe "bundler/inline#gemfile" do
   it "installs inline gems when BUNDLE_GEMFILE is set to an empty string" do
     ENV["BUNDLE_GEMFILE"] = ""
 
-    in_app_root do
-      script <<-RUBY
-        gemfile do
-          source "#{file_uri_for(gem_repo1)}"
-          gem "rack"
-        end
+    script <<-RUBY
+      gemfile do
+        source "#{file_uri_for(gem_repo1)}"
+        gem "rack"
+      end
 
-        puts RACK
-      RUBY
-    end
+      puts RACK
+    RUBY
 
     expect(err).to be_empty
     expect(exitstatus).to be_zero if exitstatus

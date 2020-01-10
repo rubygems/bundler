@@ -10,7 +10,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
     end
 
     it "creates a Gemfile.lock if one did not exist" do
-      FileUtils.rm("Gemfile.lock")
+      FileUtils.rm(bundled_app_lock)
 
       bundle! "show"
 
@@ -18,7 +18,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
     end
 
     it "creates a Gemfile.lock when invoked with a gem name" do
-      FileUtils.rm("Gemfile.lock")
+      FileUtils.rm(bundled_app_lock)
 
       bundle! "show rails"
 
@@ -143,13 +143,12 @@ RSpec.describe "bundle show", :bundler => "< 3" do
   context "in a fresh gem in a blank git repo" do
     before :each do
       build_git "foo", :path => lib_path("foo")
-      Dir.chdir lib_path("foo")
-      File.open("Gemfile", "w") {|f| f.puts "gemspec" }
-      sys_exec "rm -rf .git && git init"
+      File.open(lib_path("foo/Gemfile"), "w") {|f| f.puts "gemspec" }
+      sys_exec "rm -rf .git && git init", :dir => lib_path("foo")
     end
 
     it "does not output git errors" do
-      bundle :show
+      bundle :show, :dir => lib_path("foo")
       expect(err_without_deprecations).to be_empty
     end
   end

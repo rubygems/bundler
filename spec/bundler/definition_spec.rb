@@ -210,6 +210,8 @@ RSpec.describe Bundler::Definition do
           source "#{file_uri_for(gem_repo1)}"
           gem "foo"
           G
+
+          allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
         end
 
         it "should get a locked specs list when updating all" do
@@ -267,6 +269,8 @@ RSpec.describe Bundler::Definition do
             BUNDLED WITH
                1.13.0
           L
+
+          allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
         end
 
         it "should not eagerly unlock shared dependency with bundle install conservative updating behavior" do

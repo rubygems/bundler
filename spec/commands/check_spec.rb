@@ -18,8 +18,7 @@ RSpec.describe "bundle check" do
       gem "rails"
     G
 
-    Dir.chdir tmp
-    bundle "check --gemfile bundled_app/Gemfile"
+    bundle "check --gemfile bundled_app/Gemfile", :dir => tmp
     expect(out).to include("The Gemfile's dependencies are satisfied")
   end
 
@@ -29,7 +28,7 @@ RSpec.describe "bundle check" do
       gem "rails"
     G
 
-    FileUtils.rm("Gemfile.lock")
+    FileUtils.rm(bundled_app_lock)
 
     bundle "check"
 
@@ -42,7 +41,7 @@ RSpec.describe "bundle check" do
       gem "rails"
     G
 
-    FileUtils.rm("Gemfile.lock")
+    FileUtils.rm(bundled_app_lock)
 
     bundle "check --dry-run"
 

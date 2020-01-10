@@ -44,14 +44,14 @@ RSpec.describe "Running bin/* commands" do
 
   it "uses the default ruby install name when shebang is not specified" do
     bundle! "binstubs rack"
-    expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env #{RbConfig::CONFIG["ruby_install_name"]}\n")
+    expect(File.open(bundled_app("bin/rackup")).gets).to eq("#!/usr/bin/env #{RbConfig::CONFIG["ruby_install_name"]}\n")
   end
 
   it "allows the name of the shebang executable to be specified" do
     skip "not created with custom name :/" if Gem.win_platform?
 
     bundle! "binstubs rack", :shebang => "ruby-foo"
-    expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env ruby-foo\n")
+    expect(File.open(bundled_app("bin/rackup")).gets).to eq("#!/usr/bin/env ruby-foo\n")
   end
 
   it "runs the bundled command when out of the bundle" do
@@ -63,10 +63,8 @@ RSpec.describe "Running bin/* commands" do
       s.executables = "rackup"
     end
 
-    Dir.chdir(tmp) do
-      gembin "rackup"
-      expect(out).to eq("1.0.0")
-    end
+    gembin "rackup", :dir => tmp
+    expect(out).to eq("1.0.0")
   end
 
   it "works with gems in path" do

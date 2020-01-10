@@ -43,13 +43,12 @@ RSpec.describe "install with --deployment or --frozen" do
 
   it "still works if you are not in the app directory and specify --gemfile" do
     bundle! "install"
-    Dir.chdir tmp do
-      simulate_new_machine
-      bundle! :install,
-        forgotten_command_line_options(:gemfile => "#{tmp}/bundled_app/Gemfile",
-                                       :deployment => true,
-                                       :path => "vendor/bundle")
-    end
+    simulate_new_machine
+    bundle! :install,
+      forgotten_command_line_options(:gemfile => "#{tmp}/bundled_app/Gemfile",
+                                     :deployment => true,
+                                     :path => "vendor/bundle",
+                                     :dir => tmp)
     expect(the_bundle).to include_gems "rack 1.0"
   end
 

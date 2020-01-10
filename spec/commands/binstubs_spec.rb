@@ -86,7 +86,7 @@ RSpec.describe "bundle binstubs <gem>" do
 
         bundle "binstubs rack"
 
-        File.open("bin/bundle", "wb") do |file|
+        File.open(bundled_app("bin/bundle"), "wb") do |file|
           file.print "OMG"
         end
 
@@ -301,7 +301,7 @@ RSpec.describe "bundle binstubs <gem>" do
 
         bundle "binstubs rack --shebang jruby"
 
-        expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env jruby\n")
+        expect(File.open(bundled_app("bin/rackup")).gets).to eq("#!/usr/bin/env jruby\n")
       end
     end
   end
