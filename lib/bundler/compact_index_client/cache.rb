@@ -95,8 +95,8 @@ module Bundler
       end
 
       def parse_gem(line)
-        @dependency_parser ||= GemParser.new
-        @dependency_parser.parse(line)
+        @gem_parser ||= GemParser.new
+        @gem_parser.parse(line)
       end
 
       def info_roots
