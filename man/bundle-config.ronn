@@ -11,7 +11,7 @@ This command allows you to interact with Bundler's configuration system.
 
 Bundler loads configuration settings in this order:
 
-1. Local config (`app/.bundle/config`)
+1. Local config (`app/.bundle/config` or `$BUNDLE_APP_CONFIG/config`)
 2. Environmental variables (`ENV`)
 3. Global config (`~/.bundle/config`)
 4. Bundler default config
@@ -31,7 +31,9 @@ overridden and user will be warned.
 Executing `bundle config set --global <name> <value>` works the same as above.
 
 Executing `bundle config set --local <name> <value>` will set that configuration to
-the local application. The configuration will be stored in `app/.bundle/config`.
+the local application. The configuration will be stored in `app/.bundle/config`. If
+`BUNDLE_APP_CONFIG` is set, the configuration will be stored in
+`$BUNDLE_APP_CONFIG/config`.
 
 Executing `bundle config unset <name>` will delete the configuration in both
 local and global sources.
@@ -396,4 +398,3 @@ outlines the available environment variables and their default values
     BUNDLE_USER_CACHE : $BUNDLE_USER_HOME/cache
     BUNDLE_USER_CONFIG : $BUNDLE_USER_HOME/config
     BUNDLE_USER_PLUGIN : $BUNDLE_USER_HOME/plugin
-
