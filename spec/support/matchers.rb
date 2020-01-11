@@ -218,7 +218,7 @@ module Spec
     end
 
     def gemfile_should_be(expected)
-      expect(bundled_app("Gemfile")).to read_as(strip_whitespace(expected))
+      expect(bundled_app_gemfile).to read_as(strip_whitespace(expected))
     end
   end
 end

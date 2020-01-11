@@ -64,7 +64,7 @@ RSpec.describe "bundle install" do
 
       it "installs the standalone bundle relative to the cwd" do
         Dir.chdir(bundled_app.parent) do
-          bundle! :install, :gemfile => bundled_app("Gemfile"), :standalone => true
+          bundle! :install, :gemfile => bundled_app_gemfile, :standalone => true
           expect(out).to include("installed into `./bundled_app/bundle`")
           expect(bundled_app("bundle")).to be_directory
           expect(bundled_app("bundle/ruby")).to be_directory
@@ -73,7 +73,7 @@ RSpec.describe "bundle install" do
         bundle! "config unset path"
 
         Dir.chdir(bundled_app("subdir").tap(&:mkpath)) do
-          bundle! :install, :gemfile => bundled_app("Gemfile"), :standalone => true
+          bundle! :install, :gemfile => bundled_app_gemfile, :standalone => true
           expect(out).to include("installed into `../bundle`")
           expect(bundled_app("bundle")).to be_directory
           expect(bundled_app("bundle/ruby")).to be_directory

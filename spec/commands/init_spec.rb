@@ -4,7 +4,7 @@ RSpec.describe "bundle init" do
   it "generates a Gemfile" do
     bundle! :init
     expect(out).to include("Writing new Gemfile")
-    expect(bundled_app("Gemfile")).to be_file
+    expect(bundled_app_gemfile).to be_file
   end
 
   context "when a Gemfile already exists" do
@@ -15,7 +15,7 @@ RSpec.describe "bundle init" do
     end
 
     it "does not change existing Gemfiles" do
-      expect { bundle :init }.not_to change { File.read(bundled_app("Gemfile")) }
+      expect { bundle :init }.not_to change { File.read(bundled_app_gemfile) }
     end
 
     it "notifies the user that an existing Gemfile already exists" do
@@ -75,7 +75,7 @@ RSpec.describe "bundle init" do
 
       bundle :init, :gemspec => spec_file
 
-      gemfile = bundled_app("Gemfile").read
+      gemfile = bundled_app_gemfile.read
       expect(gemfile).to match(%r{source 'https://rubygems.org'})
       expect(gemfile.scan(/gem "rack", "= 1.0.1"/).size).to eq(1)
       expect(gemfile.scan(/gem "rspec", "= 1.2"/).size).to eq(1)

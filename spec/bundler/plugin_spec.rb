@@ -107,7 +107,7 @@ RSpec.describe Bundler::Plugin do
   describe "evaluate gemfile for plugins" do
     let(:definition) { double("definition") }
     let(:builder) { double("builder") }
-    let(:gemfile) { bundled_app("Gemfile") }
+    let(:gemfile) { bundled_app_gemfile }
 
     before do
       allow(Plugin::DSL).to receive(:new) { builder }

@@ -22,9 +22,9 @@ RSpec.describe "bundle inject", :bundler => "< 3" do
     end
 
     it "adds the injected gems to the Gemfile" do
-      expect(bundled_app("Gemfile").read).not_to match(/rack-obama/)
+      expect(bundled_app_gemfile.read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile").read).to match(/rack-obama/)
+      expect(bundled_app_gemfile.read).to match(/rack-obama/)
     end
 
     it "locks with the injected gems" do
@@ -54,7 +54,7 @@ Usage: "bundle inject GEM VERSION"
   context "with source option" do
     it "add gem with source option in gemfile" do
       bundle "inject 'foo' '>0' --source #{file_uri_for(gem_repo1)}"
-      gemfile = bundled_app("Gemfile").read
+      gemfile = bundled_app_gemfile.read
       str = "gem \"foo\", \"> 0\", :source => \"#{file_uri_for(gem_repo1)}\""
       expect(gemfile).to include str
     end
@@ -63,14 +63,14 @@ Usage: "bundle inject GEM VERSION"
   context "with group option" do
     it "add gem with group option in gemfile" do
       bundle "inject 'rack-obama' '>0' --group=development"
-      gemfile = bundled_app("Gemfile").read
+      gemfile = bundled_app_gemfile.read
       str = "gem \"rack-obama\", \"> 0\", :group => :development"
       expect(gemfile).to include str
     end
 
     it "add gem with multiple groups in gemfile" do
       bundle "inject 'rack-obama' '>0' --group=development,test"
-      gemfile = bundled_app("Gemfile").read
+      gemfile = bundled_app_gemfile.read
       str = "gem \"rack-obama\", \"> 0\", :groups => [:development, :test]"
       expect(gemfile).to include str
     end
@@ -88,7 +88,7 @@ Usage: "bundle inject GEM VERSION"
 
     it "injects anyway" do
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile").read).to match(/rack-obama/)
+      expect(bundled_app_gemfile.read).to match(/rack-obama/)
     end
 
     it "locks with the injected gems" do

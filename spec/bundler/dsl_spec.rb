@@ -271,7 +271,7 @@ RSpec.describe Bundler::Dsl do
   describe "syntax errors" do
     it "will raise a Bundler::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
-      expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
+      expect { Bundler::Dsl.evaluate(bundled_app_gemfile, nil, true) }.
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`:( compile error -)? unknown regexp options - trg.+ Bundler cannot continue./)
     end
   end
@@ -279,7 +279,7 @@ RSpec.describe Bundler::Dsl do
   describe "Runtime errors" do
     it "will raise a Bundler::GemfileError" do
       gemfile "raise RuntimeError, 'foo'"
-      expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
+      expect { Bundler::Dsl.evaluate(bundled_app_gemfile, nil, true) }.
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: foo. Bundler cannot continue./i)
     end
   end

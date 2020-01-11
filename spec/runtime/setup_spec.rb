@@ -866,7 +866,7 @@ end
       G
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile").to_s }
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app_gemfile.to_s }
           require 'foo'
         R
       end
@@ -890,7 +890,7 @@ end
       bundle :install
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile").to_s }
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app_gemfile.to_s }
           require 'foo'
         R
       end
