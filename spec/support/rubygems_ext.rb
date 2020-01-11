@@ -15,7 +15,7 @@ module Spec
     }.freeze
 
     DEPS = {
-      "rack" => "~> 2.0",
+      "rack" => "2.0.8",
       "rack-test" => "~> 1.1",
       "artifice" => "~> 0.6.0",
       "compact_index" => "~> 0.11.0",
