@@ -251,10 +251,10 @@ RSpec.describe "The library itself" do
       ]
       files_to_require = lib_tracked_files.split("\x0").grep(/\.rb$/) - exclusions
       files_to_require.reject! {|f| f.start_with?("lib/bundler/vendor") }
-      files_to_require.map! {|f| f.chomp(".rb") }
-      sys_exec!("ruby -w -Ilib") do |input, _, _|
+      files_to_require.map! {|f| File.expand_path("../#{f}", __dir__) }
+      sys_exec!("ruby -w") do |input, _, _|
         files_to_require.each do |f|
-          input.puts "require '#{f.sub(%r{\Alib/}, "")}'"
+          input.puts "require '#{f}'"
         end
       end
 
