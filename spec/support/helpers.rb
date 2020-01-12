@@ -180,8 +180,8 @@ module Spec
       ENV["RUBYOPT"] = old
     end
 
-    def gem_command(command, args = "")
-      sys_exec("#{Path.gem_bin} #{command} #{args}")
+    def gem_command(command)
+      sys_exec("#{Path.gem_bin} #{command}")
     end
     bang :gem_command
 
@@ -292,12 +292,12 @@ module Spec
     def install_gem(path)
       raise "OMG `#{path}` does not exist!" unless File.exist?(path)
 
-      gem_command! :install, "--no-document --ignore-dependencies '#{path}'"
+      gem_command! "install --no-document --ignore-dependencies '#{path}'"
     end
 
     def with_built_bundler
       with_root_gemspec do |gemspec|
-        in_repo_root { gem_command! :build, gemspec.to_s }
+        in_repo_root { gem_command! "build #{gemspec}" }
       end
 
       bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
@@ -406,7 +406,7 @@ module Spec
       ENV["GEM_PATH"] = system_gem_path.to_s
 
       gems.each do |gem|
-        gem_command! :install, "--no-document #{gem}"
+        gem_command! "install --no-document #{gem}"
       end
       return unless block_given?
       begin
