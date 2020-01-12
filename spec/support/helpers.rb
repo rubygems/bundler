@@ -128,7 +128,7 @@ module Spec
       end.join
 
       cmd = "#{sudo} #{Gem.ruby} #{load_path_str} #{requires_str} #{bundle_bin} #{cmd}#{args}"
-      sys_exec(cmd, env, &block)
+      sys_exec(cmd, { :env => env }, &block)
     end
     bang :bundle
 
@@ -155,9 +155,8 @@ module Spec
     end
 
     def ruby(ruby, options = {})
-      env = options.delete(:env) || {}
       lib_option = options[:no_lib] ? "" : " -I#{lib_dir}"
-      sys_exec(%(#{Gem.ruby}#{lib_option} -w -e #{ruby.shellescape}), env)
+      sys_exec(%(#{Gem.ruby}#{lib_option} -w -e #{ruby.shellescape}), options)
     end
     bang :ruby
 
@@ -189,7 +188,8 @@ module Spec
       "#{Gem.ruby} -S #{ENV["GEM_PATH"]}/bin/rake"
     end
 
-    def sys_exec(cmd, env = {})
+    def sys_exec(cmd, options = {})
+      env = options[:env] || {}
       command_execution = CommandExecution.new(cmd.to_s, Dir.pwd)
 
       require "open3"

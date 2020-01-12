@@ -1375,7 +1375,7 @@ end
     end
 
     it "takes care of requiring rubygems" do
-      sys_exec("#{Gem.ruby} -I#{lib_dir} -e \"puts require('bundler/setup')\"", "RUBYOPT" => "--disable=gems")
+      sys_exec("#{Gem.ruby} -I#{lib_dir} -e \"puts require('bundler/setup')\"", :env => { "RUBYOPT" => "--disable=gems" })
 
       expect(last_command.stdboth).to eq("true")
     end
