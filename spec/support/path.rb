@@ -51,6 +51,12 @@ module Spec
       @lib_tracked_files ||= ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
     end
 
+    def man_tracked_files
+      skip "not in git working directory" unless git_root_dir?
+
+      @man_tracked_files ||= `git ls-files -z -- man`
+    end
+
     def tmp(*path)
       root.join("tmp", scope, *path)
     end

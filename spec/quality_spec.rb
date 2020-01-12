@@ -157,7 +157,7 @@ RSpec.describe "The library itself" do
     included = /ronn/
     error_messages = []
     in_repo_root do
-      `git ls-files -z -- man`.split("\x0").each do |filename|
+      man_tracked_files.split("\x0").each do |filename|
         next unless filename =~ included
         error_messages << check_for_expendable_words(filename)
         error_messages << check_for_specific_pronouns(filename)
