@@ -615,7 +615,7 @@ RSpec.describe "gemcutter's dependency API" do
     let(:user)     { "user" }
     let(:password) { "pass" }
     let(:basic_auth_source_uri) do
-      uri          = URI.parse(source_uri)
+      uri          = Bundler::URI.parse(source_uri)
       uri.user     = user
       uri.password = password
 
