@@ -210,6 +210,8 @@ EOF
         gem "rack"
       G
 
+      allow(Bundler).to receive(:root).and_return(bundled_app)
+
       Bundler.mkdir_p(bundled_app.join("foo", "bar"))
       expect(bundled_app.join("foo", "bar")).to exist
     end

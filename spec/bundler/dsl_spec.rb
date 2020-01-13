@@ -72,7 +72,7 @@ RSpec.describe Bundler::Dsl do
 
   describe "#method_missing" do
     it "raises an error for unknown DSL methods" do
-      expect(Bundler).to receive(:read_file).with(bundled_app("Gemfile").to_s).
+      expect(Bundler).to receive(:read_file).with(root.join("Gemfile").to_s).
         and_return("unknown")
 
       error_msg = "There was an error parsing `Gemfile`: Undefined local variable or method `unknown' for Gemfile. Bundler cannot continue."
@@ -83,13 +83,13 @@ RSpec.describe Bundler::Dsl do
 
   describe "#eval_gemfile" do
     it "handles syntax errors with a useful message" do
-      expect(Bundler).to receive(:read_file).with(bundled_app("Gemfile").to_s).and_return("}")
+      expect(Bundler).to receive(:read_file).with(root.join("Gemfile").to_s).and_return("}")
       expect { subject.eval_gemfile("Gemfile") }.
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '\}'). Bundler cannot continue./)
     end
 
     it "distinguishes syntax errors from evaluation errors" do
-      expect(Bundler).to receive(:read_file).with(bundled_app("Gemfile").to_s).and_return(
+      expect(Bundler).to receive(:read_file).with(root.join("Gemfile").to_s).and_return(
         "ruby '2.1.5', :engine => 'ruby', :engine_version => '1.2.4'"
       )
       expect { subject.eval_gemfile("Gemfile") }.
@@ -271,7 +271,7 @@ RSpec.describe Bundler::Dsl do
   describe "syntax errors" do
     it "will raise a Bundler::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
-      expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
+      expect { Bundler::Dsl.evaluate(bundled_app_gemfile, nil, true) }.
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`:( compile error -)? unknown regexp options - trg.+ Bundler cannot continue./)
     end
   end
@@ -279,7 +279,7 @@ RSpec.describe Bundler::Dsl do
   describe "Runtime errors" do
     it "will raise a Bundler::GemfileError" do
       gemfile "raise RuntimeError, 'foo'"
-      expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
+      expect { Bundler::Dsl.evaluate(bundled_app_gemfile, nil, true) }.
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: foo. Bundler cannot continue./i)
     end
   end

@@ -195,6 +195,8 @@ RSpec.describe "bundle lock" do
         gem 'foo'
         gem 'qux'
       G
+
+      allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     end
 
     it "single gem updates dependent gem to minor" do
@@ -213,12 +215,15 @@ RSpec.describe "bundle lock" do
   it "supports adding new platforms" do
     bundle! "lock --add-platform java x86-mingw32"
 
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     lockfile = Bundler::LockfileParser.new(read_lockfile)
     expect(lockfile.platforms).to match_array(local_platforms.unshift(java, mingw).uniq)
   end
 
   it "supports adding the `ruby` platform" do
     bundle! "lock --add-platform ruby"
+
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     lockfile = Bundler::LockfileParser.new(read_lockfile)
     expect(lockfile.platforms).to match_array(local_platforms.unshift("ruby").uniq)
   end
@@ -231,6 +236,7 @@ RSpec.describe "bundle lock" do
   it "allows removing platforms" do
     bundle! "lock --add-platform java x86-mingw32"
 
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     lockfile = Bundler::LockfileParser.new(read_lockfile)
     expect(lockfile.platforms).to match_array(local_platforms.unshift(java, mingw).uniq)
 

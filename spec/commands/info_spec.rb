@@ -11,11 +11,11 @@ RSpec.describe "bundle info" do
     end
 
     it "creates a Gemfile.lock when invoked with a gem name" do
-      FileUtils.rm("Gemfile.lock")
+      FileUtils.rm(bundled_app_lock)
 
       bundle! "info rails"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app_lock).to exist
     end
 
     it "prints information if gem exists in bundle" do

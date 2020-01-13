@@ -129,11 +129,11 @@ RSpec.describe "bundle exec" do
     skip "https://github.com/bundler/bundler/issues/6898" if Gem.win_platform?
 
     install_gemfile 'gem "rack"'
-    File.open("--verbose", "w") do |f|
+    File.open(bundled_app("--verbose"), "w") do |f|
       f.puts "#!/bin/sh"
       f.puts "echo foobar"
     end
-    File.chmod(0o744, "--verbose")
+    File.chmod(0o744, bundled_app("--verbose"))
     with_path_as(".") do
       bundle "exec -- --verbose"
     end
@@ -152,21 +152,17 @@ RSpec.describe "bundle exec" do
       gem "rack", "0.9.1"
     G
 
-    in_app_root2 do
-      install_gemfile bundled_app2("Gemfile"), <<-G
-        source "#{file_uri_for(gem_repo2)}"
-        gem "rack_two", "1.0.0"
-      G
-    end
+    install_gemfile bundled_app2("Gemfile"), <<-G, :dir => bundled_app2
+      source "#{file_uri_for(gem_repo2)}"
+      gem "rack_two", "1.0.0"
+    G
 
     bundle! "exec rackup"
 
     expect(out).to eq("0.9.1")
 
-    in_app_root2 do
-      bundle! "exec rackup"
-      expect(out).to eq("1.0.0")
-    end
+    bundle! "exec rackup", :dir => bundled_app2
+    expect(out).to eq("1.0.0")
   end
 
   context "with default gems" do
@@ -260,12 +256,10 @@ RSpec.describe "bundle exec" do
       gem "rack", "0.9.1"
     G
 
-    in_app_root2 do
-      install_gemfile bundled_app2("Gemfile"), <<-G
-        source "#{file_uri_for(gem_repo2)}"
-        gem "rack_two", "1.0.0"
-      G
-    end
+    install_gemfile bundled_app2("Gemfile"), <<-G, :dir => bundled_app2
+      source "#{file_uri_for(gem_repo2)}"
+      gem "rack_two", "1.0.0"
+    G
 
     bundle! "exec rackup"
 
@@ -624,8 +618,8 @@ RSpec.describe "bundle exec" do
     RUBY
 
     before do
-      path.open("w") {|f| f << executable }
-      path.chmod(0o755)
+      bundled_app(path).open("w") {|f| f << executable }
+      bundled_app(path).chmod(0o755)
 
       install_gemfile <<-G
         gem "rack"
@@ -798,7 +792,7 @@ __FILE__: #{path.to_s.inspect}
       end
 
       context "when the path is relative with a leading ./" do
-        let(:path) { Pathname.new("./#{super().relative_path_from(Pathname.pwd)}") }
+        let(:path) { Pathname.new("./#{super().relative_path_from(bundled_app)}") }
 
         pending "relative paths with ./ have absolute __FILE__"
       end

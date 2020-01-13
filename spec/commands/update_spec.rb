@@ -31,7 +31,7 @@ RSpec.describe "bundle update" do
         exit!
       G
       bundle "update"
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app_lock).to exist
     end
   end
 
@@ -54,7 +54,7 @@ RSpec.describe "bundle update" do
         exit!
       G
       bundle "update", :all => true
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app_lock).to exist
     end
   end
 
@@ -831,6 +831,7 @@ RSpec.describe "bundle update --bundler" do
       source "#{file_uri_for(gem_repo4)}"
       gem "rack"
     G
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     lockfile lockfile.sub(/(^\s*)#{Bundler::VERSION}($)/, '\11.0.0\2')
 
     FileUtils.rm_r gem_repo4

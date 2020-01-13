@@ -585,11 +585,11 @@ RSpec.describe "bundle clean" do
     bundle "install"
 
     # mimic 7 length git revisions in Gemfile.lock
-    gemfile_lock = File.read(bundled_app("Gemfile.lock")).split("\n")
+    gemfile_lock = File.read(bundled_app_lock).split("\n")
     gemfile_lock.each_with_index do |line, index|
       gemfile_lock[index] = line[0..(11 + 7)] if line.include?("  revision:")
     end
-    lockfile(bundled_app("Gemfile.lock"), gemfile_lock.join("\n"))
+    lockfile(bundled_app_lock, gemfile_lock.join("\n"))
 
     bundle "config set path vendor/bundle"
     bundle "install"

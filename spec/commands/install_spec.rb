@@ -17,7 +17,7 @@ RSpec.describe "bundle install with gem sources" do
       G
 
       expect(err).to include('StandardError, "FAIL"')
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app_lock).not_to exist
     end
 
     it "creates a Gemfile.lock" do
@@ -26,7 +26,7 @@ RSpec.describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app_lock).to exist
     end
 
     it "does not create ./.bundle by default", :bundler => "< 3" do
@@ -66,13 +66,13 @@ RSpec.describe "bundle install with gem sources" do
         gem 'rack'
       G
 
-      lockfile = File.read(bundled_app("Gemfile.lock"))
+      lockfile = File.read(bundled_app_lock)
 
       install_gemfile <<-G
         raise StandardError, "FAIL"
       G
 
-      expect(File.read(bundled_app("Gemfile.lock"))).to eq(lockfile)
+      expect(File.read(bundled_app_lock)).to eq(lockfile)
     end
 
     it "does not touch the lockfile if nothing changed" do
@@ -81,7 +81,7 @@ RSpec.describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      expect { run "1" }.not_to change { File.mtime(bundled_app("Gemfile.lock")) }
+      expect { run "1" }.not_to change { File.mtime(bundled_app_lock) }
     end
 
     it "fetches gems" do
@@ -320,7 +320,7 @@ RSpec.describe "bundle install with gem sources" do
       install_gemfile <<-G
       G
 
-      expect(File.exist?(bundled_app("Gemfile.lock"))).to eq(true)
+      expect(File.exist?(bundled_app_lock)).to eq(true)
     end
 
     context "throws a warning if a gem is added twice in Gemfile" do
@@ -504,23 +504,20 @@ RSpec.describe "bundle install with gem sources" do
   end
 
   describe "when Bundler root contains regex chars" do
-    before do
+    it "doesn't blow up" do
       root_dir = tmp("foo[]bar")
 
       FileUtils.mkdir_p(root_dir)
-      Dir.chdir(root_dir)
-    end
 
-    it "doesn't blow up" do
       build_lib "foo"
       gemfile = <<-G
         gem 'foo', :path => "#{lib_path("foo-1.0")}"
       G
-      File.open("Gemfile", "w") do |file|
+      File.open("#{root_dir}/Gemfile", "w") do |file|
         file.puts gemfile
       end
 
-      bundle :install
+      bundle :install, :dir => root_dir
 
       expect(exitstatus).to eq(0) if exitstatus
     end

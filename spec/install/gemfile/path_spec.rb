@@ -37,7 +37,7 @@ RSpec.describe "bundle install with explicit source paths" do
   it "supports relative paths" do
     build_lib "foo"
 
-    relative_path = lib_path("foo-1.0").relative_path_from(Pathname.new(Dir.pwd))
+    relative_path = lib_path("foo-1.0").relative_path_from(bundled_app)
 
     install_gemfile <<-G
       gem 'foo', :path => "#{relative_path}"
@@ -79,10 +79,7 @@ RSpec.describe "bundle install with explicit source paths" do
       gem 'foo', :path => "./foo-1.0"
     G
 
-    bundled_app("subdir").mkpath
-    Dir.chdir(bundled_app("subdir")) do
-      expect(the_bundle).to include_gems("foo 1.0")
-    end
+    expect(the_bundle).to include_gems("foo 1.0", :dir => bundled_app("subdir").mkpath)
   end
 
   it "sorts paths consistently on install and update when they start with ./" do
@@ -121,12 +118,10 @@ RSpec.describe "bundle install with explicit source paths" do
          #{Bundler::VERSION}
     L
 
-    Dir.chdir(lib_path("demo")) do
-      bundle :install
-      expect(lib_path("demo/Gemfile.lock")).to have_lockfile(lockfile)
-      bundle :update, :all => true
-      expect(lib_path("demo/Gemfile.lock")).to have_lockfile(lockfile)
-    end
+    bundle :install, :dir => lib_path("demo")
+    expect(lib_path("demo/Gemfile.lock")).to have_lockfile(lockfile)
+    bundle :update, :all => true, :dir => lib_path("demo")
+    expect(lib_path("demo/Gemfile.lock")).to have_lockfile(lockfile)
   end
 
   it "expands paths when comparing locked paths to Gemfile paths" do
@@ -249,11 +244,9 @@ RSpec.describe "bundle install with explicit source paths" do
 
     File.open(lib_path("foo/Gemfile"), "w") {|f| f.puts gemfile }
 
-    Dir.chdir(lib_path("foo")) do
-      bundle "install"
-      expect(the_bundle).to include_gems "foo 1.0"
-      expect(the_bundle).to include_gems "rack 1.0"
-    end
+    bundle "install", :dir => lib_path("foo")
+    expect(the_bundle).to include_gems "foo 1.0", :dir => lib_path("foo")
+    expect(the_bundle).to include_gems "rack 1.0", :dir => lib_path("foo")
   end
 
   it "supports gemspec syntax with an alternative path" do
@@ -275,19 +268,17 @@ RSpec.describe "bundle install with explicit source paths" do
       s.add_dependency "rack", ">= 1.0"
     end
 
-    Dir.chdir lib_path("foo")
-
-    install_gemfile lib_path("foo/Gemfile"), <<-G
+    install_gemfile lib_path("foo/Gemfile"), <<-G, :dir => lib_path("foo")
       source "#{file_uri_for(gem_repo1)}"
       gemspec
     G
 
     build_gem "rack", "1.0.1", :to_system => true
 
-    bundle "install"
+    bundle "install", :dir => lib_path("foo")
 
-    expect(the_bundle).to include_gems "foo 1.0"
-    expect(the_bundle).to include_gems "rack 1.0"
+    expect(the_bundle).to include_gems "foo 1.0", :dir => lib_path("foo")
+    expect(the_bundle).to include_gems "rack 1.0", :dir => lib_path("foo")
   end
 
   it "doesn't automatically unlock dependencies when using the gemspec syntax and the gem has development dependencies" do
@@ -296,19 +287,17 @@ RSpec.describe "bundle install with explicit source paths" do
       s.add_development_dependency "activesupport"
     end
 
-    Dir.chdir lib_path("foo")
-
-    install_gemfile lib_path("foo/Gemfile"), <<-G
+    install_gemfile lib_path("foo/Gemfile"), <<-G, :dir => lib_path("foo")
       source "#{file_uri_for(gem_repo1)}"
       gemspec
     G
 
     build_gem "rack", "1.0.1", :to_system => true
 
-    bundle "install"
+    bundle "install", :dir => lib_path("foo")
 
-    expect(the_bundle).to include_gems "foo 1.0"
-    expect(the_bundle).to include_gems "rack 1.0"
+    expect(the_bundle).to include_gems "foo 1.0", :dir => lib_path("foo")
+    expect(the_bundle).to include_gems "rack 1.0", :dir => lib_path("foo")
   end
 
   it "raises if there are multiple gemspecs" do
@@ -426,7 +415,7 @@ RSpec.describe "bundle install with explicit source paths" do
         remote: http://rubygems.org
     L
 
-    in_app_root { FileUtils.mkdir_p("vendor/bar") }
+    FileUtils.mkdir_p(bundled_app("vendor/bar"))
 
     install_gemfile <<-G
       gem "bar", "1.0.0", path: "vendor/bar", require: "bar/nyard"
@@ -658,13 +647,11 @@ RSpec.describe "bundle install with explicit source paths" do
       G
       File.open(lib_path("private_lib/Gemfile"), "w") {|f| f.puts gemfile }
 
-      Dir.chdir(lib_path("private_lib")) do
-        bundle :install, :env => { "DEBUG" => "1" }, :artifice => "endpoint"
-        expect(out).to match(%r{^HTTP GET http://localgemserver\.test/api/v1/dependencies\?gems=rack$})
-        expect(out).not_to match(/^HTTP GET.*private_lib/)
-        expect(the_bundle).to include_gems "private_lib 2.2"
-        expect(the_bundle).to include_gems "rack 1.0"
-      end
+      bundle :install, :env => { "DEBUG" => "1" }, :artifice => "endpoint", :dir => lib_path("private_lib")
+      expect(out).to match(%r{^HTTP GET http://localgemserver\.test/api/v1/dependencies\?gems=rack$})
+      expect(out).not_to match(/^HTTP GET.*private_lib/)
+      expect(the_bundle).to include_gems "private_lib 2.2", :dir => lib_path("private_lib")
+      expect(the_bundle).to include_gems "rack 1.0", :dir => lib_path("private_lib")
     end
   end
 

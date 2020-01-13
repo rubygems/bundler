@@ -48,7 +48,13 @@ module Spec
     def lib_tracked_files
       skip "not in git working directory" unless git_root_dir?
 
-      @lib_tracked_files ||= ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
+      @lib_tracked_files ||= ruby_core? ? sys_exec("git ls-files -z -- lib/bundler lib/bundler.rb", :dir => root) : sys_exec("git ls-files -z -- lib", :dir => root)
+    end
+
+    def man_tracked_files
+      skip "not in git working directory" unless git_root_dir?
+
+      @man_tracked_files ||= sys_exec("git ls-files -z -- man", :dir => root)
     end
 
     def tmp(*path)
@@ -94,6 +100,14 @@ module Spec
 
     def cached_gem(path)
       bundled_app("vendor/cache/#{path}.gem")
+    end
+
+    def bundled_app_gemfile
+      bundled_app("Gemfile")
+    end
+
+    def bundled_app_lock
+      bundled_app("Gemfile.lock")
     end
 
     def base_system_gems
@@ -178,14 +192,6 @@ module Spec
       else
         @ruby_core
       end
-    end
-
-    def in_app_root
-      Dir.chdir(bundled_app) { yield }
-    end
-
-    def in_app_root2
-      Dir.chdir(bundled_app2) { yield }
     end
 
     def in_repo_root
