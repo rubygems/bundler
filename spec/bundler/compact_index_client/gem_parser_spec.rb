@@ -116,7 +116,7 @@ RSpec.describe Bundler::CompactIndexClient::GemParser do
           [],
           [
             ["checksum", [checksum]],
-            ["ruby", [">= 2.0"]],
+            ["Ruby", [">= 2.0"]],
           ],
         ]
         expect(parse(line)).to eq expected
@@ -131,7 +131,7 @@ RSpec.describe Bundler::CompactIndexClient::GemParser do
           [],
           [
             ["checksum", [checksum]],
-            ["ruby", [">= 2.2", "< 2.7.dev"]],
+            ["Ruby", [">= 2.2", "< 2.7.dev"]],
           ],
         ]
         expect(parse(line)).to eq expected
@@ -146,8 +146,8 @@ RSpec.describe Bundler::CompactIndexClient::GemParser do
           [],
           [
             ["checksum", [checksum]],
-            ["ruby", [">= 1.9", "< 2.7.dev"]],
-            ["rubygems", ["> 1.3.1"]],
+            ["Ruby", [">= 1.9", "< 2.7.dev"]],
+            ["RubyGems", ["> 1.3.1"]],
           ],
         ]
         expect(parse(line)).to eq expected
@@ -164,7 +164,7 @@ RSpec.describe Bundler::CompactIndexClient::GemParser do
           [],
           [
             ["checksum", [checksum]],
-            ["rubygems", ["> 1.3.1"]],
+            ["RubyGems", ["> 1.3.1"]],
           ],
         ]
         expect(parse(line)).to eq expected

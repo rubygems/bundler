@@ -54,10 +54,10 @@ module Bundler
         end
         ruby = raw_requirements.match(/\A(ruby):(.+)\z/)
         if ruby
-          requirements << [ruby[1], ruby[2].split(/\s*,\s*/)]
+          requirements << ["Ruby", ruby[2].split(/\s*,\s*/)]
         end
         if rubygems
-          requirements << [rubygems[1], rubygems[2].split(/\s*,\s*/)]
+          requirements << ["RubyGems", rubygems[2].split(/\s*,\s*/)]
         end
         requirements
       end
