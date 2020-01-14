@@ -73,10 +73,10 @@ RSpec.describe "Resolving platform craziness" do
       gem "foo", "1.1.0", "x64-mingw32" do |s|
         s.required_ruby_version = [">= 2.0", "< 2.4"]
       end
-      gem "ruby\0", "2.5.1"
+      gem "Ruby\0", "2.5.1"
     end
     dep "foo"
-    dep "ruby\0", "2.5.1"
+    dep "Ruby\0", "2.5.1"
     platforms "x64-mingw32"
 
     should_resolve_as %w[foo-1.1.0]
