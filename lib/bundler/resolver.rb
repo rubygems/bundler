@@ -151,8 +151,8 @@ module Bundler
         spec = sg.spec_for(platform)
         next if spec.nil?
         spec_platform = spec.platform
-        if (spec_platform && spec_platform != Gem::Platform::RUBY) ||
-           platform != Gem::Platform::RUBY
+        if (platform != Gem::Platform::RUBY) ||
+            (spec_platform && spec_platform != Gem::Platform::RUBY)
           # Add a spec group for "non platform specific spec" as the fallback
           # spec group.
           sg_ruby = sg.copy_for(Gem::Platform::RUBY)
