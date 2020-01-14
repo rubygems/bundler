@@ -69,7 +69,9 @@ RSpec.describe "Resolving platform craziness" do
     @index = build_index do
       gem "foo", "1.0.0"
       gem "foo", "1.0.0", "x64-mingw32"
-      gem "foo", "1.1.0"
+      gem "foo", "1.1.0" do |s|
+        s.required_ruby_version = [">= 2.0"]
+      end
       gem "foo", "1.1.0", "x64-mingw32" do |s|
         s.required_ruby_version = [">= 2.0", "< 2.4"]
       end
@@ -144,11 +146,11 @@ RSpec.describe "Resolving platform craziness" do
       end
     end
 
-    it "reports on the conflict" do
+    it "takes the ruby version as fallback" do
       platforms "ruby", "java"
       dep "foo"
 
-      should_conflict_on "baz"
+      should_resolve_as %w[bar-1.0.0 baz-1.0.0 foo-1.0.0]
     end
   end
 end
