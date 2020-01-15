@@ -148,21 +148,22 @@ module Bundler
       end
       selected_sgs = []
       search.each do |sg|
-        spec = sg.spec_for(platform)
-        next if spec.nil?
+        next unless sg.for?(platform)
         # Add a spec group for "non platform specific spec" as the fallback
         # spec group.
         sg_ruby = sg.copy_for(Gem::Platform::RUBY)
         selected_sgs << sg_ruby if sg_ruby
         sg_all_platforms = nil
-        self.class.sort_platforms(@platforms).reverse_each do |other_platform|
+        all_platforms = @platforms + [platform]
+        sorted_all_platforms = self.class.sort_platforms(all_platforms)
+        sorted_all_platforms.reverse_each do |other_platform|
           if sg_all_platforms.nil?
             sg_all_platforms = sg.copy_for(other_platform)
           else
             sg_all_platforms.activate_platform!(other_platform)
           end
         end
-        selected_sgs << sg_all_platforms if sg_all_platforms
+        selected_sgs << sg_all_platforms
       end
       selected_sgs
     end
