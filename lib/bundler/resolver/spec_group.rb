@@ -29,7 +29,7 @@ module Bundler
           lazy_spec = LazySpecification.new(name, version, s.platform, source)
           lazy_spec.dependencies.replace s.dependencies
           lazy_spec
-        end.compact
+        end.compact.uniq
       end
 
       def activate_platform!(platform)
