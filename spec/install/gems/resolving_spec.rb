@@ -181,8 +181,8 @@ RSpec.describe "bundle install with install-time dependencies" do
               In Gemfile:
                 Ruby\0 (#{error_message_requirement})#{error_message_platform}
 
-                require_ruby was resolved to 1.0, which depends on
-                  Ruby\0 (> 9000)#{error_message_platform}
+                require_ruby#{error_message_platform} was resolved to 1.0, which depends on
+                  Ruby\0 (> 9000)
 
             Ruby\0 (> 9000), which is required by gem 'require_ruby', is not available in the local ruby installation
           E

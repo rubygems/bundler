@@ -154,14 +154,15 @@ module Bundler
         # spec group.
         sg_ruby = sg.copy_for(Gem::Platform::RUBY)
         selected_sgs << sg_ruby if sg_ruby
-        sg_all_platforms = sg.copy_for(platform)
-        activated_platforms = [platform]
-        @platforms.each do |other_platform|
-          next if platform == other_platform
-          sg_all_platforms.activate_platform!(other_platform)
-          activated_platforms << other_platform
+        sg_all_platforms = nil
+        self.class.sort_platforms(@platforms).reverse_each do |other_platform|
+          if sg_all_platforms.nil?
+            sg_all_platforms = sg.copy_for(other_platform)
+          else
+            sg_all_platforms.activate_platform!(other_platform)
+          end
         end
-        selected_sgs << sg_all_platforms
+        selected_sgs << sg_all_platforms if sg_all_platforms
       end
       selected_sgs
     end
