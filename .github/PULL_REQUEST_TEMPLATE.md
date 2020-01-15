@@ -1,5 +1,7 @@
+<!--
 Thanks so much for the contribution!
 To make reviewing this PR a bit easier, please fill out answers to the following questions.
+-->
 
 ### What was the end-user or developer problem that led to this PR?
 
