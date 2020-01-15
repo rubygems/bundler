@@ -1,5 +1,10 @@
 <!--
 Thanks so much for the contribution!
+
+If you're updating documentation, make sure you run `bin/rake man:build` and
+squash the result into your changes, so that all documentation formats are
+updated.
+
 To make reviewing this PR a bit easier, please fill out answers to the following questions.
 -->
 
