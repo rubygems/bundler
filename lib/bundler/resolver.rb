@@ -146,7 +146,26 @@ module Bundler
           @gem_version_promoter.sort_versions(dependency, spec_groups)
         end
       end
-      search.select {|sg| sg.for?(platform) }.each {|sg| sg.activate_platform!(platform) }
+      selected_sgs = []
+      search.each do |sg|
+        next unless sg.for?(platform)
+        # Add a spec group for "non platform specific spec" as the fallback
+        # spec group.
+        sg_ruby = sg.copy_for(Gem::Platform::RUBY)
+        selected_sgs << sg_ruby if sg_ruby
+        sg_all_platforms = nil
+        all_platforms = @platforms + [platform]
+        sorted_all_platforms = self.class.sort_platforms(all_platforms)
+        sorted_all_platforms.reverse_each do |other_platform|
+          if sg_all_platforms.nil?
+            sg_all_platforms = sg.copy_for(other_platform)
+          else
+            sg_all_platforms.activate_platform!(other_platform)
+          end
+        end
+        selected_sgs << sg_all_platforms
+      end
+      selected_sgs
     end
 
     def index_for(dependency)
@@ -183,9 +202,7 @@ module Bundler
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
-      return false unless requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
-      spec.activate_platform!(requirement.__platform) if !@platforms || @platforms.include?(requirement.__platform)
-      true
+      requirement.matches_spec?(spec) || spec.source.is_a?(Source::Gemspec)
     end
 
     def relevant_sources_for_vertex(vertex)
@@ -223,8 +240,9 @@ module Bundler
     end
 
     def self.platform_sort_key(platform)
-      return ["", "", ""] if Gem::Platform::RUBY == platform
-      platform.to_a.map {|part| part || "" }
+      # Prefer specific platform to not specific platform
+      return ["99-LAST", "", "", ""] if Gem::Platform::RUBY == platform
+      ["00", *platform.to_a.map {|part| part || "" }]
     end
 
   private

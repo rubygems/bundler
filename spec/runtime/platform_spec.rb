@@ -113,6 +113,7 @@ RSpec.describe "Bundler.setup with multi platform stuff" do
       bundle! "install"
 
       expect(the_bundle).to include_gems "platform_specific 1.0 RUBY"
+      expect(the_bundle).to not_include_gems "nokogiri"
     end
   end
 

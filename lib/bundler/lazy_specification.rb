@@ -46,6 +46,14 @@ module Bundler
       identifier == other.identifier
     end
 
+    def eql?(other)
+      identifier.eql?(other.identifier)
+    end
+
+    def hash
+      identifier.hash
+    end
+
     def satisfies?(dependency)
       @name == dependency.name && dependency.requirement.satisfied_by?(Gem::Version.new(@version))
     end

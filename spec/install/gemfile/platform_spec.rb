@@ -379,8 +379,6 @@ RSpec.describe "bundle install with platform conditionals" do
   end
 
   it "prints a helpful warning when a dependency is unused on any platform" do
-    skip "prints warning but bundle install fails" if Gem.win_platform?
-
     simulate_platform "ruby"
     simulate_ruby_engine "ruby"
 
@@ -401,8 +399,6 @@ The dependency #{Gem::Dependency.new("rack", ">= 0")} will be unused by any of t
     before { bundle! "config set disable_platform_warnings true" }
 
     it "does not print the warning when a dependency is unused on any platform" do
-      skip "skips warning but bundle install fails" if Gem.win_platform?
-
       simulate_platform "ruby"
       simulate_ruby_engine "ruby"
 
