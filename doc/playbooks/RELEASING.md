@@ -39,9 +39,9 @@ When we cherry-pick, we cherry-pick the merge commits using the following comman
 $ git cherry-pick -m 1 MERGE_COMMIT_SHAS
 ```
 
-For example, for PR [#5029](https://github.com/bundler/bundler/pull/5029), we
-cherry picked commit [dd6aef9](https://github.com/bundler/bundler/commit/dd6aef97a5f2e7173f406267256a8c319d6134ab),
-not [4fe9291](https://github.com/bundler/bundler/commit/4fe92919f51e3463f0aad6fa833ab68044311f03)
+For example, for PR [#5029](https://github.com/rubygems/bundler/pull/5029), we
+cherry picked commit [dd6aef9](https://github.com/rubygems/bundler/commit/dd6aef97a5f2e7173f406267256a8c319d6134ab),
+not [4fe9291](https://github.com/rubygems/bundler/commit/4fe92919f51e3463f0aad6fa833ab68044311f03)
 using:
 
 ```bash
@@ -95,7 +95,7 @@ Here's the checklist for releasing new minor versions:
 Wait! You're not done yet! After your prelease looks good:
 
 * [ ] Update `version.rb` to a final version (i.e. 1.12.0)
-* [ ] In the [bundler/bundler-site](https://github.com/bundler/bundler-site) repo,
+* [ ] In the [rubygems/bundler-site](https://github.com/rubygems/bundler-site) repo,
   copy the previous version's docs to create a new version (e.g. `cp -r v1.11 v1.12`)
 * [ ] Update the new docs as needed, paying special attention to the "What's new"
   page for this version

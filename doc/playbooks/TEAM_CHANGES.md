@@ -25,7 +25,7 @@ Interested in adding someone to the team? Here's the process.
 
 ## Removing a team member
 
-When the conditions in [POLICIES](https://github.com/bundler/bundler/blob/master/doc/POLICIES.md#maintainer-team-guidelines) are met, or when team members choose to retire, here's how to remove someone from the team.
+When the conditions in [POLICIES](https://github.com/rubygems/bundler/blob/master/doc/POLICIES.md#maintainer-team-guidelines) are met, or when team members choose to retire, here's how to remove someone from the team.
 
 - Remove them from the owners list on RubyGems.org by running
   ```
@@ -36,8 +36,8 @@ When the conditions in [POLICIES](https://github.com/bundler/bundler/blob/master
 - Remove them from the [maintainers team][org_team] on GitHub
 - Remove them from the maintainers Slack channel
 
-[policies]: https://github.com/bundler/bundler/blob/master/doc/POLICIES.md#bundler-policies
+[policies]: https://github.com/rubygems/bundler/blob/master/doc/POLICIES.md#bundler-policies
 [org_team]: https://github.com/orgs/bundler/teams/maintainers/members
 [team]: https://bundler.io/contributors.html
-[maintainers]: https://github.com/bundler/bundler-site/blob/02483d3f79f243774722b3fc18a471ca77b1c424/source/contributors.html.haml#L25
-[list]: https://github.com/bundler/bundler-site/blob/02483d3f79f243774722b3fc18a471ca77b1c424/lib/tasks/contributors.rake#L8
+[maintainers]: https://github.com/rubygems/bundler-site/blob/02483d3f79f243774722b3fc18a471ca77b1c424/source/contributors.html.haml#L25
+[list]: https://github.com/rubygems/bundler-site/blob/02483d3f79f243774722b3fc18a471ca77b1c424/lib/tasks/contributors.rake#L8

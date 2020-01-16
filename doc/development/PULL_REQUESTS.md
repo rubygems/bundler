@@ -29,7 +29,7 @@ Ex. For a pull request that changes something with `bundle update`, you might ru
 
 Please ensure that the commit messages included in the pull request __do not__ have the following:
   - `@tag` GitHub user or team references (ex. `@indirect` or `@bundler/core`)
-  - `#id` references to issues or pull requests (ex. `#43` or `bundler/bundler-site#12`)
+  - `#id` references to issues or pull requests (ex. `#43` or `rubygems/bundler-site#12`)
 
 If you want to use these mechanisms, please instead include them in the pull request description. This prevents multiple notifications or references being created on commit rebases or pull request/branch force pushes.
 

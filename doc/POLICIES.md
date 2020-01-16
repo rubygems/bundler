@@ -68,7 +68,7 @@ Major version releases should be cut no more than once per year, ideally between
 
 ### Enforcement guidelines
 
-First off, Bundler's policies and enforcement of those policies are subsidiary to [Bundler's code of conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md) in any case where they conflict. The first priority is treating human beings with respect and empathy, and figuring out project guidelines and sticking to them will always come after that.
+First off, Bundler's policies and enforcement of those policies are subsidiary to [Bundler's code of conduct](https://github.com/rubygems/bundler/blob/master/CODE_OF_CONDUCT.md) in any case where they conflict. The first priority is treating human beings with respect and empathy, and figuring out project guidelines and sticking to them will always come after that.
 
 When it comes to carrying out our own policies, we're all regular humans trying to do the best we can. There will probably be times when we don't stick to our policies or goals. If you notice a discrepancy between real-life actions and these policies and goals, please bring it up! We want to make sure that our actions and our policies line up, and that our policies exemplify our goals.
 
