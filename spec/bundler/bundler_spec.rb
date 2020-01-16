@@ -338,7 +338,7 @@ EOF
       end
 
       context "with unwritable files in a parent dir" do
-        # Regression test for https://github.com/bundler/bundler/pull/6316
+        # Regression test for https://github.com/rubygems/bundler/pull/6316
         # It doesn't matter if there are other unwritable files so long as
         # bundle_path can be created
         before do

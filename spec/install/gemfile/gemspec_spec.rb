@@ -199,7 +199,7 @@ RSpec.describe "bundle install from an existing gemspec" do
 
   it "allows the gemspec to activate other gems" do
     ENV["BUNDLE_PATH__SYSTEM"] = "true"
-    # see https://github.com/bundler/bundler/issues/5409
+    # see https://github.com/rubygems/bundler/issues/5409
     #
     # issue was caused by rubygems having an unresolved gem during a require,
     # so emulate that

@@ -251,7 +251,7 @@ RSpec.describe "bundle lock" do
     expect(err).to include("Removing all platforms from the bundle is not allowed")
   end
 
-  # from https://github.com/bundler/bundler/issues/4896
+  # from https://github.com/rubygems/bundler/issues/4896
   it "properly adds platforms when platform requirements come from different dependencies" do
     build_repo4 do
       build_gem "ffi", "1.9.14"

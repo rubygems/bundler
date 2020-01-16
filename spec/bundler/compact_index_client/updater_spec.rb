@@ -12,7 +12,7 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
   subject(:updater) { described_class.new(fetcher) }
 
   context "when the ETag header is missing" do
-    # Regression test for https://github.com/bundler/bundler/issues/5463
+    # Regression test for https://github.com/rubygems/bundler/issues/5463
 
     let(:response) { double(:response, :body => "") }
 
