@@ -16,7 +16,7 @@ This command allows you to interact with Bundler\'s configuration system\.
 Bundler loads configuration settings in this order:
 .
 .IP "1." 4
-Local config (\fBapp/\.bundle/config\fR)
+Local config (\fBapp/\.bundle/config\fR or \fB$BUNDLE_APP_CONFIG/config\fR)
 .
 .IP "2." 4
 Environmental variables (\fBENV\fR)
@@ -42,7 +42,7 @@ Executing \fBbundle config set <name> <value>\fR will set that configuration to 
 Executing \fBbundle config set \-\-global <name> <value>\fR works the same as above\.
 .
 .P
-Executing \fBbundle config set \-\-local <name> <value>\fR will set that configuration to the local application\. The configuration will be stored in \fBapp/\.bundle/config\fR\.
+Executing \fBbundle config set \-\-local <name> <value>\fR will set that configuration to the local application\. The configuration will be stored in \fBapp/\.bundle/config\fR\. If \fBBUNDLE_APP_CONFIG\fR is set, the configuration will be stored in \fB$BUNDLE_APP_CONFIG/config\fR\.
 .
 .P
 Executing \fBbundle config unset <name>\fR will delete the configuration in both local and global sources\.
