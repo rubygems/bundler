@@ -15,10 +15,7 @@ module Bundler
       return true if Gem::Platform::RUBY == gemspec_platform
       return true if local_platform == gemspec_platform
       gemspec_platform = Gem::Platform.new(gemspec_platform)
-      generic_gemspec_platform = GemHelpers.generic(gemspec_platform)
-      unless generic_gemspec_platform == Gem::Platform::RUBY
-        return true if generic_gemspec_platform === local_platform
-      end
+      return true if GemHelpers.generic(gemspec_platform) === local_platform
       return true if gemspec_platform === local_platform
 
       false

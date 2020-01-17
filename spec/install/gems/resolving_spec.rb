@@ -150,17 +150,19 @@ RSpec.describe "bundle install with install-time dependencies" do
             s.required_ruby_version = "> 9000"
           end
           build_gem "rack", "1.2" do |s|
-            s.platform = Bundler.local_platform
+            s.platform = mingw
             s.required_ruby_version = "> 9000"
           end
           build_gem "rack", "1.2"
         end
 
-        install_gemfile <<-G, :artifice => "compact_index_rate_limited", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo4.to_s }
-          ruby "#{RUBY_VERSION}"
-          source "http://localgemserver.test/"
-          gem 'rack'
-        G
+        simulate_platform mingw do
+          install_gemfile <<-G, :artifice => "compact_index_rate_limited", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo4.to_s }
+            ruby "#{RUBY_VERSION}"
+            source "http://localgemserver.test/"
+            gem 'rack'
+          G
+        end
 
         expect(out).to_not include("rack-9001.0.0 requires ruby version > 9000")
         expect(out).to_not include("rack-1.2-#{Bundler.local_platform} requires ruby version > 9000")
