@@ -860,8 +860,8 @@ module Bundler
       @metadata_dependencies ||= begin
         ruby_versions = concat_ruby_version_requirements(@ruby_version)
         if ruby_versions.empty? || !@ruby_version.exact?
-          concat_ruby_version_requirements(RubyVersion.system)
-          concat_ruby_version_requirements(locked_ruby_version_object) unless @unlock[:ruby]
+          concat_ruby_version_requirements(RubyVersion.system, ruby_versions)
+          concat_ruby_version_requirements(locked_ruby_version_object, ruby_versions) unless @unlock[:ruby]
         end
         [
           Dependency.new("Ruby\0", ruby_versions),
