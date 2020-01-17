@@ -157,7 +157,7 @@ RSpec.describe "bundle install with install-time dependencies" do
         end
 
         simulate_platform mingw do
-          install_gemfile <<-G, :artifice => "compact_index_rate_limited", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo4.to_s }
+          install_gemfile <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo4.to_s }
             ruby "#{RUBY_VERSION}"
             source "http://localgemserver.test/"
             gem 'rack'
