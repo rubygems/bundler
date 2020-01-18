@@ -2,7 +2,7 @@ require: rubocop-performance
 
 AllCops:
   DisabledByDefault: true
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.4
   Exclude:
     - tmp/**/*
     - lib/bundler/vendor/**/*
@@ -445,9 +445,6 @@ Performance/EndWith:
   Enabled: true
 
 Performance/FixedSize:
-  Enabled: true
-
-Performance/RegexpMatch:
   Enabled: true
 
 Performance/ReverseEach:

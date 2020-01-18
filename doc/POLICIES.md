@@ -17,7 +17,7 @@ Bundler tries for perfect backwards compatibility. That means that if something 
 
 Bundler will provide features and bugfixes to older versions on a schedule similar to Ruby itself. For example, when Bundler 4.x is the current version, Bundler 4 will be eligible for new features and bugfixes. Bundler 3 will be eligible for bugfixes only. Bundler 2 will be eligible for security bugfixes only. Bundler 1 will be unsupported.
 
-Bundler 2 and above will support Ruby and RubyGems versions for the same amount of time as the Ruby core team supports them. As of February 2018, that means no support for Bundler running on Ruby 2.2, security fixes only for Bundler running on Ruby 2.3, and full support (including new features and bugfixes) for Bundler running on Ruby 2.4 and 2.5. Unsupported Ruby versions will be dropped in the first Bundler minor release after support ends.
+Bundler 2 supports Ruby and RubyGems versions for the same amount of time as the Ruby core team supports them. As of February 2020, that means no support for Bundler running on Ruby 2.3, security fixes only for Bundler running on Ruby 2.4, and full support (including new features and bugfixes) for Bundler running on Ruby 2.5, 2.6 and 2.7. Unsupported Ruby versions will be dropped in the first Bundler minor release after support ends.
 
 These policies are not a guarantee that any particular fix will be backported. Instead, this is a way for us to set an upper limit on the versions of Ruby, RubyGems, and Bundler that we have to consider while making changes. Without the limit, the number of versions grows exponentially over time and quickly becomes overwhelming, which leads to maintainer burnout. We want to avoid that.
 

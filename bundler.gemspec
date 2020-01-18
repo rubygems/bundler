@@ -31,8 +31,8 @@ Gem::Specification.new do |s|
     }
   end
 
-  s.required_ruby_version     = ">= 2.3.0"
-  s.required_rubygems_version = ">= 2.5.2"
+  s.required_ruby_version     = ">= 2.4.0"
+  s.required_rubygems_version = ">= 2.6.14"
 
   s.files = Dir.glob("{lib,man,exe}/**/*", File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
 
