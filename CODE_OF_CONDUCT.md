@@ -133,4 +133,4 @@ Sometimes, though, you need to get admins involved. Admins will do their best to
 
 This Code of Conduct is adapted from the [package.community Code of Conduct], adapted from the [WeAllJS Code of Conduct](https://wealljs.org/code-of-conduct), itself adapted from [Contributor Covenant](https://contributor-covenant.org) version 1.4, available at [https://contributor-covenant.org/version/1/4](https://contributor-covenant.org/version/1/4), as well as the LGBTQ in Technology Slack [Code of Conduct](https://lgbtq.technology/coc.html).
 
-Additional thanks to [Contributor Covenant](https://contributor-covenant.org) for the [default code of conduct](https://github.com/bundler/bundler/blob/master/lib/bundler/templates/newgem/CODE_OF_CONDUCT.md.tt) included in generated gems.
+Additional thanks to [Contributor Covenant](https://contributor-covenant.org) for the [default code of conduct](https://github.com/rubygems/bundler/blob/master/lib/bundler/templates/newgem/CODE_OF_CONDUCT.md.tt) included in generated gems.

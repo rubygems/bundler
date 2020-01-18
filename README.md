@@ -1,6 +1,6 @@
 [![Version     ](https://img.shields.io/gem/v/bundler.svg?style=flat)](https://rubygems.org/gems/bundler)
 [![Build Status](https://img.shields.io/travis/rubygems/bundler/master.svg?style=flat)](https://travis-ci.org/rubygems/bundler)
-[![Inline docs ](https://inch-ci.org/github/bundler/bundler.svg?style=flat)](https://inch-ci.org/github/bundler/bundler)
+[![Inline docs ](https://inch-ci.org/github/rubygems/bundler.svg?style=flat)](https://inch-ci.org/github/rubygems/bundler)
 [![Slack       ](https://bundler-slackin.herokuapp.com/badge.svg)](https://bundler-slackin.herokuapp.com)
 
 # Bundler: a gem to bundle gems
@@ -44,7 +44,7 @@ To get in touch with the Bundler core team and other Bundler users, please see [
 
 ### Contributing
 
-If you'd like to contribute to Bundler, that's awesome, and we <3 you. We've put together [the Bundler contributor guide](https://github.com/bundler/bundler/blob/master/doc/contributing/README.md) with all of the information you need to get started.
+If you'd like to contribute to Bundler, that's awesome, and we <3 you. We've put together [the Bundler contributor guide](https://github.com/rubygems/bundler/blob/master/doc/contributing/README.md) with all of the information you need to get started.
 
 If you'd like to request a substantial change to Bundler or to the Bundler documentation, refer to the [Bundler RFC process](https://github.com/bundler/rfcs) for more information.
 
@@ -57,8 +57,8 @@ While some Bundler contributors are compensated by Ruby Together, the project ma
 
 ### Code of Conduct
 
-Everyone interacting in the Bundler project's codebases, issue trackers, chat rooms, and mailing lists is expected to follow the [Bundler code of conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Bundler project's codebases, issue trackers, chat rooms, and mailing lists is expected to follow the [Bundler code of conduct](https://github.com/rubygems/bundler/blob/master/CODE_OF_CONDUCT.md).
 
 ### License
 
-Bundler is available under an [MIT License](https://github.com/bundler/bundler/blob/master/LICENSE.md).
+Bundler is available under an [MIT License](https://github.com/rubygems/bundler/blob/master/LICENSE.md).

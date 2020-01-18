@@ -46,6 +46,6 @@ If your version of Bundler does not have the `bundle env` command, then please i
 
 If you have either `rubygems-bundler` or `open_gem` installed, please try removing them and then following the troubleshooting steps above before opening a new ticket.
 
-[Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/bundler/bundler/issues) and [create a ticket](https://github.com/bundler/bundler/issues/new) describing your problem and linking to your gist.
+[Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/rubygems/bundler/issues) and [create a ticket](https://github.com/rubygems/bundler/issues/new) describing your problem and linking to your gist.
 
 Thanks for reporting issues and helping make Bundler better!

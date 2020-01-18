@@ -5,7 +5,7 @@ RSpec.describe "ruby requirement" do
     Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(File.read(bundled_app_lock)).ruby_version)
   end
 
-  # As discovered by https://github.com/bundler/bundler/issues/4147, there is
+  # As discovered by https://github.com/rubygems/bundler/issues/4147, there is
   # no test coverage to ensure that adding a gem is possible with a ruby
   # requirement. This test verifies the fix, committed in bfbad5c5.
   it "allows adding gems" do

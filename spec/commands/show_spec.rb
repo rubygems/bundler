@@ -192,7 +192,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
   end
 
   context "--outdated option" do
-    # Regression test for https://github.com/bundler/bundler/issues/5375
+    # Regression test for https://github.com/rubygems/bundler/issues/5375
     before do
       build_repo2
     end
