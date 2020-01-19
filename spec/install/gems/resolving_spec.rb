@@ -69,6 +69,20 @@ RSpec.describe "bundle install with install-time dependencies" do
       expect(the_bundle).to include_gems "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
     end
 
+    context "with ENV['BUNDLER_DEBUG_RESOLVER'] set" do
+      it "produces debug output" do
+        gemfile <<-G
+          source "#{file_uri_for(gem_repo1)}"
+          gem "net_c"
+          gem "net_e"
+        G
+
+        bundle :install, :env => { "BUNDLER_DEBUG_RESOLVER" => "1" }
+
+        expect(err).to include("Creating possibility state for net_c")
+      end
+    end
+
     context "with ENV['DEBUG_RESOLVER'] set" do
       it "produces debug output" do
         gemfile <<-G

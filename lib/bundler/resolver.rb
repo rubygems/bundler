@@ -80,7 +80,12 @@ module Bundler
 
     def debug?
       return @debug_mode if defined?(@debug_mode)
-      @debug_mode = ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"] || false
+      @debug_mode =
+        ENV["BUNDLER_DEBUG_RESOLVER"] ||
+        ENV["BUNDLER_DEBUG_RESOLVER_TREE"] ||
+        ENV["DEBUG_RESOLVER"] ||
+        ENV["DEBUG_RESOLVER_TREE"] ||
+        false
     end
 
     def before_resolution
