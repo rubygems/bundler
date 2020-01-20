@@ -9,7 +9,7 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
   let(:local_path) { Pathname("/tmp/localpath") }
   let(:remote_path) { double(:remote_path) }
 
-  subject(:updater) { described_class.new(fetcher) }
+  let!(:updater) { described_class.new(fetcher) }
 
   context "when the ETag header is missing" do
     # Regression test for https://github.com/rubygems/bundler/issues/5463
