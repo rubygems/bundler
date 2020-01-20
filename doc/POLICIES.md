@@ -29,7 +29,7 @@ Minor/feature releases can be cut anytime at least one new feature is ready, but
 
 Major version releases should be cut no more than once per year, and must include a new section of the website with documentation for that major version.
 
-Major releases ideally happen after a Ruby version loses support in February or March, which helps us stay in sync with Ruby versions uspported by the core team.  
+Major releases ideally happen after a Ruby version loses support in February or March, which helps us stay in sync with Ruby versions uspported by the core team.
 
 Breaking changes other than dropping support for old Ruby versions should be avoided whenever possible, but may be included in major releases. In general, breaking changes should include at least one major version (and one year elapsed) with a deprecation warning before the breaking change takes effect.
 
