@@ -19,6 +19,8 @@ Bundler will provide features and bugfixes to older versions on a schedule simil
 
 Bundler supports Ruby and RubyGems versions until the next major release after the Ruby core team drops support. For example, the Ruby core team will drop all Ruby 2.4 support on March 31, 2020. The next Bundler major release after that date will drop support for Ruby 2.4.
 
+These policies are not a guarantee that any particular fix will be backported. Instead, this is a way for us to set an upper limit on the versions of Ruby, RubyGems, and Bundler that we have to consider while making changes. Without the limit, the number of versions grows exponentially over time and quickly becomes overwhelming, which leads to maintainer burnout. We want to avoid that.
+
 ### Release guidelines
 
 Bugfix releases should generally be cut as soon as possible. A bugfix release for a single PR is totally okay.
