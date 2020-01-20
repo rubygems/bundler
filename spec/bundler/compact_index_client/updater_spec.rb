@@ -42,8 +42,6 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
   end
 
   context "when bundler doesn't have permissions on Dir.tmpdir" do
-    let(:response) { double(:response, :body => "") }
-
     it "Errno::EACCES is raised" do
       allow(Dir).to receive(:mktmpdir) { raise Errno::EACCES }
 
