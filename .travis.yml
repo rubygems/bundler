@@ -39,6 +39,7 @@ notifications:
       - secure: JxBi7DDJGkIF/7f/FSN/HUHpvV4EKfQccZHTPd1b2pNJn3GXo6u+tNVbAw2WjxYzPyPQI3ZcYBCU9SEXp/i7VmG8uMzh8Kyildw+miSKYKVb90uYqcsXWzbxwyNBgJLvyDkzST45H5lgnyAicee3WkFes/WDZikIajbH7ztdb04=
 
 rvm:
+  - 2.7.0
   - 2.6.5
   - 2.5.7
   - 2.4.9
@@ -52,12 +53,12 @@ env:
   - RGV=master BUNDLER_SPEC_SUB_VERSION=3.0.0
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v3.0.6 BUNDLER_SPEC_SUB_VERSION=3.0.0
-  - RGV=v3.0.6
+  - RGV=v3.1.2 BUNDLER_SPEC_SUB_VERSION=3.0.0
+  - RGV=v3.1.2
 
 jobs:
   include:
-    - rvm: 2.6.5
+    - rvm: 2.7.0
       script: bin/rake rubocop check_rvm_integration man:check
       stage: linting
     # Ruby 2.3 also tested in 2.x mode
@@ -65,6 +66,10 @@ jobs:
       env: RGV=master
       stage: test
     - rvm: 2.3.8
+      env: RGV=v3.1.2
+      stage: test
+    # Ruby 2.6, Rubygems 3.0
+    - rvm: 2.6.5
       env: RGV=v3.0.6
       stage: test
     # Ruby 2.5, Rubygems 2.7
