@@ -7,6 +7,7 @@ on:
     branches:
       - staging
       - trying
+      - ci/balance_github_actions_test_times
 
 jobs:
   windows:
@@ -24,6 +25,13 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
 
+      - name: Cache parallel tests runtimes
+        uses: actions/cache@v1
+        with:
+          path: tmp/parallel_runtime_rspec.log
+          key: ${{ matrix.ruby }}-runtime
+          restore-keys: ${{ matrix.ruby }}-runtime
+
       - name: Install dependencies
         run: bin/rake spec:parallel_deps
         shell: bash
@@ -31,8 +39,3 @@ jobs:
       - name: Run specs
         run: bin/parallel_rspec spec
         shell: bash
-
-      - uses: actions/upload-artifact@v1
-        with:
-          name: parallel_runtime
-          path: tmp/parallel_runtime_rspec.log
