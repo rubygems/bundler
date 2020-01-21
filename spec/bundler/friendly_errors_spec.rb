@@ -7,13 +7,13 @@ require "cgi"
 RSpec.describe Bundler, "friendly errors" do
   context "with invalid YAML in .gemrc" do
     before do
-      File.open(Gem.configuration.config_file_name, "w") do |f|
+      File.open(home(".gemrc"), "w") do |f|
         f.write "invalid: yaml: hah"
       end
     end
 
     after do
-      FileUtils.rm(Gem.configuration.config_file_name)
+      FileUtils.rm(home(".gemrc"))
     end
 
     it "reports a relevant friendly error message" do
