@@ -6,6 +6,7 @@ module Spec
   module Rubygems
     DEV_DEPS = {
       "automatiek" => "~> 0.3.0",
+      "parallel" => "~> 1.19",
       "parallel_tests" => "~> 2.29",
       "rake" => "~> 12.0",
       "ronn" => "~> 0.7.3",
@@ -57,7 +58,7 @@ module Spec
     end
 
     def install_parallel_test_deps
-      require "parallel"
+      gem_require "parallel"
 
       prev_env_test_number = ENV["TEST_ENV_NUMBER"]
 
