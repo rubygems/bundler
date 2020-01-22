@@ -27,6 +27,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - auto_install_dev_deps
 
 cache:
   directories:

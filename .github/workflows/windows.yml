@@ -5,6 +5,7 @@ on:
 
   push:
     branches:
+      - auto_install_dev_deps
       - staging
       - trying
 
