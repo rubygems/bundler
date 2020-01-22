@@ -199,7 +199,6 @@ RSpec.describe "bundle cache" do
 
   context "with --all-platforms" do
     before do
-      skip "doesn't put gems where it should" if Gem.win_platform?
     end
 
     it "puts the gems in vendor/cache even for other rubies" do

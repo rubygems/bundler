@@ -9,7 +9,6 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "runs the bundled command when in the bundle" do
-    skip "exec format error" if Gem.win_platform?
 
     bundle! "binstubs rack"
 
@@ -22,7 +21,6 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "allows the location of the gem stubs to be specified" do
-    skip "created in bin :/" if Gem.win_platform?
 
     bundle! "binstubs rack", :path => "gbin"
 
@@ -34,7 +32,6 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "allows absolute paths as a specification of where to install bin stubs" do
-    skip "exec format error" if Gem.win_platform?
 
     bundle! "binstubs rack", :path => tmp("bin")
 
@@ -48,14 +45,12 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "allows the name of the shebang executable to be specified" do
-    skip "not created with custom name :/" if Gem.win_platform?
 
     bundle! "binstubs rack", :shebang => "ruby-foo"
     expect(File.open(bundled_app("bin/rackup")).gets).to eq("#!/usr/bin/env ruby-foo\n")
   end
 
   it "runs the bundled command when out of the bundle" do
-    skip "exec format error" if Gem.win_platform?
 
     bundle! "binstubs rack"
 
@@ -68,7 +63,6 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "works with gems in path" do
-    skip "exec format error" if Gem.win_platform?
 
     build_lib "rack", :path => lib_path("rack") do |s|
       s.executables = "rackup"
@@ -104,7 +98,6 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "does not generate bin stubs if the option was not specified" do
-    skip "generated :/" if Gem.win_platform?
 
     bundle! "install"
 
@@ -112,7 +105,6 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "allows you to stop installing binstubs", :bundler => "< 3" do
-    skip "delete permission error" if Gem.win_platform?
 
     bundle! "install --binstubs bin/"
     bundled_app("bin/rackup").rmtree
@@ -157,7 +149,6 @@ RSpec.describe "Running bin/* commands" do
   end
 
   it "use BUNDLE_GEMFILE gemfile for binstub" do
-    skip "exec format error" if Gem.win_platform?
 
     # context with bin/bundler w/ default Gemfile
     bundle! "binstubs bundler"

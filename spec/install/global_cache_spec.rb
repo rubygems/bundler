@@ -16,7 +16,6 @@ RSpec.describe "global gem caching" do
     end
 
     it "caches gems into the global cache on download" do
-      skip "corrupt test gem" if Gem.win_platform?
 
       install_gemfile! <<-G, :artifice => "compact_index"
         source "#{source}"
@@ -41,7 +40,6 @@ RSpec.describe "global gem caching" do
 
     describe "when the same gem from different sources is installed" do
       before do
-        skip "corrupt test gem" if Gem.win_platform?
       end
 
       it "should use the appropriate one from the global cache" do
@@ -140,7 +138,6 @@ RSpec.describe "global gem caching" do
 
     describe "when installing gems from a different directory" do
       it "uses the global cache as a source" do
-        skip "corrupt test gem" if Gem.win_platform?
 
         install_gemfile! <<-G, :artifice => "compact_index"
           source "#{source}"
@@ -195,7 +192,6 @@ RSpec.describe "global gem caching" do
 
   describe "extension caching", :ruby_repo do
     it "works" do
-      skip "gets incorrect ref in path" if Gem.win_platform?
 
       build_git "very_simple_git_binary", &:add_c_extension
       build_lib "very_simple_path_binary", &:add_c_extension

@@ -226,7 +226,6 @@ RSpec.shared_examples "bundle install --standalone" do
 
     describe "simple gems" do
       before do
-        skip "artifice issues maybe" if Gem.win_platform?
 
         gemfile <<-G
           source "#{source_uri}"
@@ -265,13 +264,11 @@ RSpec.shared_examples "bundle install --standalone" do
     include_examples "common functionality"
 
     it "creates stubs that use the standalone load path" do
-      skip "exec format error" if Gem.win_platform?
 
       expect(sys_exec("bin/rails -v").chomp).to eql "2.3.2"
     end
 
     it "creates stubs that can be executed from anywhere" do
-      skip "exec format error" if Gem.win_platform?
 
       require "tmpdir"
       sys_exec!(%(#{bundled_app("bin/rails")} -v), :dir => Dir.tmpdir)
@@ -279,7 +276,6 @@ RSpec.shared_examples "bundle install --standalone" do
     end
 
     it "creates stubs that can be symlinked" do
-      skip "symlinks unsupported" if Gem.win_platform?
 
       symlink_dir = tmp("symlink")
       FileUtils.mkdir_p(symlink_dir)

@@ -794,7 +794,6 @@ end
     let(:full_name) { "bundler-#{Bundler::VERSION}" }
 
     before do
-      skip "symlink destination exists" if Gem.win_platform?
 
       FileUtils.ln_sf(gem_home, symlinked_gem_home)
       gems_dir = File.join(gem_home, "gems")
@@ -1014,7 +1013,6 @@ end
     end
 
     it "error intelligently if the gemspec has a LoadError" do
-      skip "whitespace issue?" if Gem.win_platform?
 
       ref = update_git "bar", :gemspec => false do |s|
         s.write "bar.gemspec", "require 'foobarbaz'"
@@ -1259,7 +1257,6 @@ end
       end
 
       it "activates no gems with bundle exec that is loaded" do
-        skip "not executable" if Gem.win_platform?
 
         install_gemfile! ""
         create_file("script.rb", "#!/usr/bin/env ruby\n\n#{code}")

@@ -303,7 +303,6 @@ RSpec.describe "the lockfile format" do
   end
 
   it "generates a lockfile without credentials for a configured source", :bundler => "< 3" do
-    skip "corrupt test gem" if Gem.win_platform?
 
     bundle "config set http://localgemserver.test/ user:pass"
 
@@ -1405,7 +1404,6 @@ RSpec.describe "the lockfile format" do
       end
 
       it "preserves Gemfile.lock \\n\\r line endings" do
-        skip "needs to be adapted" if Gem.win_platform?
 
         update_repo2
         win_lock = File.read(bundled_app_lock).gsub(/\n/, "\r\n")

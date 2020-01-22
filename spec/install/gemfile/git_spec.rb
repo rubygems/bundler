@@ -311,7 +311,6 @@ RSpec.describe "bundle install with git sources" do
     context "when the branch starts with a `#`" do
       let(:branch) { "#149/redirect-url-fragment" }
       it "works" do
-        skip "git does not accept this" if Gem.win_platform?
 
         update_git("foo", :path => repo, :branch => branch)
 
@@ -328,7 +327,6 @@ RSpec.describe "bundle install with git sources" do
     context "when the branch includes quotes" do
       let(:branch) { %('") }
       it "works" do
-        skip "git does not accept this" if Gem.win_platform?
 
         update_git("foo", :path => repo, :branch => branch)
 
@@ -362,7 +360,6 @@ RSpec.describe "bundle install with git sources" do
     context "when the tag starts with a `#`" do
       let(:tag) { "#149/redirect-url-fragment" }
       it "works" do
-        skip "git does not accept this" if Gem.win_platform?
 
         update_git("foo", :path => repo, :tag => tag)
 
@@ -379,7 +376,6 @@ RSpec.describe "bundle install with git sources" do
     context "when the tag includes quotes" do
       let(:tag) { %('") }
       it "works" do
-        skip "git does not accept this" if Gem.win_platform?
 
         update_git("foo", :path => repo, :tag => tag)
 
@@ -623,7 +619,6 @@ RSpec.describe "bundle install with git sources" do
     end
 
     it "installs dependencies from git even if a newer gem is available elsewhere" do
-      skip "override is not winning" if Gem.win_platform?
 
       system_gems "rack-1.0.0"
 
@@ -914,7 +909,6 @@ RSpec.describe "bundle install with git sources" do
   end
 
   it "prints a friendly error if a file blocks the git repo" do
-    skip "drive letter is not detected correctly in error message" if Gem.win_platform?
 
     build_git "foo"
 

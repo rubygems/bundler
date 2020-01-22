@@ -19,7 +19,6 @@ RSpec.describe "bundle install with install-time dependencies" do
   end
 
   it "installs gems with a dependency with no type" do
-    skip "incorrect data check error" if Gem.win_platform?
 
     build_repo2
 
@@ -118,7 +117,6 @@ RSpec.describe "bundle install with install-time dependencies" do
   describe "when a required ruby version" do
     context "allows only an older version" do
       before do
-        skip "gem not found" if Gem.win_platform?
       end
 
       it "installs the older version" do
@@ -205,7 +203,6 @@ RSpec.describe "bundle install with install-time dependencies" do
 
       shared_examples_for "ruby version conflicts" do
         it "raises an error during resolution" do
-          skip "ruby requirement includes platform and it shouldn't" if Gem.win_platform?
 
           install_gemfile <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo2.to_s }
             source "http://localgemserver.test/"
