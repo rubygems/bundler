@@ -124,11 +124,6 @@ RSpec.describe Bundler, "friendly errors" do
         expect(Bundler.ui).to receive(:warn).with(any_args, :wrap => true)
         Bundler::FriendlyErrors.log_error(error)
       end
-
-      it "Bundler.ui receive trace" do
-        expect(Bundler.ui).to receive(:trace).with(error)
-        Bundler::FriendlyErrors.log_error(error)
-      end
     end
 
     context "Interrupt" do

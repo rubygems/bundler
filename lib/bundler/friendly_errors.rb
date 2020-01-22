@@ -29,7 +29,6 @@ module Bundler
           Gemfile from 'https' to 'http'. Instructions for compiling with OpenSSL \
           using RVM are available at https://rvm.io/packages/openssl.
         WARN
-        Bundler.ui.trace error
       when Interrupt
         Bundler.ui.error "\nQuitting..."
         Bundler.ui.trace error
