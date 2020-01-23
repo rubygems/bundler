@@ -23,13 +23,12 @@ module Bundler
         Bundler.ui.error error.message
       when LoadError
         raise error unless error.message =~ /cannot load such file -- openssl|openssl.so|libcrypto.so/
-        Bundler.ui.error "\nCould not load OpenSSL."
+        Bundler.ui.error "\nCould not load OpenSSL. #{error.class}: #{error}\n#{error.backtrace.join("\n  ")}"
         Bundler.ui.warn <<-WARN, :wrap => true
           You must recompile Ruby with OpenSSL support or change the sources in your \
           Gemfile from 'https' to 'http'. Instructions for compiling with OpenSSL \
           using RVM are available at https://rvm.io/packages/openssl.
         WARN
-        Bundler.ui.trace error
       when Interrupt
         Bundler.ui.error "\nQuitting..."
         Bundler.ui.trace error
