@@ -31,8 +31,8 @@ RSpec.describe "bundle cache with path" do
   end
 
   it "copies when the path is outside the bundle and the paths intersect" do
-    libname = File.basename(Dir.pwd) + "_gem"
-    libpath = File.join(File.dirname(Dir.pwd), libname)
+    libname = File.basename(bundled_app) + "_gem"
+    libpath = File.join(File.dirname(bundled_app), libname)
 
     build_lib libname, :path => libpath
 
