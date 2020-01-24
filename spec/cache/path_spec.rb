@@ -26,7 +26,6 @@ RSpec.describe "bundle cache with path" do
     expect(bundled_app("vendor/cache/foo-1.0")).to exist
     expect(bundled_app("vendor/cache/foo-1.0/.bundlecache")).to be_file
 
-    FileUtils.rm_rf lib_path("foo-1.0")
     expect(the_bundle).to include_gems "foo 1.0"
   end
 
@@ -45,7 +44,6 @@ RSpec.describe "bundle cache with path" do
     expect(bundled_app("vendor/cache/#{libname}")).to exist
     expect(bundled_app("vendor/cache/#{libname}/.bundlecache")).to be_file
 
-    FileUtils.rm_rf libpath
     expect(the_bundle).to include_gems "#{libname} 1.0"
   end
 
@@ -66,7 +64,6 @@ RSpec.describe "bundle cache with path" do
     bundle :cache
 
     expect(bundled_app("vendor/cache/foo-1.0")).to exist
-    FileUtils.rm_rf lib_path("foo-1.0")
 
     run "require 'foo'"
     expect(out).to eq("CACHE")
