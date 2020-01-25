@@ -25,7 +25,7 @@ These policies are not a guarantee that any particular fix will be backported. I
 
 Bugfix releases should generally be cut as soon as possible. A bugfix release for a single PR is totally okay.
 
-Minor/feature releases can be cut anytime at least one new feature is ready, but don't have to be. Minor version releases should include an update to the documentation website.
+Minor/feature releases can be cut anytime at least one new feature is ready, but don't have to be. Minor version releases must also include any needed updates to the documentation website, plus a "What's new" page summarizing what was added.
 
 Major version releases should be cut no more than once per year, and must include a new section of the website with documentation for that major version.
 
