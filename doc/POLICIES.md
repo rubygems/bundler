@@ -23,13 +23,13 @@ These policies are not a guarantee that any particular fix will be backported. I
 
 ### Release guidelines
 
-Bugfix releases should generally be cut as soon as possible. A bugfix release for a single PR is totally okay.
+**tl;dr**: Majors about once per year, minors for any finished features with docs, patches for any committed bugfix.
 
-Minor/feature releases can be cut anytime at least one new feature is ready, but don't have to be. Minor version releases must also include any needed updates to the documentation website, plus a "What's new" page summarizing what was added.
+Patch (bugfix) releases should generally be cut as soon as possible. A patch release for a single bugfix PR is totally okay.
 
-Major version releases should be cut no more than once per year, and must include a new section of the website with documentation for that major version.
+Minor (feature) releases can be cut anytime at least one new feature is ready, but don't have to be. Minor version releases must update their major version's man pages and docs website as needed, and should each have their own "What's new?" section.
 
-Major releases ideally happen after a Ruby version loses support in February or March, which helps us stay in sync with Ruby versions uspported by the core team.
+Major (breaking) version releases should be cut no more than once per year, and must include a new section of the docs website dedicated to that major version. Ideally, major releases will happen after a Ruby version loses support in February or March, to help us stay in sync with Ruby versions supported by the core team.
 
 Breaking changes other than dropping support for old Ruby versions should be avoided whenever possible, but may be included in major releases. In general, breaking changes should include at least one major version (and one year elapsed) with a deprecation warning before the breaking change takes effect.
 
