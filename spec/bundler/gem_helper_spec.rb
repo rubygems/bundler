@@ -11,7 +11,7 @@ RSpec.describe Bundler::GemHelper do
   before(:each) do
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false", "BUNDLE_GEM__RUBOCOP" => "false"
     bundle "gem #{app_name}"
-    prepare_gemspec(app_gemspec_path)
+    @app_gemspec_content = prepare_gemspec(app_gemspec_path)
   end
 
   context "determining gemspec" do
@@ -64,10 +64,9 @@ RSpec.describe Bundler::GemHelper do
     let(:app_version) { "0.1.0" }
     let(:app_gem_dir) { app_path.join("pkg") }
     let(:app_gem_path) { app_gem_dir.join("#{app_name}-#{app_version}.gem") }
-    let(:app_gemspec_content) { File.read(app_gemspec_path) }
 
     before(:each) do
-      content = app_gemspec_content.gsub("TODO: ", "")
+      content = @app_gemspec_content.gsub("TODO: ", "")
       content.sub!(/homepage\s+= ".*"/, 'homepage = ""')
       content.gsub!(/spec\.metadata.+\n/, "")
       File.open(app_gemspec_path, "w") {|file| file << content }
@@ -126,7 +125,7 @@ RSpec.describe Bundler::GemHelper do
       context "when build failed" do
         it "raises an error with appropriate message" do
           # break the gemspec by adding back the TODOs
-          File.open(app_gemspec_path, "w") {|file| file << app_gemspec_content }
+          File.open(app_gemspec_path, "w") {|file| file << @app_gemspec_content }
           expect { subject.build_gem }.to raise_error(/TODO/)
         end
       end

@@ -532,10 +532,12 @@ module Spec
     end
 
     def process_file(pathname)
-      changed_lines = pathname.readlines.map do |line|
+      previous_content = pathname.readlines
+      changed_lines = previous_content.map do |line|
         yield line
       end
       File.open(pathname, "w") {|file| file.puts(changed_lines.join) }
+      previous_content.join
     end
 
     def with_env_vars(env_hash, &block)
