@@ -17,9 +17,21 @@ Bundler tries for perfect backwards compatibility. That means that if something 
 
 Bundler will provide features and bugfixes to older versions on a schedule similar to Ruby itself. For example, when Bundler 4.x is the current version, Bundler 4 will be eligible for new features and bugfixes. Bundler 3 will be eligible for bugfixes only. Bundler 2 will be eligible for security bugfixes only. Bundler 1 will be unsupported.
 
-Bundler 2 and above will support Ruby and RubyGems versions for the same amount of time as the Ruby core team supports them. As of February 2018, that means no support for Bundler running on Ruby 2.2, security fixes only for Bundler running on Ruby 2.3, and full support (including new features and bugfixes) for Bundler running on Ruby 2.4 and 2.5. Unsupported Ruby versions will be dropped in the first Bundler minor release after support ends.
+Bundler supports Ruby and RubyGems versions until the next major release after the Ruby core team drops support. For example, the Ruby core team will drop all Ruby 2.4 support on March 31, 2020. The next Bundler major release after that date will drop support for Ruby 2.4.
 
 These policies are not a guarantee that any particular fix will be backported. Instead, this is a way for us to set an upper limit on the versions of Ruby, RubyGems, and Bundler that we have to consider while making changes. Without the limit, the number of versions grows exponentially over time and quickly becomes overwhelming, which leads to maintainer burnout. We want to avoid that.
+
+### Release guidelines
+
+**tl;dr**: Majors about once per year, minors for any finished features with docs, patches for any committed bugfix.
+
+Patch (bugfix) releases should generally be cut as soon as possible. A patch release for a single bugfix PR is totally okay.
+
+Minor (feature) releases can be cut anytime at least one new feature is ready, but don't have to be. Minor version releases must update their major version's man pages and docs website as needed, and should each have their own "What's new?" section.
+
+Major (breaking) version releases should be cut no more than once per year, and must include a new section of the docs website dedicated to that major version. Ideally, major releases will happen after a Ruby version loses support in February or March, to help us stay in sync with Ruby versions supported by the core team.
+
+Breaking changes other than dropping support for old Ruby versions should be avoided whenever possible, but may be included in major releases. In general, breaking changes should include at least one major version (and one year elapsed) with a deprecation warning before the breaking change takes effect.
 
 ### User experience guidelines
 
@@ -57,14 +69,6 @@ Large changes often benefit from being written out more completely, read by othe
 Always create pull requests rather than pushing directly to the primary branch. Try to get code review and merge approval from someone other than yourself whenever possible. Always merge using `@bundlerbot` to guarantee the primary branch stays green.
 
 Contributors who have contributed regularly for more than six months (or implemented a completely new feature for a minor release) are eligible to join the maintainer team. Unless vetoed by an existing maintainer, these contributors will be asked to join the maintainer team. If they accept, new maintainers will be given permissions to view maintainer playbooks, accept pull requests, and release new versions.
-
-### Release guidelines
-
-Bugfix releases should generally be cut as soon as possible. Multiple bugfix releases are preferable to waiting for a specific fix to land.
-
-Minor/feature releases can be cut anytime at least one new feature is ready, but don't have to be. Minor version releases should include an update to the documentation website, allowing users to view the documentation for whatever minor version they happen to be using.
-
-Major version releases should be cut no more than once per year, ideally between Ruby's release on December 25 and February 15 of the next year. Releasing soon after Ruby helps us stay in sync with deprecated Ruby versions. Breaking changes other than dropping support for old Ruby versions should be avoided whenever possible, but may be included in major releases. In general, breaking changes should include at least one major version with a deprecation warning before the breaking change takes effect.
 
 ### Enforcement guidelines
 
