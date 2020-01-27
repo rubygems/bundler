@@ -408,6 +408,8 @@ Naming/ConstantName:
 
 Naming/FileName:
   Enabled: true
+  Exclude:
+    - 'spec/realworld/fixtures/warbler/bin/warbler-example.rb'
 
 Naming/HeredocDelimiterCase:
   Enabled: true
