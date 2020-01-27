@@ -1,3 +1,19 @@
+## 2.1.4 (January 5, 2020)
+
+Bugfixes:
+
+  - Fix `net-http-pipeline` no longer being allowed in Gemfiles if already installed in the system due to our vendored version of `net-http-persistent` optionally requiring it [#7529](https://github.com/bundler/bundler/pull/7529)
+  - Fix inline gems no longer being requirable if no Gemfile is present in the directory hierarchy [#7537](https://github.com/bundler/bundler/pull/7537)
+
+## 2.1.3 (January 2, 2020)
+
+Bugfixes:
+
+  - Fix `rake build` when path has spaces on it [#7514](https://github.com/bundler/bundler/pull/7514)
+  - Fix `rake release` git push tasks when the running shell has `git` as an alias of another command (like `hub`) [#7510](https://github.com/bundler/bundler/pull/7510)
+  - Fix some circular require warnings [#7520](https://github.com/bundler/bundler/pull/7520)
+  - Fix `bundle config set deployment true` recommended alternative to `bundle config --deployment` to behave in the same way as the `--deployment` flag [#7519](https://github.com/bundler/bundler/pull/7519)
+
 ## 2.1.2 (December 20, 2019)
 
 Bugfixes:
