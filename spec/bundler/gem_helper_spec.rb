@@ -231,7 +231,8 @@ RSpec.describe Bundler::GemHelper do
           end
 
           it "uses Kernel.system" do
-            expect(Kernel).to receive(:system).with(gem_bin, "push", app_gem_path.to_s, "--host", "http://example.org").and_return(true)
+            cmd = gem_bin.shellsplit
+            expect(Kernel).to receive(:system).with(*cmd, "push", app_gem_path.to_s, "--host", "http://example.org").and_return(true)
 
             Rake.application["release"].invoke
           end
