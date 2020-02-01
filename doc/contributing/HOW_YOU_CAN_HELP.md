@@ -19,7 +19,7 @@ Generally, great ways to get started helping out with Bundler are:
   - closing issues that are not complete
   - adding a failing test for reproducible [reported bugs](https://github.com/rubygems/bundler/issues)
   - reviewing [pull requests](https://github.com/rubygems/bundler/pulls) and suggesting improvements
-  - improving existing code, including suggestions from [CodeClimate](https://codeclimate.com/github/bundler/bundler)
+  - improving existing code, including suggestions from [CodeClimate](https://codeclimate.com/github/rubygems/bundler)
   - writing code (no patch is too small! fix typos or bad whitespace)
     - get started setting up your dev environment with [these instructions](../development/SETUP.md)
   - backfilling [unit tests](https://github.com/rubygems/bundler/tree/master/spec/bundler) for modules that lack coverage.
