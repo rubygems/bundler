@@ -19,6 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
+      - uses: actions/checkout@v2
+        with:
+          repository: deivid-rodriguez/parallel_tests
+          ref: fix_fetch_issue
+          path: parallel_tests
+
       - name: Setup ruby
         uses: actions/setup-ruby@v1
         with:
