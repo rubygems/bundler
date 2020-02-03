@@ -285,7 +285,13 @@ module Bundler
 
     def app_config_path
       if app_config = ENV["BUNDLE_APP_CONFIG"]
-        Pathname.new(app_config).expand_path(root)
+        app_config_pathname = Pathname.new(app_config)
+
+        if app_config_pathname.absolute?
+          app_config_pathname
+        else
+          app_config_pathname.expand_path(root)
+        end
       else
         root.join(".bundle")
       end
