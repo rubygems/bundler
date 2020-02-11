@@ -29,15 +29,15 @@ module Bundler
       # commit instance variable then we can't determine its commits SHA.
       git_dir = File.join(File.expand_path("../../..", __FILE__), ".git")
       if File.directory?(git_dir)
-        return @git_commit_sha = Dir.chdir(git_dir) { `git rev-parse --short HEAD`.strip.freeze }
+        require "open3"
+        return @git_commit_sha = Open3.capture2e("git", "rev-parse", "--short", "HEAD", :chdir => git_dir)[0].strip.freeze
       end
 
       # If Bundler is a submodule in RubyGems, get the submodule commit
       git_sub_dir = File.join(File.expand_path("../../../..", __FILE__), ".git")
       if File.directory?(git_sub_dir)
-        return @git_commit_sha = Dir.chdir(git_sub_dir) do
-          `git ls-tree --abbrev=8 HEAD bundler`.split(/\s/).fetch(2, "").strip.freeze
-        end
+        require "open3"
+        return @git_commit_sha = Open3.capture2e("git", "ls-tree", "--abbrev=8", "HEAD", "bundler", :chdir => git_sub_dir)[0].split(/\s/).fetch(2, "").strip.freeze
       end
 
       @git_commit_sha ||= "unknown"
