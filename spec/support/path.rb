@@ -170,8 +170,8 @@ module Spec
     def with_root_gemspec
       if ruby_core?
         root_gemspec = root.join("bundler.gemspec")
-        # `in_repo_root` for Dir.glob in gemspec
-        spec = in_repo_root { Gem::Specification.load(gemspec.to_s) }
+        # Dir.chdir for Dir.glob in gemspec
+        spec = Dir.chdir(root) { Gem::Specification.load(gemspec.to_s) }
         spec.bindir = "libexec"
         File.open(root_gemspec.to_s, "w") {|f| f.write spec.to_ruby }
         yield(root_gemspec)
@@ -190,10 +190,6 @@ module Spec
       else
         @ruby_core
       end
-    end
-
-    def in_repo_root
-      Dir.chdir(root) { yield }
     end
 
     extend self
