@@ -750,8 +750,6 @@ module Spec
         Dir.chdir(lib_path) do
           FileUtils.mkdir_p(destination)
 
-          @spec.authors = ["that guy"] if !@spec.authors || @spec.authors.empty?
-
           Bundler.rubygems.build(@spec, opts[:skip_validation])
         end
         gem_path = File.expand_path("#{@spec.full_name}.gem", lib_path)
