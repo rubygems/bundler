@@ -86,8 +86,6 @@ module Spec
       root.join(*path)
     end
 
-    alias_method :bundled_app1, :bundled_app
-
     def bundled_app2(*path)
       root = tmp.join("bundled_app2")
       FileUtils.mkdir_p(root)
