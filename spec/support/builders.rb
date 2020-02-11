@@ -615,15 +615,6 @@ module Spec
           def @spec.validate(*); end
         end
 
-        case options[:gemspec]
-        when false
-          # do nothing
-        when :yaml
-          @files["#{name}.gemspec"] = @spec.to_yaml
-        else
-          @files["#{name}.gemspec"] = @spec.to_ruby
-        end
-
         unless options[:no_default]
           gem_source = options[:source] || "path@#{path}"
           @files = _default_files.
@@ -632,13 +623,24 @@ module Spec
         end
 
         @spec.authors = ["no one"]
+        @spec.files = @files.keys
+
+        case options[:gemspec]
+        when false
+          # do nothing
+        when :yaml
+          @spec.files << "#{name}.gemspec"
+          @files["#{name}.gemspec"] = @spec.to_yaml
+        else
+          @spec.files << "#{name}.gemspec"
+          @files["#{name}.gemspec"] = @spec.to_ruby
+        end
 
         @files.each do |file, source|
           file = Pathname.new(path).join(file)
           FileUtils.mkdir_p(file.dirname)
           File.open(file, "w") {|f| f.puts source }
         end
-        @spec.files = @files.keys
         path
       end
 
@@ -747,11 +749,18 @@ module Spec
       def _build(opts)
         lib_path = super(opts.merge(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default]))
         destination = opts[:path] || _default_path
-        Dir.chdir(lib_path) do
-          FileUtils.mkdir_p(destination)
+        FileUtils.mkdir_p(lib_path.join(destination))
 
-          Bundler.rubygems.build(@spec, opts[:skip_validation])
+        if opts[:gemspec] == :yaml || opts[:gemspec] == false
+          Dir.chdir(lib_path) do
+            Bundler.rubygems.build(@spec, opts[:skip_validation])
+          end
+        elsif opts[:skip_validation]
+          @context.gem_command "build --force #{@spec.name}", :dir => lib_path
+        else
+          @context.gem_command! "build #{@spec.name}", :dir => lib_path
         end
+
         gem_path = File.expand_path("#{@spec.full_name}.gem", lib_path)
         if opts[:to_system]
           @context.system_gems gem_path, :keep_path => true
