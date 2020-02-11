@@ -35,7 +35,7 @@ RSpec.describe ".bundle/config" do
     end
   end
 
-  describe "location" do
+  describe "location with a gemfile" do
     before :each do
       gemfile <<-G
         source "#{file_uri_for(gem_repo1)}"
@@ -61,6 +61,16 @@ RSpec.describe ".bundle/config" do
       expect(bundled_app(".bundle")).not_to exist
       expect(bundled_app("../foo/config")).to exist
       expect(the_bundle).to include_gems "rack 1.0.0", :dir => bundled_app("omg")
+    end
+  end
+
+  describe "location without a gemfile" do
+    it "works with an absolute path" do
+      ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
+      bundle "config set --local path vendor/bundle"
+
+      expect(bundled_app(".bundle")).not_to exist
+      expect(tmp("foo/bar/config")).to exist
     end
   end
 
