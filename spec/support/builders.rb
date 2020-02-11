@@ -463,7 +463,6 @@ module Spec
 
       Array(versions).each do |version|
         spec = builder.new(self, name, version)
-        spec.authors = ["no one"] if !spec.authors || spec.authors.empty?
         yield spec if block_given?
         spec._build(options)
       end
