@@ -518,7 +518,8 @@ EOF
         Your user account isn't allowed to install to the system RubyGems.
         You can cancel this installation and run:
 
-            bundle install --path vendor/bundle
+            bundle config set --local path 'vendor/bundle'
+            bundle install
 
         to install the gems into ./vendor/bundle/, or you can enter your password
         and install the bundled gems to RubyGems using sudo.
