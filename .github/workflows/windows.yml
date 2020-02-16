@@ -35,5 +35,5 @@ jobs:
         shell: bash
 
       - name: Run specs
-        run: bin/parallel_rspec spec
+        run: parallel_tests/bin/parallel_rspec spec
         shell: bash
