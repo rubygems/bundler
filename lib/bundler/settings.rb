@@ -384,7 +384,7 @@ module Bundler
     end
 
     def local_config_file
-      Pathname.new(@root).join("config")
+      @root.join("config")
     end
 
     def load_config(config_file)
