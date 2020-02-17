@@ -108,6 +108,8 @@ module Bundler
     end
 
     def set_local(key, value)
+      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
+
       set_key(key, value, @local_config, local_config_file)
     end
 
@@ -384,7 +386,7 @@ module Bundler
     end
 
     def local_config_file
-      @root.join("config")
+      @root.join("config") if @root
     end
 
     def load_config(config_file)
