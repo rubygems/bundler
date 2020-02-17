@@ -158,7 +158,7 @@ RSpec.describe "The library itself" do
 
   it "maintains language quality of sentences used in source code" do
     error_messages = []
-    exempt = /vendor|vcr_cassettes/
+    exempt = /vendor|vcr_cassettes|CODE_OF_CONDUCT/
     lib_tracked_files.split("\x0").each do |filename|
       next if filename =~ exempt
       error_messages << check_for_expendable_words(filename)
