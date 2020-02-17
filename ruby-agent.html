@@ -1,0 +1,509 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+
+
+
+
+<title>
+Ruby Agent
+| Online Help Site24x7</title>
+<meta name="description" content="">
+<link rel="canonical" href="/help/apm/ruby-agent.html"/>
+<link href="/help/style/pcommonc.css" rel="stylesheet" type="text/css" media="all">
+</link>
+<link rel="stylesheet" type="text/css" media="print" href="/help/style/print.css"/>
+<link rel="SHORTCUT ICON" href="/help/images/site24x7-fav.ico?p=WEBMON_BUILD_NUMBER">
+
+<style>
+.srchbtn {
+    background: #666 url("https://www.google.com/uds/css/v2/search_box_icon.png") no-repeat scroll 24px 4px;
+    border: 1px solid #999;
+    cursor: pointer;
+    height: 16px;
+    width: 21px;
+    padding: 11px 30px;
+    float: left;
+    margin-left: 10px
+}
+#cse-search-results iframe {
+    height: 1080px;
+}
+#help .s1Nav li .ifTree.dropact:after {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #ff8134;
+    content: "";
+    display: inline-block;
+    left: 5px;
+    position: absolute;
+    top: 16px;
+}
+#help .s1Nav li .dropact {
+    border-left: 2px solid #333;
+    background: #f8f8f8
+}
+#help .s1Nav ul {
+    padding-left: 20px;
+    display: none;
+}
+#help .s1Nav li a, #help .s1Nav li span {
+    position: relative;
+}
+#scrollingDiv1 {
+    cursor: pointer;
+}
+span.ifTree:after {
+    border-bottom: 4px solid transparent;
+    border-left: 4px solid #ff8134;
+    border-top: 4px solid transparent;
+    content: "";
+    display: inline-block;
+    left: 5px;
+    top: 16px;
+    position: absolute;
+}
+span.ifTree.dropact:after {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #ff8134;
+    content: "";
+    display: inline-block;
+    left: 5px;
+    top: 16px;
+    position: absolute;
+}
+.bc span {
+    margin-right: 10px;
+}
+.IP.s2 td {
+    background: none repeat scroll 0 0 #fff;
+    padding: 10px;
+}
+.IP.s2 > table {
+    background: none repeat scroll 0 0 #e4e4e4;
+}
+.IP.s2 img {
+    border: 2px solid #e4e4e4;
+}
+.codecopy {
+    background: none repeat scroll 0 0 #f4f4f4;
+    border: 1px dashed #ccc;
+    font-size: 13px;
+    font-style: italic;
+    margin: 5px;
+    padding: 5px;
+}
+#help h3 {
+    font-size: 19px;
+    line-height: 40px;
+}
+.snote {
+    background: url("/help/images/noteicon-st.png") no-repeat scroll 0 2px rgba(0, 0, 0, 0);
+    border: 1px dashed #949494;
+    line-height: 22px;
+    font-size: 14px;
+    padding: 30px 20px 10px 10px;
+}
+.tl-so a {
+    color: #767676;
+    font-size: 12px;
+    line-height: 24px;
+}
+.fhw .fs {
+    display: block;
+}
+.zoho-logo {
+    background: url("/help/images/zoho-logo.png") no-repeat scroll left top transparent;
+    display: inline-block;
+    height: 19px;
+    margin-top: 24px;
+    position: relative;
+    text-indent: -9999em;
+    vertical-align: text-bottom;
+    width: 50px;
+}
+.floatleft {
+    float: left;
+}
+#help .IP table {
+    background: none repeat scroll 0 0 #e4e4e4;
+    margin-top: 10px;
+}
+.p a {
+    background: none repeat scroll 0 0 #83b633;
+    color: #ffffff !important;
+    height: 30px;
+    text-align: center;
+    width: 80px;
+}
+
+</style>
+<!--??? script ???-->
+</head><body>
+
+<div id="hw">
+  <div class="h">
+    <div id="headercontainer">
+      <div>
+        <div class="ll">
+          <div class="l"> <a href="/help/index.html"><img alt="Site24x7" title="Monitoring Availability and End User Experience Made Simple" src="https://static.site24x7.com/images/logo.png"></a> </div>
+          <ul class="ml">
+            <li id="D"><a href="/help/api/">API Guide</a></li>
+            <li id="INT"><a href="https://support.site24x7.com/portal/helpcenter/site24x7">Knowledge Base</a></li>
+            <li id="WN"><a href="https://www.site24x7.com/community/" target="_blank">Community</a></li>
+            <li id="SUP"><a href="/contact-support.html">Support</a></li>
+            <li class="p"><a href="/signup.html?pack=44&l=en">Sign Up</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--div id="bw">
+  <div class="slprnt"> <SCRIPT LANGUAGE="JavaScript">
+if (window.print) {
+document.write('<form> '
++ '<input type=button class=pr name=print value="" title="Print this page" alt="Print this page"'
++ 'onClick="
+script:window.print()"> </form>');
+}
+</script> </div>
+</div-->
+
+<div id="cw">
+<div class="tab-search clearfix">
+<form id="cse-search-box" class="srchbox clearfix" action="/help/search-results.html">
+    <input type="text" class="src-input" name="q" value="" placeholder="Site24x7 User Guide, KBase, API Guide, Blogs, and Community" />
+   
+    <div class="clear">&nbsp;</div>
+    <input type="hidden" value="site24x7" name="siteurl" id="siteurl"/>
+    <input type="submit" id="submitBtn" value="Search"/>
+  </form>
+  <script type="text/javascript">
+  	(function() {
+      var cx = '014218779213353391028:iq8oe0l-47g';
+      var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+      gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//www.google.com/cse/cse.js?cx=' + cx;
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+    })();
+  </script>
+  </div>
+<div class="c" id="help">
+  <div id="linkscontainer">
+    <div class="s1" id="scrollingDiv1">
+      <ul class="s1Nav" id="guide_tree">
+        
+      </ul>
+    </div>
+  </div>
+  <div id="breadcrumbcontainer">
+    <div class="bc">
+      <p><a href="/help/">Help</a> <a href="/help/apm.html"><span>
+        APM
+        </span> </a> <a href=""><span>
+        
+        </span></a> <span>
+        APM for Ruby
+        </span></p>
+    </div>
+    <div id="contentcontainer">
+      <div class="IP s2 clr">
+        <h1>
+          Ruby Application Performance Monitoring
+        </h1>
+        <p>Site24x7 APM Insight Ruby agent deployed on a Rails platform gives you end-to-end web-transaction awareness enabling you to isolate performance issues and resolve them quickly. Site24x7 requires a monitoring agent (ruby gem) to be deployed in your application server to monitor Ruby application performance. Download the latest Ruby Agent and deploy it in your application server. The agent collects application performance metrics and sends it to the central Site24x7 server at fixed intervals i.e. every 60 seconds.</p>
+<p>For an in-depth understanding of Site24x7 APM Insight along with the architecture, check out our <a title="APM Insight architecture" href="/help/getting-started/apm-insight.html" target="_self">getting started</a> page.</p>
+<div class="plHr">
+<h2>Agent Setup</h2>
+<ul>
+<li><a href="/help/apm/ruby-agent/install-ruby-agent.html" target="_self">Install Ruby Agent</a></li>
+<li><a href="https://support.site24x7.com/portal/kb/articles/methods-to-upgrade-ruby-agent" target="_blank"> Agent upgrade</a></li>
+<li><a title="Uninstall Ruby Agent" href="https://www.site24x7.com/help/apm/ruby-agent/uninstall-ruby-agent.html" target="_blank">Uninstall Ruby Agent</a></li>
+<li><a href="/help/apm/ruby-agent/ruby-agent-release-notes.html" target="_self">Release notes</a></li>
+</ul>
+</div>
+<div class="plHr">
+<h2>Agent Configurations</h2>
+<ul>
+<li><a href="/help/apm/apm-insight-configuration.html" target="_self">APM Insight Configuration</a></li>
+<li><a href="/help/apm/ruby-agent/grouping-similar-transactions.html" target="_self">Group Similar Transactions</a></li>
+<li><a href="https://support.site24x7.com/portal/kb/articles/is-it-possible-to-provide-environment-variable-in-apminsight-conf-file" target="_blank">How to use environment variables in agent configuration</a></li>
+<li><a href="/help/apm/ruby-agent/custom-instrumentation-and-exception-tracking-via-Ruby-agent-API.html" target="_self">Custom instrumentation and exception tracking via API</a></li>
+</ul>
+</div>
+      </div>
+	
+	
+<!-- Feedback form Starts -->
+	 	  <div id="feedbackcontainer" class="clr">
+	<div class="rating-form no-print">
+		<div class="request-sec">
+			<div class="yes-no">
+				<div class="pull-left">Was this document helpful?</div>
+				<div class="btn-grp pull-right">
+					<button id="yesButton" class="btn btn-xs btn-primary" style="background-color: #fff; border: 1px solid #428bca; color: #428bca;">YES</button>
+					<button id="noButton" class="btn btn-xs"
+						style="background-color: #fff; border: 1px solid #428bca; color: #428bca;">NO</button>
+				</div>
+			</div>
+			<div class="feedback-sec">
+				<span id="feebacktxt">Sorry to hear that. Let us know how we can improve this document.</span>
+				<div class="feedback-error-msg">Please describe how we can improve this document.</div>
+				<textarea id="comments"></textarea>
+				<button id="submitButton" class="btn btn-xs btn-primary">Submit</button>
+			</div>
+		</div>
+		<div class="reponse-sec">Thanks for taking the time to share your feedback. We’ll use your feedback to improve our online help resources.</div>
+	</div>
+	<iframe name="form-success" style="display: none;"></iframe>
+	<form id="ratingForm" target="form-success" name="Help_Doc_Feedback"
+		action="https://creator.zoho.com/addRecordValidateNew.do" method="post"
+		style="display: none;">
+		<input name="scriptembed" value="true" type="hidden" /> <input
+			name="formid" value="101930000002716024" type="hidden" /> <input
+			name="sharedBy" value="site24x7" type="hidden" /> <input name="plan"
+			value="" type="hidden" id="plan" /> <input name="Type_of_Page" /> <input
+			name="useful" /> <input name="feedback_page_name" /> <input
+			name="Feedback" />
+		<button type="submit">Submit</button>
+	</form>
+        <!-- Feedback form Ends -->        
+</div>
+
+    </div>
+  </div>
+  <div id="botsigncontainer"></div>
+  <p id="back-top"> <a href="#top"><span></span>Top</a> </p>
+</div>
+<div class="bcw">
+  <div id="breadcrumbcontainer">
+    <div class="bc">
+      <p><a href="/help/">Help</a> <a href="/help/apm.html"><span>
+        APM
+        </span> </a> <a href=""><span>
+        
+        </span></a> <span>
+        APM for Ruby
+        </span></p>
+    </div>
+  </div>
+</div>
+<div id="fw" class="fhw">
+<div id="footercontainer">
+  <div class="f">
+    <div class="ls">
+      <div class="fcs">
+        <div class="fs">
+          <ul class="bsi">
+            <div align="right" style="position: relative; float: right; width: 420px; top: -60px; right: -50px;" id="social">
+              <div style="margin-right:15px;" class="floatleft"><a target="_blank" href="https://www.site24x7.com/blog/"><img src="/help/images/blog-icon.png"></a></div>
+              <div style="margin-right:15px;" class="floatleft"><a target="_blank" href="https://facebook.com/Site24x7"><img src="//static.site24x7.com/images/fb-icon.gif"></a></div>
+              <div style="margin-right:15px;" class="floatleft"><a target="_blank" href="https://twitter.com/Site24x7"><img src="//static.site24x7.com/images/twitter-icon.gif"></a></div>
+              <div style="margin-right:15px;" class="floatleft"><a target="_blank" href="https://plus.google.com/100099796876039543020/posts"><img src="//static.site24x7.com/images/gplus-icon.gif"></a></div>
+              <div style="margin-right:15px;" class="floatleft"><a target="_blank" href="http://www.linkedin.com/company/site24x7"><img src="//static.site24x7.com/images/linkeden-icon.gif"></a></div>
+              <div style="margin-right:15px;" class="floatleft"><a target="_blank" href="https://zohodiscussions.com/site24x7/feed"><img src="//static.site24x7.com/images/rss-icon.png"></a></div>
+            </div>
+          </ul>
+        </div>
+        <div class="floatleft">
+          <p class="partn">Site24x7 is a service by <span class="zoho-logo"></span> Corp.</p>
+        </div>
+        <p class="co"><a target="_blank" href="//www.zohocorp.com/">©  2019, Zoho Corporation Pvt. Ltd.</a><br>
+        </p>
+        <ul class="fcsl">
+          <li><a href="/">Home</a></li>
+          <li><a href="/privacypolicy.html">Privacy Policy</a></li>
+		  <li><a href="/gdpr.html">GDPR Readiness</a></li>
+          <li><a href="/terms.html">Terms of Use</a></li>
+          <li><a href="/security.html">Security</a></li>
+          <li><a href="/sitemap.html">Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="/help/script/left-tree.js"></script>
+<script type="text/javascript" src="/help/script/common1.js"></script>
+ <script>
+$(document).ready(function(e) {
+	$('.dropDownList > ul > li').click(function(e) {
+		setTimeout(function(){
+			var siteurl = $('#drop-place').attr('value');
+			$('#siteurl').val(siteurl);
+		})
+	});
+})
+</script>
+
+<script>
+$(document).ready(function(e) {
+    $('.dropPlace').click(function(e) {
+		$(this).next('ul').slideToggle();
+    });
+	$('.dropDownList > ul > li').click(function(e) {
+		//var clickProp = $(this).attr('data-targetFolder');
+		var clickPropTxt = $(this).html();
+		$('.dropPlace').attr('value',$(this).attr('value'));
+		$('.dropPlace').html(clickPropTxt);
+		$('.dropDownList ul').slideUp();
+		//$('#placeVal').val(clickProp);
+    });
+});
+</script>
+<script>
+/*----------- Tree Script -----------*/
+/*
+$('#scrollingDiv1 span').click(function(){
+    if($(this).hasClass('dropact'))
+    {
+        $(this).removeClass('dropact');
+        $(this).siblings('ul').slideUp(300);
+    }
+    else if($(this).parents('ul').siblings('span').hasClass('dropact')){
+        $(this).siblings('ul').slideDown(300);
+        $(this).addClass('dropact');
+        return false;
+    }
+    else{
+        $('#scrollingDiv1 span').removeClass('dropact').siblings('ul').slideUp(300);
+        $(this).siblings('ul').slideDown(300);
+        $(this).addClass('dropact');
+    }
+});*/
+$('.tocclick').click(function(){$(this).toggleClass('tocclickact');$('.tocbox').slideToggle()});
+setTimeout(function(){$('.gsc-input').attr('placeholder','Search...')}, 3000);
+
+// FEEDBACK SCRIPT BEGINS
+var FeedbackConstants = {
+    HELP_DOMAIN : 'help.site24x7.com',
+    HELP_CONTEXT : '/help/',
+    KBASE_DOMAIN : 'support.site24x7.com',
+    SITE24X7_DOMAIN : 'site24x7.com',
+    KBASE : 'KBase',
+    HELP_DOC : 'Help Doc',
+    WEB_PAGE : 'Web Page',
+    YES : 'Yes',
+    NO : 'No',
+    YES_FEEDBACK_TEXT : 'Would you like to help us improve our documents? Tell us what you think we could do better.',
+    NO_FEEBACK_TEXT : 'Sorry to hear that. Let us know how we can improve this document.'
+};
+var FeedbackUtil = new function(){
+    this._url = null;
+    this._pageType = null;
+    this._feedback = null;
+    this._rating = null;
+    this.init = function() {
+        FeedbackUtil.hideElements();
+        FeedbackUtil.addListeners();
+        FeedbackUtil.setUrl();
+        FeedbackUtil.setPageType();
+        FeedbackUtil.log('FeedbackUtil initialized');
+    };
+    this.addListeners = function() {
+        $('#submitButton').click(function(event) {
+			/*if (FeedbackUtil._rating === FeedbackConstants.NO && $('#comments').val().trim() == '') {
+				$('#comments').addClass('feedback-error');
+				$('.feedback-error-msg').css('display', 'inline-block');
+				return false;
+			}*/
+            FeedbackUtil.submitFeedback();
+        });
+		/*$('#comments').keypress(function(e){
+			$('#comments').removeClass('feedback-error');
+			$('.feedback-error-msg').css('display', 'none');
+		});*/
+        $('#yesButton').click(function(event) {
+            FeedbackUtil.setRating(FeedbackConstants.YES);
+            FeedbackUtil.submitRating();
+        });
+        $('#noButton').click(function(event) {
+            FeedbackUtil.setRating(FeedbackConstants.NO);
+            FeedbackUtil.submitRating();
+        });
+    };
+    this.hideElements = function() {
+        $(".request-sec").show();
+        $(".feedback-sec").hide();
+        $(".reponse-sec").hide();
+    };
+    this.setUrl = function() {
+        FeedbackUtil._url = location.href;
+        FeedbackUtil.log('Url : ' + this._url);
+    };
+    this.setPageType = function() {
+        FeedbackUtil.pageType = FeedbackConstants.WEB_PAGE;
+        if (this._url.indexOf(FeedbackConstants.HELP_DOMAIN) != -1
+                || FeedbackUtil._url.indexOf(FeedbackConstants.HELP_CONTEXT) != -1) {
+            FeedbackUtil.pageType = FeedbackConstants.HELP_DOC;
+        } else if (FeedbackUtil._url.indexOf(FeedbackConstants.KBASE_DOMAIN) != -1) {
+            FeedbackUtil.pageType = FeedbackConstants.KBASE;
+        } else if (FeedbackUtil._url.indexOf(FeedbackConstants.SITE24X7_DOMAIN) != -1) {
+            FeedbackUtil.pageType = FeedbackConstants.WEB_PAGE;
+        }
+        FeedbackUtil.log('pageType : ' + this.pageType);
+    };
+    this.setFeedback = function() {
+        FeedbackUtil._feedback = $("#comments").val();
+        FeedbackUtil.log('Feedback : ' + this._feedback);
+    };
+    this.setRating = function(ratingValue) {
+        FeedbackUtil._rating = ratingValue;
+        FeedbackUtil.log('Rating : ' + this._rating);
+    };
+    this.submitRating = function() {
+        if (FeedbackUtil._rating === FeedbackConstants.YES) {
+        	$("#feebacktxt").text(FeedbackConstants.YES_FEEDBACK_TEXT);
+        	$(".yes-no").hide();
+            $(".feedback-sec").show();
+        } else {
+        	$("#feebacktxt").text(FeedbackConstants.NO_FEEDBACK_TEXT);
+            $(".yes-no").hide();
+            $(".feedback-sec").show();
+        }
+    };
+    this.submitFeedback = function(rating) {
+        FeedbackUtil.setFeedback();
+        $("[name=useful]").val(FeedbackUtil._rating);
+        $("[name=Feedback]").val(FeedbackUtil._feedback);
+        $("[name=Type_of_Page]").val(FeedbackUtil.pageType);
+        $("[name=feedback_page_name]").val(FeedbackUtil._url);
+        $("#ratingForm").submit();
+        $(".request-sec").hide();
+        $(".reponse-sec").show();
+    };
+    this.log = function(message) {
+        //console.log(message);
+    };
+};
+FeedbackUtil.init();
+//FEEDBACK SCRIPT ENDS
+
+//SALESIQ SCRIPT BEGINS
+
+var $zoho=$zoho || {};$zoho.salesiq = $zoho.salesiq || {widgetcode:"5362c7d950008260cb11d438fe0eb5af19347df077bd1a6ca7d2f863ad8c6db0", values:{},ready:function(){}};
+var d=document;s=d.createElement("script");
+s.type="text/javascript";
+s.id="zsiqscript";
+s.defer=true;
+s.src="https://salesiq.zoho.com/widget";t=d.getElementsByTagName("script")[0];
+t.parentNode.insertBefore(s,t);
+d.write("<div id='zsiqwidget'></div>");
+
+ $zoho.salesiq.ready=function(embedinfo)
+{$zoho.salesiq.floatbutton.visible("hide");   
+}
+//SALESIQ SCRIPT ENDS
+
+</script>
+<script>var list = $('#link8sub3');$(list).addClass('treeAct');</script>
+<!--script>
+$("# > span").addClass('dropact').siblings('ul').slideDown();
+</script-->
+
+
+</body>
+</html>
+
