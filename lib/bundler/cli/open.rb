@@ -18,12 +18,10 @@ module Bundler
         Bundler.ui.info "Unable to open #{name} because it's a default gem, so the directory it would normally be installed to does not exist."
       else
         path = spec.full_gem_path
-        Dir.chdir(path) do
-          command = Shellwords.split(editor) + [path]
-          Bundler.with_original_env do
-            system(*command)
-          end || Bundler.ui.info("Could not run '#{command.join(" ")}'")
-        end
+        command = Shellwords.split(editor) + [path]
+        Bundler.with_original_env do
+          system(*command, :chdir => path)
+        end || Bundler.ui.info("Could not run '#{command.join(" ")}'")
       end
     end
   end
