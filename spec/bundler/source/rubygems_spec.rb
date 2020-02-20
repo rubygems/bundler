@@ -29,5 +29,12 @@ RSpec.describe Bundler::Source::Rubygems do
         expect { subject.add_remote("https:rubygems.org") }.to raise_error(ArgumentError)
       end
     end
+
+    context "when the source is too similar to a known host" do
+      it "warns" do
+        expect(Bundler.ui).to receive(:warn).with(/similar/)
+        subject.add_remote("https://rubgems.org")
+      end
+    end
   end
 end

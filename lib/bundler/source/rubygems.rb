@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "rubygems/user_interaction"
+require_relative "../similarity_detector"
 
 module Bundler
   class Source
@@ -327,11 +328,28 @@ module Bundler
       def normalize_uri(uri)
         uri = uri.to_s
         uri = "#{uri}/" unless uri =~ %r{/$}
+
+        validate_uri(uri)
+
         require_relative "../vendored_uri"
         uri = Bundler::URI(uri)
         raise ArgumentError, "The source must be an absolute URI. For example:\n" \
           "source 'https://rubygems.org'" if !uri.absolute? || (uri.is_a?(Bundler::URI::HTTP) && uri.host.nil?)
+
         uri
+      end
+
+      def validate_uri(uri)
+        similarity_detector = SimilarityDetector.new(["https://rubygems.org"])
+
+        similar_source = similarity_detector.similar_words(uri, 5)[0]
+        return unless similar_source
+
+        Bundler.ui.warn(<<~ERR)
+          The source "#{uri}" is very similar to "#{similar_source}". Are you
+          sure you this isn't a typo? This is a common source of security
+          issues.
+        ERR
       end
 
       def suppress_configured_credentials(remote)
