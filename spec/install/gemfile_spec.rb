@@ -115,4 +115,41 @@ RSpec.describe "bundle install" do
       expect(out).to include("Bundle complete!")
     end
   end
+
+  context "with rubygems plugins" do
+    it "does not load rubygems plugins after install" do
+      foo_file = home("foo_plugin_loaded")
+      bar_file = home("bar_plugin_loaded")
+      baz_file = home("baz_plugin_loaded")
+      expect(foo_file).not_to be_file
+      expect(bar_file).not_to be_file
+      expect(baz_file).not_to be_file
+
+      build_repo4 do
+        build_lib "foo", "1.0", :path => lib_path("foo-1.0") do |s|
+          s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{foo_file}')")
+        end
+
+        build_git "bar", "1.0", :path => lib_path("bar-1.0") do |s|
+          s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{bar_file}')")
+        end
+
+        build_gem "baz" do |s|
+          s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{baz_file}')")
+        end
+      end
+
+      install_gemfile! <<-G
+        source "#{file_uri_for(gem_repo4)}"
+
+        gem "foo", :path => "#{lib_path("foo-1.0")}"
+        gem "bar", :path => "#{lib_path("bar-1.0")}"
+        gem "baz"
+      G
+
+      expect(foo_file).not_to be_file
+      expect(bar_file).not_to be_file
+      expect(baz_file).not_to be_file
+    end
+  end
 end
