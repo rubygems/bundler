@@ -27,6 +27,7 @@ branches:
     - trying
     - /.+-dev$/
     - /.+-stable$/
+    - catch_up_with_rubygems_plugin_loading_changes
 
 cache:
   directories:
