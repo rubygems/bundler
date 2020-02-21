@@ -713,7 +713,7 @@ RSpec.describe "bundle install with explicit source paths" do
       expect(err).to include("failed for foo-1.0")
     end
 
-    it "loads plugins from the path gem" do
+    it "does not load rubygems plugins after install" do
       foo_file = home("foo_plugin_loaded")
       bar_file = home("bar_plugin_loaded")
       baz_file = home("baz_plugin_loaded")
@@ -743,9 +743,9 @@ RSpec.describe "bundle install with explicit source paths" do
         gem "baz"
       G
 
-      expect(foo_file).to be_file
-      expect(bar_file).to be_file
-      expect(baz_file).to be_file
+      expect(foo_file).not_to be_file
+      expect(bar_file).not_to be_file
+      expect(baz_file).not_to be_file
     end
   end
 end

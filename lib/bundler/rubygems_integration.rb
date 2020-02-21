@@ -94,14 +94,6 @@ module Bundler
       spec.respond_to?(:default_gem?) && spec.default_gem?
     end
 
-    def spec_matches_for_glob(spec, glob)
-      return spec.matches_for_glob(glob) if spec.respond_to?(:matches_for_glob)
-
-      spec.load_paths.map do |lp|
-        Dir["#{lp}/#{glob}#{suffix_pattern}"]
-      end.flatten(1)
-    end
-
     def spec_extension_dir(spec)
       return unless spec.respond_to?(:extension_dir)
       spec.extension_dir
@@ -231,14 +223,6 @@ module Bundler
     def loaded_gem_paths
       loaded_gem_paths = Gem.loaded_specs.map {|_, s| s.full_require_paths }
       loaded_gem_paths.flatten
-    end
-
-    def load_plugins
-      Gem.load_plugins if Gem.respond_to?(:load_plugins)
-    end
-
-    def load_plugin_files(files)
-      Gem.load_plugin_files(files) if Gem.respond_to?(:load_plugin_files)
     end
 
     def ui=(obj)
