@@ -355,8 +355,6 @@ module Bundler
     # under bundler. The new Gem.bin_path only considers gems in
     # +specs+
     def replace_bin_path(specs_by_name)
-      gem_class = (class << Gem; self; end)
-
       redefine_method(gem_class, :find_spec_for_exe) do |gem_name, *args|
         exec_name = args.first
         raise ArgumentError, "you must supply exec_name" unless exec_name
@@ -493,7 +491,7 @@ module Bundler
         Gem::Specification.all = specs
       end
 
-      redefine_method((class << Gem; self; end), :finish_resolve) do |*|
+      redefine_method(gem_class, :finish_resolve) do |*|
         []
       end
     end
@@ -610,6 +608,10 @@ module Bundler
       runtime = Bundler.setup
       activated_spec_names = runtime.requested_specs.map(&:to_spec).sort_by(&:name)
       [Gemdeps.new(runtime), activated_spec_names]
+    end
+
+    def gem_class
+      @gem_class ||= class << Gem; self; end
     end
   end
 
