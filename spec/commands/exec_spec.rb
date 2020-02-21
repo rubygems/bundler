@@ -67,6 +67,41 @@ RSpec.describe "bundle exec" do
     expect(out).to eq(Gem::VERSION)
   end
 
+  it "works when exec'ing to rubygems with a plugin that installs an extra rubygems command" do
+    build_repo4 do
+      build_gem "gem-foo" do |s|
+        s.write("lib/rubygems/commands/foo_command.rb", <<~RUBY)
+          class Gem::Commands::FooCommand < Gem::Command
+            def initialize
+              super("foo", "Extend rubygems with foo magic")
+            end
+
+            def execute
+              puts "WIN"
+            end
+          end
+        RUBY
+
+        s.write("lib/rubygems_plugin.rb", "Gem::CommandManager.instance.register_command :foo")
+      end
+    end
+
+    system_gems("gem-foo-1.0", :gem_repo => gem_repo4)
+
+    install_gemfile! <<-G
+      source "#{file_uri_for(gem_repo4)}"
+    G
+    bundle "exec gem foo"
+    expect(err).to include("Unknown command foo")
+
+    install_gemfile! <<-G
+      source "#{file_uri_for(gem_repo4)}"
+      gem "gem-foo"
+    G
+    bundle "exec gem foo"
+    expect(out).to eq("WIN")
+  end
+
   it "respects custom process title when loading through ruby" do
     skip "https://github.com/rubygems/bundler/issues/6898" if Gem.win_platform?
 

@@ -233,10 +233,6 @@ module Bundler
       loaded_gem_paths.flatten
     end
 
-    def load_plugins
-      Gem.load_plugins if Gem.respond_to?(:load_plugins)
-    end
-
     def load_plugin_files(files)
       Gem.load_plugin_files(files) if Gem.respond_to?(:load_plugin_files)
     end
@@ -493,6 +489,9 @@ module Bundler
 
       redefine_method(gem_class, :finish_resolve) do |*|
         []
+      end
+
+      redefine_method(gem_class, :load_plugins) do |*|
       end
     end
 

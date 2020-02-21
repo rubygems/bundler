@@ -226,10 +226,7 @@ module Bundler
     end
 
     def load_plugins
-      Bundler.rubygems.load_plugins
-
-      requested_path_gems = @definition.requested_specs.select {|s| s.source.is_a?(Source::Path) }
-      path_plugin_files = requested_path_gems.map do |spec|
+      plugin_files = @definition.requested_specs.map do |spec|
         begin
           Bundler.rubygems.spec_matches_for_glob(spec, "rubygems_plugin#{Bundler.rubygems.suffix_pattern}")
         rescue TypeError
@@ -237,7 +234,7 @@ module Bundler
           raise Gem::InvalidSpecificationException, error_message
         end
       end.flatten
-      Bundler.rubygems.load_plugin_files(path_plugin_files)
+      Bundler.rubygems.load_plugin_files(plugin_files)
     end
 
     def ensure_specs_are_compatible!
