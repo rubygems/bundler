@@ -716,24 +716,36 @@ RSpec.describe "bundle install with explicit source paths" do
     it "loads plugins from the path gem" do
       foo_file = home("foo_plugin_loaded")
       bar_file = home("bar_plugin_loaded")
+      baz_file = home("baz_plugin_loaded")
       expect(foo_file).not_to be_file
       expect(bar_file).not_to be_file
+      expect(baz_file).not_to be_file
 
-      build_lib "foo" do |s|
-        s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{foo_file}')")
-      end
+      build_repo4 do
+        build_lib "foo", "1.0", :path => lib_path("foo-1.0") do |s|
+          s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{foo_file}')")
+        end
 
-      build_git "bar" do |s|
-        s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{bar_file}')")
+        build_git "bar", "1.0", :path => lib_path("bar-1.0") do |s|
+          s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{bar_file}')")
+        end
+
+        build_gem "baz" do |s|
+          s.write("lib/rubygems_plugin.rb", "FileUtils.touch('#{baz_file}')")
+        end
       end
 
       install_gemfile! <<-G
+        source "#{file_uri_for(gem_repo4)}"
+
         gem "foo", :path => "#{lib_path("foo-1.0")}"
         gem "bar", :path => "#{lib_path("bar-1.0")}"
+        gem "baz"
       G
 
       expect(foo_file).to be_file
       expect(bar_file).to be_file
+      expect(baz_file).to be_file
     end
   end
 end
