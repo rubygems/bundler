@@ -7,7 +7,6 @@ module Spec
     DEV_DEPS = { # rubocop:disable Style/MutableConstant
       "automatiek" => "~> 0.3.0",
       "parallel_tests" => "~> 2.29",
-      "rake" => "~> 12.0",
       "ronn" => "~> 0.7.3",
       "rspec" => "~> 3.8",
       "rubocop" => "= 0.77.0",
