@@ -251,7 +251,7 @@ RSpec.describe "bundle gem" do
 
     prepare_gemspec(bundled_app("newgem", "newgem.gemspec"))
 
-    gems = ["rake-12.3.2"]
+    gems = ["rake-13.0.1"]
     system_gems gems, :path => :bundle_path, :bundle_dir => bundled_app("newgem")
     bundle! "exec rake build", :dir => bundled_app("newgem")
 
@@ -359,7 +359,7 @@ RSpec.describe "bundle gem" do
     it "runs rake without problems" do
       bundle! "gem #{gem_name}"
 
-      system_gems ["rake-12.3.2"]
+      system_gems ["rake-13.0.1"]
 
       rakefile = strip_whitespace <<-RAKEFILE
         task :default do

@@ -159,7 +159,7 @@ RSpec.describe "Bundler.setup" do
         "/gems/actionpack-2.3.2/lib",
         "/gems/actionmailer-2.3.2/lib",
         "/gems/activesupport-2.3.2/lib",
-        "/gems/rake-12.3.2/lib"
+        "/gems/rake-13.0.1/lib"
       )
     end
 
