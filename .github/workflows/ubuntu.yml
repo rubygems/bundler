@@ -15,6 +15,7 @@ jobs:
       matrix:
         ruby: [ 2.3.8, 2.4.9, 2.5.7, 2.6.5 ]
         rgv: [ master, v3.0.6 ]
+        bundler_version: [ 2.2.0.dev 3.0.0 ]
     steps:
       - uses: actions/checkout@v1
       - name: Setup ruby
@@ -31,6 +32,7 @@ jobs:
         run: bin/parallel_rspec spec
         env:
           RGV: ${{ matrix.rgv }}
+          BUNDLER_SPEC_SUB_VERSION: ${{ matrix.bundler_version }}
       - name: Run Test with realworld
         run: |
           bin/rake spec:realworld

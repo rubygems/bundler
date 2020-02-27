@@ -32,47 +32,25 @@ notifications:
     rooms:
       - secure: JxBi7DDJGkIF/7f/FSN/HUHpvV4EKfQccZHTPd1b2pNJn3GXo6u+tNVbAw2WjxYzPyPQI3ZcYBCU9SEXp/i7VmG8uMzh8Kyildw+miSKYKVb90uYqcsXWzbxwyNBgJLvyDkzST45H5lgnyAicee3WkFes/WDZikIajbH7ztdb04=
 
-rvm:
-  - 2.6.5
-  - 2.5.7
-  - 2.4.9
-
-stages:
-  - test
-
-env:
-  # We need to know if changes to rubygems will break bundler on release
-  - RGV=master BUNDLER_SPEC_SUB_VERSION=3.0.0
-  - RGV=master
-  # Test the latest rubygems release with all of our supported rubies
-  - RGV=v3.0.6 BUNDLER_SPEC_SUB_VERSION=3.0.0
-  - RGV=v3.0.6
-
 jobs:
   include:
     # Ruby 2.3 also tested in 2.x mode
     - rvm: 2.3.8
       env: RGV=master
-      stage: test
     - rvm: 2.3.8
       env: RGV=v3.0.6
-      stage: test
     # Ruby 2.5, Rubygems 2.7
     - rvm: 2.5.7
       env: RGV=v2.7.10
-      stage: test
     # Ruby 2.4, Rubygems 2.6
     - rvm: 2.4.9
       env: RGV=v2.6.14
-      stage: test
     # Ruby 2.3, Rubygems 2.5
     - rvm: 2.3.8
       env: RGV=v2.5.2
-      stage: test
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
       env: RGV=master
-      stage: test
 
   allow_failures:
     - rvm: ruby-head
