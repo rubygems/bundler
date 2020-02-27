@@ -1,0 +1,35 @@
+name: ubuntu
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - staging
+      - trying
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [ 2.3.8, 2.4.9, 2.5.7, 2.6.5 ]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: Prepare dependencies
+        run: |
+          sudo apt-get install graphviz -y
+          bin/rake override_version
+          bin/rake spec:parallel_deps
+      - name: Run Test
+        run: bin/parallel_rspec spec
+      - name: Run Test with realworld
+        run: |
+          sudo -E bin/rake spec:sudo
+          sudo chown -R $(whoami) tmp
+          BUNDLER_SPEC_PRE_RECORDED=1 bin/rake spec:realworld
+    timeout-minutes: 60
