@@ -1,0 +1,32 @@
+name: ubuntu-sudo
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - staging
+      - trying
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [ 2.4.x, 2.5.x, 2.6.x ]
+        rgv: [ v3.0.6, master ]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: Prepare dependencies
+        run: |
+          bin/rake override_version
+          bin/rake spec:deps
+      - name: Run Test
+        run: sudo -E bin/rake spec:sudo
+        env:
+          RGV: ${{ matrix.rgv }}
+    timeout-minutes: 60
