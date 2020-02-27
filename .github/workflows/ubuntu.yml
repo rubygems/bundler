@@ -15,7 +15,25 @@ jobs:
       matrix:
         ruby: [ 2.3.8, 2.4.9, 2.5.7, 2.6.5 ]
         rgv: [ v2.5.2, v2.6.14, v2.7.10, v3.0.6, master ]
-        bundler_version: [ 2.2.0.dev, 3.0.0 ]
+        include:
+          - ruby: 2.4.9
+            rgv: v3.0.6
+            bundler_version: 3.0.0
+          - ruby: 2.4.9
+            rgv: master
+            bundler_version: 3.0.0
+          - ruby: 2.5.7
+            rgv: v3.0.6
+            bundler_version: 3.0.0
+          - ruby: 2.5.7
+            rgv: master
+            bundler_version: 3.0.0
+          - ruby: 2.6.5
+            rgv: v3.0.6
+            bundler_version: 3.0.0
+          - ruby: 2.6.5
+            rgv: master
+            bundler_version: 3.0.0
         exclude:
           - ruby: 2.4.9
             rgv: v2.5.2
