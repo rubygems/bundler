@@ -38,7 +38,6 @@ rvm:
   - 2.4.9
 
 stages:
-  - linting
   - test
 
 env:
@@ -51,9 +50,6 @@ env:
 
 jobs:
   include:
-    - rvm: 2.6.5
-      script: bin/rake rubocop check_rvm_integration man:check
-      stage: linting
     # Ruby 2.3 also tested in 2.x mode
     - rvm: 2.3.8
       env: RGV=master
