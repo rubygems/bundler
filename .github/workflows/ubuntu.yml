@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         ruby: [ 2.3.8, 2.4.9, 2.5.7, 2.6.5 ]
+        rgv: [ master, v3.0.6 ]
     steps:
       - uses: actions/checkout@v1
       - name: Setup ruby
@@ -27,6 +28,8 @@ jobs:
           bin/rake spec:parallel_deps
       - name: Run Test
         run: bin/parallel_rspec spec
+        env:
+          RGV: ${{ matrix.rgv }}
       - name: Run Test with realworld
         run: |
           sudo -E bin/rake spec:sudo
