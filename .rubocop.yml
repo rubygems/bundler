@@ -363,7 +363,7 @@ Layout/SpaceInsideArrayPercentLiteral:
 
 Layout/SpaceInsideBlockBraces:
   Enabled: true
-  SpaceBeforeBlockParameters: false
+  SpaceBeforeBlockParameters: true
 
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: true
