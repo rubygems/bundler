@@ -33,7 +33,7 @@ jobs:
           RGV: ${{ matrix.rgv }}
       - name: Run Test with realworld
         run: |
-          sudo -E bin/rake spec:sudo
-          sudo chown -R $(whoami) tmp
-          BUNDLER_SPEC_PRE_RECORDED=1 bin/rake spec:realworld
+          bin/rake spec:realworld
+        env:
+          BUNDLER_SPEC_PRE_RECORDED: 1 
     timeout-minutes: 60
