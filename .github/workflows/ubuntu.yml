@@ -37,5 +37,5 @@ jobs:
         run: |
           bin/rake spec:realworld
         env:
-          BUNDLER_SPEC_PRE_RECORDED: 1 
+          BUNDLER_SPEC_PRE_RECORDED: 1
     timeout-minutes: 60
