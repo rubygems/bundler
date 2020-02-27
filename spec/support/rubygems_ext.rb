@@ -4,28 +4,27 @@ require_relative "path"
 
 module Spec
   module Rubygems
-    DEV_DEPS = {
+    DEV_DEPS = { # rubocop:disable Style/MutableConstant
       "automatiek" => "~> 0.3.0",
       "parallel_tests" => "~> 2.29",
-      "rake" => "~> 12.0",
       "ronn" => "~> 0.7.3",
       "rspec" => "~> 3.8",
       "rubocop" => "= 0.77.0",
       "rubocop-performance" => "= 1.5.1",
-    }.freeze
+    }
 
-    DEPS = {
+    DEPS = { # rubocop:disable Style/MutableConstant
       "rack" => "2.0.8",
       "rack-test" => "~> 1.1",
       "artifice" => "~> 0.6.0",
       "compact_index" => "~> 0.11.0",
       "sinatra" => "~> 2.0",
       # Rake version has to be consistent for tests to pass
-      "rake" => "12.3.2",
+      "rake" => "13.0.1",
       "builder" => "~> 3.2",
       # ruby-graphviz is used by the viz tests
       "ruby-graphviz" => ">= 0.a",
-    }.freeze
+    }
 
     extend self
 

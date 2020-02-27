@@ -79,7 +79,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
         bundle :install, :env => { "BUNDLER_DEBUG_RESOLVER" => "1" }
 
-        expect(err).to include("Creating possibility state for net_c")
+        expect(err).to include("BUNDLER: Starting resolution")
       end
     end
 
@@ -93,7 +93,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
         bundle :install, :env => { "DEBUG_RESOLVER" => "1" }
 
-        expect(err).to include("Creating possibility state for net_c")
+        expect(err).to include("BUNDLER: Starting resolution")
       end
     end
 
@@ -108,8 +108,8 @@ RSpec.describe "bundle install with install-time dependencies" do
         bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
 
         expect(err).to include(" net_b").
-          and include("Starting resolution").
-          and include("Finished resolution").
+          and include("BUNDLER: Starting resolution").
+          and include("BUNDLER: Finished resolution").
           and include("Attempting to activate")
       end
     end
@@ -233,7 +233,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
       describe "with a < requirement" do
         let(:ruby_requirement) { %("< 5000") }
-        let(:error_message_requirement) { Gem::Requirement.new(["< 5000", "= #{RUBY_VERSION}.#{RUBY_PATCHLEVEL}"]).to_s }
+        let(:error_message_requirement) { Gem::Requirement.new(["< 5000", "= #{Bundler::RubyVersion.system.to_gem_version_with_patchlevel}"]).to_s }
 
         it_behaves_like "ruby version conflicts"
       end
@@ -241,7 +241,7 @@ RSpec.describe "bundle install with install-time dependencies" do
       describe "with a compound requirement" do
         let(:reqs) { ["> 0.1", "< 5000"] }
         let(:ruby_requirement) { reqs.map(&:dump).join(", ") }
-        let(:error_message_requirement) { Gem::Requirement.new(reqs + ["= #{RUBY_VERSION}.#{RUBY_PATCHLEVEL}"]).to_s }
+        let(:error_message_requirement) { Gem::Requirement.new(reqs + ["= #{Bundler::RubyVersion.system.to_gem_version_with_patchlevel}"]).to_s }
 
         it_behaves_like "ruby version conflicts"
       end

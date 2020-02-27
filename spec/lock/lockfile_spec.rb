@@ -748,8 +748,8 @@ RSpec.describe "the lockfile format" do
             actionpack (= 2.3.2)
             activerecord (= 2.3.2)
             activeresource (= 2.3.2)
-            rake (= 12.3.2)
-          rake (12.3.2)
+            rake (= 13.0.1)
+          rake (13.0.1)
 
       PLATFORMS
         #{lockfile_platforms}

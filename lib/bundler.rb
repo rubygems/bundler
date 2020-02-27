@@ -457,6 +457,10 @@ EOF
       Bundler.settings[:system_bindir] || Bundler.rubygems.gem_bindir
     end
 
+    def preferred_gemfile_name
+      Bundler.settings[:init_gems_rb] ? "gems.rb" : "Gemfile"
+    end
+
     def use_system_gems?
       configured_bundle_path.use_system_gems?
     end

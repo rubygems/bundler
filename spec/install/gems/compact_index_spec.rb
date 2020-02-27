@@ -1015,7 +1015,7 @@ The checksum of /versions does not match the checksum provided by the server! So
       source "#{source_uri}"
       gem "rails"
     G
-    deps = [Gem::Dependency.new("rake", "= 12.3.2"),
+    deps = [Gem::Dependency.new("rake", "= 13.0.1"),
             Gem::Dependency.new("actionpack", "= 2.3.2"),
             Gem::Dependency.new("activerecord", "= 2.3.2"),
             Gem::Dependency.new("actionmailer", "= 2.3.2"),
