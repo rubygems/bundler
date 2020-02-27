@@ -16,6 +16,15 @@ jobs:
         ruby: [ 2.3.8, 2.4.9, 2.5.7, 2.6.5 ]
         rgv: [ master, v3.0.6 ]
         bundler_version: [ 2.2.0.dev, 3.0.0 ]
+        include:
+          - ruby: 2.3.8
+            rgv: v2.5.2
+          - ruby: 2.4.9
+            rgv: v2.6.14
+          - ruby: 2.5.7
+            rgv: v2.7.10
+          - ruby: head
+            rgv: master
     steps:
       - uses: actions/checkout@v1
       - name: Setup ruby
@@ -38,4 +47,5 @@ jobs:
           bin/rake spec:realworld
         env:
           BUNDLER_SPEC_PRE_RECORDED: 1
+        continue-on-error: ${{matrix.ruby == 'head' }}
     timeout-minutes: 60
