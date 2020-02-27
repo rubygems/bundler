@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: git submodule update -i
       - name: Setup ruby
         uses: ruby/setup-ruby@v1
         with:
