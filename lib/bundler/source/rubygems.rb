@@ -22,7 +22,7 @@ module Bundler
         @allow_cached = false
         @caches = [cache_path, *Bundler.rubygems.gem_cache]
 
-        Array(options["remotes"] || []).reverse_each {|r| add_remote(r) }
+        Array(options["remotes"] || []).reverse_each { |r| add_remote(r) }
       end
 
       def remote!
@@ -320,8 +320,8 @@ module Bundler
       end
 
       def cached_path(spec)
-        possibilities = @caches.map {|p| "#{p}/#{spec.file_name}" }
-        possibilities.find {|p| File.exist?(p) }
+        possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
+        possibilities.find { |p| File.exist?(p) }
       end
 
       def normalize_uri(uri)
@@ -345,7 +345,7 @@ module Bundler
 
       def remove_auth(remote)
         if remote.user || remote.password
-          remote.dup.tap {|uri| uri.user = uri.password = nil }.to_s
+          remote.dup.tap { |uri| uri.user = uri.password = nil }.to_s
         else
           remote.to_s
         end
@@ -385,7 +385,7 @@ module Bundler
       end
 
       def api_fetchers
-        fetchers.select {|f| f.use_api && f.fetchers.first.api_fetcher? }
+        fetchers.select { |f| f.use_api && f.fetchers.first.api_fetcher? }
       end
 
       def remote_specs

@@ -17,7 +17,7 @@ class CompactIndexConcurrentDownload < CompactIndexAPI
 
     # Overwrite the file in parallel, which should be then overwritten
     # after a successful download to prevent corruption
-    File.open(versions, "w") {|f| f.puts "another process" }
+    File.open(versions, "w") { |f| f.puts "another process" }
 
     etag_response do
       file = tmp("versions.list")

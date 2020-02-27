@@ -1409,7 +1409,7 @@ RSpec.describe "the lockfile format" do
 
         update_repo2
         win_lock = File.read(bundled_app_lock).gsub(/\n/, "\r\n")
-        File.open(bundled_app_lock, "wb") {|f| f.puts(win_lock) }
+        File.open(bundled_app_lock, "wb") { |f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
         expect { bundle "update", :all => true }.to change { File.mtime(bundled_app_lock) }
@@ -1430,7 +1430,7 @@ RSpec.describe "the lockfile format" do
 
       it "preserves Gemfile.lock \\n\\r line endings" do
         win_lock = File.read(bundled_app_lock).gsub(/\n/, "\r\n")
-        File.open(bundled_app_lock, "wb") {|f| f.puts(win_lock) }
+        File.open(bundled_app_lock, "wb") { |f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
         expect do
@@ -1480,7 +1480,7 @@ private
   end
 
   def previous_major(version)
-    version.split(".").map.with_index {|v, i| i == 0 ? v.to_i - 1 : v }.join(".")
+    version.split(".").map.with_index { |v, i| i == 0 ? v.to_i - 1 : v }.join(".")
   end
 
   def bump_minor(version)
@@ -1488,6 +1488,6 @@ private
   end
 
   def bump(version, segment)
-    version.split(".").map.with_index {|v, i| i == segment ? v.to_i + 1 : v }.join(".")
+    version.split(".").map.with_index { |v, i| i == segment ? v.to_i + 1 : v }.join(".")
   end
 end

@@ -115,7 +115,7 @@ module Bundler
     end
 
     def temporary(update)
-      existing = Hash[update.map {|k, _| [k, @temporary[key_for(k)]] }]
+      existing = Hash[update.map { |k, _| [k, @temporary[key_for(k)]] }]
       update.each do |k, v|
         set_key(k, v, @temporary, nil)
       end
@@ -123,7 +123,7 @@ module Bundler
       begin
         yield
       ensure
-        existing.each {|k, v| set_key(k, v, @temporary, nil) }
+        existing.each { |k, v| set_key(k, v, @temporary, nil) }
       end
     end
 
@@ -356,7 +356,7 @@ module Bundler
       SharedHelpers.filesystem_access(file) do |p|
         FileUtils.mkdir_p(p.dirname)
         require_relative "yaml_serializer"
-        p.open("w") {|f| f.write(YAMLSerializer.dump(hash)) }
+        p.open("w") { |f| f.write(YAMLSerializer.dump(hash)) }
       end
     end
 

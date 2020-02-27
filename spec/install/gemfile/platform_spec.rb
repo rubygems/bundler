@@ -78,7 +78,7 @@ RSpec.describe "bundle install across platforms" do
       build_gem "empyrean", "0.1.0"
       build_gem "coderay", "1.1.2"
       build_gem "method_source", "0.9.0"
-      build_gem("spoon", "0.0.6") {|s| s.add_runtime_dependency "ffi" }
+      build_gem("spoon", "0.0.6") { |s| s.add_runtime_dependency "ffi" }
       build_gem "pry", "0.11.3" do |s|
         s.platform = "java"
         s.add_runtime_dependency "coderay", "~> 1.1.0"
@@ -89,7 +89,7 @@ RSpec.describe "bundle install across platforms" do
         s.add_runtime_dependency "coderay", "~> 1.1.0"
         s.add_runtime_dependency "method_source", "~> 0.9.0"
       end
-      build_gem("ffi", "1.9.23") {|s| s.platform = "java" }
+      build_gem("ffi", "1.9.23") { |s| s.platform = "java" }
       build_gem("ffi", "1.9.23")
     end
 

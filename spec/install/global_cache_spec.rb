@@ -225,8 +225,8 @@ RSpec.describe "global gem caching" do
 
       FileUtils.rm Dir[home(".bundle", "cache", "extensions", "**", "*binary_c*")]
 
-      gem_binary_cache.join("very_simple_binary_c.rb").open("w") {|f| f << "puts File.basename(__FILE__)" }
-      git_binary_cache.join("very_simple_git_binary_c.rb").open("w") {|f| f << "puts File.basename(__FILE__)" }
+      gem_binary_cache.join("very_simple_binary_c.rb").open("w") { |f| f << "puts File.basename(__FILE__)" }
+      git_binary_cache.join("very_simple_git_binary_c.rb").open("w") { |f| f << "puts File.basename(__FILE__)" }
 
       bundle! "config set --local path different_path"
       bundle! :install

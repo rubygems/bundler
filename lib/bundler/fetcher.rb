@@ -70,7 +70,7 @@ module Bundler
     FAIL_ERRORS = begin
       fail_errors = [AuthenticationRequiredError, BadAuthenticationError, FallbackError]
       fail_errors << Gem::Requirement::BadRequirementError if defined?(Gem::Requirement::BadRequirementError)
-      fail_errors.concat(NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
+      fail_errors.concat(NET_ERRORS.map { |e| SharedHelpers.const_get_safely(e, Net) }.compact)
     end.freeze
 
     class << self
@@ -204,7 +204,7 @@ module Bundler
     end
 
     def fetchers
-      @fetchers ||= FETCHERS.map {|f| f.new(downloader, @remote, uri) }
+      @fetchers ||= FETCHERS.map { |f| f.new(downloader, @remote, uri) }
     end
 
     def http_proxy
@@ -232,7 +232,7 @@ module Bundler
         "CI_NAME" => ENV["CI_NAME"],
         "CI" => "ci",
       }
-      env_cis.find_all {|env, _| ENV[env] }.map {|_, ci| ci }
+      env_cis.find_all { |env, _| ENV[env] }.map { |_, ci| ci }
     end
 
     def connection
@@ -272,8 +272,8 @@ module Bundler
 
     # cached gem specification path, if one exists
     def gemspec_cached_path(spec_file_name)
-      paths = Bundler.rubygems.spec_cache_dirs.map {|dir| File.join(dir, spec_file_name) }
-      paths = paths.select {|path| File.file? path }
+      paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+      paths = paths.select { |path| File.file? path }
       paths.first
     end
 
@@ -297,7 +297,7 @@ module Bundler
         end
       else
         store.set_default_paths
-        Gem::Request.get_cert_files.each {|c| store.add_file c }
+        Gem::Request.get_cert_files.each { |c| store.add_file c }
       end
       store
     end

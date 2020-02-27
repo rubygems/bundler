@@ -128,7 +128,7 @@ In Gemfile:
           build_gem "a"
         end
 
-        gem_repo4("gems", "a-1.0.gem").open("w") {|f| f << "<html></html>" }
+        gem_repo4("gems", "a-1.0.gem").open("w") { |f| f << "<html></html>" }
       end
 
       it "removes the downloaded .gem" do

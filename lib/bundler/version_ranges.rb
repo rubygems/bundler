@@ -76,7 +76,7 @@ module Bundler
     end
 
     def self.for_many(requirements)
-      requirements = requirements.map(&:requirements).flatten(1).map {|r| r.join(" ") }
+      requirements = requirements.map(&:requirements).flatten(1).map { |r| r.join(" ") }
       requirements << ">= 0.a" if requirements.empty?
       requirement = Gem::Requirement.new(requirements)
       self.for(requirement)
@@ -95,7 +95,7 @@ module Bundler
         else raise "unknown version op #{op} in requirement #{requirement}"
         end
       end.uniq
-      ranges, neqs = ranges.partition {|r| !r.is_a?(NEq) }
+      ranges, neqs = ranges.partition { |r| !r.is_a?(NEq) }
 
       [ranges.sort, neqs.map(&:version)]
     end

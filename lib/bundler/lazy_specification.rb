@@ -78,7 +78,7 @@ module Bundler
     def __materialize__
       search_object = Bundler.feature_flag.specific_platform? || Bundler.settings[:force_ruby_platform] ? self : Dependency.new(name, version)
       @specification = if source.is_a?(Source::Gemspec) && source.gemspec.name == name
-        source.gemspec.tap {|s| s.source = source }
+        source.gemspec.tap { |s| s.source = source }
       else
         platform_object = Gem::Platform.new(platform)
         candidates = source.specs.search(search_object)
@@ -86,7 +86,7 @@ module Bundler
           MatchPlatform.platforms_match?(spec.platform, platform_object)
         end
         search = same_platform_candidates.last || candidates.last
-        if search && Gem::Platform.new(search.platform) != platform_object && !search.runtime_dependencies.-(dependencies.reject {|d| d.type == :development }).empty?
+        if search && Gem::Platform.new(search.platform) != platform_object && !search.runtime_dependencies.-(dependencies.reject { |d| d.type == :development }).empty?
           Bundler.ui.warn "Unable to use the platform-specific (#{search.platform}) version of #{name} (#{version}) " \
             "because it has different dependencies from the #{platform} version. " \
             "To use the platform-specific version of the gem, run `bundle config set specific_platform true` and install again."

@@ -200,14 +200,14 @@ module Bundler
     end
 
     def gem_cache
-      gem_path.map {|p| File.expand_path("cache", p) }
+      gem_path.map { |p| File.expand_path("cache", p) }
     end
 
     def spec_cache_dirs
       @spec_cache_dirs ||= begin
-        dirs = gem_path.map {|dir| File.join(dir, "specifications") }
+        dirs = gem_path.map { |dir| File.join(dir, "specifications") }
         dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in RubyGems 2.0.3 or earlier
-        dirs.uniq.select {|dir| File.directory? dir }
+        dirs.uniq.select { |dir| File.directory? dir }
       end
     end
 
@@ -229,7 +229,7 @@ module Bundler
     end
 
     def loaded_gem_paths
-      loaded_gem_paths = Gem.loaded_specs.map {|_, s| s.full_require_paths }
+      loaded_gem_paths = Gem.loaded_specs.map { |_, s| s.full_require_paths }
       loaded_gem_paths.flatten
     end
 
@@ -284,7 +284,7 @@ module Bundler
     end
 
     def security_policy_keys
-      %w[High Medium Low AlmostNo No].map {|level| "#{level}Security" }
+      %w[High Medium Low AlmostNo No].map { |level| "#{level}Security" }
     end
 
     def security_policies
@@ -362,7 +362,7 @@ module Bundler
         raise ArgumentError, "you must supply exec_name" unless exec_name
 
         spec_with_name = specs_by_name[gem_name]
-        matching_specs_by_exec_name = specs_by_name.values.select {|s| s.executables.include?(exec_name) }
+        matching_specs_by_exec_name = specs_by_name.values.select { |s| s.executables.include?(exec_name) }
         spec = matching_specs_by_exec_name.delete(spec_with_name)
 
         unless spec || !matching_specs_by_exec_name.empty?
@@ -448,9 +448,9 @@ module Bundler
         redefine_method(klass, sym, method)
       end
       if Binding.public_method_defined?(:source_location)
-        post_reset_hooks.reject! {|proc| proc.binding.source_location[0] == __FILE__ }
+        post_reset_hooks.reject! { |proc| proc.binding.source_location[0] == __FILE__ }
       else
-        post_reset_hooks.reject! {|proc| proc.binding.eval("__FILE__") == __FILE__ }
+        post_reset_hooks.reject! { |proc| proc.binding.eval("__FILE__") == __FILE__ }
       end
       @replaced_methods.clear
     end

@@ -443,7 +443,7 @@ RSpec.describe "bundle clean" do
     bundle! "update", :all => true
 
     files = Pathname.glob(bundled_app(".bundle", Bundler.ruby_scope, "*", "*"))
-    files.map! {|f| f.to_s.sub(bundled_app(".bundle", Bundler.ruby_scope).to_s, "") }
+    files.map! { |f| f.to_s.sub(bundled_app(".bundle", Bundler.ruby_scope).to_s, "") }
     expect(files.sort).to eq %w[
       /cache/foo-1.0.1.gem
       /gems/foo-1.0.1

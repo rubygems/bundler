@@ -77,7 +77,7 @@ module Bundler
 
         # allow us to handle when the specs dependencies are an array of array of string
         # see https://github.com/rubygems/bundler/issues/5797
-        deps = deps.map {|d| d.is_a?(Gem::Dependency) ? d : Gem::Dependency.new(*d) }
+        deps = deps.map { |d| d.is_a?(Gem::Dependency) ? d : Gem::Dependency.new(*d) }
 
         deps
       end

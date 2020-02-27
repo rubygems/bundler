@@ -111,7 +111,7 @@ RSpec.describe "bundle install" do
 
           bundle! :install
 
-          paths_to_exist = %w[cache/rack-1.0.0.gem gems/rack-1.0.0 specifications/rack-1.0.0.gemspec].map {|path| bundled_app(Bundler.ruby_scope, path) }
+          paths_to_exist = %w[cache/rack-1.0.0.gem gems/rack-1.0.0 specifications/rack-1.0.0.gemspec].map { |path| bundled_app(Bundler.ruby_scope, path) }
           expect(paths_to_exist).to all exist
           expect(the_bundle).to include_gems "rack 1.0.0"
         end

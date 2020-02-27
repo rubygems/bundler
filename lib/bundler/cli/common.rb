@@ -23,7 +23,7 @@ module Bundler
       command_in_past_tense = command == :install ? "installed" : "updated"
       groups = Bundler.settings[:without]
       group_list = [groups[0...-1].join(", "), groups[-1..-1]].
-        reject {|s| s.to_s.empty? }.join(" and ")
+        reject { |s| s.to_s.empty? }.join(" and ")
       group_str = groups.size == 1 ? "group" : "groups"
       "Gems in the #{group_str} #{group_list} were not #{command_in_past_tense}."
     end
@@ -62,7 +62,7 @@ module Bundler
     def self.gem_not_found_message(missing_gem_name, alternatives)
       require_relative "../similarity_detector"
       message = "Could not find gem '#{missing_gem_name}'."
-      alternate_names = alternatives.map {|a| a.respond_to?(:name) ? a.name : a }
+      alternate_names = alternatives.map { |a| a.respond_to?(:name) ? a.name : a }
       suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
@@ -87,7 +87,7 @@ module Bundler
     end
 
     def self.patch_level_options(options)
-      [:major, :minor, :patch].select {|v| options.keys.include?(v.to_s) }
+      [:major, :minor, :patch].select { |v| options.keys.include?(v.to_s) }
     end
 
     def self.clean_after_install?

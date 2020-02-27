@@ -96,7 +96,7 @@ RSpec.describe Bundler::Fetcher do
     context "when bunder ssl ssl configuration is set" do
       before do
         cert = File.join(Spec::Path.tmpdir, "cert")
-        File.open(cert, "w") {|f| f.write "PEM" }
+        File.open(cert, "w") { |f| f.write "PEM" }
         allow(Bundler.settings).to receive(:[]).and_return(nil)
         allow(Bundler.settings).to receive(:[]).with(:ssl_client_cert).and_return(cert)
         expect(OpenSSL::X509::Certificate).to receive(:new).with("PEM").and_return("cert")
@@ -144,14 +144,14 @@ RSpec.describe Bundler::Fetcher do
     describe "include CI information" do
       it "from one CI" do
         with_env_vars("JENKINS_URL" => "foo") do
-          ci_part = fetcher.user_agent.split(" ").find {|x| x.start_with?("ci/") }
+          ci_part = fetcher.user_agent.split(" ").find { |x| x.start_with?("ci/") }
           expect(ci_part).to match("jenkins")
         end
       end
 
       it "from many CI" do
         with_env_vars("TRAVIS" => "foo", "CI_NAME" => "my_ci") do
-          ci_part = fetcher.user_agent.split(" ").find {|x| x.start_with?("ci/") }
+          ci_part = fetcher.user_agent.split(" ").find { |x| x.start_with?("ci/") }
           expect(ci_part).to match("travis")
           expect(ci_part).to match("my_ci")
         end

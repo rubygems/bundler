@@ -42,8 +42,8 @@ module Bundler
     module_function :platform_specificity_match
 
     def select_best_platform_match(specs, platform)
-      specs.select {|spec| spec.match_platform(platform) }.
-        min_by {|spec| platform_specificity_match(spec.platform, platform) }
+      specs.select { |spec| spec.match_platform(platform) }.
+        min_by { |spec| platform_specificity_match(spec.platform, platform) }
     end
     module_function :select_best_platform_match
 

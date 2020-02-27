@@ -41,7 +41,7 @@ class CompactIndexAPI < Endpoint
 
       if ranges
         status 206
-        body ranges.map! {|range| slice_body(response_body, range) }.join
+        body ranges.map! { |range| slice_body(response_body, range) }.join
       else
         status 200
         body response_body
@@ -53,7 +53,7 @@ class CompactIndexAPI < Endpoint
     end
 
     def parse_etags(value)
-      value ? value.split(/, ?/).select {|s| s.sub!(/"(.*)"/, '\1') } : []
+      value ? value.split(/, ?/).select { |s| s.sub!(/"(.*)"/, '\1') } : []
     end
 
     def slice_body(body, range)
@@ -73,8 +73,8 @@ class CompactIndexAPI < Endpoint
 
         specs.group_by(&:name).map do |name, versions|
           gem_versions = versions.map do |spec|
-            deps = spec.dependencies.select {|d| d.type == :runtime }.map do |d|
-              reqs = d.requirement.requirements.map {|r| r.join(" ") }.join(", ")
+            deps = spec.dependencies.select { |d| d.type == :runtime }.map do |d|
+              reqs = d.requirement.requirements.map { |r| r.join(" ") }.join(", ")
               CompactIndex::Dependency.new(d.name, reqs)
             end
             checksum = begin
@@ -109,7 +109,7 @@ class CompactIndexAPI < Endpoint
 
   get "/info/:name" do
     etag_response do
-      gem = gems.find {|g| g.name == params[:name] }
+      gem = gems.find { |g| g.name == params[:name] }
       CompactIndex.info(gem ? gem.versions : [])
     end
   end

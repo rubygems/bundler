@@ -106,7 +106,7 @@ module Spec
     end
 
     def install_gems(gems)
-      deps = gems.map {|name, req| "'#{name}:#{req}'" }.join(" ")
+      deps = gems.map { |name, req| "'#{name}:#{req}'" }.join(" ")
       gem = ENV["GEM_COMMAND"] || "#{Gem.ruby} -S gem --backtrace"
       cmd = "#{gem} install #{deps} --no-document --conservative"
       system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")

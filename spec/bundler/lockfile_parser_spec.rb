@@ -121,7 +121,7 @@ RSpec.describe Bundler::LockfileParser do
         expect(subject.sources).to eq sources
         expect(subject.dependencies).to eq dependencies
         expect(subject.specs).to eq specs
-        expect(Hash[subject.specs.map {|s| [s, s.dependencies] }]).to eq Hash[subject.specs.map {|s| [s, s.dependencies] }]
+        expect(Hash[subject.specs.map { |s| [s, s.dependencies] }]).to eq Hash[subject.specs.map { |s| [s, s.dependencies] }]
         expect(subject.platforms).to eq platforms
         expect(subject.bundler_version).to eq bundler_version
         expect(subject.ruby_version).to eq ruby_version

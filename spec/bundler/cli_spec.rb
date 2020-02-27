@@ -155,7 +155,7 @@ RSpec.describe "bundle executable" do
       if latest_version
         info_path = home(".bundle/cache/compact_index/rubygems.org.443.29b0360b937aa4d161703e6160654e47/info/bundler")
         info_path.parent.mkpath
-        info_path.open("w") {|f| f.write "#{latest_version}\n" }
+        info_path.open("w") { |f| f.write "#{latest_version}\n" }
       end
     end
 

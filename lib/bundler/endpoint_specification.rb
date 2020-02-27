@@ -14,7 +14,7 @@ module Bundler
       @name         = name
       @version      = Gem::Version.create version
       @platform     = platform
-      @dependencies = dependencies.map {|dep, reqs| build_dependency(dep, reqs) }
+      @dependencies = dependencies.map { |dep, reqs| build_dependency(dep, reqs) }
 
       @loaded_from          = nil
       @remote_specification = nil

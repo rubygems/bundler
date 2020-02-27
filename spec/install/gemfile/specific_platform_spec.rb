@@ -6,31 +6,31 @@ RSpec.describe "bundle install with specific_platform enabled" do
 
     build_repo2 do
       build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1")
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") {|s| s.platform = "x86_64-linux" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") {|s| s.platform = "x86-mingw32" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") {|s| s.platform = "x86-linux" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") {|s| s.platform = "x64-mingw32" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") {|s| s.platform = "universal-darwin" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") { |s| s.platform = "x86_64-linux" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") { |s| s.platform = "x86-mingw32" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") { |s| s.platform = "x86-linux" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") { |s| s.platform = "x64-mingw32" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.5.1") { |s| s.platform = "universal-darwin" }
 
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.5") {|s| s.platform = "x86_64-linux" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.5") {|s| s.platform = "x86-linux" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.5") {|s| s.platform = "x64-mingw32" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.5") {|s| s.platform = "x86-mingw32" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.5") { |s| s.platform = "x86_64-linux" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.5") { |s| s.platform = "x86-linux" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.5") { |s| s.platform = "x64-mingw32" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.5") { |s| s.platform = "x86-mingw32" }
       build_gem("google-protobuf", "3.0.0.alpha.5.0.5")
 
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") {|s| s.platform = "universal-darwin" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") {|s| s.platform = "x86_64-linux" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") {|s| s.platform = "x86-mingw32" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") {|s| s.platform = "x86-linux" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") {|s| s.platform = "x64-mingw32" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") { |s| s.platform = "universal-darwin" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") { |s| s.platform = "x86_64-linux" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") { |s| s.platform = "x86-mingw32" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") { |s| s.platform = "x86-linux" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.4") { |s| s.platform = "x64-mingw32" }
       build_gem("google-protobuf", "3.0.0.alpha.5.0.4")
 
       build_gem("google-protobuf", "3.0.0.alpha.5.0.3")
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") {|s| s.platform = "x86_64-linux" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") {|s| s.platform = "x86-mingw32" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") {|s| s.platform = "x86-linux" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") {|s| s.platform = "x64-mingw32" }
-      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") {|s| s.platform = "universal-darwin" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") { |s| s.platform = "x86_64-linux" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") { |s| s.platform = "x86-mingw32" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") { |s| s.platform = "x86-linux" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") { |s| s.platform = "x64-mingw32" }
+      build_gem("google-protobuf", "3.0.0.alpha.5.0.3") { |s| s.platform = "universal-darwin" }
 
       build_gem("google-protobuf", "3.0.0.alpha.4.0")
       build_gem("google-protobuf", "3.0.0.alpha.3.1.pre")

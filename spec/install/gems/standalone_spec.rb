@@ -3,7 +3,7 @@
 RSpec.shared_examples "bundle install --standalone" do
   shared_examples "common functionality" do
     it "still makes the gems available to normal bundler" do
-      args = expected_gems.map {|k, v| "#{k} #{v}" }
+      args = expected_gems.map { |k, v| "#{k} #{v}" }
       expect(the_bundle).to include_gems(*args)
     end
 
@@ -73,7 +73,7 @@ RSpec.shared_examples "bundle install --standalone" do
 
     it "generates a bundle/bundler/setup.rb with the proper paths" do
       expected_path = bundled_app("bundle/bundler/setup.rb")
-      extension_line = File.read(expected_path).each_line.find {|line| line.include? "/extensions/" }.strip
+      extension_line = File.read(expected_path).each_line.find { |line| line.include? "/extensions/" }.strip
       expect(extension_line).to start_with '$:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/extensions/'
       expect(extension_line).to end_with '/very_simple_binary-1.0"'
     end
@@ -291,7 +291,7 @@ RSpec.shared_examples "bundle install --standalone" do
     end
 
     it "creates stubs with the correct load path" do
-      extension_line = File.read(bundled_app("bin/rails")).each_line.find {|line| line.include? "$:.unshift" }.strip
+      extension_line = File.read(bundled_app("bin/rails")).each_line.find { |line| line.include? "$:.unshift" }.strip
       expect(extension_line).to eq %($:.unshift File.expand_path "../../bundle", path.realpath)
     end
   end

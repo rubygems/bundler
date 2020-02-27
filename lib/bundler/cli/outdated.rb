@@ -34,7 +34,7 @@ module Bundler
       current_specs = Bundler.ui.silence { Bundler.definition.resolve }
 
       current_dependencies = Bundler.ui.silence do
-        Bundler.load.dependencies.map {|dep| [dep.name, dep] }.to_h
+        Bundler.load.dependencies.map { |dep| [dep.name, dep] }.to_h
       end
 
       definition = if gems.empty? && sources.empty?
@@ -101,7 +101,7 @@ module Bundler
         end
       else
         if options_include_groups
-          relevant_outdated_gems = outdated_gems.group_by {|g| g[:groups] }.sort.flat_map do |groups, gems|
+          relevant_outdated_gems = outdated_gems.group_by { |g| g[:groups] }.sort.flat_map do |groups, gems|
             contains_group = groups.split(", ").include?(options[:group])
             next unless options[:groups] || contains_group
 
@@ -149,7 +149,7 @@ module Bundler
       else
         active_specs = definition.find_indexed_specs(current_spec)
         if !current_spec.version.prerelease? && !options[:pre] && active_specs.size > 1
-          active_specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
+          active_specs.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
         end
         active_spec = active_specs.last
       end
@@ -266,12 +266,12 @@ module Bundler
       data = matrix[1..-1]
 
       column_sizes = Array.new(header.size) do |index|
-        matrix.max_by {|row| row[index].length }[index].length
+        matrix.max_by { |row| row[index].length }[index].length
       end
 
       Bundler.ui.info justify(header, column_sizes)
 
-      data.sort_by! {|row| row[0] }
+      data.sort_by! { |row| row[0] }
 
       data.each do |row|
         Bundler.ui.info justify(row, column_sizes)

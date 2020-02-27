@@ -25,12 +25,12 @@ module Spec
       end
 
       def matches?(target, &blk)
-        return false if @failure_index = @preconditions.index {|pc| !pc.matches?(target, &blk) }
+        return false if @failure_index = @preconditions.index { |pc| !pc.matches?(target, &blk) }
         @matcher.matches?(target, &blk)
       end
 
       def does_not_match?(target, &blk)
-        return false if @failure_index = @preconditions.index {|pc| !pc.matches?(target, &blk) }
+        return false if @failure_index = @preconditions.index { |pc| !pc.matches?(target, &blk) }
         if @matcher.respond_to?(:does_not_match?)
           @matcher.does_not_match?(target, &blk)
         else
@@ -65,13 +65,13 @@ module Spec
       dep = Bundler::Dependency.new(*args)
 
       match do |actual|
-        actual.length == 1 && actual.all? {|d| d == dep }
+        actual.length == 1 && actual.all? { |d| d == dep }
       end
     end
 
     RSpec::Matchers.define :have_gem do |*args|
       match do |actual|
-        actual.length == args.length && actual.all? {|a| args.include?(a.full_name) }
+        actual.length == args.length && actual.all? { |a| args.include?(a.full_name) }
       end
     end
 
@@ -81,7 +81,7 @@ module Spec
 
       match do |actual|
         actual = actual.split(/\s+/) if actual.is_a?(String)
-        args.all? {|arg| actual.include?(arg) } && actual.uniq.size == actual.size
+        args.all? { |arg| actual.include?(arg) } && actual.uniq.size == actual.size
       end
     end
 
@@ -185,11 +185,11 @@ module Spec
       end
 
       failure_message do
-        super() + " but:\n" + @errors.map {|e| indent(e) }.join("\n")
+        super() + " but:\n" + @errors.map { |e| indent(e) }.join("\n")
       end
 
       failure_message_when_negated do
-        super() + " but:\n" + @errors.map {|e| indent(e) }.join("\n")
+        super() + " but:\n" + @errors.map { |e| indent(e) }.join("\n")
       end
     end
     RSpec::Matchers.define_negated_matcher :not_include_gems, :include_gems

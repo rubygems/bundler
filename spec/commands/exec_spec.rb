@@ -367,7 +367,7 @@ RSpec.describe "bundle exec" do
 
   describe "with help flags" do
     each_prefix = proc do |string, &blk|
-      1.upto(string.length) {|l| blk.call(string[0, l]) }
+      1.upto(string.length) { |l| blk.call(string[0, l]) }
     end
     each_prefix.call("exec") do |exec|
       describe "when #{exec} is used" do
@@ -618,7 +618,7 @@ RSpec.describe "bundle exec" do
     RUBY
 
     before do
-      bundled_app(path).open("w") {|f| f << executable }
+      bundled_app(path).open("w") { |f| f << executable }
       bundled_app(path).chmod(0o755)
 
       install_gemfile <<-G

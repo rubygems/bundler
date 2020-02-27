@@ -59,13 +59,13 @@ module Bundler
       $0 = file
       Process.setproctitle(process_title(file, args)) if Process.respond_to?(:setproctitle)
       require_relative "../setup"
-      TRAPPED_SIGNALS.each {|s| trap(s, "DEFAULT") }
+      TRAPPED_SIGNALS.each { |s| trap(s, "DEFAULT") }
       Kernel.load(file)
     rescue SystemExit, SignalException
       raise
     rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui.error "bundler: failed to load command: #{cmd} (#{file})"
-      backtrace = e.backtrace ? e.backtrace.take_while {|bt| !bt.start_with?(__FILE__) } : []
+      backtrace = e.backtrace ? e.backtrace.take_while { |bt| !bt.start_with?(__FILE__) } : []
       abort "#{e.class}: #{e.message}\n  #{backtrace.join("\n  ")}"
     end
 
@@ -86,8 +86,8 @@ module Bundler
         return false
       end
 
-      first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }
-      possibilities.any? {|shebang| first_line.start_with?(shebang) }
+      first_line = File.open(file, "rb") { |f| f.read(possibilities.map(&:size).max) }
+      possibilities.any? { |shebang| first_line.start_with?(shebang) }
     end
   end
 end

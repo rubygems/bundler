@@ -24,7 +24,7 @@ class CompactIndexRangeNotSatisfiable < CompactIndexAPI
       status 416
     else
       etag_response do
-        gem = gems.find {|g| g.name == params[:name] }
+        gem = gems.find { |g| g.name == params[:name] }
         CompactIndex.info(gem ? gem.versions : [])
       end
     end

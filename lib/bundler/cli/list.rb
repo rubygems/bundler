@@ -17,16 +17,16 @@ module Bundler
         filtered_specs_by_groups
       else
         Bundler.load.specs
-      end.reject {|s| s.name == "bundler" }.sort_by(&:name)
+      end.reject { |s| s.name == "bundler" }.sort_by(&:name)
 
       return Bundler.ui.info "No gems in the Gemfile" if specs.empty?
 
-      return specs.each {|s| Bundler.ui.info s.name } if @options["name-only"]
-      return specs.each {|s| Bundler.ui.info s.full_gem_path } if @options["paths"]
+      return specs.each { |s| Bundler.ui.info s.name } if @options["name-only"]
+      return specs.each { |s| Bundler.ui.info s.full_gem_path } if @options["paths"]
 
       Bundler.ui.info "Gems included by the bundle:"
 
-      specs.each {|s| Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version})" }
+      specs.each { |s| Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version})" }
 
       Bundler.ui.info "Use `bundle info` to print more detailed information about a gem"
     end
@@ -47,9 +47,9 @@ module Bundler
 
       show_groups =
         if @without_group.any?
-          groups.reject {|g| @without_group.include?(g) }
+          groups.reject { |g| @without_group.include?(g) }
         elsif @only_group.any?
-          groups.select {|g| @only_group.include?(g) }
+          groups.select { |g| @only_group.include?(g) }
         else
           groups
         end.map(&:to_sym)

@@ -925,7 +925,7 @@ The checksum of /versions does not match the checksum provided by the server! So
     expected_rack_info_content = File.read(rake_info_path)
 
     # Modify the cache files. We expect them to be reset to the normal ones when we re-run :install
-    File.open(rake_info_path, "w") {|f| f << (expected_rack_info_content + "this is different") }
+    File.open(rake_info_path, "w") { |f| f << (expected_rack_info_content + "this is different") }
 
     # Update the Gemfile so the next install does its normal things
     gemfile <<-G

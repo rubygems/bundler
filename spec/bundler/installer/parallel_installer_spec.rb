@@ -14,7 +14,7 @@ RSpec.describe Bundler::ParallelInstaller do
   context "when dependencies that are not on the overall installation list are the only ones not installed" do
     let(:all_specs) do
       [
-        build_spec("alpha", "1.0") {|s| s.runtime "a", "1" },
+        build_spec("alpha", "1.0") { |s| s.runtime "a", "1" },
       ].flatten
     end
 

@@ -44,7 +44,7 @@ module Bundler
 
     def fail_attempt(e)
       @failed = true
-      if last_attempt? || @exceptions.any? {|k| e.is_a?(k) }
+      if last_attempt? || @exceptions.any? { |k| e.is_a?(k) }
         Bundler.ui.info "" unless Bundler.ui.debug?
         raise e
       end

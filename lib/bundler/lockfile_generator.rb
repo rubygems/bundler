@@ -35,7 +35,7 @@ module Bundler
         out << source.to_lock
 
         # Find all specs for this source
-        specs = definition.resolve.select {|s| source.can_lock?(s) }
+        specs = definition.resolve.select { |s| source.can_lock?(s) }
         add_specs(specs)
       end
     end
@@ -82,7 +82,7 @@ module Bundler
           out << "  #{val}\n"
         end
       when Hash
-        value.to_a.sort_by {|k, _| k.to_s }.each do |key, val|
+        value.to_a.sort_by { |k, _| k.to_s }.each do |key, val|
           out << "  #{key}: #{val}\n"
         end
       when String

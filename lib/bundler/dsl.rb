@@ -44,7 +44,7 @@ module Bundler
       @gemfile = expanded_gemfile_path
       @gemfiles << expanded_gemfile_path
       contents ||= Bundler.read_file(@gemfile.to_s)
-      instance_eval(contents.dup.tap{|x| x.untaint if RUBY_VERSION < "2.7" }, gemfile.to_s, 1)
+      instance_eval(contents.dup.tap{ |x| x.untaint if RUBY_VERSION < "2.7" }, gemfile.to_s, 1)
     rescue Exception => e # rubocop:disable Lint/RescueException
       message = "There was an error " \
         "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \
@@ -63,15 +63,15 @@ module Bundler
       development_group = opts[:development_group] || :development
       expanded_path     = gemfile_root.join(path)
 
-      gemspecs = Dir[File.join(expanded_path, "{,*}.gemspec")].map {|g| Bundler.load_gemspec(g) }.compact
-      gemspecs.reject! {|s| s.name != name } if name
+      gemspecs = Dir[File.join(expanded_path, "{,*}.gemspec")].map { |g| Bundler.load_gemspec(g) }.compact
+      gemspecs.reject! { |s| s.name != name } if name
       Index.sort_specs(gemspecs)
-      specs_by_name_and_version = gemspecs.group_by {|s| [s.name, s.version] }
+      specs_by_name_and_version = gemspecs.group_by { |s| [s.name, s.version] }
 
       case specs_by_name_and_version.size
       when 1
         specs = specs_by_name_and_version.values.first
-        spec = specs.find {|s| s.match_platform(Bundler.local_platform) } || specs.first
+        spec = specs.find { |s| s.match_platform(Bundler.local_platform) } || specs.first
 
         @gemspecs << spec
 
@@ -100,7 +100,7 @@ module Bundler
       dep = Dependency.new(name, version, options)
 
       # if there's already a dependency with this name we try to prefer one
-      if current = @dependencies.find {|d| d.name == dep.name }
+      if current = @dependencies.find { |d| d.name == dep.name }
         deleted_dep = @dependencies.delete(current) if current.type == :development
 
         if current.requirement != dep.requirement
@@ -199,7 +199,7 @@ module Bundler
       source_options = normalize_hash(options).merge(
         "path" => Pathname.new(path),
         "root_path" => gemfile_root,
-        "gemspec" => gemspecs.find {|g| g.name == options["name"] }
+        "gemspec" => gemspecs.find { |g| g.name == options["name"] }
       )
       source = @sources.add_path_source(source_options)
       with_source(source, &blk)
@@ -400,7 +400,7 @@ repo_name ||= user_name
     def normalize_group_options(opts, groups)
       normalize_hash(opts)
 
-      groups = groups.map {|group| ":#{group}" }.join(", ")
+      groups = groups.map { |group| ":#{group}" }.join(", ")
       validate_keys("group #{groups}", opts, %w[optional])
 
       opts["optional"] ||= false
@@ -417,7 +417,7 @@ repo_name ||= user_name
       return true unless invalid_keys.any?
 
       message = String.new
-      message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
+      message << "You passed #{invalid_keys.map { |k| ":" + k }.join(", ")} "
       message << if invalid_keys.size > 1
         "as options for #{command}, but they are invalid."
       else
@@ -548,7 +548,7 @@ The :#{name} git source is deprecated, and will be removed in the future.#{addit
 
           return m unless backtrace && dsl_path && contents
 
-          trace_line = backtrace.find {|l| l.include?(dsl_path.to_s) } || trace_line
+          trace_line = backtrace.find { |l| l.include?(dsl_path.to_s) } || trace_line
           return m unless trace_line
           line_numer = trace_line.split(":")[1].to_i - 1
           return m unless line_numer

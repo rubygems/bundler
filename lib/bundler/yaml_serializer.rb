@@ -17,7 +17,7 @@ module Bundler
         if v.is_a?(Hash)
           yaml << dump_hash(v).gsub(/^(?!$)/, "  ") # indent all non-empty lines
         elsif v.is_a?(Array) # Expected to be array of strings
-          yaml << "\n- " << v.map {|s| s.to_s.gsub(/\s+/, " ").inspect }.join("\n- ") << "\n"
+          yaml << "\n- " << v.map { |s| s.to_s.gsub(/\s+/, " ").inspect }.join("\n- ") << "\n"
         else
           yaml << " " << v.to_s.gsub(/\s+/, " ").inspect << "\n"
         end

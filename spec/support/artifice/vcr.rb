@@ -32,7 +32,7 @@ class BundlerVCRHTTP < Net::HTTP
     def recorded_response?
       return true if ENV["BUNDLER_SPEC_PRE_RECORDED"]
       return false if ENV["BUNDLER_SPEC_FORCE_RECORD"]
-      request_pair_paths.all? {|f| File.exist?(f) }
+      request_pair_paths.all? { |f| File.exist?(f) }
     end
 
     def recorded_response
@@ -92,7 +92,7 @@ class BundlerVCRHTTP < Net::HTTP
         end
       end
       body = contents =~ /^([^>].*)/m && $1
-      Net::HTTP.const_get(method.capitalize).new(path, headers).tap {|r| r.body = body if body }
+      Net::HTTP.const_get(method.capitalize).new(path, headers).tap { |r| r.body = body if body }
     end
 
     def request_to_string(request)
@@ -129,7 +129,7 @@ class BundlerVCRHTTP < Net::HTTP
     end
 
     def binwrite(path, contents)
-      File.open(path, "wb:ASCII-8BIT") {|f| f.write(contents) }
+      File.open(path, "wb:ASCII-8BIT") { |f| f.write(contents) }
     end
   end
 

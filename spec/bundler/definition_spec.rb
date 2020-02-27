@@ -320,7 +320,7 @@ RSpec.describe Bundler::Definition do
   describe "find_indexed_specs" do
     it "with no platform set in indexed specs" do
       index = Bundler::Index.new
-      %w[1.0.0 1.0.1 1.1.0].each {|v| index << build_stub_spec("foo", v) }
+      %w[1.0.0 1.0.1 1.1.0].each { |v| index << build_stub_spec("foo", v) }
 
       dfn = Bundler::Definition.new(nil, [], mock_source_list, true)
       dfn.instance_variable_set("@index", index)

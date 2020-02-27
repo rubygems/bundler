@@ -19,11 +19,11 @@ module Bundler
   module_function
 
     def reset!
-      instance_variables.each {|i| remove_instance_variable(i) }
+      instance_variables.each { |i| remove_instance_variable(i) }
 
       @sources = {}
       @commands = {}
-      @hooks_by_event = Hash.new {|h, k| h[k] = [] }
+      @hooks_by_event = Hash.new { |h, k| h[k] = [] }
       @loaded_plugin_names = []
     end
 
@@ -40,8 +40,8 @@ module Bundler
       save_plugins names, specs
     rescue PluginError => e
       if specs
-        specs_to_delete = Hash[specs.select {|k, _v| names.include?(k) && !index.commands.values.include?(k) }]
-        specs_to_delete.values.each {|spec| Bundler.rm_rf(spec.full_gem_path) }
+        specs_to_delete = Hash[specs.select { |k, _v| names.include?(k) && !index.commands.values.include?(k) }]
+        specs_to_delete.values.each { |spec| Bundler.rm_rf(spec.full_gem_path) }
       end
 
       Bundler.ui.error "Failed to install plugin #{name}: #{e.message}\n  #{e.backtrace.join("\n ")}"
@@ -84,7 +84,7 @@ module Bundler
 
         return if definition.dependencies.empty?
 
-        plugins = definition.dependencies.map(&:name).reject {|p| index.installed? p }
+        plugins = definition.dependencies.map(&:name).reject { |p| index.installed? p }
         installed_specs = Installer.new.install_definition(definition)
 
         save_plugins plugins, installed_specs, builder.inferred_plugins
@@ -199,9 +199,9 @@ module Bundler
       plugins = index.hook_plugins(event)
       return unless plugins.any?
 
-      (plugins - @loaded_plugin_names).each {|name| load_plugin(name) }
+      (plugins - @loaded_plugin_names).each { |name| load_plugin(name) }
 
-      @hooks_by_event[event].each {|blk| blk.call(*args, &arg_blk) }
+      @hooks_by_event[event].each { |blk| blk.call(*args, &arg_blk) }
     end
 
     # currently only intended for specs
@@ -253,7 +253,7 @@ module Bundler
 
       @commands = {}
       @sources = {}
-      @hooks_by_event = Hash.new {|h, k| h[k] = [] }
+      @hooks_by_event = Hash.new { |h, k| h[k] = [] }
 
       load_paths = spec.load_paths
       Bundler.rubygems.add_to_load_path(load_paths)
@@ -265,7 +265,7 @@ module Bundler
         raise MalformattedPlugin, "#{e.class}: #{e.message}"
       end
 
-      if optional_plugin && @sources.keys.any? {|s| source? s }
+      if optional_plugin && @sources.keys.any? { |s| source? s }
         Bundler.rm_rf(path)
         false
       else

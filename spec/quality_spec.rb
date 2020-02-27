@@ -178,17 +178,17 @@ RSpec.describe "The library itself" do
       use_gem_version_promoter_for_major_updates
     ]
 
-    all_settings = Hash.new {|h, k| h[k] = [] }
+    all_settings = Hash.new { |h, k| h[k] = [] }
     documented_settings = []
 
-    Bundler::Settings::BOOL_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::BOOL_KEYS" }
-    Bundler::Settings::NUMBER_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::NUMBER_KEYS" }
-    Bundler::Settings::ARRAY_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::ARRAY_KEYS" }
+    Bundler::Settings::BOOL_KEYS.each { |k| all_settings[k] << "in Bundler::Settings::BOOL_KEYS" }
+    Bundler::Settings::NUMBER_KEYS.each { |k| all_settings[k] << "in Bundler::Settings::NUMBER_KEYS" }
+    Bundler::Settings::ARRAY_KEYS.each { |k| all_settings[k] << "in Bundler::Settings::ARRAY_KEYS" }
 
     key_pattern = /([a-z\._-]+)/i
     lib_tracked_files.split("\x0").each do |filename|
       each_line(filename) do |line, number|
-        line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `#{filename}:#{number.succ}`" }
+        line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each { |s| all_settings[s] << "referenced at `#{filename}:#{number.succ}`" }
       end
     end
     documented_settings = File.read("man/bundle-config.ronn")[/LIST OF AVAILABLE KEYS.*/m].scan(/^\* `#{key_pattern}`/).flatten
@@ -233,8 +233,8 @@ RSpec.describe "The library itself" do
       lib/bundler/templates/gems.rb
     ]
     files_to_require = lib_tracked_files.split("\x0").grep(/\.rb$/) - exclusions
-    files_to_require.reject! {|f| f.start_with?("lib/bundler/vendor") }
-    files_to_require.map! {|f| File.expand_path("../#{f}", __dir__) }
+    files_to_require.reject! { |f| f.start_with?("lib/bundler/vendor") }
+    files_to_require.map! { |f| File.expand_path("../#{f}", __dir__) }
     sys_exec!("ruby -w") do |input, _, _|
       files_to_require.each do |f|
         input.puts "require '#{f}'"
@@ -243,7 +243,7 @@ RSpec.describe "The library itself" do
 
     warnings = last_command.stdboth.split("\n")
     # ignore warnings around deprecated Object#=~ method in RubyGems
-    warnings.reject! {|w| w =~ %r{rubygems\/version.rb.*deprecated\ Object#=~} }
+    warnings.reject! { |w| w =~ %r{rubygems\/version.rb.*deprecated\ Object#=~} }
 
     expect(warnings).to be_well_formed
   end

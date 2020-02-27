@@ -120,7 +120,7 @@ module Bundler
 
     def exact?
       return @exact if defined?(@exact)
-      @exact = versions.all? {|v| Gem::Requirement.create(v).exact? }
+      @exact = versions.all? { |v| Gem::Requirement.create(v).exact? }
     end
 
   private

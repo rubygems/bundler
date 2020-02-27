@@ -13,7 +13,7 @@ def write_build_metadata(build_metadata)
 
   contents = File.read(build_metadata_file)
   contents.sub!(/^(\s+# begin ivars).+(^\s+# end ivars)/m, "\\1\n#{ivars}\n\\2")
-  File.open(build_metadata_file, "w") {|f| f << contents }
+  File.open(build_metadata_file, "w") { |f| f << contents }
 end
 
 task :build_metadata do

@@ -25,7 +25,7 @@ module Bundler
     end
 
     def inject_dependencies
-      dependencies = gems.map {|g| Bundler::Dependency.new(g, version, options) }
+      dependencies = gems.map { |g| Bundler::Dependency.new(g, version, options) }
 
       Injector.inject(dependencies,
         :conservative_versioning => options[:version].nil?, # Perform conservative versioning only when version is not specified

@@ -48,7 +48,7 @@ module Bundler
     end
 
     def self.aliases_for(command_name)
-      COMMAND_ALIASES.select {|k, _| k == command_name }.invert
+      COMMAND_ALIASES.select { |k, _| k == command_name }.invert
     end
 
     def initialize(*args)
@@ -71,7 +71,7 @@ module Bundler
       unprinted_warnings = Bundler.ui.unprinted_warnings
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
-      unprinted_warnings.each {|w| Bundler.ui.warn(w) }
+      unprinted_warnings.each { |w| Bundler.ui.warn(w) }
 
       if ENV["RUBYGEMS_GEMDEPS"] && !ENV["RUBYGEMS_GEMDEPS"].empty?
         Bundler.ui.warn(
@@ -93,10 +93,10 @@ module Bundler
       primary_commands = ["install", "update", "cache", "exec", "config", "help"]
 
       list = self.class.printable_commands(true)
-      by_name = list.group_by {|name, _message| name.match(/^bundle (\w+)/)[1] }
+      by_name = list.group_by { |name, _message| name.match(/^bundle (\w+)/)[1] }
       utilities = by_name.keys.sort - primary_commands
-      primary_commands.map! {|name| (by_name[name] || raise("no primary command #{name}")).first }
-      utilities.map! {|name| by_name[name].first }
+      primary_commands.map! { |name| (by_name[name] || raise("no primary command #{name}")).first }
+      utilities.map! { |name| by_name[name].first }
 
       shell.say "Bundler commands:\n\n"
 
@@ -319,10 +319,10 @@ module Bundler
         if ARGV[0] == "show"
           rest = ARGV[1..-1]
 
-          if flag = rest.find{|arg| ["--verbose", "--outdated"].include?(arg) }
+          if flag = rest.find{ |arg| ["--verbose", "--outdated"].include?(arg) }
             Bundler::SharedHelpers.major_deprecation(2, "the `#{flag}` flag to `bundle show` was undocumented and will be removed without replacement")
           else
-            new_command = rest.find {|arg| !arg.start_with?("--") } ? "info" : "list"
+            new_command = rest.find { |arg| !arg.start_with?("--") } ? "info" : "list"
 
             new_arguments = rest.map do |arg|
               next arg if arg != "--paths"
@@ -525,7 +525,7 @@ module Bundler
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
-      Bundler.load.specs.sort_by {|s| s.license.to_s }.reverse_each do |s|
+      Bundler.load.specs.sort_by { |s| s.license.to_s }.reverse_each do |s|
         gem_name = s.name
         license  = s.license || s.licenses
 
@@ -562,7 +562,7 @@ module Bundler
     method_option :exe, :type => :boolean, :default => false, :aliases => ["--bin", "-b"], :desc => "Generate a binary executable for your library."
     method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config set gem.coc true`."
     method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "EDITOR",
-                         :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find {|e| !e.nil? && !e.empty? },
+                         :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find { |e| !e.nil? && !e.empty? },
                          :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
     method_option :ext, :type => :boolean, :default => false, :desc => "Generate the boilerplate for C extension code"
     method_option :git, :type => :boolean, :default => true, :desc => "Initialize a git repo inside your library."
@@ -711,10 +711,10 @@ module Bundler
       help_flags = %w[--help -h]
       exec_commands = ["exec"] + COMMAND_ALIASES["exec"]
 
-      help_used = args.index {|a| help_flags.include? a }
-      exec_used = args.index {|a| exec_commands.include? a }
+      help_used = args.index { |a| help_flags.include? a }
+      exec_used = args.index { |a| exec_commands.include? a }
 
-      command = args.find {|a| bundler_commands.include? a }
+      command = args.find { |a| bundler_commands.include? a }
       command = all_aliases[command] if all_aliases[command]
 
       if exec_used && help_used
@@ -788,7 +788,7 @@ module Bundler
                send(:compact_index_client).
                instance_variable_get(:@cache).
                dependencies("bundler").
-               map {|d| Gem::Version.new(d.first) }.
+               map { |d| Gem::Version.new(d.first) }.
                max
       return unless latest
 
@@ -813,7 +813,7 @@ module Bundler
       option = current_command.options[name]
       flag_name = option.switch_name
 
-      name_index = ARGV.find {|arg| flag_name == arg }
+      name_index = ARGV.find { |arg| flag_name == arg }
       return unless name_index
 
       value = options[name]

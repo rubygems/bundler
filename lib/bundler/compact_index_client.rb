@@ -69,7 +69,7 @@ module Bundler
       Bundler::CompactIndexClient.debug { "dependencies(#{names})" }
       execution_mode.call(names) do |name|
         update_info(name)
-        @cache.dependencies(name).map {|d| d.unshift(name) }
+        @cache.dependencies(name).map { |d| d.unshift(name) }
       end.flatten(1)
     end
 

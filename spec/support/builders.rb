@@ -499,7 +499,7 @@ module Spec
       end
 
       def versions(versions)
-        versions.split(/\s+/).each {|version| yield v(version) }
+        versions.split(/\s+/).each { |version| yield v(version) }
       end
     end
 
@@ -639,7 +639,7 @@ module Spec
         @files.each do |file, source|
           file = Pathname.new(path).join(file)
           FileUtils.mkdir_p(file.dirname)
-          File.open(file, "w") {|f| f.puts source }
+          File.open(file, "w") { |f| f.puts source }
         end
         path
       end

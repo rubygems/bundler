@@ -52,7 +52,7 @@ module Spec
     end
 
     def deprecations
-      err.split("\n").select {|l| l =~ MAJOR_DEPRECATION }.join("\n").split(MAJOR_DEPRECATION)
+      err.split("\n").select { |l| l =~ MAJOR_DEPRECATION }.join("\n").split(MAJOR_DEPRECATION)
     end
 
     def exitstatus
@@ -107,7 +107,7 @@ module Spec
         requires << "support/artifice/#{artifice}"
       end
 
-      requires_str = requires.map {|r| "-r#{r}" }.join(" ")
+      requires_str = requires.map { |r| "-r#{r}" }.join(" ")
 
       load_path = []
       load_path << lib_dir unless system_bundler
@@ -283,7 +283,7 @@ module Spec
       gem_repo = options.fetch(:gem_repo) { gem_repo1 }
       gems.each do |g|
         if g == :bundler
-          with_built_bundler {|gem_path| install_gem(gem_path) }
+          with_built_bundler { |gem_path| install_gem(gem_path) }
         elsif g.to_s =~ %r{\A(?:[a-zA-Z]:)?/.*\.gem\z}
           install_gem(g)
         else
@@ -535,7 +535,7 @@ module Spec
       changed_lines = pathname.readlines.map do |line|
         yield line
       end
-      File.open(pathname, "w") {|file| file.puts(changed_lines.join) }
+      File.open(pathname, "w") { |file| file.puts(changed_lines.join) }
     end
 
     def with_env_vars(env_hash, &block)

@@ -208,7 +208,7 @@ module Bundler
         Bundler.ui.warn "Warning: the gem '#{name}' was found in multiple sources."
         Bundler.ui.warn "Installed from: #{installed_from_uri}"
         Bundler.ui.warn "Also found in:"
-        also_found_in_uris.each {|uri| Bundler.ui.warn "  * #{uri}" }
+        also_found_in_uris.each { |uri| Bundler.ui.warn "  * #{uri}" }
         Bundler.ui.warn "You should add a source requirement to restrict this gem to your preferred source."
         Bundler.ui.warn "For example:"
         Bundler.ui.warn "    gem '#{name}', :source => '#{installed_from_uri}'"

@@ -31,7 +31,7 @@ module Bundler
         check_for_activated_spec!(spec)
 
         Bundler.rubygems.mark_loaded(spec)
-        spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
+        spec.load_paths.reject { |path| $LOAD_PATH.include?(path) }
       end.reverse.flatten
 
       Bundler.rubygems.add_to_load_path(load_paths)
@@ -79,7 +79,7 @@ module Bundler
             end
           end
         rescue LoadError => e
-          REQUIRE_ERRORS.find {|r| r =~ e.message }
+          REQUIRE_ERRORS.find { |r| r =~ e.message }
           raise if dep.autorequire || $1 != required_file
 
           if dep.autorequire.nil? && dep.name.include?("-")
@@ -87,7 +87,7 @@ module Bundler
               namespaced_file = dep.name.tr("-", "/")
               Kernel.require namespaced_file
             rescue LoadError => e
-              REQUIRE_ERRORS.find {|r| r =~ e.message }
+              REQUIRE_ERRORS.find { |r| r =~ e.message }
               raise if $1 != namespaced_file
             end
           end
@@ -190,8 +190,8 @@ module Bundler
       stale_gemspec_files  = gemspec_files - spec_gemspec_paths
       stale_extension_dirs = extension_dirs - spec_extension_paths
 
-      removed_stale_gem_dirs = stale_gem_dirs.collect {|dir| remove_dir(dir, dry_run) }
-      removed_stale_git_dirs = stale_git_dirs.collect {|dir| remove_dir(dir, dry_run) }
+      removed_stale_gem_dirs = stale_gem_dirs.collect { |dir| remove_dir(dir, dry_run) }
+      removed_stale_git_dirs = stale_git_dirs.collect { |dir| remove_dir(dir, dry_run) }
       output = removed_stale_gem_dirs + removed_stale_git_dirs
 
       unless dry_run

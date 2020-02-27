@@ -70,7 +70,7 @@ RSpec.describe Bundler::GemHelper do
       content = app_gemspec_content.gsub("TODO: ", "")
       content.sub!(/homepage\s+= ".*"/, 'homepage = ""')
       content.gsub!(/spec\.metadata.+\n/, "")
-      File.open(app_gemspec_path, "w") {|file| file << content }
+      File.open(app_gemspec_path, "w") { |file| file << content }
     end
 
     it "uses a shell UI for output" do
@@ -126,7 +126,7 @@ RSpec.describe Bundler::GemHelper do
       context "when build failed" do
         it "raises an error with appropriate message" do
           # break the gemspec by adding back the TODOs
-          File.open(app_gemspec_path, "w") {|file| file << app_gemspec_content }
+          File.open(app_gemspec_path, "w") { |file| file << app_gemspec_content }
           expect { subject.build_gem }.to raise_error(/TODO/)
         end
       end

@@ -60,7 +60,7 @@ module Bundler
       end
 
       def dependencies_for_activated_platforms
-        dependencies = @activated_platforms.map {|p| __dependencies[p] }
+        dependencies = @activated_platforms.map { |p| __dependencies[p] }
         metadata_dependencies = @activated_platforms.map do |platform|
           metadata_dependencies(@specs[platform], platform)
         end

@@ -10,7 +10,7 @@ namespace :release do
   task :verify_docs => :"man:check"
 
   task :verify_files do
-    git_list = IO.popen("git ls-files -z", &:read).split("\x0").select {|f| f.match(%r{^(lib|man|exe)/}) }
+    git_list = IO.popen("git ls-files -z", &:read).split("\x0").select { |f| f.match(%r{^(lib|man|exe)/}) }
     git_list += %w[CHANGELOG.md LICENSE.md README.md bundler.gemspec]
 
     gem_list = Gem::Specification.load("bundler.gemspec").files
@@ -113,14 +113,14 @@ namespace :release do
     text = File.open("CHANGELOG.md", "r:UTF-8", &:read)
     lines = text.split("\n")
 
-    current_version_index = lines.find_index {|line| line.strip =~ /^#{current_version_title}($|\b)/ }
+    current_version_index = lines.find_index { |line| line.strip =~ /^#{current_version_title}($|\b)/ }
     unless current_version_index
       raise "Update the changelog for the last version (#{version})"
     end
     current_version_index += 1
     previous_version_lines = lines[current_version_index.succ...-1]
     previous_version_index = current_version_index + (
-      previous_version_lines.find_index {|line| line.start_with?(title_token) && !line.start_with?(current_minor_title) } ||
+      previous_version_lines.find_index { |line| line.start_with?(title_token) && !line.start_with?(current_minor_title) } ||
       lines.count
     )
 
@@ -161,7 +161,7 @@ namespace :release do
     puts "Cherry-picking PRs milestoned for #{version} (currently #{bundler_spec.version}) into the stable branch..."
 
     milestones = gh_api_request(:path => "repos/bundler/bundler/milestones?state=open")
-    unless patch_milestone = milestones.find {|m| m["title"] == version }
+    unless patch_milestone = milestones.find { |m| m["title"] == version }
       abort "failed to find #{version} milestone on GitHub"
     end
     prs = gh_api_request(:path => "repos/bundler/bundler/issues?milestone=#{patch_milestone["number"]}&state=all")
@@ -175,8 +175,8 @@ namespace :release do
     branch = version.split(".", 3)[0, 2].push("stable").join("-")
     sh("git", "checkout", "-b", "release/#{version}", branch)
 
-    commits = `git log --oneline origin/master --`.split("\n").map {|l| l.split(/\s/, 2) }.reverse
-    commits.select! {|_sha, message| message =~ /(Auto merge of|Merge pull request|Merge) ##{Regexp.union(*prs)}/ }
+    commits = `git log --oneline origin/master --`.split("\n").map { |l| l.split(/\s/, 2) }.reverse
+    commits.select! { |_sha, message| message =~ /(Auto merge of|Merge pull request|Merge) ##{Regexp.union(*prs)}/ }
 
     abort "Could not find commits for all PRs" unless commits.size == prs.size
 
@@ -193,7 +193,7 @@ namespace :release do
     unless version_contents.sub!(/^(\s*VERSION = )"#{Gem::Version::VERSION_PATTERN}"/, "\\1#{version.to_s.dump}")
       abort "failed to update #{version_file}, is it in the expected format?"
     end
-    File.open(version_file, "w") {|f| f.write(version_contents) }
+    File.open(version_file, "w") { |f| f.write(version_contents) }
 
     sh("git", "commit", "-am", "Version #{version}")
   end
@@ -202,11 +202,11 @@ namespace :release do
   task :open_unreleased_prs do
     def prs(on = "master")
       commits = `git log --oneline origin/#{on} --`.split("\n")
-      commits.reverse_each.map {|c| c =~ /(Auto merge of|Merge pull request|Merge) #(\d+)/ && $2 }.compact
+      commits.reverse_each.map { |c| c =~ /(Auto merge of|Merge pull request|Merge) #(\d+)/ && $2 }.compact
     end
 
     def minor_release_tags
-      `git ls-remote origin`.split("\n").map {|r| r =~ %r{refs/tags/v([\d.]+)$} && $1 }.compact.map {|v| Gem::Version.create(Gem::Version.create(v).segments[0, 2].join(".")) }.sort.uniq
+      `git ls-remote origin`.split("\n").map { |r| r =~ %r{refs/tags/v([\d.]+)$} && $1 }.compact.map { |v| Gem::Version.create(Gem::Version.create(v).segments[0, 2].join(".")) }.sort.uniq
     end
 
     def to_stable_branch(release_tag)

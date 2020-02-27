@@ -17,7 +17,7 @@ module Bundler
         @allow_remote = false
 
         # Stringify options that could be set as symbols
-        %w[ref branch tag revision].each {|k| options[k] = options[k].to_s if options[k] }
+        %w[ref branch tag revision].each { |k| options[k] = options[k].to_s if options[k] }
 
         @uri        = options["uri"] || ""
         @safe_uri   = URICredentialsFilter.credential_filtered_uri(@uri)
@@ -246,7 +246,7 @@ module Bundler
           next unless spec
           Bundler.rubygems.set_installed_by_version(spec)
           Bundler.rubygems.validate(spec)
-          File.open(spec_path, "wb") {|file| file.write(spec.to_ruby) }
+          File.open(spec_path, "wb") { |file| file.write(spec.to_ruby) }
         end
       end
 
@@ -316,7 +316,7 @@ module Bundler
 
       def load_gemspec(file)
         stub = Gem::StubSpecification.gemspec_stub(file, install_path.parent, install_path.parent)
-        stub.full_gem_path = Pathname.new(file).dirname.expand_path(root).to_s.tap{|x| x.untaint if RUBY_VERSION < "2.7" }
+        stub.full_gem_path = Pathname.new(file).dirname.expand_path(root).to_s.tap{ |x| x.untaint if RUBY_VERSION < "2.7" }
         StubSpecification.from_stub(stub)
       end
 

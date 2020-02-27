@@ -75,7 +75,7 @@ module Bundler
       file_name = nil
       sh([*gem_command, "build", "-V", spec_path]) do
         file_name = File.basename(built_gem_path)
-        SharedHelpers.filesystem_access(File.join(base, "pkg")) {|p| FileUtils.mkdir_p(p) }
+        SharedHelpers.filesystem_access(File.join(base, "pkg")) { |p| FileUtils.mkdir_p(p) }
         FileUtils.mv(built_gem_path, "pkg")
         Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}."
       end
@@ -107,7 +107,7 @@ module Bundler
     end
 
     def built_gem_path
-      Dir[File.join(base, "#{name}-*.gem")].sort_by {|f| File.mtime(f) }.last
+      Dir[File.join(base, "#{name}-*.gem")].sort_by { |f| File.mtime(f) }.last
     end
 
     def git_push(remote = "")

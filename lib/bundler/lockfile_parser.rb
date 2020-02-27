@@ -129,7 +129,7 @@ module Bundler
           @current_source = TYPES[@type].from_lock(@opts)
           # Strip out duplicate GIT sections
           if @sources.include?(@current_source)
-            @current_source = @sources.find {|s| s == @current_source }
+            @current_source = @sources.find { |s| s == @current_source }
           else
             @sources << @current_source
           end
@@ -193,7 +193,7 @@ module Bundler
       dep = Bundler::Dependency.new(name, version)
 
       if pinned && dep.name != "bundler"
-        spec = @specs.find {|_, v| v.name == dep.name }
+        spec = @specs.find { |_, v| v.name == dep.name }
         dep.source = spec.last.source if spec
 
         # Path sources need to know what the default name / version

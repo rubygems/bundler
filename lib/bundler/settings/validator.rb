@@ -18,7 +18,7 @@ module Bundler
 
         def fail!(key, value, *reasons)
           reasons.unshift @description
-          raise InvalidOption, "Setting `#{key}` to #{value.inspect} failed:\n#{reasons.map {|r| " - #{r}" }.join("\n")}"
+          raise InvalidOption, "Setting `#{key}` to #{value.inspect} failed:\n#{reasons.map { |r| " - #{r}" }.join("\n")}"
         end
 
         def set(settings, key, value, *reasons)
@@ -39,19 +39,19 @@ module Bundler
       end
 
       def self.rules
-        @rules ||= Hash.new {|h, k| h[k] = [] }
+        @rules ||= Hash.new { |h, k| h[k] = [] }
       end
       private_class_method :rules
 
       def self.rule(keys, description, &blk)
         rule = Rule.new(keys, description, &blk)
-        keys.each {|k| rules[k] << rule }
+        keys.each { |k| rules[k] << rule }
       end
       private_class_method :rule
 
       def self.validate!(key, value, settings)
         rules_to_validate = rules[key]
-        rules_to_validate.each {|rule| rule.validate!(key, value, settings) }
+        rules_to_validate.each { |rule| rule.validate!(key, value, settings) }
       end
 
       rule %w[path path.system], "path and path.system are mutually exclusive" do |key, value, settings|

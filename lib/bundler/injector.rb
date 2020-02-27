@@ -70,7 +70,7 @@ module Bundler
 
         show_warning("No gems were removed from the gemfile.") if deps.empty?
 
-        deps.each {|dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false)} was removed." }
+        deps.each { |dep| Bundler.ui.confirm "#{SharedHelpers.pretty_dependency(dep, false)} was removed." }
       end
     end
 
@@ -161,7 +161,7 @@ module Bundler
       removed_deps = []
 
       gems.each do |gem_name|
-        deleted_dep = builder.dependencies.find {|d| d.name == gem_name }
+        deleted_dep = builder.dependencies.find { |d| d.name == gem_name }
 
         if deleted_dep.nil?
           raise GemfileError, "`#{gem_name}` is not specified in #{gemfile_path} so it could not be removed."
@@ -181,7 +181,7 @@ module Bundler
       patterns = /gem\s+(['"])#{Regexp.union(gems)}\1|gem\s*\((['"])#{Regexp.union(gems)}\2\)/
 
       # remove lines which match the regex
-      new_gemfile = IO.readlines(gemfile_path).reject {|line| line.match(patterns) }
+      new_gemfile = IO.readlines(gemfile_path).reject { |line| line.match(patterns) }
 
       # remove lone \n and append them with other strings
       new_gemfile.each_with_index do |_line, index|
@@ -191,7 +191,7 @@ module Bundler
         end
       end
 
-      %w[group source env install_if].each {|block| remove_nested_blocks(new_gemfile, block) }
+      %w[group source env install_if].each { |block| remove_nested_blocks(new_gemfile, block) }
 
       new_gemfile.join.chomp
     end
@@ -202,7 +202,7 @@ module Bundler
       nested_blocks = 0
 
       # count number of nested blocks
-      gemfile.each_with_index {|line, index| nested_blocks += 1 if !gemfile[index + 1].nil? && gemfile[index + 1].include?(block_name) && line.include?(block_name) }
+      gemfile.each_with_index { |line, index| nested_blocks += 1 if !gemfile[index + 1].nil? && gemfile[index + 1].include?(block_name) && line.include?(block_name) }
 
       while nested_blocks >= 0
         nested_blocks -= 1
@@ -240,7 +240,7 @@ module Bundler
       end
 
       # record gems which could not be removed due to some reasons
-      errored_deps = builder.dependencies.select {|d| d.gemfile == gemfile_path } & removed_deps.select {|d| d.gemfile == gemfile_path }
+      errored_deps = builder.dependencies.select { |d| d.gemfile == gemfile_path } & removed_deps.select { |d| d.gemfile == gemfile_path }
 
       show_warning "#{errored_deps.map(&:name).join(", ")} could not be removed." unless errored_deps.empty?
 

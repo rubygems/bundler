@@ -464,7 +464,7 @@ RSpec.describe "bundle update in more complicated situations" do
     G
 
     update_repo2 do
-      build_gem("thin", "2.0") {|s| s.add_dependency "rack" }
+      build_gem("thin", "2.0") { |s| s.add_dependency "rack" }
       build_gem "rack", "10.0"
     end
 
@@ -527,9 +527,9 @@ RSpec.describe "bundle update in more complicated situations" do
     before do
       build_repo4 do
         build_gem("a", "0.9")
-        build_gem("a", "0.9") {|s| s.platform = "java" }
+        build_gem("a", "0.9") { |s| s.platform = "java" }
         build_gem("a", "1.1")
-        build_gem("a", "1.1") {|s| s.platform = "java" }
+        build_gem("a", "1.1") { |s| s.platform = "java" }
       end
 
       gemfile <<-G
@@ -567,8 +567,8 @@ RSpec.describe "bundle update in more complicated situations" do
   context "when the dependency is for a different platform" do
     before do
       build_repo4 do
-        build_gem("a", "0.9") {|s| s.platform = "java" }
-        build_gem("a", "1.1") {|s| s.platform = "java" }
+        build_gem("a", "0.9") { |s| s.platform = "java" }
+        build_gem("a", "1.1") { |s| s.platform = "java" }
       end
 
       gemfile <<-G

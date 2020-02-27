@@ -34,7 +34,7 @@ module Bundler
         dep = Dependency.new(ls.name, ls.version)
         @base_dg.add_vertex(ls.name, DepProxy.new(dep, ls.platform), true)
       end
-      additional_base_requirements.each {|d| @base_dg.add_vertex(d.name, d) }
+      additional_base_requirements.each { |d| @base_dg.add_vertex(d.name, d) }
       @platforms = platforms
       @gem_version_promoter = gem_version_promoter
       @allow_bundler_dependency_conflicts = Bundler.feature_flag.allow_bundler_dependency_conflicts?
@@ -44,21 +44,21 @@ module Bundler
 
     def start(requirements)
       @gem_version_promoter.prerelease_specified = @prerelease_specified = {}
-      requirements.each {|dep| @prerelease_specified[dep.name] ||= dep.prerelease? }
+      requirements.each { |dep| @prerelease_specified[dep.name] ||= dep.prerelease? }
 
       verify_gemfile_dependencies_are_found!(requirements)
       dg = @resolver.resolve(requirements, @base_dg)
       dg.
-        tap {|resolved| validate_resolved_specs!(resolved) }.
+        tap { |resolved| validate_resolved_specs!(resolved) }.
         map(&:payload).
-        reject {|sg| sg.name.end_with?("\0") }.
+        reject { |sg| sg.name.end_with?("\0") }.
         map(&:to_specs).
         flatten
     rescue Molinillo::VersionConflict => e
       message = version_conflict_message(e)
       raise VersionConflict.new(e.conflicts.keys.uniq, message)
     rescue Molinillo::CircularDependencyError => e
-      names = e.dependencies.sort_by(&:name).map {|d| "gem '#{d.name}'" }
+      names = e.dependencies.sort_by(&:name).map { |d| "gem '#{d.name}'" }
       raise CyclicDependencyError, "Your bundle requires gems that depend" \
         " on each other, creating an infinite loop. Please remove" \
         " #{names.count > 1 ? "either " : ""}#{names.join(" or ")}" \
@@ -75,7 +75,7 @@ module Bundler
       return unless debug?
       debug_info = yield
       debug_info = debug_info.inspect unless debug_info.is_a?(String)
-      warn debug_info.split("\n").map {|s| "  " * depth + s }
+      warn debug_info.split("\n").map { |s| "  " * depth + s }
     end
 
     def debug?
@@ -120,7 +120,7 @@ module Bundler
         if !@prerelease_specified[dependency.name] && (!@use_gvp || locked_requirement.nil?)
           # Move prereleases to the beginning of the list, so they're considered
           # last during resolution.
-          pre, results = results.partition {|spec| spec.version.prerelease? }
+          pre, results = results.partition { |spec| spec.version.prerelease? }
           results = pre + results
         end
 
@@ -180,7 +180,7 @@ module Bundler
       elsif @lockfile_uses_separate_rubygems_sources
         Index.build do |idx|
           if dependency.all_sources
-            dependency.all_sources.each {|s| idx.add_source(s.specs) if s }
+            dependency.all_sources.each { |s| idx.add_source(s.specs) if s }
           else
             idx.add_source @source_requirements[:default].specs
           end
@@ -247,7 +247,7 @@ module Bundler
     def self.platform_sort_key(platform)
       # Prefer specific platform to not specific platform
       return ["99-LAST", "", "", ""] if Gem::Platform::RUBY == platform
-      ["00", *platform.to_a.map {|part| part || "" }]
+      ["00", *platform.to_a.map { |part| part || "" }]
     end
 
   private
@@ -270,7 +270,7 @@ module Bundler
             all - 1_000_000
           else
             search = search_for(dependency)
-            search = @prerelease_specified[dependency.name] ? search.count : search.count {|s| !s.version.prerelease? }
+            search = @prerelease_specified[dependency.name] ? search.count : search.count { |s| !s.version.prerelease? }
             search - all
           end
         end
@@ -299,7 +299,7 @@ module Bundler
             "try passing them all to `bundle update`"
         elsif source = @source_requirements[name]
           specs = source.specs[name]
-          versions_with_platforms = specs.map {|s| [s.version, s.platform] }
+          versions_with_platforms = specs.map { |s| [s.version, s.platform] }
           message = String.new("Could not find gem '#{SharedHelpers.pretty_dependency(requirement)}' in #{source}#{cache_message}.\n")
           message << if versions_with_platforms.any?
             "The source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
@@ -341,7 +341,7 @@ module Bundler
         :possibility_type => possibility_type,
         :reduce_trees => lambda do |trees|
           # called first, because we want to reduce the amount of work required to find maximal empty sets
-          trees = trees.uniq {|t| t.flatten.map {|dep| [dep.name, dep.requirement] } }
+          trees = trees.uniq { |t| t.flatten.map { |dep| [dep.name, dep.requirement] } }
 
           # bail out if tree size is too big for Array#combination to make any sense
           return trees if trees.size > 15
@@ -351,11 +351,11 @@ module Bundler
             Bundler::VersionRanges.empty?(*Bundler::VersionRanges.for_many(deps.map(&:requirement)))
           end.min_by(&:size)
 
-          trees.reject! {|t| !maximal.include?(t.last) } if maximal
+          trees.reject! { |t| !maximal.include?(t.last) } if maximal
 
-          trees.sort_by {|t| t.reverse.map(&:name) }
+          trees.sort_by { |t| t.reverse.map(&:name) }
         end,
-        :printable_requirement => lambda {|req| SharedHelpers.pretty_dependency(req) },
+        :printable_requirement => lambda { |req| SharedHelpers.pretty_dependency(req) },
         :additional_message_for_conflict => lambda do |o, name, conflict|
           if name == "bundler"
             o << %(\n  Current Bundler version:\n    bundler (#{Bundler::VERSION}))
@@ -406,7 +406,7 @@ module Bundler
             end
           end
         end,
-        :version_for_spec => lambda {|spec| spec.version },
+        :version_for_spec => lambda { |spec| spec.version },
         :incompatible_version_message_for_conflict => lambda do |name, _conflict|
           if name.end_with?("\0")
             %(#{solver_name} found conflicting requirements for the #{name} version:)
@@ -425,14 +425,14 @@ module Bundler
         if default_index = sources.index(@source_requirements[:default])
           sources.delete_at(default_index)
         end
-        sources.reject! {|s| s.specs[name].empty? }
+        sources.reject! { |s| s.specs[name].empty? }
         sources.uniq!
         next if sources.size <= 1
 
         multisource_disabled = Bundler.feature_flag.disable_multisource?
 
         msg = ["The gem '#{name}' was found in multiple relevant sources."]
-        msg.concat sources.map {|s| "  * #{s}" }.sort
+        msg.concat sources.map { |s| "  * #{s}" }.sort
         msg << "You #{multisource_disabled ? :must : :should} add this gem to the source block for the source you wish it to be installed from."
         msg = msg.join("\n")
 

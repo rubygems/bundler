@@ -361,6 +361,10 @@ Layout/SpaceInsideArrayLiteralBrackets:
 Layout/SpaceInsideArrayPercentLiteral:
   Enabled: true
 
+Layout/SpaceInsideBlockBraces:
+  Enabled: true
+  SpaceBeforeBlockParameters: true
+
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: true
 

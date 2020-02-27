@@ -10,7 +10,7 @@ module Bundler
       # So that we don't have to override all there methods to dummy ones
       # explicitly.
       # They will be handled by method_missing
-      [:gemspec, :gem, :path, :install_if, :platforms, :env].each {|m| undef_method m }
+      [:gemspec, :gem, :path, :install_if, :platforms, :env].each { |m| undef_method m }
 
       # This lists the plugins that was added automatically and not specified by
       # the user.
@@ -43,7 +43,7 @@ module Bundler
 
         plugin_name = "bundler-source-#{options["type"]}"
 
-        return if @dependencies.any? {|d| d.name == plugin_name }
+        return if @dependencies.any? { |d| d.name == plugin_name }
 
         plugin(plugin_name)
         @inferred_plugins << plugin_name

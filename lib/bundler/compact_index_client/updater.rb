@@ -60,9 +60,9 @@ module Bundler
 
           SharedHelpers.filesystem_access(local_temp_path) do
             if response.is_a?(Net::HTTPPartialContent) && local_temp_path.size.nonzero?
-              local_temp_path.open("a") {|f| f << slice_body(content, 1..-1) }
+              local_temp_path.open("a") { |f| f << slice_body(content, 1..-1) }
             else
-              local_temp_path.open("w") {|f| f << content }
+              local_temp_path.open("w") { |f| f << content }
             end
           end
 

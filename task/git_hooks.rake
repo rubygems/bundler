@@ -3,7 +3,7 @@
 directory ".git/hooks"
 
 file ".git/hooks/pre-commit" => [__FILE__] do |t|
-  File.open(t.name, "w") {|f| f << <<-SH }
+  File.open(t.name, "w") { |f| f << <<-SH }
 #!/bin/sh
 
 set -e
@@ -22,7 +22,7 @@ file ".git/hooks/pre-push" => [__FILE__] do |_t|
 end
 
 file ".git/hooks/run-ruby" => [__FILE__] do |t|
-  File.open(t.name, "w") {|f| f << <<-SH }
+  File.open(t.name, "w") { |f| f << <<-SH }
 #!/bin/bash
 
 ruby="ruby"
@@ -33,4 +33,4 @@ ruby $@
   chmod 0o755, t.name, :verbose => false
 end
 
-task :git_hooks => Rake::Task.tasks.select {|t| t.name.start_with?(".git/hooks") }
+task :git_hooks => Rake::Task.tasks.select { |t| t.name.start_with?(".git/hooks") }

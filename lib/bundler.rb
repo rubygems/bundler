@@ -104,7 +104,7 @@ module Bundler
       @bin_path ||= begin
         path = settings[:bin] || "bin"
         path = Pathname.new(path).expand_path(root).expand_path
-        SharedHelpers.filesystem_access(path) {|p| FileUtils.mkdir_p(p) }
+        SharedHelpers.filesystem_access(path) { |p| FileUtils.mkdir_p(p) }
         path
       end
     end
@@ -350,7 +350,7 @@ EOF
         env["MANPATH"] = env["BUNDLER_ORIG_MANPATH"]
       end
 
-      env.delete_if {|k, _| k[0, 7] == "BUNDLE_" }
+      env.delete_if { |k, _| k[0, 7] == "BUNDLE_" }
 
       if env.key?("RUBYOPT")
         env["RUBYOPT"] = env["RUBYOPT"].sub "-rbundler/setup", ""
@@ -478,7 +478,7 @@ EOF
 
         # if any directory is not writable, we need sudo
         files = [path, bin_dir] | Dir[bundle_path.join("build_info/*").to_s] | Dir[bundle_path.join("*").to_s]
-        unwritable_files = files.reject {|f| File.writable?(f) }
+        unwritable_files = files.reject { |f| File.writable?(f) }
         sudo_needed = !unwritable_files.empty?
         if sudo_needed
           Bundler.ui.warn "Following files may not be writable, so sudo is needed:\n  #{unwritable_files.map(&:to_s).sort.join("\n  ")}"

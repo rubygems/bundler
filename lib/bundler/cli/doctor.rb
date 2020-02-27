@@ -23,9 +23,9 @@ module Bundler
 
     def dylibs_darwin(path)
       output = `/usr/bin/otool -L "#{path}"`.chomp
-      dylibs = output.split("\n")[1..-1].map {|l| l.match(DARWIN_REGEX).captures[0] }.uniq
+      dylibs = output.split("\n")[1..-1].map { |l| l.match(DARWIN_REGEX).captures[0] }.uniq
       # ignore @rpath and friends
-      dylibs.reject {|dylib| dylib.start_with? "@" }
+      dylibs.reject { |dylib| dylib.start_with? "@" }
     end
 
     def dylibs_ldd(path)
@@ -70,7 +70,7 @@ module Bundler
 
       definition.specs.each do |spec|
         bundles_for_gem(spec).each do |bundle|
-          bad_paths = dylibs(bundle).select {|f| !File.exist?(f) }
+          bad_paths = dylibs(bundle).select { |f| !File.exist?(f) }
           if bad_paths.any?
             broken_links[spec] ||= []
             broken_links[spec].concat(bad_paths)
@@ -86,7 +86,7 @@ module Bundler
           paths.uniq.map do |path|
             "\n * #{spec.name}: #{path}"
           end
-        end.flatten.sort.each {|m| message += m }
+        end.flatten.sort.each { |m| message += m }
         raise ProductionError, message
       elsif !permissions_valid
         Bundler.ui.info "No issues found with the installed bundle"

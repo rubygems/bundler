@@ -13,13 +13,13 @@ module Bundler
     def root
       gemfile = find_gemfile
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
-      Pathname.new(gemfile).tap{|x| x.untaint if RUBY_VERSION < "2.7" }.expand_path.parent
+      Pathname.new(gemfile).tap{ |x| x.untaint if RUBY_VERSION < "2.7" }.expand_path.parent
     end
 
     def default_gemfile
       gemfile = find_gemfile
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
-      Pathname.new(gemfile).tap{|x| x.untaint if RUBY_VERSION < "2.7" }.expand_path
+      Pathname.new(gemfile).tap{ |x| x.untaint if RUBY_VERSION < "2.7" }.expand_path
     end
 
     def default_lockfile
@@ -28,7 +28,7 @@ module Bundler
       case gemfile.basename.to_s
       when "gems.rb" then Pathname.new(gemfile.sub(/.rb$/, ".locked"))
       else Pathname.new("#{gemfile}.lock")
-      end.tap{|x| x.untaint if RUBY_VERSION < "2.7" }
+      end.tap{ |x| x.untaint if RUBY_VERSION < "2.7" }
     end
 
     def default_bundle_dir
@@ -65,11 +65,11 @@ module Bundler
         h.update(k => ENV[k])
       end
 
-      keys.each {|key| ENV.delete(key) }
+      keys.each { |key| ENV.delete(key) }
 
       block.call
     ensure
-      keys.each {|key| ENV[key] = old_env[key] }
+      keys.each { |key| ENV[key] = old_env[key] }
     end
 
     def set_bundle_environment
@@ -100,7 +100,7 @@ module Bundler
     #
     # @see {Bundler::PermissionError}
     def filesystem_access(path, action = :write, &block)
-      yield(path.dup.tap{|x| x.untaint if RUBY_VERSION < "2.7" })
+      yield(path.dup.tap{ |x| x.untaint if RUBY_VERSION < "2.7" })
     rescue Errno::EACCES
       raise PermissionError.new(path, action)
     rescue Errno::EAGAIN
@@ -142,7 +142,7 @@ module Bundler
 
     def print_major_deprecations!
       multiple_gemfiles = search_up(".") do |dir|
-        gemfiles = gemfile_names.select {|gf| File.file? File.expand_path(gf, dir) }
+        gemfiles = gemfile_names.select { |gf| File.file? File.expand_path(gf, dir) }
         next if gemfiles.empty?
         break gemfiles.size != 1
       end
@@ -160,10 +160,10 @@ module Bundler
     end
 
     def ensure_same_dependencies(spec, old_deps, new_deps)
-      new_deps = new_deps.reject {|d| d.type == :development }
-      old_deps = old_deps.reject {|d| d.type == :development }
+      new_deps = new_deps.reject { |d| d.type == :development }
+      old_deps = old_deps.reject { |d| d.type == :development }
 
-      without_type = proc {|d| Gem::Dependency.new(d.name, d.requirements_list.sort) }
+      without_type = proc { |d| Gem::Dependency.new(d.name, d.requirements_list.sort) }
       new_deps.map!(&without_type)
       old_deps.map!(&without_type)
 
@@ -209,7 +209,7 @@ module Bundler
     end
 
     def write_to_gemfile(gemfile_path, contents)
-      filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts contents } }
+      filesystem_access(gemfile_path) { |g| File.open(g, "w") { |file| file.puts contents } }
     end
 
   private
@@ -250,7 +250,7 @@ module Bundler
 
     def search_up(*names)
       previous = nil
-      current  = File.expand_path(SharedHelpers.pwd).tap{|x| x.untaint if RUBY_VERSION < "2.7" }
+      current  = File.expand_path(SharedHelpers.pwd).tap{ |x| x.untaint if RUBY_VERSION < "2.7" }
 
       until !File.directory?(current) || current == previous
         if ENV["BUNDLE_SPEC_RUN"]

@@ -3,7 +3,7 @@
 RSpec.describe "bundle platform" do
   context "without flags" do
     let(:bundle_platform_platforms_string) do
-      local_platforms.reverse.map {|pl| "* #{pl}" }.join("\n")
+      local_platforms.reverse.map { |pl| "* #{pl}" }.join("\n")
     end
 
     it "returns all the output" do

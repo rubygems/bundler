@@ -15,7 +15,7 @@ module Bundler
     private
 
       def parse_dependencies(raw_dependencies)
-        raw_dependencies.split(",").map {|d| parse_dependency(d) }
+        raw_dependencies.split(",").map { |d| parse_dependency(d) }
       end
 
       def parse_dependency(raw_dependency)

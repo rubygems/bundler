@@ -26,7 +26,7 @@ RSpec.describe "bundle gem" do
     EOF
     @git_config_location = ENV["GIT_CONFIG"]
     path = "#{tmp}/test_git_config.txt"
-    File.open(path, "w") {|f| f.write(git_config_content) }
+    File.open(path, "w") { |f| f.write(git_config_content) }
     ENV["GIT_CONFIG"] = path
   end
 
@@ -166,7 +166,7 @@ RSpec.describe "bundle gem" do
       builder = Bundler::Dsl.new
       builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
       builder.dependencies
-      rubocop_dep = builder.dependencies.find {|d| d.name == "rubocop" }
+      rubocop_dep = builder.dependencies.find { |d| d.name == "rubocop" }
       expect(rubocop_dep).not_to be_nil
     end
   end
@@ -189,7 +189,7 @@ RSpec.describe "bundle gem" do
       builder = Bundler::Dsl.new
       builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
       builder.dependencies
-      rubocop_dep = builder.dependencies.find {|d| d.name == "rubocop" }
+      rubocop_dep = builder.dependencies.find { |d| d.name == "rubocop" }
       expect(rubocop_dep).to be_nil
     end
   end
@@ -432,7 +432,7 @@ RSpec.describe "bundle gem" do
         builder = Bundler::Dsl.new
         builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
         builder.dependencies
-        rspec_dep = builder.dependencies.find {|d| d.name == "rspec" }
+        rspec_dep = builder.dependencies.find { |d| d.name == "rspec" }
         expect(rspec_dep).to be_specific
       end
 
@@ -480,7 +480,7 @@ RSpec.describe "bundle gem" do
         builder = Bundler::Dsl.new
         builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
         builder.dependencies
-        minitest_dep = builder.dependencies.find {|d| d.name == "minitest" }
+        minitest_dep = builder.dependencies.find { |d| d.name == "minitest" }
         expect(minitest_dep).to be_specific
       end
 
@@ -536,7 +536,7 @@ RSpec.describe "bundle gem" do
         builder = Bundler::Dsl.new
         builder.eval_gemfile(bundled_app("#{gem_name}/Gemfile"))
         builder.dependencies
-        test_unit_dep = builder.dependencies.find {|d| d.name == "test-unit" }
+        test_unit_dep = builder.dependencies.find { |d| d.name == "test-unit" }
         expect(test_unit_dep).to be_specific
       end
 

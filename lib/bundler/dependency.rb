@@ -102,7 +102,7 @@ module Bundler
     end
 
     def expanded_platforms
-      @platforms.map {|pl| PLATFORM_MAP[pl] }
+      @platforms.map { |pl| PLATFORM_MAP[pl] }
     end
 
     def should_include?

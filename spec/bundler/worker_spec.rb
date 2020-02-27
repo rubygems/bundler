@@ -5,7 +5,7 @@ require "bundler/worker"
 RSpec.describe Bundler::Worker do
   let(:size) { 5 }
   let(:name) { "Spec Worker" }
-  let(:function) { proc {|object, worker_number| [object, worker_number] } }
+  let(:function) { proc { |object, worker_number| [object, worker_number] } }
   subject { described_class.new(size, name, function) }
 
   after { subject.stop }

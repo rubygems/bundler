@@ -553,7 +553,7 @@ RSpec.describe "bundle install from an existing gemspec" do
       build_lib("foo", :path => tmp.join("foo")) do |s|
         s.version = "1.0.0"
         s.add_development_dependency "rack"
-        s.write "foo-universal-java.gemspec", build_spec("foo", "1.0.0", "universal-java") {|sj| sj.runtime "rack", "1.0.0" }.first.to_ruby
+        s.write "foo-universal-java.gemspec", build_spec("foo", "1.0.0", "universal-java") { |sj| sj.runtime "rack", "1.0.0" }.first.to_ruby
       end
     end
 

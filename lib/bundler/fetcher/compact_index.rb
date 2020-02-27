@@ -46,8 +46,8 @@ module Bundler
                    @bundle_worker = nil # reset it.  Not sure if necessary
                    serial_compact_index_client.dependencies(remaining_gems)
                  end
-          next_gems = deps.map {|d| d[3].map(&:first).flatten(1) }.flatten(1).uniq
-          deps.each {|dep| gem_info << dep }
+          next_gems = deps.map { |d| d[3].map(&:first).flatten(1) }.flatten(1).uniq
+          deps.each { |dep| gem_info << dep }
           complete_gems.concat(deps.map(&:first)).uniq!
           remaining_gems = next_gems - complete_gems
         end
@@ -62,7 +62,7 @@ module Bundler
         contents = compact_index_client.spec(*spec)
         return nil if contents.nil?
         contents.unshift(spec.first)
-        contents[3].map! {|d| Gem::Dependency.new(*d) }
+        contents[3].map! { |d| Gem::Dependency.new(*d) }
         EndpointSpecification.new(*contents)
       end
       compact_index_request :fetch_spec
@@ -94,9 +94,9 @@ module Bundler
 
       def parallel_compact_index_client
         compact_index_client.execution_mode = lambda do |inputs, &blk|
-          func = lambda {|object, _index| blk.call(object) }
+          func = lambda { |object, _index| blk.call(object) }
           worker = bundle_worker(func)
-          inputs.each {|input| worker.enq(input) }
+          inputs.each { |input| worker.enq(input) }
           inputs.map { worker.deq }
         end
 

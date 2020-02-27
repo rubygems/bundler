@@ -22,8 +22,8 @@ module Bundler
       # when `inject` support addition of more than one gem, then this loop will
       # help. Currently this loop is running once.
       gems.each_slice(4) do |gem_name, gem_version, gem_group, gem_source|
-        ops = Gem::Requirement::OPS.map {|key, _val| key }
-        has_op = ops.any? {|op| gem_version.start_with? op }
+        ops = Gem::Requirement::OPS.map { |key, _val| key }
+        has_op = ops.any? { |op| gem_version.start_with? op }
         gem_version = "~> #{gem_version}" unless has_op
         deps << Bundler::Dependency.new(gem_name, gem_version, "group" => gem_group, "source" => gem_source)
       end
@@ -51,7 +51,7 @@ module Bundler
       definition.resolve_remotely!
       specs = definition.index[name].sort_by(&:version)
       unless options[:pre]
-        specs.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
+        specs.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
       end
       spec = specs.last
       spec.version.to_s

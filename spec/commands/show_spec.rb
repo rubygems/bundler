@@ -61,7 +61,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
       expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
 
       # Gem names are the last component of their path.
-      gem_list = out.split.map {|p| p.split("/").last }
+      gem_list = out.split.map { |p| p.split("/").last }
       expect(gem_list).to eq(gem_list.sort)
     end
 
@@ -143,7 +143,7 @@ RSpec.describe "bundle show", :bundler => "< 3" do
   context "in a fresh gem in a blank git repo" do
     before :each do
       build_git "foo", :path => lib_path("foo")
-      File.open(lib_path("foo/Gemfile"), "w") {|f| f.puts "gemspec" }
+      File.open(lib_path("foo/Gemfile"), "w") { |f| f.puts "gemspec" }
       sys_exec "rm -rf .git && git init", :dir => lib_path("foo")
     end
 

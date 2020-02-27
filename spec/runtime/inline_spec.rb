@@ -4,7 +4,7 @@ RSpec.describe "bundler/inline#gemfile" do
   def script(code, options = {})
     requires = ["#{lib_dir}/bundler/inline"]
     requires.unshift "#{spec_dir}/support/artifice/" + options.delete(:artifice) if options.key?(:artifice)
-    requires = requires.map {|r| "require '#{r}'" }.join("\n")
+    requires = requires.map { |r| "require '#{r}'" }.join("\n")
     ruby("#{requires}\n\n" + code, options)
   end
 
@@ -91,7 +91,7 @@ RSpec.describe "bundler/inline#gemfile" do
 
     expect(out).to include("Installing activesupport")
     err_lines = err.split("\n")
-    err_lines.reject!{|line| line =~ /\.rb:\d+: warning: / } unless RUBY_VERSION < "2.7"
+    err_lines.reject!{ |line| line =~ /\.rb:\d+: warning: / } unless RUBY_VERSION < "2.7"
     expect(err_lines).to be_empty
     expect(exitstatus).to be_zero if exitstatus
   end

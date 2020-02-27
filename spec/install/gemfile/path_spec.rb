@@ -91,7 +91,7 @@ RSpec.describe "bundle install with explicit source paths" do
       gem "aaa", :path => "./aaa"
     G
 
-    File.open(lib_path("demo/Gemfile"), "w") {|f| f.puts gemfile }
+    File.open(lib_path("demo/Gemfile"), "w") { |f| f.puts gemfile }
 
     lockfile = <<~L
       PATH
@@ -242,7 +242,7 @@ RSpec.describe "bundle install with explicit source paths" do
       gemspec
     G
 
-    File.open(lib_path("foo/Gemfile"), "w") {|f| f.puts gemfile }
+    File.open(lib_path("foo/Gemfile"), "w") { |f| f.puts gemfile }
 
     bundle "install", :dir => lib_path("foo")
     expect(the_bundle).to include_gems "foo 1.0", :dir => lib_path("foo")
@@ -645,7 +645,7 @@ RSpec.describe "bundle install with explicit source paths" do
         gemspec
         gem 'rack'
       G
-      File.open(lib_path("private_lib/Gemfile"), "w") {|f| f.puts gemfile }
+      File.open(lib_path("private_lib/Gemfile"), "w") { |f| f.puts gemfile }
 
       bundle :install, :env => { "DEBUG" => "1" }, :artifice => "endpoint", :dir => lib_path("private_lib")
       expect(out).to match(%r{^HTTP GET http://localgemserver\.test/api/v1/dependencies\?gems=rack$})

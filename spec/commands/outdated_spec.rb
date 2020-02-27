@@ -630,7 +630,7 @@ RSpec.describe "bundle outdated" do
     it "reports that a gem has a newer version" do
       subject
 
-      outdated_gems = out.split("\n").drop_while {|l| !l.start_with?("Gem") }[1..-1]
+      outdated_gems = out.split("\n").drop_while { |l| !l.start_with?("Gem") }[1..-1]
 
       expect(outdated_gems.size).to be > 0
     end

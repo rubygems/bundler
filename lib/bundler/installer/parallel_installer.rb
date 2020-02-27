@@ -48,20 +48,20 @@ module Bundler
       # sure needed dependencies have been installed.
       def dependencies_installed?(all_specs)
         installed_specs = all_specs.select(&:installed?).map(&:name)
-        dependencies.all? {|d| installed_specs.include? d.name }
+        dependencies.all? { |d| installed_specs.include? d.name }
       end
 
       # Represents only the non-development dependencies, the ones that are
       # itself and are in the total list.
       def dependencies
         @dependencies ||= begin
-          all_dependencies.reject {|dep| ignorable_dependency? dep }
+          all_dependencies.reject { |dep| ignorable_dependency? dep }
         end
       end
 
       def missing_lockfile_dependencies(all_spec_names)
-        deps = all_dependencies.reject {|dep| ignorable_dependency? dep }
-        deps.reject {|dep| all_spec_names.include? dep.name }
+        deps = all_dependencies.reject { |dep| ignorable_dependency? dep }
+        deps.reject { |dep| all_spec_names.include? dep.name }
       end
 
       # Represents all dependencies
@@ -85,9 +85,9 @@ module Bundler
       @size = size
       @standalone = standalone
       @force = force
-      @specs = all_specs.map {|s| SpecInstallation.new(s) }
+      @specs = all_specs.map { |s| SpecInstallation.new(s) }
       @spec_set = all_specs
-      @rake = @specs.find {|s| s.name == "rake" }
+      @rake = @specs.find { |s| s.name == "rake" }
     end
 
     def call
@@ -111,7 +111,7 @@ module Bundler
           s,
           s.missing_lockfile_dependencies(@specs.map(&:name)),
         ]
-      end.reject {|a| a.last.empty? }
+      end.reject { |a| a.last.empty? }
       return if missing_dependencies.empty?
 
       warning = []
@@ -146,7 +146,7 @@ module Bundler
     end
 
     def worker_pool
-      @worker_pool ||= Bundler::Worker.new @size, "Parallel Installer", lambda {|spec_install, worker_num|
+      @worker_pool ||= Bundler::Worker.new @size, "Parallel Installer", lambda { |spec_install, worker_num|
         do_install(spec_install, worker_num)
       }
     end
@@ -191,7 +191,7 @@ module Bundler
 
     def handle_error
       errors = @specs.select(&:failed?).map(&:error)
-      if exception = errors.find {|e| e.is_a?(Bundler::BundlerError) }
+      if exception = errors.find { |e| e.is_a?(Bundler::BundlerError) }
         raise exception
       end
       raise Bundler::InstallError, errors.map(&:to_s).join("\n\n")

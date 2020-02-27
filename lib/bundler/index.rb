@@ -21,15 +21,15 @@ module Bundler
     def initialize
       @sources = []
       @cache = {}
-      @specs = Hash.new {|h, k| h[k] = {} }
-      @all_specs = Hash.new {|h, k| h[k] = EMPTY_SEARCH }
+      @specs = Hash.new { |h, k| h[k] = {} }
+      @all_specs = Hash.new { |h, k| h[k] = EMPTY_SEARCH }
     end
 
     def initialize_copy(o)
       @sources = o.sources.dup
       @cache = {}
-      @specs = Hash.new {|h, k| h[k] = {} }
-      @all_specs = Hash.new {|h, k| h[k] = EMPTY_SEARCH }
+      @specs = Hash.new { |h, k| h[k] = {} }
+      @all_specs = Hash.new { |h, k| h[k] = EMPTY_SEARCH }
 
       o.specs.each do |name, hash|
         @specs[name] = hash.dup
@@ -111,7 +111,7 @@ module Bundler
       specs.values.each do |spec_sets|
         spec_sets.values.each(&blk)
       end
-      sources.each {|s| s.each(&blk) }
+      sources.each { |s| s.each(&blk) }
       self
     end
 
@@ -168,8 +168,8 @@ module Bundler
     end
 
     def dependencies_eql?(spec, other_spec)
-      deps       = spec.dependencies.select {|d| d.type != :development }
-      other_deps = other_spec.dependencies.select {|d| d.type != :development }
+      deps       = spec.dependencies.select { |d| d.type != :development }
+      other_deps = other_spec.dependencies.select { |d| d.type != :development }
       Set.new(deps) == Set.new(other_deps)
     end
 

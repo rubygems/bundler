@@ -106,7 +106,7 @@ module Bundler
         if options.any?
           Bundler.ui.warn "#{spec.name} has no executables, but you may want " \
             "one from a gem it depends on."
-          options.each {|name, bins| Bundler.ui.warn "  #{name} has: #{bins.join(", ")}" }
+          options.each { |name, bins| Bundler.ui.warn "  #{name} has: #{bins.join(", ")}" }
         else
           Bundler.ui.warn "There are no executables for the gem #{spec.name}."
         end
@@ -228,7 +228,7 @@ module Bundler
     def load_plugins
       Bundler.rubygems.load_plugins
 
-      requested_path_gems = @definition.requested_specs.select {|s| s.source.is_a?(Source::Path) }
+      requested_path_gems = @definition.requested_specs.select { |s| s.source.is_a?(Source::Path) }
       path_plugin_files = requested_path_gems.map do |spec|
         begin
           Bundler.rubygems.spec_matches_for_glob(spec, "rubygems_plugin#{Bundler.rubygems.suffix_pattern}")

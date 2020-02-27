@@ -75,7 +75,7 @@ RSpec.describe Bundler::Fetcher::Dependency do
     before do
       stub_const("Bundler::Fetcher::FAIL_ERRORS", fail_errors)
       allow(Bundler::Retry).to receive(:new).with("dependency api", fail_errors).and_return(bundler_retry)
-      allow(bundler_retry).to receive(:attempts) {|&block| block.call }
+      allow(bundler_retry).to receive(:attempts) { |&block| block.call }
       allow(subject).to receive(:log_specs) {}
       allow(subject).to receive(:remote_uri).and_return(remote_uri)
       allow(Bundler).to receive_message_chain(:ui, :debug?)

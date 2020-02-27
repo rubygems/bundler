@@ -164,7 +164,7 @@ RSpec.describe "Running bin/* commands" do
 
     # generate other Gemfile with executable gem
     build_repo2 do
-      build_gem("bindir") {|s| s.executables = "foo" }
+      build_gem("bindir") { |s| s.executables = "foo" }
     end
 
     create_file("OtherGemfile", <<-G)

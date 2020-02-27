@@ -29,7 +29,7 @@ module Gem
       # gems at that time, this method could be called inside another require,
       # thus raising with that constant being undefined. Better to check a method
       if source.respond_to?(:path) || (source.respond_to?(:bundler_plugin_api_source?) && source.bundler_plugin_api_source?)
-        Pathname.new(loaded_from).dirname.expand_path(source.root).to_s.tap{|x| x.untaint if RUBY_VERSION < "2.7" }
+        Pathname.new(loaded_from).dirname.expand_path(source.root).to_s.tap{ |x| x.untaint if RUBY_VERSION < "2.7" }
       else
         rg_full_gem_path
       end
@@ -117,13 +117,13 @@ module Gem
     end
 
     def to_yaml_properties
-      instance_variables.reject {|p| ["@source", "@groups", "@all_sources"].include?(p.to_s) }
+      instance_variables.reject { |p| ["@source", "@groups", "@all_sources"].include?(p.to_s) }
     end
 
     def to_lock
       out = String.new("  #{name}")
       unless requirement.none?
-        reqs = requirement.requirements.map {|o, v| "#{o} #{v}" }.sort.reverse
+        reqs = requirement.requirements.map { |o, v| "#{o} #{v}" }.sort.reverse
         out << " (#{reqs.join(", ")})"
       end
       out

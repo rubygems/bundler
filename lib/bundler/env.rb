@@ -49,7 +49,7 @@ module Bundler
       end
 
       if print_gemspecs
-        dsl = Dsl.new.tap {|d| d.eval_gemfile(Bundler.default_gemfile) }
+        dsl = Dsl.new.tap { |d| d.eval_gemfile(Bundler.default_gemfile) }
         out << "\n## Gemspecs\n" unless dsl.gemspecs.empty?
         dsl.gemspecs.each do |gs|
           out << "\n### #{File.basename(gs.loaded_from)}"
@@ -138,7 +138,7 @@ module Bundler
       return if pairs.empty?
       out << "\n" unless out.empty?
       out << "## #{title}\n\n```\n"
-      ljust = pairs.map {|k, _v| k.to_s.length }.max
+      ljust = pairs.map { |k, _v| k.to_s.length }.max
       pairs.each do |k, v|
         out << "#{k.to_s.ljust(ljust)}  #{v}\n"
       end

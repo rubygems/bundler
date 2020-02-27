@@ -110,18 +110,18 @@ module Bundler
       arr = sorted.dup
       set.each do |set_spec|
         full_name = set_spec.full_name
-        next if arr.any? {|spec| spec.full_name == full_name }
+        next if arr.any? { |spec| spec.full_name == full_name }
         arr << set_spec
       end
       SpecSet.new(arr)
     end
 
     def find_by_name_and_platform(name, platform)
-      @specs.detect {|spec| spec.name == name && spec.match_platform(platform) }
+      @specs.detect { |spec| spec.name == name && spec.match_platform(platform) }
     end
 
     def what_required(spec)
-      unless req = find {|s| s.dependencies.any? {|d| d.type == :runtime && d.name == spec.name } }
+      unless req = find { |s| s.dependencies.any? { |d| d.type == :runtime && d.name == spec.name } }
         return [spec]
       end
       what_required(req) << spec
@@ -150,7 +150,7 @@ module Bundler
   private
 
     def sorted
-      rake = @specs.find {|s| s.name == "rake" }
+      rake = @specs.find { |s| s.name == "rake" }
       begin
         @sorted ||= ([rake] + tsort).compact.uniq
       rescue TSort::Cyclic => error
@@ -167,7 +167,7 @@ module Bundler
 
     def lookup
       @lookup ||= begin
-        lookup = Hash.new {|h, k| h[k] = [] }
+        lookup = Hash.new { |h, k| h[k] = [] }
         Index.sort_specs(@specs).reverse_each do |s|
           lookup[s.name] << s
         end
@@ -177,7 +177,7 @@ module Bundler
 
     def tsort_each_node
       # MUST sort by name for backwards compatibility
-      @specs.sort_by(&:name).each {|s| yield s }
+      @specs.sort_by(&:name).each { |s| yield s }
     end
 
     def spec_for_dependency(dep, match_current_platform)
@@ -196,7 +196,7 @@ module Bundler
     def tsort_each_child(s)
       s.dependencies.sort_by(&:name).each do |d|
         next if d.type == :development
-        lookup[d.name].each {|s2| yield s2 }
+        lookup[d.name].each { |s2| yield s2 }
       end
     end
   end

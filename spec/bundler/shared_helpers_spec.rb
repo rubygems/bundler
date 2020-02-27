@@ -6,7 +6,7 @@ RSpec.describe Bundler::SharedHelpers do
   before do
     pwd_stub
     allow(Bundler.rubygems).to receive(:ext_lock).and_return(ext_lock_double)
-    allow(ext_lock_double).to receive(:synchronize) {|&block| block.call }
+    allow(ext_lock_double).to receive(:synchronize) { |&block| block.call }
   end
 
   let(:pwd_stub) { allow(subject).to receive(:pwd).and_return(bundled_app) }
@@ -425,7 +425,7 @@ RSpec.describe Bundler::SharedHelpers do
 
   describe "#filesystem_access" do
     context "system has proper permission access" do
-      let(:file_op_block) { proc {|path| FileUtils.mkdir_p(path) } }
+      let(:file_op_block) { proc { |path| FileUtils.mkdir_p(path) } }
 
       it "performs the operation in the passed block" do
         subject.filesystem_access("./test_dir", &file_op_block)
@@ -434,7 +434,7 @@ RSpec.describe Bundler::SharedHelpers do
     end
 
     context "system throws Errno::EACESS" do
-      let(:file_op_block) { proc {|_path| raise Errno::EACCES } }
+      let(:file_op_block) { proc { |_path| raise Errno::EACCES } }
 
       it "raises a PermissionError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
@@ -444,7 +444,7 @@ RSpec.describe Bundler::SharedHelpers do
     end
 
     context "system throws Errno::EAGAIN" do
-      let(:file_op_block) { proc {|_path| raise Errno::EAGAIN } }
+      let(:file_op_block) { proc { |_path| raise Errno::EAGAIN } }
 
       it "raises a TemporaryResourceError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
@@ -454,7 +454,7 @@ RSpec.describe Bundler::SharedHelpers do
     end
 
     context "system throws Errno::EPROTO" do
-      let(:file_op_block) { proc {|_path| raise Errno::EPROTO } }
+      let(:file_op_block) { proc { |_path| raise Errno::EPROTO } }
 
       it "raises a VirtualProtocolError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
@@ -464,7 +464,7 @@ RSpec.describe Bundler::SharedHelpers do
     end
 
     context "system throws Errno::ENOTSUP" do
-      let(:file_op_block) { proc {|_path| raise Errno::ENOTSUP } }
+      let(:file_op_block) { proc { |_path| raise Errno::ENOTSUP } }
 
       it "raises a OperationNotSupportedError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
@@ -474,7 +474,7 @@ RSpec.describe Bundler::SharedHelpers do
     end
 
     context "system throws Errno::ENOSPC" do
-      let(:file_op_block) { proc {|_path| raise Errno::ENOSPC } }
+      let(:file_op_block) { proc { |_path| raise Errno::ENOSPC } }
 
       it "raises a NoSpaceOnDeviceError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
@@ -485,7 +485,7 @@ RSpec.describe Bundler::SharedHelpers do
 
     context "system throws an unhandled SystemCallError" do
       let(:error) { SystemCallError.new("Shields down", 1337) }
-      let(:file_op_block) { proc {|_path| raise error } }
+      let(:file_op_block) { proc { |_path| raise error } }
 
       it "raises a GenericSystemCallError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(

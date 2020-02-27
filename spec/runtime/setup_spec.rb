@@ -109,7 +109,7 @@ RSpec.describe "Bundler.setup" do
     def clean_load_path(lp)
       without_bundler_load_path = ruby!("puts $LOAD_PATH").split("\n")
       lp -= without_bundler_load_path
-      lp.map! {|p| p.sub(/^#{Regexp.union system_gem_path.to_s, default_bundle_path.to_s, lib_dir.to_s}/i, "") }
+      lp.map! { |p| p.sub(/^#{Regexp.union system_gem_path.to_s, default_bundle_path.to_s, lib_dir.to_s}/i, "") }
     end
 
     it "puts loaded gems after -I and RUBYLIB", :ruby_repo do
@@ -128,7 +128,7 @@ RSpec.describe "Bundler.setup" do
       RUBY
 
       load_path = out.split("\n")
-      rack_load_order = load_path.index {|path| path.include?("rack") }
+      rack_load_order = load_path.index { |path| path.include?("rack") }
 
       expect(err).to be_empty
       expect(load_path).to include(a_string_ending_with("dash_i_dir"), "rubylib_dir")
@@ -396,7 +396,7 @@ RSpec.describe "Bundler.setup" do
 
       context "when the ruby stdlib is a substring of Gem.path" do
         it "does not reject the stdlib from $LOAD_PATH" do
-          substring = "/" + $LOAD_PATH.find {|p| p =~ /vendor_ruby/ }.split("/")[2]
+          substring = "/" + $LOAD_PATH.find { |p| p =~ /vendor_ruby/ }.split("/")[2]
           run "puts 'worked!'", :env => { "GEM_PATH" => substring }
           expect(out).to eq("worked!")
         end
@@ -806,7 +806,7 @@ end
 
       gemspec_content = File.binread(gemspec).
                 sub("Bundler::VERSION", %("#{Bundler::VERSION}")).
-                lines.reject {|line| line =~ %r{lib/bundler/version} }.join
+                lines.reject { |line| line =~ %r{lib/bundler/version} }.join
 
       File.open(File.join(specifications_dir, "#{full_name}.gemspec"), "wb") do |f|
         f.write(gemspec_content)

@@ -10,10 +10,10 @@ def capture(*args)
   begin
     result = StringIO.new
     result.close if opts[:closed]
-    args.each {|stream| eval "$#{stream} = result" }
+    args.each { |stream| eval "$#{stream} = result" }
     yield
   ensure
-    args.each {|stream| eval("$#{stream} = #{stream.upcase}") }
+    args.each { |stream| eval("$#{stream} = #{stream.upcase}") }
   end
   result.string
 end

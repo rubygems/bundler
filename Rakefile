@@ -91,7 +91,7 @@ namespace :man do
       directory "man"
 
       index = []
-      sources = Dir["man/*.ronn"].map {|f| File.basename(f, ".ronn") }
+      sources = Dir["man/*.ronn"].map { |f| File.basename(f, ".ronn") }
       sources.map do |basename|
         ronn = "man/#{basename}.ronn"
         manual_section = ".1" unless basename =~ /\.(\d+)\Z/
@@ -115,7 +115,7 @@ namespace :man do
           [File.read(ronn).split(" ").first, roff]
         end
         index = index.sort_by(&:first)
-        justification = index.map {|(n, _f)| n.length }.max + 4
+        justification = index.map { |(n, _f)| n.length }.max + 4
         File.open("man/index.txt", "w") do |f|
           index.each do |name, filename|
             f << name.ljust(justification) << filename << "\n"
@@ -238,7 +238,7 @@ task :override_version do
   unless contents.sub!(/(^\s+VERSION\s*=\s*)"#{Gem::Version::VERSION_PATTERN}"/, %(\\1"#{version}"))
     abort("Failed to change bundler version")
   end
-  File.open(version_file, "w") {|f| f << contents }
+  File.open(version_file, "w") { |f| f << contents }
 end
 
 task :default => :spec

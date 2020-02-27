@@ -18,7 +18,7 @@ module Bundler
         if ARGV.size == 1
           ["config", "list"]
         elsif ARGV.include?("--delete")
-          ARGV.map {|arg| arg == "--delete" ? "unset" : arg }
+          ARGV.map { |arg| arg == "--delete" ? "unset" : arg }
         elsif ARGV.include?("--global") || ARGV.include?("--local") || ARGV.size == 3
           ["config", "set", *ARGV[1..-1]]
         else
@@ -177,7 +177,7 @@ module Bundler
 
       def validate_scope!
         @explicit_scope = true
-        scopes = %w[global local].select {|s| options[s] }
+        scopes = %w[global local].select { |s| options[s] }
         case scopes.size
         when 0
           @scope = "global"

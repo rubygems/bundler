@@ -8,8 +8,8 @@ RSpec.describe Bundler::Dsl do
 
   describe "#git_source" do
     it "registers custom hosts" do
-      subject.git_source(:example) {|repo_name| "git@git.example.com:#{repo_name}.git" }
-      subject.git_source(:foobar) {|repo_name| "git@foobar.com:#{repo_name}.git" }
+      subject.git_source(:example) { |repo_name| "git@git.example.com:#{repo_name}.git" }
+      subject.git_source(:foobar) { |repo_name| "git@foobar.com:#{repo_name}.git" }
       subject.gem("dobry-pies", :example => "strzalek/dobry-pies")
       example_uri = "git@git.example.com:strzalek/dobry-pies.git"
       expect(subject.dependencies.first.source.uri).to eq(example_uri)
@@ -17,7 +17,7 @@ RSpec.describe Bundler::Dsl do
 
     it "raises exception on invalid hostname" do
       expect do
-        subject.git_source(:group) {|repo_name| "git@git.example.com:#{repo_name}.git" }
+        subject.git_source(:group) { |repo_name| "git@git.example.com:#{repo_name}.git" }
       end.to raise_error(Bundler::InvalidOption)
     end
 
@@ -167,7 +167,7 @@ RSpec.describe Bundler::Dsl do
     end
 
     it "allows specifying a branch on git gems with a git_source" do
-      subject.git_source(:test_source) {|n| "https://github.com/#{n}" }
+      subject.git_source(:test_source) { |n| "https://github.com/#{n}" }
       subject.gem("foo", :branch => "test", :test_source => "bundler/bundler")
       dep = subject.dependencies.last
       expect(dep.name).to eq "foo"
@@ -184,7 +184,7 @@ RSpec.describe Bundler::Dsl do
       it "from a single repo" do
         rails_gems = %w[railties action_pack active_model]
         subject.git "https://github.com/rails/rails.git" do
-          rails_gems.each {|rails_gem| subject.send :gem, rails_gem }
+          rails_gems.each { |rails_gem| subject.send :gem, rails_gem }
         end
         expect(subject.dependencies.map(&:name)).to match_array rails_gems
       end
@@ -199,7 +199,7 @@ RSpec.describe Bundler::Dsl do
       it "from github" do
         spree_gems = %w[spree_core spree_api spree_backend]
         subject.github "spree" do
-          spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
+          spree_gems.each { |spree_gem| subject.send :gem, spree_gem }
         end
 
         subject.dependencies.each do |d|
@@ -212,7 +212,7 @@ RSpec.describe Bundler::Dsl do
       it "from github" do
         spree_gems = %w[spree_core spree_api spree_backend]
         subject.github "spree" do
-          spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
+          spree_gems.each { |spree_gem| subject.send :gem, spree_gem }
         end
 
         subject.dependencies.each do |d|
@@ -226,7 +226,7 @@ RSpec.describe Bundler::Dsl do
         expect do
           spree_gems = %w[spree_core spree_api spree_backend]
           subject.github "spree" do
-            spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
+            spree_gems.each { |spree_gem| subject.send :gem, spree_gem }
           end
         end.to raise_error(Bundler::DeprecatedError, /github method has been removed/)
       end

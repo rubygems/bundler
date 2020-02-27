@@ -49,7 +49,7 @@ module Spec
     end
 
     def not_local
-      all_platforms.find {|p| p != generic_local_platform }
+      all_platforms.find { |p| p != generic_local_platform }
     end
 
     def local_tag
@@ -61,7 +61,7 @@ module Spec
     end
 
     def not_local_tag
-      [:ruby, :jruby].find {|tag| tag != local_tag }
+      [:ruby, :jruby].find { |tag| tag != local_tag }
     end
 
     def local_ruby_engine

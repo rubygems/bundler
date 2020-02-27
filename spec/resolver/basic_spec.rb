@@ -109,7 +109,7 @@ RSpec.describe "Resolving" do
 
   it "raises an exception with the minimal set of conflicting dependencies" do
     @index = build_index do
-      %w[0.9 1.0 2.0].each {|v| gem("a", v) }
+      %w[0.9 1.0 2.0].each { |v| gem("a", v) }
       gem("b", "1.0") { dep "a", ">= 2" }
       gem("c", "1.0") { dep "a", "< 1" }
     end

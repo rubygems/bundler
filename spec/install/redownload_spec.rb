@@ -13,7 +13,7 @@ RSpec.describe "bundle install" do
       rack_lib = default_bundle_path("gems/rack-1.0.0/lib/rack.rb")
 
       bundle! :install
-      rack_lib.open("w") {|f| f.write("blah blah blah") }
+      rack_lib.open("w") { |f| f.write("blah blah blah") }
       bundle! :install, flag => true
 
       expect(out).to include "Installing rack 1.0.0"
@@ -41,7 +41,7 @@ RSpec.describe "bundle install" do
         foo_lib = default_bundle_path("bundler/gems/foo-1.0-#{ref}/lib/foo.rb")
 
         bundle! :install
-        foo_lib.open("w") {|f| f.write("blah blah blah") }
+        foo_lib.open("w") { |f| f.write("blah blah blah") }
         bundle! :install, flag => true
 
         expect(foo_lib.open(&:read)).to eq("FOO = '1.0'\n")

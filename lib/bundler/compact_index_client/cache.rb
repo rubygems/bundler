@@ -25,7 +25,7 @@ module Bundler
       end
 
       def versions
-        versions_by_name = Hash.new {|hash, key| hash[key] = [] }
+        versions_by_name = Hash.new { |hash, key| hash[key] = [] }
         info_checksums_by_name = {}
 
         lines(versions_path).each do |line|
