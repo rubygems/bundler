@@ -75,7 +75,7 @@ module Bundler
       return unless debug?
       debug_info = yield
       debug_info = debug_info.inspect unless debug_info.is_a?(String)
-      warn debug_info.split("\n").map {|s| "  " * depth + s }
+      warn debug_info.split("\n").map {|s| "BUNDLER: " + "  " * depth + s }
     end
 
     def debug?
