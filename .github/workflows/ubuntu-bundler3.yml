@@ -23,6 +23,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
       - name: Prepare dependencies
         run: |
+          gem i parallel_tests -v "~> 2.29"
           bin/rake override_version
           bin/rake spec:parallel_deps
       - name: Run Test
