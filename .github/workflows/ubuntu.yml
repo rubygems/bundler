@@ -56,6 +56,7 @@ jobs:
         run: |
           bin/rake spec:realworld
         env:
+          RGV: ${{ matrix.rgv }}
           BUNDLER_SPEC_PRE_RECORDED: 1
         continue-on-error: ${{ matrix.ruby == 'head' }}
     timeout-minutes: 60

@@ -35,5 +35,6 @@ jobs:
         run: |
           bin/rake spec:realworld
         env:
+          RGV: ${{ matrix.rgv }}
           BUNDLER_SPEC_PRE_RECORDED: 1
     timeout-minutes: 60
