@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: [ 2.3.8, 2.4.9, 2.5.7, 2.6.5 ]
+        ruby: [ 2.3.8, 2.4.9, 2.5.7, 2.6.5, head ]
         rgv: [ v2.5.2, v2.6.14, v2.7.10, v3.0.6, master ]
         exclude:
           - ruby: 2.4.9
