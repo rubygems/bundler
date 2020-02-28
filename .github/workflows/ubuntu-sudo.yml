@@ -29,4 +29,9 @@ jobs:
         run: sudo -E bin/rake spec:sudo
         env:
           RGV: ${{ matrix.rgv }}
+      - name: Run Test with BUNDLER_SPEC_SUB_VERSION
+        run: sudo -E bin/rake spec:sudo
+        env:
+          RGV: ${{ matrix.rgv }}
+          BUNDLER_SPEC_SUB_VERSION: 3.0.0
     timeout-minutes: 60
