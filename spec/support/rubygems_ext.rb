@@ -24,6 +24,8 @@ module Spec
       "builder" => "~> 3.2",
       # ruby-graphviz is used by the viz tests
       "ruby-graphviz" => ">= 0.a",
+      # ruby-graphviz depends on rexml after Ruby 2.8
+      "rexml" => ">= 0.a",
     }
 
     extend self
