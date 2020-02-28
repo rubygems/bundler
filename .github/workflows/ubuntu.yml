@@ -45,7 +45,7 @@ jobs:
       - name: Prepare dependencies
         run: |
           sudo apt-get install graphviz -y
-          gem i parallel_tests -v "~> 2.29"
+          gem i parallel --no-document
           bin/rake override_version
           bin/rake spec:parallel_deps
       - name: Run Test
