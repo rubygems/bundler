@@ -52,7 +52,6 @@ jobs:
         run: bin/parallel_rspec spec
         env:
           RGV: ${{ matrix.rgv }}
-          BUNDLER_SPEC_SUB_VERSION: ${{ matrix.bundler_version }}
       - name: Run Test with realworld
         run: |
           bin/rake spec:realworld
