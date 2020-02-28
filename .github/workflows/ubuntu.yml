@@ -52,6 +52,7 @@ jobs:
         run: bin/parallel_rspec spec
         env:
           RGV: ${{ matrix.rgv }}
+        continue-on-error: ${{ matrix.ruby == 'head' }}
       - name: Run Test with realworld
         run: |
           bin/rake spec:realworld
