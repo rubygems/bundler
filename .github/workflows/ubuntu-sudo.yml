@@ -9,7 +9,7 @@ on:
       - trying
 
 jobs:
-  ubuntu:
+  ubuntu-sudo:
     runs-on: ubuntu-latest
     strategy:
       matrix:

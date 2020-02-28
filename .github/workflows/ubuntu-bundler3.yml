@@ -9,7 +9,7 @@ on:
       - trying
 
 jobs:
-  ubuntu:
+  ubuntu-bundler3:
     runs-on: ubuntu-latest
     strategy:
       matrix:
