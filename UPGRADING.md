@@ -4,8 +4,7 @@
 
 The following is a summary of the changes that we plan to introduce in Bundler
 3, why we will be making those changes, and what the deprecation process will
-look like. All these deprecations will be printed by default in the upcoming
-Bundler 2.1 release.
+look like. All these deprecations are printed by default in the Bundler 2.1 release.
 
 If you don't want to deal with deprecations right now and want to toggle them
 off, you can do it through configuration. Set the `BUNDLE_SILENCE_DEPRECATIONS`
@@ -30,7 +29,7 @@ them.
 
 The CLI defines a set of commands and options that can be used by our users to
 create command lines that bundler can understand. There's a number of changes
-that we plan to make to this set of commands and options.
+in the upcoming 3 version.
 
 * Flags passed to `bundle install` that relied on being remembered across invocations have been deprecated.
 
