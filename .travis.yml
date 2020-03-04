@@ -7,11 +7,11 @@ script:
   - BUNDLER_SPEC_PRE_RECORDED=1 bin/rake spec:realworld
 
 before_script:
-  - travis_retry bin/rake override_version
-  - travis_retry bin/rake spec:parallel_deps
+  - bin/rake override_version
+  - bin/rake spec:parallel_deps
   - if [ "$BUNDLER_SPEC_SUB_VERSION" = "" ];
     then
-      travis_retry sudo apt-get install graphviz -y;
+      sudo apt-get install graphviz -y;
     fi
   - if [ "$TRAVIS_RUBY_VERSION" = "2.3.8" ];
     then

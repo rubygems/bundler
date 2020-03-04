@@ -105,10 +105,14 @@ module Spec
     end
 
     def install_gems(gems)
-      deps = gems.map {|name, req| "'#{name}:#{req}'" }.join(" ")
-      gem = ENV["GEM_COMMAND"] || "#{Gem.ruby} -S gem --backtrace"
-      cmd = "#{gem} install #{deps} --no-document --conservative"
-      system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
+      require "rubygems/dependency_installer"
+
+      gems.each do |name, req|
+        dependency = Gem::Dependency.new(name, req)
+        next unless dependency.matching_specs.empty?
+
+        Gem::DependencyInstaller.new(:document => false).install(dependency)
+      end
     end
   end
 end
