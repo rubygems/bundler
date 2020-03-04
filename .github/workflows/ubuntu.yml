@@ -37,12 +37,11 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
       - name: Prepare dependencies
         run: |
-          sudo apt-get install graphviz -y
-          gem i parallel --no-document
           bin/rake override_version
           bin/rake spec:parallel_deps
       - name: Run Test
         run: |
+          sudo cat /etc/sudoers
           sudo -E bin/rake spec:sudo
           sudo chown -R $(whoami) tmp
           BUNDLER_SPEC_PRE_RECORDED=1 bin/rake spec:realworld
