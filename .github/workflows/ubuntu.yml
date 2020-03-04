@@ -41,6 +41,7 @@ jobs:
           bin/rake spec:parallel_deps
       - name: Run Test
         run: |
+          sudo sed -i '/secure_path/d' /etc/sudoers
           sudo cat /etc/sudoers
           sudo -E bin/rake spec:sudo
           sudo chown -R $(whoami) tmp
