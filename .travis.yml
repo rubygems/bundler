@@ -2,6 +2,7 @@ language: ruby
 dist: bionic
 script:
   - bin/parallel_rspec spec
+  - sudo sed -i '/secure_path/d' /etc/sudoers
   - test "$(ruby -v)" = "$(sudo -E ruby -v)"
   - sudo -E bin/rake spec:sudo
   - sudo chown -R $(whoami) tmp
@@ -14,7 +15,6 @@ before_script:
     then
       travis_retry sudo apt-get install graphviz -y;
     fi
-    sudo sed -i '/secure_path/d' /etc/sudoers;
 
 branches:
   only:
