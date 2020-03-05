@@ -543,7 +543,7 @@ The :gist git source is deprecated, and will be removed in the future. Add this 
 
   context "bundle viz" do
     let(:ruby_graphviz) do
-      "ruby-graphviz --version 1.2.4"
+      "ruby-graphviz --version #{RUBY_VERSION >= "2.4" ? "1.2.5" : "1.2.4"}"
     end
 
     before do

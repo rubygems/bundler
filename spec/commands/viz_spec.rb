@@ -2,7 +2,7 @@
 
 RSpec.describe "bundle viz", :bundler => "< 3", :if => Bundler.which("dot") do
   let(:ruby_graphviz) do
-    "ruby-graphviz --version 1.2.4"
+    "ruby-graphviz --version #{RUBY_VERSION >= "2.4" ? "1.2.5" : "1.2.4"}"
   end
 
   before do
