@@ -374,11 +374,10 @@ module Spec
       end
       gems = gems.flatten
 
-      Gem.clear_paths
-
       env_backup = ENV.to_hash
-      ENV["GEM_HOME"] = path.to_s
-      ENV["GEM_PATH"] = path.to_s
+
+      set_gem_paths_to(path)
+
       ENV["BUNDLER_ORIG_GEM_PATH"] = nil
 
       install_gems(*gems)
@@ -396,13 +395,11 @@ module Spec
       FileUtils.rm_rf(system_gem_path)
       FileUtils.mkdir_p(system_gem_path)
 
-      Gem.clear_paths
-
       gem_home = ENV["GEM_HOME"]
       gem_path = ENV["GEM_PATH"]
       path = ENV["PATH"]
-      ENV["GEM_HOME"] = system_gem_path.to_s
-      ENV["GEM_PATH"] = system_gem_path.to_s
+
+      set_gem_paths_to(system_gem_path)
 
       gems.each do |gem|
         gem_command! "install --no-document #{gem}"
@@ -415,6 +412,13 @@ module Spec
         ENV["GEM_PATH"] = gem_path
         ENV["PATH"] = path
       end
+    end
+
+    def set_gem_paths_to(path)
+      Gem.clear_paths
+
+      ENV["GEM_HOME"] = path.to_s
+      ENV["GEM_PATH"] = path.to_s
     end
 
     def cache_gems(*gems)
