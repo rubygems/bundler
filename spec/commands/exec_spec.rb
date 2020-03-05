@@ -931,7 +931,7 @@ __FILE__: #{path.to_s.inspect}
       before do
         system_gems :bundler
         build_git "simple_git_binary", &:add_c_extension
-        bundle! "config set path .bundle"
+        bundle! "config set --local path .bundle"
         install_gemfile! <<-G, :system_bundler => true
           gem "simple_git_binary", :git => '#{lib_path("simple_git_binary-1.0")}'
         G
