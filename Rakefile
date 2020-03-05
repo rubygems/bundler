@@ -55,7 +55,23 @@ namespace :spec do
   end
 
   desc "Run the spec suite with the sudo tests"
-  task :sudo => %w[set_sudo spec]
+  task :sudo => %w[set_sudo] do
+    require "open3"
+    output, status = Open3.capture2e("sudo", "cp", "/etc/sudoers", "tmp/old_sudoers")
+    raise "Couldn't read sudoers file: #{output}" unless status.success?
+
+    begin
+      output, status = Open3.capture2e("sudo sed -i '/secure_path/d' /etc/sudoers")
+      raise "Couldn't configure sudo to preserve path: #{output}" unless status.success?
+
+      raise "Couldn't configure sudo correctly to preserve path" unless `ruby -v` == `sudo -E ruby -v`
+
+      sh("sudo -E bin/rspec")
+    ensure
+      system("sudo", "cp", "tmp/old_sudoers", "/etc/sudoers")
+      system("sudo", "chown", "-R", ENV["USER"], "tmp")
+    end
+  end
 
   task :set_sudo do
     ENV["BUNDLER_SUDO_TESTS"] = "1"

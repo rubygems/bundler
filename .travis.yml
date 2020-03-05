@@ -2,8 +2,7 @@ language: ruby
 dist: bionic
 script:
   - bin/parallel_rspec spec
-  - sudo -E bin/rake spec:sudo
-  - sudo chown -R $(whoami) tmp
+  - bin/rake spec:sudo
   - BUNDLER_SPEC_PRE_RECORDED=1 bin/rake spec:realworld
 
 before_script:
@@ -12,11 +11,6 @@ before_script:
   - if [ "$BUNDLER_SPEC_SUB_VERSION" = "" ];
     then
       travis_retry sudo apt-get install graphviz -y;
-    fi
-  - if [ "$TRAVIS_RUBY_VERSION" = "2.3.8" ];
-    then
-      sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd;
-      sudo sed -i '/secure_path/d' /etc/sudoers;
     fi
 
 branches:
