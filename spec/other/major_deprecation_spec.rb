@@ -543,12 +543,11 @@ The :gist git source is deprecated, and will be removed in the future. Add this 
 
   context "bundle viz" do
     let(:ruby_graphviz) do
-      graphviz_glob = base_system_gems.join("cache/ruby-graphviz*")
-      Pathname.glob(graphviz_glob).first
+      "ruby-graphviz --version 1.2.4"
     end
 
     before do
-      system_gems ruby_graphviz
+      realworld_system_gems ruby_graphviz
       create_file "gems.rb"
       bundle "viz"
     end

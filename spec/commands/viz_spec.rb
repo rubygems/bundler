@@ -2,12 +2,11 @@
 
 RSpec.describe "bundle viz", :bundler => "< 3", :if => Bundler.which("dot") do
   let(:ruby_graphviz) do
-    graphviz_glob = base_system_gems.join("cache/ruby-graphviz*")
-    Pathname.glob(graphviz_glob).first
+    "ruby-graphviz --version 1.2.4"
   end
 
   before do
-    system_gems ruby_graphviz
+    realworld_system_gems ruby_graphviz
   end
 
   it "graphs gems from the Gemfile" do
@@ -82,7 +81,7 @@ RSpec.describe "bundle viz", :bundler => "< 3", :if => Bundler.which("dot") do
         end
       end
 
-      system_gems ruby_graphviz, "graphviz-999", :gem_repo => gem_repo4
+      system_gems "graphviz-999", :gem_repo => gem_repo4
     end
 
     it "loads the correct ruby-graphviz gem" do

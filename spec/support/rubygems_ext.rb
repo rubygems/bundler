@@ -22,9 +22,6 @@ module Spec
       # Rake version has to be consistent for tests to pass
       "rake" => "13.0.1",
       "builder" => "~> 3.2",
-      # ruby-graphviz is used by the viz tests
-      # for >= Ruby 2.3
-      "ruby-graphviz" => "1.2.4",
     }
 
     extend self
