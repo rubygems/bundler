@@ -91,7 +91,7 @@ module Spec
       end
 
       env = options.delete(:env) || {}
-      env["PATH"].gsub!("#{Path.root}/exe", "") if env["PATH"] && system_bundler
+      env["PATH"] = ENV["PATH"].gsub("#{Path.root}/exe", "") if system_bundler
 
       requires = options.delete(:requires) || []
       requires << "support/hax"
