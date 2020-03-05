@@ -101,7 +101,7 @@ RSpec.configure do |config|
 
   config.around :each do |example|
     ENV.replace(original_env)
-    system_gems []
+    set_gem_paths_to(system_gem_path)
     @command_executions = []
 
     Bundler.ui.silence { example.run }
