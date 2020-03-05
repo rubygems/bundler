@@ -374,11 +374,6 @@ module Spec
       end
       gems = gems.flatten
 
-      unless opts[:keep_path]
-        FileUtils.rm_rf(path)
-        FileUtils.mkdir_p(path)
-      end
-
       Gem.clear_paths
 
       env_backup = ENV.to_hash

@@ -929,7 +929,7 @@ __FILE__: #{path.to_s.inspect}
 
     context "with a git gem that includes extensions" do
       before do
-        system_gems :bundler, :keep_path => true
+        system_gems :bundler
         build_git "simple_git_binary", &:add_c_extension
         bundle! "config set path .bundle"
         install_gemfile! <<-G, :system_bundler => true
