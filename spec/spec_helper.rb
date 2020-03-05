@@ -101,12 +101,12 @@ RSpec.configure do |config|
 
   config.around :each do |example|
     ENV.replace(original_env)
-    reset!
     system_gems []
-
     @command_executions = []
 
     Bundler.ui.silence { example.run }
+
+    reset!
 
     all_output = @command_executions.map(&:to_s_verbose).join("\n\n")
     if example.exception && !all_output.empty?
