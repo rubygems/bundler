@@ -395,22 +395,10 @@ module Spec
       FileUtils.rm_rf(system_gem_path)
       FileUtils.mkdir_p(system_gem_path)
 
-      gem_home = ENV["GEM_HOME"]
-      gem_path = ENV["GEM_PATH"]
-      path = ENV["PATH"]
-
       set_gem_paths_to(system_gem_path)
 
       gems.each do |gem|
         gem_command! "install --no-document #{gem}"
-      end
-      return unless block_given?
-      begin
-        yield
-      ensure
-        ENV["GEM_HOME"] = gem_home
-        ENV["GEM_PATH"] = gem_path
-        ENV["PATH"] = path
       end
     end
 
