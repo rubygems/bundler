@@ -53,8 +53,7 @@ jobs:
           RGV: ${{ matrix.rgv }}
         continue-on-error: ${{ matrix.ruby == 'head' }}
       - name: Run Test with realworld
-        run: |
-          bin/rake spec:realworld
+        run: bin/rake spec:realworld
         env:
           RGV: ${{ matrix.rgv }}
           BUNDLER_SPEC_PRE_RECORDED: 1

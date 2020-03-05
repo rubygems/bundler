@@ -31,8 +31,7 @@ jobs:
           RGV: ${{ matrix.rgv }}
           BUNDLER_SPEC_SUB_VERSION: 3.0.0
       - name: Run Test with realworld
-        run: |
-          bin/rake spec:realworld
+        run: bin/rake spec:realworld
         env:
           RGV: ${{ matrix.rgv }}
           BUNDLER_SPEC_SUB_VERSION: 3.0.0
