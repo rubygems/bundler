@@ -223,11 +223,6 @@ module Bundler
       Gem.bin_path(gem, bin, ver)
     end
 
-    def preserve_paths
-      # this is a no-op outside of RubyGems 1.8
-      yield
-    end
-
     def loaded_gem_paths
       loaded_gem_paths = Gem.loaded_specs.map {|_, s| s.full_require_paths }
       loaded_gem_paths.flatten
