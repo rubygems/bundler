@@ -33,6 +33,6 @@ jobs:
         run: bin/rake spec:realworld
         env:
           BUNDLER_SPEC_PRE_RECORDED: 1
-      - name: Run Test with BUNDLER_SPEC_SUB_VERSION
+      - name: Run Test with sudo
         run: bin/rake spec:sudo
     timeout-minutes: 60
