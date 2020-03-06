@@ -1,5 +1,4 @@
 [![Version     ](https://img.shields.io/gem/v/bundler.svg?style=flat)](https://rubygems.org/gems/bundler)
-[![Build Status](https://img.shields.io/travis/rubygems/bundler/master.svg?style=flat)](https://travis-ci.org/rubygems/bundler)
 [![Inline docs ](https://inch-ci.org/github/rubygems/bundler.svg?style=flat)](https://inch-ci.org/github/rubygems/bundler)
 [![Slack       ](https://bundler-slackin.herokuapp.com/badge.svg)](https://bundler-slackin.herokuapp.com)
 
