@@ -1,0 +1,24 @@
+name: ubuntu-lint
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - staging
+      - trying
+
+jobs:
+  ubuntu_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6.5
+      - name: Install Dependencies
+        run: bin/rake spec:deps
+      - name: Run Lint
+        run: bin/rake rubocop check_rvm_integration man:check
+    timeout-minutes: 15

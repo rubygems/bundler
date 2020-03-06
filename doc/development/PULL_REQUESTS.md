@@ -8,7 +8,7 @@ Before you submit a pull request, please remember to do the following:
 
 ## Code formatting
 
-Make sure the code formatting and styling adheres to the guidelines. We use RuboCop for this. Lack of formatting adherence will result in automatic Travis build failures.
+Make sure the code formatting and styling adheres to the guidelines. We use RuboCop for this. Lack of formatting adherence will result in automatic GitHub Actions build failures.
 
       $ bin/rubocop -a
 
