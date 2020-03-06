@@ -15,6 +15,8 @@ jobs:
       matrix:
         ruby: [ 2.4.9, 2.5.7, 2.6.5 ]
         rgv: [ v3.0.6, master ]
+    env:
+      RGV: ${{ matrix.rgv }}
     steps:
       - uses: actions/checkout@v1
       - name: Setup ruby
@@ -27,15 +29,10 @@ jobs:
           bin/rake spec:parallel_deps
       - name: Run Test
         run: bin/parallel_rspec spec
-        env:
-          RGV: ${{ matrix.rgv }}
       - name: Run Test with realworld
         run: bin/rake spec:realworld
         env:
-          RGV: ${{ matrix.rgv }}
           BUNDLER_SPEC_PRE_RECORDED: 1
       - name: Run Test with BUNDLER_SPEC_SUB_VERSION
         run: bin/rake spec:sudo
-        env:
-          RGV: ${{ matrix.rgv }}
     timeout-minutes: 60
