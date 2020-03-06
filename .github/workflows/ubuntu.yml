@@ -45,7 +45,6 @@ jobs:
       - name: Prepare dependencies
         run: |
           sudo apt-get install graphviz -y
-          bin/rake override_version
           bin/rake spec:parallel_deps
       - name: Run Test
         run: bin/parallel_rspec spec
