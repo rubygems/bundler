@@ -23,7 +23,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
       - name: Prepare dependencies
         run: |
-          bin/rake override_version
+          BUNDLER_SPEC_SUB_VERSION=3.0.0 bin/rake override_version
           bin/rake spec:parallel_deps
       - name: Run Test
         run: bin/parallel_rspec spec
