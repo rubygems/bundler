@@ -1,8 +1,28 @@
 status = [
-  "continuous-integration/travis-ci/push",
   "windows (2.4.x)",
   "windows (2.5.x)",
-  "windows (2.6.x)"
+  "windows (2.6.x)",
+  "ubuntu_lint",
+  "ubuntu (2.3.8, v2.5.2)",
+  "ubuntu (2.3.8, v2.6.14)",
+  "ubuntu (2.3.8, v2.7.10)",
+  "ubuntu (2.3.8, v3.0.6)",
+  "ubuntu (2.3.8, master)",
+  "ubuntu (2.4.9, v2.6.14)",
+  "ubuntu (2.4.9, v2.7.10)",
+  "ubuntu (2.4.9, v3.0.6)",
+  "ubuntu (2.4.9, master)",
+  "ubuntu (2.5.7, v2.7.10)",
+  "ubuntu (2.5.7, v3.0.6)",
+  "ubuntu (2.5.7, master)",
+  "ubuntu (2.6.5, v3.0.6)",
+  "ubuntu (2.6.5, master)",
+  "ubuntu-bundler3 (2.4.9, v3.0.6)",
+  "ubuntu-bundler3 (2.4.9, master)",
+  "ubuntu-bundler3 (2.5.7, v3.0.6)",
+  "ubuntu-bundler3 (2.5.7, master)",
+  "ubuntu-bundler3 (2.6.5, v3.0.6)",
+  "ubuntu-bundler3 (2.6.5, master)"
 ]
 
 timeout_sec = 14400
