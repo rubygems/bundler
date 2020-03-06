@@ -8,6 +8,9 @@ on:
       - staging
       - trying
 
+env:
+  RGV: ${{ matrix.rgv }}
+
 jobs:
   ubuntu:
     runs-on: ubuntu-latest
@@ -45,22 +48,16 @@ jobs:
       - name: Prepare dependencies
         run: |
           sudo apt-get install graphviz -y
-          bin/rake override_version
           bin/rake spec:parallel_deps
       - name: Run Test
         run: bin/parallel_rspec spec
-        env:
-          RGV: ${{ matrix.rgv }}
         continue-on-error: ${{ matrix.ruby == 'head' }}
       - name: Run Test with realworld
         run: bin/rake spec:realworld
         env:
-          RGV: ${{ matrix.rgv }}
           BUNDLER_SPEC_PRE_RECORDED: 1
         continue-on-error: ${{ matrix.ruby == 'head' }}
       - name: Run Test with sudo
         run: bin/rake spec:sudo
-        env:
-          RGV: ${{ matrix.rgv }}
         continue-on-error: ${{ matrix.ruby == 'head' }}
     timeout-minutes: 60

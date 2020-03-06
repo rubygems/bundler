@@ -8,6 +8,9 @@ on:
       - staging
       - trying
 
+env:
+  RGV: ${{ matrix.rgv }}
+
 jobs:
   ubuntu-bundler3:
     runs-on: ubuntu-latest
@@ -27,18 +30,10 @@ jobs:
           bin/rake spec:parallel_deps
       - name: Run Test
         run: bin/parallel_rspec spec
-        env:
-          RGV: ${{ matrix.rgv }}
-          BUNDLER_SPEC_SUB_VERSION: 3.0.0
       - name: Run Test with realworld
         run: bin/rake spec:realworld
         env:
-          RGV: ${{ matrix.rgv }}
-          BUNDLER_SPEC_SUB_VERSION: 3.0.0
           BUNDLER_SPEC_PRE_RECORDED: 1
       - name: Run Test with BUNDLER_SPEC_SUB_VERSION
         run: bin/rake spec:sudo
-        env:
-          RGV: ${{ matrix.rgv }}
-          BUNDLER_SPEC_SUB_VERSION: 3.0.0
     timeout-minutes: 60
