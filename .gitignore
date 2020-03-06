@@ -5,6 +5,7 @@
 
 # files created by running the specs
 /tmp/
+!/tmp/parallel_runtime_rspec.log
 
 # gems built by `rake build`
 /pkg/

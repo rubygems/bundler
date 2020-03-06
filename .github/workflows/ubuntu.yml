@@ -7,6 +7,7 @@ on:
     branches:
       - staging
       - trying
+      - balanced_test_times
 
 jobs:
   ubuntu:
