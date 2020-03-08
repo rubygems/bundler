@@ -26,7 +26,7 @@ module Bundler
         end
       end
 
-      if fund_info.length.zero?
+      if fund_info.empty?
         Bundler.ui.info "None of the gems you depend on are looking for funding!"
       else
         Bundler.ui.info fund_info.join("\n")
