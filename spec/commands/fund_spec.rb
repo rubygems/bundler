@@ -11,8 +11,8 @@ RSpec.describe "bundle fund" do
 
     bundle "fund"
 
-    expect(out).to include("* has_metadata (1.0)\n  Funding: https://example.com/bestgemever/funding")
-    expect(out).to include("* has_funding (1.2.3)\n  Funding: https://example.com/somewildgem/funding")
+    expect(out).to include("* has_metadata (1.0)\n  Funding: https://example.com/has_metadata/funding")
+    expect(out).to include("* has_funding (1.2.3)\n  Funding: https://example.com/has_funding/funding")
     expect(out).to_not include("rack-obama")
   end
 
@@ -24,7 +24,7 @@ RSpec.describe "bundle fund" do
 
     bundle "fund"
 
-    expect(out).to_not include("* has_funding (1.2.3)\n  Funding: https://example.com/somewildgem/funding")
+    expect(out).to_not include("* has_funding (1.2.3)\n  Funding: https://example.com/has_funding/funding")
     expect(out).to_not include("gem_with_dependent_funding")
   end
 
@@ -48,8 +48,8 @@ RSpec.describe "bundle fund" do
       G
 
       bundle "fund --group development"
-      expect(out).to include("* has_metadata (1.0)\n  Funding: https://example.com/bestgemever/funding")
-      expect(out).to_not include("* has_funding (1.2.3)\n  Funding: https://example.com/somewildgem/funding")
+      expect(out).to include("* has_metadata (1.0)\n  Funding: https://example.com/has_metadata/funding")
+      expect(out).to_not include("* has_funding (1.2.3)\n  Funding: https://example.com/has_funding/funding")
     end
   end
 end
