@@ -169,7 +169,7 @@ module Bundler
       if success
         spec_install.state = :installed
         spec_install.post_install_message = message unless message.nil?
-        spec_install.fund_metadata = { version: spec_install.spec.version, uri: spec_install.spec.metadata["funding_uri"] } if spec_install.spec.metadata.key?("funding_uri")
+        spec_install.fund_metadata = spec_install.spec.metadata["funding_uri"] if spec_install.spec.metadata.key?("funding_uri")
       else
         spec_install.state = :failed
         spec_install.error = "#{message}\n\n#{require_tree_for_spec(spec_install.spec)}"

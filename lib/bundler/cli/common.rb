@@ -14,11 +14,14 @@ module Bundler
       Bundler.ui.info msg
     end
 
-    def self.output_fund_metadata_summary(funds)
-      gems_seeking_funding = funds.keys.count
-      return if gems_seeking_funding.zero?
+    def self.output_fund_metadata_summary(gems_seeking_funding)
+      gem_names = gems_seeking_funding.keys
+      current_dependencies = Bundler.definition.current_dependencies.map(&:name)
+      direct_gems_seeking_funding = gem_names.reject { |g| !current_dependencies.include?(g) }
+      return if direct_gems_seeking_funding.empty?
 
-      intro = gems_seeking_funding > 1 ? "#{gems_seeking_funding} gems you depend on are" : "#{gems_seeking_funding} gem you depend on is"
+      count = direct_gems_seeking_funding.length
+      intro = count > 1 ? "#{count} gems you depend on are" : "#{count} gem you depend on is"
       message = "#{intro} looking for funding!\n  Run `bundle fund` for details"
       Bundler.ui.info message
     end
