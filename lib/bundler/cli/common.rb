@@ -17,7 +17,7 @@ module Bundler
     def self.output_fund_metadata_summary(gems_seeking_funding)
       gem_names = gems_seeking_funding.keys
       current_dependencies = Bundler.definition.current_dependencies.map(&:name)
-      direct_gems_seeking_funding = gem_names.reject { |g| !current_dependencies.include?(g) }
+      direct_gems_seeking_funding = gem_names.reject {|g| !current_dependencies.include?(g) }
       return if direct_gems_seeking_funding.empty?
 
       count = direct_gems_seeking_funding.length

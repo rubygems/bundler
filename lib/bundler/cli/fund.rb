@@ -11,18 +11,18 @@ module Bundler
     def run
       Bundler.definition.validate_runtime!
 
-      groups  = Array(options[:group]).map(&:to_sym)
+      groups = Array(options[:group]).map(&:to_sym)
 
       deps = if groups.any?
-               Bundler.definition.current_dependencies.select { |d| (d.groups & groups).any? }
-             else
-               Bundler.definition.current_dependencies
-             end
+        Bundler.definition.current_dependencies.select {|d| (d.groups & groups).any? }
+      else
+        Bundler.definition.current_dependencies
+      end
 
       fund_info = deps.each_with_object([]) do |dep, arr|
         spec = Bundler.definition.specs[dep.name].first
         if spec.metadata.key?("funding_uri")
-          arr << "* #{spec.name} (#{spec.version})\n  Funding: #{spec.metadata['funding_uri']}"
+          arr << "* #{spec.name} (#{spec.version})\n  Funding: #{spec.metadata["funding_uri"]}"
         end
       end
 
