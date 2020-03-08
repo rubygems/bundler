@@ -6,12 +6,13 @@ require_relative "gem_installer"
 module Bundler
   class ParallelInstaller
     class SpecInstallation
-      attr_accessor :spec, :name, :post_install_message, :state, :error
+      attr_accessor :spec, :name, :post_install_message, :fund_metadata, :state, :error
       def initialize(spec)
         @spec = spec
         @name = spec.name
         @state = :none
         @post_install_message = ""
+        @fund_metadata = {}
         @error = nil
       end
 
@@ -38,6 +39,10 @@ module Bundler
 
       def has_post_install_message?
         !post_install_message.empty?
+      end
+
+      def has_fund_metadata?
+        !fund_metadata.empty?
       end
 
       def ignorable_dependency?(dep)
@@ -164,6 +169,7 @@ module Bundler
       if success
         spec_install.state = :installed
         spec_install.post_install_message = message unless message.nil?
+        spec_install.fund_metadata = { version: spec_install.spec.version, uri: spec_install.spec.metadata["funding_uri"] } if spec_install.spec.metadata.key?("funding_uri")
       else
         spec_install.state = :failed
         spec_install.error = "#{message}\n\n#{require_tree_for_spec(spec_install.spec)}"

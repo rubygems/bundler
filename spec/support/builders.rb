@@ -310,9 +310,20 @@ module Spec
             "documentation_uri" => "https://www.example.info/gems/bestgemever/0.0.1",
             "homepage_uri"      => "https://bestgemever.example.io",
             "mailing_list_uri"  => "https://groups.example.com/bestgemever",
+            "funding_uri"       => "https://example.com/bestgemever/funding",
             "source_code_uri"   => "https://example.com/user/bestgemever",
             "wiki_uri"          => "https://example.com/user/bestgemever/wiki",
           }
+        end
+
+        build_gem "has_funding", "1.2.3" do |s|
+          s.metadata = {
+            "funding_uri"       => "https://example.com/somewildgem/funding",
+          }
+        end
+
+        build_gem "gem_with_dependent_funding", "1.0" do |s|
+          s.add_dependency "has_funding"
         end
       end
     end

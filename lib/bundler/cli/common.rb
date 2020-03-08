@@ -14,6 +14,15 @@ module Bundler
       Bundler.ui.info msg
     end
 
+    def self.output_fund_metadata_summary(funds)
+      gems_seeking_funding = funds.keys.count
+      return if gems_seeking_funding.zero?
+
+      intro = gems_seeking_funding > 1 ? "#{gems_seeking_funding} gems you depend on are" : "#{gems_seeking_funding} gem you depend on is"
+      message = "#{intro} looking for funding!\n  Run `bundle fund` for details"
+      Bundler.ui.info message
+    end
+
     def self.output_without_groups_message(command)
       return if Bundler.settings[:without].empty?
       Bundler.ui.confirm without_groups_message(command)

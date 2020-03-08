@@ -434,6 +434,12 @@ module Bundler
       Outdated.new(options, gems).run
     end
 
+    desc "fund", "Lists information about gems seeking funding assistance"
+    def fund(*gems)
+      require_relative "cli/fund"
+      Fund.new(gems).run
+    end
+
     desc "cache [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     unless Bundler.feature_flag.cache_all?
       method_option "all",  :type => :boolean,

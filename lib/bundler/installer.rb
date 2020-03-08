@@ -15,7 +15,7 @@ module Bundler
       Installer.ambiguous_gems = []
     end
 
-    attr_reader :post_install_messages
+    attr_reader :post_install_messages, :fund_metadata
 
     # Begins the installation process for Bundler.
     # For more information see the #run method on this class.
@@ -31,6 +31,7 @@ module Bundler
       @root = root
       @definition = definition
       @post_install_messages = {}
+      @fund_metadata = {}
     end
 
     # Runs the install procedures for a specific Gemfile.
@@ -282,6 +283,7 @@ module Bundler
       spec_installations = ParallelInstaller.call(self, @definition.specs, size, standalone, force)
       spec_installations.each do |installation|
         post_install_messages[installation.name] = installation.post_install_message if installation.has_post_install_message?
+        fund_metadata[installation.name] = installation.fund_metadata if installation.has_fund_metadata?
       end
     end
 
