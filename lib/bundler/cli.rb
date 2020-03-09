@@ -570,6 +570,7 @@ module Bundler
     method_option :rubocop, :type => :boolean, :desc => "Add rubocop to the generated Rakefile and gemspec. Set a default with `bundle config set gem.rubocop true`."
     method_option :test, :type => :string, :lazy_default => "rspec", :aliases => "-t", :banner => "rspec",
                          :desc => "Generate a test directory for your library, either rspec, minitest or test-unit. Set a default with `bundle config set gem.test rspec`."
+    method_option :ci,   :type => :string, :desc => "Generate CI configuration, either Github Actions, Travis CI, Gitlab CI or Circle CI. Set a default with `bundle config set gem.ci (github|travis|gitlab|circle)`"
     def gem(name)
     end
 

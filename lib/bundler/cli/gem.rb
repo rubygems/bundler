@@ -84,8 +84,6 @@ module Bundler
         config[:test] = test_framework
         config[:test_framework_version] = TEST_FRAMEWORK_VERSIONS[test_framework]
 
-        templates.merge!("travis.yml.tt" => ".travis.yml")
-
         case test_framework
         when "rspec"
           templates.merge!(
@@ -107,6 +105,18 @@ module Bundler
           )
           config[:test_task] = :test
         end
+      end
+
+      config[:ci] = ask_and_set_ci
+      case config[:ci]
+      when "github"
+        templates.merge!(".github/workflows/main.yml.tt" => ".github/workflows/main.yml")
+      when "travis"
+        templates.merge!("travis.yml.tt" => ".travis.yml")
+      when "gitlab"
+        templates.merge!(".gitlab-ci.yml.tt" => ".gitlab-ci.yml")
+      when "circle"
+        templates.merge!(".circleci/config.yml.tt" => ".circleci/config.yml")
       end
 
       if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
@@ -229,6 +239,35 @@ module Bundler
       end
 
       test_framework
+    end
+
+    def ask_and_set_ci
+      ci_template = options[:ci] || Bundler.settings["gem.ci"]
+
+      if ci_template.nil?
+        Bundler.ui.confirm "Do you want to set up automated testing for your gem? " \
+          "Continuous integration services make it easy to see if pull requests have passing tests " \
+          "before you merge them. Bundler supports these services:"\
+          "* Circle CI:      https://circleci.com/\n" \
+          "* Github Actions: https://github.com/features/actions\n" \
+          "* Gitlab CI:      https://docs.gitlab.com/ee/ci/\n" \
+          "* Travis CI:      https://travis-ci.org/\n" \
+          "\n"
+
+        result = Bundler.ui.ask "Enter a service name to generate a CI configuration now and " \
+          "in the future. github/travis/gitlab/circle/(none):"
+        if result =~ /github|travis|gitlab|circle/
+          ci_template = result
+        else
+          ci_template = false
+        end
+      end
+
+      if Bundler.settings["gem.ci"].nil?
+        Bundler.settings.set_global("gem.ci", ci_template)
+      end
+
+      ci_template
     end
 
     def bundler_dependency_version
