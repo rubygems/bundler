@@ -299,11 +299,11 @@ module Spec
     end
 
     def with_built_bundler
-      with_root_gemspec do |gemspec|
-        gem_command! "build #{gemspec}", :dir => root
-      end
+      bundler_path = tmp + "bundler-#{Bundler::VERSION}.gem"
 
-      bundler_path = root + "bundler-#{Bundler::VERSION}.gem"
+      with_root_gemspec do |gemspec|
+        gem_command! "build #{gemspec} --output #{bundler_path}", :dir => root
+      end
 
       begin
         yield(bundler_path)
