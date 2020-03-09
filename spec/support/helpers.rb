@@ -302,7 +302,12 @@ module Spec
       bundler_path = tmp + "bundler-#{Bundler::VERSION}.gem"
 
       with_root_gemspec do |gemspec|
-        gem_command! "build #{gemspec} --output #{bundler_path}", :dir => root
+        if Gem::VERSION >= "3.0.0"
+          gem_command! "build #{gemspec} --output #{bundler_path}", :dir => root
+        else
+          gem_command! "build #{gemspec}", :dir => root
+          FileUtils.mv root + File.basename(bundler_path), bundler_path
+        end
       end
 
       begin
