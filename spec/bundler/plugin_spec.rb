@@ -237,7 +237,8 @@ RSpec.describe Bundler::Plugin do
   describe "#root" do
     context "in app dir" do
       before do
-        allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
+        allow(Bundler::SharedHelpers).to receive(:pwd).and_return(bundled_app)
+        FileUtils.touch(bundled_app.join("Gemfile"))
       end
 
       it "returns plugin dir in app .bundle path" do
@@ -247,7 +248,7 @@ RSpec.describe Bundler::Plugin do
 
     context "outside app dir" do
       before do
-        allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(nil)
+        allow(Bundler::SharedHelpers).to receive(:pwd).and_return(root)
       end
 
       it "returns plugin dir in global bundle path" do

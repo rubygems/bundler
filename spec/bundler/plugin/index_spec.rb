@@ -4,7 +4,7 @@ RSpec.describe Bundler::Plugin::Index do
   Index = Bundler::Plugin::Index
 
   before do
-    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
+    allow(Bundler::SharedHelpers).to receive(:pwd).and_return(bundled_app)
     gemfile ""
     path = lib_path(plugin_name)
     index.register_plugin("new-plugin", path.to_s, [path.join("lib").to_s], commands, sources, hooks)

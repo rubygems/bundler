@@ -21,7 +21,7 @@ RSpec.describe "bundler source plugin" do
         end
       G
 
-      allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
+      allow(Bundler::SharedHelpers).to receive(:pwd).and_return(bundled_app)
       plugin_should_be_installed("bundler-source-psource")
     end
 
@@ -76,7 +76,7 @@ RSpec.describe "bundler source plugin" do
         end
 
         it "installs the explicit one" do
-          allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
+          allow(Bundler::SharedHelpers).to receive(:pwd).and_return(bundled_app)
           plugin_should_be_installed("another-psource")
         end
 
@@ -102,7 +102,7 @@ RSpec.describe "bundler source plugin" do
         end
 
         it "installs the default one" do
-          allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
+          allow(Bundler::SharedHelpers).to receive(:pwd).and_return(bundled_app)
           plugin_should_be_installed("bundler-source-psource")
         end
       end

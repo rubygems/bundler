@@ -156,7 +156,7 @@ RSpec.describe "bundler plugin install" do
 
   context "Gemfile eval" do
     before do
-      allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
+      allow(Bundler::SharedHelpers).to receive(:pwd).and_return(bundled_app)
     end
 
     it "installs plugins listed in gemfile" do
@@ -249,7 +249,7 @@ RSpec.describe "bundler plugin install" do
 
   describe "local plugin" do
     it "is installed when inside an app" do
-      allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
+      allow(Bundler::SharedHelpers).to receive(:pwd).and_return(bundled_app)
       gemfile ""
       bundle "plugin install foo --source #{file_uri_for(gem_repo2)}"
 

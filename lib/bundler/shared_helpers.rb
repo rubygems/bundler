@@ -23,7 +23,7 @@ module Bundler
     def config_root
       bundle_dir = default_bundle_dir
 
-      bundle_dir ? bundle_dir.parent : Pathname.pwd
+      bundle_dir ? bundle_dir.parent : pwd
     end
 
     def default_gemfile
