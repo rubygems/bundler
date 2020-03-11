@@ -12,6 +12,7 @@ RSpec.describe "bundle install" do
         gem "rack"
       G
 
+      FileUtils.mkdir_p system_gem_path
       config "BUNDLE_SYSTEM_BINDIR" => system_gem_path("altbin").to_s
       bundle :install
       expect(the_bundle).to include_gems "rack 1.0.0"
