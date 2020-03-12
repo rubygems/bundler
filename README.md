@@ -1,4 +1,4 @@
-Bundler is now maintained in the [rubygems/rubygems](https://github.com/rubygems/rubygems) repository.
+**Bundler is now maintained in the [rubygems/rubygems](https://github.com/rubygems/rubygems) repository.**
 
 ----
 
