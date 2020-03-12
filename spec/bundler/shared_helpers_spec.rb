@@ -428,8 +428,8 @@ RSpec.describe Bundler::SharedHelpers do
       let(:file_op_block) { proc {|path| FileUtils.mkdir_p(path) } }
 
       it "performs the operation in the passed block" do
-        subject.filesystem_access("./test_dir", &file_op_block)
-        expect(Pathname.new("test_dir")).to exist
+        subject.filesystem_access(bundled_app("test_dir"), &file_op_block)
+        expect(bundled_app("test_dir")).to exist
       end
     end
 
