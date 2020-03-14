@@ -7,12 +7,14 @@ Signal.trap("INT") do
   exit 1
 end
 
-update = "update".start_with?(ARGV.first || " ") && ARGV.find {|a| a.start_with?("--bundler") }
-update &&= update =~ /--bundler(?:=(.+))?/ && $1 || "> 0.a"
-ENV["BUNDLER_VERSION"] = update if update
-require "bundler/postit_trampoline"
+base_path = File.expand_path("../lib", __dir__)
 
-require "bundler"
+if File.exist?(base_path)
+  require_relative "../lib/bundler"
+else
+  require "bundler"
+end
+
 # Check if an older version of bundler is installed
 $LOAD_PATH.each do |path|
   next unless path =~ %r{/bundler-0\.(\d+)} && $1.to_i < 9
@@ -23,12 +25,21 @@ $LOAD_PATH.each do |path|
   abort(err)
 end
 
-require "bundler/friendly_errors"
+if File.exist?(base_path)
+  require_relative "../lib/bundler/friendly_errors"
+else
+  require "bundler/friendly_errors"
+end
+
 Bundler.with_friendly_errors do
-  require "bundler/cli"
+  if File.exist?(base_path)
+    require_relative "../lib/bundler/cli"
+  else
+    require "bundler/cli"
+  end
 
   # Allow any command to use --help flag to show help for that command
-  help_flags = %w(--help -h)
+  help_flags = %w[--help -h]
   help_flag_used = ARGV.any? {|a| help_flags.include? a }
   args = help_flag_used ? Bundler::CLI.reformatted_help_args(ARGV) : ARGV
 

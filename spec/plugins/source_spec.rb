@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundler source plugin" do
   describe "plugins dsl eval for #source with :type option" do
@@ -17,11 +16,12 @@ RSpec.describe "bundler source plugin" do
 
     it "installs bundler-source-* gem when no handler for source is present" do
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
-        source "file://#{lib_path("gitp")}", :type => :psource do
+        source "#{file_uri_for(gem_repo2)}"
+        source "#{file_uri_for(lib_path("gitp"))}", :type => :psource do
         end
       G
 
+      allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
       plugin_should_be_installed("bundler-source-psource")
     end
 
@@ -38,8 +38,8 @@ RSpec.describe "bundler source plugin" do
       end
 
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
-        source "file://#{lib_path("gitp")}", :type => :psource do
+        source "#{file_uri_for(gem_repo2)}"
+        source "#{file_uri_for(lib_path("gitp"))}", :type => :psource do
         end
       G
 
@@ -62,11 +62,11 @@ RSpec.describe "bundler source plugin" do
       context "explicit presence in gemfile" do
         before do
           install_gemfile <<-G
-            source "file://#{gem_repo2}"
+            source "#{file_uri_for(gem_repo2)}"
 
             plugin "another-psource"
 
-            source "file://#{lib_path("gitp")}", :type => :psource do
+            source "#{file_uri_for(lib_path("gitp"))}", :type => :psource do
             end
           G
         end
@@ -76,6 +76,7 @@ RSpec.describe "bundler source plugin" do
         end
 
         it "installs the explicit one" do
+          allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
           plugin_should_be_installed("another-psource")
         end
 
@@ -87,11 +88,11 @@ RSpec.describe "bundler source plugin" do
       context "explicit default source" do
         before do
           install_gemfile <<-G
-            source "file://#{gem_repo2}"
+            source "#{file_uri_for(gem_repo2)}"
 
             plugin "bundler-source-psource"
 
-            source "file://#{lib_path("gitp")}", :type => :psource do
+            source "#{file_uri_for(lib_path("gitp"))}", :type => :psource do
             end
           G
         end
@@ -101,6 +102,7 @@ RSpec.describe "bundler source plugin" do
         end
 
         it "installs the default one" do
+          allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
           plugin_should_be_installed("bundler-source-psource")
         end
       end

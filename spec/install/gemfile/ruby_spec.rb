@@ -1,23 +1,22 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "ruby requirement" do
   def locked_ruby_version
-    Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(lockfile).ruby_version)
+    Bundler::RubyVersion.from_string(Bundler::LockfileParser.new(File.read(bundled_app_lock)).ruby_version)
   end
 
-  # As discovered by https://github.com/bundler/bundler/issues/4147, there is
+  # As discovered by https://github.com/rubygems/bundler/issues/4147, there is
   # no test coverage to ensure that adding a gem is possible with a ruby
   # requirement. This test verifies the fix, committed in bfbad5c5.
   it "allows adding gems" do
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       ruby "#{RUBY_VERSION}"
       gem "rack"
     G
 
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       ruby "#{RUBY_VERSION}"
       gem "rack"
       gem "rack-obama"
@@ -29,7 +28,7 @@ RSpec.describe "ruby requirement" do
 
   it "allows removing the ruby version requirement" do
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       ruby "~> #{RUBY_VERSION}"
       gem "rack"
     G
@@ -37,7 +36,7 @@ RSpec.describe "ruby requirement" do
     expect(lockfile).to include("RUBY VERSION")
 
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       gem "rack"
     G
 
@@ -47,17 +46,18 @@ RSpec.describe "ruby requirement" do
 
   it "allows changing the ruby version requirement to something compatible" do
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       ruby ">= 1.0.0"
       gem "rack"
     G
 
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     expect(locked_ruby_version).to eq(Bundler::RubyVersion.system)
 
     simulate_ruby_version "5100"
 
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       ruby ">= 1.0.1"
       gem "rack"
     G
@@ -68,17 +68,18 @@ RSpec.describe "ruby requirement" do
 
   it "allows changing the ruby version requirement to something incompatible" do
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       ruby ">= 1.0.0"
       gem "rack"
     G
 
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     expect(locked_ruby_version).to eq(Bundler::RubyVersion.system)
 
     simulate_ruby_version "5100"
 
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       ruby ">= 5000.0"
       gem "rack"
     G
@@ -89,7 +90,7 @@ RSpec.describe "ruby requirement" do
 
   it "allows requirements with trailing whitespace" do
     install_gemfile! <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       ruby "#{RUBY_VERSION}\\n \t\\n"
       gem "rack"
     G
@@ -99,11 +100,11 @@ RSpec.describe "ruby requirement" do
 
   it "fails gracefully with malformed requirements" do
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       ruby ">= 0", "-.\\0"
       gem "rack"
     G
 
-    expect(out).to include("There was an error parsing") # i.e. DSL error, not error template
+    expect(err).to include("There was an error parsing") # i.e. DSL error, not error template
   end
 end

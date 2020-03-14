@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe "bundle outdated" do
   before :each do
@@ -9,7 +8,7 @@ RSpec.describe "bundle outdated" do
     end
 
     install_gemfile <<-G
-      source "file://#{gem_repo2}"
+      source "#{file_uri_for(gem_repo2)}"
       gem "zebra", :git => "#{lib_path("zebra")}"
       gem "foo", :git => "#{lib_path("foo")}"
       gem "activesupport", "2.3.5"
@@ -30,13 +29,35 @@ RSpec.describe "bundle outdated" do
 
       bundle "outdated"
 
-      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
-      expect(out).to include("weakling (newest 0.2, installed 0.0.3, requested ~> 0.0.1)")
-      expect(out).to include("foo (newest 1.0")
+      expected_output = <<~TABLE.gsub("x", "\\\h").tr(".", "\.").strip
+        Gem            Current      Latest       Requested  Groups
+        activesupport  2.3.5        3.0          = 2.3.5    default
+        foo            1.0 xxxxxxx  1.0 xxxxxxx  >= 0       default
+        weakling       0.0.3        0.2          ~> 0.0.1   default
+        zebra          1.0 xxxxxxx  1.0 xxxxxxx  >= 0       default
+      TABLE
 
-      # Gem names are one per-line, between "*" and their parenthesized version.
-      gem_list = out.split("\n").map {|g| g[/\* (.*) \(/, 1] }.compact
-      expect(gem_list).to eq(gem_list.sort)
+      expect(out).to match(Regexp.new(expected_output))
+    end
+
+    it "excludes header row from the sorting" do
+      update_repo2 do
+        build_gem "AAA", %w[1.0.0 2.0.0]
+      end
+
+      install_gemfile <<-G
+        source "#{file_uri_for(gem_repo2)}"
+        gem "AAA", "1.0.0"
+      G
+
+      bundle "outdated"
+
+      expected_output = <<~TABLE
+        Gem  Current  Latest  Requested  Groups
+        AAA  1.0.0    2.0.0   = 1.0.0    default
+      TABLE
+
+      expect(out).to include(expected_output.strip)
     end
 
     it "returns non zero exit status if outdated gems present" do
@@ -58,7 +79,9 @@ RSpec.describe "bundle outdated" do
 
     it "adds gem group to dependency output when repo is updated" do
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
+        source "#{file_uri_for(gem_repo2)}"
+
+        gem "terranova", '8'
 
         group :development, :test do
           gem 'activesupport', '2.3.5'
@@ -66,16 +89,57 @@ RSpec.describe "bundle outdated" do
       G
 
       update_repo2 { build_gem "activesupport", "3.0" }
+      update_repo2 { build_gem "terranova", "9" }
+
+      bundle "outdated"
+
+      expected_output = <<~TABLE.strip
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.5    3.0     = 2.3.5    development, test
+        terranova      8        9       = 8        default
+      TABLE
+
+      expect(out).to end_with(expected_output)
+    end
+  end
+
+  describe "with --verbose option" do
+    it "shows the location of the latest version's gemspec if installed" do
+      bundle! "config set clean false"
+
+      update_repo2 { build_gem "activesupport", "3.0" }
+      update_repo2 { build_gem "terranova", "9" }
+
+      install_gemfile <<-G
+        source "#{file_uri_for(gem_repo2)}"
+
+        gem "terranova", '9'
+        gem 'activesupport', '2.3.5'
+      G
+
+      gemfile <<-G
+        source "#{file_uri_for(gem_repo2)}"
+
+        gem "terranova", '8'
+        gem 'activesupport', '2.3.5'
+      G
 
       bundle "outdated --verbose"
-      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5) in groups \"development, test\"")
+
+      expected_output = <<~TABLE.strip
+        Gem            Current  Latest  Requested  Groups   Path
+        activesupport  2.3.5    3.0     = 2.3.5    default
+        terranova      8        9       = 8        default  #{default_bundle_path("specifications/terranova-9.gemspec")}
+      TABLE
+
+      expect(out).to end_with(expected_output)
     end
   end
 
   describe "with --group option" do
-    def test_group_option(group = nil, gems_list_size = 1)
+    before do
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
+        source "#{file_uri_for(gem_repo2)}"
 
         gem "weakling", "~> 0.0.1"
         gem "terranova", '8'
@@ -84,7 +148,9 @@ RSpec.describe "bundle outdated" do
           gem 'activesupport', '2.3.5'
         end
       G
+    end
 
+    def test_group_option(group)
       update_repo2 do
         build_gem "activesupport", "3.0"
         build_gem "terranova", "9"
@@ -92,56 +158,86 @@ RSpec.describe "bundle outdated" do
       end
 
       bundle "outdated --group #{group}"
-
-      # Gem names are one per-line, between "*" and their parenthesized version.
-      gem_list = out.split("\n").map {|g| g[/\* (.*) \(/, 1] }.compact
-      expect(gem_list).to eq(gem_list.sort)
-      expect(gem_list.size).to eq gems_list_size
     end
 
-    it "not outdated gems" do
-      install_gemfile <<-G
-        source "file://#{gem_repo2}"
-
-        gem "weakling", "~> 0.0.1"
-        gem "terranova", '8'
-        group :development, :test do
-          gem 'activesupport', '2.3.5'
-          gem "duradura", '7.0'
-        end
-      G
-
+    it "works when the bundle is up to date" do
       bundle "outdated --group"
-      expect(out).to include("Bundle up to date!")
+      expect(out).to end_with("Bundle up to date!")
     end
 
     it "returns a sorted list of outdated gems from one group => 'default'" do
       test_group_option("default")
 
-      expect(out).to include("===== Group default =====")
-      expect(out).to include("terranova (")
+      expected_output = <<~TABLE.strip
+        Gem        Current  Latest  Requested  Groups
+        terranova  8        9       = 8        default
+      TABLE
 
-      expect(out).not_to include("===== Group development, test =====")
-      expect(out).not_to include("activesupport")
-      expect(out).not_to include("duradura")
+      expect(out).to end_with(expected_output)
     end
 
     it "returns a sorted list of outdated gems from one group => 'development'" do
-      test_group_option("development", 2)
+      test_group_option("development")
 
-      expect(out).not_to include("===== Group default =====")
-      expect(out).not_to include("terranova (")
+      expected_output = <<~TABLE.strip
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.5    3.0     = 2.3.5    development, test
+        duradura       7.0      8.0     = 7.0      development, test
+      TABLE
 
-      expect(out).to include("===== Group development, test =====")
-      expect(out).to include("activesupport")
-      expect(out).to include("duradura")
+      expect(out).to end_with(expected_output)
+    end
+
+    it "returns a sorted list of outdated gems from one group => 'test'" do
+      test_group_option("test")
+
+      expected_output = <<~TABLE.strip
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.5    3.0     = 2.3.5    development, test
+        duradura       7.0      8.0     = 7.0      development, test
+      TABLE
+
+      expect(out).to end_with(expected_output)
+    end
+  end
+
+  describe "with --groups option and outdated transitive dependencies" do
+    before do
+      update_repo2 do
+        build_gem "bar", %w[2.0.0]
+
+        build_gem "bar_dependant", "7.0" do |s|
+          s.add_dependency "bar", "~> 2.0"
+        end
+      end
+
+      install_gemfile <<-G
+        source "#{file_uri_for(gem_repo2)}"
+
+        gem "bar_dependant", '7.0'
+      G
+
+      update_repo2 do
+        build_gem "bar", %w[3.0.0]
+      end
+    end
+
+    it "returns a sorted list of outdated gems" do
+      bundle "outdated --groups"
+
+      expected_output = <<~TABLE.strip
+        Gem  Current  Latest  Requested  Groups
+        bar  2.0.0    3.0.0
+      TABLE
+
+      expect(out).to end_with(expected_output)
     end
   end
 
   describe "with --groups option" do
-    it "not outdated gems" do
+    before do
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
+        source "#{file_uri_for(gem_repo2)}"
 
         gem "weakling", "~> 0.0.1"
         gem "terranova", '8'
@@ -150,23 +246,14 @@ RSpec.describe "bundle outdated" do
           gem "duradura", '7.0'
         end
       G
+    end
 
+    it "not outdated gems" do
       bundle "outdated --groups"
-      expect(out).to include("Bundle up to date!")
+      expect(out).to end_with("Bundle up to date!")
     end
 
     it "returns a sorted list of outdated gems by groups" do
-      install_gemfile <<-G
-        source "file://#{gem_repo2}"
-
-        gem "weakling", "~> 0.0.1"
-        gem "terranova", '8'
-        group :development, :test do
-          gem 'activesupport', '2.3.5'
-          gem "duradura", '7.0'
-        end
-      G
-
       update_repo2 do
         build_gem "activesupport", "3.0"
         build_gem "terranova", "9"
@@ -174,15 +261,15 @@ RSpec.describe "bundle outdated" do
       end
 
       bundle "outdated --groups"
-      expect(out).to include("===== Group default =====")
-      expect(out).to include("terranova (newest 9, installed 8, requested = 8)")
-      expect(out).to include("===== Group development, test =====")
-      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
-      expect(out).to include("duradura (newest 8.0, installed 7.0, requested = 7.0)")
 
-      expect(out).not_to include("weakling (")
+      expected_output = <<~TABLE.strip
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.5    3.0     = 2.3.5    development, test
+        duradura       7.0      8.0     = 7.0      development, test
+        terranova      8        9       = 8        default
+      TABLE
 
-      # TODO: check gems order inside the group
+      expect(out).to end_with(expected_output)
     end
   end
 
@@ -192,14 +279,21 @@ RSpec.describe "bundle outdated" do
         build_gem "activesupport", "2.3.4"
       end
 
+      bundle! "config set clean false"
+
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
+        source "#{file_uri_for(gem_repo2)}"
         gem "activesupport", "2.3.4"
       G
 
       bundle "outdated --local"
 
-      expect(out).to include("activesupport (newest 2.3.5, installed 2.3.4, requested = 2.3.4)")
+      expected_output = <<~TABLE.strip
+        Gem            Current  Latest  Requested  Groups
+        activesupport  2.3.4    2.3.5   = 2.3.4    default
+      TABLE
+
+      expect(out).to end_with(expected_output)
     end
 
     it "doesn't hit repo2" do
@@ -230,7 +324,7 @@ RSpec.describe "bundle outdated" do
     context "and no gems are outdated" do
       it "has empty output" do
         subject
-        expect(out).to eq("")
+        expect(out).to be_empty
       end
     end
   end
@@ -255,8 +349,13 @@ RSpec.describe "bundle outdated" do
       end
 
       bundle "outdated foo"
-      expect(out).not_to include("activesupport (newest")
-      expect(out).to include("foo (newest 1.0")
+
+      expected_output = <<~TABLE.gsub("x", "\\\h").tr(".", "\.").strip
+        Gem  Current      Latest       Requested  Groups
+        foo  1.0 xxxxxxx  1.0 xxxxxxx  >= 0       default
+      TABLE
+
+      expect(out).to match(Regexp.new(expected_output))
     end
   end
 
@@ -268,7 +367,8 @@ RSpec.describe "bundle outdated" do
         end
 
         bundle "outdated"
-        expect(out).not_to include("activesupport (3.0.0.beta > 2.3.5)")
+
+        expect(out).to end_with("Bundle up to date!")
       end
     end
 
@@ -279,7 +379,13 @@ RSpec.describe "bundle outdated" do
         end
 
         bundle "outdated --pre"
-        expect(out).to include("activesupport (newest 3.0.0.beta, installed 2.3.5, requested = 2.3.5)")
+
+        expected_output = <<~TABLE.strip
+          Gem            Current  Latest      Requested  Groups
+          activesupport  2.3.5    3.0.0.beta  = 2.3.5    default
+        TABLE
+
+        expect(out).to end_with(expected_output)
       end
     end
 
@@ -291,93 +397,116 @@ RSpec.describe "bundle outdated" do
         end
 
         install_gemfile <<-G
-          source "file://#{gem_repo2}"
+          source "#{file_uri_for(gem_repo2)}"
           gem "activesupport", "3.0.0.beta.1"
         G
 
         bundle "outdated"
-        expect(out).to include("(newest 3.0.0.beta.2, installed 3.0.0.beta.1, requested = 3.0.0.beta.1)")
+
+        expected_output = <<~TABLE.strip
+          Gem            Current       Latest        Requested       Groups
+          activesupport  3.0.0.beta.1  3.0.0.beta.2  = 3.0.0.beta.1  default
+        TABLE
+
+        expect(out).to end_with(expected_output)
       end
     end
   end
 
-  describe "with --strict option" do
+  filter_strict_option = Bundler.feature_flag.bundler_2_mode? ? :"filter-strict" : :strict
+  describe "with --#{filter_strict_option} option" do
     it "only reports gems that have a newer version that matches the specified dependency version requirements" do
       update_repo2 do
         build_gem "activesupport", "3.0"
         build_gem "weakling", "0.0.5"
       end
 
-      bundle "outdated --strict"
+      bundle :outdated, filter_strict_option => true
 
-      expect(out).to_not include("activesupport (newest")
-      expect(out).to include("(newest 0.0.5, installed 0.0.3, requested ~> 0.0.1)")
+      expected_output = <<~TABLE.strip
+        Gem       Current  Latest  Requested  Groups
+        weakling  0.0.3    0.0.5   ~> 0.0.1   default
+      TABLE
+
+      expect(out).to end_with(expected_output)
     end
 
     it "only reports gem dependencies when they can actually be updated" do
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
+        source "#{file_uri_for(gem_repo2)}"
         gem "rack_middleware", "1.0"
       G
 
-      bundle "outdated --strict"
+      bundle :outdated, filter_strict_option => true
 
-      expect(out).to_not include("rack (1.2")
+      expect(out).to end_with("Bundle up to date!")
     end
 
     describe "and filter options" do
       it "only reports gems that match requirement and patch filter level" do
         install_gemfile <<-G
-          source "file://#{gem_repo2}"
+          source "#{file_uri_for(gem_repo2)}"
           gem "activesupport", "~> 2.3"
           gem "weakling", ">= 0.0.1"
         G
 
         update_repo2 do
-          build_gem "activesupport", %w(2.4.0 3.0.0)
+          build_gem "activesupport", %w[2.4.0 3.0.0]
           build_gem "weakling", "0.0.5"
         end
 
-        bundle "outdated --strict --filter-patch"
+        bundle :outdated, filter_strict_option => true, "filter-patch" => true
 
-        expect(out).to_not include("activesupport (newest")
-        expect(out).to include("(newest 0.0.5, installed 0.0.3")
+        expected_output = <<~TABLE.strip
+          Gem       Current  Latest  Requested  Groups
+          weakling  0.0.3    0.0.5   >= 0.0.1   default
+        TABLE
+
+        expect(out).to end_with(expected_output)
       end
 
       it "only reports gems that match requirement and minor filter level" do
         install_gemfile <<-G
-          source "file://#{gem_repo2}"
+          source "#{file_uri_for(gem_repo2)}"
           gem "activesupport", "~> 2.3"
           gem "weakling", ">= 0.0.1"
         G
 
         update_repo2 do
-          build_gem "activesupport", %w(2.3.9)
+          build_gem "activesupport", %w[2.3.9]
           build_gem "weakling", "0.1.5"
         end
 
-        bundle "outdated --strict --filter-minor"
+        bundle :outdated, filter_strict_option => true, "filter-minor" => true
 
-        expect(out).to_not include("activesupport (newest")
-        expect(out).to include("(newest 0.1.5, installed 0.0.3")
+        expected_output = <<~TABLE.strip
+          Gem       Current  Latest  Requested  Groups
+          weakling  0.0.3    0.1.5   >= 0.0.1   default
+        TABLE
+
+        expect(out).to end_with(expected_output)
       end
 
       it "only reports gems that match requirement and major filter level" do
         install_gemfile <<-G
-          source "file://#{gem_repo2}"
+          source "#{file_uri_for(gem_repo2)}"
           gem "activesupport", "~> 2.3"
           gem "weakling", ">= 0.0.1"
         G
 
         update_repo2 do
-          build_gem "activesupport", %w(2.4.0 2.5.0)
+          build_gem "activesupport", %w[2.4.0 2.5.0]
           build_gem "weakling", "1.1.5"
         end
 
-        bundle "outdated --strict --filter-major"
+        bundle :outdated, filter_strict_option => true, "filter-major" => true
 
-        expect(out).to_not include("activesupport (newest")
-        expect(out).to include("(newest 1.1.5, installed 0.0.3")
+        expected_output = <<~TABLE.strip
+          Gem       Current  Latest  Requested  Groups
+          weakling  0.0.3    1.1.5   >= 0.0.1   default
+        TABLE
+
+        expect(out).to end_with(expected_output)
       end
     end
   end
@@ -385,7 +514,7 @@ RSpec.describe "bundle outdated" do
   describe "with invalid gem name" do
     it "returns could not find gem name" do
       bundle "outdated invalid_gem_name"
-      expect(out).to include("Could not find gem 'invalid_gem_name'.")
+      expect(err).to include("Could not find gem 'invalid_gem_name'.")
     end
 
     it "returns non-zero exit code" do
@@ -396,20 +525,20 @@ RSpec.describe "bundle outdated" do
 
   it "performs an automatic bundle install" do
     gemfile <<-G
-      source "file://#{gem_repo1}"
+      source "#{file_uri_for(gem_repo1)}"
       gem "rack", "0.9.1"
       gem "foo"
     G
 
-    bundle "config auto_install 1"
+    bundle "config set auto_install 1"
     bundle :outdated
     expect(out).to include("Installing foo 1.0")
   end
 
-  context "after bundle install --deployment" do
+  context "after bundle install --deployment", :bundler => "< 3" do
     before do
-      install_gemfile <<-G, :deployment => true
-        source "file://#{gem_repo2}"
+      install_gemfile <<-G, forgotten_command_line_options(:deployment => true)
+        source "#{file_uri_for(gem_repo2)}"
 
         gem "rack"
         gem "foo"
@@ -420,50 +549,78 @@ RSpec.describe "bundle outdated" do
       update_repo2 { build_gem "activesupport", "3.0" }
 
       bundle "outdated"
-      expect(exitstatus).to_not be_zero if exitstatus
-      expect(out).to include("You are trying to check outdated gems in deployment mode.")
-      expect(out).to include("Run `bundle outdated` elsewhere.")
-      expect(out).to include("If this is a development machine, remove the ")
-      expect(out).to include("Gemfile freeze\nby running `bundle install --no-deployment`.")
+      expect(last_command).to be_failure
+      expect(err).to include("You are trying to check outdated gems in deployment mode.")
+      expect(err).to include("Run `bundle outdated` elsewhere.")
+      expect(err).to include("If this is a development machine, remove the ")
+      expect(err).to include("Gemfile freeze\nby running `bundle config unset deployment`.")
+    end
+  end
+
+  context "after bundle config set deployment true" do
+    before do
+      install_gemfile <<-G
+        source "#{file_uri_for(gem_repo2)}"
+
+        gem "rack"
+        gem "foo"
+      G
+      bundle! "config set deployment true"
+    end
+
+    it "outputs a helpful message about being in deployment mode" do
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "outdated"
+      expect(last_command).to be_failure
+      expect(err).to include("You are trying to check outdated gems in deployment mode.")
+      expect(err).to include("Run `bundle outdated` elsewhere.")
+      expect(err).to include("If this is a development machine, remove the ")
+      expect(err).to include("Gemfile freeze\nby running `bundle config unset deployment`.")
     end
   end
 
   context "update available for a gem on a different platform" do
     before do
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
+        source "#{file_uri_for(gem_repo2)}"
         gem "laduradura", '= 5.15.2'
       G
     end
 
     it "reports that no updates are available" do
       bundle "outdated"
-      expect(out).to include("Bundle up to date!")
+      expect(out).to end_with("Bundle up to date!")
     end
   end
 
   context "update available for a gem on the same platform while multiple platforms used for gem" do
     it "reports that updates are available if the Ruby platform is used" do
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
+        source "#{file_uri_for(gem_repo2)}"
         gem "laduradura", '= 5.15.2', :platforms => [:ruby, :jruby]
       G
 
       bundle "outdated"
-      expect(out).to include("Bundle up to date!")
+      expect(out).to end_with("Bundle up to date!")
     end
 
     it "reports that updates are available if the JRuby platform is used" do
       simulate_ruby_engine "jruby", "1.6.7" do
         simulate_platform "jruby" do
           install_gemfile <<-G
-            source "file://#{gem_repo2}"
+            source "#{file_uri_for(gem_repo2)}"
             gem "laduradura", '= 5.15.2', :platforms => [:ruby, :jruby]
           G
 
           bundle "outdated"
-          expect(out).to include("Outdated gems included in the bundle:")
-          expect(out).to include("laduradura (newest 5.15.3, installed 5.15.2, requested = 5.15.2)")
+
+          expected_output = <<~TABLE.strip
+            Gem         Current  Latest  Requested  Groups
+            laduradura  5.15.2   5.15.3  = 5.15.2   default
+          TABLE
+
+          expect(out).to end_with(expected_output)
         end
       end
     end
@@ -472,9 +629,10 @@ RSpec.describe "bundle outdated" do
   shared_examples_for "version update is detected" do
     it "reports that a gem has a newer version" do
       subject
-      expect(out).to include("Outdated gems included in the bundle:")
-      expect(out).to include("activesupport (newest")
-      expect(out).to_not include("ERROR REPORT TEMPLATE")
+
+      outdated_gems = out.split("\n").drop_while {|l| !l.start_with?("Gem") }[1..-1]
+
+      expect(outdated_gems.size).to be > 0
     end
   end
 
@@ -529,10 +687,7 @@ RSpec.describe "bundle outdated" do
   shared_examples_for "no version updates are detected" do
     it "does not detect any version updates" do
       subject
-      expect(out).to include("updates to display.")
-      expect(out).to_not include("ERROR REPORT TEMPLATE")
-      expect(out).to_not include("activesupport (newest")
-      expect(out).to_not include("weakling (newest")
+      expect(out).to end_with("updates to display.")
     end
   end
 
@@ -629,52 +784,58 @@ RSpec.describe "bundle outdated" do
     context "without update-strict" do
       before do
         build_repo4 do
-          build_gem "patch", %w(1.0.0 1.0.1)
-          build_gem "minor", %w(1.0.0 1.0.1 1.1.0)
-          build_gem "major", %w(1.0.0 1.0.1 1.1.0 2.0.0)
+          build_gem "patch", %w[1.0.0 1.0.1]
+          build_gem "minor", %w[1.0.0 1.0.1 1.1.0]
+          build_gem "major", %w[1.0.0 1.0.1 1.1.0 2.0.0]
         end
 
         # establish a lockfile set to 1.0.0
         install_gemfile <<-G
-        source "file://#{gem_repo4}"
-        gem 'patch', '1.0.0'
-        gem 'minor', '1.0.0'
-        gem 'major', '1.0.0'
+          source "#{file_uri_for(gem_repo4)}"
+          gem 'patch', '1.0.0'
+          gem 'minor', '1.0.0'
+          gem 'major', '1.0.0'
         G
 
         # remove 1.4.3 requirement and bar altogether
         # to setup update specs below
         gemfile <<-G
-        source "file://#{gem_repo4}"
-        gem 'patch'
-        gem 'minor'
-        gem 'major'
+          source "#{file_uri_for(gem_repo4)}"
+          gem 'patch'
+          gem 'minor'
+          gem 'major'
         G
       end
 
       it "shows nothing when patching and filtering to minor" do
         bundle "outdated --patch --filter-minor"
 
-        expect(out).to include("No minor updates to display.")
-        expect(out).not_to include("patch (newest")
-        expect(out).not_to include("minor (newest")
-        expect(out).not_to include("major (newest")
+        expect(out).to end_with("No minor updates to display.")
       end
 
       it "shows all gems when patching and filtering to patch" do
         bundle "outdated --patch --filter-patch"
 
-        expect(out).to include("patch (newest 1.0.1")
-        expect(out).to include("minor (newest 1.0.1")
-        expect(out).to include("major (newest 1.0.1")
+        expected_output = <<~TABLE.strip
+          Gem    Current  Latest  Requested  Groups
+          major  1.0.0    1.0.1   >= 0       default
+          minor  1.0.0    1.0.1   >= 0       default
+          patch  1.0.0    1.0.1   >= 0       default
+        TABLE
+
+        expect(out).to end_with(expected_output)
       end
 
       it "shows minor and major when updating to minor and filtering to patch and minor" do
         bundle "outdated --minor --filter-minor"
 
-        expect(out).not_to include("patch (newest")
-        expect(out).to include("minor (newest 1.1.0")
-        expect(out).to include("major (newest 1.1.0")
+        expected_output = <<~TABLE.strip
+          Gem    Current  Latest  Requested  Groups
+          major  1.0.0    1.1.0   >= 0       default
+          minor  1.0.0    1.1.0   >= 0       default
+        TABLE
+
+        expect(out).to end_with(expected_output)
       end
 
       it "shows minor when updating to major and filtering to minor with parseable" do
@@ -689,22 +850,22 @@ RSpec.describe "bundle outdated" do
     context "with update-strict" do
       before do
         build_repo4 do
-          build_gem "foo", %w(1.4.3 1.4.4) do |s|
+          build_gem "foo", %w[1.4.3 1.4.4] do |s|
             s.add_dependency "bar", "~> 2.0"
           end
-          build_gem "foo", %w(1.4.5 1.5.0) do |s|
+          build_gem "foo", %w[1.4.5 1.5.0] do |s|
             s.add_dependency "bar", "~> 2.1"
           end
-          build_gem "foo", %w(1.5.1) do |s|
+          build_gem "foo", %w[1.5.1] do |s|
             s.add_dependency "bar", "~> 3.0"
           end
-          build_gem "bar", %w(2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0)
-          build_gem "qux", %w(1.0.0 1.1.0 2.0.0)
+          build_gem "bar", %w[2.0.3 2.0.4 2.0.5 2.1.0 2.1.1 3.0.0]
+          build_gem "qux", %w[1.0.0 1.1.0 2.0.0]
         end
 
         # establish a lockfile set to 1.4.3
         install_gemfile <<-G
-          source "file://#{gem_repo4}"
+          source "#{file_uri_for(gem_repo4)}"
           gem 'foo', '1.4.3'
           gem 'bar', '2.0.3'
           gem 'qux', '1.0.0'
@@ -713,7 +874,7 @@ RSpec.describe "bundle outdated" do
         # remove 1.4.3 requirement and bar altogether
         # to setup update specs below
         gemfile <<-G
-          source "file://#{gem_repo4}"
+          source "#{file_uri_for(gem_repo4)}"
           gem 'foo'
           gem 'qux'
         G
@@ -722,10 +883,45 @@ RSpec.describe "bundle outdated" do
       it "shows gems with update-strict updating to patch and filtering to patch" do
         bundle "outdated --patch --update-strict --filter-patch"
 
-        expect(out).to include("foo (newest 1.4.4")
-        expect(out).to include("bar (newest 2.0.5")
-        expect(out).not_to include("qux (newest")
+        expected_output = <<~TABLE.strip
+          Gem  Current  Latest  Requested  Groups
+          bar  2.0.3    2.0.5
+          foo  1.4.3    1.4.4   >= 0       default
+        TABLE
+
+        expect(out).to end_with(expected_output)
       end
+    end
+  end
+
+  describe "with --only-explicit" do
+    it "does not report outdated dependent gems" do
+      build_repo4 do
+        build_gem "weakling", %w[0.2 0.3] do |s|
+          s.add_dependency "bar", "~> 2.1"
+        end
+        build_gem "bar", %w[2.1 2.2]
+      end
+
+      install_gemfile <<-G
+        source "#{file_uri_for(gem_repo4)}"
+        gem 'weakling', '0.2'
+        gem 'bar', '2.1'
+      G
+
+      gemfile  <<-G
+        source "#{file_uri_for(gem_repo4)}"
+        gem 'weakling'
+      G
+
+      bundle "outdated --only-explicit"
+
+      expected_output = <<~TABLE.strip
+        Gem       Current  Latest  Requested  Groups
+        weakling  0.2      0.3     >= 0       default
+      TABLE
+
+      expect(out).to end_with(expected_output)
     end
   end
 end

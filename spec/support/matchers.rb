@@ -1,6 +1,8 @@
 # frozen_string_literal: true
+
 require "forwardable"
-require "support/the_bundle"
+require_relative "the_bundle"
+
 module Spec
   module Matchers
     extend RSpec::Matchers
@@ -59,31 +61,6 @@ module Spec
       end
     end
 
-    MAJOR_DEPRECATION = /^\[DEPRECATED FOR 2\.0\]\s*/
-
-    RSpec::Matchers.define :lack_errors do
-      diffable
-      match do |actual|
-        actual.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "") == ""
-      end
-    end
-
-    RSpec::Matchers.define :eq_err do |expected|
-      diffable
-      match do |actual|
-        actual.gsub(/#{MAJOR_DEPRECATION}.+[\n]?/, "") == expected
-      end
-    end
-
-    RSpec::Matchers.define :have_major_deprecation do |expected|
-      diffable
-      match do |actual|
-        actual.split(MAJOR_DEPRECATION).any? do |d|
-          !d.empty? && values_match?(expected, d.strip)
-        end
-      end
-    end
-
     RSpec::Matchers.define :have_dep do |*args|
       dep = Bundler::Dependency.new(*args)
 
@@ -108,6 +85,28 @@ module Spec
       end
     end
 
+    RSpec::Matchers.define :be_sorted do
+      diffable
+      attr_reader :expected
+      match do |actual|
+        expected = block_arg ? actual.sort_by(&block_arg) : actual.sort
+        actual.==(expected).tap do
+          # HACK: since rspec won't show a diff when everything is a string
+          differ = RSpec::Support::Differ.new
+          @actual = differ.send(:object_to_string, actual)
+          @expected = differ.send(:object_to_string, expected)
+        end
+      end
+    end
+
+    RSpec::Matchers.define :be_well_formed do
+      match(&:empty?)
+
+      failure_message do |actual|
+        actual.join("\n")
+      end
+    end
+
     define_compound_matcher :read_as, [exist] do |file_contents|
       diffable
 
@@ -129,13 +128,13 @@ module Spec
         groups << opts
         @errors = names.map do |name|
           name, version, platform = name.split(/\s+/)
+          require_path = name == "bundler" ? "#{lib_dir}/bundler" : name.tr("-", "/")
           version_const = name == "bundler" ? "Bundler::VERSION" : Spec::Builders.constantize(name)
           begin
-            run! "require '#{name}.rb'; puts #{version_const}", *groups
-          rescue => e
+            run! "require '#{require_path}.rb'; puts #{version_const}", *groups
+          rescue StandardError => e
             next "#{name} is not installed:\n#{indent(e)}"
           end
-          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
           actual_version, actual_platform = out.strip.split(/\s+/, 2)
           unless Gem::Version.new(actual_version) == Gem::Version.new(version)
             next "#{name} was expected to be at version #{version} but was #{actual_version}"
@@ -146,11 +145,10 @@ module Spec
           next unless source
           begin
             source_const = "#{Spec::Builders.constantize(name)}_SOURCE"
-            run! "require '#{name}/source'; puts #{source_const}", *groups
-          rescue
+            run! "require '#{require_path}/source'; puts #{source_const}", *groups
+          rescue StandardError
             next "#{name} does not have a source defined:\n#{indent(e)}"
           end
-          out.gsub!(/#{MAJOR_DEPRECATION}.*$/, "")
           unless out.strip == source
             next "Expected #{name} (#{version}) to be installed from `#{source}`, was actually from `#{out}`"
           end
@@ -173,8 +171,8 @@ module Spec
                 puts "WIN"
               end
             R
-          rescue => e
-            next "checking for #{name} failed:\n#{e}"
+          rescue StandardError => e
+            next "checking for #{name} failed:\n#{e}\n#{e.backtrace.join("\n")}"
           end
           next if out == "WIN"
           next "expected #{name} to not be installed, but it was" if version.nil?
@@ -216,7 +214,11 @@ module Spec
     end
 
     def lockfile_should_be(expected)
-      expect(bundled_app("Gemfile.lock")).to read_as(strip_whitespace(expected))
+      expect(bundled_app_lock).to have_lockfile(expected)
+    end
+
+    def gemfile_should_be(expected)
+      expect(bundled_app_gemfile).to read_as(strip_whitespace(expected))
     end
   end
 end

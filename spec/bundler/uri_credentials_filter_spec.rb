@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe Bundler::URICredentialsFilter do
   subject { described_class }
@@ -17,7 +16,7 @@ RSpec.describe Bundler::URICredentialsFilter do
           let(:credentials) { "oauth_token:x-oauth-basic@" }
 
           it "returns the uri without the oauth token" do
-            expect(subject.credential_filtered_uri(uri).to_s).to eq(URI("https://x-oauth-basic@github.com/company/private-repo").to_s)
+            expect(subject.credential_filtered_uri(uri).to_s).to eq(Bundler::URI("https://x-oauth-basic@github.com/company/private-repo").to_s)
           end
 
           it_behaves_like "original type of uri is maintained"
@@ -27,7 +26,7 @@ RSpec.describe Bundler::URICredentialsFilter do
           let(:credentials) { "oauth_token:x@" }
 
           it "returns the uri without the oauth token" do
-            expect(subject.credential_filtered_uri(uri).to_s).to eq(URI("https://x@github.com/company/private-repo").to_s)
+            expect(subject.credential_filtered_uri(uri).to_s).to eq(Bundler::URI("https://x@github.com/company/private-repo").to_s)
           end
 
           it_behaves_like "original type of uri is maintained"
@@ -38,7 +37,7 @@ RSpec.describe Bundler::URICredentialsFilter do
         let(:credentials) { "username1:hunter3@" }
 
         it "returns the uri without the password" do
-          expect(subject.credential_filtered_uri(uri).to_s).to eq(URI("https://username1@github.com/company/private-repo").to_s)
+          expect(subject.credential_filtered_uri(uri).to_s).to eq(Bundler::URI("https://username1@github.com/company/private-repo").to_s)
         end
 
         it_behaves_like "original type of uri is maintained"
@@ -56,7 +55,7 @@ RSpec.describe Bundler::URICredentialsFilter do
     end
 
     context "uri is a uri object" do
-      let(:uri) { URI("https://#{credentials}github.com/company/private-repo") }
+      let(:uri) { Bundler::URI("https://#{credentials}github.com/company/private-repo") }
 
       it_behaves_like "sensitive credentials in uri are filtered out"
     end
@@ -91,7 +90,7 @@ RSpec.describe Bundler::URICredentialsFilter do
   describe "#credential_filtered_string" do
     let(:str_to_filter) { "This is a git message containing a uri #{uri}!" }
     let(:credentials)   { "" }
-    let(:uri)           { URI("https://#{credentials}github.com/company/private-repo") }
+    let(:uri)           { Bundler::URI("https://#{credentials}github.com/company/private-repo") }
 
     context "with a uri that contains credentials" do
       let(:credentials) { "oauth_token:x-oauth-basic@" }

@@ -1,0 +1,7 @@
+> GET /info/tty-screen
+> accept-encoding: gzip
+> accept: */*
+> user-agent: bundler/2.1.0.pre.2 rubygems/3.1.0.pre2 ruby/2.6.5 (x86_64-pc-linux-gnu) command/install options/no_install,jobs,spec_run 6ee5c4117218dedb
+> connection: keep-alive
+> keep-alive: 30
+> host: index.rubygems.org

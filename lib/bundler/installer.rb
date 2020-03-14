@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 require "erb"
 require "rubygems/dependency_installer"
-require "bundler/worker"
-require "bundler/installer/parallel_installer"
-require "bundler/installer/standalone"
-require "bundler/installer/gem_installer"
+require_relative "worker"
+require_relative "installer/parallel_installer"
+require_relative "installer/standalone"
+require_relative "installer/gem_installer"
 
 module Bundler
   class Installer
@@ -20,8 +21,9 @@ module Bundler
     # For more information see the #run method on this class.
     def self.install(root, definition, options = {})
       installer = new(root, definition)
-      Plugin.hook("before-install-all", definition.dependencies)
+      Plugin.hook(Plugin::Events::GEM_BEFORE_INSTALL_ALL, definition.dependencies)
       installer.run(options)
+      Plugin.hook(Plugin::Events::GEM_AFTER_INSTALL_ALL, definition.dependencies)
       installer
     end
 
@@ -51,7 +53,7 @@ module Bundler
     #
     # Fourthly, Bundler checks if the Gemfile.lock exists, and if so
     # then proceeds to set up a definition based on the Gemfile and the Gemfile.lock.
-    # During this step Bundler will also download infomrmation about any new gems
+    # During this step Bundler will also download information about any new gems
     # that are not in the Gemfile.lock and resolve any dependencies if needed.
     #
     # Fifthly, Bundler resolves the dependencies either through a cache of gems or by remote.
@@ -68,22 +70,30 @@ module Bundler
     def run(options)
       create_bundle_path
 
-      if Bundler.settings[:frozen]
-        @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
+      ProcessLock.lock do
+        if Bundler.frozen_bundle?
+          @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
+        end
+
+        if @definition.dependencies.empty?
+          Bundler.ui.warn "The Gemfile specifies no dependencies"
+          lock
+          return
+        end
+
+        if resolve_if_needed(options)
+          ensure_specs_are_compatible!
+          warn_on_incompatible_bundler_deps
+          load_plugins
+          options.delete(:jobs)
+        else
+          options[:jobs] = 1 # to avoid the overhead of Bundler::Worker
+        end
+        install(options)
+
+        lock unless Bundler.frozen_bundle?
+        Standalone.new(options[:standalone], @definition).generate if options[:standalone]
       end
-
-      if @definition.dependencies.empty?
-        Bundler.ui.warn "The Gemfile specifies no dependencies"
-        lock
-        return
-      end
-
-      resolve_if_need(options)
-      ensure_specs_are_compatible!
-      install(options)
-
-      lock unless Bundler.settings[:frozen]
-      Standalone.new(options[:standalone], @definition).generate if options[:standalone]
     end
 
     def generate_bundler_executable_stubs(spec, options = {})
@@ -104,15 +114,21 @@ module Bundler
       end
 
       # double-assignment to avoid warnings about variables that will be used by ERB
-      bin_path = bin_path = Bundler.bin_path
-      template = template = File.read(File.expand_path("../templates/Executable", __FILE__))
-      relative_gemfile_path = relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
-      ruby_command = ruby_command = Thor::Util.ruby_command
+      bin_path = Bundler.bin_path
+      bin_path = bin_path
+      relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
+      relative_gemfile_path = relative_gemfile_path
+      ruby_command = Thor::Util.ruby_command
+      ruby_command = ruby_command
+      template_path = File.expand_path("../templates/Executable", __FILE__)
+      if spec.name == "bundler"
+        template_path += ".bundler"
+        spec.executables = %(bundle)
+      end
+      template = File.read(template_path)
 
       exists = []
       spec.executables.each do |executable|
-        next if executable == "bundle"
-
         binstub_path = "#{bin_path}/#{executable}"
         if File.exist?(binstub_path) && !options[:force]
           exists << executable
@@ -120,7 +136,11 @@ module Bundler
         end
 
         File.open(binstub_path, "w", 0o777 & ~File.umask) do |f|
-          f.puts ERB.new(template, nil, "-").result(binding)
+          if RUBY_VERSION >= "2.6"
+            f.puts ERB.new(template, :trim_mode => "-").result(binding)
+          else
+            f.puts ERB.new(template, nil, "-").result(binding)
+          end
         end
       end
 
@@ -142,15 +162,25 @@ module Bundler
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = Bundler.bin_path
-      standalone_path = standalone_path = Bundler.root.join(Bundler.settings[:path]).relative_path_from(bin_path)
+      unless path = Bundler.settings[:path]
+        raise "Can't standalone without an explicit path set"
+      end
+      standalone_path = Bundler.root.join(path).relative_path_from(bin_path)
+      standalone_path = standalone_path
       template = File.read(File.expand_path("../templates/Executable.standalone", __FILE__))
-      ruby_command = ruby_command = Thor::Util.ruby_command
+      ruby_command = Thor::Util.ruby_command
+      ruby_command = ruby_command
 
       spec.executables.each do |executable|
         next if executable == "bundle"
-        executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
+        executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
+        executable_path = executable_path
         File.open "#{bin_path}/#{executable}", "w", 0o755 do |f|
-          f.puts ERB.new(template, nil, "-").result(binding)
+          if RUBY_VERSION >= "2.6"
+            f.puts ERB.new(template, :trim_mode => "-").result(binding)
+          else
+            f.puts ERB.new(template, nil, "-").result(binding)
+          end
         end
       end
     end
@@ -162,11 +192,52 @@ module Bundler
     # that said, it's a rare situation (other than rake), and parallel
     # installation is SO MUCH FASTER. so we let people opt in.
     def install(options)
-      Bundler.rubygems.load_plugins
       force = options["force"]
-      jobs = 1
-      jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?
+      jobs = installation_parallelization(options)
       install_in_parallel jobs, options[:standalone], force
+    end
+
+    def installation_parallelization(options)
+      if jobs = options.delete(:jobs)
+        return jobs
+      end
+
+      return 1 unless can_install_in_parallel?
+
+      auto_config_jobs = Bundler.feature_flag.auto_config_jobs?
+      if jobs = Bundler.settings[:jobs]
+        if auto_config_jobs
+          jobs
+        else
+          [jobs.pred, 1].max
+        end
+      elsif auto_config_jobs
+        processor_count
+      else
+        1
+      end
+    end
+
+    def processor_count
+      require "etc"
+      Etc.nprocessors
+    rescue StandardError
+      1
+    end
+
+    def load_plugins
+      Bundler.rubygems.load_plugins
+
+      requested_path_gems = @definition.requested_specs.select {|s| s.source.is_a?(Source::Path) }
+      path_plugin_files = requested_path_gems.map do |spec|
+        begin
+          Bundler.rubygems.spec_matches_for_glob(spec, "rubygems_plugin#{Bundler.rubygems.suffix_pattern}")
+        rescue TypeError
+          error_message = "#{spec.name} #{spec.version} has an invalid gemspec"
+          raise Gem::InvalidSpecificationException, error_message
+        end
+      end.flatten
+      Bundler.rubygems.load_plugin_files(path_plugin_files)
     end
 
     def ensure_specs_are_compatible!
@@ -187,15 +258,24 @@ module Bundler
       end
     end
 
-    def can_install_in_parallel?
-      if Bundler.rubygems.provides?(">= 2.1.0")
-        true
-      else
-        Bundler.ui.warn "RubyGems #{Gem::VERSION} is not threadsafe, so your "\
-          "gems will be installed one at a time. Upgrade to RubyGems 2.1.0 " \
-          "or higher to enable parallel gem installation."
-        false
+    def warn_on_incompatible_bundler_deps
+      bundler_version = Gem::Version.create(Bundler::VERSION)
+      @definition.specs.each do |spec|
+        spec.dependencies.each do |dep|
+          next if dep.type == :development
+          next unless dep.name == "bundler".freeze
+          next if dep.requirement.satisfied_by?(bundler_version)
+
+          Bundler.ui.warn "#{spec.name} (#{spec.version}) has dependency" \
+            " #{SharedHelpers.pretty_dependency(dep)}" \
+            ", which is unsatisfied by the current bundler version #{VERSION}" \
+            ", so the dependency is being ignored"
+        end
       end
+    end
+
+    def can_install_in_parallel?
+      true
     end
 
     def install_in_parallel(size, standalone, force = false)
@@ -210,23 +290,18 @@ module Bundler
         Bundler.mkdir_p(p)
       end unless Bundler.bundle_path.exist?
     rescue Errno::EEXIST
-      raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " \
+      raise PathError, "Could not install to path `#{Bundler.bundle_path}` " \
         "because a file already exists at that path. Either remove or rename the file so the directory can be created."
     end
 
-    def resolve_if_need(options)
-      if !options["update"] && !options[:inline] && Bundler.default_lockfile.file?
-        local = Bundler.ui.silence do
-          begin
-            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-            true unless tmpdef.new_platform? || tmpdef.missing_dependencies.any?
-          rescue BundlerError
-          end
-        end
+    # returns whether or not a re-resolve was needed
+    def resolve_if_needed(options)
+      if !@definition.unlocking? && !options["force"] && !options["all-platforms"] && !Bundler.settings[:inline] && Bundler.default_lockfile.file?
+        return false if @definition.nothing_changed? && !@definition.missing_specs?
       end
 
-      return if local
       options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
+      true
     end
 
     def lock(opts = {})

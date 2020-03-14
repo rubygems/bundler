@@ -1,0 +1,31 @@
+name: jruby
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - staging
+      - trying
+
+jobs:
+  warbler:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup ruby
+        uses: eregon/use-ruby-action@v1
+        with:
+          ruby-version: jruby-9.2.9.0
+
+      - name: Install local bundler
+        run: bin/rake install:local
+
+      - name: Run a warbler project
+        run: |
+          cd spec/realworld/fixtures/warbler
+          bundle install
+          bundle exec warble
+          java -jar warbler.jar

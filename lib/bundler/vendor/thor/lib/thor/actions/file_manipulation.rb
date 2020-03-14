@@ -1,5 +1,4 @@
 require "erb"
-require "open-uri"
 
 class Bundler::Thor
   module Actions
@@ -24,14 +23,14 @@ class Bundler::Thor
       destination = args.first || source
       source = File.expand_path(find_in_source_paths(source.to_s))
 
-      create_file destination, nil, config do
+      resulting_destination = create_file destination, nil, config do
         content = File.binread(source)
         content = yield(content) if block
         content
       end
       if config[:mode] == :preserve
         mode = File.stat(source).mode
-        chmod(destination, mode, config)
+        chmod(resulting_destination, mode, config)
       end
     end
 
@@ -61,6 +60,9 @@ class Bundler::Thor
     # destination. If a block is given instead of destination, the content of
     # the url is yielded and used as location.
     #
+    # +get+ relies on open-uri, so passing application user input would provide
+    # a command injection attack vector.
+    #
     # ==== Parameters
     # source<String>:: the address of the given content.
     # destination<String>:: the relative path to the destination root.
@@ -78,8 +80,13 @@ class Bundler::Thor
       config = args.last.is_a?(Hash) ? args.pop : {}
       destination = args.first
 
-      source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ %r{^https?\://}
-      render = open(source) { |input| input.binmode.read }
+      render = if source =~ %r{^https?\://}
+        require "open-uri"
+        URI.send(:open, source) { |input| input.binmode.read }
+      else
+        source = File.expand_path(find_in_source_paths(source.to_s))
+        open(source) { |input| input.binmode.read }
+      end
 
       destination ||= if block_given?
         block.arity == 1 ? yield(render) : yield
@@ -113,7 +120,15 @@ class Bundler::Thor
       context = config.delete(:context) || instance_eval("binding")
 
       create_file destination, nil, config do
-        content = CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer").result(context)
+        match = ERB.version.match(/(\d+\.\d+\.\d+)/)
+        capturable_erb = if match && match[1] >= "2.2.0" # Ruby 2.6+
+          CapturableERB.new(::File.binread(source), :trim_mode => "-", :eoutvar => "@output_buffer")
+        else
+          CapturableERB.new(::File.binread(source), nil, "-", "@output_buffer")
+        end
+        content = capturable_erb.tap do |erb|
+          erb.filename = source
+        end.result(context)
         content = yield(content) if block
         content
       end
@@ -134,7 +149,10 @@ class Bundler::Thor
       return unless behavior == :invoke
       path = File.expand_path(path, destination_root)
       say_status :chmod, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      FileUtils.chmod_R(mode, path) unless options[:pretend]
+      unless options[:pretend]
+        require "fileutils"
+        FileUtils.chmod_R(mode, path)
+      end
     end
 
     # Prepend text to a file. Since it depends on insert_into_file, it's reversible.
@@ -204,6 +222,29 @@ class Bundler::Thor
       insert_into_file(path, *(args << config), &block)
     end
 
+    # Injects text right after the module definition. Since it depends on
+    # insert_into_file, it's reversible.
+    #
+    # ==== Parameters
+    # path<String>:: path of the file to be changed
+    # module_name<String|Class>:: the module to be manipulated
+    # data<String>:: the data to append to the class, can be also given as a block.
+    # config<Hash>:: give :verbose => false to not log the status.
+    #
+    # ==== Examples
+    #
+    #   inject_into_module "app/helpers/application_helper.rb", ApplicationHelper, "  def help; 'help'; end\n"
+    #
+    #   inject_into_module "app/helpers/application_helper.rb", ApplicationHelper do
+    #     "  def help; 'help'; end\n"
+    #   end
+    #
+    def inject_into_module(path, module_name, *args, &block)
+      config = args.last.is_a?(Hash) ? args.pop : {}
+      config[:after] = /module #{module_name}\n|module #{module_name} .*\n/
+      insert_into_file(path, *(args << config), &block)
+    end
+
     # Run a regular expression replacement on a file.
     #
     # ==== Parameters
@@ -269,7 +310,7 @@ class Bundler::Thor
     def comment_lines(path, flag, *args)
       flag = flag.respond_to?(:source) ? flag.source : flag
 
-      gsub_file(path, /^(\s*)([^#|\n]*#{flag})/, '\1# \2', *args)
+      gsub_file(path, /^(\s*)([^#\n]*#{flag})/, '\1# \2', *args)
     end
 
     # Removes a file at the given location.
@@ -288,7 +329,10 @@ class Bundler::Thor
       path = File.expand_path(path, destination_root)
 
       say_status :remove, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      ::FileUtils.rm_rf(path) if !options[:pretend] && File.exist?(path)
+      if !options[:pretend] && File.exist?(path)
+        require "fileutils"
+        ::FileUtils.rm_rf(path)
+      end
     end
     alias_method :remove_dir, :remove_file
 
@@ -305,8 +349,10 @@ class Bundler::Thor
       with_output_buffer { yield(*args) }
     end
 
-    def with_output_buffer(buf = "") #:nodoc:
-      self.output_buffer, old_buffer = buf, output_buffer
+    def with_output_buffer(buf = "".dup) #:nodoc:
+      raise ArgumentError, "Buffer can not be a frozen object" if buf.frozen?
+      old_buffer = output_buffer
+      self.output_buffer = buf
       yield
       output_buffer
     ensure
@@ -319,7 +365,7 @@ class Bundler::Thor
       def set_eoutvar(compiler, eoutvar = "_erbout")
         compiler.put_cmd = "#{eoutvar}.concat"
         compiler.insert_cmd = "#{eoutvar}.concat"
-        compiler.pre_cmd = ["#{eoutvar} = ''"]
+        compiler.pre_cmd = ["#{eoutvar} = ''.dup"]
         compiler.post_cmd = [eoutvar]
       end
     end

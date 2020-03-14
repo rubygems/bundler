@@ -1,42 +1,81 @@
 # Bundler Code of Conduct
 
-The Bundler project strongly values contributors from anywhere, regardless of level of experience, gender, gender identity and expression, sexual orientation, disability, physical appearance, body size, race, ethnicity, age, religion, or nationality. As a result, the Bundler team has agreed to and enforces this code of conduct in order to provide a harassment-free experience for everyone who participates in the development of Bundler.
+## Our Pledge
 
-### Summary
+We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
-Harassment in code and discussion or violation of physical boundaries is completely unacceptable anywhere in the Bundler project’s codebases, issue trackers, chat rooms, mailing lists, meetups, and any other events. Violators will be warned and then blocked or banned by the core team at or before the 3rd violation.
+We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
 
-### In detail
+## Our Standards
 
-Harassment includes offensive verbal comments related to level of experience, gender, gender identity and expression, sexual orientation, disability, physical appearance, body size, race, ethnicity, age, religion, nationality, the use of sexualized language or imagery, deliberate intimidation, stalking, sustained disruption, and unwelcome sexual attention.
+Examples of behavior that contributes to a positive environment for our community include:
 
-Individuals asked to stop any harassing behavior are expected to comply immediately.
+* Demonstrating empathy and kindness toward other people
+* Being respectful of differing opinions, viewpoints, and experiences
+* Giving and gracefully accepting constructive feedback
+* Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
+* Focusing on what is best not just for us as individuals, but for the overall community
 
-Maintainers, including the core team, are also subject to the anti-harassment policy.
+Examples of unacceptable behavior include:
 
-If anyone engages in abusive, harassing, or otherwise unacceptable behavior, including maintainers, we may take appropriate action, up to and including warning the offender, deletion of comments, removal from the project’s codebase and communication systems, and escalation to GitHub support.
+* The use of sexualized language or imagery, and sexual attention or advances of any kind
+* Trolling, insulting or derogatory comments, and personal or political attacks
+* Public or private harassment
+* Publishing others' private information, such as a physical or email address, without their explicit permission
+* Other conduct which could reasonably be considered inappropriate in a professional setting
 
-If you are being harassed, notice that someone else is being harassed, or have any other concerns, please contact a member of [the core team](http://bundler.io/contributors.html) or [email the core team](mailto:team@bundler.io) immediately.
+## Enforcement Responsibilities
 
-We expect everyone to follow these rules anywhere in the Bundler project’s codebases, issue trackers, IRC channel, group chat, and mailing lists.
+Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
 
-This code of conduct applies both within project spaces and in public spaces when an individual is representing the project or its community.
+Community leaders have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.
 
-Finally, don't forget that it is human to make mistakes! We all do. Let’s work together to help each other, resolve issues, and learn from the mistakes that we will all inevitably make from time to time.
+## Scope
 
+This Code of Conduct applies within all community spaces, and also applies when an individual is officially representing the community in public spaces. Examples of representing our community include using an official e-mail address, posting via an official social media account, or acting as an appointed representative at an online or offline event.
 
-### Thanks
+## Enforcement
 
-Thanks to the [JSConf Code of Conduct](http://jsconf.com/codeofconduct.html) and [Fedora Code of Conduct](http://fedoraproject.org/code-of-conduct) for inspiration and ideas. Additional thanks to [Contributor Covenant](http://contributor-covenant.org) for the [default code of conduct](https://github.com/bundler/bundler/blob/master/lib/bundler/templates/newgem/CODE_OF_CONDUCT.md.tt) included in generated gems.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at team@bundler.io, or directly contacting project team members via email or Slack. All complaints will be reviewed and investigated promptly and fairly.
 
+All community leaders are obligated to respect the privacy and security of the reporter of any incident.
 
-### License
+## Enforcement Guidelines
 
-<p class="license" xmlns:dct="http://purl.org/dc/terms/" xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#">
-  To the extent possible under law, <a rel="dct:publisher" href="http://bundler.io">The Bundler Team</a> has waived all copyright and related or neighboring rights to the <span property="dct:title">Bundler Code of Conduct</span>. This work is published from the <span property="vcard:Country" datatype="dct:ISO3166" content="US" about="http://bundler.io">United States.</span>
-  <br>
-  <br>
-  <a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">
-    <img src="http://i.creativecommons.org/p/zero/1.0/88x31.png" style="border-style: none;" alt="CC0">
-  </a>
-</p>
+Community leaders will follow these Community Impact Guidelines in determining the consequences for any action they deem in violation of this Code of Conduct:
+
+### 1. Correction
+
+**Community Impact**: Use of inappropriate language or other behavior deemed unprofessional or unwelcome in the community.
+
+**Consequence**: A private, written warning from community leaders, providing clarity around the nature of the violation and an explanation of why the behavior was inappropriate. A public apology may be requested.
+
+### 2. Warning
+
+**Community Impact**: A violation through a single incident or series of actions.
+
+**Consequence**: A warning with consequences for continued behavior. No interaction with the people involved, including unsolicited interaction with those enforcing the Code of Conduct, for a specified period of time. This includes avoiding interactions in community spaces as well as external channels like social media. Violating these terms may lead to a temporary or permanent ban.
+
+### 3. Temporary Ban
+
+**Community Impact**: A serious violation of community standards, including sustained inappropriate behavior.
+
+**Consequence**: A temporary ban from any sort of interaction or public communication with the community for a specified period of time. No public or private interaction with the people involved, including unsolicited interaction with those enforcing the Code of Conduct, is allowed during this period. Violating these terms may lead to a permanent ban.
+
+### 4. Permanent Ban
+
+**Community Impact**: Demonstrating a pattern of violation of community standards, including sustained inappropriate behavior,  harassment of an individual, or aggression toward or disparagement of classes of individuals.
+
+**Consequence**: A permanent ban from any sort of public interaction within the community.
+
+## Attribution
+
+This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 2.0,
+available at https://www.contributor-covenant.org/version/2/0/code_of_conduct.html.
+
+Community Impact Guidelines were inspired by [Mozilla's code of conduct enforcement ladder](https://github.com/mozilla/diversity).
+
+[homepage]: https://www.contributor-covenant.org
+
+For answers to common questions about this code of conduct, see the FAQ at
+https://www.contributor-covenant.org/faq. Translations are available at https://www.contributor-covenant.org/translations.

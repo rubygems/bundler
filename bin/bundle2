@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+module Bundler
+  VERSION = "2.0.0.dev".freeze
+end
+
+load File.expand_path("../bundle", __FILE__)

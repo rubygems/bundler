@@ -1,63 +1,119 @@
 # frozen_string_literal: true
-require "rubygems/user_interaction"
-require "support/path" unless defined?(Spec::Path)
+
+require_relative "path"
 
 module Spec
   module Rubygems
-    DEPS = begin
-      deps = {
-        # rack 2.x requires Ruby version >= 2.2.2.
-        # artifice doesn't support rack 2.x now.
-        # TODO: revert to `< 2` once https://github.com/rack/rack/issues/1168 is
-        # addressed
-        "rack" => "1.6.6",
-        "artifice" => "~> 0.6.0",
-        "compact_index" => "~> 0.11.0",
-        "sinatra" => "~> 1.4.7",
-        # Rake version has to be consistent for tests to pass
-        "rake" => "10.0.2",
-        # 3.0.0 breaks 1.9.2 specs
-        "builder" => "2.1.2",
-        "bundler" => "1.12.0",
-      }
+    DEV_DEPS = { # rubocop:disable Style/MutableConstant
+      "automatiek" => "~> 0.3.0",
+      "parallel_tests" => "~> 2.29",
+      "ronn" => "~> 0.7.3",
+      "rspec" => "~> 3.8",
+      "rubocop" => "= 0.77.0",
+      "rubocop-performance" => "= 1.5.1",
+    }
+
+    DEPS = { # rubocop:disable Style/MutableConstant
+      "rack" => "2.0.8",
+      "rack-test" => "~> 1.1",
+      "artifice" => "~> 0.6.0",
+      "compact_index" => "~> 0.11.0",
+      "sinatra" => "~> 2.0",
+      # Rake version has to be consistent for tests to pass
+      "rake" => "13.0.1",
+      "builder" => "~> 3.2",
       # ruby-graphviz is used by the viz tests
-      deps["ruby-graphviz"] = nil if RUBY_VERSION >= "1.9.3"
-      deps
+      # for >= Ruby 2.3
+      "ruby-graphviz" => "1.2.4",
+    }
+
+    extend self
+
+    def dev_setup
+      deps = DEV_DEPS
+
+      # JRuby can't build ronn, so we skip that
+      deps.delete("ronn") if RUBY_ENGINE == "jruby"
+
+      install_gems(deps)
     end
 
-    def self.setup
-      Gem.clear_paths
+    def gem_load(gem_name, bin_container)
+      require_relative "rubygems_version_manager"
+      RubygemsVersionManager.new(ENV["RGV"]).switch
 
-      ENV["BUNDLE_PATH"] = nil
-      ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
-      ENV["PATH"] = ["#{Path.root}/exe", "#{Path.system_gem_path}/bin", ENV["PATH"]].join(File::PATH_SEPARATOR)
+      gem_load_and_activate(gem_name, bin_container)
+    end
 
-      manifest = DEPS.to_a.sort_by(&:first).map {|k, v| "#{k} => #{v}\n" }
-      manifest_path = "#{Path.base_system_gems}/manifest.txt"
-      # it's OK if there are extra gems
-      if !File.exist?(manifest_path) || !(manifest - File.readlines(manifest_path)).empty?
-        FileUtils.rm_rf(Path.base_system_gems)
-        FileUtils.mkdir_p(Path.base_system_gems)
-        puts "installing gems for the tests to use..."
-        install_gems(DEPS)
-        File.open(manifest_path, "w") {|f| f << manifest.join }
-      end
+    def gem_require(gem_name)
+      gem_activate(gem_name)
+      require gem_name
+    end
+
+    def setup
+      install_test_deps
+
+      require "fileutils"
+
+      FileUtils.mkdir_p(Path.home)
+      FileUtils.mkdir_p(Path.tmpdir)
 
       ENV["HOME"] = Path.home.to_s
       ENV["TMPDIR"] = Path.tmpdir.to_s
 
+      require "rubygems/user_interaction"
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
     end
 
-    def self.install_gems(gems)
-      reqs, no_reqs = gems.partition {|_, req| !req.nil? && !req.split(" ").empty? }
-      reqs = reqs.sort_by {|name, _| name == "rack" ? 0 : 1 } # TODO: remove when we drop ruby 1.8.7 support
-      no_reqs.map!(&:first)
-      reqs.map! {|name, req| "'#{name}:#{req}'" }
-      deps = reqs.concat(no_reqs).join(" ")
-      cmd = "gem install #{deps} --no-rdoc --no-ri --conservative"
-      puts cmd
-      system(cmd) || raise("Installing gems #{deps} for the tests to use failed!")
+    def install_parallel_test_deps
+      require "parallel"
+
+      prev_env_test_number = ENV["TEST_ENV_NUMBER"]
+
+      begin
+        Parallel.processor_count.times do |n|
+          ENV["TEST_ENV_NUMBER"] = (n + 1).to_s
+
+          install_test_deps
+        end
+      ensure
+        ENV["TEST_ENV_NUMBER"] = prev_env_test_number
+      end
+    end
+
+    def install_test_deps
+      Gem.clear_paths
+
+      ENV["BUNDLE_PATH"] = nil
+      ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
+      ENV["PATH"] = [Path.bindir, Path.system_gem_path.join("bin"), ENV["PATH"]].join(File::PATH_SEPARATOR)
+
+      install_gems(DEPS)
+    end
+
+  private
+
+    def gem_load_and_activate(gem_name, bin_container)
+      gem_activate(gem_name)
+      load Gem.bin_path(gem_name, bin_container)
+    rescue Gem::LoadError => e
+      abort "We couln't activate #{gem_name} (#{e.requirement}). Run `gem install #{gem_name}:'#{e.requirement}'`"
+    end
+
+    def gem_activate(gem_name)
+      gem_requirement = DEV_DEPS[gem_name]
+      gem gem_name, gem_requirement
+    end
+
+    def install_gems(gems)
+      require "rubygems/dependency_installer"
+
+      gems.each do |name, req|
+        dependency = Gem::Dependency.new(name, req)
+        next unless dependency.matching_specs.empty?
+
+        Gem::DependencyInstaller.new(:document => false).install(dependency)
+      end
     end
   end
 end

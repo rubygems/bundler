@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require "digest/md5"
+
+require_relative "gem_parser"
 
 module Bundler
   class CompactIndexClient
@@ -68,7 +69,7 @@ module Bundler
       def info_path(name)
         name = name.to_s
         if name =~ /[^a-z0-9_-]/
-          name += "-#{Digest::MD5.hexdigest(name).downcase}"
+          name += "-#{SharedHelpers.digest(:MD5).hexdigest(name).downcase}"
           info_roots.last.join(name)
         else
           info_roots.first.join(name)
@@ -93,19 +94,9 @@ module Bundler
         header ? lines[header + 1..-1] : lines
       end
 
-      def parse_gem(string)
-        version_and_platform, rest = string.split(" ", 2)
-        version, platform = version_and_platform.split("-", 2)
-        dependencies, requirements = rest.split("|", 2).map {|s| s.split(",") } if rest
-        dependencies = dependencies ? dependencies.map {|d| parse_dependency(d) } : []
-        requirements = requirements ? requirements.map {|r| parse_dependency(r) } : []
-        [version, platform, dependencies, requirements]
-      end
-
-      def parse_dependency(string)
-        dependency = string.split(":")
-        dependency[-1] = dependency[-1].split("&") if dependency.size > 1
-        dependency
+      def parse_gem(line)
+        @gem_parser ||= GemParser.new
+        @gem_parser.parse(line)
       end
 
       def info_roots

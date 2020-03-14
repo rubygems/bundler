@@ -1,6 +1,4 @@
 # frozen_string_literal: true
-require "uri"
-require "digest/sha1"
 
 module Bundler
   module Plugin
@@ -37,7 +35,7 @@ module Bundler
       #
       # @!attribute [rw] dependency_names
       #   @return [Array<String>] Names of dependencies that the source should
-      #     try to resolve. It is not necessary to use this list intenally. This
+      #     try to resolve. It is not necessary to use this list internally. This
       #     is present to be compatible with `Definition` and is used by
       #     rubygems source.
       module Source
@@ -108,7 +106,7 @@ module Bundler
         def install_path
           @install_path ||=
             begin
-              base_name = File.basename(URI.parse(uri).normalize.path)
+              base_name = File.basename(Bundler::URI.parse(uri).normalize.path)
 
               gem_install_dir.join("#{base_name}-#{uri_hash[0..11]}")
             end
@@ -170,7 +168,7 @@ module Bundler
         #
         # This is used by `app_cache_path`
         def app_cache_dirname
-          base_name = File.basename(URI.parse(uri).normalize.path)
+          base_name = File.basename(Bundler::URI.parse(uri).normalize.path)
           "#{base_name}-#{uri_hash}"
         end
 
@@ -196,7 +194,7 @@ module Bundler
         # This shall check if two source object represent the same source.
         #
         # The comparison shall take place only on the attribute that can be
-        # inferred from the options passed from Gemfile and not on attibutes
+        # inferred from the options passed from Gemfile and not on attributes
         # that are used to pin down the gem to specific version (e.g. Git
         # sources should compare on branch and tag but not on commit hash)
         #
@@ -271,7 +269,7 @@ module Bundler
         end
 
         def uri_hash
-          Digest::SHA1.hexdigest(uri)
+          SharedHelpers.digest(:SHA1).hexdigest(uri)
         end
 
         # Note: Do not override if you don't know what you are doing.
@@ -293,6 +291,13 @@ module Bundler
         def bundler_plugin_api_source?
           true
         end
+
+        # @private
+        # This API on source might not be stable, and for now we expect plugins
+        # to download all specs in `#specs`, so we implement the method for
+        # compatibility purposes and leave it undocumented (and don't support)
+        # overriding it)
+        def double_check_for(*); end
       end
     end
   end

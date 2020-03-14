@@ -1,14 +1,13 @@
-require "bundler/vendor/thor/lib/thor"
-require "bundler/vendor/thor/lib/thor/group"
-require "bundler/vendor/thor/lib/thor/core_ext/io_binary_read"
+require_relative "../thor"
+require_relative "group"
 
-require "fileutils"
-require "open-uri"
 require "yaml"
 require "digest/md5"
 require "pathname"
 
 class Bundler::Thor::Runner < Bundler::Thor #:nodoc: # rubocop:disable ClassLength
+  autoload :OpenURI, "open-uri"
+
   map "-T" => :list, "-i" => :install, "-u" => :update, "-v" => :version
 
   def self.banner(command, all = false, subcommand = false)
@@ -67,7 +66,7 @@ class Bundler::Thor::Runner < Bundler::Thor #:nodoc: # rubocop:disable ClassLeng
       raise Error, "Error opening file '#{name}'"
     end
 
-    say "Your Bundler::Thorfile contains:"
+    say "Your Thorfile contains:"
     say contents
 
     unless options["force"]
@@ -104,6 +103,7 @@ class Bundler::Thor::Runner < Bundler::Thor #:nodoc: # rubocop:disable ClassLeng
     if package == :file
       File.open(destination, "w") { |f| f.puts contents }
     else
+      require "fileutils"
       FileUtils.cp_r(name, destination)
     end
 
@@ -112,7 +112,7 @@ class Bundler::Thor::Runner < Bundler::Thor #:nodoc: # rubocop:disable ClassLeng
 
   desc "version", "Show Bundler::Thor version"
   def version
-    require "bundler/vendor/thor/lib/thor/version"
+    require_relative "version"
     say "Bundler::Thor #{Bundler::Thor::VERSION}"
   end
 
@@ -120,6 +120,7 @@ class Bundler::Thor::Runner < Bundler::Thor #:nodoc: # rubocop:disable ClassLeng
   def uninstall(name)
     raise Error, "Can't find module '#{name}'" unless thor_yaml[name]
     say "Uninstalling #{name}."
+    require "fileutils"
     FileUtils.rm_rf(File.join(thor_root, (thor_yaml[name][:filename]).to_s))
 
     thor_yaml.delete(name)
@@ -138,6 +139,7 @@ class Bundler::Thor::Runner < Bundler::Thor #:nodoc: # rubocop:disable ClassLeng
     self.options = options.merge("as" => name)
 
     if File.directory? File.expand_path(name)
+      require "fileutils"
       FileUtils.rm_rf(File.join(thor_root, old_filename))
 
       thor_yaml.delete(old_filename)
@@ -194,6 +196,7 @@ private
     yaml_file = File.join(thor_root, "thor.yml")
 
     unless File.exist?(yaml_file)
+      require "fileutils"
       FileUtils.mkdir_p(thor_root)
       yaml_file = File.join(thor_root, "thor.yml")
       FileUtils.touch(yaml_file)
@@ -202,7 +205,7 @@ private
     File.open(yaml_file, "w") { |f| f.puts yaml.to_yaml }
   end
 
-  # Load the Bundler::Thorfiles. If relevant_to is supplied, looks for specific files
+  # Load the Thorfiles. If relevant_to is supplied, looks for specific files
   # in the thor_root instead of loading them all.
   #
   # By default, it also traverses the current path until find Bundler::Thor files, as
@@ -215,11 +218,11 @@ private
     end
   end
 
-  # Finds Bundler::Thorfiles by traversing from your current directory down to the root
+  # Finds Thorfiles by traversing from your current directory down to the root
   # directory of your system. If at any time we find a Bundler::Thor file, we stop.
   #
-  # We also ensure that system-wide Bundler::Thorfiles are loaded first, so local
-  # Bundler::Thorfiles can override them.
+  # We also ensure that system-wide Thorfiles are loaded first, so local
+  # Thorfiles can override them.
   #
   # ==== Example
   #
@@ -227,7 +230,7 @@ private
   #
   # 1. /Users/wycats/dev/thor
   # 2. /Users/wycats/dev
-  # 3. /Users/wycats <-- we find a Bundler::Thorfile here, so we stop
+  # 3. /Users/wycats <-- we find a Thorfile here, so we stop
   #
   # Suppose we start at c:\Documents and Settings\james\dev\thor ...
   #
@@ -235,7 +238,7 @@ private
   # 2. c:\Documents and Settings\james\dev
   # 3. c:\Documents and Settings\james
   # 4. c:\Documents and Settings
-  # 5. c:\ <-- no Bundler::Thorfiles found!
+  # 5. c:\ <-- no Thorfiles found!
   #
   def thorfiles(relevant_to = nil, skip_lookup = false)
     thorfiles = []
@@ -256,7 +259,7 @@ private
     end
   end
 
-  # Load Bundler::Thorfiles relevant to the given method. If you provide "foo:bar" it
+  # Load Thorfiles relevant to the given method. If you provide "foo:bar" it
   # will load all thor files in the thor.yaml that has "foo" e "foo:bar"
   # namespaces registered.
   #

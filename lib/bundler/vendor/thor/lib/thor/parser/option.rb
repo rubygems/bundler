@@ -1,16 +1,18 @@
 class Bundler::Thor
   class Option < Argument #:nodoc:
-    attr_reader :aliases, :group, :lazy_default, :hide
+    attr_reader :aliases, :group, :lazy_default, :hide, :repeatable
 
     VALID_TYPES = [:boolean, :numeric, :hash, :array, :string]
 
     def initialize(name, options = {})
+      @check_default_type = options[:check_default_type]
       options[:required] = false unless options.key?(:required)
+      @repeatable     = options.fetch(:repeatable, false)
       super
-      @lazy_default = options[:lazy_default]
-      @group        = options[:group].to_s.capitalize if options[:group]
-      @aliases      = Array(options[:aliases])
-      @hide         = options[:hide]
+      @lazy_default   = options[:lazy_default]
+      @group          = options[:group].to_s.capitalize if options[:group]
+      @aliases        = Array(options[:aliases])
+      @hide           = options[:hide]
     end
 
     # This parse quick options given as method_options. It makes several
@@ -80,12 +82,12 @@ class Bundler::Thor
 
     def usage(padding = 0)
       sample = if banner && !banner.to_s.empty?
-        "#{switch_name}=#{banner}"
+        "#{switch_name}=#{banner}".dup
       else
         switch_name
       end
 
-      sample = "[#{sample}]" unless required?
+      sample = "[#{sample}]".dup unless required?
 
       if boolean?
         sample << ", [#{dasherize('no-' + human_name)}]" unless (name == "force") || name.start_with?("no-")
@@ -127,8 +129,19 @@ class Bundler::Thor
         @default.class.name.downcase.to_sym
       end
 
-      # TODO: This should raise an ArgumentError in a future version of Bundler::Thor
-      warn "Expected #{@type} default value for '#{switch_name}'; got #{@default.inspect} (#{default_type})" unless default_type == @type
+      expected_type = (@repeatable && @type != :hash) ? :array : @type
+
+      if default_type != expected_type
+        err = "Expected #{expected_type} default value for '#{switch_name}'; got #{@default.inspect} (#{default_type})"
+
+        if @check_default_type
+          raise ArgumentError, err
+        elsif @check_default_type == nil
+          Bundler::Thor.deprecation_warning "#{err}.\n" +
+            'This will be rejected in the future unless you explicitly pass the options `check_default_type: false`' +
+            ' or call `allow_incompatible_default_type!` in your code'
+        end
+      end
     end
 
     def dasherized?

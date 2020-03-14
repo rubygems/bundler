@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "spec_helper"
+
 require "bundler/settings"
 
 RSpec.describe Bundler::Settings do
@@ -40,7 +40,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
 
     before do
       hash.each do |key, value|
-        settings[key] = value
+        settings.set_local key, value
       end
     end
 
@@ -67,7 +67,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       context "when $TMPDIR is not writable" do
         it "does not raise" do
           expect(Bundler.rubygems).to receive(:user_home).twice.and_return(nil)
-          expect(FileUtils).to receive(:mkpath).twice.with(File.join(Dir.tmpdir, "bundler", "home")).and_raise(Errno::EROFS, "Read-only file system @ dir_s_mkdir - /tmp/bundler")
+          expect(Bundler).to receive(:tmp).twice.and_raise(Errno::EROFS, "Read-only file system @ dir_s_mkdir - /tmp/bundler")
 
           expect(subject.send(:global_config_file)).to be_nil
         end
@@ -100,12 +100,12 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
 
     context "when is boolean" do
       it "returns a boolean" do
-        settings[:frozen] = "true"
+        settings.set_local :frozen, "true"
         expect(settings[:frozen]).to be true
       end
       context "when specific gem is configured" do
         it "returns a boolean" do
-          settings["ignore_messages.foobar"] = "true"
+          settings.set_local "ignore_messages.foobar", "true"
           expect(settings["ignore_messages.foobar"]).to be true
         end
       end
@@ -113,16 +113,16 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
 
     context "when is number" do
       it "returns a number" do
-        settings[:ssl_verify_mode] = "1"
+        settings.set_local :ssl_verify_mode, "1"
         expect(settings[:ssl_verify_mode]).to be 1
       end
     end
 
     context "when it's not possible to write to the file" do
       it "raises an PermissionError with explanation" do
-        expect(FileUtils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
+        expect(::Bundler::FileUtils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
           and_raise(Errno::EACCES)
-        expect { settings[:frozen] = "1" }.
+        expect { settings.set_local :frozen, "1" }.
           to raise_error(Bundler::PermissionError, /config/)
       end
     end
@@ -130,20 +130,40 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
 
   describe "#temporary" do
     it "reset after used" do
-      Bundler.settings[:no_install] = true
+      allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
+
+      Bundler.settings.set_command_option :no_install, true
 
       Bundler.settings.temporary(:no_install => false) do
         expect(Bundler.settings[:no_install]).to eq false
       end
 
       expect(Bundler.settings[:no_install]).to eq true
+
+      Bundler.settings.set_command_option :no_install, nil
+    end
+
+    it "returns the return value of the block" do
+      ret = Bundler.settings.temporary({}) { :ret }
+      expect(ret).to eq :ret
+    end
+
+    context "when called without a block" do
+      it "leaves the setting changed" do
+        Bundler.settings.temporary(:foo => :random)
+        expect(Bundler.settings[:foo]).to eq "random"
+      end
+
+      it "returns nil" do
+        expect(Bundler.settings.temporary(:foo => :bar)).to be_nil
+      end
     end
   end
 
   describe "#set_global" do
     context "when it's not possible to write to the file" do
       it "raises an PermissionError with explanation" do
-        expect(FileUtils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
+        expect(::Bundler::FileUtils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
           and_raise(Errno::EACCES)
         expect { settings.set_global(:frozen, "1") }.
           to raise_error(Bundler::PermissionError, %r{\.bundle/config})
@@ -151,8 +171,18 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
     end
   end
 
+  describe "#pretty_values_for" do
+    it "prints the converted value rather than the raw string" do
+      bool_key = described_class::BOOL_KEYS.first
+      settings.set_local(bool_key, "false")
+      expect(subject.pretty_values_for(bool_key)).to eq [
+        "Set for your local app (#{bundled_app("config")}): false",
+      ]
+    end
+  end
+
   describe "#mirror_for" do
-    let(:uri) { URI("https://rubygems.org/") }
+    let(:uri) { Bundler::URI("https://rubygems.org/") }
 
     context "with no configured mirror" do
       it "returns the original URI" do
@@ -165,9 +195,9 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
     end
 
     context "with a configured mirror" do
-      let(:mirror_uri) { URI("https://rubygems-mirror.org/") }
+      let(:mirror_uri) { Bundler::URI("https://rubygems-mirror.org/") }
 
-      before { settings["mirror.https://rubygems.org/"] = mirror_uri.to_s }
+      before { settings.set_local "mirror.https://rubygems.org/", mirror_uri.to_s }
 
       it "returns the mirror URI" do
         expect(settings.mirror_for(uri)).to eq(mirror_uri)
@@ -186,7 +216,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       end
 
       context "with a file URI" do
-        let(:mirror_uri) { URI("file:/foo/BAR/baz/qUx/") }
+        let(:mirror_uri) { Bundler::URI("file:/foo/BAR/baz/qUx/") }
 
         it "returns the mirror URI" do
           expect(settings.mirror_for(uri)).to eq(mirror_uri)
@@ -204,7 +234,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
   end
 
   describe "#credentials_for" do
-    let(:uri) { URI("https://gemserver.example.org/") }
+    let(:uri) { Bundler::URI("https://gemserver.example.org/") }
     let(:credentials) { "username:password" }
 
     context "with no configured credentials" do
@@ -214,7 +244,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
     end
 
     context "with credentials configured by URL" do
-      before { settings["https://gemserver.example.org/"] = credentials }
+      before { settings.set_local "https://gemserver.example.org/", credentials }
 
       it "returns the configured credentials" do
         expect(settings.credentials_for(uri)).to eq(credentials)
@@ -222,7 +252,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
     end
 
     context "with credentials configured by hostname" do
-      before { settings["gemserver.example.org"] = credentials }
+      before { settings.set_local "gemserver.example.org", credentials }
 
       it "returns the configured credentials" do
         expect(settings.credentials_for(uri)).to eq(credentials)
@@ -232,49 +262,49 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
 
   describe "URI normalization" do
     it "normalizes HTTP URIs in credentials configuration" do
-      settings["http://gemserver.example.org"] = "username:password"
+      settings.set_local "http://gemserver.example.org", "username:password"
       expect(settings.all).to include("http://gemserver.example.org/")
     end
 
     it "normalizes HTTPS URIs in credentials configuration" do
-      settings["https://gemserver.example.org"] = "username:password"
+      settings.set_local "https://gemserver.example.org", "username:password"
       expect(settings.all).to include("https://gemserver.example.org/")
     end
 
     it "normalizes HTTP URIs in mirror configuration" do
-      settings["mirror.http://rubygems.org"] = "http://rubygems-mirror.org"
+      settings.set_local "mirror.http://rubygems.org", "http://rubygems-mirror.org"
       expect(settings.all).to include("mirror.http://rubygems.org/")
     end
 
     it "normalizes HTTPS URIs in mirror configuration" do
-      settings["mirror.https://rubygems.org"] = "http://rubygems-mirror.org"
+      settings.set_local "mirror.https://rubygems.org", "http://rubygems-mirror.org"
       expect(settings.all).to include("mirror.https://rubygems.org/")
     end
 
     it "does not normalize other config keys that happen to contain 'http'" do
-      settings["local.httparty"] = home("httparty")
+      settings.set_local "local.httparty", home("httparty")
       expect(settings.all).to include("local.httparty")
     end
 
     it "does not normalize other config keys that happen to contain 'https'" do
-      settings["local.httpsmarty"] = home("httpsmarty")
+      settings.set_local "local.httpsmarty", home("httpsmarty")
       expect(settings.all).to include("local.httpsmarty")
     end
 
     it "reads older keys without trailing slashes" do
-      settings["mirror.https://rubygems.org"] = "http://rubygems-mirror.org"
+      settings.set_local "mirror.https://rubygems.org", "http://rubygems-mirror.org"
       expect(settings.mirror_for("https://rubygems.org/")).to eq(
-        URI("http://rubygems-mirror.org/")
+        Bundler::URI("http://rubygems-mirror.org/")
       )
     end
 
     it "normalizes URIs with a fallback_timeout option" do
-      settings["mirror.https://rubygems.org/.fallback_timeout"] = "true"
+      settings.set_local "mirror.https://rubygems.org/.fallback_timeout", "true"
       expect(settings.all).to include("mirror.https://rubygems.org/.fallback_timeout")
     end
 
     it "normalizes URIs with a fallback_timeout option without a trailing slash" do
-      settings["mirror.https://rubygems.org.fallback_timeout"] = "true"
+      settings.set_local "mirror.https://rubygems.org.fallback_timeout", "true"
       expect(settings.all).to include("mirror.https://rubygems.org/.fallback_timeout")
     end
   end

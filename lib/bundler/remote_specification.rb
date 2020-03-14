@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "uri"
 
 module Bundler
   # Represents a lazily loaded gem specification, where the full specification
@@ -73,7 +72,15 @@ module Bundler
     end
 
     def dependencies
-      @dependencies || method_missing(:dependencies)
+      @dependencies ||= begin
+        deps = method_missing(:dependencies)
+
+        # allow us to handle when the specs dependencies are an array of array of string
+        # see https://github.com/rubygems/bundler/issues/5797
+        deps = deps.map {|d| d.is_a?(Gem::Dependency) ? d : Gem::Dependency.new(*d) }
+
+        deps
+      end
     end
 
     def git_version

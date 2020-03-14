@@ -1,10 +1,10 @@
 # frozen_string_literal: true
-require "spec_helper"
 
 RSpec.describe Bundler::Plugin::Index do
   Index = Bundler::Plugin::Index
 
   before do
+    allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app_gemfile)
     gemfile ""
     path = lib_path(plugin_name)
     index.register_plugin("new-plugin", path.to_s, [path.join("lib").to_s], commands, sources, hooks)
@@ -87,6 +87,17 @@ RSpec.describe Bundler::Plugin::Index do
       expect(new_index.hook_plugins("after-bar")).to eq([plugin_name])
     end
 
+    it "only registers a gem once for an event" do
+      path = lib_path(plugin_name)
+      index.register_plugin(plugin_name,
+        path.to_s,
+        [path.join("lib").to_s],
+        commands,
+        sources,
+        hooks + hooks)
+      expect(index.hook_plugins("after-bar")).to eq([plugin_name])
+    end
+
     context "that are not registered", :focused do
       let(:file) { double("index-file") }
 
@@ -107,11 +118,11 @@ RSpec.describe Bundler::Plugin::Index do
 
   describe "global index" do
     before do
-      Dir.chdir(tmp) do
-        Bundler::Plugin.reset!
-        path = lib_path("gplugin")
-        index.register_plugin("gplugin", path.to_s, [path.join("lib").to_s], [], ["glb_source"], [])
-      end
+      allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(nil)
+
+      Bundler::Plugin.reset!
+      path = lib_path("gplugin")
+      index.register_plugin("gplugin", path.to_s, [path.join("lib").to_s], [], ["glb_source"], [])
     end
 
     it "skips sources" do
@@ -174,6 +185,14 @@ RSpec.describe Bundler::Plugin::Index do
       end
 
       include_examples "it cleans up"
+    end
+  end
+
+  describe "readonly disk without home" do
+    it "ignores being unable to create temp home dir" do
+      expect_any_instance_of(Bundler::Plugin::Index).to receive(:global_index_file).
+        and_raise(Bundler::GenericSystemCallError.new("foo", "bar"))
+      Bundler::Plugin::Index.new
     end
   end
 end

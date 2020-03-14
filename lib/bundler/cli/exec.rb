@@ -1,18 +1,19 @@
 # frozen_string_literal: true
-require "bundler/current_ruby"
+
+require_relative "../current_ruby"
 
 module Bundler
   class CLI::Exec
     attr_reader :options, :args, :cmd
 
-    RESERVED_SIGNALS = %w(SEGV BUS ILL FPE VTALRM KILL STOP).freeze
+    TRAPPED_SIGNALS = %w[INT].freeze
 
     def initialize(options, args)
       @options = options
       @cmd = args.shift
       @args = args
 
-      if Bundler.current_ruby.ruby_2? && !Bundler.current_ruby.jruby?
+      if !Bundler.current_ruby.jruby?
         @args << { :close_others => !options.keep_file_descriptors? }
       elsif options.keep_file_descriptors?
         Bundler.ui.warn "Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec."
@@ -26,12 +27,7 @@ module Bundler
         if !Bundler.settings[:disable_exec_load] && ruby_shebang?(bin_path)
           return kernel_load(bin_path, *args)
         end
-        # First, try to exec directly to something in PATH
-        if Bundler.current_ruby.jruby_18?
-          kernel_exec(bin_path, *args)
-        else
-          kernel_exec([bin_path, cmd], *args)
-        end
+        kernel_exec(bin_path, *args)
       else
         # exec using the given command
         kernel_exec(cmd, *args)
@@ -47,15 +43,11 @@ module Bundler
     end
 
     def kernel_exec(*args)
-      ui = Bundler.ui
-      Bundler.ui = nil
       Kernel.exec(*args)
     rescue Errno::EACCES, Errno::ENOEXEC
-      Bundler.ui = ui
       Bundler.ui.error "bundler: not executable: #{cmd}"
       exit 126
     rescue Errno::ENOENT
-      Bundler.ui = ui
       Bundler.ui.error "bundler: command not found: #{cmd}"
       Bundler.ui.warn "Install missing gem executables with `bundle install`"
       exit 127
@@ -66,18 +58,14 @@ module Bundler
       ARGV.replace(args)
       $0 = file
       Process.setproctitle(process_title(file, args)) if Process.respond_to?(:setproctitle)
-      ui = Bundler.ui
-      Bundler.ui = nil
-      require "bundler/setup"
-      signals = Signal.list.keys - RESERVED_SIGNALS
-      signals.each {|s| trap(s, "DEFAULT") }
+      require_relative "../setup"
+      TRAPPED_SIGNALS.each {|s| trap(s, "DEFAULT") }
       Kernel.load(file)
-    rescue SystemExit
+    rescue SystemExit, SignalException
       raise
     rescue Exception => e # rubocop:disable Lint/RescueException
-      Bundler.ui = ui
       Bundler.ui.error "bundler: failed to load command: #{cmd} (#{file})"
-      backtrace = e.backtrace.take_while {|bt| !bt.start_with?(__FILE__) }
+      backtrace = e.backtrace ? e.backtrace.take_while {|bt| !bt.start_with?(__FILE__) } : []
       abort "#{e.class}: #{e.message}\n  #{backtrace.join("\n  ")}"
     end
 
@@ -89,6 +77,7 @@ module Bundler
       possibilities = [
         "#!/usr/bin/env ruby\n",
         "#!/usr/bin/env jruby\n",
+        "#!/usr/bin/env truffleruby\n",
         "#!#{Gem.ruby}\n",
       ]
 

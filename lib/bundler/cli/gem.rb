@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "pathname"
 
 module Bundler
@@ -10,7 +11,8 @@ module Bundler
   class CLI::Gem
     TEST_FRAMEWORK_VERSIONS = {
       "rspec" => "3.0",
-      "minitest" => "5.0"
+      "minitest" => "5.0",
+      "test-unit" => "3.0",
     }.freeze
 
     attr_reader :options, :gem_name, :thor, :name, :target
@@ -56,25 +58,25 @@ module Bundler
         :ext              => options[:ext],
         :exe              => options[:exe],
         :bundler_version  => bundler_dependency_version,
-        :github_username  => github_username.empty? ? "[USERNAME]" : github_username
+        :github_username  => github_username.empty? ? "[USERNAME]" : github_username,
       }
       ensure_safe_gem_name(name, constant_array)
 
       templates = {
-        "Gemfile.tt" => "Gemfile",
+        "#{Bundler.preferred_gemfile_name}.tt" => Bundler.preferred_gemfile_name,
         "lib/newgem.rb.tt" => "lib/#{namespaced_path}.rb",
         "lib/newgem/version.rb.tt" => "lib/#{namespaced_path}/version.rb",
         "newgem.gemspec.tt" => "#{name}.gemspec",
         "Rakefile.tt" => "Rakefile",
         "README.md.tt" => "README.md",
         "bin/console.tt" => "bin/console",
-        "bin/setup.tt" => "bin/setup"
+        "bin/setup.tt" => "bin/setup",
       }
 
-      executables = %w(
+      executables = %w[
         bin/console
         bin/setup
-      )
+      ]
 
       templates.merge!("gitignore.tt" => ".gitignore") if Bundler.git_present?
 
@@ -82,7 +84,7 @@ module Bundler
         config[:test] = test_framework
         config[:test_framework_version] = TEST_FRAMEWORK_VERSIONS[test_framework]
 
-        templates.merge!(".travis.yml.tt" => ".travis.yml")
+        templates.merge!("travis.yml.tt" => ".travis.yml")
 
         case test_framework
         when "rspec"
@@ -91,20 +93,26 @@ module Bundler
             "spec/spec_helper.rb.tt" => "spec/spec_helper.rb",
             "spec/newgem_spec.rb.tt" => "spec/#{namespaced_path}_spec.rb"
           )
+          config[:test_task] = :spec
         when "minitest"
           templates.merge!(
-            "test/test_helper.rb.tt" => "test/test_helper.rb",
-            "test/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
+            "test/minitest/test_helper.rb.tt" => "test/test_helper.rb",
+            "test/minitest/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
           )
+          config[:test_task] = :test
+        when "test-unit"
+          templates.merge!(
+            "test/test-unit/test_helper.rb.tt" => "test/test_helper.rb",
+            "test/test-unit/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
+          )
+          config[:test_task] = :test
         end
       end
-
-      config[:test_task] = config[:test] == "minitest" ? "test" : "spec"
 
       if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
         "This means that any other developer or company will be legally allowed to use your code " \
         "for free as long as they admit you created it. You can read more about the MIT license " \
-        "at http://choosealicense.com/licenses/mit.")
+        "at https://choosealicense.com/licenses/mit.")
         config[:mit] = true
         Bundler.ui.info "MIT License enabled in config"
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
@@ -117,10 +125,19 @@ module Bundler
         "of enforcing it, so be sure that you are prepared to do that. Be sure that your email " \
         "address is specified as a contact in the generated code of conduct so that people know " \
         "who to contact in case of a violation. For suggestions about " \
-        "how to enforce codes of conduct, see http://bit.ly/coc-enforcement.")
+        "how to enforce codes of conduct, see https://bit.ly/coc-enforcement.")
         config[:coc] = true
         Bundler.ui.info "Code of conduct enabled in config"
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
+      end
+
+      if ask_and_set(:rubocop, "Do you want to add rubocop as a dependency for gems you generate?",
+        "RuboCop is a static code analyzer that has out-of-the-box rules for many " \
+        "of the guidelines in the community style guide. " \
+        "For more information, see the RuboCop docs (https://docs.rubocop.org/en/stable/) " \
+        "and the Ruby Style Guides (https://github.com/rubocop-hq/ruby-style-guide).")
+        config[:rubocop] = true
+        Bundler.ui.info "RuboCop enabled in config"
       end
 
       templates.merge!("exe/newgem.tt" => "exe/#{name}") if config[:exe]
@@ -141,12 +158,13 @@ module Bundler
       end
 
       executables.each do |file|
-        path = target.join(file)
-        executable = (path.stat.mode | 0o111)
-        path.chmod(executable)
+        SharedHelpers.filesystem_access(target.join(file)) do |path|
+          executable = (path.stat.mode | 0o111)
+          path.chmod(executable)
+        end
       end
 
-      if Bundler.git_present?
+      if Bundler.git_present? && options[:git]
         Bundler.ui.info "Initializing git repo in #{target}"
         Dir.chdir(target) do
           `git init`
@@ -156,6 +174,9 @@ module Bundler
 
       # Open gemspec in editor
       open_editor(options["edit"], target.join("#{name}.gemspec")) if options[:edit]
+
+      Bundler.ui.info "Gem '#{name}' was successfully created. " \
+        "For more information on making a RubyGem visit https://bundler.io/guides/creating_gem.html"
     rescue Errno::EEXIST => e
       raise GenericSystemCallError.new(e, "There was a conflict while creating the new gem.")
     end
@@ -185,7 +206,7 @@ module Bundler
       Bundler.ui.error "You have specified a gem name which does not conform to the \n" \
                        "naming guidelines for C extensions. For more information, \n" \
                        "see the 'Extension Naming' section at the following URL:\n" \
-                       "http://guides.rubygems.org/gems-with-extensions/\n"
+                       "https://guides.rubygems.org/gems-with-extensions/\n"
       exit 1
     end
 
@@ -194,9 +215,9 @@ module Bundler
 
       if test_framework.nil?
         Bundler.ui.confirm "Do you want to generate tests with your gem?"
-        result = Bundler.ui.ask "Type 'rspec' or 'minitest' to generate those test files now and " \
-          "in the future. rspec/minitest/(none):"
-        if result =~ /rspec|minitest/
+        result = Bundler.ui.ask "Type 'rspec', 'minitest' or 'test-unit' to generate those test files now and " \
+          "in the future. rspec/minitest/test-unit/(none):"
+        if result =~ /rspec|minitest|test-unit/
           test_framework = result
         else
           test_framework = false

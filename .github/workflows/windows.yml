@@ -1,0 +1,33 @@
+name: windows
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - staging
+      - trying
+
+jobs:
+  windows:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        ruby: [ '2.4.x', '2.5.x', '2.6.x' ]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+
+      - name: Install dependencies
+        run: bin/rake spec:parallel_deps
+        shell: bash
+
+      - name: Run specs
+        run: bin/parallel_rspec spec
+        shell: bash

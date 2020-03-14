@@ -1,17 +1,17 @@
-require "bundler/vendor/thor/lib/thor/command"
-require "bundler/vendor/thor/lib/thor/core_ext/hash_with_indifferent_access"
-require "bundler/vendor/thor/lib/thor/core_ext/ordered_hash"
-require "bundler/vendor/thor/lib/thor/error"
-require "bundler/vendor/thor/lib/thor/invocation"
-require "bundler/vendor/thor/lib/thor/parser"
-require "bundler/vendor/thor/lib/thor/shell"
-require "bundler/vendor/thor/lib/thor/line_editor"
-require "bundler/vendor/thor/lib/thor/util"
+require_relative "command"
+require_relative "core_ext/hash_with_indifferent_access"
+require_relative "error"
+require_relative "invocation"
+require_relative "nested_context"
+require_relative "parser"
+require_relative "shell"
+require_relative "line_editor"
+require_relative "util"
 
 class Bundler::Thor
-  autoload :Actions,    "bundler/vendor/thor/lib/thor/actions"
-  autoload :RakeCompat, "bundler/vendor/thor/lib/thor/rake_compat"
-  autoload :Group,      "bundler/vendor/thor/lib/thor/group"
+  autoload :Actions,    File.expand_path("actions", __dir__)
+  autoload :RakeCompat, File.expand_path("rake_compat", __dir__)
+  autoload :Group,      File.expand_path("group", __dir__)
 
   # Shortcuts for help.
   HELP_MAPPINGS       = %w(-h -? --help -D)
@@ -42,7 +42,7 @@ class Bundler::Thor
     # config<Hash>:: Configuration for this Bundler::Thor class.
     #
     def initialize(args = [], local_options = {}, config = {})
-      parse_options = config[:current_command] && config[:current_command].disable_class_options ? {} : self.class.class_options
+      parse_options = self.class.class_options
 
       # The start method splits inbound arguments at the first argument
       # that looks like an option (starts with - or --). It then calls
@@ -65,7 +65,8 @@ class Bundler::Thor
       # declared options from the array. This will leave us with
       # a list of arguments that weren't declared.
       stop_on_unknown = self.class.stop_on_unknown_option? config[:current_command]
-      opts = Bundler::Thor::Options.new(parse_options, hash_options, stop_on_unknown)
+      disable_required_check = self.class.disable_required_check? config[:current_command]
+      opts = Bundler::Thor::Options.new(parse_options, hash_options, stop_on_unknown, disable_required_check)
       self.options = opts.parse(array_options)
       self.options = config[:class_options].merge(options) if config[:class_options]
 
@@ -88,6 +89,7 @@ class Bundler::Thor
 
     class << self
       def included(base) #:nodoc:
+        super(base)
         base.extend ClassMethods
         base.send :include, Invocation
         base.send :include, Shell
@@ -150,10 +152,34 @@ class Bundler::Thor
         !!check_unknown_options
       end
 
+      # If you want to raise an error when the default value of an option does not match
+      # the type call check_default_type!
+      # This will be the default; for compatibility a deprecation warning is issued if necessary.
+      def check_default_type!
+        @check_default_type = true
+      end
+
+      # If you want to use defaults that don't match the type of an option,
+      # either specify `check_default_type: false` or call `allow_incompatible_default_type!`
+      def allow_incompatible_default_type!
+        @check_default_type = false
+      end
+
+      def check_default_type #:nodoc:
+        @check_default_type = from_superclass(:check_default_type, nil) unless defined?(@check_default_type)
+        @check_default_type
+      end
+
       # If true, option parsing is suspended as soon as an unknown option or a
       # regular argument is encountered.  All remaining arguments are passed to
       # the command as regular arguments.
       def stop_on_unknown_option?(command_name) #:nodoc:
+        false
+      end
+
+      # If true, option set will not suspend the execution of the command when
+      # a required option is not provided.
+      def disable_required_check?(command_name) #:nodoc:
         false
       end
 
@@ -331,22 +357,22 @@ class Bundler::Thor
       # Returns the commands for this Bundler::Thor class.
       #
       # ==== Returns
-      # OrderedHash:: An ordered hash with commands names as keys and Bundler::Thor::Command
-      #               objects as values.
+      # Hash:: An ordered hash with commands names as keys and Bundler::Thor::Command
+      #        objects as values.
       #
       def commands
-        @commands ||= Bundler::Thor::CoreExt::OrderedHash.new
+        @commands ||= Hash.new
       end
       alias_method :tasks, :commands
 
       # Returns the commands for this Bundler::Thor class and all subclasses.
       #
       # ==== Returns
-      # OrderedHash:: An ordered hash with commands names as keys and Bundler::Thor::Command
-      #               objects as values.
+      # Hash:: An ordered hash with commands names as keys and Bundler::Thor::Command
+      #        objects as values.
       #
       def all_commands
-        @all_commands ||= from_superclass(:all_commands, Bundler::Thor::CoreExt::OrderedHash.new)
+        @all_commands ||= from_superclass(:all_commands, Hash.new)
         @all_commands.merge!(commands)
       end
       alias_method :all_tasks, :all_commands
@@ -393,13 +419,19 @@ class Bundler::Thor
       #     remove_command :this_is_not_a_command
       #   end
       #
-      def no_commands
-        @no_commands = true
-        yield
-      ensure
-        @no_commands = false
+      def no_commands(&block)
+        no_commands_context.enter(&block)
       end
+
       alias_method :no_tasks, :no_commands
+
+      def no_commands_context
+        @no_commands_context ||= NestedContext.new
+      end
+
+      def no_commands?
+        no_commands_context.entered?
+      end
 
       # Sets the namespace for the Bundler::Thor or Bundler::Thor::Group class. By default the
       # namespace is retrieved from the class name. If your Bundler::Thor class is named
@@ -444,13 +476,13 @@ class Bundler::Thor
         dispatch(nil, given_args.dup, nil, config)
       rescue Bundler::Thor::Error => e
         config[:debug] || ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
-        exit(1) if exit_on_failure?
+        exit(false) if exit_on_failure?
       rescue Errno::EPIPE
         # This happens if a thor command is piped to something like `head`,
         # which closes the pipe when it's done reading. This will also
         # mean that if the pipe is closed, further unnecessary
         # computation will not occur.
-        exit(0)
+        exit(true)
       end
 
       # Allows to use private methods from parent in child classes as commands.
@@ -471,17 +503,23 @@ class Bundler::Thor
       alias_method :public_task, :public_command
 
       def handle_no_command_error(command, has_namespace = $thor_runner) #:nodoc:
-        raise UndefinedCommandError, "Could not find command #{command.inspect} in #{namespace.inspect} namespace." if has_namespace
-        raise UndefinedCommandError, "Could not find command #{command.inspect}."
+        raise UndefinedCommandError.new(command, all_commands.keys, (namespace if has_namespace))
       end
       alias_method :handle_no_task_error, :handle_no_command_error
 
       def handle_argument_error(command, error, args, arity) #:nodoc:
-        msg = "ERROR: \"#{basename} #{command.name}\" was called with "
+        name = [command.ancestor_name, command.name].compact.join(" ")
+        msg = "ERROR: \"#{basename} #{name}\" was called with ".dup
         msg << "no arguments"               if     args.empty?
         msg << "arguments " << args.inspect unless args.empty?
-        msg << "\nUsage: #{banner(command).inspect}"
+        msg << "\nUsage: \"#{banner(command).split("\n").join("\"\n       \"")}\""
         raise InvocationError, msg
+      end
+
+      # A flag that makes the process exit with status 1 if any error happens.
+      def exit_on_failure?
+        Bundler::Thor.deprecation_warning "Bundler::Thor exit with status 0 on errors. To keep this behavior, you must define `exit_on_failure?` in `#{self.name}`"
+        false
       end
 
     protected
@@ -541,7 +579,7 @@ class Bundler::Thor
       # options<Hash>:: Described in both class_option and method_option.
       # scope<Hash>:: Options hash that is being built up
       def build_option(name, options, scope) #:nodoc:
-        scope[name] = Bundler::Thor::Option.new(name, options)
+        scope[name] = Bundler::Thor::Option.new(name, {:check_default_type => check_default_type}.merge!(options))
       end
 
       # Receives a hash of options, parse them and add to the scope. This is a
@@ -574,13 +612,15 @@ class Bundler::Thor
       # Everytime someone inherits from a Bundler::Thor class, register the klass
       # and file into baseclass.
       def inherited(klass)
+        super(klass)
         Bundler::Thor::Base.register_klass_file(klass)
-        klass.instance_variable_set(:@no_commands, false)
+        klass.instance_variable_set(:@no_commands, 0)
       end
 
       # Fire this callback whenever a method is added. Added methods are
       # tracked as commands by invoking the create_command method.
       def method_added(meth)
+        super(meth)
         meth = meth.to_s
 
         if meth == "initialize"
@@ -591,8 +631,7 @@ class Bundler::Thor
         # Return if it's not a public instance method
         return unless public_method_defined?(meth.to_sym)
 
-        @no_commands ||= false
-        return if @no_commands || !create_command(meth)
+        return if no_commands? || !create_command(meth)
 
         is_thor_reserved_word?(meth, :command)
         Bundler::Thor::Base.register_klass_file(self)
@@ -617,11 +656,6 @@ class Bundler::Thor
           end
 
         end
-      end
-
-      # A flag that makes the process exit with status 1 if any error happens.
-      def exit_on_failure?
-        false
       end
 
       #
