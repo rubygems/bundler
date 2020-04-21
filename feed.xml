@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+	<id>https://en.wikipedia.org/w/api.php?hidebots=1&amp;hidecategorization=1&amp;hideWikibase=1&amp;urlversion=1&amp;days=7&amp;limit=50&amp;target=Wikipedia%3AText_of_the_GNU_Free_Documentation_License&amp;action=feedrecentchanges&amp;feedformat=atom</id>
+	<title>Wikipedia  - Changes related to &quot;Wikipedia:Text of the GNU Free Documentation License&quot; [en]</title>
+	<link rel="self" type="application/atom+xml" href="https://en.wikipedia.org/w/api.php?hidebots=1&amp;hidecategorization=1&amp;hideWikibase=1&amp;urlversion=1&amp;days=7&amp;limit=50&amp;target=Wikipedia%3AText_of_the_GNU_Free_Documentation_License&amp;action=feedrecentchanges&amp;feedformat=atom"/>
+	<link rel="alternate" type="text/html" href="https://en.wikipedia.org/wiki/Special:RecentChangesLinked"/>
+	<updated>2020-02-10T16:18:51Z</updated>
+	<subtitle>Related changes</subtitle>
+	<generator>MediaWiki 1.35.0-wmf.16</generator>
+	<entry>
+		<id>https://en.wikipedia.org/w/index.php?title=Module:Protection_banner/config&amp;diff=939889955&amp;oldid=923736493</id>
+		<title>Module:Protection banner/config</title>
+		<link rel="alternate" type="text/html" href="https://en.wikipedia.org/w/index.php?title=Module:Protection_banner/config&amp;diff=939889955&amp;oldid=923736493"/>
+		<updated>2020-02-09T10:06:16Z</updated>
+
+		<summary type="html">&lt;p&gt;people -&amp;gt; persons, per edit request&lt;/p&gt;
+&lt;table class=&quot;diff diff-contentalign-left&quot; data-mw=&quot;interface&quot;&gt;
+				&lt;col class=&quot;diff-marker&quot; /&gt;
+				&lt;col class=&quot;diff-content&quot; /&gt;
+				&lt;col class=&quot;diff-marker&quot; /&gt;
+				&lt;col class=&quot;diff-content&quot; /&gt;
+				&lt;tr class=&quot;diff-title&quot; lang=&quot;en&quot;&gt;
+				&lt;td colspan=&quot;2&quot; style=&quot;background-color: #fff; color: #222; text-align: center;&quot;&gt;← Previous revision&lt;/td&gt;
+				&lt;td colspan=&quot;2&quot; style=&quot;background-color: #fff; color: #222; text-align: center;&quot;&gt;Revision as of 10:06, 9 February 2020&lt;/td&gt;
+				&lt;/tr&gt;&lt;tr&gt;
+  &lt;td colspan=&quot;2&quot; class=&quot;diff-lineno&quot;&gt;Line 163:&lt;/td&gt;
+  &lt;td colspan=&quot;2&quot; class=&quot;diff-lineno&quot;&gt;Line 163:&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;				.. ' of&amp;amp;nbsp;living&amp;amp;nbsp;people]].',&lt;/div&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;				.. ' of&amp;amp;nbsp;living&amp;amp;nbsp;people]].',&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;			tooltip = '${TOOLTIPFRAGMENT} to promote compliance with the policy on'&lt;/div&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;			tooltip = '${TOOLTIPFRAGMENT} to promote compliance with the policy on'&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;−&lt;/td&gt;
+  &lt;td style=&quot;color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #ffe49c; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;				.. ' biographies of living &lt;del class=&quot;diffchange diffchange-inline&quot;&gt;people&lt;/del&gt;',&lt;/div&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;+&lt;/td&gt;
+  &lt;td style=&quot;color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #a3d3ff; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;				.. ' biographies of living &lt;ins class=&quot;diffchange diffchange-inline&quot;&gt;persons&lt;/ins&gt;',&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;		},&lt;/div&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;		},&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;		dmca = {&lt;/div&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;		dmca = {&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- diff cache key enwiki:diff:wikidiff2:1.12:old-923736493:rev-939889955:1.10.0 --&gt;
+&lt;/table&gt;</summary>
+		<author><name>DannyS712</name></author>
+	</entry>
+	<entry>
+		<id>https://en.wikipedia.org/w/index.php?title=Wikipedia:Protection_policy&amp;diff=939571797&amp;oldid=937465387</id>
+		<title>Wikipedia:Protection policy</title>
+		<link rel="alternate" type="text/html" href="https://en.wikipedia.org/w/index.php?title=Wikipedia:Protection_policy&amp;diff=939571797&amp;oldid=937465387"/>
+		<updated>2020-02-07T08:48:07Z</updated>
+
+		<summary type="html">&lt;p&gt;&lt;span dir=&quot;auto&quot;&gt;&lt;span class=&quot;autocomment&quot;&gt;Upload protection: &lt;/span&gt;  Deleted redundance&lt;/span&gt;&lt;/p&gt;
+&lt;table class=&quot;diff diff-contentalign-left&quot; data-mw=&quot;interface&quot;&gt;
+				&lt;col class=&quot;diff-marker&quot; /&gt;
+				&lt;col class=&quot;diff-content&quot; /&gt;
+				&lt;col class=&quot;diff-marker&quot; /&gt;
+				&lt;col class=&quot;diff-content&quot; /&gt;
+				&lt;tr class=&quot;diff-title&quot; lang=&quot;en&quot;&gt;
+				&lt;td colspan=&quot;2&quot; style=&quot;background-color: #fff; color: #222; text-align: center;&quot;&gt;← Previous revision&lt;/td&gt;
+				&lt;td colspan=&quot;2&quot; style=&quot;background-color: #fff; color: #222; text-align: center;&quot;&gt;Revision as of 08:48, 7 February 2020&lt;/td&gt;
+				&lt;/tr&gt;&lt;tr&gt;
+  &lt;td colspan=&quot;2&quot; class=&quot;diff-lineno&quot;&gt;Line 172:&lt;/td&gt;
+  &lt;td colspan=&quot;2&quot; class=&quot;diff-lineno&quot;&gt;Line 172:&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;* Files with common or generic names.&lt;/div&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;* Files with common or generic names.&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;−&lt;/td&gt;
+  &lt;td style=&quot;color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #ffe49c; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;As with full edit protection, administrators should avoid favoring one file version over another, and protection should not be considered an endorsement of the current file version. An&lt;del class=&quot;diffchange diffchange-inline&quot;&gt; obvious&lt;/del&gt; exception to this rule is when files are protected due to upload vandalism.&lt;/div&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;+&lt;/td&gt;
+  &lt;td style=&quot;color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #a3d3ff; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;As with full edit protection, administrators should avoid favoring one file version over another, and protection should not be considered an endorsement of the current file version. An exception to this rule is when files are protected due to upload vandalism.&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;{{Clear}}{{anchor|pending}}{{anchor|Pending-changes protection (trial)}}{{anchor|pc1}}{{anchor|pc2}}&amp;lt;!--former tags allow section referencing while accommodating section name changes. DO NOT REMOVE IT.--&amp;gt;&lt;/div&gt;&lt;/td&gt;
+  &lt;td class=&quot;diff-marker&quot;&gt;&amp;#160;&lt;/td&gt;
+  &lt;td style=&quot;background-color: #f8f9fa; color: #222; font-size: 88%; border-style: solid; border-width: 1px 1px 1px 4px; border-radius: 0.33em; border-color: #eaecf0; vertical-align: top; white-space: pre-wrap;&quot;&gt;&lt;div&gt;{{Clear}}{{anchor|pending}}{{anchor|Pending-changes protection (trial)}}{{anchor|pc1}}{{anchor|pc2}}&amp;lt;!--former tags allow section referencing while accommodating section name changes. DO NOT REMOVE IT.--&amp;gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- diff cache key enwiki:diff:wikidiff2:1.12:old-937465387:rev-939571797:1.10.0 --&gt;
+&lt;/table&gt;</summary>
+		<author><name>Firestar464</name></author>
+	</entry>
+</feed>

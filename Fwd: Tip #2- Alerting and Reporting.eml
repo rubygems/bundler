@@ -1,0 +1,226 @@
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kGh2+cnbuT9Uq/oES3T8j1o0oZxig5r/tc8G0GPcp5PDLKo6dvDNBmZ8iubeP1nxJ//tnt6GsIUPP94Vaus8vH8MnnSYUaJFPPc3XI9mUjjj9uz1tHRUNIHF2I4Sy8pKT0pHqAa0jY33QvBWeS16p/enQGIpc9sVLgACefycSlTA95gHA4PcrKLPXD6PtIiM0dH/pwC2Ri6bLzbJeKtfgNwiRN5lzKNlnUePufoz9ygCX3oaL/Zy3D2Ft3xqIH2xATfuBv3VgFdNzOqaTFsZb/RmbsXPTFL+ALzm36bD7slTomtJOJUZpy+xmh++xocggdrH0uarzLVpThLR0qjNYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qGxBUAmPEtnxpemtkwF55Guo+v7xxx6rGcJpuQqyPvo=;
+ b=MeVlvJ3aWom/ALEcOu4/vHa34gytdp5Cv10udHtpA1nUES2dZYfN0AhYCFIyNzrtvgci2knWO/q1HN0u7CwpQRrodW7HTUdOSTO4ikRa1pbgLxebQtH1NWPvm32zharx8ukzm4CklQZFEt0fAsXwx5RaP3qkcDUlQ3i89RO11XlfSz7CIsMMul6FSVmYZ8urAn7ov7yRFeXPqTL8t/xiA849/fP3ScgVES/C5c7KlRLb9BByjVCilhemm4fBX880hLpnhcH8loOz/I3ElIL7AVpfY8h9hspAiIFmwrgHbMrAlBYEmuCih8Os41OyUVu5GmqXi8+eqcuHZLEb6ighOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=live.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qGxBUAmPEtnxpemtkwF55Guo+v7xxx6rGcJpuQqyPvo=;
+ b=O7c3wpiV4RiA6m/CQfGff706nY/LcxGCWVYEj8sTuBaoBXXX7EOhI4VrqB4l8PQypZP32RPJE7JroBiQRQMCYBdV8Kh3ScTQdR5gl5Fsx6NNiD0A3xbGnyHObTber2bu1I9/t2cdSAGBYzDdoQUAq2HoXV3bCVve4zM4Gk/bvW2kcBYF6Y8uGM7goUH/8xE1D71+myXzgYIDQz2UtY6ki2Ug0rTQCEl+1Y+LIZNMmHV0foXFgQLFhRvOr0PAKbzlD/HTByek/PTUvVx2hS5iW95R+By9BEaGSJ3un/sLJMIcExZAEVbySrtVuP0joiuIbqucjwh0Isr8qGVnOJnJzQ==
+Received: from BN8NAM11FT034.eop-nam11.prod.protection.outlook.com
+ (2a01:111:e400:fc4b::37) by
+ BN8NAM11HT149.eop-nam11.prod.protection.outlook.com (2a01:111:e400:fc4b::99)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.21; Mon, 10 Feb
+ 2020 09:58:52 +0000
+Received: from BY5PR19MB3956.namprd19.prod.outlook.com (10.13.176.58) by
+ BN8NAM11FT034.mail.protection.outlook.com (10.13.176.139) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21 via Frontend Transport; Mon, 10 Feb 2020 09:58:52 +0000
+Received: from BY5PR19MB3956.namprd19.prod.outlook.com
+ ([fe80::b4ef:fcb0:d2a8:3c87]) by BY5PR19MB3956.namprd19.prod.outlook.com
+ ([fe80::b4ef:fcb0:d2a8:3c87%3]) with mapi id 15.20.2707.030; Mon, 10 Feb 2020
+ 09:58:51 +0000
+From: americanbeautyci Yourcontractservice <HRenee1978@live.com>
+To: "planyourdefense@yahoo.com" <planyourdefense@yahoo.com>, Jamie Hanks
+	<nosenergywrap2@gmail.com>, Google Cloud Support <esupport@google.com>,
+	Errata Ruclip <noreply@github.com>, tressie pearce
+	<tressie@wellington-management.com>, "mnusbaum@wellingtonrealty.com"
+	<mnusbaum@wellingtonrealty.com>
+Subject: Fwd: Tip #2- Alerting and Reporting
+Thread-Topic: Tip #2- Alerting and Reporting
+Thread-Index: AdXf+LI2RgTowEzeMEuzZV5rLVcmWw==
+Date: Mon, 10 Feb 2020 09:58:51 +0000
+Message-ID: <BY5PR19MB395688207FC12EA620E65A38B5190@BY5PR19MB3956.namprd19.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-incomingtopheadermarker: OriginalChecksum:D3AD273680CAB385037BB4939CBBBF72868999CB043E82615D3B9F3A09AFF2DD;UpperCasedChecksum:35FED685C7CDBA8EFC45A53E616BC2588001D2AD3BADFBB8AA5E5648A3FD5ECB;SizeAsReceived:7461;Count:45
+x-ms-exchange-calendar-series-instance-id: BAAAAIIA4AB0xbcQGoLgCAAAAAByFAiy+N/VAQAAAAAAAAAAEAAAAOzM/J89hf5DtYp/WOubeao=
+x-tmn: [Q/+7438De43ceSrxSolfFHBvRQNJ++5Ph9Ql0D1ton6+7iWJK75Vz64FV2ihcGpG]
+x-incomingheadercount: 45
+x-eopattributedmessage: 0
+x-ms-office365-filtering-correlation-id: 8ec9aa09-cfc3-484a-b237-08d7ae0fd516
+x-ms-traffictypediagnostic: BN8NAM11HT149:MeetingMessage
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 38+NggilvMkAQBaWZBFt396+kx7mR+yDhc7IJTET3113AUekpf4WVwcEk/WJF2muPjsceby2aY+yFo7k3V646NLW8zbQIbf0H6exWLimB0/Ot84ZflHbm3dvJOj4ACH9SgSAQ2d78T3UtNq95d/desz7d3cOK8ISkXtHGyhaJfQlLhmncqKNENsOnMo6xUeg
+x-ms-exchange-antispam-messagedata: uxoFNHFTFpX8nMHDTbfjqepKmHXpKhAQfzyAmr1l+i6Vj5wqUDN22uJ5i/wFbmqJpIWllYcPeZNK92dTgBUeM9OobG2C6Hf1p2vPklNQxgHxnjKG90vpvDOA20qNwzalmWfmmQcNueQ85OzkPhXhc6BpLwAK3q8ZIY99TjYF21zkAAfcrawSCb9NW8yJOySuYK5oQPfRMOI5eM8CNTY6GA==
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+	boundary="_002_BY5PR19MB395688207FC12EA620E65A38B5190BY5PR19MB3956namp_"
+X-OriginatorOrg: live.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ec9aa09-cfc3-484a-b237-08d7ae0fd516
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Feb 2020 09:58:51.7766
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Internet
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8NAM11HT149
+MIME-Version: 1.0
+
+--_002_BY5PR19MB395688207FC12EA620E65A38B5190BY5PR19MB3956namp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Cloud=A0=0A=
+=0A=
+---------- Forwarded message ---------=0A=
+From: <support@site24x7.com>=0A=
+Date: Wed, Feb 5, 2020, 11:00 AM=0A=
+Subject: Tip #2- Alerting and Reporting=0A=
+To: <thomison78@gmail.com>=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+Hello,=0A=
+=0A=
+With Site24x7 you will be the first to know you have a problem, before larg=
+e volume of users are impacted. Here are some tips to help you configure Si=
+te24x7 alerting and reporting.=0A=
+=0A=
+1. Defining Alerting Policies=0A=
+=0A=
+=0A=
+Add contacts, setup your notification hierarchy - you can route different a=
+lerts to various teams=0A=
+=0A=
+Define notification mechanism (email, phone, Twitter, SMS etc). Get alerted=
+ anytime, anywhere on the go on your mobile device =0A=
+=0A=
+Customize email templates and the information you send out with your alerts=
+=0A=
+=0A=
+Define corrective actions to be automatically taken when your Website is do=
+wn or slow (e.g. restart a service) =0A=
+=0A=
+=0A=
+=0A=
+=0A=
+2. Configuring Reports, for You and Your Stakeholders=0A=
+=0A=
+=0A=
+=0A=
+Select key reports: (summary, downtime, outages, response time, trends, log=
+s, etc.)=0A=
+=0A=
+Schedule and automatically distribute reports=0A=
+=0A=
+TIP: Busy Hours Report tells you exactly at what time of the day your Websi=
+te response is the slowest =0A=
+=0A=
+TIP: Don't forget to configure your maintenance periods!=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+Happy Monitoring!=0A=
+Site24x7 Team=0A=
+Email: support@site24x7.com=0A=
+Telephone: +1 408 352 9117=0A=
+Visit: blogs.site24x7.com=0A=
+For latest Site24x7 and IT updates, follow our Community. =0A=
+=0A=
+Site24x7 Remember, we're always here to help. If you have any questions, pl=
+ease contact customer support at support@site24x7.com where you can consult=
+ a knowledgeable and friendly Site24x7 representative. =0A=
+thomison78@gmail.com has added you to the Site24x7 mailing list. Unsubscrib=
+e if you don't want emails from Site24x7 in the future. Let abuse@site24x7.=
+com know if you think this is spam.=0A=
+=0A=
+Zoho Corporation, 4141 Hacienda Drive Pleasanton, CA 94588, USA. =0A=
+=0A=
+
+--_002_BY5PR19MB395688207FC12EA620E65A38B5190BY5PR19MB3956namp_
+Content-Type: text/calendar; charset="utf-8"; method=REQUEST
+Content-Transfer-Encoding: base64
+
+QkVHSU46VkNBTEVOREFSDQpNRVRIT0Q6UkVRVUVTVA0KUFJPRElEOk1pY3Jvc29mdCBFeGNoYW5n
+ZSBTZXJ2ZXIgMjAxMA0KVkVSU0lPTjoyLjANCkJFR0lOOlZUSU1FWk9ORQ0KVFpJRDpDZW50cmFs
+IFN0YW5kYXJkIFRpbWUNCkJFR0lOOlNUQU5EQVJEDQpEVFNUQVJUOjE2MDEwMTAxVDAyMDAwMA0K
+VFpPRkZTRVRGUk9NOi0wNTAwDQpUWk9GRlNFVFRPOi0wNjAwDQpSUlVMRTpGUkVRPVlFQVJMWTtJ
+TlRFUlZBTD0xO0JZREFZPTFTVTtCWU1PTlRIPTExDQpFTkQ6U1RBTkRBUkQNCkJFR0lOOkRBWUxJ
+R0hUDQpEVFNUQVJUOjE2MDEwMTAxVDAyMDAwMA0KVFpPRkZTRVRGUk9NOi0wNjAwDQpUWk9GRlNF
+VFRPOi0wNTAwDQpSUlVMRTpGUkVRPVlFQVJMWTtJTlRFUlZBTD0xO0JZREFZPTJTVTtCWU1PTlRI
+PTMNCkVORDpEQVlMSUdIVA0KRU5EOlZUSU1FWk9ORQ0KQkVHSU46VkVWRU5UDQpPUkdBTklaRVI7
+Q049YW1lcmljYW5iZWF1dHljaSBZb3VyY29udHJhY3RzZXJ2aWNlOm1haWx0bzpIUmVuZWUxOTc4
+QGxpdmUuY28NCiBtDQpBVFRFTkRFRTtST0xFPVJFUS1QQVJUSUNJUEFOVDtQQVJUU1RBVD1ORUVE
+Uy1BQ1RJT047UlNWUD1UUlVFO0NOPXBsYW55b3VyZGUNCiBmZW5zZUB5YWhvby5jb206bWFpbHRv
+OnBsYW55b3VyZGVmZW5zZUB5YWhvby5jb20NCkFUVEVOREVFO1JPTEU9UkVRLVBBUlRJQ0lQQU5U
+O1BBUlRTVEFUPU5FRURTLUFDVElPTjtSU1ZQPVRSVUU7Q049SmFtaWUgSGFuaw0KIHM6bWFpbHRv
+Om5vc2VuZXJneXdyYXAyQGdtYWlsLmNvbQ0KQVRURU5ERUU7Uk9MRT1SRVEtUEFSVElDSVBBTlQ7
+UEFSVFNUQVQ9TkVFRFMtQUNUSU9OO1JTVlA9VFJVRTtDTj1Hb29nbGUgQ2xvDQogdWQgU3VwcG9y
+dDptYWlsdG86ZXN1cHBvcnRAZ29vZ2xlLmNvbQ0KQVRURU5ERUU7Uk9MRT1SRVEtUEFSVElDSVBB
+TlQ7UEFSVFNUQVQ9TkVFRFMtQUNUSU9OO1JTVlA9VFJVRTtDTj1FcnJhdGEgUnVjDQogbGlwOm1h
+aWx0bzpub3JlcGx5QGdpdGh1Yi5jb20NCkFUVEVOREVFO1JPTEU9UkVRLVBBUlRJQ0lQQU5UO1BB
+UlRTVEFUPU5FRURTLUFDVElPTjtSU1ZQPVRSVUU7Q049dHJlc3NpZSBwZQ0KIGFyY2U6bWFpbHRv
+OnRyZXNzaWVAd2VsbGluZ3Rvbi1tYW5hZ2VtZW50LmNvbQ0KQVRURU5ERUU7Uk9MRT1SRVEtUEFS
+VElDSVBBTlQ7UEFSVFNUQVQ9TkVFRFMtQUNUSU9OO1JTVlA9VFJVRTtDTj1tbnVzYmF1bUB3DQog
+ZWxsaW5ndG9ucmVhbHR5LmNvbTptYWlsdG86bW51c2JhdW1Ad2VsbGluZ3RvbnJlYWx0eS5jb20N
+CkRFU0NSSVBUSU9OO0xBTkdVQUdFPWVuLVVTOkNsb3VkwqBcblxuLS0tLS0tLS0tLSBGb3J3YXJk
+ZWQgbWVzc2FnZSAtLS0tLS0tLQ0KIC1cbkZyb206IDxzdXBwb3J0QHNpdGUyNHg3LmNvbT5cbkRh
+dGU6IFdlZFwsIEZlYiA1XCwgMjAyMFwsIDExOjAwIEFNXG5TdWJqDQogZWN0OiBUaXAgIzItIEFs
+ZXJ0aW5nIGFuZCBSZXBvcnRpbmdcblRvOiA8dGhvbWlzb243OEBnbWFpbC5jb20+XG5cblxuXG5c
+bkgNCiBlbGxvXCxcblxuV2l0aCBTaXRlMjR4NyB5b3Ugd2lsbCBiZSB0aGUgZmlyc3QgdG8ga25v
+dyB5b3UgaGF2ZSBhIHByb2JsZW1cLA0KICBiZWZvcmUgbGFyZ2Ugdm9sdW1lIG9mIHVzZXJzIGFy
+ZSBpbXBhY3RlZC4gSGVyZSBhcmUgc29tZSB0aXBzIHRvIGhlbHAgeW91DQogIGNvbmZpZ3VyZSBT
+aXRlMjR4NyBhbGVydGluZyBhbmQgcmVwb3J0aW5nLlxuXG4xLiBEZWZpbmluZyBBbGVydGluZyBQ
+b2xpY2kNCiBlc1xuXG5cbkFkZCBjb250YWN0c1wsIHNldHVwIHlvdXIgbm90aWZpY2F0aW9uIGhp
+ZXJhcmNoeSAtIHlvdSBjYW4gcm91dGUgZA0KIGlmZmVyZW50IGFsZXJ0cyB0byB2YXJpb3VzIHRl
+YW1zXG5cbkRlZmluZSBub3RpZmljYXRpb24gbWVjaGFuaXNtIChlbWFpbFwsDQogIHBob25lXCwg
+VHdpdHRlclwsIFNNUyBldGMpLiBHZXQgYWxlcnRlZCBhbnl0aW1lXCwgYW55d2hlcmUgb24gdGhl
+IGdvIG9uIHkNCiBvdXIgbW9iaWxlIGRldmljZSBcblxuQ3VzdG9taXplIGVtYWlsIHRlbXBsYXRl
+cyBhbmQgdGhlIGluZm9ybWF0aW9uIHlvdSBzZQ0KIG5kIG91dCB3aXRoIHlvdXIgYWxlcnRzXG5c
+bkRlZmluZSBjb3JyZWN0aXZlIGFjdGlvbnMgdG8gYmUgYXV0b21hdGljYWxseSB0DQogYWtlbiB3
+aGVuIHlvdXIgV2Vic2l0ZSBpcyBkb3duIG9yIHNsb3cgKGUuZy4gcmVzdGFydCBhIHNlcnZpY2Up
+IFxuXG5cblxuXG4NCiAyLiBDb25maWd1cmluZyBSZXBvcnRzXCwgZm9yIFlvdSBhbmQgWW91ciBT
+dGFrZWhvbGRlcnNcblxuXG5cblNlbGVjdCBrZXkgcg0KIGVwb3J0czogKHN1bW1hcnlcLCBkb3du
+dGltZVwsIG91dGFnZXNcLCByZXNwb25zZSB0aW1lXCwgdHJlbmRzXCwgbG9nc1wsIGV0DQogYy4p
+XG5cblNjaGVkdWxlIGFuZCBhdXRvbWF0aWNhbGx5IGRpc3RyaWJ1dGUgcmVwb3J0c1xuXG5USVA6
+IEJ1c3kgSG91cnMgUmUNCiBwb3J0IHRlbGxzIHlvdSBleGFjdGx5IGF0IHdoYXQgdGltZSBvZiB0
+aGUgZGF5IHlvdXIgV2Vic2l0ZSByZXNwb25zZSBpcyB0aA0KIGUgc2xvd2VzdCBcblxuVElQOiBE
+b24ndCBmb3JnZXQgdG8gY29uZmlndXJlIHlvdXIgbWFpbnRlbmFuY2UgcGVyaW9kcyFcblxuDQog
+XG5cblxuSGFwcHkgTW9uaXRvcmluZyFcblNpdGUyNHg3IFRlYW1cbkVtYWlsOiBzdXBwb3J0QHNp
+dGUyNHg3LmNvbVxuVGVsZXANCiBob25lOiArMSA0MDggMzUyIDkxMTdcblZpc2l0OiBibG9ncy5z
+aXRlMjR4Ny5jb21cbkZvciBsYXRlc3QgU2l0ZTI0eDcgYW5kIA0KIElUIHVwZGF0ZXNcLCBmb2xs
+b3cgb3VyIENvbW11bml0eS4gXG5cblNpdGUyNHg3IFJlbWVtYmVyXCwgd2UncmUgYWx3YXlzIGhl
+DQogcmUgdG8gaGVscC4gSWYgeW91IGhhdmUgYW55IHF1ZXN0aW9uc1wsIHBsZWFzZSBjb250YWN0
+IGN1c3RvbWVyIHN1cHBvcnQgYXQNCiAgc3VwcG9ydEBzaXRlMjR4Ny5jb20gd2hlcmUgeW91IGNh
+biBjb25zdWx0IGEga25vd2xlZGdlYWJsZSBhbmQgZnJpZW5kbHkgUw0KIGl0ZTI0eDcgcmVwcmVz
+ZW50YXRpdmUuIFxudGhvbWlzb243OEBnbWFpbC5jb20gaGFzIGFkZGVkIHlvdSB0byB0aGUgU2l0
+ZTI0DQogeDcgbWFpbGluZyBsaXN0LiBVbnN1YnNjcmliZSBpZiB5b3UgZG9uJ3Qgd2FudCBlbWFp
+bHMgZnJvbSBTaXRlMjR4NyBpbiB0aGUNCiAgZnV0dXJlLiBMZXQgYWJ1c2VAc2l0ZTI0eDcuY29t
+IGtub3cgaWYgeW91IHRoaW5rIHRoaXMgaXMgc3BhbS5cblxuWm9obyBDbw0KIHJwb3JhdGlvblws
+IDQxNDEgSGFjaWVuZGEgRHJpdmUgUGxlYXNhbnRvblwsIENBIDk0NTg4XCwgVVNBLiBcblxuDQpV
+SUQ6MDQwMDAwMDA4MjAwRTAwMDc0QzVCNzEwMUE4MkUwMDgwMDAwMDAwMDcyMTQwOEIyRjhERkQ1
+MDEwMDAwMDAwMDAwMDAwMDANCiAwMTAwMDAwMDBFQ0NDRkM5RjNEODVGRTQzQjU4QTdGNThFQjlC
+NzlBQQ0KU1VNTUFSWTtMQU5HVUFHRT1lbi1VUzpGd2Q6IFRpcCAjMi0gQWxlcnRpbmcgYW5kIFJl
+cG9ydGluZw0KRFRTVEFSVDtUWklEPUNlbnRyYWwgU3RhbmRhcmQgVGltZToyMDIwMDIxMFQwNDAw
+MTgNCkRURU5EO1RaSUQ9Q2VudHJhbCBTdGFuZGFyZCBUaW1lOjIwMjAwMjEwVDA1MDAxOA0KQ0xB
+U1M6UFVCTElDDQpQUklPUklUWTo1DQpEVFNUQU1QOjIwMjAwMjEwVDA5NTg1MVoNClRSQU5TUDpP
+UEFRVUUNClNUQVRVUzpDT05GSVJNRUQNClNFUVVFTkNFOjANCkxPQ0FUSU9OO0xBTkdVQUdFPWVu
+LVVTOkRlbHRhIFNreSBDbHViKFRlcm1pbmFsIEVcLCBuZWFyIEdhdGUgRTEwKQ0KWC1NSUNST1NP
+RlQtQ0RPLUFQUFQtU0VRVUVOQ0U6MA0KWC1NSUNST1NPRlQtQ0RPLU9XTkVSQVBQVElEOjIxMTgy
+NzU0NDINClgtTUlDUk9TT0ZULUNETy1CVVNZU1RBVFVTOlRFTlRBVElWRQ0KWC1NSUNST1NPRlQt
+Q0RPLUlOVEVOREVEU1RBVFVTOkJVU1kNClgtTUlDUk9TT0ZULUNETy1BTExEQVlFVkVOVDpGQUxT
+RQ0KWC1NSUNST1NPRlQtQ0RPLUlNUE9SVEFOQ0U6MQ0KWC1NSUNST1NPRlQtQ0RPLUlOU1RUWVBF
+OjANClgtTUlDUk9TT0ZULURPTk9URk9SV0FSRE1FRVRJTkc6RkFMU0UNClgtTUlDUk9TT0ZULURJ
+U0FMTE9XLUNPVU5URVI6RkFMU0UNClgtTUlDUk9TT0ZULUxPQ0FUSU9ORElTUExBWU5BTUU6RGVs
+dGEgU2t5IENsdWIoVGVybWluYWwgRVwsIG5lYXIgR2F0ZSBFMTApDQpYLU1JQ1JPU09GVC1MT0NB
+VElPTlNPVVJDRTpOb25lDQpYLU1JQ1JPU09GVC1MQVRJVFVERTozMjg5MjE1NQ0KWC1NSUNST1NP
+RlQtTE9OR0lUVURFOi05NzAzNjQxNQ0KWC1NSUNST1NPRlQtTE9DQVRJT05TOlt7IkRpc3BsYXlO
+YW1lIjoiRGVsdGEgU2t5IENsdWIoVGVybWluYWwgRVwsIG5lYXIgR2F0DQogZSBFMTApIlwsIkxv
+Y2F0aW9uQW5ub3RhdGlvbiI6IiJcLCJMb2NhdGlvblVyaSI6IiJcLCJMYXRpdHVkZSI6MzI4OTIx
+NTUuMFwNCiAsIkxvbmdpdHVkZSI6LTk3MDM2NDE1LjBcLCJMb2NhdGlvblN0cmVldCI6IiJcLCJM
+b2NhdGlvbkNpdHkiOiIiXCwiTG9jYXRpbw0KIG5TdGF0ZSI6IiJcLCJMb2NhdGlvbkNvdW50cnki
+OiIiXCwiTG9jYXRpb25Qb3N0YWxDb2RlIjoiIlwsIkxvY2F0aW9uRnVsbEFkDQogZHJlc3MiOiIi
+fV0NCkJFR0lOOlZBTEFSTQ0KREVTQ1JJUFRJT046UkVNSU5ERVINClRSSUdHRVI7UkVMQVRFRD1T
+VEFSVDotUFQxME0NCkFDVElPTjpESVNQTEFZDQpFTkQ6VkFMQVJNDQpFTkQ6VkVWRU5UDQpFTkQ6
+VkNBTEVOREFSDQo=
+
+--_002_BY5PR19MB395688207FC12EA620E65A38B5190BY5PR19MB3956namp_--
